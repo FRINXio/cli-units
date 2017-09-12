@@ -10,15 +10,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.opendaylight.controller</groupId>
+    <groupId>io.frinx.distribution</groupId>
     <artifactId>karaf-parent</artifactId>
-    <version>1.8.1-Carbon</version>
+    <version>3.1.0.rc2-frinx-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
   <groupId>io.frinx.cli</groupId>
-  <artifactId>cli-southbound-plugin-karaf</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <artifactId>cli-units-karaf</artifactId>
+  <version>3.1.0.rc2-frinx-SNAPSHOT</version>
   <name>${project.artifactId}</name>
 
   <prerequisites>
@@ -27,10 +27,10 @@
 
   <properties>
     <karaf.localFeature></karaf.localFeature>
-    <restconf.version>1.5.1-Carbon</restconf.version>
-    <netconf.version>1.2.1-Carbon</netconf.version>
-    <cli.version>0.1.0-SNAPSHOT</cli.version>
-    <openconfig.version>0.1.0-SNAPSHOT</openconfig.version>
+    <restconf.version>1.5.1-Carbon-SR1.3_1_0_rc2-frinxodl</restconf.version>
+    <netconf.version>1.2.1-Carbon-SR1.3_1_0_rc2-frinxodl</netconf.version>
+    <cli.version>3.1.0.rc2-frinx-SNAPSHOT</cli.version>
+    <openconfig.version>3.1.0.rc2-frinx-SNAPSHOT</openconfig.version>
   </properties>
 
   <dependencies>
@@ -92,16 +92,36 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <!-- DO NOT deploy the karaf artifact -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+      <plugins>
+       <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>copy-resources</id>
+              <!-- here the phase you need -->
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+
+                <outputDirectory>${basedir}/target/assembly</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>src/main/assembly</directory>
+                  </resource>
+                  <resource>
+                    <directory>src/main/resources</directory>
+                    <filtering>true</filtering>
+                  </resource>
+                </resources>
+                <overwrite>true</overwrite>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
 </project>

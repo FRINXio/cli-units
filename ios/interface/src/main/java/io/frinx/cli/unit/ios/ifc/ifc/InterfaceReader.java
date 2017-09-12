@@ -8,11 +8,16 @@
 
 package io.frinx.cli.unit.ios.ifc.ifc;
 
+import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListReader;
+import java.util.List;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
@@ -20,12 +25,6 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev16122
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
 
 public final class InterfaceReader implements CliListReader<Interface, InterfaceKey, InterfaceBuilder> {
 

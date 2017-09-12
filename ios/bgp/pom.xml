@@ -11,19 +11,19 @@
     <parent>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>config-parent</artifactId>
-        <version>0.6.1-Carbon</version>
+        <version>0.6.1-Carbon-SR1.3_1_0_rc2-frinxodl-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.cli</groupId>
     <artifactId>ios-bgp-unit</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>3.1.0.rc2-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <properties>
-        <cli.version>0.1.0-SNAPSHOT</cli.version>
-        <openconfig.version>0.1.0-SNAPSHOT</openconfig.version>
+        <cli.version>3.1.0.rc2-frinx-SNAPSHOT</cli.version>
+        <openconfig.version>3.1.0.rc2-frinx-SNAPSHOT</openconfig.version>
     </properties>
 
     <dependencies>

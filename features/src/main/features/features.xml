@@ -9,7 +9,7 @@
 
 <!-- vi: set et smarttab sw=4 tabstop=4: -->
 
-<features name="odl-cli-topology-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0"
+<features name="odl-cli-units-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.0 http://karaf.apache.org/xmlns/features/v1.2.0">
     <repository>mvn:org.opendaylight.yangtools/features-yangtools/{{VERSION}}/xml/features</repository>
@@ -35,7 +35,7 @@
     </feature>
 
     <feature name='cli-southbound-unit-ios' version='${project.version}'>
-        <feature version='${project.version}'>cli-topology</feature>
+        <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-essential</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-interfaces</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-bgp</feature>
