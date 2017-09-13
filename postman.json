@@ -1,0 +1,903 @@
+{
+	"variables": [],
+	"info": {
+		"name": "ODL_CLI",
+		"_postman_id": "72213dfb-a15e-2fe2-f39c-a8ad9c9f0450",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Cli topology",
+			"description": "",
+			"item": [
+				{
+					"name": "List CLI topology OPER",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"ls ~\"\n  }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "List CLI topology CFG",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"ls ~\"\n  }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ios mount",
+			"description": "",
+			"item": [
+				{
+					"name": "GET VERSION OPER",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/ios-essential:version",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "GET INTERFACES OPER",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/openconfig-interfaces:interfaces",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "GET VRFS OPER",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/ios-essential:vrfs",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "GET ALL OPER",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "GET ALL CONFIG",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "    <vrf xmlns=\"urn:opendaylight:params:xml:ns:yang:ios-cli\">\n        <id>2</id>\n        <address-type>random</address-type>\n        <unicast>no</unicast>\n    </vrf>"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "ADD NEW VRF",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/ios-essential:vrfs/vrf/VRFfromPOSTMAN",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n\t\"vrf\": {\n    \t\"id\": \"VRFfromPOSTMAN\",\n    \t\"description\": \"This was created from POSTMAN - REST - ODL - CLI southbound - IOS\"\n\t}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE VRF",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/ios-essential:vrfs/vrf/VRFfromPOSTMAN",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/xml",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "JOURNAL",
+					"request": {
+						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/journal:read-journal",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "DRYRUN: ADD NEW VRF",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS1-dryrun/yang-ext:mount/ios-essential:vrfs/vrf/VRFfromPOSTMAN",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n\t\"vrf\": {\n    \t\"id\": \"VRFfromPOSTMAN\",\n    \t\"description\": \"This was created from POSTMAN - REST - ODL - CLI southbound - IOS\"\n\t}\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "DRYRUN: JOURNAL",
+					"request": {
+						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS1-dryrun/yang-ext:mount/journal:read-journal",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "EXECUTE CLI",
+					"request": {
+						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/cli-unit-generic:execute-and-read",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"sh ip vrf\"\n  }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "RECONCILE",
+					"request": {
+						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/reconcile:reconcile",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"input\" :\n  {\n     \"reconcile:strategy\" : \"merge-from-device\"\n  }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check status",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"Linux1\",\n      \n      \"cli-topology:host\" : \"10.10.199.226\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"*\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"root\",\n    \"cli-topology:password\" : \"frinx2017\"\n      \n    }\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Mount SSH",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS1\",\n      \n      \"cli-topology:host\" : \"192.168.1.221\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+						},
+						"description": "To enable SSH on IOS use:\n\nhttps://networklessons.com/cisco/ccna-routing-switching-icnd1-100-105/configure-ssh-cisco-ios/\n\n\ntelnet <IP>\n enable\n  \n conf t\n enable password cisco\n interface FastEthernet0/0\n ip address 192.168.56.121 255.255.255.0\n no shutdown\n exit\n exit\n \n configure terminal\n hostname R121\n ip domain-name FRINX.LOCAL\n crypto key generate rsa\n  1024\n ip ssh version 2\n line vty 0 4\n  transport input ssh\n  login local\n  exit\n username cisco password cisco\n exit"
+					},
+					"response": []
+				},
+				{
+					"name": "Mount TELNET",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"192.168.1.222\",\n      \"cli-topology:port\" : \"23\",\n      \"cli-topology:transport-type\" : \"telnet\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
+						},
+						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
+					},
+					"response": []
+				},
+				{
+					"name": "ENABLE INTERFACE",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/GigabitEthernet1%2F0/config",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"config\": {\n        \"type\": \"iana-if-type:gigabitEthernet\",\n        \"enabled\": true,\n        \"name\": \"GigabitEthernet1/0\"\n    }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE LOOPBACK",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback99",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"Loopback99\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"Loopback99\"\n            }\n        }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "ENABLE LOOPBACK",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback99/config",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"config\": {\n        \"type\": \"iana-if-type:softwareLoopback\",\n        \"enabled\": true,\n        \"name\": \"Loopback99\"\n    }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "SET IPV4",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback99/subinterfaces/subinterface/0/ipv4/addresses/address/44.44.44.44",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"openconfig-if-ip:address\": [\n        {\n            \"ip\": \"44.44.44.44\",\n            \"config\": {\n                \"prefix-length\": 24,\n                \"ip\": \"44.44.44.44\"\n            }\n        }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE IPV4",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback99/subinterfaces/subinterface/0/ipv4/addresses/address/44.44.44.44",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"openconfig-if-ip:address\": [\n        {\n            \"ip\": \"44.44.44.44\",\n            \"config\": {\n                \"prefix-length\": 24,\n                \"ip\": \"44.44.44.44\"\n            }\n        }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE LOOPBACK",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback99",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "BGP",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/openconfig-bgp:bgp",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "BGP RIB",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/openconfig-rib-bgp:bgp-rib",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Linux mount",
+			"description": "",
+			"item": [
+				{
+					"name": "Mount",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"Linux1\",\n      \n      \"cli-topology:host\" : \"10.10.199.226\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"*\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"root\",\n    \"cli-topology:password\" : \"frinx2017\"\n      \n    }\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check status",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/Linux1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"Linux1\",\n      \n      \"cli-topology:host\" : \"10.10.199.226\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"*\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"root\",\n    \"cli-topology:password\" : \"frinx2017\"\n      \n    }\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Unmount",
+					"request": {
+						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "List home directory",
+					"request": {
+						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/Linux1/yang-ext:mount/cli-unit-generic:execute-and-read",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"ls ~\"\n  }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "registry",
+			"description": "",
+			"item": [
+				{
+					"name": "TRANSLATE REGISTRY",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/cli-translate-registry:available-cli-device-translations",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
