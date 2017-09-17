@@ -29,6 +29,7 @@
     <module>essential</module>
     <module>interface</module>
     <module>bgp</module>
+    <module>network-instance</module>
   </modules>
 
   <build>

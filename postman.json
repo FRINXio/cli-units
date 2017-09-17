@@ -288,6 +288,36 @@
 					"response": []
 				},
 				{
+					"name": "GET NETWORK INSTANCE",
+					"request": {
+						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/openconfig-network-instance:network-instances",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
 					"name": "JOURNAL",
 					"request": {
 						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/journal:read-journal",
