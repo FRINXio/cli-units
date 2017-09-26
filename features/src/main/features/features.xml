@@ -36,6 +36,7 @@
 
     <feature name='cli-southbound-unit-ios-network-instance' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-interfaces</feature>
         <bundle>mvn:io.frinx.cli/ios-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
