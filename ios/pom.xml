@@ -31,6 +31,7 @@
     <module>bgp</module>
     <module>network-instance</module>
     <module>ospf</module>
+    <module>local-routing</module>
   </modules>
 
   <build>
