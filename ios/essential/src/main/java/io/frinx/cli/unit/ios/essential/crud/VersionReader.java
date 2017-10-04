@@ -42,7 +42,8 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
     }
 
     private static final Pattern DESCRIPTION_LINE = Pattern.compile("System image file is \"(?<image>[^\"]+)\"");
-    private static final Pattern FIRST_LINE = Pattern.compile("(?<osFamily>.+) Software, (?<platform>.+) Software .* Version (?<version>.+)");
+    private static final Pattern FIRST_LINE = Pattern.compile("(?<osFamily>.+) Software, .*");
+    private static final Pattern SECOND_LINE = Pattern.compile(".+ Software, (?<platform>.+) Software .* Version (?<version>.+)");
     private static final Pattern REGISTRY_LINE = Pattern.compile("Configuration register is (?<registry>.+)");
     private static final Pattern MEMORY_LINE = Pattern.compile(".*with (?<memory>.+) bytes of memory.*");
     private static final Pattern PROCESSOR_LINE = Pattern.compile("Processor board ID (?<processor>.+)");
@@ -60,12 +61,12 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
                 builder::setOsFamily);
 
         parseField(output, 0,
-                FIRST_LINE::matcher,
+                SECOND_LINE::matcher,
                 matcher -> matcher.group("platform"),
                 builder::setPlatform);
 
         parseField(output, 0,
-                FIRST_LINE::matcher,
+                SECOND_LINE::matcher,
                 matcher -> matcher.group("version"),
                 builder::setOsVersion);
 
