@@ -45,8 +45,8 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
     private static final Pattern FIRST_LINE = Pattern.compile("(?<osFamily>.+) Software, .*");
     private static final Pattern SECOND_LINE = Pattern.compile(".+ Software, (?<platform>.+) Software .* Version (?<version>.+)");
     private static final Pattern REGISTRY_LINE = Pattern.compile("Configuration register is (?<registry>.+)");
-    private static final Pattern MEMORY_LINE = Pattern.compile(".*with (?<memory>.+) bytes of memory.*");
     private static final Pattern PROCESSOR_LINE = Pattern.compile("Processor board ID (?<processor>.+)");
+    private static final Pattern PLATFORM_AND_MEMORY_LINE = Pattern.compile("(?<platform>.+) with (?<memory>.+) bytes of memory.*");
 
     @VisibleForTesting
     static void parseVersion(String output, VersionBuilder builder) {
@@ -61,7 +61,7 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
                 builder::setOsFamily);
 
         parseField(output, 0,
-                SECOND_LINE::matcher,
+                PLATFORM_AND_MEMORY_LINE::matcher,
                 matcher -> matcher.group("platform"),
                 builder::setPlatform);
 
@@ -76,7 +76,7 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
                 builder::setConfReg);
 
         parseField(output, 0,
-                MEMORY_LINE::matcher,
+                PLATFORM_AND_MEMORY_LINE::matcher,
                 matcher -> matcher.group("memory"),
                 builder::setSysMemory);
 
