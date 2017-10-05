@@ -100,7 +100,7 @@ public class VersionReaderTest {
                     "If you require further assistance please contact us by sending email to\n" +
                     "export@cisco.com.\n" +
                     "\n" +
-                    "Cisco IOSv (revision 1.0) with  with 496897K/25600K bytes of memory.\n" +
+                    "Cisco IOSv (revision 1.0) with 496897K/25600K bytes of memory.\n" +
                     "Processor board ID 9P3CKSW96DBM601B90NOB\n" +
                     "1 Gigabit Ethernet interface\n" +
                     "DRAM configuration is 72 bits wide with parity disabled.\n" +
@@ -116,12 +116,12 @@ public class VersionReaderTest {
                     "\n";
 
     @Test
-    public void testParseVrfIds_XE() throws Exception {
+    public void testParseXEVersion() {
         VersionBuilder expected = new VersionBuilder();
         expected.setConfReg("0x2102")
                 .setOsFamily("Cisco IOS XE")
                 .setOsVersion("15.3(3)S2, RELEASE SOFTWARE (fc3)")
-                .setPlatform("CSR1000V")
+                .setPlatform("cisco CSR1000V (VXE) processor")
                 .setSerialId("9GHUYVY8CTT")
                 .setSysImage("bootflash:csr1000v-universalk9.03.10.02.S.153-3.S2-ext.SPA.bin")
                 .setSysMemory("2187404K/6147K");
@@ -131,12 +131,12 @@ public class VersionReaderTest {
     }
 
     @Test
-    public void testParseVrfIds() throws Exception {
+    public void testParseIOSClassicVersion() throws Exception {
         VersionBuilder expected = new VersionBuilder();
         expected.setConfReg("0x0")
                 .setOsFamily("Cisco IOS")
                 .setOsVersion("15.6(2)T, RELEASE SOFTWARE (fc2)")
-                .setPlatform("IOSv")
+                .setPlatform("Cisco IOSv (revision 1.0)")
                 .setSerialId("9P3CKSW96DBM601B90NOB")
                 .setSysImage("flash0:/vios-adventerprisek9-m")
                 .setSysMemory("496897K/25600K");
