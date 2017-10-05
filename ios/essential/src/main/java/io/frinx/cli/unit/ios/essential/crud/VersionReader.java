@@ -20,9 +20,11 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 import javax.annotation.Nonnull;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
+import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
 
 public class VersionReader implements CliReader<Version, VersionBuilder> {
 
@@ -43,8 +45,8 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
 
     private static final Pattern DESCRIPTION_LINE = Pattern.compile("System image file is \"(?<image>[^\"]+)\"");
     private static final Pattern FIRST_LINE = Pattern.compile("(?<osFamily>.+) Software, .*");
-    private static final Pattern SECOND_LINE = Pattern.compile(".+ Software, (?<platform>.+) Software .* Version (?<version>.+)");
-    private static final Pattern REGISTRY_LINE = Pattern.compile("Configuration register is (?<registry>.+)");
+    private static final Pattern VERSION_LINE = Pattern.compile(".+ Software, .*Version (?<version>.+)");
+    private static final Pattern REGISTRY_LINE = Pattern.compile("Configuration register .*is (?<registry>.+)");
     private static final Pattern PROCESSOR_LINE = Pattern.compile("Processor board ID (?<processor>.+)");
     private static final Pattern PLATFORM_AND_MEMORY_LINE = Pattern.compile("(?<platform>.+) with (?<memory>.+) bytes of memory.*");
 
@@ -65,10 +67,13 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
                 matcher -> matcher.group("platform"),
                 builder::setPlatform);
 
-        parseField(output, 0,
-                SECOND_LINE::matcher,
+        // For IOS XE this will match IOS version
+        // but also the platform version.
+        // We want to parse the latter one.
+        parseFields(output, 0,
+                VERSION_LINE::matcher,
                 matcher -> matcher.group("version"),
-                builder::setOsVersion);
+                Function.identity()).stream().reduce((a, b) -> b).ifPresent(builder::setOsVersion);
 
         parseField(output, 0,
                 REGISTRY_LINE::matcher,
