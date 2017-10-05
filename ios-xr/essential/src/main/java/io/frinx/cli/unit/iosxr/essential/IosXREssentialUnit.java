@@ -19,11 +19,13 @@ import io.frinx.cli.io.SessionException;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import io.frinx.cli.unit.iosxr.essential.crud.StorageReader;
 import io.frinx.cli.unit.iosxr.essential.crud.VersionReader;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.credentials.LoginPassword;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.Version;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.version.Storage;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
@@ -66,6 +68,8 @@ public class IosXREssentialUnit implements TranslateUnit {
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         // Version
         rRegistry.add(new GenericReader<>(InstanceIdentifier.create(Version.class), new VersionReader(cli)));
+        // Storage
+        rRegistry.add(new GenericReader<>(InstanceIdentifier.create(Storage.class), new StorageReader(cli)));
     }
 
     @Override
