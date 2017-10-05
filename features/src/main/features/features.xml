@@ -48,4 +48,8 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-network-instance</feature>
     </feature>
 
+    <feature name='cli-southbound-all-units' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-ios</feature>
+    </feature>
+
 </features>
