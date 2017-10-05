@@ -102,6 +102,11 @@ public class VersionReaderTest {
             "    Built on Fri Nov 11 11:32:56 UTC 2016\n" +
             "    By iox-lnx-009 in /auto/srcarchive11/production/6.1.2/xrvr/workspace for pie";
 
+    private static final String SH_INV_RACK_XR = "Thu Oct  5 21:26:01.605 UTC\n" +
+            "  Rack                 Chassis PID           S/N  \n" +
+            "  ----                 ------------      ----------\n" +
+            "  0                    IOSXRV            9NXOBSDHKS0";
+
     @Test
     public void testParseXRShowVersion() {
         VersionBuilder expectedVersion = new VersionBuilder();
@@ -115,5 +120,16 @@ public class VersionReaderTest {
         VersionBuilder actualVersion = new VersionBuilder();
         VersionReader.parseShowVersion(SH_VERSION_XR, actualVersion);
         assertEquals(expectedVersion.build(), actualVersion.build());
+    }
+
+    @Test
+    public void testParseXRShowInvRack() {
+        VersionBuilder expectedVersion = new VersionBuilder();
+        expectedVersion.setSerialId("9NXOBSDHKS0");
+
+        VersionBuilder actualVersion = new VersionBuilder();
+        VersionReader.parseShowInventoryRack(SH_INV_RACK_XR, actualVersion);
+        assertEquals(expectedVersion.build(), actualVersion.build());
+
     }
 }

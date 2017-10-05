@@ -35,12 +35,14 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
     }
 
     private static final String SH_VERSION = "sh version";
+    private static final String SH_INV_RACK = "sh inv rack";
 
     @Override
     public void readCurrentAttributes(@Nonnull final InstanceIdentifier<Version> id,
                                       @Nonnull final VersionBuilder builder,
                                       @Nonnull final ReadContext ctx) throws ReadFailedException {
         parseShowVersion(blockingRead(SH_VERSION, cli, id), builder);
+        parseShowInventoryRack(blockingRead(SH_INV_RACK, cli,id), builder);
     }
 
     private static final Pattern DESCRIPTION_LINE = Pattern.compile("System image file is \"(?<image>[^\"]+)\"");
@@ -49,6 +51,14 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
     private static final Pattern REGISTRY_LINE = Pattern.compile("Configuration register .*is (?<registry>.+)");
     private static final Pattern PROCESSOR_LINE = Pattern.compile("Processor board ID (?<processor>.+)");
     private static final Pattern PLATFORM_AND_MEMORY_LINE = Pattern.compile("(?<platform>.+) with (?<memory>.+) bytes of memory.*");
+    private static final Pattern RACK_INVENTORY_LINE = Pattern.compile("\\s*\\w+\\s+\\w+\\s+(?<serialNumber>\\w+)\\s*");
+
+    static void parseShowInventoryRack(String output, VersionBuilder builder) {
+        parseField(output, 0,
+                RACK_INVENTORY_LINE::matcher,
+                matcher -> matcher.group("serialNumber"),
+                builder::setSerialId);
+    }
 
     @VisibleForTesting
     static void parseShowVersion(String output, VersionBuilder builder) {
