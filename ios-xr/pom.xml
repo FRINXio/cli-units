@@ -17,7 +17,7 @@
   </parent>
 
   <groupId>io.frinx.cli</groupId>
-  <artifactId>cli-units-aggregator</artifactId>
+  <artifactId>cli-units-ios-xr</artifactId>
   <version>3.1.0.rc3-frinx-SNAPSHOT</version>
   <packaging>pom</packaging>
 
@@ -26,9 +26,7 @@
   </prerequisites>
 
   <modules>
-    <module>ios</module>
-    <module>ios-xr</module>
-    <module>features</module>
+    <module>essential</module>
   </modules>
 
   <build>
@@ -51,16 +49,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>karaf</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>karaf</module>
-      </modules>
-    </profile>
-
     <profile>
       <!--
           This profile is to ensure we only build javadocs reports
