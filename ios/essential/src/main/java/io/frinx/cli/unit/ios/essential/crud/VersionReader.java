@@ -40,7 +40,7 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
     public void readCurrentAttributes(@Nonnull final InstanceIdentifier<Version> id,
                                       @Nonnull final VersionBuilder builder,
                                       @Nonnull final ReadContext ctx) throws ReadFailedException {
-        parseVersion(blockingRead(SH_VERSION, cli, id), builder);
+        parseShowVersion(blockingRead(SH_VERSION, cli, id), builder);
     }
 
     private static final Pattern DESCRIPTION_LINE = Pattern.compile("System image file is \"(?<image>[^\"]+)\"");
@@ -51,7 +51,7 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
     private static final Pattern PLATFORM_AND_MEMORY_LINE = Pattern.compile("(?<platform>.+) with (?<memory>.+) bytes of memory.*");
 
     @VisibleForTesting
-    static void parseVersion(String output, VersionBuilder builder) {
+    static void parseShowVersion(String output, VersionBuilder builder) {
         parseField(output, 0,
                 DESCRIPTION_LINE::matcher,
                 matcher -> matcher.group("image"),

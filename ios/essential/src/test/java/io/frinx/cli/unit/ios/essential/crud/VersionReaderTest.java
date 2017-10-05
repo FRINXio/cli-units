@@ -203,7 +203,7 @@ public class VersionReaderTest {
                     "    By iox-lnx-009 in /auto/srcarchive11/production/6.1.2/xrvr/workspace for pie";
 
     @Test
-    public void testParseXEVersion() {
+    public void testParseXEShowVersion() {
         VersionBuilder expected = new VersionBuilder();
         expected.setConfReg("0x2102")
                 .setOsFamily("Cisco IOS XE")
@@ -213,12 +213,12 @@ public class VersionReaderTest {
                 .setSysImage("bootflash:csr1000v-universalk9.03.10.02.S.153-3.S2-ext.SPA.bin")
                 .setSysMemory("2187404K/6147K");
         VersionBuilder actual = new VersionBuilder();
-        VersionReader.parseVersion(SH_VERSION_XE, actual);
+        VersionReader.parseShowVersion(SH_VERSION_XE, actual);
         assertEquals(expected.build(), actual.build());
     }
 
     @Test
-    public void testParseIOSClassicVersion() throws Exception {
+    public void testParseIOSClassicShowVersion() {
         VersionBuilder expected = new VersionBuilder();
         expected.setConfReg("0x0")
                 .setOsFamily("Cisco IOS")
@@ -228,12 +228,12 @@ public class VersionReaderTest {
                 .setSysImage("flash0:/vios-adventerprisek9-m")
                 .setSysMemory("496897K/25600K");
         VersionBuilder actual = new VersionBuilder();
-        VersionReader.parseVersion(SH_VERSION, actual);
+        VersionReader.parseShowVersion(SH_VERSION, actual);
         assertEquals(expected.build(), actual.build());
     }
 
     @Test
-    public void testParseXRVersion() throws Exception {
+    public void testParseXRShowVersion() {
         VersionBuilder expectedVersion = new VersionBuilder();
         expectedVersion.setConfReg("0x2102")
                 .setOsFamily("Cisco IOS XR")
@@ -243,7 +243,7 @@ public class VersionReaderTest {
                 .setSysImage("bootflash:disk0/xrvr-os-mbi-6.1.2/mbixrvr-rp.vm");
 
         VersionBuilder actualVersion = new VersionBuilder();
-        VersionReader.parseVersion(SH_VERSION_XR, actualVersion);
+        VersionReader.parseShowVersion(SH_VERSION_XR, actualVersion);
         assertEquals(expectedVersion.build(), actualVersion.build());
     }
 }

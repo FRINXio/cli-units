@@ -24,6 +24,7 @@ import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import io.frinx.cli.unit.ios.essential.crud.StorageReader;
 import io.frinx.cli.unit.ios.essential.crud.VersionReader;
 import io.frinx.cli.unit.ios.essential.crud.VrfReader;
 import io.frinx.cli.unit.ios.essential.crud.VrfWriter;
@@ -39,6 +40,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.esse
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.Version;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.Vrfs;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.VrfsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.version.Storage;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.vrfs.Vrf;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -109,6 +111,8 @@ public class IosEssentialUnit implements TranslateUnit {
         rRegistry.add(new GenericInitListReader<>(InstanceIdentifier.create(Vrfs.class).child(Vrf.class), new VrfReader(cli)));
         // Version
         rRegistry.add(new GenericReader<>(InstanceIdentifier.create(Version.class), new VersionReader(cli)));
+        // Storage
+        rRegistry.add(new GenericReader<>(InstanceIdentifier.create(Version.class).child(Storage.class), new StorageReader(cli)));
     }
 
     @Override
