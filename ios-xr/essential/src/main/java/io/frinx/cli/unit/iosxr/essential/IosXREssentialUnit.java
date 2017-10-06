@@ -17,10 +17,13 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
 import io.frinx.cli.io.SessionInitializationStrategy;
+import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import io.frinx.cli.unit.iosxr.essential.crud.StorageReader;
 import io.frinx.cli.unit.iosxr.essential.crud.VersionReader;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.credentials.LoginPassword;
@@ -40,6 +43,28 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class IosXREssentialUnit implements TranslateUnit {
     private static final Logger LOG = LoggerFactory.getLogger(IosXREssentialUnit.class);
+
+    private static final Device IOS_XR = new DeviceIdBuilder()
+            .setDeviceType("ios xr")
+            .setDeviceVersion("*")
+            .build();
+
+    private TranslationUnitCollector registry;
+    private TranslationUnitCollector.Registration reg;
+
+    public IosXREssentialUnit(@Nonnull final TranslationUnitCollector registry) {
+        this.registry = registry;
+    }
+
+    public void init() {
+        reg = registry.registerTranslateUnit(IOS_XR, this);
+    }
+
+    public void close() {
+        if (reg != null) {
+            reg.close();
+        }
+    }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
@@ -69,7 +94,9 @@ public class IosXREssentialUnit implements TranslateUnit {
         // Version
         rRegistry.add(new GenericReader<>(InstanceIdentifier.create(Version.class), new VersionReader(cli)));
         // Storage
-        rRegistry.add(new GenericReader<>(InstanceIdentifier.create(Storage.class), new StorageReader(cli)));
+        rRegistry.add(
+                new GenericReader<>(InstanceIdentifier.create(Version.class).child(Storage.class),
+                        new StorageReader(cli)));
     }
 
     @Override
