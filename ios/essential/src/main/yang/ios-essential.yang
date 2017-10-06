@@ -85,6 +85,16 @@ module ios-essential {
         leaf hw-env {
             type string;
         }
+
+        container storage {
+            leaf storage-size {
+                type string;
+            }
+
+            leaf available-bytes {
+                type string;
+            }
+        }
     }
 
 }
