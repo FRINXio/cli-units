@@ -40,12 +40,18 @@
         <bundle>mvn:io.frinx.cli/ios-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='cli-southbound-unit-ios-ospf' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:io.frinx.cli/ios-ospf-unit/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-ios' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-essential</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-interfaces</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-bgp</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-network-instance</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-ospf</feature>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-essential' version='${project.version}'>

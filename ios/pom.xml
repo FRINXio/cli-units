@@ -30,6 +30,7 @@
     <module>interface</module>
     <module>bgp</module>
     <module>network-instance</module>
+    <module>ospf</module>
   </modules>
 
   <build>
