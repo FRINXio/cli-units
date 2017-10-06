@@ -22,6 +22,10 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstances;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Protocols;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.bgp.rib.top.BgpRib;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
@@ -33,6 +37,17 @@ import org.slf4j.LoggerFactory;
 public class BgpUnit implements TranslateUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(BgpUnit.class);
+    // FIXME duplicate code with Network instance unit
+    private static final InstanceIdentifier<NetworkInstances> NETWORK_INSTANCES_ID = InstanceIdentifier
+            .create(NetworkInstances.class);
+    private static final InstanceIdentifier<NetworkInstance> NETWORK_INSTANCE_ID = NETWORK_INSTANCES_ID
+            .child(NetworkInstance.class);
+    private static final InstanceIdentifier<Protocols> PROTOCOLS_ID = NETWORK_INSTANCE_ID
+            .child(Protocols.class);
+    private static final InstanceIdentifier<Protocol> PROTOCOL_ID = PROTOCOLS_ID
+            .child(Protocol.class);
+
+    private static final InstanceIdentifier<Bgp> NETWORK_INSTANCE_PROTOCOL_BGP = PROTOCOL_ID.child(Bgp.class);
 
     private static final Device IOS_ALL = new DeviceIdBuilder()
             .setDeviceType("ios")
@@ -85,7 +100,7 @@ public class BgpUnit implements TranslateUnit {
         // FIXME BGP reader reads also subtree nodes, it needs to be split into multiple readers. Because this
         // way it is only possible to perform read of the root node: bgp and also, it will not be possible to extend
         // from other units
-        rRegistry.add(new GenericReader<>(InstanceIdentifier.create(Bgp.class), new BgpReader(cli)));
+        rRegistry.add(new GenericReader<>(NETWORK_INSTANCE_PROTOCOL_BGP, new BgpReader(cli)));
         // FIXME same for RIB
         rRegistry.add(new GenericReader<>(InstanceIdentifier.create(BgpRib.class), new RibReader(cli)));
     }

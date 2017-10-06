@@ -66,6 +66,11 @@
             <artifactId>ios-ospf-unit</artifactId>
             <version>${cli.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>ios-bgp-unit</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
 
         <!-- Openconfig models -->
         <dependency>

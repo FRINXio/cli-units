@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ios.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.ospf.OspfProtocolReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class ProtocolReader implements CliListReader<Protocol, ProtocolKey, Prot
     public ProtocolReader(Cli cli) {
         specificReaders = new ArrayList<CliListReader<Protocol, ProtocolKey, ProtocolBuilder>>() {{
             add(new OspfProtocolReader(cli));
+            add(new BgpProtocolReader(cli));
         }};
     }
 
