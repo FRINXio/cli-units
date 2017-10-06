@@ -1,236 +1,397 @@
 {
 	"variables": [],
 	"info": {
-		"name": "ODL_CLI",
-		"_postman_id": "72213dfb-a15e-2fe2-f39c-a8ad9c9f0450",
+		"name": "FRINX CLI 3.1.0 MULESOFT",
+		"_postman_id": "59c25dc7-39af-130b-c82f-39b0467d4ea9",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Cli topology",
+			"name": "IOS classic",
 			"description": "",
 			"item": [
 				{
-					"name": "List CLI topology OPER",
-					"request": {
-						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
+					"name": "General information",
+					"description": "",
+					"item": [
+						{
+							"name": "show version",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"0x2102\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Cisco IOS\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Cisco 7206VXR (NPE400) processor (revision A)\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"15.2(4)S5, RELEASE SOFTWARE (fc1)\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"4279256517\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"491520K/32768K\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"tftp://255.255.255.255/unknown\");",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/ios-essential:version",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"description": ""
 							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"ls ~\"\n  }\n}"
-						},
-						"description": ""
-					},
-					"response": []
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
 				},
 				{
-					"name": "List CLI topology CFG",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
+					"name": "Interface",
+					"description": "",
+					"item": [
+						{
+							"name": "show interfaces",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"FastEthernet0/0\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"GigabitEthernet1/0\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"GigabitEthernet2/0\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Loopback0\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"1500\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"ip\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"192.168.1.230\");"
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"description": ""
 							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"ls ~\"\n  }\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Ios mount",
-			"description": "",
-			"item": [
-				{
-					"name": "GET VERSION OPER",
-					"request": {
-						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/ios-essential:version",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
 				},
 				{
-					"name": "GET INTERFACES OPER",
-					"request": {
-						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/openconfig-interfaces:interfaces",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
+					"name": "IP information",
+					"description": "",
+					"item": [
+						{
+							"name": "show ip interfaces",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"up\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"1500\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"192.168.1.230\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"FastEthernet0/0\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"FE80::C803:10FF:FEFB:0\");"
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"description": ""
 							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
 				},
 				{
-					"name": "GET VRFS OPER",
-					"request": {
-						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/ios-essential:vrfs",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
+					"name": "Routing Information",
+					"description": "",
+					"item": [
+						{
+							"name": "show ip ospf",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"77\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"47\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"99.99.99.99\");",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-network-instance:network-instances/",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"description": ""
 							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
+							"response": []
 						},
-						"description": ""
-					},
-					"response": []
+						{
+							"name": "show ip ospf interface brief",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"Loopback99\");",
+											"",
+											"",
+											"",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/77/ospfv2/areas/area/47/interfaces",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show ip vrf",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"TMP\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"GigabitEthernet1/0\");",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-network-instance:network-instances",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show ip bgp summary",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"99.99.99.99\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"65000\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"10.255.255.2\");",
+											"",
+											"",
+											"",
+											"",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default/",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
 				},
 				{
-					"name": "GET ALL OPER",
-					"request": {
-						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+					"name": "Mount IOS Classic",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+								]
 							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "GET ALL CONFIG",
+						}
+					],
 					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "    <vrf xmlns=\"urn:opendaylight:params:xml:ns:yang:ios-cli\">\n        <id>2</id>\n        <address-type>random</address-type>\n        <unicast>no</unicast>\n    </vrf>"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "ADD NEW VRF",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/ios-essential:vrfs/vrf/VRFfromPOSTMAN",
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2",
 						"method": "PUT",
 						"header": [
 							{
@@ -251,466 +412,27 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \n\t\"vrf\": {\n    \t\"id\": \"VRFfromPOSTMAN\",\n    \t\"description\": \"This was created from POSTMAN - REST - ODL - CLI southbound - IOS\"\n\t}\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE VRF",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/ios-essential:vrfs/vrf/VRFfromPOSTMAN",
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/xml",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "GET NETWORK INSTANCE",
-					"request": {
-						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/openconfig-network-instance:network-instances",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "JOURNAL",
-					"request": {
-						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/journal:read-journal",
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/xml",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "DRYRUN: ADD NEW VRF",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS1-dryrun/yang-ext:mount/ios-essential:vrfs/vrf/VRFfromPOSTMAN",
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{ \n\t\"vrf\": {\n    \t\"id\": \"VRFfromPOSTMAN\",\n    \t\"description\": \"This was created from POSTMAN - REST - ODL - CLI southbound - IOS\"\n\t}\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "DRYRUN: JOURNAL",
-					"request": {
-						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS1-dryrun/yang-ext:mount/journal:read-journal",
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/xml",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "EXECUTE CLI",
-					"request": {
-						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/cli-unit-generic:execute-and-read",
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"sh ip vrf\"\n  }\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "RECONCILE",
-					"request": {
-						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/reconcile:reconcile",
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"input\" :\n  {\n     \"reconcile:strategy\" : \"merge-from-device\"\n  }\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Check status",
-					"request": {
-						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"Linux1\",\n      \n      \"cli-topology:host\" : \"10.10.199.226\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"*\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"root\",\n    \"cli-topology:password\" : \"frinx2017\"\n      \n    }\n  }"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Mount SSH",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS1",
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS1\",\n      \n      \"cli-topology:host\" : \"192.168.1.221\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
-						},
-						"description": "To enable SSH on IOS use:\n\nhttps://networklessons.com/cisco/ccna-routing-switching-icnd1-100-105/configure-ssh-cisco-ios/\n\n\ntelnet <IP>\n enable\n  \n conf t\n enable password cisco\n interface FastEthernet0/0\n ip address 192.168.56.121 255.255.255.0\n no shutdown\n exit\n exit\n \n configure terminal\n hostname R121\n ip domain-name FRINX.LOCAL\n crypto key generate rsa\n  1024\n ip ssh version 2\n line vty 0 4\n  transport input ssh\n  login local\n  exit\n username cisco password cisco\n exit"
-					},
-					"response": []
-				},
-				{
-					"name": "Mount TELNET",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2",
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"192.168.1.222\",\n      \"cli-topology:port\" : \"23\",\n      \"cli-topology:transport-type\" : \"telnet\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
 						},
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
 					"response": []
 				},
 				{
-					"name": "ENABLE INTERFACE",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/GigabitEthernet1%2F0/config",
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+					"name": "DELETE IOS Classic",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
 							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"config\": {\n        \"type\": \"iana-if-type:gigabitEthernet\",\n        \"enabled\": true,\n        \"name\": \"GigabitEthernet1/0\"\n    }\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "CREATE LOOPBACK",
+						}
+					],
 					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback99",
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"Loopback99\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"Loopback99\"\n            }\n        }\n    ]\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "ENABLE LOOPBACK",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback99/config",
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"config\": {\n        \"type\": \"iana-if-type:softwareLoopback\",\n        \"enabled\": true,\n        \"name\": \"Loopback99\"\n    }\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "SET IPV4",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback99/subinterfaces/subinterface/0/ipv4/addresses/address/44.44.44.44",
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"openconfig-if-ip:address\": [\n        {\n            \"ip\": \"44.44.44.44\",\n            \"config\": {\n                \"prefix-length\": 24,\n                \"ip\": \"44.44.44.44\"\n            }\n        }\n    ]\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE IPV4",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback99/subinterfaces/subinterface/0/ipv4/addresses/address/44.44.44.44",
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"openconfig-if-ip:address\": [\n        {\n            \"ip\": \"44.44.44.44\",\n            \"config\": {\n                \"prefix-length\": 24,\n                \"ip\": \"44.44.44.44\"\n            }\n        }\n    ]\n}"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE LOOPBACK",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback99",
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2",
 						"method": "DELETE",
 						"header": [
 							{
@@ -733,138 +455,14 @@
 							"mode": "raw",
 							"raw": ""
 						},
-						"description": ""
+						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
 					"response": []
 				},
 				{
-					"name": "BGP",
+					"name": "Configure IPv4 interface",
 					"request": {
-						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/openconfig-bgp:bgp",
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "BGP RIB",
-					"request": {
-						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS1/yang-ext:mount/openconfig-rib-bgp:bgp-rib",
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Linux mount",
-			"description": "",
-			"item": [
-				{
-					"name": "Mount",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"Linux1\",\n      \n      \"cli-topology:host\" : \"10.10.199.226\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"*\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"root\",\n    \"cli-topology:password\" : \"frinx2017\"\n      \n    }\n  }"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Check status",
-					"request": {
-						"url": "http://localhost:8181/restconf/operational/network-topology:network-topology/topology/cli/node/Linux1",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"Linux1\",\n      \n      \"cli-topology:host\" : \"10.10.199.226\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"*\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"root\",\n    \"cli-topology:password\" : \"frinx2017\"\n      \n    }\n  }"
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Unmount",
-					"request": {
-						"url": "http://localhost:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "List home directory",
-					"request": {
-						"url": "http://localhost:8181/restconf/operations/network-topology:network-topology/topology/cli/node/Linux1/yang-ext:mount/cli-unit-generic:execute-and-read",
+						"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/cli-unit-generic:execute-and-read",
 						"method": "POST",
 						"header": [
 							{
@@ -885,7 +483,67 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"ls ~\"\n  }\n}"
+							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface loopback 99\\r\nip address 99.99.99.99 255.255.255.255\\r\nno shutdown\\r\nexit\\r\nrouter ospf 77\\r\nnetwork 99.99.99.99 0.0.0.0 area 47\\r\nexit\\r\nexit\\r\"\n  }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Configure IPv6 interface",
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/cli-unit-generic:execute-and-read",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface loopback 55\\r\nipv6 address FE80::AB8 link-local\\r\nipv6 address 2002::2/124\\r\nipv6 address 2003::1/124\\r\nipv6 address 2004::1/124\\r\nno shut\\r\nexit\\r\nexit\\r\"\n  }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Configure BGP",
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/cli-unit-generic:execute-and-read",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n router bgp 65000\\r\n bgp log-neighbor-changes\\r\n no bgp default ipv4-unicast\\r\n neighbor 10.255.255.2 remote-as 65000\\r\n neighbor 10.255.255.2 update-source Loopback0\\r\n neighbor 10.255.255.3 remote-as 65000\\r\n neighbor 10.255.255.3 update-source Loopback0\\r\n neighbor 10.255.255.5 remote-as 65000\\r\n neighbor 10.255.255.5 update-source Loopback0\\r\n address-family ipv4\\r\n network 10.255.1.0 mask 255.255.255.0\\r\n neighbor 10.255.255.2 activate\\r\n neighbor 10.255.255.2 send-community both\\r\n neighbor 10.255.255.3 activate\\r\n neighbor 10.255.255.5 activate\\r\n exit-address-family\\r\"\n  }\n}"
 						},
 						"description": ""
 					},
@@ -894,14 +552,434 @@
 			]
 		},
 		{
-			"name": "registry",
+			"name": "IOS XE",
 			"description": "",
 			"item": [
 				{
-					"name": "TRANSLATE REGISTRY",
+					"name": "General information",
+					"description": "",
+					"item": [
+						{
+							"name": "show version",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"0x2102\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Cisco IOS XE\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"cisco CSR1000V (VXE) processor\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"15.4(2)S, RELEASE SOFTWARE (fc2)\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"14713405579B\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"16324145152B\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"90MD4IFB0OJ\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"2170596K/6147B\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"bootflash:packages.conf\");",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/ios-essential:version",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Interface",
+					"description": "",
+					"item": [
+						{
+							"name": "show interfaces",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"GigabitEthernet1\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Loopback444\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Loopback44\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Loopback99\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"1500\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"ip\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"99.99.99.99\");"
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "IP information",
+					"description": "",
+					"item": [
+						{
+							"name": "show ip interfaces",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"up\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"1500\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"99.99.99.99\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Loopback99\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"FE80::C803:10FF:FEFB:0\");"
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-interfaces:interfaces",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Routing Information",
+					"description": "",
+					"item": [
+						{
+							"name": "show ip ospf",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"77\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"99.99.99.99\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"47\");",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-network-instance:network-instances/",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show ip ospf interface brief",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"Loopback444\");",
+											"",
+											"",
+											"",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/55/ospfv2/areas/area/45/interfaces",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show ip vrf",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"TMP\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Loopback99\");",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-network-instance:network-instances",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show ip bgp summary",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"99.99.99.99\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"65000\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"10.255.255.2\");",
+											"",
+											"",
+											"",
+											"",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS2/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Mount IOS Classic",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+								]
+							}
+						}
+					],
 					"request": {
-						"url": "http://localhost:8181/restconf/operational/cli-translate-registry:available-cli-device-translations",
-						"method": "GET",
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{xe_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+						},
+						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE IOS Classic",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS2",
+						"method": "DELETE",
 						"header": [
 							{
 								"key": "Authorization",
@@ -923,7 +1001,498 @@
 							"mode": "raw",
 							"raw": ""
 						},
-						"description": ""
+						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "IOS XR",
+			"description": "",
+			"item": [
+				{
+					"name": "General information",
+					"description": "",
+					"item": [
+						{
+							"name": "show version",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"0x2102\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Cisco IOS XR\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"3102305280B\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"4183259136B\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"cisco IOS XRv Series (Pentium Celeron Stepping 3) processor\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"6.1.2[Default]\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"98GO8PYWX03\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"3145215K\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"bootflash:disk0/xrvr-os-mbi-6.1.2/mbixrvr-rp.vm\");"
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Interface",
+					"description": "",
+					"item": [
+						{
+							"name": "show all interfaces",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"GigabitEthernet0/0/0/1\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"GigabitEthernet0/0/0/3\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"Loopback0\");"
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOS1-unified/yang-ext:mount/openconfig-interfaces:interfaces/",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "IP information",
+					"description": "",
+					"item": [
+						{
+							"name": "show ip interface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"up\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"1500\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"192.168.1.230\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"FastEthernet0/0\");",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOS1-unified/yang-ext:mount/openconfig-interfaces:interfaces",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Routing Information",
+					"description": "",
+					"item": [
+						{
+							"name": "show bgp process type/ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"10.0.0.1\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"65000\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"default\");",
+											"",
+											"",
+											"",
+											"",
+											"",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOS1-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show static route",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"default\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"1.1.1.1/32\");",
+											"",
+											"",
+											"",
+											"",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOS1-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/default",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "shpw rputer ospf type, ID, interfaces",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"Body matches string\"] = responseBody.has(\"1\");",
+											"tests[\"Body matches string\"] = responseBody.has(\"0\");",
+											"",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOS1-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/1",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Mount IOS XR netconf",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOS1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"node\": [\n    {\n      \"node-id\": \"IOS1\",\n      \"netconf-node-topology:host\": \"{{xr_ip}}\",\n      \"netconf-node-topology:port\": 830,\n      \"netconf-node-topology:keepalive-delay\": 0,\n      \"netconf-node-topology:tcp-only\": false,\n      \"netconf-node-topology:username\": \"cisco\",\n      \"netconf-node-topology:password\": \"cisco\"\n    }\n  ]\n}"
+						},
+						"description": "To enable SSH on IOS use:\n\nhttps://networklessons.com/cisco/ccna-routing-switching-icnd1-100-105/configure-ssh-cisco-ios/\n\n\ntelnet <IP>\n enable\n  \n conf t\n enable password cisco\n interface FastEthernet0/0\n ip address 192.168.56.121 255.255.255.0\n no shutdown\n exit\n exit\n \n configure terminal\n hostname R121\n ip domain-name FRINX.LOCAL\n crypto key generate rsa\n  1024\n ip ssh version 2\n line vty 0 4\n  transport input ssh\n  login local\n  exit\n username cisco password cisco\n exit"
+					},
+					"response": []
+				},
+				{
+					"name": "Mount IOS XR cli",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOSXR\",\n      \n      \"cli-topology:host\" : \"{{xr_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios xr\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+						},
+						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Mount IOS XR cli",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE IOS XR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOS1",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": "To enable SSH on IOS use:\n\nhttps://networklessons.com/cisco/ccna-routing-switching-icnd1-100-105/configure-ssh-cisco-ios/\n\n\ntelnet <IP>\n enable\n  \n conf t\n enable password cisco\n interface FastEthernet0/0\n ip address 192.168.56.121 255.255.255.0\n no shutdown\n exit\n exit\n \n configure terminal\n hostname R121\n ip domain-name FRINX.LOCAL\n crypto key generate rsa\n  1024\n ip ssh version 2\n line vty 0 4\n  transport input ssh\n  login local\n  exit\n username cisco password cisco\n exit"
 					},
 					"response": []
 				}
