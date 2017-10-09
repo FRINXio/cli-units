@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.types.rev170202.BgpOriginAttrType;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.types.rev170202.IPV4UNICAST;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.BgpLocRibCommonKeys.Origin;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.bgp.rib.top.BgpRib;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.bgp.rib.top.BgpRibBuilder;
@@ -63,6 +65,11 @@ public class RibReader implements CliReader<BgpRib, BgpRibBuilder> {
     @Override
     public void readCurrentAttributes(InstanceIdentifier<BgpRib> id, BgpRibBuilder builder, ReadContext ctx)
     throws ReadFailedException {
+        ProtocolKey protocolKey = id.firstKeyOf(Protocol.class);
+        if (!protocolKey.getIdentifier().equals(BgpProtocolReader.TYPE)) {
+            return;
+        }
+
         parseRib(blockingRead(SH_VERSION, cli, id), builder);
     }
 

@@ -28,6 +28,8 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.t
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.GlobalBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.NeighborsBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.types.inet.rev170403.IpAddress;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.types.inet.rev170403.Ipv4Address;
@@ -68,6 +70,11 @@ public class BgpReader implements CliReader<Bgp, BgpBuilder> {
 
     @Override
     public void readCurrentAttributes(InstanceIdentifier<Bgp> id, BgpBuilder builder, ReadContext ctx) throws ReadFailedException {
+        ProtocolKey protocolKey = id.firstKeyOf(Protocol.class);
+        if (!protocolKey.getIdentifier().equals(BgpProtocolReader.TYPE)) {
+            return;
+        }
+
         parseGlobal(blockingRead(SH_SUMM, cli, id), builder);
 
         List<Neighbor> nList = new ArrayList<>();

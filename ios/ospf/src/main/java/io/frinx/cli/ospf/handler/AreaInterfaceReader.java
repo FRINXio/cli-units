@@ -97,6 +97,10 @@ public class AreaInterfaceReader implements CliListReader<Interface, InterfaceKe
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                       @Nonnull InterfaceBuilder interfaceBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
+        ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
+        if (!protocolKey.getIdentifier().equals(OspfProtocolReader.TYPE)) {
+            return;
+        }
         interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class).getId());
     }
 }
