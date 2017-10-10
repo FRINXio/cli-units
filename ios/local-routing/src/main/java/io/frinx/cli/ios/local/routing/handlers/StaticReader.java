@@ -16,7 +16,6 @@ import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -33,13 +32,17 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.types.inet.rev17040
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StaticReader implements CliListReader<Static, StaticKey, StaticBuilder> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(StaticReader.class);
+
     private static final String DEFAULT_VRF = "default";
-    private static final String SH_IP_ROUTE= "sh ip route static";
-    private static final Pattern INTERFACE_IP_LINE =
-            Pattern.compile("\\s*S        (?<ip>[^/]+/[0-9][0-9]).*");
+    private static final String SH_IP__STATIC_ROUTE= "sh ip static route";
+    private static final Pattern IP_PREFIX_LINE =
+            Pattern.compile("\\w{1,2} {2}(?<ipPrefix>[\\S&&[^/]]+/\\d{1,2}).*");
 
     private Cli cli;
 
@@ -51,25 +54,22 @@ public class StaticReader implements CliListReader<Static, StaticKey, StaticBuil
     @Override
     public List<StaticKey> getAllIds(@Nonnull InstanceIdentifier<Static> instanceIdentifier,
                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+        String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
-        ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
-        if (!protocolKey.getIdentifier().equals(StaticLocalRoutingProtocolReader.TYPE)) {
+        // FIXME We should support also VRF
+        if (!vrfName.equals(DEFAULT_VRF)) {
+            LOG.info("VRR-aware static routes are not implemented yet");
             return Collections.emptyList();
         }
 
-        String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        if (vrfName.equals(DEFAULT_VRF)) {
-            return parseStatic(blockingRead(SH_IP_ROUTE, cli, instanceIdentifier, readContext));
-        }
-
-        return new ArrayList<>();
+        return parseStaticPrefixes(blockingRead(SH_IP__STATIC_ROUTE, cli, instanceIdentifier));
     }
 
     @VisibleForTesting
-    static List<StaticKey> parseStatic(String output) {
+    static List<StaticKey> parseStaticPrefixes(String output) {
         return ParsingUtils.parseFields(output, 0,
-                INTERFACE_IP_LINE::matcher,
-                m -> m.group("ip"),
+                IP_PREFIX_LINE::matcher,
+                m -> m.group("ipPrefix"),
                 value -> new StaticKey(new IpPrefix(new Ipv4Prefix(value))));
     }
 

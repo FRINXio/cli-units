@@ -15,15 +15,14 @@ import io.fd.honeycomb.translate.impl.read.GenericReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.local.routing.handlers.StaticConfigReader;
-import io.frinx.cli.ios.local.routing.handlers.StaticNextHopReader;
-import io.frinx.cli.ios.local.routing.handlers.StaticReader;
-import io.frinx.cli.ios.local.routing.handlers.StaticStateReader;
+import io.frinx.cli.ios.local.routing.handlers.*;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
+
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.LocalStaticNexthopConfig;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutes;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
@@ -64,6 +63,12 @@ public class LocalRoutingUnit implements TranslateUnit {
     private static final InstanceIdentifier<NextHops> NEXT_HOPS_ID = STATIC_ID.child(NextHops.class);
     private static final InstanceIdentifier<NextHop> NEXT_HOP_ID = NEXT_HOPS_ID.child(NextHop.class);
 
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.next.hop.Config> NEXT_HOP_CONFIG_ID =
+            NEXT_HOP_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.next.hop.Config.class);
+
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.next.hop.State> NEXT_HOP_STATE_ID =
+            NEXT_HOP_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.next.hop.State.class);
+
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
 
@@ -83,7 +88,7 @@ public class LocalRoutingUnit implements TranslateUnit {
 
     @Override
     public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     @Override
@@ -100,8 +105,9 @@ public class LocalRoutingUnit implements TranslateUnit {
         rRegistry.add(new GenericReader<>(STATE_ID, new StaticStateReader()));
         rRegistry.add(new GenericReader<>(CONFIG_ID, new StaticConfigReader()));
         rRegistry.addStructuralReader(NEXT_HOPS_ID, NextHopsBuilder.class);
-        rRegistry.add(new GenericListReader<>(NEXT_HOP_ID, new StaticNextHopReader(cli)));
-
+        rRegistry.add(new GenericListReader<>(NEXT_HOP_ID, new NextHopReader(cli)));
+        rRegistry.add(new GenericReader<>(NEXT_HOP_CONFIG_ID, new NextHopConfigReader(cli)));
+        rRegistry.add(new GenericReader<>(NEXT_HOP_STATE_ID, new NextHopStateReader(cli)));
     }
 
     @Override

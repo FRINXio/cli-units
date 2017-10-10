@@ -11,12 +11,12 @@ package io.frinx.cli.ios.local.routing.handlers;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.fd.honeycomb.translate.spi.read.Initialized;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
-import io.frinx.cli.unit.utils.InitCliListReader;
+import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -34,17 +34,22 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StaticNextHopReader implements InitCliListReader<NextHop, NextHopKey, NextHopBuilder> {
+public class NextHopReader implements CliListReader<NextHop, NextHopKey, NextHopBuilder> {
 
-    private static final String SH_IP_ROUTE= "sh ip route";
-    private static final Pattern NEXT_HOP_LINE =
-            Pattern.compile("[\\*[\\s]]*(?<nextHopIp>\\d+\\.\\d+\\.\\d+\\.\\d+)");
-    private static final Pattern INTERFACE_LINE =
-            Pattern.compile(".*directly connected, via (?<interface>\\w+)");
+    private static final String SH_IP_ROUTE = "sh ip static route %s";
+
+    private static final Pattern NEXT_HOP_INTERFACE_LINE =
+            Pattern.compile(".+] via (?<interface>\\w+) \\[.+");
+    private static final Pattern NEXT_HOP_IP_LINE =
+            Pattern.compile(".+] via (?<ipAddress>[\\d*\\.]+) \\[.+");
+    private static final Pattern NEXT_HOP_INTERFACE_IP_LINE =
+            Pattern.compile(".+] via (?<interface>[\\w[/]]+) (?<ipAddress>[\\d*\\.]+) \\[.+");
+
+
 
     private Cli cli;
 
-    public StaticNextHopReader(final Cli cli) {
+    public NextHopReader(final Cli cli) {
         this.cli = cli;
     }
 
@@ -58,30 +63,37 @@ public class StaticNextHopReader implements InitCliListReader<NextHop, NextHopKe
         }
 
         StaticKey staticRouteKey = instanceIdentifier.firstKeyOf(Static.class);
+        String ipPrefix = staticRouteKey.getPrefix().getIpv4Prefix().getValue();
 
-        String[] cidrFormat = staticRouteKey.getPrefix().getIpv4Prefix().getValue().split("/");
-        String ipAddress = cidrFormat[0];
-
-        return parseNextHop(blockingRead(SH_IP_ROUTE + " " + ipAddress, cli, instanceIdentifier, readContext));
+        return parseNextHopPrefixes(blockingRead(String.format(SH_IP_ROUTE, ipPrefix),
+                cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting
-    static List<NextHopKey> parseNextHop(String output) {
-        List<NextHopKey> nextHopIpKeys =
+    static List<NextHopKey> parseNextHopPrefixes(String output) {
+        List<NextHopKey> nextHopKeyes = new ArrayList<>();
+
+        nextHopKeyes.addAll(
                 ParsingUtils.parseFields(output, 0,
-                        NEXT_HOP_LINE::matcher,
-                        m -> m.group("nextHopIp"),
-                        NextHopKey::new);
+                        NEXT_HOP_IP_LINE::matcher,
+                        matcher -> matcher.group("ipAddress"),
+                        NextHopKey::new));
 
-        List<NextHopKey> nextHopInterfaceKeys =
+        nextHopKeyes.addAll(
                 ParsingUtils.parseFields(output, 0,
-                        INTERFACE_LINE::matcher,
-                        m -> m.group("interface"),
-                        NextHopKey::new);
+                        NEXT_HOP_INTERFACE_LINE::matcher,
+                        matcher -> matcher.group("interface"),
+                        NextHopKey::new));
 
-        nextHopInterfaceKeys.addAll(nextHopIpKeys);
+        nextHopKeyes.addAll(
+                ParsingUtils.parseFields(output, 0,
+                        NEXT_HOP_INTERFACE_IP_LINE::matcher,
+                        matcher ->
+                                String.format("%s %s", matcher.group("ipAddress"),
+                                        matcher.group("interface")),
+                        NextHopKey::new));
 
-        return nextHopInterfaceKeys;
+        return nextHopKeyes;
     }
 
     @Override
@@ -104,16 +116,6 @@ public class StaticNextHopReader implements InitCliListReader<NextHop, NextHopKe
             return;
         }
 
-        // TODO parse properly all needed attributes
         nextHopBuilder.setIndex(instanceIdentifier.firstKeyOf(NextHop.class).getIndex());
-    }
-
-    @Nonnull
-    @Override
-    public Initialized<? extends DataObject> init(@Nonnull InstanceIdentifier<NextHop> id,
-                                                  @Nonnull NextHop readValue,
-                                                  @Nonnull ReadContext readContext) {
-        // Direct translation
-        return Initialized.create(id, readValue);
     }
 }

@@ -17,31 +17,42 @@ import java.util.stream.Collectors;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHopKey;
 
-@RunWith(MockitoJUnitRunner.class)
 public class StaticNextHopReaderTest {
-    private static final String SH_IP_ROUTE_NETWORK = "Routing entry for 10.255.1.0/24\n" +
-            "  Known via \"static\", distance 1, metric 0 (connected)\n" +
-            "  Advertised by bgp 65000\n" +
-            "  Routing Descriptor Blocks:\n" +
-            "    192.168.1.5\n" +
-            "      Route metric is 0, traffic share count is 1\n" +
-            "  * directly connected, via Null0\n" +
-            "      Route metric is 0, traffic share count is 1\n";
+    private static final String SH_IP_ROUTE_NETWORK =
+            "Codes: M - Manual static, A - AAA download, N - IP NAT, D - DHCP,\n" +
+                    "       G - GPRS, V - Crypto VPN, C - CASA, P - Channel interface processor,\n" +
+                    "       B - BootP, S - Service selection gateway\n" +
+                    "       DN - Default Network, T - Tracking object\n" +
+                    "       L - TL1, E - OER, I - iEdge\n" +
+                    "       D1 - Dot1x Vlan Network, K - MWAM Route\n" +
+                    "       PP - PPP default route, MR - MRIPv6, SS - SSLVPN\n" +
+                    "       H - IPe Host, ID - IPe Domain Broadcast\n" +
+                    "       U - User GPRS, TE - MPLS Traffic-eng, LI - LIIN\n" +
+                    "       IR - ICMP Redirect\n" +
+                    "Codes in []: A - active, N - non-active, B - BFD-tracked, D - Not Tracked, P - permanent\n" +
+                    "\n" +
+                    "\n" +
+                    "M  10.40.6.0/24 [40/0] via FastEthernet0/0 8.8.8.8 [A]\n" +
+                    "M               [40/0] via 9.8.8.8 [N]" +
+                    "M               [40/0] via null0 [N]\"";
 
-    private static final List<NextHopKey> IDS_EXPECTED =
-            Lists.newArrayList("192.168.1.5", "Null0")
+    private static final List<NextHopKey> EXPECTED_IDS =
+            Lists.newArrayList("9.8.8.8", "8.8.8.8 FastEthernet0/0", "null0")
                     .stream()
                     .map(NextHopKey::new)
                     .collect(Collectors.toList());
 
     @Test
     public void testReader() {
-        System.out.println(IDS_EXPECTED.size());
-        assertEquals(new HashSet<>(IDS_EXPECTED), new HashSet<>(StaticNextHopReader.parseNextHop(SH_IP_ROUTE_NETWORK)));
+        System.out.println(EXPECTED_IDS.size());
+        assertEquals(new HashSet<>(EXPECTED_IDS), new HashSet<>(NextHopReader.parseNextHopPrefixes(SH_IP_ROUTE_NETWORK)));
+    }
+
+    @Test
+    public void testParseNextHopPrefixes() {
+
     }
 
 }

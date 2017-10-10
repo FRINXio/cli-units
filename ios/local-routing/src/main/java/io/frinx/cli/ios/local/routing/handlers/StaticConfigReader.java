@@ -10,10 +10,8 @@ package io.frinx.cli.ios.local.routing.handlers;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.fd.honeycomb.translate.spi.read.Initialized;
 import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
 import io.frinx.cli.unit.utils.CliReader;
-import io.frinx.cli.unit.utils.InitCliReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticBuilder;
@@ -25,8 +23,6 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.types.inet.rev17040
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import java.util.Collections;
 
 public class StaticConfigReader implements CliReader<Config, ConfigBuilder> {
     @Nonnull
