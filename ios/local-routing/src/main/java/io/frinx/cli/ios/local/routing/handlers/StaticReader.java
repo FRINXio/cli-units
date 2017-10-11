@@ -8,6 +8,8 @@
 
 package io.frinx.cli.ios.local.routing.handlers;
 
+import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -15,7 +17,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -33,7 +34,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class StaticReader implements CliListReader<Static, StaticKey, StaticBuilder> {
 
-    static final String DEFAULT_VRF = "default";
     private static final String SH_IP_STATIC_ROUTE = "sh ip static route";
     private static final String SH_IP_STATIC_ROUTE_VRF = "sh ip static route vrf %s";
     private static final Pattern IP_PREFIX_LINE =
@@ -51,7 +51,7 @@ public class StaticReader implements CliListReader<Static, StaticKey, StaticBuil
                                      @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
 
-        String showCommand = vrfName.equals(DEFAULT_VRF)
+        String showCommand = vrfName.equals(DEFAULT_NETWORK_NAME)
                 ? SH_IP_STATIC_ROUTE : String.format(SH_IP_STATIC_ROUTE_VRF, vrfName);
 
         return parseStaticPrefixes(blockingRead(showCommand, cli, instanceIdentifier));

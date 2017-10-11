@@ -8,6 +8,8 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler;
 
+import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -25,17 +27,12 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class NetworkInstanceReader implements InitCliListReader<NetworkInstance, NetworkInstanceKey,
         NetworkInstanceBuilder> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NetworkInstanceReader.class);
-
     private static final String SH_IP_VRF = "sh ip vrf";
     private static final Pattern VRF_ID_LINE = Pattern.compile("(?<id>[^\\s]+[\\s]+).*");
-    static final NetworkInstanceKey DEFAULT_VRF = new NetworkInstanceKey("default");
 
     private Cli cli;
 
@@ -57,7 +54,7 @@ public class NetworkInstanceReader implements InitCliListReader<NetworkInstance,
                 m -> m.group("id"),
                 value -> new NetworkInstanceKey(value.trim()));
 
-        networkInstanceKeys.add(DEFAULT_VRF);
+        networkInstanceKeys.add(DEFAULT_NETWORK);
 
         return networkInstanceKeys;
     }
