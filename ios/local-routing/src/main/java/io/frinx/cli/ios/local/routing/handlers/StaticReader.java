@@ -16,7 +16,6 @@ import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -24,7 +23,6 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev17
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticKey;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.types.inet.rev170403.IpPrefix;
@@ -32,15 +30,12 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.types.inet.rev17040
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class StaticReader implements CliListReader<Static, StaticKey, StaticBuilder> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StaticReader.class);
-
-    private static final String DEFAULT_VRF = "default";
-    private static final String SH_IP__STATIC_ROUTE= "sh ip static route";
+    static final String DEFAULT_VRF = "default";
+    private static final String SH_IP_STATIC_ROUTE = "sh ip static route";
+    private static final String SH_IP_STATIC_ROUTE_VRF = "sh ip static route vrf %s";
     private static final Pattern IP_PREFIX_LINE =
             Pattern.compile("\\w{1,2} {2}(?<ipPrefix>[\\S&&[^/]]+/\\d{1,2}).*");
 
@@ -54,15 +49,12 @@ public class StaticReader implements CliListReader<Static, StaticKey, StaticBuil
     @Override
     public List<StaticKey> getAllIds(@Nonnull InstanceIdentifier<Static> instanceIdentifier,
                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
+        String vrfName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
 
-        // FIXME We should support also VRF
-        if (!vrfName.equals(DEFAULT_VRF)) {
-            LOG.info("VRR-aware static routes are not implemented yet");
-            return Collections.emptyList();
-        }
+        String showCommand = vrfName.equals(DEFAULT_VRF)
+                ? SH_IP_STATIC_ROUTE : String.format(SH_IP_STATIC_ROUTE_VRF, vrfName);
 
-        return parseStaticPrefixes(blockingRead(SH_IP__STATIC_ROUTE, cli, instanceIdentifier));
+        return parseStaticPrefixes(blockingRead(showCommand, cli, instanceIdentifier));
     }
 
     @VisibleForTesting

@@ -34,9 +34,12 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import static io.frinx.cli.ios.local.routing.handlers.StaticReader.DEFAULT_VRF;
+
 public class NextHopReader implements CliListReader<NextHop, NextHopKey, NextHopBuilder> {
 
     private static final String SH_IP_ROUTE = "sh ip static route %s";
+    private static final String SH_IP_STATIC_ROUTE_VRF = "sh ip static route vrf %s %s";
 
     private static final Pattern NEXT_HOP_INTERFACE_LINE =
             Pattern.compile(".+] via (?<interface>\\w+) \\[.+");
@@ -65,7 +68,11 @@ public class NextHopReader implements CliListReader<NextHop, NextHopKey, NextHop
         StaticKey staticRouteKey = instanceIdentifier.firstKeyOf(Static.class);
         String ipPrefix = staticRouteKey.getPrefix().getIpv4Prefix().getValue();
 
-        return parseNextHopPrefixes(blockingRead(String.format(SH_IP_ROUTE, ipPrefix),
+        String showCommand = protocolKey.getName().equals(DEFAULT_VRF)
+                ? String.format(SH_IP_ROUTE, ipPrefix)
+                : String.format(SH_IP_STATIC_ROUTE_VRF, protocolKey.getName(), ipPrefix);
+
+        return parseNextHopPrefixes(blockingRead(String.format(showCommand, ipPrefix),
                 cli, instanceIdentifier, readContext));
     }
 

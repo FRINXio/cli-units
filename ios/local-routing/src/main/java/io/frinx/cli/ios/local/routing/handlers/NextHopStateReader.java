@@ -31,9 +31,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
 
+import static io.frinx.cli.ios.local.routing.handlers.StaticReader.DEFAULT_VRF;
+
 public class NextHopStateReader implements CliReader<State, StateBuilder> {
 
     private static final String SHOW_IP_STATIC_ROUTE_NETWORK = "sh ip static route %s | include %s";
+    private static final String SHOW_IP_STATIC_ROUTE_VRF_NETWORK = "sh ip static route vrf %s %s | include %s";
 
     private static final Pattern METRIC_LINE = Pattern.compile(".*\\[(?<metric>\\d+)/\\d+].*");
     private static final Pattern SPACE = Pattern.compile(" ");
@@ -63,7 +66,12 @@ public class NextHopStateReader implements CliReader<State, StateBuilder> {
 
         NextHopKey nextHopKey = id.firstKeyOf(NextHop.class);
         String index = nextHopKey.getIndex();
-        parseMetric(blockingRead(String.format(SHOW_IP_STATIC_ROUTE_NETWORK, ipPrefix, switchIndex(index)), cli, id, ctx), builder);
+
+        String showCommand = protocolKey.getName().equals(DEFAULT_VRF)
+                ? String.format(SHOW_IP_STATIC_ROUTE_NETWORK, ipPrefix, switchIndex(index))
+                : String.format(SHOW_IP_STATIC_ROUTE_VRF_NETWORK, protocolKey.getName(), ipPrefix, switchIndex(index));
+
+        parseMetric(blockingRead(showCommand, cli, id, ctx), builder);
 
         builder.setIndex(index);
     }
