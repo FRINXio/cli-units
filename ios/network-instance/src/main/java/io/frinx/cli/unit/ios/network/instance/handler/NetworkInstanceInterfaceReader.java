@@ -18,6 +18,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.ifc.InterfaceReader;
 import io.frinx.cli.unit.utils.InitCliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,12 +33,8 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class NetworkInstanceInterfaceReader implements InitCliListReader<Interface, InterfaceKey, InterfaceBuilder> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(NetworkInstanceInterfaceReader.class);
 
     private static final String SH_IP_VRF_INTERFACES_ALL = "sh ip vrf interfaces";
     private static final String SH_IP_VRF_INTERFACES = "sh ip vrf interfaces %s";
@@ -60,7 +57,7 @@ public class NetworkInstanceInterfaceReader implements InitCliListReader<Interfa
                                         @Nonnull ReadContext ctx) throws ReadFailedException {
         final String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
-        if (name.equals(NetworkInstanceReader.DEFAULT_VRF.getName())) {
+        if (name.equals(NetworInstance.DEFAULT_NETWORK_NAME)) {
             final List<InterfaceKey> interfaceKeys = interfaceReader.getAllIds(InstanceIdentifier
                             .create(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222
                                     .interfaces.top.interfaces.Interface.class), ctx)

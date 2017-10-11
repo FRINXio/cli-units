@@ -8,6 +8,8 @@
 
 package io.frinx.cli.ios.local.routing.handlers;
 
+import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -15,13 +17,11 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticKey;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.NextHopsBuilder;
@@ -33,8 +33,6 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import static io.frinx.cli.ios.local.routing.handlers.StaticReader.DEFAULT_VRF;
 
 public class NextHopReader implements CliListReader<NextHop, NextHopKey, NextHopBuilder> {
 
@@ -68,7 +66,7 @@ public class NextHopReader implements CliListReader<NextHop, NextHopKey, NextHop
         StaticKey staticRouteKey = instanceIdentifier.firstKeyOf(Static.class);
         String ipPrefix = staticRouteKey.getPrefix().getIpv4Prefix().getValue();
 
-        String showCommand = protocolKey.getName().equals(DEFAULT_VRF)
+        String showCommand = protocolKey.getName().equals(DEFAULT_NETWORK_NAME)
                 ? String.format(SH_IP_ROUTE, ipPrefix)
                 : String.format(SH_IP_STATIC_ROUTE_VRF, protocolKey.getName(), ipPrefix);
 
