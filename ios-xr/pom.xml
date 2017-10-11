@@ -18,7 +18,7 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-ios-xr</artifactId>
-  <version>3.1.0.rc3-frinx-SNAPSHOT</version>
+  <version>3.1.0.frinx</version>
   <packaging>pom</packaging>
 
   <prerequisites>
