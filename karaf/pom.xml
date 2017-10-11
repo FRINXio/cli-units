@@ -20,13 +20,13 @@
   <artifactId>cli-units-karaf</artifactId>
   <version>3.1.0.rc3-frinx-SNAPSHOT</version>
   <name>${project.artifactId}</name>
+  <packaging>pom</packaging>
 
   <prerequisites>
     <maven>3.1.1</maven>
   </prerequisites>
 
   <properties>
-    <karaf.localFeature></karaf.localFeature>
     <restconf.version>1.5.1-Carbon-SR1.3_1_0_rc3-frinxodl-SNAPSHOT</restconf.version>
     <netconf.version>1.2.1-Carbon-SR1.3_1_0_rc3-frinxodl-SNAPSHOT</netconf.version>
     <cli.version>3.1.0.rc3-frinx-SNAPSHOT</cli.version>
@@ -41,7 +41,6 @@
       <artifactId>framework</artifactId>
       <type>kar</type>
     </dependency>
-
     <dependency>
       <groupId>io.frinx.openconfig</groupId>
       <artifactId>openconfig-features</artifactId>
@@ -74,46 +73,25 @@
       <type>xml</type>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>features-netconf</artifactId>
-      <classifier>features</classifier>
-      <version>${netconf.version}</version>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>features-netconf-connector</artifactId>
-      <classifier>features</classifier>
-      <version>${netconf.version}</version>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
   </dependencies>
 
     <build>
       <plugins>
-       <plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <executions>
             <execution>
               <id>copy-resources</id>
-              <!-- here the phase you need -->
               <phase>prepare-package</phase>
               <goals>
                 <goal>copy-resources</goal>
               </goals>
               <configuration>
-
                 <outputDirectory>${basedir}/target/assembly</outputDirectory>
                 <resources>
                   <resource>
-                    <directory>src/main/assembly</directory>
-                  </resource>
-                  <resource>
-                    <directory>src/main/resources</directory>
+                    <directory>src/main/version</directory>
                     <filtering>true</filtering>
                   </resource>
                 </resources>
