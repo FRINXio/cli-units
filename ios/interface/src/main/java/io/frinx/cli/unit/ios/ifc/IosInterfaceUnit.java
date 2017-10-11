@@ -32,6 +32,7 @@ import io.frinx.cli.unit.ios.ifc.subifc.Ipv6AddressReader;
 import io.frinx.cli.unit.ios.ifc.subifc.Ipv6ConfigReader;
 import io.frinx.cli.unit.ios.ifc.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
+import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.$YangModuleInfoImpl;
@@ -46,14 +47,8 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev16
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.Address;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.Ipv6;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.Ipv6Builder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.State;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.Subinterfaces;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -105,21 +100,14 @@ public final class IosInterfaceUnit implements TranslateUnit {
         provideWriters(wRegistry, cli);
     }
 
-    private static final InstanceIdentifier<Interfaces> IFCS_ID = InstanceIdentifier.create(Interfaces.class);
-    private static final InstanceIdentifier<Interface> IFC_ID = IFCS_ID.child(Interface.class);
-    private static final InstanceIdentifier<State> IFC_STATE_ID = IFC_ID.child(State.class);
-    private static final InstanceIdentifier<Config> IFC_CONFIG_ID = IFC_ID.child(Config.class);
-    private static final InstanceIdentifier<Subinterfaces> SUBIFCS_ID = IFC_ID.child(Subinterfaces.class);
-    private static final InstanceIdentifier<Subinterface> SUBIFC_ID = SUBIFCS_ID.child(Subinterface.class);
-
-    private static final InstanceIdentifier<Subinterface1> SUBIFC_IPV4_AUG_ID = SUBIFC_ID.augmentation(Subinterface1.class);
+    private static final InstanceIdentifier<Subinterface1> SUBIFC_IPV4_AUG_ID = IIDs.IN_IN_SU_SUBINTERFACE.augmentation(Subinterface1.class);
     private static final InstanceIdentifier<Ipv4> SUBIFC_IPV4_ID = SUBIFC_IPV4_AUG_ID.child(Ipv4.class);
     private static final InstanceIdentifier<Addresses> SUBIFC_IPV4_ADDRESSES_ID = SUBIFC_IPV4_ID.child(Addresses.class);
     private static final InstanceIdentifier<Address> SUBIFC_IPV4_ADDRESS_ID = SUBIFC_IPV4_ADDRESSES_ID.child(Address.class);
     private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config> SUBIFC_IPV4_CFG_ID =
             SUBIFC_IPV4_ADDRESS_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config.class);
 
-    private static final InstanceIdentifier<Subinterface2> SUBIFC_IPV6_AUG_ID = SUBIFC_ID.augmentation(Subinterface2.class);
+    private static final InstanceIdentifier<Subinterface2> SUBIFC_IPV6_AUG_ID = IIDs.IN_IN_SU_SUBINTERFACE.augmentation(Subinterface2.class);
     private static final InstanceIdentifier<Ipv6> SUBIFC_IPV6_ID = SUBIFC_IPV6_AUG_ID.child(Ipv6.class);
     private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.Addresses> SUBIFC_IPV6_ADDRESSES_ID =
             SUBIFC_IPV6_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.Addresses.class);
@@ -129,22 +117,22 @@ public final class IosInterfaceUnit implements TranslateUnit {
             SUBIFC_IPV6_ADDRESS_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.Config.class);
 
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
-        wRegistry.add(new GenericListWriter<>(IFC_ID, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IFC_CONFIG_ID, new InterfaceConfigWriter(cli)));
+        wRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
 
-        wRegistry.add(new GenericWriter<>(SUBIFC_ID, new NoopCliListWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SUBINTERFACE, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(SUBIFC_IPV4_ADDRESS_ID, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(SUBIFC_IPV4_CFG_ID, new Ipv4ConfigWriter(cli)));
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IFCS_ID, InterfacesBuilder.class);
-        rRegistry.add(new GenericListReader<>(IFC_ID, new InterfaceReader(cli)));
-        rRegistry.add(new GenericReader<>(IFC_STATE_ID, new InterfaceStateReader(cli)));
-        rRegistry.add(new GenericInitReader<>(IFC_CONFIG_ID, new InterfaceConfigReader(cli)));
+        rRegistry.addStructuralReader(IIDs.INTERFACES, InterfacesBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.IN_INTERFACE, new InterfaceReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.IN_IN_STATE, new InterfaceStateReader(cli)));
+        rRegistry.add(new GenericInitReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));
 
-        rRegistry.addStructuralReader(SUBIFCS_ID, SubinterfacesBuilder.class);
-        rRegistry.add(new GenericInitListReader<>(SUBIFC_ID, new SubinterfaceReader(cli)));
+        rRegistry.addStructuralReader(IIDs.IN_IN_SUBINTERFACES, SubinterfacesBuilder.class);
+        rRegistry.add(new GenericInitListReader<>(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli)));
 
         rRegistry.addStructuralReader(SUBIFC_IPV4_AUG_ID, Subinterface1Builder.class);
         rRegistry.addStructuralReader(SUBIFC_IPV4_ID, Ipv4Builder.class);

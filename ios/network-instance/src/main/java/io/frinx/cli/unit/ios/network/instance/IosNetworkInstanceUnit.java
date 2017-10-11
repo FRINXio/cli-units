@@ -23,22 +23,15 @@ import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.ProtocolConfigReader;
 import io.frinx.cli.unit.ios.network.instance.handler.ProtocolReader;
 import io.frinx.cli.unit.ios.network.instance.handler.ProtocolStateReader;
+import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstances;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Interfaces;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Protocols;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ProtocolsBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class IosNetworkInstanceUnit implements TranslateUnit {
@@ -46,25 +39,6 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
             .setDeviceType("ios")
             .setDeviceVersion("*")
             .build();
-    private static final InstanceIdentifier<NetworkInstances> NETWORK_INSTANCES_ID = InstanceIdentifier
-            .create(NetworkInstances.class);
-    private static final InstanceIdentifier<NetworkInstance> NETWORK_INSTANCE_ID = NETWORK_INSTANCES_ID
-            .child(NetworkInstance.class);
-    private static final InstanceIdentifier<Protocols> PROTOCOLS_ID = NETWORK_INSTANCE_ID
-            .child(Protocols.class);
-    private static final InstanceIdentifier<Protocol> PROTOCOL_ID = PROTOCOLS_ID
-            .child(Protocol.class);
-    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config> PROTOCOL_CFG_ID = PROTOCOL_ID
-            .child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config.class);
-    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.State> PROTOCOL_STATE_ID = PROTOCOL_ID
-            .child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.State.class);
-
-    private static final InstanceIdentifier<Config> NETWORK_INSTANCE_CONFIG_ID = NETWORK_INSTANCE_ID
-            .child(Config.class);
-    private static final InstanceIdentifier<Interfaces> NETWORK_INSTANCE_INTERFFACES_ID = NETWORK_INSTANCE_ID
-            .child(Interfaces.class);
-    private static final InstanceIdentifier<Interface> NETWORK_INSTANCE_INTERFACE = NETWORK_INSTANCE_INTERFFACES_ID
-            .child(Interface.class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -98,16 +72,16 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         // VRFs
-        rRegistry.addStructuralReader(NETWORK_INSTANCES_ID, NetworkInstancesBuilder.class);
-        rRegistry.add(new GenericListReader<>(NETWORK_INSTANCE_ID, new NetworkInstanceReader(cli)));
-        rRegistry.add(new GenericReader<>(NETWORK_INSTANCE_CONFIG_ID, new NetworkInstanceConfigReader(cli)));
-        rRegistry.addStructuralReader(NETWORK_INSTANCE_INTERFFACES_ID, InterfacesBuilder.class);
-        rRegistry.add(new GenericListReader<>(NETWORK_INSTANCE_INTERFACE, new NetworkInstanceInterfaceReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_NE_INTERFACES, InterfacesBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_IN_INTERFACE, new NetworkInstanceInterfaceReader(cli)));
 
-        rRegistry.addStructuralReader(PROTOCOLS_ID, ProtocolsBuilder.class);
-        rRegistry.add(new GenericListReader<>(PROTOCOL_ID, new ProtocolReader(cli)));
-        rRegistry.add(new GenericReader<>(PROTOCOL_CFG_ID, new ProtocolConfigReader()));
-        rRegistry.add(new GenericReader<>(PROTOCOL_STATE_ID, new ProtocolStateReader()));
+        rRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader()));
     }
 
     @Override

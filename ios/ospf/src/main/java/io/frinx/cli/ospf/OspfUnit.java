@@ -23,29 +23,17 @@ import io.frinx.cli.ospf.handler.GlobalStateReader;
 import io.frinx.cli.ospf.handler.OspfAreaReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstances;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Protocols;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.Interfaces;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.Global;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.GlobalBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.Config;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.State;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.Ospfv2;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.Ospfv2Builder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.Areas;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.AreasBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.Area;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class OspfUnit implements TranslateUnit {
@@ -54,35 +42,6 @@ public class OspfUnit implements TranslateUnit {
             .setDeviceType("ios")
             .setDeviceVersion("*")
             .build();
-
-    // FIXME duplicate code with Network instance unit
-    private static final InstanceIdentifier<NetworkInstances> NETWORK_INSTANCES_ID = InstanceIdentifier
-            .create(NetworkInstances.class);
-    private static final InstanceIdentifier<NetworkInstance> NETWORK_INSTANCE_ID = NETWORK_INSTANCES_ID
-            .child(NetworkInstance.class);
-    private static final InstanceIdentifier<Protocols> PROTOCOLS_ID = NETWORK_INSTANCE_ID
-            .child(Protocols.class);
-    private static final InstanceIdentifier<Protocol> PROTOCOL_ID = PROTOCOLS_ID
-            .child(Protocol.class);
-
-    private static final InstanceIdentifier<Ospfv2> NETWORK_INSTANCE_PROTOCOL_OSPF = PROTOCOL_ID.child(Ospfv2.class);
-    private static final InstanceIdentifier<Global> NETWORK_INSTANCE_PROTOCOL_OSPF_GLOBAL = NETWORK_INSTANCE_PROTOCOL_OSPF
-            .child(Global.class);
-    private static final InstanceIdentifier<Config> PROTOCOL_GLOBAL_CONFIG = NETWORK_INSTANCE_PROTOCOL_OSPF_GLOBAL.child(Config.class);
-    private static final InstanceIdentifier<State> PROTOCOL_GLOBAL_STATE = NETWORK_INSTANCE_PROTOCOL_OSPF_GLOBAL.child(State.class);
-    private static final InstanceIdentifier<Areas> NETWORK_INSTANCE_PROTOCOL_OSPF_AREAS = NETWORK_INSTANCE_PROTOCOL_OSPF
-            .child(Areas.class);
-    private static final InstanceIdentifier<Area> NETWORK_INSTANCE_PROTOCOL_OSPF_AREA = NETWORK_INSTANCE_PROTOCOL_OSPF_AREAS
-            .child(Area.class);
-
-    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.structure.Config> OSPF_AREA_CONFIG = NETWORK_INSTANCE_PROTOCOL_OSPF_AREA
-            .child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.structure.Config.class);
-    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.structure.State> OSPF_AREA_STATE = NETWORK_INSTANCE_PROTOCOL_OSPF_AREA
-            .child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.structure.State.class);
-
-    private static final InstanceIdentifier<Interfaces> OSPF_AREA_INTERFACES = NETWORK_INSTANCE_PROTOCOL_OSPF_AREA
-            .child(Interfaces.class);
-    private static final InstanceIdentifier<Interface> OSPF_AREA_INTERFACS = OSPF_AREA_INTERFACES.child(Interface.class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -115,16 +74,16 @@ public class OspfUnit implements TranslateUnit {
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(NETWORK_INSTANCE_PROTOCOL_OSPF, Ospfv2Builder.class);
-        rRegistry.addStructuralReader(NETWORK_INSTANCE_PROTOCOL_OSPF_GLOBAL, GlobalBuilder.class);
-        rRegistry.add(new GenericReader<>(PROTOCOL_GLOBAL_CONFIG, new GlobalConfigReader(cli)));
-        rRegistry.add(new GenericReader<>(PROTOCOL_GLOBAL_STATE, new GlobalStateReader(cli)));
-        rRegistry.addStructuralReader(NETWORK_INSTANCE_PROTOCOL_OSPF_AREAS, AreasBuilder.class);
-        rRegistry.add(new GenericListReader<>(NETWORK_INSTANCE_PROTOCOL_OSPF_AREA, new OspfAreaReader(cli)));
-        rRegistry.add(new GenericReader<>(OSPF_AREA_CONFIG, new AreaConfigReader()));
-        rRegistry.add(new GenericReader<>(OSPF_AREA_STATE, new AreaStateReader()));
-        rRegistry.addStructuralReader(OSPF_AREA_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericListReader<>(OSPF_AREA_INTERFACS, new AreaInterfaceReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OSPFV, Ospfv2Builder.class);
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GLOBAL, GlobalBuilder.class);
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_OS_GL_STATE, new GlobalStateReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AREAS, AreasBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new OspfAreaReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigReader()));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_STATE, new AreaStateReader()));
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_INTERFACES, InterfacesBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new AreaInterfaceReader(cli)));
     }
 
     @Override

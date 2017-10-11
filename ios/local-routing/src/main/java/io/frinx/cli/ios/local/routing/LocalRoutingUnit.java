@@ -15,29 +15,22 @@ import io.fd.honeycomb.translate.impl.read.GenericReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.local.routing.handlers.*;
+import io.frinx.cli.ios.local.routing.handlers.NextHopConfigReader;
+import io.frinx.cli.ios.local.routing.handlers.NextHopReader;
+import io.frinx.cli.ios.local.routing.handlers.NextHopStateReader;
+import io.frinx.cli.ios.local.routing.handlers.StaticConfigReader;
+import io.frinx.cli.ios.local.routing.handlers.StaticReader;
+import io.frinx.cli.ios.local.routing.handlers.StaticStateReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.LocalStaticNexthopConfig;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutes;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutesBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.Config;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.NextHops;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.NextHopsBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.State;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHop;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstances;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Protocols;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class LocalRoutingUnit implements TranslateUnit {
@@ -46,28 +39,6 @@ public class LocalRoutingUnit implements TranslateUnit {
             .setDeviceType("ios")
             .setDeviceVersion("*")
             .build();
-
-    private static final InstanceIdentifier<NetworkInstances> NETWORK_INSTANCES_ID = InstanceIdentifier
-            .create(NetworkInstances.class);
-    private static final InstanceIdentifier<NetworkInstance> NETWORK_INSTANCE_ID = NETWORK_INSTANCES_ID
-            .child(NetworkInstance.class);
-    private static final InstanceIdentifier<Protocols> PROTOCOLS_ID = NETWORK_INSTANCE_ID
-            .child(Protocols.class);
-    private static final InstanceIdentifier<Protocol> PROTOCOL_ID = PROTOCOLS_ID
-            .child(Protocol.class);
-
-    private static final InstanceIdentifier<StaticRoutes> STATIC_ROUTES_ID = PROTOCOL_ID.child(StaticRoutes.class);
-    private static final InstanceIdentifier<Static> STATIC_ID = STATIC_ROUTES_ID.child(Static.class);
-    private static final InstanceIdentifier<State> STATE_ID = STATIC_ID.child(State.class);
-    private static final InstanceIdentifier<Config> CONFIG_ID = STATIC_ID.child(Config.class);
-    private static final InstanceIdentifier<NextHops> NEXT_HOPS_ID = STATIC_ID.child(NextHops.class);
-    private static final InstanceIdentifier<NextHop> NEXT_HOP_ID = NEXT_HOPS_ID.child(NextHop.class);
-
-    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.next.hop.Config> NEXT_HOP_CONFIG_ID =
-            NEXT_HOP_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.next.hop.Config.class);
-
-    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.next.hop.State> NEXT_HOP_STATE_ID =
-            NEXT_HOP_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.next.hop.State.class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -100,14 +71,14 @@ public class LocalRoutingUnit implements TranslateUnit {
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(STATIC_ROUTES_ID, StaticRoutesBuilder.class);
-        rRegistry.add(new GenericListReader<>(STATIC_ID, new StaticReader(cli)));
-        rRegistry.add(new GenericReader<>(STATE_ID, new StaticStateReader()));
-        rRegistry.add(new GenericReader<>(CONFIG_ID, new StaticConfigReader()));
-        rRegistry.addStructuralReader(NEXT_HOPS_ID, NextHopsBuilder.class);
-        rRegistry.add(new GenericListReader<>(NEXT_HOP_ID, new NextHopReader(cli)));
-        rRegistry.add(new GenericReader<>(NEXT_HOP_CONFIG_ID, new NextHopConfigReader(cli)));
-        rRegistry.add(new GenericReader<>(NEXT_HOP_STATE_ID, new NextHopStateReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_STATICROUTES, StaticRoutesBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PR_ST_STATIC, new StaticReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_ST_ST_STATE, new StaticStateReader()));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_ST_ST_CONFIG, new StaticConfigReader()));
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_ST_ST_NEXTHOPS, NextHopsBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PR_ST_ST_NE_NEXTHOP, new NextHopReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_ST_ST_NE_NE_CONFIG, new NextHopConfigReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_ST_ST_NE_NE_STATE, new NextHopStateReader(cli)));
     }
 
     @Override
