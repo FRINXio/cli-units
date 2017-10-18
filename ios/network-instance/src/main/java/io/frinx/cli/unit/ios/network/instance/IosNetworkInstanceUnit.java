@@ -74,7 +74,7 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
         // VRFs
         rRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
         rRegistry.add(new GenericListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader()));
         rRegistry.addStructuralReader(IIDs.NE_NE_INTERFACES, InterfacesBuilder.class);
         rRegistry.add(new GenericListReader<>(IIDs.NE_NE_IN_INTERFACE, new NetworkInstanceInterfaceReader(cli)));
 
