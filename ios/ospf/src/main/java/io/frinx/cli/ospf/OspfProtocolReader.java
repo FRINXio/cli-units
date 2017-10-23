@@ -6,6 +6,7 @@ import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWOR
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ospf.common.OspfReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
@@ -17,14 +18,13 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.policy.types.rev160512.OSPF;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder> {
+public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
+        OspfReader<Protocol, ProtocolBuilder> {
 
-    public static final Class<OSPF> TYPE = OSPF.class;
     private Cli cli;
 
     public OspfProtocolReader(Cli cli) {
@@ -71,14 +71,10 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier,
-                                      @Nonnull ProtocolBuilder protocolBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(InstanceIdentifier<Protocol> instanceIdentifier, ProtocolBuilder protocolBuilder, ReadContext readContext) {
         ProtocolKey key = instanceIdentifier.firstKeyOf(Protocol.class);
-        if (key.getIdentifier().equals(TYPE)) {
-            protocolBuilder.setName(key.getName());
-            protocolBuilder.setIdentifier(key.getIdentifier());
-            // FIXME set attributes
-        }
+        protocolBuilder.setName(key.getName());
+        protocolBuilder.setIdentifier(key.getIdentifier());
     }
+
 }

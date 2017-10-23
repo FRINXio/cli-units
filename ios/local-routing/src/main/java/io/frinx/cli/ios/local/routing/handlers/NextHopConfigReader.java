@@ -14,8 +14,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
-import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.cli.ios.local.routing.common.LrReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -32,7 +31,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NextHopConfigReader implements CliReader<Config, ConfigBuilder> {
+public class NextHopConfigReader implements LrReader<Config, ConfigBuilder> {
 
     private static final String SHOW_IP_STATIC_ROUTE_NETWORK = "sh ip static route %s | include %s";
     private static final String SHOW_IP_STATIC_ROUTE_VRF_NETWORK = "sh ip static route vrf %s %s | include %s";
@@ -53,12 +52,9 @@ public class NextHopConfigReader implements CliReader<Config, ConfigBuilder> {
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
-                                      @Nonnull ReadContext ctx) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
+                                             @Nonnull ReadContext ctx) throws ReadFailedException {
         ProtocolKey protocolKey = id.firstKeyOf(Protocol.class);
-        if (!protocolKey.getIdentifier().equals(StaticLocalRoutingProtocolReader.TYPE)) {
-            return;
-        }
 
         StaticKey staticRouteKey = id.firstKeyOf(Static.class);
         String ipPrefix = staticRouteKey.getPrefix().getIpv4Prefix().getValue();

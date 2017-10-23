@@ -12,10 +12,8 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ospf.OspfProtocolReader;
-import io.frinx.cli.unit.utils.CliListReader;
+import io.frinx.cli.ospf.common.OspfListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -29,7 +27,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class OspfAreaReader implements CliListReader<Area, AreaKey, AreaBuilder> {
+public class OspfAreaReader implements OspfListReader<Area, AreaKey, AreaBuilder> {
     private static final Pattern AREA_ID = Pattern.compile(".*?Area (?:BACKBONE\\()?(?<areaId>[0-9]+).*");
 
     private final Cli cli;
@@ -40,12 +38,8 @@ public class OspfAreaReader implements CliListReader<Area, AreaKey, AreaBuilder>
 
     @Nonnull
     @Override
-    public List<AreaKey> getAllIds(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
+    public List<AreaKey> getAllIdsForType(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
                                    @Nonnull ReadContext readContext) throws ReadFailedException {
-        if(!instanceIdentifier.firstKeyOf(Protocol.class).getIdentifier().equals(OspfProtocolReader.TYPE)) {
-            return Collections.emptyList();
-        }
-
         String id = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         return parseAreasIds(blockingRead(String.format(GlobalConfigReader.SH_OSPF, id), cli, instanceIdentifier, readContext));
     }
@@ -64,13 +58,9 @@ public class OspfAreaReader implements CliListReader<Area, AreaKey, AreaBuilder>
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
                                       @Nonnull AreaBuilder areaBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        if(!instanceIdentifier.firstKeyOf(Protocol.class).getIdentifier().equals(OspfProtocolReader.TYPE)) {
-            return;
-        }
-
         areaBuilder.setIdentifier(instanceIdentifier.firstKeyOf(Area.class).getIdentifier());
     }
 

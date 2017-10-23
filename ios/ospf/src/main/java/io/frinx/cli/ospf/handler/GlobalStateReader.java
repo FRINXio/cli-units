@@ -4,8 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ospf.OspfProtocolReader;
-import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.cli.ospf.common.OspfReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
@@ -17,7 +16,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalStateReader implements CliReader<State, StateBuilder> {
+public class GlobalStateReader implements OspfReader<State, StateBuilder> {
 
     private Cli cli;
 
@@ -32,14 +31,9 @@ public class GlobalStateReader implements CliReader<State, StateBuilder> {
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier,
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                       @Nonnull StateBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        if(!instanceIdentifier.firstKeyOf(Protocol.class).getIdentifier().equals(OspfProtocolReader.TYPE)) {
-            return;
-        }
-
-        // FIXME duplicite code with config reader !!!
         String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         parseGlobal(blockingRead(String.format(GlobalConfigReader.SH_OSPF, ospfId), cli, instanceIdentifier), configBuilder);
     }

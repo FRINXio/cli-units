@@ -16,14 +16,13 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.policy.types.rev160512.BGP;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder> {
+public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
+        io.frinx.cli.ios.bgp.common.BgpReader<Protocol, ProtocolBuilder> {
 
-    public static final Class<BGP> TYPE = BGP.class;
     public static final String DEFAULT_BGP_INSTANCE = "default";
     private final Cli cli;
 
@@ -61,9 +60,9 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Protocol> iid,
-                                      @Nonnull ProtocolBuilder builder,
-                                      @Nonnull ReadContext ctx) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> iid,
+                                             @Nonnull ProtocolBuilder builder,
+                                             @Nonnull ReadContext ctx) throws ReadFailedException {
         // FIXME implement BGP VRF-awareness
         if (!DEFAULT_NETWORK.equals(iid.firstKeyOf(NetworkInstance.class))) {
             LOG.info("BGP VRF-aware is not implemented yet.");
@@ -71,15 +70,13 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
         }
 
         ProtocolKey key = iid.firstKeyOf(Protocol.class);
-        if (key.getIdentifier().equals(TYPE)) {
-            builder.setName(key.getName());
-            builder.setIdentifier(key.getIdentifier());
-            BgpReader bgpReader = new BgpReader(cli);
-            BgpBuilder bgpBuilder = new BgpBuilder();
-            bgpReader.readCurrentAttributes(iid.child(Bgp.class), bgpBuilder, ctx);
-            // FIXME we should not set Bgp here because it has own BgpReader
-            builder.setBgp(bgpBuilder.build());
-            // FIXME set attributes
-        }
+        builder.setName(key.getName());
+        builder.setIdentifier(key.getIdentifier());
+        BgpReader bgpReader = new BgpReader(cli);
+        BgpBuilder bgpBuilder = new BgpBuilder();
+        bgpReader.readCurrentAttributes(iid.child(Bgp.class), bgpBuilder, ctx);
+        // FIXME we should not set Bgp here because it has own BgpReader
+        builder.setBgp(bgpBuilder.build());
+        // FIXME set attributes
     }
 }

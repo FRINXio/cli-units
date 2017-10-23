@@ -4,8 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ospf.OspfProtocolReader;
-import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.cli.ospf.common.OspfReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -18,7 +17,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalConfigReader implements CliReader<Config, ConfigBuilder> {
+public class GlobalConfigReader implements OspfReader<Config, ConfigBuilder> {
 
     private Cli cli;
 
@@ -36,14 +35,9 @@ public class GlobalConfigReader implements CliReader<Config, ConfigBuilder> {
     static final Pattern ROUTER_ID = Pattern.compile(".*?with ID (?<routerId>[^\\s]+).*");
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        // FIXME extract this check into superclass since it is used everywhere under /network-instance/protocol/
-        if(!instanceIdentifier.firstKeyOf(Protocol.class).getIdentifier().equals(OspfProtocolReader.TYPE)) {
-            return;
-        }
-
         String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         parseGlobal(blockingRead(String.format(SH_OSPF, ospfId), cli, instanceIdentifier), configBuilder);
     }

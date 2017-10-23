@@ -8,11 +8,15 @@
 
 package io.frinx.cli.ios.bgp.handler;
 
+import com.google.common.annotations.VisibleForTesting;
+import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.BgpNeighborState.SessionState;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder;
@@ -38,15 +42,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import com.google.common.annotations.VisibleForTesting;
-
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-
-public class BgpReader implements CliReader<Bgp, BgpBuilder> {
+public class BgpReader implements io.frinx.cli.ios.bgp.common.BgpReader<Bgp, BgpBuilder> {
 
     private static final String SH_SUMM = "sh bgp summ";
     private static final Pattern CONFIG_LINE = Pattern.compile("BGP router identifier (?<id>.+), local AS number (?<as>.+)");
@@ -69,11 +65,8 @@ public class BgpReader implements CliReader<Bgp, BgpBuilder> {
     }
 
     @Override
-    public void readCurrentAttributes(InstanceIdentifier<Bgp> id, BgpBuilder builder, ReadContext ctx) throws ReadFailedException {
+    public void readCurrentAttributesForType(InstanceIdentifier<Bgp> id, BgpBuilder builder, ReadContext ctx) throws ReadFailedException {
         ProtocolKey protocolKey = id.firstKeyOf(Protocol.class);
-        if (!protocolKey.getIdentifier().equals(BgpProtocolReader.TYPE)) {
-            return;
-        }
 
         parseGlobal(blockingRead(SH_SUMM, cli, id), builder);
 

@@ -14,11 +14,9 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
-import io.frinx.cli.unit.utils.CliListReader;
+import io.frinx.cli.ios.local.routing.common.LrListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -34,7 +32,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NextHopReader implements CliListReader<NextHop, NextHopKey, NextHopBuilder> {
+public class NextHopReader implements LrListReader<NextHop, NextHopKey, NextHopBuilder> {
 
     private static final String SH_IP_ROUTE = "sh ip static route %s";
     private static final String SH_IP_STATIC_ROUTE_VRF = "sh ip static route vrf %s %s";
@@ -46,8 +44,6 @@ public class NextHopReader implements CliListReader<NextHop, NextHopKey, NextHop
     private static final Pattern NEXT_HOP_INTERFACE_IP_LINE =
             Pattern.compile(".+] via (?<interface>[\\w[/]]+) (?<ipAddress>[\\d*\\.]+) \\[.+");
 
-
-
     private Cli cli;
 
     public NextHopReader(final Cli cli) {
@@ -56,12 +52,9 @@ public class NextHopReader implements CliListReader<NextHop, NextHopKey, NextHop
 
     @Nonnull
     @Override
-    public List<NextHopKey> getAllIds(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<NextHopKey> getAllIdsForType(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
+                                             @Nonnull ReadContext readContext) throws ReadFailedException {
         ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
-        if (!protocolKey.getIdentifier().equals(StaticLocalRoutingProtocolReader.TYPE)) {
-            return Collections.emptyList();
-        }
 
         StaticKey staticRouteKey = instanceIdentifier.firstKeyOf(Static.class);
         String ipPrefix = staticRouteKey.getPrefix().getIpv4Prefix().getValue();
@@ -113,14 +106,9 @@ public class NextHopReader implements CliListReader<NextHop, NextHopKey, NextHop
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
-                                      @Nonnull NextHopBuilder nextHopBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
-        if (!protocolKey.getIdentifier().equals(StaticLocalRoutingProtocolReader.TYPE)) {
-            return;
-        }
-
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
+                                             @Nonnull NextHopBuilder nextHopBuilder,
+                                             @Nonnull ReadContext readContext) throws ReadFailedException {
         nextHopBuilder.setIndex(instanceIdentifier.firstKeyOf(NextHop.class).getIndex());
     }
 }
