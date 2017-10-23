@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.registry.common.CompositeReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import java.util.Collections;
 import java.util.List;
@@ -16,12 +17,11 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
-        io.frinx.cli.ios.bgp.common.BgpReader<Protocol, ProtocolBuilder> {
+        io.frinx.cli.ios.bgp.common.BgpReader<Protocol, ProtocolBuilder>,
+        CompositeReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     public static final String DEFAULT_BGP_INSTANCE = "default";
     private final Cli cli;
@@ -46,17 +46,6 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
         }
         // IOS does not support multi-instance BGP therefore there is only default instance
         return ImmutableList.of(new ProtocolKey(TYPE, DEFAULT_BGP_INSTANCE));
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Protocol> readData) {
-        // Noop
-    }
-
-    @Nonnull
-    @Override
-    public ProtocolBuilder getBuilder(@Nonnull InstanceIdentifier<Protocol> iid) {
-        return new ProtocolBuilder();
     }
 
     @Override

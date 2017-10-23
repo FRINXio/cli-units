@@ -7,6 +7,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ospf.common.OspfReader;
+import io.frinx.cli.registry.common.CompositeReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
@@ -18,12 +19,11 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
-        OspfReader<Protocol, ProtocolBuilder> {
+        OspfReader<Protocol, ProtocolBuilder>,
+        CompositeReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     private Cli cli;
 
@@ -36,7 +36,9 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
 
     @Nonnull
     @Override
-    public List<ProtocolKey> getAllIds(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<ProtocolKey> getAllIds(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier,
+                                       @Nonnull ReadContext readContext)
+            throws ReadFailedException {
         String output = blockingRead("sh run | include ospf", cli, instanceIdentifier, readContext);
         String vrfId = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
@@ -59,19 +61,9 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Protocol> list) {
-        // NOOP
-    }
-
-    @Nonnull
-    @Override
-    public ProtocolBuilder getBuilder(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier) {
-        // NOOP
-        return null;
-    }
-
-    @Override
-    public void readCurrentAttributesForType(InstanceIdentifier<Protocol> instanceIdentifier, ProtocolBuilder protocolBuilder, ReadContext readContext) {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier,
+                                             @Nonnull ProtocolBuilder protocolBuilder,
+                                             @Nonnull ReadContext readContext) {
         ProtocolKey key = instanceIdentifier.firstKeyOf(Protocol.class);
         protocolBuilder.setName(key.getName());
         protocolBuilder.setIdentifier(key.getIdentifier());
