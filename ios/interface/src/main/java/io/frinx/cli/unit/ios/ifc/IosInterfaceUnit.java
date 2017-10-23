@@ -118,11 +118,20 @@ public final class IosInterfaceUnit implements TranslateUnit {
 
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
         wRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
+
+        // InterfaceConfigWriter is responsible for:
+        //  configuring interface (e.g. shutdown, mtu etc.)
+        //  creating/deleting new interfaces (e.g. loopback)
         wRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
 
         wRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SUBINTERFACE, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(SUBIFC_IPV4_ADDRESS_ID, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(SUBIFC_IPV4_CFG_ID, new Ipv4ConfigWriter(cli)));
+
+        // Ipv4ConfigReader is responsible for:
+        //  creating/deleting IPv4 configuration per interface
+        // RELATIONS: NEeds to be executed after InterfaceConfigWriter
+        wRegistry.addAfter(new GenericWriter<>(SUBIFC_IPV4_CFG_ID, new Ipv4ConfigWriter(cli)),
+                IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
