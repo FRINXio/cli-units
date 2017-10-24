@@ -47,6 +47,11 @@
         <bundle>mvn:io.frinx.cli/ios-ospf-unit/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='cli-southbound-unit-ios-cdp' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:io.frinx.cli/ios-cdp-unit/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-ios-local-routing' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <bundle>mvn:io.frinx.cli/ios-local-routing-unit/{{VERSION}}</bundle>
@@ -60,6 +65,7 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-network-instance</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-local-routing</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-ospf</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-cdp</feature>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-essential' version='${project.version}'>

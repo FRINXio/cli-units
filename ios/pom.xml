@@ -32,6 +32,7 @@
     <module>network-instance</module>
     <module>ospf</module>
     <module>local-routing</module>
+    <module>cdp</module>
   </modules>
 
   <build>
