@@ -33,6 +33,8 @@
     <module>ospf</module>
     <module>local-routing</module>
     <module>cdp</module>
+
+    <module>lldp</module>
   </modules>
 
   <build>

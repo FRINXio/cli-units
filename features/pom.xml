@@ -140,6 +140,10 @@
       <artifactId>ios-cdp-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>ios-lldp-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>
