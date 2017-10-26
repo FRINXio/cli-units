@@ -33,9 +33,9 @@ public class GlobalStateReader implements OspfReader<State, StateBuilder> {
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                       @Nonnull StateBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+                                      @Nonnull ReadContext ctx) throws ReadFailedException {
         String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        parseGlobal(blockingRead(String.format(GlobalConfigReader.SH_OSPF, ospfId), cli, instanceIdentifier), configBuilder);
+        parseGlobal(blockingRead(String.format(GlobalConfigReader.SH_OSPF, ospfId), cli, instanceIdentifier, ctx), configBuilder);
     }
 
     @VisibleForTesting

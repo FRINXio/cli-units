@@ -8,23 +8,22 @@
 
 package io.frinx.cli.unit.iosxr.essential.crud;
 
+import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
+import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliReader;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.Version;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.VersionBuilder;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
 
 public class VersionReader implements CliReader<Version, VersionBuilder> {
 
@@ -41,8 +40,8 @@ public class VersionReader implements CliReader<Version, VersionBuilder> {
     public void readCurrentAttributes(@Nonnull final InstanceIdentifier<Version> id,
                                       @Nonnull final VersionBuilder builder,
                                       @Nonnull final ReadContext ctx) throws ReadFailedException {
-        parseShowVersion(blockingRead(SH_VERSION, cli, id), builder);
-        parseShowInventoryRack(blockingRead(SH_INV_RACK, cli,id), builder);
+        parseShowVersion(blockingRead(SH_VERSION, cli, id, ctx), builder);
+        parseShowInventoryRack(blockingRead(SH_INV_RACK, cli,id, ctx), builder);
     }
 
     private static final Pattern DESCRIPTION_LINE = Pattern.compile("System image file is \"(?<image>[^\"]+)\"");

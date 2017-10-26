@@ -41,7 +41,7 @@ public class VrfReader implements InitCliListReader<Vrf, VrfKey, VrfBuilder> {
     @Override
     public List<VrfKey> getAllIds(@Nonnull InstanceIdentifier<Vrf> instanceIdentifier,
                                   @Nonnull ReadContext readContext) throws ReadFailedException {
-        return parseVrfIds(blockingRead(SH_IP_VRF, cli, instanceIdentifier));
+        return parseVrfIds(blockingRead(SH_IP_VRF, cli, instanceIdentifier, readContext));
     }
 
     private static final Pattern VRF_ID_LINE = Pattern.compile("(?<id>[^\\s]+).*");
@@ -74,7 +74,7 @@ public class VrfReader implements InitCliListReader<Vrf, VrfKey, VrfBuilder> {
         String id = instanceIdentifier.firstKeyOf(Vrf.class).getId();
         vrfBuilder.setId(id);
 
-        parseVrf(blockingRead(String.format(SH_VRF_DETAIL_ID_TEMPLATE, id), cli, instanceIdentifier), vrfBuilder);
+        parseVrf(blockingRead(String.format(SH_VRF_DETAIL_ID_TEMPLATE, id), cli, instanceIdentifier, readContext), vrfBuilder);
     }
 
     private static final Pattern DESCRIPTION_LINE = Pattern.compile("Description:\\s+(?<description>.+)");

@@ -32,8 +32,6 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.t
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.GlobalBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.NeighborsBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.types.inet.rev170403.IpAddress;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.types.inet.rev170403.Ipv4Address;
@@ -66,17 +64,15 @@ public class BgpReader implements io.frinx.cli.ios.bgp.common.BgpReader<Bgp, Bgp
 
     @Override
     public void readCurrentAttributesForType(InstanceIdentifier<Bgp> id, BgpBuilder builder, ReadContext ctx) throws ReadFailedException {
-        ProtocolKey protocolKey = id.firstKeyOf(Protocol.class);
-
-        parseGlobal(blockingRead(SH_SUMM, cli, id), builder);
+        parseGlobal(blockingRead(SH_SUMM, cli, id, ctx), builder);
 
         List<Neighbor> nList = new ArrayList<>();
 
         // IPV4 unicast
-        parseNeighbors(blockingRead(Ipv4Reader.COMMAND, cli, id), nList, Ipv4Reader.AFI_SAFI);
+        parseNeighbors(blockingRead(Ipv4Reader.COMMAND, cli, id, ctx), nList, Ipv4Reader.AFI_SAFI);
 
         // VPNV4 unicast
-        parseNeighbors(blockingRead(Vpnv4Reader.COMMAND, cli, id), nList, Vpnv4Reader.AFI_SAFI);
+        parseNeighbors(blockingRead(Vpnv4Reader.COMMAND, cli, id, ctx), nList, Vpnv4Reader.AFI_SAFI);
 
         builder.setNeighbors(new NeighborsBuilder().setNeighbor(nList).build());
     }
