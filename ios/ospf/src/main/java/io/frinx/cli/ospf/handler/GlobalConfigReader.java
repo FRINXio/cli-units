@@ -39,7 +39,7 @@ public class GlobalConfigReader implements OspfReader<Config, ConfigBuilder> {
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        parseGlobal(blockingRead(String.format(SH_OSPF, ospfId), cli, instanceIdentifier), configBuilder);
+        parseGlobal(blockingRead(String.format(SH_OSPF, ospfId), cli, instanceIdentifier, readContext), configBuilder);
     }
 
     @VisibleForTesting

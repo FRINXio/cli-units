@@ -58,7 +58,7 @@ public class RibReader implements CliReader<BgpRib, BgpRibBuilder> {
     @Override
     public void readCurrentAttributes(InstanceIdentifier<BgpRib> id, BgpRibBuilder builder, ReadContext ctx)
     throws ReadFailedException {
-        parseRib(blockingRead(SH_IP_BGP, cli, id), builder);
+        parseRib(blockingRead(SH_IP_BGP, cli, id, ctx), builder);
     }
 
     @VisibleForTesting

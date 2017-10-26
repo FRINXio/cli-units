@@ -52,7 +52,7 @@ public class StaticReader implements LrListReader<Static, StaticKey, StaticBuild
         String showCommand = vrfName.equals(DEFAULT_NETWORK_NAME)
                 ? SH_IP_STATIC_ROUTE : String.format(SH_IP_STATIC_ROUTE_VRF, vrfName);
 
-        return parseStaticPrefixes(blockingRead(showCommand, cli, instanceIdentifier));
+        return parseStaticPrefixes(blockingRead(showCommand, cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting

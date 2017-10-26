@@ -44,7 +44,7 @@ public class NetworkInstanceReader implements InitCliListReader<NetworkInstance,
     @Override
     public List<NetworkInstanceKey> getAllIds(@Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier,
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
-        return parseVrfIds(blockingRead(SH_IP_VRF, cli, instanceIdentifier));
+        return parseVrfIds(blockingRead(SH_IP_VRF, cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting
