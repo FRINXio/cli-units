@@ -9,6 +9,8 @@
 package io.frinx.cli.ios.bgp.common;
 
 import io.frinx.cli.registry.common.TypedReader;
+import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.CliReader;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.policy.types.rev160512.BGP;
@@ -24,4 +26,11 @@ public interface BgpReader<O extends DataObject, B extends Builder<O>> extends T
     default Identifier<? extends DataObject> getKey() {
         return new ProtocolKey(TYPE, null);
     }
+
+    /**
+     * Union mixin of Bgp reader and Config reader.
+     */
+    interface BgpConfigReader<O extends DataObject, B extends Builder<O>> extends BgpReader<O, B>, CliConfigReader<O, B> {}
+
+    interface BgpOperReader<O extends DataObject, B extends Builder<O>> extends BgpReader<O, B>, CliOperReader<O, B> {}
 }

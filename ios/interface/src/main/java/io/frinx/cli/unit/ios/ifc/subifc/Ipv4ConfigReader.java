@@ -8,12 +8,16 @@
 
 package io.frinx.cli.unit.ios.ifc.subifc;
 
+import static io.frinx.cli.unit.ios.ifc.subifc.Ipv4AddressReader.INTERFACE_IP_LINE;
+import static io.frinx.cli.unit.ios.ifc.subifc.Ipv4AddressReader.SH_INTERFACE_IP;
+import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.fd.honeycomb.translate.spi.read.Initialized;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.InitCliReader;
+import io.frinx.cli.unit.utils.CliConfigReader;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.AddressBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.ConfigBuilder;
@@ -23,13 +27,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
-import static io.frinx.cli.unit.ios.ifc.subifc.Ipv4AddressReader.INTERFACE_IP_LINE;
-import static io.frinx.cli.unit.ios.ifc.subifc.Ipv4AddressReader.SH_INTERFACE_IP;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
-public class Ipv4ConfigReader implements InitCliReader<Config, ConfigBuilder> {
+public class Ipv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private Cli cli;
 
@@ -67,13 +65,5 @@ public class Ipv4ConfigReader implements InitCliReader<Config, ConfigBuilder> {
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
         ((AddressBuilder) builder).setConfig(config);
-    }
-
-    @Nonnull
-    @Override
-    public Initialized<? extends DataObject> init(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                                  @Nonnull Config config,
-                                                  @Nonnull ReadContext readContext) {
-        return Initialized.create(instanceIdentifier, config);
     }
 }

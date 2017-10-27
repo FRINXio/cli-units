@@ -21,7 +21,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StaticConfigReader implements LrReader<Config, ConfigBuilder> {
+public class StaticConfigReader implements LrReader.LrConfigReader<Config, ConfigBuilder> {
 
     @Nonnull
     @Override

@@ -11,9 +11,11 @@ package io.frinx.cli.unit.ios.ifc.subifc;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.fd.honeycomb.translate.spi.read.Initialized;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.InitCliListReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceBuilder;
@@ -22,11 +24,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public final class SubinterfaceReader implements InitCliListReader<Subinterface, SubinterfaceKey, SubinterfaceBuilder> {
+public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey, SubinterfaceBuilder> {
 
     private Cli cli;
 
@@ -62,14 +60,5 @@ public final class SubinterfaceReader implements InitCliListReader<Subinterface,
                                       @Nonnull SubinterfaceBuilder builder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         builder.setIndex(id.firstKeyOf(Subinterface.class).getIndex());
-    }
-
-    @Nonnull
-    @Override
-    public Initialized<? extends DataObject> init(@Nonnull InstanceIdentifier<Subinterface> id,
-                                                  @Nonnull Subinterface readValue,
-                                                  @Nonnull ReadContext ctx) {
-        // Direct translation
-        return Initialized.create(id, new SubinterfaceBuilder(readValue).build());
     }
 }

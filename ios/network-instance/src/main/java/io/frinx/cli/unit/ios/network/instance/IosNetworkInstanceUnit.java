@@ -10,8 +10,9 @@ package io.frinx.cli.unit.ios.network.instance;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericListReader;
-import io.fd.honeycomb.translate.impl.read.GenericReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
+import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -73,15 +74,15 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         // VRFs
         rRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader()));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader()));
         rRegistry.addStructuralReader(IIDs.NE_NE_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_IN_INTERFACE, new NetworkInstanceInterfaceReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_IN_INTERFACE, new NetworkInstanceInterfaceReader(cli)));
 
         rRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader()));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
+        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader()));
     }
 
     @Override

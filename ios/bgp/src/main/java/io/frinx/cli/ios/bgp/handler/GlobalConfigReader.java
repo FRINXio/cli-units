@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
 
-public class GlobalConfigReader implements BgpReader<Config, ConfigBuilder> {
+public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
 
     static final String SH_BGP= "sh bgp summ";

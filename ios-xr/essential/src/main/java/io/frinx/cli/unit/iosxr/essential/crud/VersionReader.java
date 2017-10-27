@@ -15,7 +15,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.cli.unit.utils.CliOperReader;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -25,7 +25,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VersionReader implements CliReader<Version, VersionBuilder> {
+public class VersionReader implements CliOperReader<Version, VersionBuilder> {
 
     private Cli cli;
 

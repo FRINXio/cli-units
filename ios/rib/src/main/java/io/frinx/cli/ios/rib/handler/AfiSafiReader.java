@@ -11,9 +11,9 @@ package io.frinx.cli.ios.rib.handler;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.unit.utils.CliListReader;
+import io.frinx.cli.unit.utils.CliOperListReader;
 import java.util.List;
-
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.types.rev170202.IPV4UNICAST;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.types.rev170202.IPV6UNICAST;
@@ -26,9 +26,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
-public class AfiSafiReader implements CliListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
+public class AfiSafiReader implements CliOperListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
     public AfiSafiReader() {
 

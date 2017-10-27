@@ -13,9 +13,8 @@ import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.fd.honeycomb.translate.spi.read.Initialized;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.InitCliReader;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -30,7 +29,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class InterfaceConfigReader implements InitCliReader<Config, ConfigBuilder> {
+public final class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private Cli cli;
 
@@ -97,14 +96,5 @@ public final class InterfaceConfigReader implements InitCliReader<Config, Config
         } else {
             return Other.class;
         }
-    }
-
-    @Nonnull
-    @Override
-    public Initialized<? extends DataObject> init(@Nonnull final InstanceIdentifier<Config> id,
-                                                  @Nonnull final Config readValue,
-                                                  @Nonnull final ReadContext ctx) {
-        // Direct translation
-        return Initialized.create(id, readValue);
     }
 }

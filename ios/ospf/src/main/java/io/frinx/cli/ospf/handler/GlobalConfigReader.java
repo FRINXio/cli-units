@@ -25,7 +25,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalConfigReader implements OspfReader<Config, ConfigBuilder> {
+public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
 
     private Cli cli;
 

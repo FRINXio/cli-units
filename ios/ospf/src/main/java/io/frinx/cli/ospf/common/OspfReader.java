@@ -9,6 +9,8 @@
 package io.frinx.cli.ospf.common;
 
 import io.frinx.cli.registry.common.TypedReader;
+import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.CliReader;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.policy.types.rev160512.OSPF;
@@ -24,4 +26,11 @@ public interface OspfReader<O extends DataObject, B extends Builder<O>> extends 
     default Identifier<? extends DataObject> getKey() {
         return new ProtocolKey(TYPE, null);
     }
+
+    /**
+     * Union mixin of Ospf reader and Config reader.
+     */
+    interface OspfConfigReader<O extends DataObject, B extends Builder<O>> extends OspfReader<O, B>, CliConfigReader<O, B> {}
+
+    interface OspfOperReader<O extends DataObject, B extends Builder<O>> extends OspfReader<O, B>, CliOperReader<O, B> {}
 }

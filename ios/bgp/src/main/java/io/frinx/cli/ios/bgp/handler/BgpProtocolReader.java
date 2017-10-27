@@ -26,7 +26,7 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
-        io.frinx.cli.ios.bgp.common.BgpReader<Protocol, ProtocolBuilder>,
+        io.frinx.cli.ios.bgp.common.BgpReader.BgpConfigReader<Protocol, ProtocolBuilder>,
         CompositeReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     public static final String DEFAULT_BGP_INSTANCE = "default";

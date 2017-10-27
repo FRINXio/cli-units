@@ -13,8 +13,11 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.spi.read.Initialized;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.InitCliListReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.List;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.VrfsBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.vrfs.Vrf;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.vrfs.VrfBuilder;
@@ -23,11 +26,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.regex.Pattern;
-
-public class VrfReader implements InitCliListReader<Vrf, VrfKey, VrfBuilder> {
+public class VrfReader implements CliConfigListReader<Vrf, VrfKey, VrfBuilder> {
 
     private Cli cli;
 

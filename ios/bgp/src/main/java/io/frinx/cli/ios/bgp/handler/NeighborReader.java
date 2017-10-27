@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class NeighborReader implements BgpListReader<Neighbor, NeighborKey, NeighborBuilder> {
+public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
     static final String SH_SUMM = "show bgp all summary";
     static final Pattern NEIGHBOR_LINE = Pattern.compile("(?<neighborIp>.+) 4 (?<as>.+) (?<msgRcvd>.+) (?<msgSent>.+) (?<tblVer>.+) (?<inQ>.+) (?<outQ>.+) (?<time>.+) (?<pfxRcd>.+)");

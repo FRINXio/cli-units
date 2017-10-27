@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class AfiSafiReader implements BgpListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
+public class AfiSafiReader implements BgpListReader.BgpConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
     private static final String SH_AFI = "show bgp neighbor %s | section family";
     private static final Pattern FAMILY_LINE = Pattern.compile("For address family: (?<family>.+)");

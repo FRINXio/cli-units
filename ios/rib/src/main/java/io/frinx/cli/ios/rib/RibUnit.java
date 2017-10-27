@@ -10,7 +10,7 @@ package io.frinx.cli.ios.rib;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericListReader;
+import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -18,10 +18,10 @@ import io.frinx.cli.ios.rib.handler.AfiSafiReader;
 import io.frinx.cli.ios.rib.handler.Ipv4RoutesReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.openconfig.openconfig.rib.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
-
-import io.frinx.openconfig.openconfig.rib.IIDs;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.bgp.rib.top.BgpRibBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.bgp.rib.top.bgp.rib.AfiSafisBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.bgp.rib.top.bgp.rib.afi.safis.AfiSafi;
@@ -34,7 +34,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.tran
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.$YangModuleInfoImpl;
 
 public class RibUnit implements TranslateUnit {
 
@@ -88,13 +87,13 @@ public class RibUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IIDs.BGPRIB, BgpRibBuilder.class);
         rRegistry.addStructuralReader(IIDs.BG_AFISAFIS, AfiSafisBuilder.class);
         rRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(AfiSafi.class).child(State.class)),
-                new GenericListReader<>(IIDs.BG_AF_AFISAFI, new AfiSafiReader()));
+                new GenericOperListReader<>(IIDs.BG_AF_AFISAFI, new AfiSafiReader()));
         rRegistry.addStructuralReader(IIDs.BG_AF_AF_IPV4UNICAST, Ipv4UnicastBuilder.class);
         rRegistry.addStructuralReader(IIDs.BG_AF_AF_IP_LOCRIB, LocRibBuilder.class);
         rRegistry.addStructuralReader(IIDs.BG_AF_AF_IP_LO_ROUTES, RoutesBuilder.class);
         rRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(Route.class)
                         .child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.ipv4.loc.rib.top.loc.rib.routes.route.State.class)),
-                new GenericListReader<>(IIDs.BG_AF_AF_IP_LO_RO_ROUTE, new Ipv4RoutesReader(cli)));
+                new GenericOperListReader<>(IIDs.BG_AF_AF_IP_LO_RO_ROUTE, new Ipv4RoutesReader(cli)));
     }
 
     @Override

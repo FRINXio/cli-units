@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StaticReader implements LrListReader<Static, StaticKey, StaticBuilder> {
+public class StaticReader implements LrListReader.LrConfigListReader<Static, StaticKey, StaticBuilder> {
 
     private static final String SH_IP_STATIC_ROUTE = "sh ip static route";
     private static final String SH_IP_STATIC_ROUTE_VRF = "sh ip static route vrf %s";

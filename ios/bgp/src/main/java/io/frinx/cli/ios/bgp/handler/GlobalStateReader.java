@@ -25,7 +25,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 import javax.annotation.Nonnull;
 
-public class GlobalStateReader implements BgpReader<State, StateBuilder> {
+public class GlobalStateReader implements BgpReader.BgpOperReader<State, StateBuilder> {
 
     private Cli cli;
 

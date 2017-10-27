@@ -20,7 +20,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AreaStateReader implements OspfReader<State, StateBuilder> {
+public class AreaStateReader implements OspfReader.OspfOperReader<State, StateBuilder> {
 
     // FIXME Duplicate code with config
 

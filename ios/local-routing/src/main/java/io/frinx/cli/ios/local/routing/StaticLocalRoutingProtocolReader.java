@@ -12,7 +12,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.ios.local.routing.common.LrReader;
 import io.frinx.cli.registry.common.CompositeReader;
-import io.frinx.cli.unit.utils.CliListReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -22,8 +22,8 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StaticLocalRoutingProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
-        LrReader<Protocol, ProtocolBuilder>,
+public class StaticLocalRoutingProtocolReader implements CliConfigListReader<Protocol, ProtocolKey, ProtocolBuilder>,
+        LrReader.LrConfigReader<Protocol, ProtocolBuilder>,
         CompositeReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     @Nonnull

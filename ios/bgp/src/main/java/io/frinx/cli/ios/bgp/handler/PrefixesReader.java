@@ -27,7 +27,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 import javax.annotation.Nonnull;
 
-public class PrefixesReader implements BgpReader<Prefixes, PrefixesBuilder> {
+public class PrefixesReader implements BgpReader.BgpOperReader<Prefixes, PrefixesBuilder> {
 
     private final String SH_IPV4 = "show bgp ipv4 unicast summary | section %s";
     private final String SH_VPNV4 = "show bgp vpnv4 unicast all summary | section %s";

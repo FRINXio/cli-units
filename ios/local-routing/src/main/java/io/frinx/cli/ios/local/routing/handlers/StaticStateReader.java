@@ -21,7 +21,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StaticStateReader implements LrReader<State, StateBuilder> {
+public class StaticStateReader implements LrReader.LrOperReader<State, StateBuilder> {
 
     @Nonnull
     @Override

@@ -30,7 +30,7 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
-        OspfReader<Protocol, ProtocolBuilder>,
+        OspfReader.OspfConfigReader<Protocol, ProtocolBuilder>,
         CompositeReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     private Cli cli;

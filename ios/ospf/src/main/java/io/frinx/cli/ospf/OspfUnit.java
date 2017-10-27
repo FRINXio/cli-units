@@ -10,8 +10,9 @@ package io.frinx.cli.ospf;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericListReader;
-import io.fd.honeycomb.translate.impl.read.GenericReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
+import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -76,14 +77,14 @@ public class OspfUnit implements TranslateUnit {
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OSPFV2, Ospfv2Builder.class);
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GLOBAL, GlobalBuilder.class);
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_OS_GL_STATE, new GlobalStateReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigReader(cli)));
+        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_OS_GL_STATE, new GlobalStateReader(cli)));
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AREAS, AreasBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new OspfAreaReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigReader()));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_STATE, new AreaStateReader()));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new OspfAreaReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigReader()));
+        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_STATE, new AreaStateReader()));
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new AreaInterfaceReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new AreaInterfaceReader(cli)));
     }
 
     @Override

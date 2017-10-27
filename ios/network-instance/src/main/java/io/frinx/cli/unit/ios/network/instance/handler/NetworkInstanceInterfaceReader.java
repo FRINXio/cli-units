@@ -16,7 +16,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.spi.read.Initialized;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.ifc.InterfaceReader;
-import io.frinx.cli.unit.utils.InitCliListReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NetworkInstanceInterfaceReader implements InitCliListReader<Interface, InterfaceKey, InterfaceBuilder> {
+public class NetworkInstanceInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private static final String SH_IP_VRF_INTERFACES_ALL = "sh ip vrf interfaces";
     private static final String SH_IP_VRF_INTERFACES = "sh ip vrf interfaces %s";

@@ -21,7 +21,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 import javax.annotation.Nonnull;
 
-public class NeighborConfigReader implements BgpReader<Config, ConfigBuilder> {
+public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
     public NeighborConfigReader() {
 

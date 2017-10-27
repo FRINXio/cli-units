@@ -14,7 +14,7 @@ import io.frinx.cli.ios.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
 import io.frinx.cli.ospf.OspfProtocolReader;
 import io.frinx.cli.registry.common.CompositeReader;
-import io.frinx.cli.unit.utils.CliListReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -27,7 +27,7 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ProtocolReader extends CompositeReader<Protocol, ProtocolKey, ProtocolBuilder>
-        implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder> {
+        implements CliConfigListReader<Protocol, ProtocolKey, ProtocolBuilder> {
 
     public ProtocolReader(Cli cli) {
         super(new ArrayList<ListReaderCustomizer<Protocol, ProtocolKey, ProtocolBuilder>>() {{

@@ -10,8 +10,9 @@ package io.frinx.cli.ios.local.routing;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericListReader;
-import io.fd.honeycomb.translate.impl.read.GenericReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
+import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -72,13 +73,13 @@ public class LocalRoutingUnit implements TranslateUnit {
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_STATICROUTES, StaticRoutesBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PR_ST_STATIC, new StaticReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_ST_ST_STATE, new StaticStateReader()));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_ST_ST_CONFIG, new StaticConfigReader()));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_ST_STATIC, new StaticReader(cli)));
+        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_ST_ST_STATE, new StaticStateReader()));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_ST_ST_CONFIG, new StaticConfigReader()));
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_ST_ST_NEXTHOPS, NextHopsBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PR_ST_ST_NE_NEXTHOP, new NextHopReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_ST_ST_NE_NE_CONFIG, new NextHopConfigReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_ST_ST_NE_NE_STATE, new NextHopStateReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_ST_ST_NE_NEXTHOP, new NextHopReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_ST_ST_NE_NE_CONFIG, new NextHopConfigReader(cli)));
+        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_ST_ST_NE_NE_STATE, new NextHopStateReader(cli)));
     }
 
     @Override

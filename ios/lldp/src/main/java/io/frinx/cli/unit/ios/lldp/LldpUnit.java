@@ -10,8 +10,10 @@ package io.frinx.cli.unit.ios.lldp;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericListReader;
-import io.fd.honeycomb.translate.impl.read.GenericReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
+import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
+import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -79,12 +81,12 @@ public class LldpUnit implements TranslateUnit {
         // TODO CDP and LLDP are almost identical, reuse code, DRY
         rRegistry.addStructuralReader(IIDs.LLDP, LldpBuilder.class);
         rRegistry.addStructuralReader(IIDs.LL_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.LL_IN_INTERFACE, new InterfaceReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.LL_IN_IN_CONFIG, new InterfaceConfigReader()));
-        rRegistry.add(new GenericReader<>(IIDs.LL_IN_IN_STATE, new InterfaceStateReader()));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.LL_IN_INTERFACE, new InterfaceReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.LL_IN_IN_CONFIG, new InterfaceConfigReader()));
+        rRegistry.add(new GenericOperReader<>(IIDs.LL_IN_IN_STATE, new InterfaceStateReader()));
         rRegistry.addStructuralReader(IIDs.LL_IN_IN_NEIGHBORS, NeighborsBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.LL_IN_IN_NE_NEIGHBOR, new NeighborReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.LL_IN_IN_NE_NE_STATE, new NeighborStateReader(cli)));
+        rRegistry.add(new GenericOperListReader<>(IIDs.LL_IN_IN_NE_NEIGHBOR, new NeighborReader(cli)));
+        rRegistry.add(new GenericOperReader<>(IIDs.LL_IN_IN_NE_NE_STATE, new NeighborStateReader(cli)));
     }
 
     @Override

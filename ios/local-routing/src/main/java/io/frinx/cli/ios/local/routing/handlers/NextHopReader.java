@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NextHopReader implements LrListReader<NextHop, NextHopKey, NextHopBuilder> {
+public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, NextHopKey, NextHopBuilder> {
 
     private static final String SH_IP_ROUTE = "sh ip static route %s";
     private static final String SH_IP_STATIC_ROUTE_VRF = "sh ip static route vrf %s %s";

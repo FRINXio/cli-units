@@ -12,8 +12,11 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliListReader;
+import io.frinx.cli.unit.utils.CliOperListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.List;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.lldp.rev160516.lldp._interface.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.lldp.rev160516.lldp.neighbor.top.NeighborsBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.lldp.rev160516.lldp.neighbor.top.neighbors.Neighbor;
@@ -23,11 +26,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.regex.Pattern;
-
-public class NeighborReader implements CliListReader<Neighbor, NeighborKey, NeighborBuilder> {
+public class NeighborReader implements CliOperListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
     private static final String SHOW_LLDP_NEIGHBOR = "sh lldp neighbor %s detail | include System Name";
     private static final Pattern NEIGHBOR_NAME =

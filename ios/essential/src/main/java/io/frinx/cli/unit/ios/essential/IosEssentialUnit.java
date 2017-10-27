@@ -12,8 +12,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericInitListReader;
-import io.fd.honeycomb.translate.impl.read.GenericReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
+import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
@@ -108,11 +108,11 @@ public class IosEssentialUnit implements TranslateUnit {
         // VRFs
         rRegistry.addStructuralReader(InstanceIdentifier.create(Vrfs.class), VrfsBuilder.class);
         //  VRF
-        rRegistry.add(new GenericInitListReader<>(InstanceIdentifier.create(Vrfs.class).child(Vrf.class), new VrfReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(InstanceIdentifier.create(Vrfs.class).child(Vrf.class), new VrfReader(cli)));
         // Version
-        rRegistry.add(new GenericReader<>(InstanceIdentifier.create(Version.class), new VersionReader(cli)));
+        rRegistry.add(new GenericOperReader<>(InstanceIdentifier.create(Version.class), new VersionReader(cli)));
         // Storage
-        rRegistry.add(new GenericReader<>(InstanceIdentifier.create(Version.class).child(Storage.class), new StorageReader(cli)));
+        rRegistry.add(new GenericOperReader<>(InstanceIdentifier.create(Version.class).child(Storage.class), new StorageReader(cli)));
     }
 
     @Override

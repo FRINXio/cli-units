@@ -34,7 +34,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AreaInterfaceReader implements OspfListReader<Interface, InterfaceKey, InterfaceBuilder> {
+public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private static final String SHOW_OSPF_INT = "sh ip ospf %s int brie";
     private static final Pattern INTERFACE_AREA =

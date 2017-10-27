@@ -10,7 +10,7 @@ package io.frinx.cli.unit.ios.network.instance.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
@@ -23,7 +23,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NetworkInstanceConfigReader implements CliReader<Config, ConfigBuilder> {
+public class NetworkInstanceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     @Nonnull
     @Override

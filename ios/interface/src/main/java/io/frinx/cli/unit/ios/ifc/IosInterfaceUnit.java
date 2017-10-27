@@ -10,10 +10,9 @@ package io.frinx.cli.unit.ios.ifc;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericInitListReader;
-import io.fd.honeycomb.translate.impl.read.GenericInitReader;
-import io.fd.honeycomb.translate.impl.read.GenericListReader;
-import io.fd.honeycomb.translate.impl.read.GenericReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
+import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
@@ -136,25 +135,25 @@ public final class IosInterfaceUnit implements TranslateUnit {
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         rRegistry.addStructuralReader(IIDs.INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.IN_INTERFACE, new InterfaceReader(cli)));
-        rRegistry.add(new GenericReader<>(IIDs.IN_IN_STATE, new InterfaceStateReader(cli)));
-        rRegistry.add(new GenericInitReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.IN_INTERFACE, new InterfaceReader(cli)));
+        rRegistry.add(new GenericOperReader<>(IIDs.IN_IN_STATE, new InterfaceStateReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));
 
         rRegistry.addStructuralReader(IIDs.IN_IN_SUBINTERFACES, SubinterfacesBuilder.class);
-        rRegistry.add(new GenericInitListReader<>(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli)));
 
         rRegistry.addStructuralReader(SUBIFC_IPV4_AUG_ID, Subinterface1Builder.class);
         rRegistry.addStructuralReader(SUBIFC_IPV4_ID, Ipv4Builder.class);
         rRegistry.addStructuralReader(SUBIFC_IPV4_ADDRESSES_ID, AddressesBuilder.class);
-        rRegistry.add(new GenericInitListReader<>(SUBIFC_IPV4_ADDRESS_ID, new Ipv4AddressReader(cli)));
-        rRegistry.add(new GenericInitReader<>(SUBIFC_IPV4_CFG_ID, new Ipv4ConfigReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(SUBIFC_IPV4_ADDRESS_ID, new Ipv4AddressReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(SUBIFC_IPV4_CFG_ID, new Ipv4ConfigReader(cli)));
 
         rRegistry.addStructuralReader(SUBIFC_IPV6_AUG_ID, Subinterface2Builder.class);
         rRegistry.addStructuralReader(SUBIFC_IPV6_ID, Ipv6Builder.class);
         rRegistry.addStructuralReader(SUBIFC_IPV6_ADDRESSES_ID,
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.AddressesBuilder.class);
-        rRegistry.add(new GenericListReader<>(SUBIFC_IPV6_ADDRESS_ID, new Ipv6AddressReader(cli)));
-        rRegistry.add(new GenericReader<>(SUBIFC_IPV6_CFG_ID, new Ipv6ConfigReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(SUBIFC_IPV6_ADDRESS_ID, new Ipv6AddressReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(SUBIFC_IPV6_CFG_ID, new Ipv6ConfigReader(cli)));
     }
 
     @Override

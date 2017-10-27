@@ -12,8 +12,12 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliListReader;
+import io.frinx.cli.unit.utils.CliOperListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.ipv4.loc.rib.top.loc.rib.RoutesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.ipv4.loc.rib.top.loc.rib.routes.Route;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.ipv4.loc.rib.top.loc.rib.routes.RouteBuilder;
@@ -24,12 +28,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
-public class Ipv4RoutesReader implements CliListReader<Route, RouteKey, RouteBuilder> {
+public class Ipv4RoutesReader implements CliOperListReader<Route, RouteKey, RouteBuilder> {
 
     private static final String SH_IP_BGP = "sh ip bgp";
     private static final String SH_IP_BGP_PREFIX = "sh ip bgp | section %s";

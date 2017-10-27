@@ -24,7 +24,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalStateReader implements OspfReader<State, StateBuilder> {
+public class GlobalStateReader implements OspfReader.OspfOperReader<State, StateBuilder> {
 
     private Cli cli;
 

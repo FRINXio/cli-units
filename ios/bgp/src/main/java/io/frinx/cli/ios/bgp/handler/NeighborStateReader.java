@@ -27,7 +27,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
 
-public class NeighborStateReader implements BgpReader<State, StateBuilder> {
+public class NeighborStateReader implements BgpReader.BgpOperReader<State, StateBuilder> {
 
     private Cli cli;
 
