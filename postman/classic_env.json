@@ -1,0 +1,190 @@
+{
+  "id": "bb9b73f7-d229-0bbd-7cf0-e4cddaadf659",
+  "name": "classic-testing",
+  "values": [
+    {
+      "enabled": true,
+      "key": "odl_ip",
+      "value": "localhost",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "classic_ip",
+      "value": "192.168.1.221",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "classic_ip_wrong",
+      "value": "1.1.1.1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "connect_attempts",
+      "value": "25",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "connect_attempt_delay",
+      "value": "5000",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "attempt",
+      "value": "1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ip41",
+      "value": "99.99.99.9",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "netmask",
+      "value": "255.255.255.254",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ipv61",
+      "value": "FE80::AB8",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ospf",
+      "value": "1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "router",
+      "value": "10.255.255.2",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "net",
+      "value": "10.0.0.0 0.0.0.0",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "area",
+      "value": "0",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ospf2",
+      "value": "77",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "net2",
+      "value": "0.0.0.0",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "area2",
+      "value": "47",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "vrf",
+      "value": "TMP",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp",
+      "value": "65000",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "neighbor",
+      "value": "10.255.255.2",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "net3",
+      "value": "10.255.1.0",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "mask",
+      "value": "255.255.255.0",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ip-route1",
+      "value": "10.40.6.0",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ip-route2",
+      "value": "10.255.1.0",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ip2-route1",
+      "value": "9.8.8.8",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ip2-route2",
+      "value": "Null0",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ip3-route1",
+      "value": "40",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "topology_port",
+      "value": "22",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "protocol",
+      "value": "ssh",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "username",
+      "value": "cisco",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "password",
+      "value": "cisco",
+      "type": "text"
+    }
+  ],
+  "timestamp": 1508789697427,
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2017-10-23T20:49:42.919Z",
+  "_postman_exported_using": "Postman/5.3.1"
+}
