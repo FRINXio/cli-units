@@ -117,9 +117,9 @@ public class IosAll {
                     .setUsername("cisco")
                     .setPassword("cisco")
                     .build())
-            .setKeepaliveDelay(120)
+            .setKeepaliveDelay(30)
             .setKeepaliveTimeout(30)
-            .setKeepaliveInitialDelay(120)
+            .setKeepaliveInitialDelay(30)
             .build();
 
     private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(4);
@@ -138,6 +138,7 @@ public class IosAll {
     private DataBroker bindingBroker;
     private DOMDataBroker domBroker;
     private SchemaContext schemaCtx;
+    private Cli cli;
 
     @Before
     public void setUp() throws Exception {
@@ -151,7 +152,7 @@ public class IosAll {
         TranslateContext translateContext = reg.getTranslateContext(IOS_ALL);
 
         RemoteDeviceId remoteId = new RemoteDeviceId(IOS_ID, IOS_ADDR);
-        Cli io = IOFactory.getIO(remoteId, CLI_CFG, translateContext.getInitializer(remoteId, CLI_CFG), EXECUTOR, RECONNECT_LISTENER)
+        cli = IOFactory.getIO(remoteId, CLI_CFG, translateContext.getInitializer(remoteId, CLI_CFG), EXECUTOR, RECONNECT_LISTENER)
                 .toCompletableFuture()
                 .get();
 
@@ -161,7 +162,7 @@ public class IosAll {
         // Get & register CRUD handlers
         CompositeReaderRegistryBuilder rRegistryBuilder = new CompositeReaderRegistryBuilder(new YangDAG());
         FlatWriterRegistryBuilder wRegistryBuilder = new FlatWriterRegistryBuilder(new YangDAG());
-        TranslateUnit.Context transportContext = () -> io;
+        TranslateUnit.Context transportContext = () -> cli;
 
         translateContext.provideHandlers(rRegistryBuilder, wRegistryBuilder, transportContext);
         ReaderRegistry rRegistry = rRegistryBuilder.build();
@@ -187,6 +188,8 @@ public class IosAll {
         root.setLevel(Level.INFO);
         Logger cli = (Logger) LoggerFactory.getLogger("io.frinx.cli");
         cli.setLevel(Level.DEBUG);
+//        cli = (Logger) LoggerFactory.getLogger("org.apache.sshd");
+//        cli.setLevel(Level.TRACE);
     }
 
     private void mockBroker() {
@@ -237,6 +240,26 @@ public class IosAll {
 
     @Ignore
     @Test
+    public void testConnectivity() throws Exception {
+        cli.close();
+
+        TranslateRegistryImpl reg = getTranslateRegistry(mockBroker);
+        TranslateContext translateContext = reg.getTranslateContext(IOS_ALL);
+
+        RemoteDeviceId remoteId = new RemoteDeviceId(IOS_ID, IOS_ADDR);
+
+        for (int i = 0; i < 20; i++) {
+
+            Cli io = IOFactory.getIO(remoteId, CLI_CFG, translateContext.getInitializer(remoteId, CLI_CFG), EXECUTOR, RECONNECT_LISTENER)
+                    .toCompletableFuture()
+                    .get();
+
+            io.close();
+        }
+    }
+
+    @Ignore
+    @Test
     public void getInterfacesBA() throws Exception {
         ReadOnlyTransaction readOnlyTransaction = bindingBroker.newReadOnlyTransaction();
         CheckedFuture<Optional<Interfaces>, ReadFailedException> read =
@@ -263,7 +286,7 @@ public class IosAll {
     @Ignore
     @Test
     public void getAllDOMBenchmark() throws Exception {
-        benchmark(2, 100, () -> {
+        benchmark(2, 10, () -> {
             try {
                 getAllDOM();
             } catch (Exception e) {
@@ -272,7 +295,7 @@ public class IosAll {
         });
     }
 
-    public void benchmark(int warmups, int rounds, Runnable code) throws Exception {
+    static void benchmark(int warmups, int rounds, Runnable code) throws Exception {
         long averageTime = 0;
 
         for (int i = 0; i < warmups; i++) {
