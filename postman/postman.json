@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "Testing UNITOPO",
-		"_postman_id": "30ea810d-9ae7-3fc8-aad7-e8c3a4902e7a",
+		"_postman_id": "f77616bb-f35f-760f-74ba-776328627d14",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -221,7 +221,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
 								"description": ""
 							},
@@ -262,7 +262,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOSXR\",\n      \n      \"cli-topology:host\" : \"{{xr_ip}}\",\n      \"cli-topology:port\" : \"{{topology_port}}\",\n      \"cli-topology:transport-type\" : \"{{protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios xr\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{username}}\",\n      \"cli-topology:password\" : \"{{password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOSXR\",\n      \n      \"cli-topology:host\" : \"{{xr_ip}}\",\n      \"cli-topology:port\" : \"{{topology_port}}\",\n      \"cli-topology:transport-type\" : \"{{protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios xr\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{username}}\",\n      \"cli-topology:password\" : \"{{password}}\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
 								"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 							},
@@ -337,7 +337,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
 								"description": ""
 							},
@@ -938,7 +938,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
 								"description": ""
 							},
@@ -1031,7 +1031,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
 								"description": ""
 							},
@@ -1818,7 +1818,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"{{topology_port}}\",\n      \"cli-topology:transport-type\" : \"{{protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{username}}\",\n      \"cli-topology:password\" : \"{{password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"{{topology_port}}\",\n      \"cli-topology:transport-type\" : \"{{protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{username}}\",\n      \"cli-topology:password\" : \"{{password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n            \n      \"cli-topology:keepalive-delay\": 55,\n      \"cli-topology:keepalive-initial-delay\": 55,\n      \"cli-topology:keepalive-timeout\": 120\n    }\n  }"
 								},
 								"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 							},
@@ -1893,7 +1893,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
 								"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 							},
@@ -3155,7 +3155,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
 								"description": ""
 							},
@@ -3206,7 +3206,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip_wrong}}\",\n      \"cli-topology:port\" : \"{{classic_port}}\",\n      \"cli-topology:transport-type\" : \"{{classic_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{classic_username}}\",\n      \"cli-topology:password\" : \"{{classic_password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip_wrong}}\",\n      \"cli-topology:port\" : \"{{classic_port}}\",\n      \"cli-topology:transport-type\" : \"{{classic_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{classic_username}}\",\n      \"cli-topology:password\" : \"{{classic_password}}\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
@@ -3260,7 +3260,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
@@ -3302,7 +3302,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"{{classic_port}}\",\n      \"cli-topology:transport-type\" : \"{{classic_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{classic_username}}\",\n      \"cli-topology:password\" : \"{{classic_password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"{{classic_port}}\",\n      \"cli-topology:transport-type\" : \"{{classic_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{classic_username}}\",\n      \"cli-topology:password\" : \"{{classic_password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \n      \"cli-topology:keepalive-delay\": 55,\n      \"cli-topology:keepalive-initial-delay\": 55,\n      \"cli-topology:keepalive-timeout\": 120\n\n    }\n  }"
 						},
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
@@ -3377,59 +3377,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
-						},
-						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
-					},
-					"response": []
-				},
-				{
-					"name": "Get all oper",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"console.log(\"Response: \" + responseBody.substring(0, 500))",
-									"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
-								]
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"",
-									""
-								]
-							}
-						}
-					],
-					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/",
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
-							},
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"description": ""
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
@@ -3522,7 +3470,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 180\n    }\n  }"
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
 						"description": ""
 					},
