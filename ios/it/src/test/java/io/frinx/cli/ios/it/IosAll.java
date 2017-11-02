@@ -34,6 +34,7 @@ import io.frinx.cli.io.impl.IOFactory;
 import io.frinx.cli.io.impl.cli.KeepaliveCli;
 import io.frinx.cli.ios.bgp.BgpUnit;
 import io.frinx.cli.ios.local.routing.LocalRoutingUnit;
+import io.frinx.cli.ios.rib.RibUnit;
 import io.frinx.cli.ospf.OspfUnit;
 import io.frinx.cli.registry.api.TranslateContext;
 import io.frinx.cli.registry.impl.TranslateRegistryImpl;
@@ -210,6 +211,7 @@ public class IosAll {
         new IosEssentialUnit(reg).init();
         new IosInterfaceUnit(reg).init();
         new BgpUnit(reg).init();
+        new RibUnit(reg).init();
         new OspfUnit(reg).init();
         new LocalRoutingUnit(reg).init();
         new IosNetworkInstanceUnit(reg).init();

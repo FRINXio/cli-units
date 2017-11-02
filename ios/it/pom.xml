@@ -59,6 +59,12 @@
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
+            <artifactId>ios-rib-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
             <artifactId>ios-interface-unit</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
