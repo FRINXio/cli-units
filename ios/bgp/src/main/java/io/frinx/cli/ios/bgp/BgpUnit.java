@@ -15,21 +15,18 @@ import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.BgpReader;
-import io.frinx.cli.ios.bgp.handler.RibReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
+
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
 
 public class BgpUnit implements TranslateUnit {
-
-    private static final Logger LOG = LoggerFactory.getLogger(BgpUnit.class);
 
     private static final Device IOS_ALL = new DeviceIdBuilder()
             .setDeviceType("ios")
@@ -55,8 +52,7 @@ public class BgpUnit implements TranslateUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl.getInstance(),
-            org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rib.bgp.rev161017.$YangModuleInfoImpl.getInstance());
+        return Sets.newHashSet($YangModuleInfoImpl.getInstance());
     }
 
     @Override
@@ -70,7 +66,6 @@ public class BgpUnit implements TranslateUnit {
                                 @Nonnull final TranslateUnit.Context context) {
         Cli cli = context.getTransport();
         provideReaders(rRegistry, cli);
-        LOG.trace("readers {}", rRegistry);
         provideWriters(wRegistry, cli);
     }
 
@@ -83,8 +78,6 @@ public class BgpUnit implements TranslateUnit {
         // way it is only possible to perform read of the root node: bgp and also, it will not be possible to extend
         // from other units
         rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_BGP, new BgpReader(cli)));
-        // FIXME same for RIB
-        rRegistry.add(new GenericReader<>(io.frinx.openconfig.openconfig.rib.IIDs.BGPRIB, new RibReader(cli)));
     }
 
     @Override
