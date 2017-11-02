@@ -10,21 +10,30 @@ package io.frinx.cli.ios.bgp;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
+import io.fd.honeycomb.translate.impl.read.GenericListReader;
 import io.fd.honeycomb.translate.impl.read.GenericReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.bgp.handler.BgpReader;
+import io.frinx.cli.ios.bgp.handler.*;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import java.util.Set;
-import javax.annotation.Nonnull;
-
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.afi.safi.Config;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.afi.safi.StateBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.AfiSafisBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.top.BgpBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.GlobalBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.NeighborsBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
+
+import javax.annotation.Nonnull;
+import java.util.Set;
 
 public class BgpUnit implements TranslateUnit {
 
@@ -74,14 +83,23 @@ public class BgpUnit implements TranslateUnit {
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        // FIXME BGP reader reads also subtree nodes, it needs to be split into multiple readers. Because this
-        // way it is only possible to perform read of the root node: bgp and also, it will not be possible to extend
-        // from other units
-        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_BGP, new BgpReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BGP, BgpBuilder.class);
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_GLOBAL, GlobalBuilder.class);
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_BG_GL_STATE, new GlobalStateReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NEIGHBORS, NeighborsBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborReader(cli)));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader()));
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_STATE, new NeighborStateReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS, AfiSafisBuilder.class);
+        rRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(AfiSafi.class).child(Config.class)),
+                new GenericListReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, new AfiSafiReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_STATE, StateBuilder.class);
+        rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_ST_PREFIXES, new PrefixesReader(cli)));
     }
 
     @Override
     public String toString() {
-        return "ios-bgp-unit";
+        return "IOS BGP (Openconfig) translate unit";
     }
 }

@@ -19,8 +19,6 @@ import io.frinx.cli.unit.utils.CliListReader;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.top.BgpBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
@@ -69,11 +67,5 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
         ProtocolKey key = iid.firstKeyOf(Protocol.class);
         builder.setName(key.getName());
         builder.setIdentifier(key.getIdentifier());
-        BgpReader bgpReader = new BgpReader(cli);
-        BgpBuilder bgpBuilder = new BgpBuilder();
-        bgpReader.readCurrentAttributes(iid.child(Bgp.class), bgpBuilder, ctx);
-        // FIXME we should not set Bgp here because it has own BgpReader
-        builder.setBgp(bgpBuilder.build());
-        // FIXME set attributes
     }
 }
