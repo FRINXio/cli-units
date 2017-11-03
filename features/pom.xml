@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>features-parent</artifactId>
-    <version>1.8.1-Carbon-SR1.3_1_1_rc1-frinxodl-SNAPSHOT</version>
+    <version>1.8.1-Carbon-SR1.3_1_1_rc1-frinxodl</version>
     <relativePath/>
   </parent>
 
@@ -26,12 +26,12 @@
   </prerequisites>
 
   <properties>
-    <mdsal.model.version>0.10.1-Carbon-SR1.3_1_1_rc1-frinxodl-SNAPSHOT</mdsal.model.version>
-    <mdsal.version>1.5.1-Carbon-SR1.3_1_1_rc1-frinxodl-SNAPSHOT</mdsal.version>
-    <netconf.version>1.2.1-Carbon-SR1.3_1_1_rc1-frinxodl-SNAPSHOT</netconf.version>
-    <yangtools.version>1.1.1-Carbon-SR1.3_1_1_rc1-frinxodl-SNAPSHOT</yangtools.version>
+    <mdsal.model.version>0.10.1-Carbon-SR1.3_1_1_rc1-frinxodl</mdsal.model.version>
+    <mdsal.version>1.5.1-Carbon-SR1.3_1_1_rc1-frinxodl</mdsal.version>
+    <netconf.version>1.2.1-Carbon-SR1.3_1_1_rc1-frinxodl</netconf.version>
+    <yangtools.version>1.1.1-Carbon-SR1.3_1_1_rc1-frinxodl</yangtools.version>
     <configfile.directory>etc/opendaylight/karaf</configfile.directory>
-    <hc.version>1.17.10-Carbon-SR1.3_1_1_rc1-frinxodl-SNAPSHOT</hc.version>
+    <hc.version>1.17.10-Carbon-SR1.3_1_1_rc1-frinxodl</hc.version>
     <jgraph.version>0.9.2</jgraph.version>
     <cli.version>3.1.1.rc1-frinx-SNAPSHOT</cli.version>
     <openconfig.version>3.1.1.rc1-frinx-SNAPSHOT</openconfig.version>
