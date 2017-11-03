@@ -74,7 +74,7 @@ public class OspfUnit implements TranslateUnit {
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OSPFV, Ospfv2Builder.class);
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OSPFV2, Ospfv2Builder.class);
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GLOBAL, GlobalBuilder.class);
         rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigReader(cli)));
         rRegistry.add(new GenericReader<>(IIDs.NE_NE_PR_PR_OS_GL_STATE, new GlobalStateReader(cli)));
