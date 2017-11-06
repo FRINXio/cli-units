@@ -52,5 +52,10 @@
             <artifactId>translation-registry-api</artifactId>
             <version>${cli.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>io-impl</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
     </dependencies>
 </project>
