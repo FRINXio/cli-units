@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.ifc.ifc;
+package io.frinx.cli.unit.ios.ifc.handler;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -14,14 +14,13 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.GigabitEthernet;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -38,15 +37,11 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config data,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (isPhysicalInterface(data)) {
-            // This cannot happen
-            throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Physical interface cannot be created"));
-        } else if (data.getType() == SoftwareLoopback.class) {
+        if (data.getType() == SoftwareLoopback.class) {
             writeLoopbackInterface(id, data, writeContext);
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Unknown interface type: " + data.getType()));
+                    new IllegalArgumentException("Cannot create interface of type: " + data.getType()));
         }
     }
 
@@ -70,17 +65,11 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 data.isEnabled() ? "no shutdown" : "shutdown",
                 "exit",
                 "exit");
-
-        // FIXME verify output
     }
 
-    private static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES =
-            new HashSet<Class<? extends InterfaceType>>() {{
-                add(EthernetCsmacd.class);
-                add(GigabitEthernet.class);
-            }};
+    public static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES = Collections.singleton(EthernetCsmacd.class);
 
-    private boolean isPhysicalInterface(Config data) {
+    public static boolean isPhysicalInterface(Config data) {
         return PHYS_IFC_TYPES.contains(data.getType());
     }
 
@@ -118,8 +107,6 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 data.isEnabled() ? "no shutdown" : "shutdown",
                 "exit",
                 "exit");
-
-        // FIXME verify output
     }
 
     @Override
@@ -147,15 +134,9 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             throw new WriteFailedException.DeleteFailedException(id, e);
         }
 
-        try {
-            blockingWriteAndRead(cli, id, data,
-                    "configure terminal",
-                    f("no interface loopback %s", matcher.group("number")),
-                    "exit");
-        } catch (WriteFailedException.CreateFailedException e) {
-            throw new WriteFailedException.DeleteFailedException(id, e);
-        }
-
-        // FIXME verify output
+        blockingDeleteAndRead(cli, id,
+                "configure terminal",
+                f("no interface loopback %s", matcher.group("number")),
+                "exit");
     }
 }

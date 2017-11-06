@@ -6,10 +6,11 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.ifc.subifc;
+package io.frinx.cli.unit.ios.ifc.handler.subifc.ip6;
 
 import static org.junit.Assert.assertEquals;
 
+import io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6AddressReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.ifc.subifc;
+package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
 import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
 
@@ -14,6 +14,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.Collections;
 import java.util.List;
@@ -49,8 +50,8 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
         String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        // Only subinterface with ID IP_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.IP_SUBINTERFACE_ID) {
+        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
+        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             return parseAddressIds(blockingRead(String.format(SH_INTERFACE_IP, id), cli, instanceIdentifier, readContext));
         } else {
             return Collections.emptyList();
@@ -59,7 +60,7 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
 
     @VisibleForTesting
     static List<AddressKey> parseAddressIds(String output) {
-        return parseFields(output,0,
+        return parseFields(output, 0,
                 INTERFACE_IP_LINE::matcher,
                 m -> m.group("ip"),
                 addr -> new AddressKey(new Ipv4AddressNoZone(addr)));
@@ -83,8 +84,8 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        // Only subinterface with ID IP_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.IP_SUBINTERFACE_ID) {
+        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
+        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class).getIp());
         }
     }

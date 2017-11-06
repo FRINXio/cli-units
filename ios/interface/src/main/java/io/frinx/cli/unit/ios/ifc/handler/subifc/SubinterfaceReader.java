@@ -6,16 +6,22 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.ifc.subifc;
+package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
-import com.google.common.collect.Lists;
+import static io.frinx.cli.unit.ios.ifc.handler.InterfaceReader.SH_INTERFACE;
+import static io.frinx.cli.unit.ios.ifc.handler.InterfaceReader.parseAllInterfaceIds;
+
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceBuilder;
@@ -26,7 +32,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey, SubinterfaceBuilder> {
 
-    static final long IP_SUBINTERFACE_ID = 0L;
+    private static final char SEPARATOR = '.';
+    public static final long ZERO_SUBINTERFACE_ID = 0L;
+
     private Cli cli;
 
     public SubinterfaceReader(Cli cli) {
@@ -37,12 +45,33 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
     @Override
     public List<SubinterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier,
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
-        // Subinterface with ID 0 is reserved for IP addresses of the interface
-        return Lists.newArrayList(IP_SUBINTERFACE_ID).stream()
-                .map(SubinterfaceKey::new)
-                .collect(Collectors.toList());
+        String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
 
-        // Real subinterfaces are not supported yet TODO
+        List<SubinterfaceKey> subinterfaceKeys = parseInterfaceIds(blockingRead(SH_INTERFACE, cli, instanceIdentifier, readContext), id);
+
+        // Subinterface with ID 0 is reserved for IP addresses of the interface
+        subinterfaceKeys.add(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
+        return subinterfaceKeys;
+    }
+
+    @VisibleForTesting
+    static List<SubinterfaceKey> parseInterfaceIds(String output, String ifcName) {
+        return parseAllInterfaceIds(output)
+                // Now exclude interfaces
+                .stream()
+                .filter(InterfaceReader::isSubinterface)
+                .map(InterfaceKey::getName)
+                .filter(subifcName -> subifcName.startsWith(ifcName))
+                .map(name -> name.substring(name.lastIndexOf(SEPARATOR) + 1))
+                .map(subifcIndex -> new SubinterfaceKey(Long.valueOf(subifcIndex)))
+                .collect(Collectors.toList());
+    }
+
+    static String getSubinterfaceName(InstanceIdentifier<?> id) {
+        InterfaceKey ifcKey = id.firstKeyOf(Interface.class);
+        SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
+
+        return ifcKey.getName() + SEPARATOR + subKey.getIndex().toString();
     }
 
     @Override

@@ -6,9 +6,10 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.ifc.subifc;
+package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -39,13 +40,24 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        SubnetUtils.SubnetInfo info = new SubnetUtils(config.getIp().getValue() + "/" + config.getPrefixLength()).getInfo();
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+
+        if (subId != ZERO_SUBINTERFACE_ID) {
+            throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
+                    new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
+        }
+
+        SubnetUtils.SubnetInfo info = getSubnetInfo(config);
 
         blockingWriteAndRead(cli, instanceIdentifier, config,
                 f(WRITE_TEMPLATE,
                         getIfcName(instanceIdentifier),
                         config.getIp().getValue(),
                         info.getNetmask()));
+    }
+
+    private static SubnetUtils.SubnetInfo getSubnetInfo(@Nonnull Config config) {
+        return new SubnetUtils(config.getIp().getValue() + "/" + config.getPrefixLength()).getInfo();
     }
 
     private static String getIfcName(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
@@ -78,16 +90,23 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        SubnetUtils.SubnetInfo info = new SubnetUtils(config.getIp().getValue() + "/" + config.getPrefixLength()).getInfo();
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        try {
-            blockingWriteAndRead(cli, instanceIdentifier, config,
-                    f(DELETE_TEMPLATE,
-                            getIfcName(instanceIdentifier),
-                            config.getIp().getValue(),
-                            info.getNetmask()));
-        } catch (WriteFailedException.CreateFailedException e) {
-            throw new WriteFailedException.DeleteFailedException(instanceIdentifier, e);
+        if (subId == ZERO_SUBINTERFACE_ID) {
+            SubnetUtils.SubnetInfo info = getSubnetInfo(config);
+
+            try {
+                blockingWriteAndRead(cli, instanceIdentifier, config,
+                        f(DELETE_TEMPLATE,
+                                getIfcName(instanceIdentifier),
+                                config.getIp().getValue(),
+                                info.getNetmask()));
+            } catch (WriteFailedException.CreateFailedException e) {
+                throw new WriteFailedException.DeleteFailedException(instanceIdentifier, e);
+            }
+        } else {
+            throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
+                    new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
         }
     }
 }

@@ -6,40 +6,36 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.ifc.subifc;
+package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
-import static io.frinx.cli.unit.ios.ifc.subifc.Ipv6AddressReader.IPV6_UNICAST_ADDRESS;
-import static io.frinx.cli.unit.ios.ifc.subifc.Ipv6AddressReader.SH_INTERFACE_IP;
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
+import static io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4AddressReader.INTERFACE_IP_LINE;
+import static io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4AddressReader.SH_INTERFACE_IP;
 import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import java.util.Arrays;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.Config;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.AddressBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6AddressNoZone;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public class Ipv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private Cli cli;
 
-    public Ipv6ConfigReader(Cli cli) {
+    public Ipv4ConfigReader(Cli cli) {
         this.cli = cli;
     }
-
-    public static final short DEFAULT_PREFIX_LENGHT = (short)64;
 
     @Nonnull
     @Override
@@ -54,21 +50,21 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         String name = id.firstKeyOf(Interface.class).getName();
         Long subId = id.firstKeyOf(Subinterface.class).getIndex();
 
-        // Only subinterface with ID IP_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.IP_SUBINTERFACE_ID) {
-            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name), cli, id, readContext), id);
+        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
+        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name), cli, id, readContext));
         }
     }
 
     @VisibleForTesting
-    static void parseAddressConfig(ConfigBuilder configBuilder, String output, InstanceIdentifier<Config> id) {
-        Ipv6AddressNoZone address = id.firstKeyOf(Address.class).getIp();
-        configBuilder.setIp(address);
-        configBuilder.setPrefixLength(DEFAULT_PREFIX_LENGHT);
-        output = String.valueOf(
-                Arrays.stream(output.split(NEWLINE.pattern())).filter(line -> line.contains(address.getValue())).findAny());
+    static void parseAddressConfig(ConfigBuilder configBuilder, String output) {
         parseField(output,
-                IPV6_UNICAST_ADDRESS::matcher,
+                INTERFACE_IP_LINE::matcher,
+                m -> new Ipv4AddressNoZone(m.group("ip")),
+                configBuilder::setIp);
+
+        parseField(output,
+                INTERFACE_IP_LINE::matcher,
                 m -> Short.parseShort(m.group("prefix")),
                 configBuilder::setPrefixLength);
     }

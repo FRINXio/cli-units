@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.ifc.ifc;
+package io.frinx.cli.unit.ios.ifc.handler;
 
 import static org.junit.Assert.assertEquals;
 

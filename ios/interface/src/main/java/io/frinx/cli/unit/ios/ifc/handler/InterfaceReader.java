@@ -6,9 +6,9 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.ifc.ifc;
+package io.frinx.cli.unit.ios.ifc.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
+import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -16,7 +16,9 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -34,7 +36,7 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
         this.cli = cli;
     }
 
-    private static final String SH_INTERFACE = "sh ip inter brie";
+    public static final String SH_INTERFACE = "sh ip inter brie";
 
     @Nonnull
     @Override
@@ -46,12 +48,33 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
     private static final Pattern INTERFACE_ID_LINE =
             Pattern.compile("(?<id>[^\\s]+)\\s+(?<ip>[^\\s]+)\\s+(?<ok>[^\\s]+)\\s+(?<method>[^\\s]+)\\s+(?<status>[^\\s]+)\\s+(?<protocol>[^\\s]+).*");
 
+    public static final Pattern SUBINTERFACE_NAME =
+            Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
+
     @VisibleForTesting
     static List<InterfaceKey> parseInterfaceIds(String output) {
-        return parseFields(output, 1,
-                INTERFACE_ID_LINE::matcher,
-                m -> m.group("id"),
-                InterfaceKey::new);
+        return parseAllInterfaceIds(output)
+                // Now exclude subinterfaces
+                .stream()
+                .filter(ifcName -> !isSubinterface(ifcName))
+                .collect(Collectors.toList());
+    }
+
+    public static List<InterfaceKey> parseAllInterfaceIds(String output) {
+        return NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                // Remove interfaces marked as deleted ! (deleted subinterface is still reported in the output as deleted)
+                .filter(line -> !line.contains("deleted"))
+                .map(INTERFACE_ID_LINE::matcher)
+                .filter(Matcher::matches)
+                .skip(1)
+                .map(m -> m.group("id"))
+                .map(InterfaceKey::new)
+                .collect(Collectors.toList());
+    }
+
+    public static boolean isSubinterface(InterfaceKey ifcName) {
+        return SUBINTERFACE_NAME.matcher(ifcName.getName()).matches();
     }
 
     @Override

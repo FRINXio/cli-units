@@ -6,9 +6,9 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.ifc.ifc;
+package io.frinx.cli.unit.ios.ifc.handler;
 
-import static io.frinx.cli.unit.ios.ifc.ifc.InterfaceConfigReader.parseType;
+import static io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigReader.parseType;
 import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -54,12 +54,12 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
         parseInterfaceState(blockingRead(String.format(SH_SINGLE_INTERFACE, name), cli, id, ctx), builder, name);
     }
 
-    private static final String SH_SINGLE_INTERFACE = "sh inter %s";
+    public static final String SH_SINGLE_INTERFACE = "sh inter %s";
 
-    private static final Pattern STATUS_LINE =
+    public static final Pattern STATUS_LINE =
             Pattern.compile("(?<id>.+)[.\\s]* (?<admin>.+), line protocol is (?<line>.+)");
-    private static final Pattern MTU_LINE = Pattern.compile("\\s*MTU (?<mtu>.+) bytes.*$");
-    private static final Pattern DESCR_LINE = Pattern.compile("\\s*Description: (?<desc>.+)");
+    public static final Pattern MTU_LINE = Pattern.compile("\\s*MTU (?<mtu>.+) bytes.*$");
+    public static final Pattern DESCR_LINE = Pattern.compile("\\s*Description: (?<desc>.+)");
 
     @VisibleForTesting
     static void parseInterfaceState(final String output, final StateBuilder builder, String name) {

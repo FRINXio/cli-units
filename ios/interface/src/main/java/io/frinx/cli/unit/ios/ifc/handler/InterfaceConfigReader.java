@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.ifc.ifc;
+package io.frinx.cli.unit.ios.ifc.handler;
 
 import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
 
@@ -56,11 +56,11 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
         parseInterface(blockingRead(String.format(SH_SINGLE_INTERFACE_CFG, name), cli, id, ctx), builder, name);
     }
 
-    private static final String SH_SINGLE_INTERFACE_CFG = "sh run int %s";
+    public static final String SH_SINGLE_INTERFACE_CFG = "sh run int %s";
 
-    private static final Pattern SHUTDOWN_LINE = Pattern.compile("shutdown");
-    private static final Pattern MTU_LINE = Pattern.compile("\\s*mtu (?<mtu>.+)$");
-    private static final Pattern DESCR_LINE = Pattern.compile("\\s*description (?<desc>.+)");
+    public static final Pattern SHUTDOWN_LINE = Pattern.compile("shutdown");
+    public static final Pattern MTU_LINE = Pattern.compile("\\s*mtu (?<mtu>.+)$");
+    public static final Pattern DESCR_LINE = Pattern.compile("\\s*description (?<desc>.+)");
 
     @VisibleForTesting
     static void parseInterface(final String output, final ConfigBuilder builder, String name) {

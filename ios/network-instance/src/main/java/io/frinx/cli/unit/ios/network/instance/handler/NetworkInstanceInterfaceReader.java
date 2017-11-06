@@ -15,7 +15,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.spi.read.Initialized;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.ios.ifc.ifc.InterfaceReader;
+import io.frinx.cli.unit.ios.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;

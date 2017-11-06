@@ -20,16 +20,21 @@ import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
-import io.frinx.cli.unit.ios.ifc.ifc.InterfaceConfigReader;
-import io.frinx.cli.unit.ios.ifc.ifc.InterfaceConfigWriter;
-import io.frinx.cli.unit.ios.ifc.ifc.InterfaceReader;
-import io.frinx.cli.unit.ios.ifc.ifc.InterfaceStateReader;
-import io.frinx.cli.unit.ios.ifc.subifc.Ipv4AddressReader;
-import io.frinx.cli.unit.ios.ifc.subifc.Ipv4ConfigReader;
-import io.frinx.cli.unit.ios.ifc.subifc.Ipv4ConfigWriter;
-import io.frinx.cli.unit.ios.ifc.subifc.Ipv6AddressReader;
-import io.frinx.cli.unit.ios.ifc.subifc.Ipv6ConfigReader;
-import io.frinx.cli.unit.ios.ifc.subifc.SubinterfaceReader;
+import io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigReader;
+import io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigWriter;
+import io.frinx.cli.unit.ios.ifc.handler.InterfaceReader;
+import io.frinx.cli.unit.ios.ifc.handler.InterfaceStateReader;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceConfigReader;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceConfigWriter;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceStateReader;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceVlanConfigReader;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceVlanConfigWriter;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4AddressReader;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4ConfigReader;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6AddressReader;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Set;
@@ -48,6 +53,9 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev16
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.Ipv6Builder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.vlan.logical.top.Vlan;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.vlan.logical.top.VlanBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.vlan.logical.top.vlan.Config;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -82,6 +90,7 @@ public final class IosInterfaceUnit implements TranslateUnit {
         return Sets.newHashSet(
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.$YangModuleInfoImpl.getInstance(),
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -115,20 +124,22 @@ public final class IosInterfaceUnit implements TranslateUnit {
     private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.Config> SUBIFC_IPV6_CFG_ID =
             SUBIFC_IPV6_ADDRESS_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.Config.class);
 
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.Subinterface1> SUBIFC_VLAN_AUG_ID =
+            IIDs.IN_IN_SU_SUBINTERFACE.augmentation(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.Subinterface1.class);
+    private static final InstanceIdentifier<Vlan> SUBIFC_VLAN_ID = SUBIFC_VLAN_AUG_ID.child(Vlan.class);
+    private static final InstanceIdentifier<Config> SUBIFC_VLAN_CFG_ID = SUBIFC_VLAN_ID.child(Config.class);
+
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
         wRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
-
-        // InterfaceConfigWriter is responsible for:
-        //  configuring interface (e.g. shutdown, mtu etc.)
-        //  creating/deleting new interfaces (e.g. loopback)
         wRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
 
         wRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SUBINTERFACE, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(SUBIFC_IPV4_ADDRESS_ID, new NoopCliListWriter<>()));
+        wRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli)),
+                IIDs.IN_IN_CONFIG);
+        wRegistry.addAfter(new GenericWriter<>(SUBIFC_VLAN_CFG_ID, new SubinterfaceVlanConfigWriter(cli)),
+                IIDs.IN_IN_SU_SU_CONFIG);
 
-        // Ipv4ConfigReader is responsible for:
-        //  creating/deleting IPv4 configuration per interface
-        // RELATIONS: NEeds to be executed after InterfaceConfigWriter
+        wRegistry.add(new GenericWriter<>(SUBIFC_IPV4_ADDRESS_ID, new NoopCliListWriter<>()));
         wRegistry.addAfter(new GenericWriter<>(SUBIFC_IPV4_CFG_ID, new Ipv4ConfigWriter(cli)),
                 IIDs.IN_IN_CONFIG);
     }
@@ -141,6 +152,8 @@ public final class IosInterfaceUnit implements TranslateUnit {
 
         rRegistry.addStructuralReader(IIDs.IN_IN_SUBINTERFACES, SubinterfacesBuilder.class);
         rRegistry.add(new GenericConfigListReader<>(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli)));
+        rRegistry.add(new GenericOperReader<>(IIDs.IN_IN_SU_SU_STATE, new SubinterfaceStateReader(cli)));
 
         rRegistry.addStructuralReader(SUBIFC_IPV4_AUG_ID, Subinterface1Builder.class);
         rRegistry.addStructuralReader(SUBIFC_IPV4_ID, Ipv4Builder.class);
@@ -154,6 +167,11 @@ public final class IosInterfaceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.AddressesBuilder.class);
         rRegistry.add(new GenericConfigListReader<>(SUBIFC_IPV6_ADDRESS_ID, new Ipv6AddressReader(cli)));
         rRegistry.add(new GenericConfigReader<>(SUBIFC_IPV6_CFG_ID, new Ipv6ConfigReader(cli)));
+
+        rRegistry.addStructuralReader(SUBIFC_VLAN_AUG_ID, org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.Subinterface1Builder.class);
+        rRegistry.addStructuralReader(SUBIFC_VLAN_ID, VlanBuilder.class);
+        rRegistry.add(new GenericConfigReader<>(SUBIFC_VLAN_CFG_ID, new SubinterfaceVlanConfigReader(cli)));
+
     }
 
     @Override
