@@ -29,6 +29,7 @@
     <module>ios</module>
     <module>ios-xr</module>
     <module>features</module>
+      <module>ios-common</module>
   </modules>
 
   <build>

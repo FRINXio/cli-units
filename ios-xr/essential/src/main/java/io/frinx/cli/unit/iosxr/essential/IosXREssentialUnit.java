@@ -89,7 +89,7 @@ public class IosXREssentialUnit implements TranslateUnit {
         provideReaders(rRegistry, cli);
     }
 
-    // FIXME duplicate YANG, INITIALIZERS as with IOS ( DRY! )
+    // FIXME duplicate INITIALIZERS as with IOS ( DRY! )
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         // Version

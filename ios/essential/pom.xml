@@ -14,9 +14,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.opendaylight.controller</groupId>
-        <artifactId>config-parent</artifactId>
-        <version>0.6.1-Carbon-SR1.3_1_1_rc4-frinxodl-SNAPSHOT</version>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>bundle-parent</artifactId>
+        <version>1.8.1-Carbon-SR1.3_1_1_rc4-frinxodl-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -52,6 +52,13 @@
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry-api</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+
+        <!-- ios-essential model -->
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>ios-essential-model</artifactId>
             <version>${cli.version}</version>
         </dependency>
 

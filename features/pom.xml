@@ -88,6 +88,13 @@
       <type>xml</type>
       <scope>runtime</scope>
     </dependency>
+
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>ios-essential-model</artifactId>
+      <version>${cli.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>io.frinx.openconfig</groupId>
       <artifactId>openconfig-features</artifactId>
