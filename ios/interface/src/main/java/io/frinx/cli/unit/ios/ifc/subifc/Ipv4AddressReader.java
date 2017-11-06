@@ -15,6 +15,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -23,6 +24,7 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev16
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.AddressBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.AddressKey;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
@@ -45,7 +47,14 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
     public List<AddressKey> getAllIds(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        return parseAddressIds(blockingRead(String.format(SH_INTERFACE_IP, id), cli, instanceIdentifier, readContext));
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+
+        // Only subinterface with ID IP_SUBINTERFACE_ID can have IP
+        if (subId == SubinterfaceReader.IP_SUBINTERFACE_ID) {
+            return parseAddressIds(blockingRead(String.format(SH_INTERFACE_IP, id), cli, instanceIdentifier, readContext));
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @VisibleForTesting
@@ -72,6 +81,11 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
                                       @Nonnull AddressBuilder addressBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class).getIp());
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+
+        // Only subinterface with ID IP_SUBINTERFACE_ID can have IP
+        if (subId == SubinterfaceReader.IP_SUBINTERFACE_ID) {
+            addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class).getIp());
+        }
     }
 }

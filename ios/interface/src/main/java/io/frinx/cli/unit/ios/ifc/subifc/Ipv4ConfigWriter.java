@@ -8,19 +8,18 @@
 
 package io.frinx.cli.unit.ios.ifc.subifc;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import javax.annotation.Nonnull;
 import org.apache.commons.net.util.SubnetUtils;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 public class Ipv4ConfigWriter implements CliWriter<Config> {
 
@@ -52,7 +51,7 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     private static String getIfcName(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
         Long subIfcIndex = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
-        checkArgument(subIfcIndex == 0, "Only subinterface 0 is supported");
+        checkArgument(subIfcIndex == ZERO_SUBINTERFACE_ID, "Only subinterface " + ZERO_SUBINTERFACE_ID + "  can have IP");
         return ifcName;
     }
 

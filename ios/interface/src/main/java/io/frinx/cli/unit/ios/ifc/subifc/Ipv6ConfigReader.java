@@ -25,6 +25,7 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev16
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.Config;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6AddressNoZone;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
@@ -50,9 +51,13 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-
         String name = id.firstKeyOf(Interface.class).getName();
-        parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name), cli, id, readContext), id);
+        Long subId = id.firstKeyOf(Subinterface.class).getIndex();
+
+        // Only subinterface with ID IP_SUBINTERFACE_ID can have IP
+        if (subId == SubinterfaceReader.IP_SUBINTERFACE_ID) {
+            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name), cli, id, readContext), id);
+        }
     }
 
     @VisibleForTesting

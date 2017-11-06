@@ -26,6 +26,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey, SubinterfaceBuilder> {
 
+    static final long IP_SUBINTERFACE_ID = 0L;
     private Cli cli;
 
     public SubinterfaceReader(Cli cli) {
@@ -37,7 +38,7 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
     public List<SubinterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier,
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
         // Subinterface with ID 0 is reserved for IP addresses of the interface
-        return Lists.newArrayList(0L).stream()
+        return Lists.newArrayList(IP_SUBINTERFACE_ID).stream()
                 .map(SubinterfaceKey::new)
                 .collect(Collectors.toList());
 
