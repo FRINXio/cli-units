@@ -106,6 +106,12 @@
 
     <dependency>
       <groupId>io.frinx.cli</groupId>
+      <artifactId>ios-cli-init-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
       <artifactId>ios-essential-unit</artifactId>
       <version>${project.version}</version>
     </dependency>

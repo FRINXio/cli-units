@@ -44,6 +44,7 @@ import io.frinx.cli.unit.generic.GenericTranslateUnit;
 import io.frinx.cli.unit.ios.cdp.IosCdpUnit;
 import io.frinx.cli.unit.ios.essential.IosEssentialUnit;
 import io.frinx.cli.unit.ios.ifc.IosInterfaceUnit;
+import io.frinx.cli.unit.ios.init.IosCliInitializerUnit;
 import io.frinx.cli.unit.ios.lldp.LldpUnit;
 import io.frinx.cli.unit.ios.network.instance.IosNetworkInstanceUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
@@ -217,6 +218,7 @@ public class IosAll {
         new IosNetworkInstanceUnit(reg).init();
         new IosCdpUnit(reg).init();
         new LldpUnit(reg).init();
+        new IosCliInitializerUnit(reg).init();
         return reg;
     }
 
