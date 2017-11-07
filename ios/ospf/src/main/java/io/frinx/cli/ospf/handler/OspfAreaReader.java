@@ -23,12 +23,13 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.os
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.Area;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.AreaBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.AreaKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DottedQuad;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area, AreaKey, AreaBuilder> {
-    private static final Pattern AREA_ID = Pattern.compile(".*?Area (?:BACKBONE\\()?(?<areaId>[0-9]+).*");
+    private static final Pattern AREA_ID = Pattern.compile(".*?Area (?:BACKBONE\\()?(?<areaId>[0-9.]+).*");
 
     private final Cli cli;
 
@@ -39,7 +40,7 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
     @Nonnull
     @Override
     public List<AreaKey> getAllIdsForType(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
-                                   @Nonnull ReadContext readContext) throws ReadFailedException {
+                                          @Nonnull ReadContext readContext) throws ReadFailedException {
         String id = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         return parseAreasIds(blockingRead(String.format(GlobalConfigReader.SH_OSPF, id), cli, instanceIdentifier, readContext));
     }
@@ -49,7 +50,15 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
         return ParsingUtils.parseFields(output, 0,
                 AREA_ID::matcher,
                 m -> m.group("areaId"),
-                area -> new AreaKey(new OspfAreaIdentifier(Long.valueOf(area))));
+                area -> new AreaKey(getAreaIdentifier(area)));
+    }
+
+    private static OspfAreaIdentifier getAreaIdentifier(String area) {
+        if (area.contains(".")) {
+            return new OspfAreaIdentifier(new DottedQuad(area));
+        } else {
+            return new OspfAreaIdentifier(Long.valueOf(area));
+        }
     }
 
     @Override
@@ -59,8 +68,8 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
 
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
-                                      @Nonnull AreaBuilder areaBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+                                             @Nonnull AreaBuilder areaBuilder,
+                                             @Nonnull ReadContext readContext) throws ReadFailedException {
         areaBuilder.setIdentifier(instanceIdentifier.firstKeyOf(Area.class).getIdentifier());
     }
 
