@@ -12,13 +12,13 @@
   <parent>
     <groupId>io.frinx.distribution</groupId>
     <artifactId>karaf-parent</artifactId>
-    <version>3.1.1.rc3-frinx</version>
+    <version>3.1.1.rc4-frinx-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-karaf</artifactId>
-  <version>3.1.1.rc3-frinx</version>
+  <version>3.1.1.rc4-frinx-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>pom</packaging>
 
@@ -29,8 +29,8 @@
   <properties>
     <restconf.version>1.5.1-Carbon-SR1.3_1_1_rc4-frinxodl-SNAPSHOT</restconf.version>
     <netconf.version>1.2.1-Carbon-SR1.3_1_1_rc4-frinxodl-SNAPSHOT</netconf.version>
-    <cli.version>3.1.1.rc3-frinx</cli.version>
-    <openconfig.version>3.1.1.rc3-frinx</openconfig.version>
+    <cli.version>3.1.1.rc4-frinx-SNAPSHOT</cli.version>
+    <openconfig.version>3.1.1.rc4-frinx-SNAPSHOT</openconfig.version>
   </properties>
 
   <dependencies>
