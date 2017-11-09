@@ -132,6 +132,44 @@ public class InterfaceStateReaderTest {
             "     0 lost carrier, 0 no carrier, 0 pause output\n" +
             "     0 output buffer failures, 0 output buffers swapped out\n\n";
 
+    private static final State EXPECTED_FALLBACK_INTERFACE_STATE = new StateBuilder()
+            .setName("GigabitEthernet0/2")
+            .setAdminStatus(InterfaceCommonState.AdminStatus.DOWN)
+            .setEnabled(false)
+            .setOperStatus(InterfaceCommonState.OperStatus.UNKNOWN)
+            .setMtu(1500)
+            .setType(EthernetCsmacd.class)
+            .build();
+
+    private static final String SH_INTERFACE_FALLBACK =
+            "GigabitEthernet0/2 is unExpectedState, line protocol is something we don't expect\n" +
+            "  Hardware is Gigabit Ethernet, address is 4055.3989.5608 (bia 4055.3989.5608)\n" +
+            "  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec,\n" +
+            "     reliability 255/255, txload 1/255, rxload 1/255\n" +
+            "  Encapsulation ARPA, loopback not set\n" +
+            "  Keepalive set (10 sec)\n" +
+            "  Full Duplex, 1000Mbps, link type is auto, media type is SX\n" +
+            "  output flow-control is unsupported, input flow-control is unsupported\n" +
+            "  ARP type: ARPA, ARP Timeout 04:00:00\n" +
+            "  Last input never, output never, output hang never\n" +
+            "  Last clearing of \"show interface\" counters never\n" +
+            "  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0\n" +
+            "  Queueing strategy: fifo\n" +
+            "  Output queue: 0/40 (size/max)\n" +
+            "  5 minute input rate 0 bits/sec, 0 packets/sec\n" +
+            "  5 minute output rate 0 bits/sec, 0 packets/sec\n" +
+            "     0 packets input, 0 bytes, 0 no buffer\n" +
+            "     Received 0 broadcasts (0 IP multicasts)\n" +
+            "     0 runts, 0 giants, 0 throttles\n" +
+            "     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored\n" +
+            "     0 watchdog, 0 multicast, 0 pause input\n" +
+            "     130 packets output, 15138 bytes, 0 underruns\n" +
+            "     0 output errors, 0 collisions, 6 interface resets\n" +
+            "     0 unknown protocol drops\n" +
+            "     0 babbles, 0 late collision, 0 deferred\n" +
+            "     0 lost carrier, 0 no carrier, 0 pause output\n" +
+            "     0 output buffer failures, 0 output buffers swapped out\n\n";
+
     @Test
     public void testParseInterfaceState() throws Exception {
         StateBuilder parsed = new StateBuilder();
@@ -145,5 +183,9 @@ public class InterfaceStateReaderTest {
         parsed = new StateBuilder();
         InterfaceStateReader.parseInterfaceState(SH_INTERFACE3, parsed, "GigabitEthernet0/0");
         assertEquals(EXPECTED_INTERFACE_STATE3, parsed.build());
+
+        parsed = new StateBuilder();
+        InterfaceStateReader.parseInterfaceState(SH_INTERFACE_FALLBACK, parsed, "GigabitEthernet0/2");
+        assertEquals(EXPECTED_FALLBACK_INTERFACE_STATE, parsed.build());
     }
 }
