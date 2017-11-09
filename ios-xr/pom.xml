@@ -27,6 +27,7 @@
 
   <modules>
     <module>essential</module>
+    <module>network-instance</module>
   </modules>
 
   <build>
