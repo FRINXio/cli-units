@@ -13,6 +13,7 @@ folder8="Platform"
 folder9="Unmount"
 folder10="ospf/vrf"
 folder11="Mount/Unmount IOS"
+folder12="journal/dry-run"
 file=list.txt
 
 if [ -f $file ] ; then
@@ -61,6 +62,7 @@ do
    newman run $collection --bail -e $i -n 1 --folder "Classic ${folder10}"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $i testing Classic $folder10 FAILED" >> $file; fi
    newman run $collection --bail -e $i -n 1 --folder "Classic ${folder6}"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $i testing Classic $folder6 FAILED" >> $file; fi
    newman run $collection --bail -e $i -n 1 --folder "Classic ${folder7}"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $i testing Classic $folder7 FAILED" >> $file; fi
+   newman run $collection --bail -e $i -n 1 --folder "Classic ${folder12}"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $i testing Classic $folder7 FAILED" >> $file; fi
    newman run $collection --bail -e $i -n 1 --folder "Classic ${folder9}"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $i testing Classic $folder9 FAILED" >> $file; fi
 done
 
