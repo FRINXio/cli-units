@@ -8,6 +8,265 @@
 	},
 	"item": [
 		{
+			"name": "Linux",
+			"description": "",
+			"item": [
+				{
+					"name": "Mount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log(\"Request: \" + request.data)",
+									"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"Linux1\",\n      \n      \"cli-topology:host\" : \"{{linux_ip}}\",\n      \"cli-topology:port\" : \"{{linux_port}}\",\n      \"cli-topology:transport-type\" : \"{{linux_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"*\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{linux_username}}\",\n      \"cli-topology:password\" : \"{{linux_password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \n      \"cli-topology:keepalive-delay\": 55,\n      \"cli-topology:keepalive-initial-delay\": 55,\n      \"cli-topology:keepalive-timeout\": 120\n\n    }\n  }"
+						},
+						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
+					},
+					"response": []
+				},
+				{
+					"name": "Check status connected",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log(\"Response: \" + responseBody)",
+									"",
+									"// attempts counter",
+									"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+									"",
+									"var jsonData = JSON.parse(responseBody);",
+									"if (responseBody.has(\"node\") && jsonData.node[0]['cli-topology:connection-status'] === \"connected\") {",
+									"    tests[\"Is connected\"] = jsonData.node[0]['cli-topology:connection-status'] === \"connected\";",
+									"    // Reset attempt counter",
+									"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+									"} else {",
+									"    // If too many attempts, abort",
+									"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"connect_attempts\"))) {",
+									"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+									"        console.log(\"Not connected yet ! Too many attempts !\")",
+									"        // Reset attempt counter",
+									"        tests[\"Unable to connect\"] = false",
+									"    } else {",
+									"        // Schedule next check attempt",
+									"        console.log(\"Not connected yet ! Waiting, attempt : \" + attempt)",
+									"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+									"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+									"        postman.setNextRequest('Check status connected');",
+									"    }",
+									"}"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/Linux1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
+						},
+						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
+					},
+					"response": []
+				},
+				{
+					"name": "List home directory",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log(\"Request: \" + request.data)",
+									"console.log(\"Response: \" + responseBody)",
+									"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/Linux1/yang-ext:mount/cli-unit-generic:execute-and-read",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"ls ~\"\n  }\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Unmount",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check unmounted",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"console.log(\"Response: \" + responseBody)",
+									"tests[\"No data expected\"] = responseCode.code === 404;"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic YWRtaW46YWRtaW4=",
+								"description": ""
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "IOS XR",
 			"description": "",
 			"item": [

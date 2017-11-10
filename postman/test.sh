@@ -67,6 +67,15 @@ do
 done
 
 
+### Test for Linux generic
+arr=("linux_157_env.json")
+
+for i in "${arr[@]}"
+do
+   echo Collection running with $i
+   newman run $collection --bail -e $i -n 1 --folder "Linux"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $i testing $folder1 FAILED" >> $file; fi
+done
+
 
 if [ -f $file ] ; then
     cat $file
