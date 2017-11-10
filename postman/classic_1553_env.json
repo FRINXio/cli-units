@@ -59,7 +59,7 @@
     {
       "enabled": true,
       "key": "ospf",
-      "value": "1",
+      "value": "97",
       "type": "text"
     },
     {
@@ -83,7 +83,7 @@
     {
       "enabled": true,
       "key": "ospf2",
-      "value": "77",
+      "value": "98",
       "type": "text"
     },
     {
@@ -95,7 +95,7 @@
     {
       "enabled": true,
       "key": "area2",
-      "value": "47",
+      "value": "98",
       "type": "text"
     },
     {
@@ -107,7 +107,7 @@
     {
       "enabled": true,
       "key": "bgp",
-      "value": "65000",
+      "value": "97",
       "type": "text"
     },
     {

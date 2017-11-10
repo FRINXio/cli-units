@@ -41,7 +41,7 @@
     {
       "enabled": true,
       "key": "bgp",
-      "value": "65000",
+      "value": "97",
       "type": "text"
     },
     {
@@ -59,13 +59,13 @@
     {
       "enabled": true,
       "key": "ospf",
-      "value": "1",
+      "value": "97",
       "type": "text"
     },
     {
       "enabled": true,
       "key": "area",
-      "value": "0",
+      "value": "97",
       "type": "text"
     },
     {
