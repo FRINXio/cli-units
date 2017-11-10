@@ -23,6 +23,8 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.PrivilegedModeCredentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.privileged.mode.credentials.IosEnablePassword;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
@@ -190,9 +192,7 @@ public class IosCliInitializerUnit  implements TranslateUnit {
             // if command's output matches something.
             // Can we hide this in session's API?
             if (enableCommandOutput.endsWith(PASSWORD_PROMPT)) {
-                checkArgument(context.getCredentials() instanceof LoginPassword,
-                        "%s: Unable to handle credentials type of: %s", id, context.getCredentials());
-                String password = ((LoginPassword) context.getCredentials()).getPassword();
+                String password = getEnablePasswordFromCliNode();
                 write(session, newline, password);
 
                 String output = session.readUntilTimeout(READ_TIMEOUT_SECONDS).trim();
@@ -213,6 +213,24 @@ public class IosCliInitializerUnit  implements TranslateUnit {
                 LOG.debug("{}: enable command did not resulted in password prompt, enable command output: {}",
                         id, enableCommandOutput);
             }
+        }
+
+        private String getEnablePasswordFromCliNode() {
+
+            PrivilegedModeCredentials privilegedModeCredentials = context.getPrivilegedModeCredentials();
+            if (privilegedModeCredentials != null) {
+                if (context.getPrivilegedModeCredentials() instanceof IosEnablePassword) {
+                    return ((IosEnablePassword) privilegedModeCredentials).getSecret();
+                }
+            }
+
+            LOG.debug("{}: Secret not set, using session password as enable password", id);
+
+            checkArgument(context.getCredentials() instanceof LoginPassword,
+                    "%s: Unable to handle credentials type of: %s",
+                    id, context.getCredentials());
+
+            return ((LoginPassword) context.getCredentials()).getPassword();
         }
     }
 }
