@@ -181,6 +181,12 @@
       "key": "password",
       "value": "cisco",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "cdp_lldp_test_interface",
+      "value": "GigabitEthernet0/1",
+      "type": "text"
     }
   ],
   "timestamp": 1508789697427,

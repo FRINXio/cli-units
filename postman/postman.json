@@ -1758,7 +1758,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/1",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/{{ospf}}",
 								"method": "GET",
 								"header": [
 									{
@@ -1906,6 +1906,368 @@
 							],
 							"request": {
 								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-platform:components",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "XR CDP",
+					"description": "",
+					"item": [
+						{
+							"name": "SETUP: Configure CDP NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n cdp\n commit\n exit\nexit\"\n  }\n}"
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show cdp",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"Body matches string\"] = responseBody.has(\"cdp\");",
+											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/cdp:cdp",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "TEARDOWN: Delete CDP NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n no cdp\n commit\n exit\nexit\"\n  }\n}\n"
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show deleted cdp",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+											"",
+											"// console.log(\"Response: \" + responseBody)",
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/cdp:cdp",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "XR LLDP",
+					"description": "",
+					"item": [
+						{
+							"name": "SETUP: Configure LLDP NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n lldp\n commit\n exit\nexit\"\n  }\n}\n"
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show lldp",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"Body matches string\"] = responseBody.has(\"lldp\");",
+											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-lldp:lldp",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "TEARDOWN: Delete LLDP NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no lldp\n commit\nexit\"\n  }\n}\n"
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show deleted lldp",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+											"",
+											"// console.log(\"Response: \" + responseBody)",
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
@@ -3680,6 +4042,368 @@
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"Loopback97\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"Loopback97\"\n            }\n        }\n    ]\n}"
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Classic CDP",
+					"description": "",
+					"item": [
+						{
+							"name": "SETUP: Configure CDP NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n cdp run\n interface {{cdp_lldp_test_interface}}\n cdp enable\n exit\nexit\"\n  }\n}"
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show cdp",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"Body matches string\"] = responseBody.has(\"cdp\");",
+											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cdp:cdp",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "TEARDOWN: Delete CDP NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n no cdp enable\n exit\nexit\"\n  }\n}\n"
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show deleted cdp",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+											"",
+											"// console.log(\"Response: \" + responseBody)",
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cdp:cdp",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Classic LLDP",
+					"description": "",
+					"item": [
+						{
+							"name": "SETUP: Configure LLDP NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n lldp run\nexit\"\n  }\n}\n"
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show lldp",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"Body matches string\"] = responseBody.has(\"lldp\");",
+											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-lldp:lldp",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "TEARDOWN: Delete LLDP NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no lldp run\nexit\"\n  }\n}\n"
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "show deleted lldp",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+											"",
+											"// console.log(\"Response: \" + responseBody)",
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+										]
+									}
+								}
+							],
+							"request": {
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-lldp:lldp",
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4=",
+										"description": ""
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"description": ""
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"description": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
 								},
 								"description": ""
 							},

@@ -133,6 +133,12 @@
       "key": "netconf_port",
       "value": "830",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "cdp_lldp_test_interface",
+      "value": "GigabitEthernet0/0/0/0",
+      "type": "text"
     }
   ],
   "timestamp": 1508791475317,
