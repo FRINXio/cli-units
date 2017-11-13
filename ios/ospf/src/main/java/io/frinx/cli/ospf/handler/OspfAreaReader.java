@@ -53,7 +53,8 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
                 area -> new AreaKey(getAreaIdentifier(area)));
     }
 
-    private static OspfAreaIdentifier getAreaIdentifier(String area) {
+    @VisibleForTesting
+    static OspfAreaIdentifier getAreaIdentifier(String area) {
         if (area.contains(".")) {
             return new OspfAreaIdentifier(new DottedQuad(area));
         } else {

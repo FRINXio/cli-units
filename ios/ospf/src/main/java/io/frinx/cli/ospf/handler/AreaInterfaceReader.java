@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospf.types.rev170228.OspfAreaIdentifier;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.InterfaceBuilder;
@@ -79,10 +80,15 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
                 .map(INTERFACE_AREA::matcher)
                 .filter(Matcher::matches)
                 // Filter out only current area
-                .filter(m -> m.group("area").equals(areaKey.getIdentifier().getUint32().toString()))
+                .filter(m -> m.group("area").equals(getAreaId(areaKey)))
                 .map(matcher -> matcher.group("interface"))
                 .map(InterfaceKey::new)
                 .collect(Collectors.toList());
+    }
+
+    private static String getAreaId(AreaKey areaKey) {
+        OspfAreaIdentifier id = areaKey.getIdentifier();
+        return id.getUint32() != null ? id.getUint32().toString() : id.getDottedQuad().getValue();
     }
 
     @Override
