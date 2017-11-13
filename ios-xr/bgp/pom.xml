@@ -6,12 +6,7 @@
   ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
   ~ and is available at http://www.eclipse.org/legal/epl-v10.html
   -->
-
-<!-- vi: set et smarttab sw=4 tabstop=4: -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.opendaylight.controller</groupId>
@@ -20,8 +15,9 @@
         <relativePath/>
     </parent>
 
+    <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.cli</groupId>
-    <artifactId>ios-xr-network-instance-unit</artifactId>
+    <artifactId>ios-xr-bgp-unit</artifactId>
     <version>3.1.1.rc4-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
@@ -52,6 +48,11 @@
             <version>${cli.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-network-instance</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry-api</artifactId>
             <version>${cli.version}</version>
@@ -59,18 +60,6 @@
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>common-handlers</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-
-        <!-- Openconfig models -->
-        <dependency>
-            <groupId>io.frinx.openconfig</groupId>
-            <artifactId>openconfig-network-instance</artifactId>
-            <version>${openconfig.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-bgp-unit</artifactId>
             <version>${cli.version}</version>
         </dependency>
 

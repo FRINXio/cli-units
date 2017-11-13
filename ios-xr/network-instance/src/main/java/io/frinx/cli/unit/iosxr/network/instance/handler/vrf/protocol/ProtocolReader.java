@@ -13,6 +13,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
 import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -62,7 +63,7 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
 
         public ProtocolReaderComposite(Cli cli) {
             super(new ArrayList<ListReaderCustomizer<Protocol, ProtocolKey, ProtocolBuilder>>() {{
-
+                add(new BgpProtocolReader(cli));
             }});
         }
 
