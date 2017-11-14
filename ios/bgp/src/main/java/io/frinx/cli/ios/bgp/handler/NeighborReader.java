@@ -30,8 +30,8 @@ import java.util.regex.Pattern;
 
 public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
-    static final String SH_SUMM = "show bgp all summary";
-    private static final Pattern NEIGHBOR_LINE = Pattern.compile("(?<neighborIp>.+) (?<ver>.+) (?<as>.+) (?<msgRcvd>.+) (?<msgSent>.+) (?<tblVer>.+) (?<inQ>.+) (?<outQ>.+) (?<time>.+) (?<pfxRcd>.+)");
+    static final String SH_SUMM = "show bgp all summary | begin Neighbor";
+    private static final Pattern NEIGHBOR_LINE = Pattern.compile("(?<neighborIp>.+) (?<ver>[\\d]+) (?<as>[\\d]+) (?<msgRcvd>[\\d]+) (?<msgSent>[\\d]+) (?<tblVer>[\\d]+) (?<inQ>.+) (?<outQ>.+) (?<time>.+) (?<pfxRcd>.+)");
 
     private Cli cli;
 
@@ -62,9 +62,9 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
 
     @VisibleForTesting
     public static List<NeighborKey> getNeighborKeys(String output) {
-        return ParsingUtils.parseFields(output.replaceAll("\\h+", " "), 1,
+        return ParsingUtils.parseFields(output.replaceAll("\\h+", " "), 0,
                 NEIGHBOR_LINE::matcher,
                 matcher -> matcher.group("neighborIp"),
-                value -> new NeighborKey(new IpAddress(new Ipv4Address(value.trim()))));
+                value -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
     }
 }

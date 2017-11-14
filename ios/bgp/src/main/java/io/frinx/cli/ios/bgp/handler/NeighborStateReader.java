@@ -31,7 +31,7 @@ public class NeighborStateReader implements BgpReader.BgpOperReader<State, State
 
     private Cli cli;
 
-    static final String NEIGHBOR_LINE = "%s 4 (?<as>.+) (?<msgRcvd>.+) (?<msgSent>.+) (?<tblVer>.+) (?<inQ>.+) (?<outQ>.+) (?<time>.+) (?<pfxRcd>.+)";
+    private static final String NEIGHBOR_LINE = "%s (?<ver>.+) (?<as>.+) (?<msgRcvd>.+) (?<msgSent>.+) (?<tblVer>.+) (?<inQ>.+) (?<outQ>.+) (?<time>.+) (?<pfxRcd>.+)";
 
     public NeighborStateReader(Cli cli) {
         this.cli = cli;
@@ -68,8 +68,7 @@ public class NeighborStateReader implements BgpReader.BgpOperReader<State, State
     static String parseState(String output, String neighborIp) {
         // State/PfxRcd can be either Idle or number depending on whether the connection is/was established and prefixes were received
         // parse first a string, then decide if it's status or number of prefixes received
-        output = output.replaceAll("\\h+", " ");
-        return ParsingUtils.parseField(output, 0,
+        return ParsingUtils.parseField(output.replaceAll("\\h+", " "), 0,
                 Pattern.compile(String.format(NEIGHBOR_LINE, neighborIp))::matcher,
                 matcher -> matcher.group("pfxRcd")).orElse("");
     }

@@ -28,7 +28,14 @@ public class NeighborReaderTest {
             "10.9.9.1        4        65000     290     285        4    0    0 00:14:25        2\n" +
             "10.255.255.2        4        65000       0       0        1    0    0 never    Idle\n" +
             "99.0.0.2        4        65000       0       0        1    0    0 never    2\n" +
-            "10.255.255.3    4        65000        0       0        1    0    0 never    0\n";
+            "10.255.255.3    4        65000        0       0        1    0    0 never    0\n" +
+            "\n" +
+            "For address family: VPNv4 Unicast\n" +
+            "BGP router identifier 10.255.255.1, local AS number 65000\n" +
+            "BGP table version is 1, main routing table version 1\n" +
+            "\n" +
+            "Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd\n" +
+            "10.255.255.3    4        65000   23713   23711        1    0    0 2w0d            0\n";
 
     @Test
     public void testNeighborIds() {
