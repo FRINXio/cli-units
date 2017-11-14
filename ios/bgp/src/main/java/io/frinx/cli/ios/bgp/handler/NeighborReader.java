@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
     static final String SH_SUMM = "show bgp all summary";
-    static final Pattern NEIGHBOR_LINE = Pattern.compile("(?<neighborIp>.+) 4 (?<as>.+) (?<msgRcvd>.+) (?<msgSent>.+) (?<tblVer>.+) (?<inQ>.+) (?<outQ>.+) (?<time>.+) (?<pfxRcd>.+)");
+    private static final Pattern NEIGHBOR_LINE = Pattern.compile("(?<neighborIp>.+) (?<ver>.+) (?<as>.+) (?<msgRcvd>.+) (?<msgSent>.+) (?<tblVer>.+) (?<inQ>.+) (?<outQ>.+) (?<time>.+) (?<pfxRcd>.+)");
 
     private Cli cli;
 
@@ -62,7 +62,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
 
     @VisibleForTesting
     public static List<NeighborKey> getNeighborKeys(String output) {
-        return ParsingUtils.parseFields(output, 0,
+        return ParsingUtils.parseFields(output.replaceAll("\\h+", " "), 1,
                 NEIGHBOR_LINE::matcher,
                 matcher -> matcher.group("neighborIp"),
                 value -> new NeighborKey(new IpAddress(new Ipv4Address(value.trim()))));

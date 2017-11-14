@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class NeighborReaderTest {
 
     private String summOutput = "Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd\n" +
+            "10.9.9.1        4        65000     290     285        4    0    0 00:14:25        2\n" +
             "10.255.255.2        4        65000       0       0        1    0    0 never    Idle\n" +
             "99.0.0.2        4        65000       0       0        1    0    0 never    2\n" +
             "10.255.255.3    4        65000        0       0        1    0    0 never    0\n";
@@ -33,6 +34,7 @@ public class NeighborReaderTest {
     public void testNeighborIds() {
         List<NeighborKey> keys = NeighborReader.getNeighborKeys(summOutput);
         Assert.assertArrayEquals(new Ipv4Address[]{
+                new Ipv4Address("10.9.9.1"),
                 new Ipv4Address("10.255.255.2"),
                 new Ipv4Address("99.0.0.2"),
                 new Ipv4Address("10.255.255.3")},
