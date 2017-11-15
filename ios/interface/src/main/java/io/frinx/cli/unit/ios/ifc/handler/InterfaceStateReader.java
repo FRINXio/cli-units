@@ -57,12 +57,12 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
     public static final String SH_SINGLE_INTERFACE = "sh inter %s";
 
     public static final Pattern STATUS_LINE =
-            Pattern.compile("(?<id>.+)[.\\s]* (?<admin>\\w+), line protocol is (?<line>\\w+).*");
+            Pattern.compile("(?<id>.+)[.\\s]* (?<admin>up|down).*, line protocol is (?<line>up|down).*");
     public static final Pattern MTU_LINE = Pattern.compile("\\s*MTU (?<mtu>.+) bytes.*$");
     public static final Pattern DESCR_LINE = Pattern.compile("\\s*Description: (?<desc>.+)");
 
     @VisibleForTesting
-    static void parseInterfaceState(final String output, final StateBuilder builder, String name) {
+    static void parseInterfaceState(final String output, final StateBuilder builder, final String name) {
         builder.setName(name);
         builder.setType(parseType(name));
 
@@ -74,10 +74,21 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
                     builder.setEnabled(adminStatus == InterfaceCommonState.AdminStatus.UP);
                 });
 
+        if (builder.getAdminStatus() == null) {
+            // We cannot parse AdminSatus from output, fallback to AdminStatus.DOWN
+            builder.setAdminStatus(InterfaceCommonState.AdminStatus.DOWN);
+            builder.setEnabled(false);
+        }
+
         parseField(output,
                 STATUS_LINE::matcher,
                 matcher -> InterfaceCommonState.OperStatus.valueOf(matcher.group("line").toUpperCase()),
                 builder::setOperStatus);
+
+        if (builder.getOperStatus() == null) {
+            // We cannot parse OperSatus from output, fallback to OperStatus.Unknown
+            builder.setOperStatus(InterfaceCommonState.OperStatus.UNKNOWN);
+        }
 
         parseField(output,
                 MTU_LINE::matcher,
