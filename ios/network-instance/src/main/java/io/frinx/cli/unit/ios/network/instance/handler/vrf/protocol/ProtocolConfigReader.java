@@ -6,40 +6,38 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.network.instance.handler;
+package io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.unit.utils.CliOperReader;
+import io.frinx.cli.unit.ios.network.instance.common.L3VrfReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.State;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.StateBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.ConfigBuilder;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class ProtocolStateReader implements CliOperReader<State, StateBuilder> {
+public class ProtocolConfigReader implements L3VrfReader.L3VrfConfigReader<Config, ConfigBuilder> {
 
     @Nonnull
     @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> instanceIdentifier) {
-        return new StateBuilder();
+    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
+        return new ConfigBuilder();
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier,
-                                   @Nonnull StateBuilder StateBuilder,
-                                   @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
-        StateBuilder.setIdentifier(protocolKey.getIdentifier());
-        StateBuilder.setName(protocolKey.getName());
+        configBuilder.setIdentifier(protocolKey.getIdentifier());
+        configBuilder.setName(protocolKey.getName());
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State State) {
-        ((ProtocolBuilder) builder).setState(State);
+    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
+        ((ProtocolBuilder) builder).setConfig(config);
     }
 }

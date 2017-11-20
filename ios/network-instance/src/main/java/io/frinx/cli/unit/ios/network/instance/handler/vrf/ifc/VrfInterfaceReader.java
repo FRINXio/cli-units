@@ -6,17 +6,16 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.network.instance.handler;
+package io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc;
 
 import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.fd.honeycomb.translate.spi.read.Initialized;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceReader;
-import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.ios.network.instance.common.L3VrfListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NetworkInstanceInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
+public class VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private static final String SH_IP_VRF_INTERFACES_ALL = "sh ip vrf interfaces";
     private static final String SH_IP_VRF_INTERFACES = "sh ip vrf interfaces %s";
@@ -46,21 +45,21 @@ public class NetworkInstanceInterfaceReader implements CliConfigListReader<Inter
     private final InterfaceReader interfaceReader;
 
 
-    public NetworkInstanceInterfaceReader(Cli cli) {
+    public VrfInterfaceReader(Cli cli) {
         this.cli = cli;
         this.interfaceReader = new InterfaceReader(cli);
     }
 
     @Nonnull
     @Override
-    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                        @Nonnull ReadContext ctx) throws ReadFailedException {
+    public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+                                               @Nonnull ReadContext ctx) throws ReadFailedException {
         final String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
         if (name.equals(NetworInstance.DEFAULT_NETWORK_NAME)) {
             final List<InterfaceKey> interfaceKeys = interfaceReader.getAllIds(InstanceIdentifier
-                            .create(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222
-                                    .interfaces.top.interfaces.Interface.class), ctx)
+                    .create(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222
+                            .interfaces.top.interfaces.Interface.class), ctx)
                     .stream()
                     .map((interfaceKey) -> new InterfaceKey(interfaceKey.getName()))
                     .collect(Collectors.toList());
@@ -120,19 +119,10 @@ public class NetworkInstanceInterfaceReader implements CliConfigListReader<Inter
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                      @Nonnull InterfaceBuilder interfaceBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+                                             @Nonnull InterfaceBuilder interfaceBuilder,
+                                             @Nonnull ReadContext ctx) throws ReadFailedException {
         String ifaceId = instanceIdentifier.firstKeyOf(Interface.class).getId();
         interfaceBuilder.setId(ifaceId);
-    }
-
-    @Nonnull
-    @Override
-    public Initialized<? extends DataObject> init(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                                  @Nonnull Interface readValue,
-                                                  @Nonnull ReadContext readContext) {
-        // Direct translation
-        return Initialized.create(instanceIdentifier, readValue);
     }
 }

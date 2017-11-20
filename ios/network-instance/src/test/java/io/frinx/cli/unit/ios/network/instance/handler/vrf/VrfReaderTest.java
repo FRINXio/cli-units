@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.network.instance.handler;
+package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,7 +19,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 
 @RunWith(MockitoJUnitRunner.class)
-public class NetworkInstanceReaderTest {
+public class VrfReaderTest {
 
     private static  final String SH_IP_VRF =
             "  Name                             Default RD          Interfaces\n" +
@@ -35,7 +35,7 @@ public class NetworkInstanceReaderTest {
 
     @Test
     public void testReader() {
-        assertEquals(IDS_EXPECTED, NetworkInstanceReader.parseVrfIds(SH_IP_VRF));
+        assertEquals(IDS_EXPECTED, VrfReader.parseVrfIds(SH_IP_VRF));
     }
 
 }

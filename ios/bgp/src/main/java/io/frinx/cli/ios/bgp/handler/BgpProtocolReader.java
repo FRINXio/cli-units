@@ -14,7 +14,7 @@ import com.google.common.collect.ImmutableList;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.registry.common.CompositeReader;
+import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
         io.frinx.cli.ios.bgp.common.BgpReader.BgpConfigReader<Protocol, ProtocolBuilder>,
-        CompositeReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
+        CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     public static final String DEFAULT_BGP_INSTANCE = "default";
     private final Cli cli;
