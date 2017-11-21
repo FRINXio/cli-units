@@ -4277,6 +4277,15 @@
 									"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
 								]
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));"
+								]
+							}
 						}
 					],
 					"request": {
