@@ -2,14 +2,13 @@
 	"variables": [],
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "6bde3fc7-4cd2-fbf2-7da1-e8427308c47e",
+		"_postman_id": "9eb03acb-43fb-9e80-f8c1-3ec095ef05f9",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Linux",
-			"description": "",
 			"item": [
 				{
 					"name": "Mount",
@@ -26,29 +25,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
 						"method": "PUT",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"Linux1\",\n      \n      \"cli-topology:host\" : \"{{linux_ip}}\",\n      \"cli-topology:port\" : \"{{linux_port}}\",\n      \"cli-topology:transport-type\" : \"{{linux_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"*\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{linux_username}}\",\n      \"cli-topology:password\" : \"{{linux_password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \n      \"cli-topology:keepalive-delay\": 55,\n      \"cli-topology:keepalive-initial-delay\": 55,\n      \"cli-topology:keepalive-timeout\": 120\n\n    }\n  }"
 						},
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
 					"response": []
@@ -101,29 +97,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/Linux1",
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/Linux1",
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
 					"response": []
@@ -144,30 +137,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/Linux1/yang-ext:mount/cli-unit-generic:execute-and-read",
 						"method": "POST",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"ls ~\"\n  }\n}"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/Linux1/yang-ext:mount/cli-unit-generic:execute-and-read"
 					},
 					"response": []
 				},
@@ -185,30 +174,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
 						"method": "DELETE",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": ""
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1"
 					},
 					"response": []
 				},
@@ -237,30 +222,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS"
 					},
 					"response": []
 				}
@@ -268,11 +249,9 @@
 		},
 		{
 			"name": "IOS XR",
-			"description": "",
 			"item": [
 				{
 					"name": "XR General information",
-					"description": "",
 					"item": [
 						{
 							"name": "show all",
@@ -290,30 +269,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/"
 							},
 							"response": []
 						},
@@ -336,30 +311,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/"
 							},
 							"response": []
 						}
@@ -368,7 +339,6 @@
 				},
 				{
 					"name": "XR Mount",
-					"description": "",
 					"item": [
 						{
 							"name": "Mount IOS XR netconf",
@@ -384,29 +354,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN",
 								"method": "PUT",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"node\": [\n    {\n      \"node-id\": \"IOSXRN\",\n      \"netconf-node-topology:host\": \"{{xr_ip}}\",\n      \"netconf-node-topology:port\": {{netconf_port}},\n      \"netconf-node-topology:keepalive-delay\": 0,\n      \"netconf-node-topology:tcp-only\": false,\n      \"netconf-node-topology:username\": \"{{username}}\",\n      \"netconf-node-topology:password\": \"{{password}}\"\n    }\n  ]\n}"
 								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN",
 								"description": "To enable SSH on IOS use:\n\nhttps://networklessons.com/cisco/ccna-routing-switching-icnd1-100-105/configure-ssh-cisco-ios/\n\n\ntelnet <IP>\n enable\n  \n conf t\n enable password cisco\n interface FastEthernet0/0\n ip address 192.168.56.121 255.255.255.0\n no shutdown\n exit\n exit\n \n configure terminal\n hostname R121\n ip domain-name FRINX.LOCAL\n crypto key generate rsa\n  1024\n ip ssh version 2\n line vty 0 4\n  transport input ssh\n  login local\n  exit\n username cisco password cisco\n exit"
 							},
 							"response": []
@@ -459,30 +426,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/IOSXRN",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/IOSXRN"
 							},
 							"response": []
 						},
@@ -500,29 +463,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR",
 								"method": "PUT",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOSXR\",\n      \n      \"cli-topology:host\" : \"{{xr_ip}}\",\n      \"cli-topology:port\" : \"{{topology_port}}\",\n      \"cli-topology:transport-type\" : \"{{protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios xr\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{username}}\",\n      \"cli-topology:password\" : \"{{password}}\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR",
 								"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 							},
 							"response": []
@@ -575,30 +535,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR"
 							},
 							"response": []
 						}
@@ -607,7 +563,6 @@
 				},
 				{
 					"name": "XR Interface",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Create Loopback NATIVE",
@@ -623,25 +578,22 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"interface-configuration\": [\n        {\n            \"active\": \"act\",\n            \"interface-name\": \"{{test_interface}}\",\n            \"interface-virtual\": [\n                null\n            ],\n            \"shutdown\": [\n                null\n            ]\n        }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -663,30 +615,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/"
 							},
 							"response": []
 						},
@@ -708,30 +656,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -749,25 +693,22 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "DELETE",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -788,30 +729,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -820,7 +757,6 @@
 				},
 				{
 					"name": "XR Interface IP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Create Loopback NATIVE",
@@ -836,25 +772,22 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"interface-configuration\": [\n        {\n            \"active\": \"act\",\n            \"interface-name\": \"{{test_interface}}\",\n            \"interface-virtual\": [\n                null\n            ],\n            \"shutdown\": [\n                null\n            ]\n        }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -874,30 +807,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -915,25 +844,22 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}/Cisco-IOS-XR-ipv4-io-cfg:ipv4-network",
 								"method": "PUT",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n\t\"ipv4-network\": {\n        \"addresses\": {\n            \"primary\": {\n                \"netmask\": \"255.255.255.0\",\n                \"address\": \"{{ip1}}\"\n            }\n        }\n    }\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}/Cisco-IOS-XR-ipv4-io-cfg:ipv4-network"
 							},
 							"response": []
 						},
@@ -954,30 +880,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -998,30 +920,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/{{ip1}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/{{ip1}}"
 							},
 							"response": []
 						},
@@ -1042,30 +960,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/255.255.255.255",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/255.255.255.255"
 							},
 							"response": []
 						},
@@ -1083,25 +997,22 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "DELETE",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -1110,7 +1021,6 @@
 				},
 				{
 					"name": "XR Unmount",
-					"description": "",
 					"item": [
 						{
 							"name": "DELETE IOS XR",
@@ -1126,29 +1036,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN",
 								"method": "DELETE",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN",
 								"description": "To enable SSH on IOS use:\n\nhttps://networklessons.com/cisco/ccna-routing-switching-icnd1-100-105/configure-ssh-cisco-ios/\n\n\ntelnet <IP>\n enable\n  \n conf t\n enable password cisco\n interface FastEthernet0/0\n ip address 192.168.56.121 255.255.255.0\n no shutdown\n exit\n exit\n \n configure terminal\n hostname R121\n ip domain-name FRINX.LOCAL\n crypto key generate rsa\n  1024\n ip ssh version 2\n line vty 0 4\n  transport input ssh\n  login local\n  exit\n username cisco password cisco\n exit"
 							},
 							"response": []
@@ -1178,30 +1085,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/IOSXRN",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/IOSXRN"
 							},
 							"response": []
 						},
@@ -1219,29 +1122,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR",
 								"method": "DELETE",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR",
 								"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 							},
 							"response": []
@@ -1271,30 +1171,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR"
 							},
 							"response": []
 						}
@@ -1303,7 +1199,6 @@
 				},
 				{
 					"name": "XR BGP summary",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure bgp NATIVE",
@@ -1322,31 +1217,27 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
 										"value": "application/json",
-										"description": "",
 										"disabled": true
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nexit\nrouter bgp {{bgp}}\nbgp router-id {{router}}\naddress-family ipv4 unicast\nexit\naddress-family vpnv4 unicast\nexit\nneighbor {{neighbor}}\nremote-as {{bgp}}\nupdate-source {{test_interface}}\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -1371,30 +1262,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default"
 							},
 							"response": []
 						},
@@ -1422,30 +1309,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/xxx",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/xxx"
 							},
 							"response": []
 						},
@@ -1464,30 +1347,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router bgp {{bgp}}\nno interface {{test_interface}}\ncommit\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -1496,7 +1375,6 @@
 				},
 				{
 					"name": "XR static route",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure static route NATIVE",
@@ -1515,31 +1393,27 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
 										"value": "application/json",
-										"description": "",
 										"disabled": true
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nrouter static\naddress-family ipv4 unicast\n{{ip-route}} {{ip-route2}}\n{{ip-route}} GigabitEthernet0/0/0/1 {{ip-route3}} metric 2\nexit\naddress-family ipv6 unicast\n{{ip61}} GigabitEthernet0/0/0/1 {{ip62}}\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -1566,30 +1440,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/default",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/default"
 							},
 							"response": []
 						},
@@ -1616,30 +1486,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/xxx",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/xxx"
 							},
 							"response": []
 						},
@@ -1660,31 +1526,27 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
 										"value": "application/json",
-										"description": "",
 										"disabled": true
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router static\ncommit\nexit\"\n  }\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -1693,7 +1555,6 @@
 				},
 				{
 					"name": "XR ospf",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure ospf NATIVE",
@@ -1712,31 +1573,27 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
 										"value": "application/json",
-										"description": "",
 										"disabled": true
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nexit\nrouter ospf {{ospf}}\nrouter-id {{router2}}\naddress-family ipv4\narea {{area}}\ninterface {{test_interface}}\nexit\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -1760,30 +1617,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/{{ospf}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/{{ospf}}"
 							},
 							"response": []
 						},
@@ -1810,30 +1663,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/666",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/666"
 							},
 							"response": []
 						},
@@ -1854,31 +1703,27 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
 										"value": "application/json",
-										"description": "",
 										"disabled": true
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router ospf {{ospf}}\nno interface {{test_interface}}\ncommit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -1887,7 +1732,6 @@
 				},
 				{
 					"name": "XR Platform",
-					"description": "",
 					"item": [
 						{
 							"name": "show inventory",
@@ -1907,30 +1751,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-platform:components",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-platform:components"
 							},
 							"response": []
 						}
@@ -1939,7 +1779,6 @@
 				},
 				{
 					"name": "XR CDP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure CDP NATIVE",
@@ -1956,30 +1795,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n cdp\n commit\n exit\nexit\"\n  }\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -2002,30 +1837,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/cdp:cdp",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/cdp:cdp"
 							},
 							"response": []
 						},
@@ -2044,30 +1875,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n no cdp\n commit\n exit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -2088,30 +1915,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/cdp:cdp",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/cdp:cdp"
 							},
 							"response": []
 						}
@@ -2120,7 +1943,6 @@
 				},
 				{
 					"name": "XR LLDP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure LLDP NATIVE",
@@ -2137,30 +1959,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n lldp\n commit\n exit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -2183,30 +2001,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-lldp:lldp"
 							},
 							"response": []
 						},
@@ -2225,30 +2039,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no lldp\n commit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -2269,30 +2079,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-lldp:lldp"
 							},
 							"response": []
 						}
@@ -2303,11 +2109,9 @@
 		},
 		{
 			"name": "IOS Classic",
-			"description": "",
 			"item": [
 				{
 					"name": "Classic General information",
-					"description": "",
 					"item": [
 						{
 							"name": "show all",
@@ -2325,30 +2129,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/"
 							},
 							"response": []
 						},
@@ -2372,30 +2172,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/ios-essential:version",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/ios-essential:version"
 							},
 							"response": []
 						}
@@ -2404,7 +2200,6 @@
 				},
 				{
 					"name": "Classic Mount",
-					"description": "",
 					"item": [
 						{
 							"name": "Mount IOS Classic",
@@ -2420,29 +2215,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 								"method": "PUT",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"{{topology_port}}\",\n      \"cli-topology:transport-type\" : \"{{protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{username}}\",\n      \"cli-topology:password\" : \"{{password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 150,\n\n      \"cli-topology:keepalive-delay\": 55,\n      \"cli-topology:keepalive-initial-delay\": 55,\n      \"cli-topology:keepalive-timeout\": 120\n    }\n  }"
 								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 								"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 							},
 							"response": []
@@ -2495,29 +2287,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 								"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 							},
 							"response": []
@@ -2527,7 +2316,6 @@
 				},
 				{
 					"name": "Classic Interface",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Create Loopback NATIVE",
@@ -2544,30 +2332,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -2589,30 +2373,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces"
 							},
 							"response": []
 						},
@@ -2634,30 +2414,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -2675,30 +2451,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno interface {{test_interface}}\nexit\"\n  }\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -2719,30 +2491,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -2751,7 +2519,6 @@
 				},
 				{
 					"name": "Classic Interface IP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Create Loopback NATIVE",
@@ -2768,30 +2535,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -2811,30 +2574,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -2853,30 +2612,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nip address {{ip41}} {{netmask}}\nipv6 address {{ipv61}} link-local\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -2898,30 +2653,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -2943,30 +2694,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/{{ip41}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/{{ip41}}"
 							},
 							"response": []
 						},
@@ -2987,30 +2734,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/255.255.255.255",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/255.255.255.255"
 							},
 							"response": []
 						},
@@ -3029,30 +2772,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nno ip address\nno ipv6 address\nno interface {{test_interface}}\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -3061,7 +2800,6 @@
 				},
 				{
 					"name": "Classic ospf/vrf",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure ip ospf and vrf NATIVE",
@@ -3078,30 +2816,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nexit\nrouter ospf {{ospf}}\nrouter-id {{router}}\nnetwork {{net}} area {{area}}\ndefault-information originate always\nmpls ldp autoconfig area {{area}}\nexit\ninterface {{test_interface}}\nip address {{ip41}} {{netmask}}\nno shutdown\nexit\nrouter ospf {{ospf2}}\nnetwork {{ip41}} {{net2}} area {{area2}}\nexit\nip vrf {{vrf}}\nexit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -3134,30 +2868,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances"
 							},
 							"response": []
 						},
@@ -3183,30 +2913,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/{{ospf2}}/ospfv2/areas/area/{{area2}}/interfaces",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/{{ospf2}}/ospfv2/areas/area/{{area2}}/interfaces"
 							},
 							"response": []
 						},
@@ -3233,30 +2959,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/666",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/666"
 							},
 							"response": []
 						},
@@ -3275,30 +2997,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router ospf {{ospf}}\nno router ospf {{ospf2}}\nno interface {{test_interface}}\nno ip vrf {{vrf}}\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -3307,7 +3025,6 @@
 				},
 				{
 					"name": "Classic BGP summary",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure bgp NATIVE",
@@ -3324,30 +3041,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{test_interface}}\n exit\n router bgp {{bgp}}\n bgp log-neighbor-changes\n no bgp default ipv4-unicast\n neighbor {{neighbor}} remote-as {{bgp}}\n neighbor {{neighbor}} update-source {{test_interface}}\n address-family ipv4\n network {{net3}} mask {{mask}}\n neighbor {{neighbor}} activate\n neighbor {{neighbor}} send-community both\n exit-address-family\nexit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -3373,30 +3086,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default/",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default/"
 							},
 							"response": []
 						},
@@ -3424,30 +3133,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/xxx/",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/xxx/"
 							},
 							"response": []
 						},
@@ -3466,30 +3171,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router bgp {{bgp}}\nno interface {{test_interface}}\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -3498,7 +3199,6 @@
 				},
 				{
 					"name": "Classic static route",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure static route NATIVE",
@@ -3515,30 +3215,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nip route {{ip-route1}} {{mask}} {{ip2-route1}} {{ip3-route1}}\nip route {{ip-route2}} {{mask}} {{ip2-route2}}\nexit\"\n  }\n}\n\n\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -3567,30 +3263,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/default",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/default"
 							},
 							"response": []
 						},
@@ -3618,30 +3310,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/xxx",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/xxx"
 							},
 							"response": []
 						},
@@ -3660,30 +3348,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno ip route {{ip-route1}} {{mask}} {{ip2-route1}} {{ip3-route1}}\nno ip route {{ip-route2}} {{mask}} {{ip2-route2}}\nexit\"\n  }\n}\n\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -3692,7 +3376,6 @@
 				},
 				{
 					"name": "Classic Unmount",
-					"description": "",
 					"item": [
 						{
 							"name": "Unmount",
@@ -3708,29 +3391,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 								"method": "DELETE",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 								"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 							},
 							"response": []
@@ -3760,30 +3440,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS"
 							},
 							"response": []
 						}
@@ -3792,8 +3468,33 @@
 				},
 				{
 					"name": "Classic journal/dry-run",
-					"description": "",
 					"item": [
+						{
+							"name": "SETUP: delete loopback",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
+							},
+							"response": []
+						},
 						{
 							"name": "create loopback dryrun",
 							"event": [
@@ -3809,30 +3510,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -3853,30 +3550,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/journal:read-journal",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/journal:read-journal"
 							},
 							"response": []
 						},
@@ -3897,30 +3590,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -3939,30 +3628,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -3983,30 +3668,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/journal:read-journal",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/journal:read-journal"
 							},
 							"response": []
 						},
@@ -4025,30 +3706,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "DELETE",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
+									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -4057,7 +3734,6 @@
 				},
 				{
 					"name": "Classic CDP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure CDP NATIVE",
@@ -4074,30 +3750,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n cdp run\n interface {{cdp_lldp_test_interface}}\n cdp enable\n exit\nexit\"\n  }\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4120,30 +3792,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cdp:cdp",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cdp:cdp"
 							},
 							"response": []
 						},
@@ -4162,30 +3830,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n no cdp enable\n exit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4206,30 +3870,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cdp:cdp",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cdp:cdp"
 							},
 							"response": []
 						}
@@ -4238,7 +3898,6 @@
 				},
 				{
 					"name": "Classic LLDP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure LLDP NATIVE",
@@ -4255,30 +3914,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n lldp run\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4301,30 +3956,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-lldp:lldp"
 							},
 							"response": []
 						},
@@ -4343,30 +3994,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no lldp run\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4387,30 +4034,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-lldp:lldp"
 							},
 							"response": []
 						}
@@ -4421,7 +4064,6 @@
 		},
 		{
 			"name": "Mount/Unmount IOS",
-			"description": "",
 			"item": [
 				{
 					"name": "Mount WRONG IP",
@@ -4438,29 +4080,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "PUT",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip_wrong}}\",\n      \"cli-topology:port\" : \"{{classic_port}}\",\n      \"cli-topology:transport-type\" : \"{{classic_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{classic_username}}\",\n      \"cli-topology:password\" : \"{{classic_password}}\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
 					"response": []
@@ -4492,29 +4131,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
 					"response": []
@@ -4534,29 +4170,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "PUT",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"{{classic_port}}\",\n      \"cli-topology:transport-type\" : \"{{classic_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{classic_username}}\",\n      \"cli-topology:password\" : \"{{classic_password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \n      \"cli-topology:keepalive-delay\": 55,\n      \"cli-topology:keepalive-initial-delay\": 55,\n      \"cli-topology:keepalive-timeout\": 120\n\n    }\n  }"
 						},
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
 					"response": []
@@ -4609,29 +4242,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 						"description": "To enable TELNET on IOS use:\n\nenable\n\nconf t\nenable password cisco\ninterface FastEthernet0/0\nip address 192.168.56.122 255.255.255.0\nno shutdown\nexit\nexit\n\nconf t\nline vty 0 4\npassword cisco\nlogin\nexec-timeout 40\nmotd-banner\nexit\nexit"
 					},
 					"response": []
@@ -4650,30 +4280,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "DELETE",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": ""
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS"
 					},
 					"response": []
 				},
@@ -4702,30 +4328,26 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Basic YWRtaW46YWRtaW4=",
-								"description": ""
+								"value": "Basic YWRtaW46YWRtaW4="
 							},
 							{
 								"key": "Accept",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							},
 							{
 								"key": "Content-Type",
-								"value": "application/json",
-								"description": ""
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS"
 					},
 					"response": []
 				}
