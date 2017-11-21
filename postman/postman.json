@@ -623,7 +623,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -639,7 +639,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"interface-configuration\": [\n        {\n            \"active\": \"act\",\n            \"interface-name\": \"Loopback97\",\n            \"interface-virtual\": [\n                null\n            ],\n            \"shutdown\": [\n                null\n            ]\n        }\n    ]\n}"
+									"raw": "{\n    \"interface-configuration\": [\n        {\n            \"active\": \"act\",\n            \"interface-name\": \"{{test_interface}}\",\n            \"interface-virtual\": [\n                null\n            ],\n            \"shutdown\": [\n                null\n            ]\n        }\n    ]\n}"
 								},
 								"description": ""
 							},
@@ -656,7 +656,8 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(\"Loopback97\");"
+											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_interface\")));",
+											""
 										]
 									}
 								}
@@ -700,13 +701,14 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(\"Loopback97\");"
+											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_interface\")));",
+											""
 										]
 									}
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -747,7 +749,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -786,7 +788,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -834,7 +836,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -850,7 +852,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"interface-configuration\": [\n        {\n            \"active\": \"act\",\n            \"interface-name\": \"Loopback97\",\n            \"interface-virtual\": [\n                null\n            ],\n            \"shutdown\": [\n                null\n            ]\n        }\n    ]\n}"
+									"raw": "{\n    \"interface-configuration\": [\n        {\n            \"active\": \"act\",\n            \"interface-name\": \"{{test_interface}}\",\n            \"interface-virtual\": [\n                null\n            ],\n            \"shutdown\": [\n                null\n            ]\n        }\n    ]\n}"
 								},
 								"description": ""
 							},
@@ -872,7 +874,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97/subinterfaces/subinterface/0/openconfig-if-ip:ipv4",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
@@ -913,7 +915,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/Loopback97/Cisco-IOS-XR-ipv4-io-cfg:ipv4-network",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}/Cisco-IOS-XR-ipv4-io-cfg:ipv4-network",
 								"method": "PUT",
 								"header": [
 									{
@@ -952,7 +954,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97/subinterfaces/subinterface/0/openconfig-if-ip:ipv4",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
@@ -996,7 +998,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97/subinterfaces/subinterface/0/openconfig-if-ip:ipv4/addresses/address/{{ip1}}",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/{{ip1}}",
 								"method": "GET",
 								"header": [
 									{
@@ -1040,7 +1042,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97/subinterfaces/subinterface/0/openconfig-if-ip:ipv4/addresses/address/255.255.255.255",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/255.255.255.255",
 								"method": "GET",
 								"header": [
 									{
@@ -1081,7 +1083,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -1342,7 +1344,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface loopback 97\nexit\nrouter bgp {{bgp}}\nbgp router-id {{router}}\naddress-family ipv4 unicast\nexit\naddress-family vpnv4 unicast\nexit\nneighbor {{neighbor}}\nremote-as {{bgp}}\nupdate-source Loopback97\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nexit\nrouter bgp {{bgp}}\nbgp router-id {{router}}\naddress-family ipv4 unicast\nexit\naddress-family vpnv4 unicast\nexit\nneighbor {{neighbor}}\nremote-as {{bgp}}\nupdate-source {{test_interface}}\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
 								},
 								"description": ""
 							},
@@ -1483,7 +1485,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router bgp {{bgp}}\nno interface loopback 97\ncommit\nexit\"\n  }\n}\n\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router bgp {{bgp}}\nno interface {{test_interface}}\ncommit\nexit\"\n  }\n}\n\n"
 								},
 								"description": ""
 							},
@@ -1732,7 +1734,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface loopback 97\nexit\nrouter ospf {{ospf}}\nrouter-id {{router2}}\naddress-family ipv4\narea {{area}}\ninterface Loopback97\nexit\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nexit\nrouter ospf {{ospf}}\nrouter-id {{router2}}\naddress-family ipv4\narea {{area}}\ninterface {{test_interface}}\nexit\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
 								},
 								"description": ""
 							},
@@ -1874,7 +1876,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router ospf {{ospf}}\nno interface Loopback97\ncommit\nexit\"\n  }\n}\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router ospf {{ospf}}\nno interface {{test_interface}}\ncommit\nexit\"\n  }\n}\n"
 								},
 								"description": ""
 							},
@@ -2563,7 +2565,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface Loopback97\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
 								},
 								"description": ""
 							},
@@ -2580,7 +2582,8 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(\"Loopback97\");"
+											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_interface\")));",
+											""
 										]
 									}
 								}
@@ -2624,13 +2627,14 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(\"Loopback97\");"
+											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_interface\")));",
+											""
 										]
 									}
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -2692,7 +2696,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno interface Loopback97\nexit\"\n  }\n}"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno interface {{test_interface}}\nexit\"\n  }\n}"
 								},
 								"description": ""
 							},
@@ -2715,7 +2719,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -2785,7 +2789,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface Loopback97\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
 								},
 								"description": ""
 							},
@@ -2807,7 +2811,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97/subinterfaces/subinterface/0/openconfig-if-ip:ipv4",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
@@ -2870,7 +2874,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface Loopback97\nip address {{ip41}} {{netmask}}\nipv6 address {{ipv61}} link-local\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nip address {{ip41}} {{netmask}}\nipv6 address {{ipv61}} link-local\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
 								},
 								"description": ""
 							},
@@ -2894,7 +2898,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97/subinterfaces/subinterface/0/openconfig-if-ip:ipv4",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
@@ -2939,7 +2943,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97/subinterfaces/subinterface/0/openconfig-if-ip:ipv4/addresses/address/{{ip41}}",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/{{ip41}}",
 								"method": "GET",
 								"header": [
 									{
@@ -2983,7 +2987,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97/subinterfaces/subinterface/0/openconfig-if-ip:ipv4/addresses/address/255.255.255.255",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/255.255.255.255",
 								"method": "GET",
 								"header": [
 									{
@@ -3046,7 +3050,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface Loopback97\nno ip address\nno ipv6 address\nno interface Loopback97\nexit\"\n  }\n}\n\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nno ip address\nno ipv6 address\nno interface {{test_interface}}\nexit\"\n  }\n}\n\n"
 								},
 								"description": ""
 							},
@@ -3095,7 +3099,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface loopback 97\nexit\nrouter ospf {{ospf}}\nrouter-id {{router}}\nnetwork {{net}} area {{area}}\ndefault-information originate always\nmpls ldp autoconfig area {{area}}\nexit\ninterface Loopback97\nip address {{ip41}} {{netmask}}\nno shutdown\nexit\nrouter ospf {{ospf2}}\nnetwork {{ip41}} {{net2}} area {{area2}}\nexit\nip vrf {{vrf}}\nexit\nexit\"\n  }\n}\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nexit\nrouter ospf {{ospf}}\nrouter-id {{router}}\nnetwork {{net}} area {{area}}\ndefault-information originate always\nmpls ldp autoconfig area {{area}}\nexit\ninterface {{test_interface}}\nip address {{ip41}} {{netmask}}\nno shutdown\nexit\nrouter ospf {{ospf2}}\nnetwork {{ip41}} {{net2}} area {{area2}}\nexit\nip vrf {{vrf}}\nexit\nexit\"\n  }\n}\n"
 								},
 								"description": ""
 							},
@@ -3165,9 +3169,10 @@
 									"script": {
 										"type": "text/javascript",
 										"exec": [
-											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"console.log(\"Response: \" + responseBody)",
 											"",
-											"tests[\"Body matches string\"] = responseBody.has(\"Loopback97\");",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_interface\")));",
 											"",
 											"",
 											"",
@@ -3291,7 +3296,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router ospf {{ospf}}\nno router ospf {{ospf2}}\nno interface Loopback97\nno ip vrf {{vrf}}\nexit\"\n  }\n}\n\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router ospf {{ospf}}\nno router ospf {{ospf2}}\nno interface {{test_interface}}\nno ip vrf {{vrf}}\nexit\"\n  }\n}\n\n"
 								},
 								"description": ""
 							},
@@ -3340,7 +3345,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface loopback 97\n exit\n router bgp {{bgp}}\n bgp log-neighbor-changes\n no bgp default ipv4-unicast\n neighbor {{neighbor}} remote-as {{bgp}}\n neighbor {{neighbor}} update-source Loopback97\n address-family ipv4\n network {{net3}} mask {{mask}}\n neighbor {{neighbor}} activate\n neighbor {{neighbor}} send-community both\n exit-address-family\nexit\nexit\"\n  }\n}\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{test_interface}}\n exit\n router bgp {{bgp}}\n bgp log-neighbor-changes\n no bgp default ipv4-unicast\n neighbor {{neighbor}} remote-as {{bgp}}\n neighbor {{neighbor}} update-source {{test_interface}}\n address-family ipv4\n network {{net3}} mask {{mask}}\n neighbor {{neighbor}} activate\n neighbor {{neighbor}} send-community both\n exit-address-family\nexit\nexit\"\n  }\n}\n"
 								},
 								"description": ""
 							},
@@ -3482,7 +3487,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router bgp {{bgp}}\nno interface loopback 97\nexit\"\n  }\n}\n\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router bgp {{bgp}}\nno interface {{test_interface}}\nexit\"\n  }\n}\n\n"
 								},
 								"description": ""
 							},
@@ -3804,7 +3809,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -3825,7 +3830,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"Loopback97\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"Loopback97\"\n            }\n        }\n    ]\n}"
+									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
 								},
 								"description": ""
 							},
@@ -3892,7 +3897,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -3934,7 +3939,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -3955,7 +3960,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"Loopback97\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"Loopback97\"\n            }\n        }\n    ]\n}"
+									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
 								},
 								"description": ""
 							},
@@ -4020,7 +4025,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/Loopback97",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -4041,7 +4046,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"Loopback97\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"Loopback97\"\n            }\n        }\n    ]\n}"
+									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
 								},
 								"description": ""
 							},

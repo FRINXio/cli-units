@@ -139,6 +139,18 @@
       "key": "cdp_lldp_test_interface",
       "value": "TenGigE0/0/2/1",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "test_interface",
+      "value": "Loopback97",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ip_subinterface_index",
+      "value": "0",
+      "type": "text"
     }
   ],
   "timestamp": 1508791475317,
