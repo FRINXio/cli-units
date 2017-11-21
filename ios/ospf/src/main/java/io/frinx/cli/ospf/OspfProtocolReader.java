@@ -15,7 +15,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ospf.common.OspfReader;
-import io.frinx.cli.registry.common.CompositeReader;
+import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
@@ -31,7 +31,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
         OspfReader.OspfConfigReader<Protocol, ProtocolBuilder>,
-        CompositeReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
+        CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     private Cli cli;
 
