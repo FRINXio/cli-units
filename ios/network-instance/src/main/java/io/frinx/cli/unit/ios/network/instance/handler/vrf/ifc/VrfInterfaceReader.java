@@ -15,7 +15,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceReader;
-import io.frinx.cli.unit.ios.network.instance.common.L3VrfListReader;
+import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.ArrayList;

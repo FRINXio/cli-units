@@ -27,9 +27,14 @@
         <bundle>mvn:io.frinx.cli/ios-essential-model/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='cli-southbound-ios-common-handlers' version='${project.version}'>
+        <bundle>mvn:io.frinx.cli/common-handlers/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-ios-essential' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-models</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:io.frinx.cli/ios-essential-unit/{{VERSION}}</bundle>
     </feature>
 
@@ -95,6 +100,7 @@
     <feature name='cli-southbound-unit-ios-xr-essential' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-models</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-essential-unit/{{VERSION}}</bundle>
     </feature>
 

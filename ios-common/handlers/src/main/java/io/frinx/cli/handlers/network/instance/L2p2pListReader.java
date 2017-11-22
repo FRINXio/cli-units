@@ -1,4 +1,12 @@
-package io.frinx.cli.unit.ios.network.instance.common;
+/*
+ * Copyright © 2017 Frinx and others. All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+
+package io.frinx.cli.handlers.network.instance;
 
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.registry.common.TypedListReader;
@@ -16,16 +24,16 @@ import org.opendaylight.yangtools.yang.binding.Identifiable;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public interface L3VrfListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends Builder<O>> extends TypedListReader<O, K, B> {
+public interface L2p2pListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends Builder<O>> extends TypedListReader<O, K, B> {
 
     @Nullable
     @Override
     default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>> getParentCheck(InstanceIdentifier<O> id) {
         return new AbstractMap.SimpleEntry<>(
                 RWUtils.cutId(id, NetworkInstance.class).child(Config.class),
-                L3VrfReader.L3VRF_CHECK);
+                L2p2pReader.L2P2P_CHECK);
     }
 
-    interface L3VrfConfigListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends Builder<O>> extends L3VrfListReader<O, K, B>, CliConfigListReader<O, K, B> {}
-    interface L3VrfOperListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends Builder<O>> extends L3VrfListReader<O, K, B>, CliOperListReader<O, K, B> {}
+    interface L2p2pConfigListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends Builder<O>> extends L2p2pListReader<O, K, B>, CliConfigListReader<O, K, B> {}
+    interface L2p2pOperListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends Builder<O>> extends L2p2pListReader<O, K, B>, CliOperListReader<O, K, B> {}
 }

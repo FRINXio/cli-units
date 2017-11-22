@@ -22,7 +22,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.common.CompositeWriter;
 import io.frinx.cli.registry.spi.TranslateUnit;
-import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstaceReader;
+import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceStateReader;
 import io.frinx.cli.unit.ios.network.instance.handler.def.DefaultConfigWriter;
@@ -114,7 +114,7 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         // VRFs, L2P2P
         rRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstaceReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli)));
         rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_STATE, new NetworkInstanceStateReader(cli)));
 

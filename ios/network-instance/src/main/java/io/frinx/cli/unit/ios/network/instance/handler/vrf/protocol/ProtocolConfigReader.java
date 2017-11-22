@@ -10,7 +10,7 @@ package io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.unit.ios.network.instance.common.L3VrfReader;
+import io.frinx.cli.handlers.network.instance.L3VrfReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;

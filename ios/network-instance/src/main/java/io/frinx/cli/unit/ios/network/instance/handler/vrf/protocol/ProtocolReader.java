@@ -16,7 +16,7 @@ import io.frinx.cli.ios.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
 import io.frinx.cli.ospf.OspfProtocolReader;
 import io.frinx.cli.registry.common.CompositeListReader;
-import io.frinx.cli.unit.ios.network.instance.common.L3VrfListReader;
+import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.ArrayList;
 import java.util.List;
