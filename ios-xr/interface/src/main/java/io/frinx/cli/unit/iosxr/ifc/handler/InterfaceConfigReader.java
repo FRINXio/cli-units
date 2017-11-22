@@ -22,6 +22,7 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev16122
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
@@ -93,6 +94,8 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
             return EthernetCsmacd.class;
         }  else if (name.startsWith("Loopback")) {
             return SoftwareLoopback.class;
+        } else if (name.startsWith("Bundle-Ether")) {
+            return Ieee8023adLag.class;
         } else {
             return Other.class;
         }
