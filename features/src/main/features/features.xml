@@ -119,12 +119,19 @@
         <bundle>mvn:io.frinx.cli/ios-xr-bgp-unit/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='cli-southbound-unit-ios-xr-interface' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:io.frinx.cli/ios-xr-interface-unit/{{VERSION}}</bundle>
+    </feature>
+
+
     <feature name='cli-southbound-unit-ios-xr' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-essential</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-network-instance</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-bgp</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-interface</feature>
     </feature>
 
     <feature name='cli-southbound-all-units' version='${project.version}'>
