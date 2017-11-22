@@ -13,6 +13,7 @@ import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWOR
 import com.google.common.collect.ImmutableList;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliListReader;
@@ -26,7 +27,7 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
-        io.frinx.cli.ios.bgp.common.BgpReader.BgpConfigReader<Protocol, ProtocolBuilder>,
+        BgpReader.BgpConfigReader<Protocol, ProtocolBuilder>,
         CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     public static final String DEFAULT_BGP_INSTANCE = "default";

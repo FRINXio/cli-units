@@ -57,6 +57,11 @@
             <artifactId>translation-registry-api</artifactId>
             <version>${cli.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>common-handlers</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
 
         <!-- Testing Dependencies -->
         <dependency>
