@@ -25,6 +25,7 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstaceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceStateReader;
+import io.frinx.cli.unit.ios.network.instance.handler.def.DefaultConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.ConnectionPointsReader;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.ConnectionPointsWriter;
@@ -90,7 +91,10 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
         wRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
 
         wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG,
-                        new CompositeWriter<>(Lists.newArrayList(new VrfConfigWriter(cli), new L2P2PConfigWriter(cli)))),
+                        new CompositeWriter<>(Lists.newArrayList(
+                                new VrfConfigWriter(cli),
+                                new DefaultConfigWriter(),
+                                new L2P2PConfigWriter(cli)))),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
 
         wRegistry.subtreeAddAfter(Sets.newHashSet(

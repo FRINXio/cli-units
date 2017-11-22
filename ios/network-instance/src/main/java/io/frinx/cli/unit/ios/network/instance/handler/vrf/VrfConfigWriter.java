@@ -45,7 +45,6 @@ public class VrfConfigWriter implements CliWriter<Config> {
 
     private static final String DELETE_TEMPLATE = "configure terminal\n" +
             "no ip vrf %s\n" +
-            "exit\n" +
             "exit";
 
     @Override

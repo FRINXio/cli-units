@@ -10,6 +10,7 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.types.rev170228.DEFAULTINSTANCE;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
@@ -17,7 +18,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public interface L3VrfReader<O extends DataObject, B extends Builder<O>> extends TypedReader<O, B> {
 
-    Function<DataObject, Boolean> L3VRF_CHECK = config -> ((Config) config).getType() == L3VRF.class;
+    // Vrf readers are also available for default network instance
+    Function<DataObject, Boolean> L3VRF_CHECK = config -> ((Config) config).getType() == L3VRF.class || ((Config) config).getType() == DEFAULTINSTANCE.class;
 
     @Nullable
     @Override
