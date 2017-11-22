@@ -29,6 +29,8 @@ import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceDampingConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceDampingConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceStateReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceStatisticsConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceStatisticsConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.bfd.BfdConfigReader;
@@ -57,6 +59,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.IfDampA
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.IfDampAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.damping.top.Damping;
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.damping.top.DampingBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.IfCiscoStatsAug;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.IfCiscoStatsAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.statistics.top.Statistics;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.statistics.top.StatisticsBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1Builder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.Aggregation;
@@ -117,6 +123,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.$YangModuleInfoImpl.getInstance(),
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -178,6 +185,13 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
     private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.damping.top.damping.Config> IFC_DAMPING_CFG_ID =
             IFC_DAMPING_ID.child(org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.damping.top.damping.Config.class);
 
+    // cisco-if-extension IIDs
+    private static final InstanceIdentifier<IfCiscoStatsAug> IFC_CISCO_EX_AUG_ID =
+            IIDs.IN_INTERFACE.augmentation(IfCiscoStatsAug.class);
+    private static final InstanceIdentifier<Statistics> IFC_CISCO_EX_STAT_ID = IFC_CISCO_EX_AUG_ID.child(Statistics.class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.statistics.top.statistics.Config> IFC_CISCO_EX_STAT_CONFIG_ID =
+            IFC_CISCO_EX_STAT_ID.child(org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.statistics.top.statistics.Config.class);
+
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
         wRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
@@ -212,6 +226,10 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
 
         // damping
         wRegistry.addAfter(new GenericWriter<>(IFC_DAMPING_CFG_ID, new InterfaceDampingConfigWriter(cli)),
+                IIDs.IN_IN_CONFIG);
+
+        // cisco-if extensions
+        wRegistry.addAfter(new GenericWriter<>(IFC_CISCO_EX_STAT_CONFIG_ID, new InterfaceStatisticsConfigWriter(cli)),
                 IIDs.IN_IN_CONFIG);
     }
 
@@ -264,6 +282,11 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IFC_DAMPING_AUG_ID, IfDampAugBuilder.class);
         rRegistry.addStructuralReader(IFC_DAMPING_ID, DampingBuilder.class);
         rRegistry.add(new GenericReader<>(IFC_DAMPING_CFG_ID, new InterfaceDampingConfigReader(cli)));
+
+        // cisco if-extensions
+        rRegistry.addStructuralReader(IFC_CISCO_EX_AUG_ID, IfCiscoStatsAugBuilder.class);
+        rRegistry.addStructuralReader(IFC_CISCO_EX_STAT_ID, StatisticsBuilder.class);
+        rRegistry.add(new GenericReader<>(IFC_CISCO_EX_STAT_CONFIG_ID, new InterfaceStatisticsConfigReader(cli)));
     }
 
     @Override
