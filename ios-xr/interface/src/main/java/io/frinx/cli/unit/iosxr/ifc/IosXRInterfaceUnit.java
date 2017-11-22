@@ -25,6 +25,8 @@ import io.frinx.cli.unit.iosxr.ifc.handler.HoldTimeConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.HoldTimeConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigWriter;
+import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceDampingConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceDampingConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigReader;
@@ -51,6 +53,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.IfLagBfdAug
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.IfLagBfdAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.bfd.top.Bfd;
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.bfd.top.BfdBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.IfDampAug;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.IfDampAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.damping.top.Damping;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.damping.top.DampingBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1Builder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.Aggregation;
@@ -110,6 +116,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.$YangModuleInfoImpl.getInstance(),
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -165,6 +172,11 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
     private static final InstanceIdentifier<Bfd> IFC_LAG_BFD_ID = IFC_LAG_BFD_AUG_ID.child(Bfd.class);
     private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.bfd.top.bfd.Config> IFC_LAG_BFD_CFG_ID =
             IFC_LAG_BFD_ID.child(org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.bfd.top.bfd.Config.class);
+    // damping IIDs
+    private static final InstanceIdentifier<IfDampAug> IFC_DAMPING_AUG_ID = IIDs.IN_INTERFACE.augmentation(IfDampAug.class);
+    private static final InstanceIdentifier<Damping> IFC_DAMPING_ID = IFC_DAMPING_AUG_ID.child(Damping.class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.damping.top.damping.Config> IFC_DAMPING_CFG_ID =
+            IFC_DAMPING_ID.child(org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.damping.top.damping.Config.class);
 
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
         wRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
@@ -197,6 +209,10 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         // bfd
         wRegistry.add(new GenericWriter<>(IFC_LAG_BFD_ID, new NoopCliWriter<>()));
         wRegistry.addAfter(new GenericWriter<>(IFC_LAG_BFD_CFG_ID, new BfdConfigWriter(cli)), IIDs.IN_IN_CONFIG);
+
+        // damping
+        wRegistry.addAfter(new GenericWriter<>(IFC_DAMPING_CFG_ID, new InterfaceDampingConfigWriter(cli)),
+                IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
@@ -243,6 +259,11 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IFC_LAG_BFD_AUG_ID, IfLagBfdAugBuilder.class);
         rRegistry.addStructuralReader(IFC_LAG_BFD_ID, BfdBuilder.class);
         rRegistry.add(new GenericConfigReader<>(IFC_LAG_BFD_CFG_ID, new BfdConfigReader(cli)));
+
+        // damping
+        rRegistry.addStructuralReader(IFC_DAMPING_AUG_ID, IfDampAugBuilder.class);
+        rRegistry.addStructuralReader(IFC_DAMPING_ID, DampingBuilder.class);
+        rRegistry.add(new GenericReader<>(IFC_DAMPING_CFG_ID, new InterfaceDampingConfigReader(cli)));
     }
 
     @Override
