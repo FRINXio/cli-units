@@ -13,6 +13,7 @@ import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
+import io.fd.honeycomb.translate.impl.read.GenericReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
@@ -20,6 +21,8 @@ import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.iosxr.ifc.handler.HoldTimeConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.HoldTimeConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader;
@@ -64,6 +67,7 @@ import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev16
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.Address;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.Ipv6;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.Ipv6Builder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222._interface.phys.holdtime.top.HoldTimeBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.vlan.logical.top.Vlan;
@@ -181,6 +185,10 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         wRegistry.add(new GenericWriter<>(SUBIFC_IPV6_ADDRESS_ID, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(SUBIFC_IPV6_CFG_ID, new NoopCliWriter<>()));
 
+        // hold-time
+        wRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_HO_CONFIG, new HoldTimeConfigWriter(cli)),
+                IIDs.IN_IN_CONFIG);
+
         // if-aggregation
         wRegistry.add(new GenericWriter<>(IFC_AGGREGATION_ID, new NoopCliWriter<>()));
         wRegistry.addAfter(new GenericWriter<>(IFC_AGGREGATION_CFG_ID, new AggregateConfigWriter(cli)),
@@ -218,6 +226,11 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         rRegistry.addStructuralReader(SUBIFC_VLAN_AUG_ID, org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.Subinterface1Builder.class);
         rRegistry.addStructuralReader(SUBIFC_VLAN_ID, VlanBuilder.class);
         rRegistry.add(new GenericConfigReader<>(SUBIFC_VLAN_CFG_ID, new SubinterfaceVlanConfigReader(cli)));
+
+        // hold-time
+        // TODO provide also hold-time state reader
+        rRegistry.addStructuralReader(IIDs.IN_IN_HOLDTIME, HoldTimeBuilder.class);
+        rRegistry.add(new GenericReader<>(IIDs.IN_IN_HO_CONFIG, new HoldTimeConfigReader(cli)));
 
         // if-aggregation
         // TODO provide also aggregation state reader
