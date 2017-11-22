@@ -36,6 +36,7 @@ import io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6AddressReader;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
+import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -142,6 +143,9 @@ public final class IosInterfaceUnit implements TranslateUnit {
         wRegistry.add(new GenericWriter<>(SUBIFC_IPV4_ADDRESS_ID, new NoopCliListWriter<>()));
         wRegistry.addAfter(new GenericWriter<>(SUBIFC_IPV4_CFG_ID, new Ipv4ConfigWriter(cli)),
                 IIDs.IN_IN_CONFIG);
+
+        wRegistry.add(new GenericWriter<>(SUBIFC_IPV6_ADDRESS_ID, new NoopCliListWriter<>()));
+        wRegistry.add(new GenericWriter<>(SUBIFC_IPV6_CFG_ID, new NoopCliWriter<>()));
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
