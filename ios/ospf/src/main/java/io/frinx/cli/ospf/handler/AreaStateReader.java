@@ -10,8 +10,9 @@ package io.frinx.cli.ospf.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.ospf.common.OspfReader;
 import javax.annotation.Nonnull;
+
+import io.frinx.cli.handlers.io.frinx.cli.handlers.ospf.OspfReader;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.structure.State;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.structure.StateBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.Area;

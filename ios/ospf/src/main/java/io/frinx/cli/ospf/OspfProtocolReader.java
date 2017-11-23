@@ -13,8 +13,8 @@ import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWOR
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.handlers.io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ospf.common.OspfReader;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;

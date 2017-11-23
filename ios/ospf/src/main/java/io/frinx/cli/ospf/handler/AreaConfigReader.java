@@ -9,7 +9,7 @@
 package io.frinx.cli.ospf.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
-import io.frinx.cli.ospf.common.OspfReader;
+import io.frinx.cli.handlers.io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.unit.utils.CliReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.structure.Config;

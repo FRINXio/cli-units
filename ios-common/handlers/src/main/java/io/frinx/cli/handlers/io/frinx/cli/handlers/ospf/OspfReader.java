@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.ospf.common;
+package io.frinx.cli.handlers.io.frinx.cli.handlers.ospf;
 
 import io.frinx.cli.registry.common.TypedReader;
 import io.frinx.cli.unit.utils.CliConfigReader;

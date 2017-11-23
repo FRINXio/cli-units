@@ -1,3 +1,11 @@
+/*
+ * Copyright © 2017 Frinx and others. All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+
 package io.frinx.cli.ospf.handler;
 
 import static org.junit.Assert.assertEquals;
@@ -54,7 +62,7 @@ public class OspfAreaReaderTest {
             "\tFlood list length 0\n" +
             "    Area 48\n" +
             "        Number of interfaces in this area is 2 (1 loopback)\n" +
-            "    Area BACKBONE(0.0.0.0)" +
+            "    Area BACKBONE(0.0.0.0)\n" +
             "    Area 9.9.9.9";
 
     public static final List<AreaKey> AREAS = Lists.newArrayList("0", "48", "0.0.0.0", "9.9.9.9")
