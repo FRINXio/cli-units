@@ -26,6 +26,7 @@
     <modules>
         <module>models</module>
         <module>ios-cli-init-unit</module>
+        <module>handlers</module>
     </modules>
 
 </project>

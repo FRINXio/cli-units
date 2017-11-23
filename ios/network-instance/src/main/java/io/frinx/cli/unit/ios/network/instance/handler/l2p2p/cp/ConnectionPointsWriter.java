@@ -1,3 +1,11 @@
+/*
+ * Copyright © 2017 Frinx and others. All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+
 package io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -6,7 +14,7 @@ import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.ios.network.instance.common.L2p2pWriter;
+import io.frinx.cli.handlers.network.instance.L2p2pWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Collections;
 import java.util.Objects;
