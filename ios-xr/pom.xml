@@ -30,6 +30,7 @@
     <module>network-instance</module>
     <module>bgp</module>
     <module>interface</module>
+    <module>mpls</module>
   </modules>
 
   <build>
