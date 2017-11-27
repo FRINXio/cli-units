@@ -35,6 +35,8 @@ import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.bfd.BfdConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.bfd.BfdConfigWriter;
+import io.frinx.cli.unit.iosxr.ifc.handler.ethernet.EthernetConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.ethernet.EthernetConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
@@ -49,6 +51,7 @@ import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.IfLagBfdAug;
@@ -63,10 +66,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev17102
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.IfCiscoStatsAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.statistics.top.Statistics;
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.statistics.top.StatisticsBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1Builder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.Aggregation;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.AggregationBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.Ethernet;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.EthernetBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1Builder;
@@ -124,6 +130,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.$YangModuleInfoImpl.getInstance(),
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -192,6 +199,13 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
     private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.statistics.top.statistics.Config> IFC_CISCO_EX_STAT_CONFIG_ID =
             IFC_CISCO_EX_STAT_ID.child(org.opendaylight.yang.gen.v1.http.frinx.io.yang.interfaces.cisco.rev171024.statistics.top.statistics.Config.class);
 
+    // if-ethernet IIDs
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.Interface1> IFC_ETH_AUD_ID =
+            IIDs.IN_INTERFACE.augmentation(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.Interface1.class);
+    private static final InstanceIdentifier<Ethernet> IFC_ETHERNET_ID = IFC_ETH_AUD_ID.child(Ethernet.class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config> IFC_ETHERNET_CONFIG_ID =
+            IFC_ETHERNET_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config.class);
+
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
         wRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
@@ -231,6 +245,14 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         // cisco-if extensions
         wRegistry.addAfter(new GenericWriter<>(IFC_CISCO_EX_STAT_CONFIG_ID, new InterfaceStatisticsConfigWriter(cli)),
                 IIDs.IN_IN_CONFIG);
+
+        // if-ethernet
+        wRegistry.add(new GenericWriter<>(IFC_ETHERNET_ID, new NoopCliWriter<>()));
+        wRegistry.subtreeAddAfter(Sets.newHashSet(InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config.class)
+                        .augmentation(Config1.class)),
+                new GenericWriter<>(IFC_ETHERNET_CONFIG_ID, new EthernetConfigWriter(cli)),
+                IIDs.IN_IN_CONFIG);
+
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
@@ -287,6 +309,11 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IFC_CISCO_EX_AUG_ID, IfCiscoStatsAugBuilder.class);
         rRegistry.addStructuralReader(IFC_CISCO_EX_STAT_ID, StatisticsBuilder.class);
         rRegistry.add(new GenericReader<>(IFC_CISCO_EX_STAT_CONFIG_ID, new InterfaceStatisticsConfigReader(cli)));
+
+        // if-ethernet
+        rRegistry.addStructuralReader(IFC_ETH_AUD_ID, org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.Interface1Builder.class);
+        rRegistry.addStructuralReader(IFC_ETHERNET_ID, EthernetBuilder.class);
+        rRegistry.add(new GenericReader<>(IFC_ETHERNET_CONFIG_ID, new EthernetConfigReader(cli)));
     }
 
     @Override
