@@ -24,6 +24,8 @@ import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceStateReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
@@ -40,6 +42,10 @@ import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1Builder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.Aggregation;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.AggregationBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1Builder;
@@ -92,6 +98,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.$YangModuleInfoImpl.getInstance(),
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -133,6 +140,14 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
     private static final InstanceIdentifier<Vlan> SUBIFC_VLAN_ID = SUBIFC_VLAN_AUG_ID.child(Vlan.class);
     private static final InstanceIdentifier<Config> SUBIFC_VLAN_CFG_ID = SUBIFC_VLAN_ID.child(Config.class);
 
+    // if-aggregate IIDs
+    private static final InstanceIdentifier<Interface1>  IFC_AGGREGATION_AUG_ID =
+            IIDs.IN_INTERFACE.augmentation(Interface1.class);
+    private static final InstanceIdentifier<Aggregation> IFC_AGGREGATION_ID =
+            IFC_AGGREGATION_AUG_ID.child(Aggregation.class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.aggregation.Config> IFC_AGGREGATION_CFG_ID =
+            IFC_AGGREGATION_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.aggregation.Config.class);
+
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
         wRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
@@ -151,6 +166,11 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         // provide at least some writers for IPv6 data
         wRegistry.add(new GenericWriter<>(SUBIFC_IPV6_ADDRESS_ID, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(SUBIFC_IPV6_CFG_ID, new NoopCliWriter<>()));
+
+        // if-aggregation
+        wRegistry.add(new GenericWriter<>(IFC_AGGREGATION_ID, new NoopCliWriter<>()));
+        wRegistry.addAfter(new GenericWriter<>(IFC_AGGREGATION_CFG_ID, new AggregateConfigWriter(cli)),
+                IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
@@ -181,6 +201,11 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         rRegistry.addStructuralReader(SUBIFC_VLAN_ID, VlanBuilder.class);
         rRegistry.add(new GenericConfigReader<>(SUBIFC_VLAN_CFG_ID, new SubinterfaceVlanConfigReader(cli)));
 
+        // if-aggregation
+        // TODO provide also aggregation state reader
+        rRegistry.addStructuralReader(IFC_AGGREGATION_AUG_ID, Interface1Builder.class);
+        rRegistry.addStructuralReader(IFC_AGGREGATION_ID, AggregationBuilder.class);
+        rRegistry.add(new GenericConfigReader<>(IFC_AGGREGATION_CFG_ID, new AggregateConfigReader(cli)));
     }
 
     @Override

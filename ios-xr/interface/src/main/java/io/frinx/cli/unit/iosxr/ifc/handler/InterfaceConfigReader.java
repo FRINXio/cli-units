@@ -87,7 +87,7 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
                 builder::setDescription);
     }
 
-    static Class<? extends InterfaceType> parseType(String name) {
+    public static Class<? extends InterfaceType> parseType(String name) {
         if(name.startsWith("FastEther")) {
             return EthernetCsmacd.class;
         } else if (name.startsWith("GigabitEthernet")) {
