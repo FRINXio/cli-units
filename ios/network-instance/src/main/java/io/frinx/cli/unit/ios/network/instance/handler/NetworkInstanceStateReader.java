@@ -11,7 +11,7 @@ package io.frinx.cli.unit.ios.network.instance.handler;
 import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeReader;
-import io.frinx.cli.unit.ios.network.instance.handler.def.DefaultStateReader;
+import io.frinx.cli.handlers.def.DefaultStateReader;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PStateReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.VrfStateReader;
 import io.frinx.cli.unit.utils.CliOperReader;

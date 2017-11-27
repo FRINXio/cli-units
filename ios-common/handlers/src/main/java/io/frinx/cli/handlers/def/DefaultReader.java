@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.network.instance.handler.def;
+package io.frinx.cli.handlers.def;
 
 import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
 import static java.util.Collections.singletonList;

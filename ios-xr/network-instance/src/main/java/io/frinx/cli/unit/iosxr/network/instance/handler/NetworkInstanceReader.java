@@ -11,7 +11,7 @@ package io.frinx.cli.unit.iosxr.network.instance.handler;
 import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
-import io.frinx.cli.unit.iosxr.network.instance.handler.def.DefaultReader;
+import io.frinx.cli.handlers.def.DefaultReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 
 import java.util.ArrayList;

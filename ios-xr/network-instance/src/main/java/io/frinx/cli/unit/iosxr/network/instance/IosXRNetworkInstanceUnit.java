@@ -24,7 +24,7 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceStateReader;
-import io.frinx.cli.unit.iosxr.network.instance.handler.def.DefaultConfigWriter;
+import io.frinx.cli.handlers.def.DefaultConfigWriter;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolConfigReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolReader;
