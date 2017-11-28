@@ -26,6 +26,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.rev171024.NiMplsRsvp
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.MplsBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.SignalingProtocolsBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.SubscriptionBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.subscription.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.rsvp.global.RsvpTeBuilder;
@@ -83,16 +84,24 @@ public class MplsUnit implements TranslateUnit {
 
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MPLS, new NoopCliWriter<>()));
+
+        // RSVP
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RSVPTE, new NoopCliWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG, new RsvpInterfaceConfigWriter(cli)));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, new NoopCliWriter<>()));
         wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG.augmentation(NiMplsRsvpIfSubscripAug.class), new NiMplsRsvpIfSubscripAugWriter(cli)),
             IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG);
+
+        // TE
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TE_INTERFACE, new NoopCliListWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigWriter(cli)));
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         rRegistry.addStructuralReader(IIDs.NE_NE_MPLS, MplsBuilder.class);
+
+        // RSVP
         rRegistry.addStructuralReader(IIDs.NE_NE_MP_SIGNALINGPROTOCOLS, SignalingProtocolsBuilder.class);
         rRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RSVPTE, RsvpTeBuilder.class);
         rRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_INTERFACEATTRIBUTES, InterfaceAttributesBuilder.class);
@@ -101,6 +110,11 @@ public class MplsUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_IN_IN_SUBSCRIPTION, SubscriptionBuilder.class);
         rRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, ConfigBuilder.class);
         rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG.augmentation(NiMplsRsvpIfSubscripAug.class), new NiMplsRsvpIfSubscripAugReader(cli)));
+
+        // TE
+        rRegistry.addStructuralReader(IIDs.NE_NE_MP_TEINTERFACEATTRIBUTES, TeInterfaceAttributesBuilder.class);
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_TE_INTERFACE, new TeInterfaceReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigReader()));
     }
 
     @Override
