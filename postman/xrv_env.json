@@ -151,6 +151,24 @@
       "key": "ip_subinterface_index",
       "value": "0",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "test_sub_interface",
+      "value": "GigabitEthernet0%2F0%2F0%2F0",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "test_sub_interface_index",
+      "value": "44",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "vlan_id",
+      "value": "28",
+      "type": "text"
     }
   ],
   "timestamp": 1508791475317,

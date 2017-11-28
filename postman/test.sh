@@ -1,17 +1,17 @@
 #!/bin/bash
 set +x
- 
+
 collection=postman.json
 file=list.txt
- 
+
 if [ -f $file ] ; then
     rm $file
 fi
- 
+
 ### Mount unmount test case
 devices=("mount_unmount_env.json" "mount_unmount_telnet_env.json" "mount_unmount_ios1553_env.json")
 folders=("Mount/Unmount IOS")
- 
+
 for device in ${devices[@]}
 do
    echo Collection running with $device
@@ -21,12 +21,12 @@ do
         sleep 5
      done
 done
- 
+
 ### Test for IOS XR
 XR_devices=("xrv_env.json" "asr_env.json")
-XR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "BGP summary" "CDP" "LLDP" "Unmount")
-ASR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "BGP summary" "Platform" "CDP" "LLDP" "Unmount")
- 
+XR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "BGP summary" "CDP" "LLDP" "subinterface common" "Unmount")
+ASR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "BGP summary" "Platform" "CDP" "LLDP" "subinterface common" "Unmount")
+
 for device in ${XR_devices[@]}
 do
    echo Collection running with $device
@@ -48,11 +48,11 @@ do
              done
          fi 
 done
- 
+
 ### Test for IOS
 IOS_devices=("classic_152_env.json" "classic_1553_env.json" "xe_env.json")
-Classic_folders=("Mount" "General information" "Interface" "Interface IP" "ospf/vrf" "static route" "BGP summary" "journal/dry-run" "CDP" "Unmount")
-XE_folders=("Mount" "General information" "Interface" "Interface IP" "ospf/vrf" "static route" "BGP summary" "journal/dry-run" "CDP" "LLDP" "Unmount")
+Classic_folders=("Mount" "General information" "Interface" "Interface IP" "ospf/vrf" "static route" "BGP summary" "journal/dry-run" "CDP" "subinterface common" "Unmount")
+XE_folders=("Mount" "General information" "Interface" "Interface IP" "ospf/vrf" "static route" "BGP summary" "journal/dry-run" "CDP" "LLDP" "subinterface common" "Unmount")
 
 for device in ${IOS_devices[@]}
 do
@@ -82,11 +82,11 @@ do
              done
          fi 
 done
- 
+
 ### Test for Linux generic
 Linux_devices=("linux_157_env.json")
 folders=("Linux")
- 
+
 for device in "${Linux_devices[@]}"
 do
    echo Collection running with $device
@@ -96,8 +96,8 @@ do
         sleep 5
      done
 done
- 
- 
+
+
 if [ -f $file ] ; then
     cat $file
     rm $file
