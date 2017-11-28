@@ -54,7 +54,7 @@ public class OspfAreaReaderTest {
             "\tFlood list length 0\n" +
             "    Area 48\n" +
             "        Number of interfaces in this area is 2 (1 loopback)\n" +
-            "    Area BACKBONE(0.0.0.0)" +
+            "    Area BACKBONE(0.0.0.0)\n" +
             "    Area 9.9.9.9";
 
     public static final List<AreaKey> AREAS = Lists.newArrayList("0", "48", "0.0.0.0", "9.9.9.9")
