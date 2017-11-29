@@ -64,7 +64,7 @@ public class NeighborConfigWriter implements CliWriter<Config> {
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final Global g = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get().getGlobal();
+        final Global g = writeContext.readBefore(RWUtils.cutId(id, Bgp.class)).get().getGlobal();
         final String instName = NetworInstance.DEFAULT_NETWORK.equals(id.firstKeyOf(Protocol.class).getName()) ? "" : "instance " + id.firstKeyOf(Protocol.class).getName();
         blockingDeleteAndRead(cli, id,
                 "configure terminal",
