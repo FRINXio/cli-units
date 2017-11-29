@@ -88,9 +88,7 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
     }
 
     public static Class<? extends InterfaceType> parseType(String name) {
-        if(name.startsWith("FastEther")) {
-            return EthernetCsmacd.class;
-        } else if (name.startsWith("GigabitEthernet")) {
+        if (name.startsWith("FastEther") || name.startsWith("GigabitEthernet") || name.startsWith("TenGigE")) {
             return EthernetCsmacd.class;
         }  else if (name.startsWith("Loopback")) {
             return SoftwareLoopback.class;
