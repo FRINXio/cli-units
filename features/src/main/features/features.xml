@@ -20,14 +20,17 @@
 
     <feature name='cli-southbound-unit-ios-common-cli-initializer' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-io</feature>
         <bundle>mvn:io.frinx.cli/ios-cli-init-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-ios-common-models' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <bundle>mvn:io.frinx.cli/ios-essential-model/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-ios-common-handlers' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <bundle>mvn:io.frinx.cli/common-handlers/{{VERSION}}</bundle>
     </feature>
 
@@ -54,6 +57,7 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-interfaces</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-ospf</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-bgp</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:io.frinx.cli/ios-network-instance-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-local-routing-unit/{{VERSION}}</bundle>
     </feature>

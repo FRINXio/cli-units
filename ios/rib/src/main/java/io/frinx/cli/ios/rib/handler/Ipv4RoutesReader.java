@@ -28,6 +28,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+
 public class Ipv4RoutesReader implements CliOperListReader<Route, RouteKey, RouteBuilder> {
 
     private static final String SH_IP_BGP = "sh ip bgp";
@@ -65,7 +66,7 @@ public class Ipv4RoutesReader implements CliOperListReader<Route, RouteKey, Rout
             matcher -> matcher.group("prefix"),
             Ipv4Prefix::new);
 
-        List<String> origins = ParsingUtils.parseFields(output, 0,
+        List<String> origins = ParsingUtils.parseNonDistinctFields(output, 0,
             ROUTE_LINE::matcher,
             matcher -> matcher.group("origin"),
             String::trim);
