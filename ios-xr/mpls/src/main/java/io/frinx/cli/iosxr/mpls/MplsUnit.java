@@ -22,17 +22,26 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAug;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.CiscoMplsTeExtension;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.CiscoMplsTeExtensionBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.rev171024.NiMplsRsvpIfSubscripAug;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.MplsBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.LspsBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.SignalingProtocolsBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributesBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.lsps.ConstrainedPathBuilder;
+import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.te.tunnels_top.TunnelsBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.SubscriptionBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.subscription.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.rsvp.global.RsvpTeBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te.InterfaceAttributesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 import javax.annotation.Nonnull;
@@ -96,6 +105,13 @@ public class MplsUnit implements TranslateUnit {
         // TE
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TE_INTERFACE, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigWriter(cli)));
+
+        // Tunnel
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LSPS, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CONSTRAINEDPATH, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TUNNEL, new NoopCliListWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG, new TunnelConfigWriter(cli)));
+        wRegistry.addAfter(new GenericWriter<>(CONFIG_IID, new LoadShareConfigWriter(cli)), IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG);
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
@@ -115,7 +131,21 @@ public class MplsUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IIDs.NE_NE_MP_TEINTERFACEATTRIBUTES, TeInterfaceAttributesBuilder.class);
         rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_TE_INTERFACE, new TeInterfaceReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigReader()));
+
+        // Tunnel
+        rRegistry.addStructuralReader(IIDs.NE_NE_MP_LSPS, LspsBuilder.class);
+        rRegistry.addStructuralReader(IIDs.NE_NE_MP_LS_CONSTRAINEDPATH, ConstrainedPathBuilder.class);
+        rRegistry.addStructuralReader(IIDs.NE_NE_MP_LS_CO_TUNNELS, TunnelsBuilder.class);
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_LS_CO_TU_TUNNEL, new TunnelReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG, new TunnelConfigReader(cli)));
+        rRegistry.addStructuralReader(TE_EXT_IID, NiMplsTeTunnelCiscoAugBuilder.class);
+        rRegistry.addStructuralReader(MPLS_EXT_IID, CiscoMplsTeExtensionBuilder.class);
+        rRegistry.add(new GenericConfigReader<>(CONFIG_IID, new LoadShareConfigReader(cli)));
     }
+
+    private static final InstanceIdentifier<NiMplsTeTunnelCiscoAug> TE_EXT_IID = IIDs.NE_NE_MP_LS_CO_TU_TUNNEL.augmentation(NiMplsTeTunnelCiscoAug.class);
+    private static final InstanceIdentifier<CiscoMplsTeExtension> MPLS_EXT_IID = TE_EXT_IID.child(CiscoMplsTeExtension.class);
+    private static final InstanceIdentifier<Config> CONFIG_IID = MPLS_EXT_IID.child(Config.class);
 
     @Override
     public String toString() {
