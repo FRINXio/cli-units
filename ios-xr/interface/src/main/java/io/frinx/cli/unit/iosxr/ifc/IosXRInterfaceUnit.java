@@ -26,6 +26,8 @@ import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigWriter;
+import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.bfd.BfdConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.bfd.BfdConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
@@ -42,6 +44,10 @@ import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.IfLagBfdAug;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.IfLagBfdAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.bfd.top.Bfd;
+import org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.bfd.top.BfdBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1Builder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.Aggregation;
@@ -99,6 +105,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ethernet.rev161222.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.vlan.rev160526.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.$YangModuleInfoImpl.getInstance(),
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -148,6 +155,13 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
     private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.aggregation.Config> IFC_AGGREGATION_CFG_ID =
             IFC_AGGREGATION_ID.child(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.aggregation.Config.class);
 
+    // bfd IIDs
+    private static final InstanceIdentifier<IfLagBfdAug> IFC_LAG_BFD_AUG_ID =
+            IFC_AGGREGATION_ID.augmentation(IfLagBfdAug.class);
+    private static final InstanceIdentifier<Bfd> IFC_LAG_BFD_ID = IFC_LAG_BFD_AUG_ID.child(Bfd.class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.bfd.top.bfd.Config> IFC_LAG_BFD_CFG_ID =
+            IFC_LAG_BFD_ID.child(org.opendaylight.yang.gen.v1.http.frinx.io.yang.bfd.rev171024.bfd.top.bfd.Config.class);
+
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
         wRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
@@ -171,6 +185,10 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         wRegistry.add(new GenericWriter<>(IFC_AGGREGATION_ID, new NoopCliWriter<>()));
         wRegistry.addAfter(new GenericWriter<>(IFC_AGGREGATION_CFG_ID, new AggregateConfigWriter(cli)),
                 IIDs.IN_IN_CONFIG);
+
+        // bfd
+        wRegistry.add(new GenericWriter<>(IFC_LAG_BFD_ID, new NoopCliWriter<>()));
+        wRegistry.addAfter(new GenericWriter<>(IFC_LAG_BFD_CFG_ID, new BfdConfigWriter(cli)), IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
@@ -206,6 +224,12 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IFC_AGGREGATION_AUG_ID, Interface1Builder.class);
         rRegistry.addStructuralReader(IFC_AGGREGATION_ID, AggregationBuilder.class);
         rRegistry.add(new GenericConfigReader<>(IFC_AGGREGATION_CFG_ID, new AggregateConfigReader(cli)));
+
+        // bfd
+        // TODO provide reader also for bfd state
+        rRegistry.addStructuralReader(IFC_LAG_BFD_AUG_ID, IfLagBfdAugBuilder.class);
+        rRegistry.addStructuralReader(IFC_LAG_BFD_ID, BfdBuilder.class);
+        rRegistry.add(new GenericConfigReader<>(IFC_LAG_BFD_CFG_ID, new BfdConfigReader(cli)));
     }
 
     @Override
