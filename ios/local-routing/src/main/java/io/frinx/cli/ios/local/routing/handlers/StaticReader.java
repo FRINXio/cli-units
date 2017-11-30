@@ -16,9 +16,15 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.local.routing.common.LrListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.annotation.Nonnull;
+
+import org.apache.commons.net.util.SubnetUtils;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutesBuilder;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
 import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticBuilder;
@@ -32,15 +38,39 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class StaticReader implements LrListReader.LrConfigListReader<Static, StaticKey, StaticBuilder> {
 
-    private static final String SH_IP_STATIC_ROUTE = "sh ip static route";
-    private static final String SH_IP_STATIC_ROUTE_VRF = "sh ip static route vrf %s";
-    private static final Pattern IP_PREFIX_LINE =
-            Pattern.compile("\\w{1,2} {2}(?<ipPrefix>[\\S&&[^/]]+/\\d{1,2}).*");
+    private static final String SH_IP_STATIC_ROUTE = "sh run | include ip route";
+    private static final Pattern IP_PREFIX_LINE_DEFAULT =
+            Pattern.compile("ip route (?<ip>(?!vrf)[\\S]+) (?<mask>[\\S]+).*");
+    private static final Pattern IP_PREFIX_LINE_VRF =
+            Pattern.compile("ip route vrf (?<vrf>[\\S]+) (?<ip>[\\S]+) (?<mask>[\\S]+).*");
+    private static final String GROUP_MASK = "mask";
+    private static final String GROUP_IP = "ip";
+    private static final String GROUP_VRF = "vrf";
 
     private Cli cli;
 
     public StaticReader(final Cli cli) {
         this.cli = cli;
+    }
+
+    private static StaticKey resolveStaticKey(HashMap<String, String> value) {
+        SubnetUtils subnetUtils = new SubnetUtils(value.get(GROUP_IP), value.get(GROUP_MASK));
+        return new StaticKey(new IpPrefix(new Ipv4Prefix(subnetUtils.getInfo().getCidrSignature())));
+    }
+
+    private static HashMap<String, String> resolveGroupsVrf(Matcher m) {
+        HashMap<String, String> groups = resolveGroups(m);
+        groups.put(GROUP_VRF, m.group(GROUP_VRF));
+        return groups;
+    }
+
+    private static HashMap<String, String> resolveGroups(Matcher m) {
+        HashMap<String, String> hashMap = new HashMap<>();
+
+        hashMap.put(GROUP_IP, m.group(GROUP_IP));
+        hashMap.put(GROUP_MASK, m.group(GROUP_MASK));
+
+        return hashMap;
     }
 
     @Nonnull
@@ -49,18 +79,23 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
                                             @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
 
-        String showCommand = vrfName.equals(DEFAULT_NETWORK_NAME)
-                ? SH_IP_STATIC_ROUTE : String.format(SH_IP_STATIC_ROUTE_VRF, vrfName);
-
-        return parseStaticPrefixes(blockingRead(showCommand, cli, instanceIdentifier, readContext));
+        return parseStaticPrefixes(blockingRead(SH_IP_STATIC_ROUTE, cli, instanceIdentifier, readContext), vrfName);
     }
 
     @VisibleForTesting
-    static List<StaticKey> parseStaticPrefixes(String output) {
-        return ParsingUtils.parseFields(output, 0,
-                IP_PREFIX_LINE::matcher,
-                m -> m.group("ipPrefix"),
-                value -> new StaticKey(new IpPrefix(new Ipv4Prefix(value))));
+    static List<StaticKey> parseStaticPrefixes(String output, String vrfName) {
+        Pattern matchPattern = vrfName.equals(DEFAULT_NETWORK_NAME) ? IP_PREFIX_LINE_DEFAULT : IP_PREFIX_LINE_VRF;
+
+        if (vrfName.equals(DEFAULT_NETWORK_NAME)) {
+            return ParsingUtils.parseFields(output, 0, matchPattern::matcher, StaticReader::resolveGroups,
+                StaticReader::resolveStaticKey);
+        } else {
+            return ParsingUtils.parseFields(output, 0,
+                matchPattern::matcher,
+                StaticReader::resolveGroupsVrf,
+                StaticReader::resolveStaticKey,
+                groupsHashMap -> groupsHashMap.get(GROUP_VRF).equals(vrfName));
+        }
     }
 
     @Override

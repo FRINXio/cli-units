@@ -74,6 +74,7 @@
 
     <feature name='cli-southbound-unit-ios-local-routing' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-local-routing-unit/{{VERSION}}</bundle>
     </feature>
 
