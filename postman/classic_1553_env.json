@@ -23,7 +23,7 @@
     {
       "enabled": true,
       "key": "connect_attempts",
-      "value": "50",
+      "value": "90",
       "type": "text"
     },
     {
@@ -203,7 +203,7 @@
     {
       "enabled": true,
       "key": "test_sub_interface",
-      "value": "GigabitEthernet2%2F0",
+      "value": "GigabitEthernet0%2F2",
       "type": "text"
     },
     {
