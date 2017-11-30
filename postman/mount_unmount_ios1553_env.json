@@ -23,7 +23,7 @@
     {
       "enabled": true,
       "key": "connect_attempts",
-      "value": "40",
+      "value": "90",
       "type": "text"
     },
     {
