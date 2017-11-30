@@ -1899,10 +1899,8 @@
 									"script": {
 										"type": "text/javascript",
 										"exec": [
-											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
-											"",
-											"// console.log(\"Response: \" + responseBody)",
-											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+											"console.log(\"Response: \" + responseBody)",
+											"tests[\"Status code is 404\"] = responseCode.code === 404;"
 										]
 									}
 								}
@@ -2063,10 +2061,8 @@
 									"script": {
 										"type": "text/javascript",
 										"exec": [
-											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
-											"",
-											"// console.log(\"Response: \" + responseBody)",
-											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+											"console.log(\"Response: \" + responseBody)",
+											"tests[\"Status code is 404\"] = responseCode.code === 404;"
 										]
 									}
 								}
@@ -4061,10 +4057,8 @@
 									"script": {
 										"type": "text/javascript",
 										"exec": [
-											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
-											"",
-											"// console.log(\"Response: \" + responseBody)",
-											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+											"console.log(\"Response: \" + responseBody)",
+											"tests[\"Status code is 404\"] = responseCode.code === 404;"
 										]
 									}
 								}
@@ -4225,10 +4219,8 @@
 									"script": {
 										"type": "text/javascript",
 										"exec": [
-											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
-											"",
-											"// console.log(\"Response: \" + responseBody)",
-											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+											"console.log(\"Response: \" + responseBody)",
+											"tests[\"Status code is 404\"] = responseCode.code === 404;"
 										]
 									}
 								}
