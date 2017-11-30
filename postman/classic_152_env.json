@@ -113,7 +113,7 @@
     {
       "enabled": true,
       "key": "neighbor",
-      "value": "10.255.255.2",
+      "value": "8.8.8.8",
       "type": "text"
     },
     {
