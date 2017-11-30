@@ -275,7 +275,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/",
 								"method": "GET",
 								"header": [
 									{
@@ -628,7 +628,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/",
 								"method": "GET",
 								"header": [
 									{
@@ -670,7 +670,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -745,7 +745,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -826,7 +826,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
@@ -901,7 +901,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
@@ -942,7 +942,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/{{ip1}}",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/{{ip1}}",
 								"method": "GET",
 								"header": [
 									{
@@ -983,7 +983,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/255.255.255.255",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/255.255.255.255",
 								"method": "GET",
 								"header": [
 									{
@@ -1292,7 +1292,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default",
 								"method": "GET",
 								"header": [
 									{
@@ -1340,7 +1340,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/xxx",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/xxx",
 								"method": "GET",
 								"header": [
 									{
@@ -1475,7 +1475,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/default",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/default",
 								"method": "GET",
 								"header": [
 									{
@@ -1522,7 +1522,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/xxx",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/xxx",
 								"method": "GET",
 								"header": [
 									{
@@ -1657,7 +1657,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/{{ospf}}",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/{{ospf}}",
 								"method": "GET",
 								"header": [
 									{
@@ -1704,7 +1704,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/666",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/666",
 								"method": "GET",
 								"header": [
 									{
@@ -1795,7 +1795,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-platform:components",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-platform:components",
 								"method": "GET",
 								"header": [
 									{
@@ -1884,7 +1884,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/cdp:cdp",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/cdp:cdp",
 								"method": "GET",
 								"header": [
 									{
@@ -1964,7 +1964,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/cdp:cdp",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/cdp:cdp",
 								"method": "GET",
 								"header": [
 									{
@@ -2053,7 +2053,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-lldp:lldp",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
@@ -2133,7 +2133,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-lldp:lldp",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
@@ -2167,7 +2167,7 @@
 						{
 							"name": "TEARDOWN: Delete subinterface",
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -2203,7 +2203,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -2239,7 +2239,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -2281,7 +2281,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "GET",
 								"header": [
 									{
@@ -2322,7 +2322,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -2361,7 +2361,7 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "GET",
 								"header": [
 									{
