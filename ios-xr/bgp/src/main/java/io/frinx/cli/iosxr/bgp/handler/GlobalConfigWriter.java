@@ -44,7 +44,7 @@ public class GlobalConfigWriter implements CliWriter<Config> {
         String name = (protName.equals(NetworInstance.DEFAULT_NETWORK_NAME)) ? "" : " instance " + protName;
         blockingDeleteAndRead(cli, id,
                 "configure terminal",
-                f("no router bgp %s %s",  data.getAs().getValue(), id.firstKeyOf(Protocol.class).getName()),
+                f("no router bgp %s %s",  data.getAs().getValue(), name),
                 "commit",
                 "end");
     }
