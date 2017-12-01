@@ -11,13 +11,15 @@ package io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol;
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.BgpProtocolWriter;
+import io.frinx.cli.iosxr.ospf.handler.OspfProtocolWriter;
 import io.frinx.cli.registry.common.CompositeWriter;
 
 public class ProtocolConfigWriter extends CompositeWriter {
 
     public ProtocolConfigWriter(final Cli cli) {
         super(Lists.newArrayList(
-            new BgpProtocolWriter()
+            new BgpProtocolWriter(),
+            new OspfProtocolWriter()
         ));
     }
 }
