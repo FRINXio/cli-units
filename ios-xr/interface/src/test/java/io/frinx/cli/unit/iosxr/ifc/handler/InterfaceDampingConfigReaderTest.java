@@ -10,8 +10,8 @@ package io.frinx.cli.unit.iosxr.ifc.handler;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.damping.top.damping.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.io.yang.damping.rev171024.damping.top.damping.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.damping.rev171024.damping.top.damping.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.damping.rev171024.damping.top.damping.ConfigBuilder;
 
 public class InterfaceDampingConfigReaderTest {
 

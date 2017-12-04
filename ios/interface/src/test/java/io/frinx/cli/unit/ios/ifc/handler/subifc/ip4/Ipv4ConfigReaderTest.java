@@ -10,7 +10,7 @@ package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
 import io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
 
 import static org.junit.Assert.assertEquals;

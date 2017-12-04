@@ -12,8 +12,8 @@ import com.google.common.collect.Lists;
 import io.frinx.cli.iosxr.mpls.handler.TeInterfaceReader;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.interfaces.rev161222.InterfaceId;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.InterfaceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.InterfaceKey;
 
 import java.util.List;
 import java.util.stream.Collectors;

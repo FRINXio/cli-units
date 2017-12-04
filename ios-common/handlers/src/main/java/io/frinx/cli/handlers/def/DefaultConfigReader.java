@@ -15,10 +15,10 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.registry.common.CompositeReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.network.instance.types.rev170228.DEFAULTINSTANCE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.DEFAULTINSTANCE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class DefaultConfigReader implements CliConfigReader<Config, ConfigBuilder>,
