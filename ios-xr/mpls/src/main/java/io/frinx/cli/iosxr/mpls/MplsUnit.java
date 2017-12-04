@@ -22,23 +22,23 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAug;
-import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.CiscoMplsTeExtension;
-import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.CiscoMplsTeExtensionBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.rev171024.NiMplsRsvpIfSubscripAug;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.MplsBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.LspsBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.SignalingProtocolsBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributesBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.lsps.ConstrainedPathBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.te.tunnels_top.TunnelsBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.SubscriptionBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.subscription.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.rsvp.global.RsvpTeBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te.InterfaceAttributesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.CiscoMplsTeExtension;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.CiscoMplsTeExtensionBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev171024.NiMplsRsvpIfSubscripAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.MplsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.LspsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.SignalingProtocolsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.lsps.ConstrainedPathBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.TunnelsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.SubscriptionBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.subscription.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.RsvpTeBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te.InterfaceAttributesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -74,7 +74,7 @@ public class MplsUnit implements TranslateUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.rev171024.$YangModuleInfoImpl.getInstance());
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev171024.$YangModuleInfoImpl.getInstance());
     }
 
     @Override

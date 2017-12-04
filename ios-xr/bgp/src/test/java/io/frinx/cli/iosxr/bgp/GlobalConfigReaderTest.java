@@ -11,7 +11,7 @@ package io.frinx.cli.iosxr.bgp;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigReader;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder;
 
 public class GlobalConfigReaderTest {
 

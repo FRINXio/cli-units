@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.List;
 
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHopKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHopKey;
 
 public class StaticNextHopReaderTest {
     private static final String SH_IP_ROUTE_NETWORK =

@@ -14,9 +14,9 @@ import io.frinx.cli.iosxr.mpls.handler.TunnelConfigReader;
 import io.frinx.cli.iosxr.mpls.handler.TunnelReader;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.TunnelKey;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.mpls.types.rev170824.LSPMETRICABSOLUTE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.TunnelKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.rev170824.LSPMETRICABSOLUTE;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,8 +51,8 @@ public class TunnelReaderTest {
         Assert.assertTrue(cb.isShortcutEligible());
         Assert.assertEquals(15, cb.getMetric().intValue());
 
-        org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.ConfigBuilder cb1 =
-                new org.opendaylight.yang.gen.v1.http.frinx.io.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.ConfigBuilder();
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.ConfigBuilder cb1 =
+                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.ConfigBuilder();
         LoadShareConfigReader.parseConfig(TUNNEL_OUTPUT, cb1);
         Assert.assertEquals(30, cb1.getLoadShare().intValue());
     }

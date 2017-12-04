@@ -28,8 +28,8 @@ import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutesBuilder;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.NextHopsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.NextHopsBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -84,7 +84,7 @@ public class LocalRoutingUnit implements TranslateUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(org.opendaylight.yang.gen.v1.http.openconfig.net.yang.local.routing.rev170515
+        return Sets.newHashSet(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515
                 .$YangModuleInfoImpl.getInstance());
     }
 

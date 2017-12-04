@@ -12,7 +12,7 @@ package io.frinx.cli.iosxr.ospf;
 import io.frinx.cli.iosxr.ospf.handler.MaxMetricConfigReader;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.timers.max.metric.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.timers.max.metric.ConfigBuilder;
 
 public class MaxMetricConfigReaderTest {
 
