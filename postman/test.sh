@@ -16,7 +16,7 @@ for device in ${devices[@]}
 do
    echo Collection running with $device
      for folder in "${folders[@]}"
-     do 
+     do
         newman run $collection --bail -e $device -n 2 --folder "$folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing $folder FAILED" >> $file; fi
         sleep 5
      done
@@ -31,56 +31,56 @@ for device in ${XR_devices[@]}
 do
    echo Collection running with $device
          if [ "$device" == "xrv_env.json" ]
-         then 
+         then
              for folder in "${XR_folders[@]}"
-             do   
+             do
                 newman run $collection --bail -e $device -n 1 --folder "XR $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing XR $folder FAILED" >> $file; fi
                 sleep 5
              done
          fi
-         
+
          if [ "$device" == "asr_env.json" ]
-         then 
+         then
              for folder in "${ASR_folders[@]}"
-             do   
+             do
                 newman run $collection --bail -e $device -n 1 --folder "XR $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing XR $folder FAILED" >> $file; fi
                 sleep 5
              done
-         fi 
+         fi
 done
 
 ### Test for IOS
 IOS_devices=("classic_152_env.json" "classic_1553_env.json" "xe_env.json")
-Classic_folders=("Mount" "General information" "Interface" "Interface IP" "ospf/vrf" "static route" "BGP summary" "journal/dry-run" "CDP" "subinterface common" "Unmount")
+Classic_folders=("Mount" "General information" "Interface" "Interface IP" "ospf/vrf" "static route" "BGP summary" "journal/dry-run" "CDP" "subinterface common" "L2P2P" "Unmount")
 XE_folders=("Mount" "General information" "Interface" "Interface IP" "ospf/vrf" "static route" "BGP summary" "journal/dry-run" "CDP" "LLDP" "subinterface common" "Unmount")
 
 for device in ${IOS_devices[@]}
 do
    echo Collection running with $device
          if [ "$device" == "classic_152_env.json" ]
-         then 
+         then
              for folder in "${Classic_folders[@]}"
-             do   
+             do
                 newman run $collection --bail -e $device -n 1 --folder "Classic $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing Classic $folder FAILED" >> $file; fi
                 sleep 5
              done
          fi
          if [ "$device" == "classic_1553_env.json" ]
-         then 
+         then
              for folder in "${Classic_folders[@]}"
-             do   
+             do
                 newman run $collection --bail -e $device -n 1 --folder "Classic $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing Classic $folder FAILED" >> $file; fi
                 sleep 5
              done
-         fi         
+         fi
          if [ "$device" == "xe_env.json" ]
-         then 
+         then
              for folder in "${XE_folders[@]}"
-             do   
+             do
                 newman run $collection --bail -e $device -n 1 --folder "Classic $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing Classic $folder FAILED" >> $file; fi
                 sleep 5
              done
-         fi 
+         fi
 done
 
 ### Test for Linux generic
@@ -91,7 +91,7 @@ for device in "${Linux_devices[@]}"
 do
    echo Collection running with $device
      for folder in "${folders[@]}"
-     do 
+     do
         newman run $collection --bail -e $device -n 1 --folder "Linux"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing $folder FAILED" >> $file; fi
         sleep 5
      done

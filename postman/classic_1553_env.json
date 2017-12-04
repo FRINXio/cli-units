@@ -1,6 +1,6 @@
 {
-  "id": "bb9b73f7-d229-0bbd-7cf0-e4cddaadf659",
-  "name": "classic-testing",
+  "id": "bbf5cf86-79c0-73d7-1c26-b4bfb6ddbb6d",
+  "name": "classic-testing 1.225",
   "values": [
     {
       "enabled": true,
@@ -217,10 +217,70 @@
       "key": "vlan_id",
       "value": "28",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_show_sub_interface_index",
+      "value": "87",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_show_interface2",
+      "value": "GigabitEthernet0/1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_show_interface2url",
+      "value": "GigabitEthernet0%2F1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_show_remoteip",
+      "value": "8.8.8.8",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_show_remotevccid",
+      "value": "456",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_show_networkinstance",
+      "value": "abcde",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_show_interface1",
+      "value": "GigabitEthernet0/1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_show_interface1url",
+      "value": "GigabitEthernet0%2F1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_show_interface3",
+      "value": "GigabitEthernet0/2",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_show_interface3url",
+      "value": "GigabitEthernet0%2F2",
+      "type": "text"
     }
   ],
-  "timestamp": 1508789697427,
+  "timestamp": 1512047209236,
   "_postman_variable_scope": "environment",
-  "_postman_exported_at": "2017-10-23T20:49:42.919Z",
-  "_postman_exported_using": "Postman/5.3.1"
+  "_postman_exported_at": "2017-11-30T13:07:53.847Z",
+  "_postman_exported_using": "Postman/5.3.2"
 }
