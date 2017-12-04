@@ -17,9 +17,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 
 public class BfdConfigReaderTest {
 
-    private static final String SH_RUN_INT_NO_BFD_CONFIG = "Mon Nov 27 14:04:50.483 UTC\n" +
+    private static final String SH_RUN_INT_BASIC_BFD_CONFIG = "Mon Nov 27 14:04:50.483 UTC\n" +
             "interface Bundle-Ether2\n" +
             " description testt\n" +
+            " bfd mode ietf\n" +
+            " bfd address-family ipv4 fast-detect\n" +
             " bundle id 400 mode on\n" +
             "!\n" +
             "\n";
@@ -64,17 +66,16 @@ public class BfdConfigReaderTest {
         Assert.assertEquals(EXPECTED_CONFIG, actualCfgBuilder.build());
 
         actualCfgBuilder = new ConfigBuilder();
-        BfdConfigReader.parseBfdConfig(SH_RUN_INT_NO_BFD_CONFIG, actualCfgBuilder);
+        BfdConfigReader.parseBfdConfig(SH_RUN_INT_BASIC_BFD_CONFIG, actualCfgBuilder);
         Assert.assertEquals(EXPECTED_NO_BFD_CONFIG, actualCfgBuilder.build());
+    }
 
-        // if the mode is not set or fast-detect is not enabled, we expect
-        // parsed config to be empty
-        actualCfgBuilder = new ConfigBuilder();
-        BfdConfigReader.parseBfdConfig(SH_RUN_INT_BFD_MODE_NOT_SET, actualCfgBuilder);
-        Assert.assertEquals(EXPECTED_NO_BFD_CONFIG, actualCfgBuilder.build());
+    @Test
+    public void testIsSupportedBfdConfig() {
+        Assert.assertTrue(BfdConfigReader.isSupportedBfdConfig(SH_INT_CFG));
+        Assert.assertTrue(BfdConfigReader.isSupportedBfdConfig(SH_RUN_INT_BASIC_BFD_CONFIG));
 
-        actualCfgBuilder = new ConfigBuilder();
-        BfdConfigReader.parseBfdConfig(SH_RUN_INT_BFD_FAST_DETECT_NOT_ENABLED, actualCfgBuilder);
-        Assert.assertEquals(EXPECTED_NO_BFD_CONFIG, actualCfgBuilder.build());
+        Assert.assertFalse(BfdConfigReader.isSupportedBfdConfig(SH_RUN_INT_BFD_FAST_DETECT_NOT_ENABLED));
+        Assert.assertFalse(BfdConfigReader.isSupportedBfdConfig(SH_RUN_INT_BFD_MODE_NOT_SET));
     }
 }

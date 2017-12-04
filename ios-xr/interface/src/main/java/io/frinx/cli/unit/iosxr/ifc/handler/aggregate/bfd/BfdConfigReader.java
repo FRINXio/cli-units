@@ -95,14 +95,10 @@ public class BfdConfigReader implements CliConfigReader<Config, ConfigBuilder> {
                 BFD_DESTINATION::matcher,
                 matcher -> new IpAddress(new Ipv4Address(matcher.group("destination"))),
                 builder::setDestinationAddress);
-
-        List<Boolean> bfdMode = ParsingUtils.parseFields(output, 0,
-               BFD_MODE_ITEF::matcher,
-               matcher -> true,
-               Function.identity());
     }
 
-    private static boolean isSupportedBfdConfig(String output) {
+    @VisibleForTesting
+    static boolean isSupportedBfdConfig(String output) {
         List<Boolean> bfdMode = ParsingUtils.parseFields(output, 0,
                 BFD_MODE_ITEF::matcher,
                 matcher -> true,
