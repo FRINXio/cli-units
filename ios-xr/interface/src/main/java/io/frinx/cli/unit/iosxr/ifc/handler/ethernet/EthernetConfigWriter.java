@@ -79,7 +79,7 @@ public class EthernetConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 "configure terminal",
                 f("interface %s", ifcName),
-                "no bundle",
+                "no bundle id",
                 "commit",
                 "end");
     }
