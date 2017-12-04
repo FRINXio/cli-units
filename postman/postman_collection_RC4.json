@@ -630,7 +630,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/"
 							},
 							"response": []
 						},
@@ -671,7 +671,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -744,7 +744,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -822,7 +822,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -895,7 +895,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -935,7 +935,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/{{ip1}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/{{ip1}}"
 							},
 							"response": []
 						},
@@ -975,7 +975,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/255.255.255.255"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/255.255.255.255"
 							},
 							"response": []
 						},
@@ -1275,7 +1275,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:BGP/default"
 							},
 							"response": []
 						},
@@ -1322,7 +1322,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/xxx"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:BGP/xxx"
 							},
 							"response": []
 						},
@@ -1453,7 +1453,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/default"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/default"
 							},
 							"response": []
 						},
@@ -1499,7 +1499,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/xxx"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/xxx"
 							},
 							"response": []
 						},
@@ -1630,7 +1630,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/{{ospf}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf}}"
 							},
 							"response": []
 						},
@@ -1676,7 +1676,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/666"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/666"
 							},
 							"response": []
 						},
@@ -1764,7 +1764,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-platform:components"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-platform:components"
 							},
 							"response": []
 						}
@@ -1850,7 +1850,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/cdp:cdp"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-cdp:cdp"
 							},
 							"response": []
 						},
@@ -1926,7 +1926,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/cdp:cdp"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-cdp:cdp"
 							},
 							"response": []
 						}
@@ -2012,7 +2012,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-lldp:lldp"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-lldp:lldp"
 							},
 							"response": []
 						},
@@ -2088,7 +2088,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-lldp:lldp"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-lldp:lldp"
 							},
 							"response": []
 						}
@@ -2116,7 +2116,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -2149,7 +2149,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"subinterface\": \n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"description\": \"testing subinterface\"\n            }\n           \n        }\n    \n}"
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -2180,9 +2180,9 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"enabled\": true,\n                \"description\": \"updated subinterface description\"\n            },\n            \n            \"openconfig-vlan:vlan\": {\n                \"config\": {\n                \t\"vlan-id\": {{vlan_id}}\n                }\n            }\n\n        }\n    ]\n}\n"
+									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"enabled\": true,\n                \"description\": \"updated subinterface description\"\n            },\n            \n            \"frinx-openconfig-vlan:vlan\": {\n                \"config\": {\n                \t\"vlan-id\": {{vlan_id}}\n                }\n            }\n\n        }\n    ]\n}\n"
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -2225,7 +2225,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -2258,7 +2258,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -2298,7 +2298,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN-unified/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						}
@@ -2590,7 +2590,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces"
 							},
 							"response": []
 						},
@@ -2631,7 +2631,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -2708,7 +2708,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -2791,7 +2791,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -2870,7 +2870,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -2911,7 +2911,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/{{ip41}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/{{ip41}}"
 							},
 							"response": []
 						},
@@ -2951,7 +2951,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/openconfig-if-ip:ipv4/addresses/address/255.255.255.255"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/255.255.255.255"
 							},
 							"response": []
 						},
@@ -3085,7 +3085,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances"
 							},
 							"response": []
 						},
@@ -3130,7 +3130,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/{{ospf2}}/ospfv2/areas/area/{{area2}}/interfaces"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf2}}/ospfv2/areas/area/{{area2}}/interfaces"
 							},
 							"response": []
 						},
@@ -3176,7 +3176,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:OSPF/666"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/666"
 							},
 							"response": []
 						},
@@ -3303,7 +3303,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/default/"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:BGP/default/"
 							},
 							"response": []
 						},
@@ -3350,7 +3350,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:BGP/xxx/"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:BGP/xxx/"
 							},
 							"response": []
 						},
@@ -3480,7 +3480,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/default"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/default"
 							},
 							"response": []
 						},
@@ -3527,7 +3527,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/openconfig-policy-types:STATIC/xxx"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/xxx"
 							},
 							"response": []
 						},
@@ -3688,7 +3688,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -3726,7 +3726,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -3806,7 +3806,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -3844,7 +3844,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -3922,7 +3922,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -4008,7 +4008,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cdp:cdp"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-cdp:cdp"
 							},
 							"response": []
 						},
@@ -4089,7 +4089,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cdp:cdp"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-cdp:cdp"
 							},
 							"response": []
 						}
@@ -4175,7 +4175,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-lldp:lldp"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-lldp:lldp"
 							},
 							"response": []
 						},
@@ -4251,7 +4251,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-lldp:lldp"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-lldp:lldp"
 							},
 							"response": []
 						}
@@ -4290,7 +4290,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -4323,7 +4323,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"subinterface\": \n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"description\": \"testing subinterface\"\n            }\n           \n        }\n    \n}"
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -4354,9 +4354,9 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"enabled\": true,\n                \"description\": \"updated subinterface description\"\n            },\n            \n            \"openconfig-vlan:vlan\": {\n                \"config\": {\n                \t\"vlan-id\": {{vlan_id}}\n                }\n            }\n\n        }\n    ]\n}\n"
+									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"enabled\": true,\n                \"description\": \"updated subinterface description\"\n            },\n            \n            \"frinx-openconfig-vlan:vlan\": {\n                \"config\": {\n                \t\"vlan-id\": {{vlan_id}}\n                }\n            }\n\n        }\n    ]\n}\n"
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -4399,7 +4399,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -4432,7 +4432,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -4472,7 +4472,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						}
