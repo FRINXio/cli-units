@@ -19,7 +19,7 @@ public class ProtocolConfigWriter extends CompositeWriter {
     public ProtocolConfigWriter(final Cli cli) {
         super(Lists.newArrayList(
             new BgpProtocolWriter(),
-            new OspfProtocolWriter()
+            new OspfProtocolWriter(cli)
         ));
     }
 }

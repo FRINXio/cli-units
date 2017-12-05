@@ -30,6 +30,7 @@ import javax.annotation.Nonnull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,30 +57,32 @@ public class MaxMetricConfigReader implements OspfReader.OspfConfigReader<Config
     @VisibleForTesting
     public static void parseTimers(String output, ConfigBuilder builder) {
 
-        ParsingUtils.findMatch(output, MAX_METRIC_LINE, builder::setSet);
+        Optional<Boolean> maybeMax = ParsingUtils.parseField(output, 0, MAX_METRIC_LINE::matcher, Matcher::matches);
 
-        ParsingUtils.parseField(output,
-                STARTUP_LINE::matcher,
-                matcher -> matcher.group("timeout"),
-                value -> builder.setTimeout(new BigInteger(value)));
+        if (maybeMax.isPresent() && maybeMax.get()) {
+            builder.setSet(true);
+            ParsingUtils.parseField(output,
+                    STARTUP_LINE::matcher,
+                    matcher -> matcher.group("timeout"),
+                    value -> builder.setTimeout(new BigInteger(value)));
 
-        List<Class<? extends MAXMETRICINCLUDE>> includes = new ArrayList<>();
-        ParsingUtils.parseField(output,
-                STUB_LINE::matcher,
-                Matcher::matches,
-                value -> includes.add(MAXMETRICINCLUDESTUB.class));
+            List<Class<? extends MAXMETRICINCLUDE>> includes = new ArrayList<>();
+            ParsingUtils.parseField(output,
+                    STUB_LINE::matcher,
+                    Matcher::matches,
+                    value -> includes.add(MAXMETRICINCLUDESTUB.class));
 
-        ParsingUtils.parseField(output,
-                SUMMARY_LINE::matcher,
-                Matcher::matches,
-                value -> includes.add(MAXMETRICSUMMARYLSA.class));
+            ParsingUtils.parseField(output,
+                    SUMMARY_LINE::matcher,
+                    Matcher::matches,
+                    value -> includes.add(MAXMETRICSUMMARYLSA.class));
 
-        ParsingUtils.parseField(output,
-                EXTERNAL_LINE::matcher,
-                Matcher::matches,
-                value -> includes.add(MAXMETRICINCLUDETYPE2EXTERNAL.class));
-
-        builder.setInclude(includes);
+            ParsingUtils.parseField(output,
+                    EXTERNAL_LINE::matcher,
+                    Matcher::matches,
+                    value -> includes.add(MAXMETRICINCLUDETYPE2EXTERNAL.class));
+            builder.setInclude(includes);
+        }
     }
 
     @Nonnull
