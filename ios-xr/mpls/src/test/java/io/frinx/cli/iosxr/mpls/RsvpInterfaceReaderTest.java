@@ -13,7 +13,7 @@ import io.frinx.cli.iosxr.mpls.handler.NiMplsRsvpIfSubscripAugReader;
 import io.frinx.cli.iosxr.mpls.handler.RsvpInterfaceReader;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev171024.NiMplsRsvpIfSubscripAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.NiMplsRsvpIfSubscripAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.InterfaceKey;
 
