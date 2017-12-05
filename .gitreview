@@ -1,5 +1,5 @@
 [gerrit]
-host=git.opendaylight.org
+host=gerrit.frinx.io
 port=29418
 project=cli-units.git
 defaultbranch=carbon/development
