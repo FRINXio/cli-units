@@ -13,7 +13,6 @@ import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
-import io.fd.honeycomb.translate.impl.read.GenericReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
@@ -285,7 +284,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         // hold-time
         // TODO provide also hold-time state reader
         rRegistry.addStructuralReader(IIDs.IN_IN_HOLDTIME, HoldTimeBuilder.class);
-        rRegistry.add(new GenericReader<>(IIDs.IN_IN_HO_CONFIG, new HoldTimeConfigReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_HO_CONFIG, new HoldTimeConfigReader(cli)));
 
         // if-aggregation
         // TODO provide also aggregation state reader
@@ -307,12 +306,12 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         // cisco if-extensions
         rRegistry.addStructuralReader(IFC_CISCO_EX_AUG_ID, IfCiscoStatsAugBuilder.class);
         rRegistry.addStructuralReader(IFC_CISCO_EX_STAT_ID, StatisticsBuilder.class);
-        rRegistry.add(new GenericReader<>(IFC_CISCO_EX_STAT_CONFIG_ID, new InterfaceStatisticsConfigReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IFC_CISCO_EX_STAT_CONFIG_ID, new InterfaceStatisticsConfigReader(cli)));
 
         // if-ethernet
         rRegistry.addStructuralReader(IFC_ETH_AUD_ID, org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.Interface1Builder.class);
         rRegistry.addStructuralReader(IFC_ETHERNET_ID, EthernetBuilder.class);
-        rRegistry.add(new GenericReader<>(IFC_ETHERNET_CONFIG_ID, new EthernetConfigReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IFC_ETHERNET_CONFIG_ID, new EthernetConfigReader(cli)));
     }
 
     @Override
