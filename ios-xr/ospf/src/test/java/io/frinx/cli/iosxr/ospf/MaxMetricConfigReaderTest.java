@@ -9,9 +9,13 @@
 
 package io.frinx.cli.iosxr.ospf;
 
+import com.google.common.collect.Lists;
 import io.frinx.cli.iosxr.ospf.handler.MaxMetricConfigReader;
 import org.junit.Assert;
 import org.junit.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.MAXMETRICSUMMARYLSA;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.MAXMETRICINCLUDESTUB;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.MAXMETRICINCLUDETYPE2EXTERNAL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.timers.max.metric.ConfigBuilder;
 
 public class MaxMetricConfigReaderTest {
@@ -28,5 +32,8 @@ public class MaxMetricConfigReaderTest {
         ConfigBuilder builder = new ConfigBuilder();
         MaxMetricConfigReader.parseTimers(output, builder);
         Assert.assertEquals(150, builder.getTimeout().intValue());
+
+        Assert.assertEquals(Lists.newArrayList(MAXMETRICINCLUDESTUB.class, MAXMETRICSUMMARYLSA.class, MAXMETRICINCLUDETYPE2EXTERNAL.class),
+                builder.getInclude());
     }
 }

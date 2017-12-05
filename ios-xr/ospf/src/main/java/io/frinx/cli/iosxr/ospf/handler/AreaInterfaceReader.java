@@ -33,8 +33,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
-    private static final String SHOW_OSPF_INT = "sh ip ospf %s %s interface";
-    private static final Pattern INTERFACE_NAME_LINE = Pattern.compile("(?<name>[^\\s]+) is (?<status>[^,]+), line protocol is (?<lineStatus>.+)");
+    private static final String SHOW_OSPF_INT = "sh run router ospf %s area %s interface";
+    private static final Pattern INTERFACE_NAME_LINE = Pattern.compile("interface (?<name>.*)");
 
     private Cli cli;
 
