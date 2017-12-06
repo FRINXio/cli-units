@@ -107,7 +107,9 @@ public class OspfUnit implements TranslateUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet($YangModuleInfoImpl.getInstance());
+        return Sets.newHashSet(
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.$YangModuleInfoImpl.getInstance(),
+                $YangModuleInfoImpl.getInstance());
     }
 
     @Override
