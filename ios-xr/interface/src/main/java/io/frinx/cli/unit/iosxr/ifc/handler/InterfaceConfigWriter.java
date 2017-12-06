@@ -115,6 +115,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
         if (isPhysicalInterface(dataAfter)) {
             updatePhysicalInterface(id, dataAfter);
         } else if (isSupportedInterface(dataAfter)) {
+            deleteInterface(id, dataBefore);
             writeInterface(id, dataAfter);
         } else {
             throw new WriteFailedException.CreateFailedException(id, dataAfter,
@@ -128,8 +129,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
                 "configure terminal",
                 f("interface %s", data.getName()),
-                data.getDescription() == null ? "" : f("description %s", data.getDescription()),
-                data.getMtu() == null ? "" : f("mtu %s", data.getMtu()),
+                data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
+                data.getMtu() == null ? "no mtu" : f("mtu %s", data.getMtu()),
                 data.isEnabled() ? "no shutdown" : "shutdown",
                 "commit",
                 "end");
