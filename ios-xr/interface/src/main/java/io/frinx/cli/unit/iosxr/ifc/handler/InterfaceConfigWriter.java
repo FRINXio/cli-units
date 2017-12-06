@@ -71,7 +71,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 "configure terminal",
                 f("interface %s", data.getName()),
                 data.getMtu() == null ? "" : f("mtu %s", data.getMtu()),
-                f("description %s", data.getDescription()),
+                data.getDescription() == null ? "" : f("description %s", data.getDescription()),
                 data.isEnabled() ? "no shutdown" : "shutdown",
                 "commit",
                 "end");

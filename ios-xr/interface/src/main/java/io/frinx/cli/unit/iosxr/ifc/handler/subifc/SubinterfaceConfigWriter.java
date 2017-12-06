@@ -50,7 +50,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
             blockingWriteAndRead(cli, id, data,
                     "configure terminal",
                     f("interface %s", getSubinterfaceName(id)),
-                    f("description %s", data.getDescription()),
+                    data.getDescription() == null ? "" : f("description %s", data.getDescription()),
                     data.isEnabled() ? "no shutdown" : "shutdown",
                     "commit",
                     "end");
