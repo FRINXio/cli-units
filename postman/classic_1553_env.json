@@ -277,6 +277,24 @@
       "key": "l2p2p_show_interface3url",
       "value": "GigabitEthernet0%2F2",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_ni-name",
+      "value": "default",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_process-name",
+      "value": "default",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_nonexisting-process-name",
+      "value": "xxx",
+      "type": "text"
     }
   ],
   "timestamp": 1512047209236,

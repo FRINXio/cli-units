@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "ad8385d5-4c98-691e-61dc-5c475ec6f212",
+		"_postman_id": "ce714632-800a-9220-df70-ef49c8becfec",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -1229,7 +1229,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nexit\nrouter bgp {{bgp}}\nbgp router-id {{router}}\naddress-family ipv4 unicast\nexit\naddress-family vpnv4 unicast\nexit\nneighbor {{neighbor}}\nremote-as {{bgp}}\nupdate-source {{test_interface}}\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nrouter bgp {{bgp}}\nbgp router-id {{router}}\naddress-family ipv4 unicast\nexit\naddress-family vpnv4 unicast\nexit\nneighbor {{neighbor}}\nremote-as {{bgp}}\nupdate-source {{test_interface}}\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
 								},
 								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
@@ -1248,6 +1248,8 @@
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
 											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"bgp\")));",
 											"//tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"neighbor\")));",
+											"//tests[\"03. Body matches string2\"] = responseBody.has(String(postman.getEnvironmentVariable(\"router\")));",
+											"//tests[\"04. Body matches string3\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_interface\")));",
 											"",
 											"",
 											""
@@ -1275,7 +1277,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:BGP/default"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						},
@@ -1293,8 +1295,8 @@
 											"// tests[\"Status code is 404\"] = responseCode.code === 404;",
 											"",
 											"",
-											"",
-											"",
+											"//var mystring = \"\\\"name\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_nonexisting-process-name\"))+\"\\\"\";",
+											"//tests[\"Body does not match string\" + mystring] = !responseBody.has(mystring);",
 											"",
 											"",
 											""
@@ -1322,7 +1324,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:BGP/xxx"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_nonexisting-process-name}}"
 							},
 							"response": []
 						},
@@ -2304,6 +2306,281 @@
 						}
 					],
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "XR BGP CRUD",
+					"item": [
+						{
+							"name": "TEARDOWN: Delete previouse bgp configuration",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 404;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP: Configure bgp NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"protocol\": [\n        {\n            \"name\": \"{{bgp_process-name}}\",\n            \"identifier\": \"frinx-openconfig-policy-types:BGP\",\n            \"config\": {\n                \"name\": \"{{bgp_process-name}}\",\n                \"identifier\": \"frinx-openconfig-policy-types:BGP\"\n            },\n            \"bgp\": {\n                \"global\": {\n                    \"config\": {\n                        \"as\": {{bgp_as}}\n                    }\n                },\n                \"neighbors\": {\n                    \"neighbor\": [\n                        {\n                            \"neighbor-address\": \"{{ip1}}\",\n                            \"config\": {\n                                \"neighbor-address\": \"{{ip1}}\",\n                                \"peer-as\": {{bgp_peer-as}},\n                                \"enabled\": true\n                            }\n                        }\n                    ]\n                }\n            }\n        }\n    ]\n}"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show bgp process type/ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"var mystring = \"\\\"neighbor-address\\\":\\\"\" + String (postman.getEnvironmentVariable(\"ip1\"))+\"\\\"\";",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring);",
+											"var mystring = \"\\\"name\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_process-name\"))+\"\\\"\";",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring); ",
+											"var mystring = '\"as\":' + postman.getEnvironmentVariable(\"bgp_as\");",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP: Update bgp process",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"protocol\": [\n        {\n            \"name\": \"{{bgp_process-name}}\",\n            \"identifier\": \"frinx-openconfig-policy-types:BGP\",\n            \"config\": {\n                \"name\": \"{{bgp_process-name}}\",\n                \"identifier\": \"frinx-openconfig-policy-types:BGP\"\n            },\n            \"bgp\": {\n                \"global\": {\n                    \"config\": {\n                        \"as\": {{bgp_as2}}\n                    }\n                },\n                \"neighbors\": {\n                    \"neighbor\": [\n                        {\n                            \"neighbor-address\": \"{{bgp_ip2}}\",\n                            \"config\": {\n                                \"neighbor-address\": \"{{bgp_ip2}}\",\n                                \"peer-as\": {{bgp_peer-as}},\n                                \"enabled\": true\n                            }\n                        }\n                    ]\n                }\n            }\n        }\n    ]\n}"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show updated bgp process type/ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"var mystring = \"\\\"neighbor-address\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_ip2\"))+\"\\\"\";",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring);",
+											"var mystring = \"\\\"name\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_process-name\"))+\"\\\"\";",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring); ",
+											"var mystring = '\"as\":' + postman.getEnvironmentVariable(\"bgp_as2\");",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
+							},
+							"response": []
+						},
+						{
+							"name": "TEARDOWN: Delete bgp NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show deleted bgp process type/ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+											"",
+											"// console.log(\"Response: \" + responseBody)",
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;",
+											"",
+											"//var mystring = \"\\\"name\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_process-name\"))+\"\\\"\";",
+											"//tests[\"Body does not matches string\" + mystring] = !responseBody.has(mystring);",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
 				}
 			]
 		},
@@ -3256,7 +3533,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{test_interface}}\n exit\n router bgp {{bgp}}\n bgp log-neighbor-changes\n no bgp default ipv4-unicast\n neighbor {{neighbor}} remote-as {{bgp}}\n neighbor {{neighbor}} update-source {{test_interface}}\n address-family ipv4\n network {{net3}} mask {{mask}}\n neighbor {{neighbor}} activate\n neighbor {{neighbor}} send-community both\n exit-address-family\nexit\nexit\"\n  }\n}\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n router bgp {{bgp}}\n bgp log-neighbor-changes\n no bgp default ipv4-unicast\n neighbor {{neighbor}} remote-as {{bgp}}\n neighbor {{neighbor}} update-source {{test_interface}}\n address-family ipv4\n network {{net3}} mask {{mask}}\n neighbor {{neighbor}} activate\n neighbor {{neighbor}} send-community both\n exit-address-family\nexit\nexit\"\n  }\n}\n"
 								},
 								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
@@ -3275,6 +3552,8 @@
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
 											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"bgp\")));",
 											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"neighbor\")));",
+											"//tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net3\")));",
+											"//tests[\"04. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_interface\")));",
 											"",
 											"",
 											"",
@@ -3303,7 +3582,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:BGP/default/"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						},
@@ -3321,8 +3600,8 @@
 											"// tests[\"Status code is 404\"] = responseCode.code === 404;",
 											"",
 											"",
-											"",
-											"",
+											"//var mystring = \"\\\"name\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_nonexisting-process-name\"))+\"\\\"\";",
+											"//tests[\"Body does not match string\" + mystring] = !responseBody.has(mystring);",
 											"",
 											"",
 											""
@@ -3350,7 +3629,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:BGP/xxx/"
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_nonexisting-process-name}}"
 							},
 							"response": []
 						},
