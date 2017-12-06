@@ -169,6 +169,48 @@
       "key": "vlan_id",
       "value": "28",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_ni-name",
+      "value": "default",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_process-name",
+      "value": "default",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_as",
+      "value": "1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_peer-as",
+      "value": "65000",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_nonexisting-process-name",
+      "value": "xxx",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_as2",
+      "value": "666",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_ip2",
+      "value": "66.66.66.66",
+      "type": "text"
     }
   ],
   "timestamp": 1508791475317,

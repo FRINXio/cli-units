@@ -217,6 +217,24 @@
       "key": "vlan_id",
       "value": "28",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_ni-name",
+      "value": "default",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_process-name",
+      "value": "default",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_nonexisting-process-name",
+      "value": "xxx",
+      "type": "text"
     }
   ],
   "timestamp": 1508789697427,

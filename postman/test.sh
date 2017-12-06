@@ -23,30 +23,40 @@ do
 done
 
 ### Test for IOS XR
-XR_devices=("xrv_env.json" "asr_env.json")
-XR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "BGP summary" "CDP" "LLDP" "subinterface common" "Unmount")
-ASR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "BGP summary" "Platform" "CDP" "LLDP" "subinterface common" "Unmount")
+XR_devices=("xrv_env.json" "asr_env.json" "xrv5_env.json")
+XR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "BGP summary" "BGP CRUD" "CDP" "LLDP" "subinterface common" "Unmount")
+XR5_folders=("Mount" "BGP CRUD" "Unmount")
+ASR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "BGP summary" "BGP CRUD" "Platform" "CDP" "LLDP" "subinterface common" "Unmount")
 
 for device in ${XR_devices[@]}
 do
    echo Collection running with $device
          if [ "$device" == "xrv_env.json" ]
-         then
+         then 
              for folder in "${XR_folders[@]}"
-             do
+             do   
+                newman run $collection --bail -e $device -n 1 --folder "XR $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing XR $folder FAILED" >> $file; fi
+                sleep 5
+             done
+         fi
+         
+         if [ "$device" == "xrv5_env.json" ]
+         then 
+             for folder in "${XR5_folders[@]}"
+             do   
                 newman run $collection --bail -e $device -n 1 --folder "XR $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing XR $folder FAILED" >> $file; fi
                 sleep 5
              done
          fi
 
          if [ "$device" == "asr_env.json" ]
-         then
+         then 
              for folder in "${ASR_folders[@]}"
-             do
+             do   
                 newman run $collection --bail -e $device -n 1 --folder "XR $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing XR $folder FAILED" >> $file; fi
                 sleep 5
              done
-         fi
+         fi 
 done
 
 ### Test for IOS
@@ -102,3 +112,7 @@ if [ -f $file ] ; then
     cat $file
     rm $file
 fi
+
+## For html and xml ouputs use this:  --reporters html,cli,junit  --reporter-junit-export "/tmp/Environment_${device}_${folder}_results.xml"  --reporter-html-export "/tmp/Environment_${device}_${folder}_results.html"
+## For example:
+##    newman run $collection --reporters html,cli,junit  --reporter-junit-export "/tmp/Environment_${device}_${folder}_results.xml"  --reporter-html-export "/tmp/Environment_${device}_${folder}_results.html" --bail -e $device -n 1 --folder "Classic $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing Classic $folder FAILED" >> $file; fi
