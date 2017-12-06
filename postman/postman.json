@@ -2,7 +2,8 @@
 	"variables": [],
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "6b080bea-fea8-8624-5a84-eb46d4b10567",
+		"_postman_id": "ad8385d5-4c98-691e-61dc-5c475ec6f212",
+		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
@@ -1245,8 +1246,8 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"bgp\")));",
-											"//tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"neighbor\")));",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"bgp\")));",
+											"//tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"neighbor\")));",
 											"",
 											"",
 											""
@@ -1601,9 +1602,9 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ospf\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"router2\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"area\")));",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ospf\")));",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"router2\")));",
+											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"area\")));",
 											""
 										]
 									}
@@ -1736,9 +1737,9 @@
 										"exec": [
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
 											"",
-											"tests[\"Body matches string\"] = responseBody.has(\"Modular Line Card\");",
-											"tests[\"Body matches string\"] = responseBody.has(\"LINECARD\");",
-											"tests[\"Body matches string\"] = responseBody.has(\"module 0/0/CPU0\");"
+											"tests[\"01. Body matches string\"] = responseBody.has(\"Modular Line Card\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(\"LINECARD\");",
+											"tests[\"03. Body matches string\"] = responseBody.has(\"module 0/0/CPU0\");"
 										]
 									}
 								}
@@ -1822,8 +1823,8 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(\"cdp\");",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
+											"tests[\"01. Body matches string\"] = responseBody.has(\"cdp\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
 											""
 										]
 									}
@@ -1984,8 +1985,8 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(\"lldp\");",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
+											"tests[\"01. Body matches string\"] = responseBody.has(\"lldp\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
 											""
 										]
 									}
@@ -2197,9 +2198,9 @@
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
 											"",
-											"tests[\"Body matches string\"] = responseBody.has(\"updated subinterface description\");",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));"
+											"tests[\"01. Body matches string\"] = responseBody.has(\"updated subinterface description\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")));",
+											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));"
 										]
 									}
 								}
@@ -3047,17 +3048,17 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ospf\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"router\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"area\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip41\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"netmask\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ospf2\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip41\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net2\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"area2\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vrf\")));",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ospf\")));",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"router\")));",
+											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net\")));",
+											"tests[\"04. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"area\")));",
+											"tests[\"05. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip41\")));",
+											"tests[\"06. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"netmask\")));",
+											"tests[\"07. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ospf2\")));",
+											"tests[\"08. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip41\")));",
+											"tests[\"09. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net2\")));",
+											"tests[\"10. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"area2\")));",
+											"tests[\"11. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vrf\")));",
 											"",
 											""
 										]
@@ -3272,8 +3273,8 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"bgp\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"neighbor\")));",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"bgp\")));",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"neighbor\")));",
 											"",
 											"",
 											"",
@@ -3446,11 +3447,11 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip-route1\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip-route2\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip2-route1\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip2-route2\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip3-route1\")));",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip-route1\")));",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip-route2\")));",
+											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip2-route1\")));",
+											"tests[\"04. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip2-route2\")));",
+											"tests[\"05. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip3-route1\")));",
 											"",
 											"",
 											"",
@@ -3980,8 +3981,8 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(\"cdp\");",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
+											"tests[\"01. Body matches string\"] = responseBody.has(\"cdp\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
 											""
 										]
 									}
@@ -4147,8 +4148,8 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(\"lldp\");",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
+											"tests[\"01. Body matches string\"] = responseBody.has(\"lldp\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
 											""
 										]
 									}
@@ -4371,9 +4372,9 @@
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
 											"",
-											"tests[\"Body matches string\"] = responseBody.has(\"updated subinterface description\");",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")));",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));"
+											"tests[\"01. Body matches string\"] = responseBody.has(\"updated subinterface description\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")));",
+											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));"
 										]
 									}
 								}
@@ -4474,6 +4475,594 @@
 								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Classic L2P2P",
+					"item": [
+						{
+							"name": "Local Point Without Subif connects Remote Point",
+							"item": [
+								{
+									"name": "SETUP: Xconnect",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n pseudowire-class {{l2p2p_show_networkinstance}}\n  encapsulation mpls\n  exit\n interface {{l2p2p_show_interface2}}\n  xconnect {{l2p2p_show_remoteip}} {{l2p2p_show_remotevccid}} pw-class {{l2p2p_show_networkinstance}}\n   exit\n  exit\n exit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show network instance",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"console.warn(\"// commented lines - output returns insufficient data - MU-124\")",
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"var mystring = \"\\\"remote-system\\\":\\\"\" + String(postman.getEnvironmentVariable(\"l2p2p_show_remoteip\")) + \"\\\"\";",
+													"//tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+													"var mystring = '\"virtual-circuit-identifier\":' + postman.getEnvironmentVariable(\"l2p2p_show_remotevccid\");",
+													"//tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+													"var mystring = '\"name\":\"' + postman.getEnvironmentVariable(\"l2p2p_show_networkinstance\") + \"\\\"\";",
+													"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete xconnect",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{l2p2p_show_interface2}}\nno xconnect\nexit\nno pseudowire-class {{l2p2p_show_networkinstance}}\nexit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted network instance",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.warn(\"// FIXME this returns data instead of returning 404 for non existing network instance\")",
+													"",
+													"// console.log(\"Response: \" + responseBody)",
+													"// tests[\"Status code is 404\"] = responseCode.code === 404;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Local Point With Subif connects Remote Point",
+							"item": [
+								{
+									"name": "TEARDOWN: Delete subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface1url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Xconnect",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{l2p2p_show_interface2}}.{{l2p2p_show_sub_interface_index}}\nencapsulation dot1Q {{l2p2p_show_sub_interface_index}}\nxconnect {{l2p2p_show_remoteip}} {{l2p2p_show_remotevccid}} encapsulation mpls\nexit\nexit\nexit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show network instance",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"",
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"var mystring = \"\\\"name\\\":\\\"\" + String(postman.getEnvironmentVariable(\"l2p2p_show_interface2\")) + \".\" + String(postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")) + \" xconnect \" + String(postman.getEnvironmentVariable(\"l2p2p_show_remoteip\"));",
+													"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+													"var mystring = \"\\\"remote-system\\\":\\\"\" + String(postman.getEnvironmentVariable(\"l2p2p_show_remoteip\")) + \"\\\"\";",
+													"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+													"var mystring = '\"virtual-circuit-identifier\":' + postman.getEnvironmentVariable(\"l2p2p_show_remotevccid\");",
+													"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+													" ",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete xconnect",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{l2p2p_show_interface2}}.{{l2p2p_show_sub_interface_index}}\nno xconnect\nno encapsulation dot1Q\nexit\nno interface {{l2p2p_show_interface2}}.{{l2p2p_show_sub_interface_index}}\nexit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted xconnect",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"",
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"var mystring = \"\\\"name\\\":\\\"\" + String(postman.getEnvironmentVariable(\"l2p2p_show_interface2\")) + \".\" + String(postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")) + \" xconnect \" + String(postman.getEnvironmentVariable(\"l2p2p_show_remoteip\"));",
+													"tests[\"Body does not match string \" + mystring] = !responseBody.has(mystring);",
+													"var mystring = \"\\\"remote-system\\\":\\\"\" + String(postman.getEnvironmentVariable(\"l2p2p_show_remoteip\")) + \"\\\"\";",
+													"tests[\"Body does not match string \" + mystring] = !responseBody.has(mystring);",
+													"var mystring = '\"virtual-circuit-identifier\":' + postman.getEnvironmentVariable(\"l2p2p_show_remotevccid\");",
+													"tests[\"Body does not match string \" + mystring] = !responseBody.has(mystring);",
+													" ",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Local Point Without Subif connects Local Point With Subif",
+							"item": [
+								{
+									"name": "TEARDOWN: Delete subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Xconnect",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\nencapsulation dot1Q {{l2p2p_show_sub_interface_index}}\nexit\nconnect {{l2p2p_show_networkinstance}} {{l2p2p_show_interface2}} {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}} interworking ethernet\nexit\nexit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show network instance",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"",
+													"tests[\"Status code is 200\"] = responseCode.code === 200;",
+													"var mystring = '\"name\":\"' + postman.getEnvironmentVariable(\"l2p2p_show_networkinstance\") + '\"';",
+													"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+													"var mystring = '\"interface\":\"' + postman.getEnvironmentVariable(\"l2p2p_show_interface2\") + '\"';",
+													"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+													"var mystring = '\"interface\":\"' + postman.getEnvironmentVariable(\"l2p2p_show_interface3\") + '\"';",
+													"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+													"var mystring = '\"subinterface\":' + postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\") + '';",
+													"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete xconnect",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno connect {{l2p2p_show_networkinstance}}\nno interface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\nexit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted network instance",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.warn(\"// FIXME this returns data instead of returning 404 for non existing network instance\")",
+													"",
+													"// console.log(\"Response: \" + responseBody)",
+													"// tests[\"Status code is 404\"] = responseCode.code === 404;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
 						}
 					],
 					"_postman_isSubFolder": true
