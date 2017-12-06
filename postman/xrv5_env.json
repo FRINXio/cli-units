@@ -133,6 +133,42 @@
       "key": "bgp_ip2",
       "value": "66.66.66.66",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "attempts_3x",
+      "value": "3",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "rsvp_ni_name",
+      "value": "default",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "rsvp_url_intf-id",
+      "value": "GigabitEthernet0%2F0%2F0%2F1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "rsvp_intf-id",
+      "value": "GigabitEthernet0/0/0/1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "rsvp_bandwidth_create",
+      "value": "100",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "rsvp_bandwidth_update",
+      "value": "200",
+      "type": "text"
     }
   ],
   "timestamp": 1512145127341,
