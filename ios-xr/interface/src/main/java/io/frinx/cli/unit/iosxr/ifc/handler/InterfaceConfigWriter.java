@@ -65,17 +65,27 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     private void writeInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.CreateFailedException {
 
-        validateIfcNameAgainstType(data);
+        validateIfcConfiguration(data);
 
         blockingWriteAndRead(cli, id, data,
                 "configure terminal",
                 f("interface %s", data.getName()),
+                data.getMtu() == null ? "" : f("mtu %s", data.getMtu()),
                 f("description %s", data.getDescription()),
                 data.isEnabled() ? "no shutdown" : "shutdown",
                 "commit",
                 "end");
     }
 
+    private static void validateIfcConfiguration(Config data) {
+        validateIfcNameAgainstType(data);
+
+        if (data.getType() == SoftwareLoopback.class) {
+            checkArgument(data.getMtu() == null,
+                    "Cannot configure mtu for interface %s of type SoftwareLoopback",
+                    data.getName());
+        }
+    }
 
     private static final Pattern LOOPBACK_NAME_PATTERN = Pattern.compile("Loopback(?<number>[0-9]+)");
     private static final Pattern LAG_IFC_NAME_PATTERN = Pattern.compile("Bundle-Ether(?<number>\\d+)");
