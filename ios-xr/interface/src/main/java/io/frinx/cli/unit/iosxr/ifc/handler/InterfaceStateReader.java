@@ -57,7 +57,7 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
     public static final String SH_SINGLE_INTERFACE = "sh inter %s";
 
     public static final Pattern STATUS_LINE =
-            Pattern.compile("(?<id>.+)[.\\s]* (?<admin>up|down).*, line protocol is.* (?<line>up|down).*");
+            Pattern.compile("(?<id>.+) is.* (?<admin>up|down).*, line protocol is.* (?<line>up|down).*");
     public static final Pattern MTU_LINE = Pattern.compile("\\s*MTU (?<mtu>.+) bytes.*$");
     public static final Pattern DESCR_LINE = Pattern.compile("\\s*Description: (?<desc>.+)");
 

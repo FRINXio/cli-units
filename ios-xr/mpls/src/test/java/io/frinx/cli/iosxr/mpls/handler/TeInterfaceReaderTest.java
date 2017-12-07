@@ -6,10 +6,9 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.iosxr.mpls;
+package io.frinx.cli.iosxr.mpls.handler;
 
 import com.google.common.collect.Lists;
-import io.frinx.cli.iosxr.mpls.handler.TeInterfaceReader;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;

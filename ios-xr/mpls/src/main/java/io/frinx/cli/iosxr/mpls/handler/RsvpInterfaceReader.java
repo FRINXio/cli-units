@@ -9,10 +9,12 @@
 package io.frinx.cli.iosxr.mpls.handler;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.mpls.MplsListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te.InterfaceAttributesBuilder;
@@ -40,17 +42,43 @@ public class RsvpInterfaceReader implements MplsListReader.MplsConfigListReader<
 
 
     @Override
-    public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+                                               @Nonnull ReadContext readContext) throws ReadFailedException {
         String output = blockingRead(SH_RSVP_INT, cli, instanceIdentifier, readContext);
-        return getInterfaceKeys(output);
+
+        // Interfaces' names can be abbreviated in the output of
+        // 'show rsvp interface' command. We have to map them to
+        // their non-abbreviated names..
+        List<InterfaceKey> shortKeys = getShortInterfaceKeys(output);
+
+        List<InterfaceKey> longKeys = Lists.newArrayList();
+        for (InterfaceKey shortKey : shortKeys) {
+            String shIfcOutput = blockingRead(
+                    String.format(InterfaceStateReader.SH_SINGLE_INTERFACE, shortKey.getInterfaceId().getValue()),
+                    cli, instanceIdentifier, readContext);
+
+            longKeys.add(getLongKey(shIfcOutput));
+        }
+
+        return longKeys;
     }
 
     @VisibleForTesting
-    public static List<InterfaceKey> getInterfaceKeys(String output) {
+    static List<InterfaceKey> getShortInterfaceKeys(String output) {
         return ParsingUtils.parseFields(output.replaceAll("\\h+", " "), 0,
             IFACE_LINE::matcher,
             matcher -> matcher.group("name"),
             v -> new InterfaceKey(new InterfaceId(v)));
+    }
+
+    @VisibleForTesting
+    static InterfaceKey getLongKey(String output) {
+        return ParsingUtils.parseFields(output, 0,
+                InterfaceStateReader.STATUS_LINE::matcher,
+                matcher -> matcher.group("id"),
+                longIfcName -> new InterfaceKey(new InterfaceId(longIfcName)))
+                // TODO we should check if the stream is actually non-empty
+                .stream().findFirst().get();
     }
 
     @Override

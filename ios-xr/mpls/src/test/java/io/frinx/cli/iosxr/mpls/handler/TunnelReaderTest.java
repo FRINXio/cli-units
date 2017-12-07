@@ -6,12 +6,9 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.iosxr.mpls;
+package io.frinx.cli.iosxr.mpls.handler;
 
 import com.google.common.collect.Lists;
-import io.frinx.cli.iosxr.mpls.handler.LoadShareConfigReader;
-import io.frinx.cli.iosxr.mpls.handler.TunnelConfigReader;
-import io.frinx.cli.iosxr.mpls.handler.TunnelReader;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.TunnelKey;
