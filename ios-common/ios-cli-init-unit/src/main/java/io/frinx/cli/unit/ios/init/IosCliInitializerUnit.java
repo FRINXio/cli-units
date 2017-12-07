@@ -130,6 +130,7 @@ public class IosCliInitializerUnit  implements TranslateUnit {
         private static final String PRIVILEGED_PROMPT_SUFFIX = "#";
         private static final String ENABLE_COMMAND = "enable";
         private static final String SET_TERMINAL_LENGTH_COMMAND = "terminal length 0";
+        private static final String SET_TERMINAL_WIDTH_COMMAND = "terminal width 0";
         private static final int WRITE_TIMEOUT_SECONDS = 10;
         private static final int READ_TIMEOUT_SECONDS = 1;
 
@@ -148,6 +149,11 @@ public class IosCliInitializerUnit  implements TranslateUnit {
                 // Set terminal length to 0 to prevent "--More--" situation
                 LOG.debug("{}: Setting terminal length to 0 to prevent \"--More--\" situation", id);
                 write(session, newline, SET_TERMINAL_LENGTH_COMMAND);
+                session.readUntilTimeout(READ_TIMEOUT_SECONDS);
+
+                // Set terminal width to 0 to prevent command shortening
+                LOG.debug("{}: Setting terminal width to 0", id);
+                write(session, newline, SET_TERMINAL_WIDTH_COMMAND);
                 session.readUntilTimeout(READ_TIMEOUT_SECONDS);
 
                 // If already in privileged mode, don't do anything else
