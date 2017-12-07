@@ -2,14 +2,13 @@
 	"variables": [],
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "35554bdd-8e5b-c804-6caa-da0e18d4ee90",
+		"_postman_id": "39be2c48-deea-9322-1983-8cf26603c212",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Linux",
-			"description": "",
 			"item": [
 				{
 					"name": "Mount",
@@ -26,7 +25,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
 						"method": "PUT",
 						"header": [
 							{
@@ -46,7 +44,7 @@
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"Linux1\",\n      \n      \"cli-topology:host\" : \"{{linux_ip}}\",\n      \"cli-topology:port\" : \"{{linux_port}}\",\n      \"cli-topology:transport-type\" : \"{{linux_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"*\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{linux_username}}\",\n      \"cli-topology:password\" : \"{{linux_password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \n      \"cli-topology:keepalive-delay\": 55,\n      \"cli-topology:keepalive-initial-delay\": 55,\n      \"cli-topology:keepalive-timeout\": 120\n\n    }\n  }"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1"
 					},
 					"response": []
 				},
@@ -98,7 +96,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/Linux1",
 						"method": "GET",
 						"header": [
 							{
@@ -118,7 +115,7 @@
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/Linux1"
 					},
 					"response": []
 				},
@@ -138,7 +135,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/Linux1/yang-ext:mount/cli-unit-generic:execute-and-read",
 						"method": "POST",
 						"header": [
 							{
@@ -158,7 +154,7 @@
 							"mode": "raw",
 							"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"ls ~\"\n  }\n}"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/Linux1/yang-ext:mount/cli-unit-generic:execute-and-read"
 					},
 					"response": []
 				},
@@ -176,7 +172,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1",
 						"method": "DELETE",
 						"header": [
 							{
@@ -196,7 +191,7 @@
 							"mode": "raw",
 							"raw": ""
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/Linux1"
 					},
 					"response": []
 				},
@@ -225,7 +220,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "GET",
 						"header": [
 							{
@@ -245,7 +239,7 @@
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS"
 					},
 					"response": []
 				}
@@ -253,11 +247,9 @@
 		},
 		{
 			"name": "IOS XR",
-			"description": "",
 			"item": [
 				{
 					"name": "XR General information",
-					"description": "",
 					"item": [
 						{
 							"name": "show all",
@@ -275,7 +267,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/",
 								"method": "GET",
 								"header": [
 									{
@@ -295,7 +286,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/"
 							},
 							"response": []
 						},
@@ -318,7 +309,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/",
 								"method": "GET",
 								"header": [
 									{
@@ -338,7 +328,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/"
 							},
 							"response": []
 						}
@@ -347,7 +337,6 @@
 				},
 				{
 					"name": "XR Mount",
-					"description": "",
 					"item": [
 						{
 							"name": "Mount IOS XR netconf",
@@ -363,7 +352,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN",
 								"method": "PUT",
 								"header": [
 									{
@@ -383,7 +371,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"node\": [\n    {\n      \"node-id\": \"IOSXRN\",\n      \"netconf-node-topology:host\": \"{{xr_ip}}\",\n      \"netconf-node-topology:port\": {{netconf_port}},\n      \"netconf-node-topology:keepalive-delay\": 0,\n      \"netconf-node-topology:tcp-only\": false,\n      \"netconf-node-topology:username\": \"{{username}}\",\n      \"netconf-node-topology:password\": \"{{password}}\"\n    }\n  ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN"
 							},
 							"response": []
 						},
@@ -435,7 +423,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/IOSXRN",
 								"method": "GET",
 								"header": [
 									{
@@ -455,7 +442,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/IOSXRN"
 							},
 							"response": []
 						},
@@ -473,7 +460,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR",
 								"method": "PUT",
 								"header": [
 									{
@@ -493,7 +479,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOSXR\",\n      \n      \"cli-topology:host\" : \"{{xr_ip}}\",\n      \"cli-topology:port\" : \"{{topology_port}}\",\n      \"cli-topology:transport-type\" : \"{{protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios xr\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{username}}\",\n      \"cli-topology:password\" : \"{{password}}\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR"
 							},
 							"response": []
 						},
@@ -545,7 +531,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR",
 								"method": "GET",
 								"header": [
 									{
@@ -565,7 +550,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR"
 							},
 							"response": []
 						}
@@ -574,7 +559,6 @@
 				},
 				{
 					"name": "XR Interface",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Create Loopback NATIVE",
@@ -590,7 +574,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -606,7 +589,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"interface-configuration\": [\n        {\n            \"active\": \"act\",\n            \"interface-name\": \"{{test_interface}}\",\n            \"interface-virtual\": [\n                null\n            ],\n            \"shutdown\": [\n                null\n            ]\n        }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -628,7 +611,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/",
 								"method": "GET",
 								"header": [
 									{
@@ -648,7 +630,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/"
 							},
 							"response": []
 						},
@@ -670,7 +652,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -690,7 +671,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -708,7 +689,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -724,7 +704,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -745,7 +725,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -765,7 +744,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -774,7 +753,6 @@
 				},
 				{
 					"name": "XR Interface IP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Create Loopback NATIVE",
@@ -790,7 +768,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -806,7 +783,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"interface-configuration\": [\n        {\n            \"active\": \"act\",\n            \"interface-name\": \"{{test_interface}}\",\n            \"interface-virtual\": [\n                null\n            ],\n            \"shutdown\": [\n                null\n            ]\n        }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -826,7 +803,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
@@ -846,7 +822,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -864,7 +840,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}/Cisco-IOS-XR-ipv4-io-cfg:ipv4-network",
 								"method": "PUT",
 								"header": [
 									{
@@ -880,7 +855,7 @@
 									"mode": "raw",
 									"raw": "{\n\t\"ipv4-network\": {\n        \"addresses\": {\n            \"primary\": {\n                \"netmask\": \"255.255.255.0\",\n                \"address\": \"{{ip1}}\"\n            }\n        }\n    }\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}/Cisco-IOS-XR-ipv4-io-cfg:ipv4-network"
 							},
 							"response": []
 						},
@@ -901,7 +876,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
@@ -921,7 +895,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -942,7 +916,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/{{ip1}}",
 								"method": "GET",
 								"header": [
 									{
@@ -962,7 +935,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/{{ip1}}"
 							},
 							"response": []
 						},
@@ -983,7 +956,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/255.255.255.255",
 								"method": "GET",
 								"header": [
 									{
@@ -1003,7 +975,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/255.255.255.255"
 							},
 							"response": []
 						},
@@ -1021,7 +993,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -1037,7 +1008,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN/yang-ext:mount/Cisco-IOS-XR-ifmgr-cfg:interface-configurations/interface-configuration/act/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -1046,7 +1017,6 @@
 				},
 				{
 					"name": "XR Unmount",
-					"description": "",
 					"item": [
 						{
 							"name": "DELETE IOS XR",
@@ -1062,7 +1032,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN",
 								"method": "DELETE",
 								"header": [
 									{
@@ -1082,7 +1051,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/IOSXRN"
 							},
 							"response": []
 						},
@@ -1111,7 +1080,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/IOSXRN",
 								"method": "GET",
 								"header": [
 									{
@@ -1131,7 +1099,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/node/IOSXRN"
 							},
 							"response": []
 						},
@@ -1149,7 +1117,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR",
 								"method": "DELETE",
 								"header": [
 									{
@@ -1169,7 +1136,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR"
 							},
 							"response": []
 						},
@@ -1198,7 +1165,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR",
 								"method": "GET",
 								"header": [
 									{
@@ -1218,7 +1184,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR"
 							},
 							"response": []
 						}
@@ -1227,7 +1193,6 @@
 				},
 				{
 					"name": "XR BGP summary",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure bgp NATIVE",
@@ -1246,7 +1211,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -1267,7 +1231,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nrouter bgp {{bgp}}\nbgp router-id {{router}}\naddress-family ipv4 unicast\nexit\naddress-family vpnv4 unicast\nexit\nneighbor {{neighbor}}\nremote-as {{bgp}}\nupdate-source {{test_interface}}\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -1294,7 +1258,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}",
 								"method": "GET",
 								"header": [
 									{
@@ -1314,7 +1277,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						},
@@ -1342,7 +1305,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_nonexisting-process-name}}",
 								"method": "GET",
 								"header": [
 									{
@@ -1362,7 +1324,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_nonexisting-process-name}}"
 							},
 							"response": []
 						},
@@ -1381,7 +1343,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -1401,7 +1362,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router bgp {{bgp}}\nno interface {{test_interface}}\ncommit\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -1410,7 +1371,6 @@
 				},
 				{
 					"name": "XR static route",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure static route NATIVE",
@@ -1429,7 +1389,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -1450,7 +1409,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nrouter static\naddress-family ipv4 unicast\n{{ip-route}} {{ip-route2}}\n{{ip-route}} GigabitEthernet0/0/0/1 {{ip-route3}} metric 2\nexit\naddress-family ipv6 unicast\n{{ip61}} GigabitEthernet0/0/0/1 {{ip62}}\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -1477,7 +1436,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/default",
 								"method": "GET",
 								"header": [
 									{
@@ -1497,7 +1455,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/default"
 							},
 							"response": []
 						},
@@ -1524,7 +1482,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/xxx",
 								"method": "GET",
 								"header": [
 									{
@@ -1544,7 +1501,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/xxx"
 							},
 							"response": []
 						},
@@ -1565,7 +1522,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -1586,7 +1542,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router static\ncommit\nexit\"\n  }\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -1595,7 +1551,6 @@
 				},
 				{
 					"name": "XR ospf",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure ospf NATIVE",
@@ -1614,7 +1569,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -1635,7 +1589,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nexit\nrouter ospf {{ospf}}\nrouter-id {{router2}}\naddress-family ipv4\narea {{area}}\ninterface {{test_interface}}\nexit\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -1659,7 +1613,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf}}",
 								"method": "GET",
 								"header": [
 									{
@@ -1679,7 +1632,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf}}"
 							},
 							"response": []
 						},
@@ -1706,7 +1659,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/666",
 								"method": "GET",
 								"header": [
 									{
@@ -1726,7 +1678,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/666"
 							},
 							"response": []
 						},
@@ -1747,7 +1699,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -1768,7 +1719,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router ospf {{ospf}}\nno interface {{test_interface}}\ncommit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -1777,7 +1728,6 @@
 				},
 				{
 					"name": "XR Platform",
-					"description": "",
 					"item": [
 						{
 							"name": "show inventory",
@@ -1797,7 +1747,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-platform:components",
 								"method": "GET",
 								"header": [
 									{
@@ -1817,7 +1766,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-platform:components"
 							},
 							"response": []
 						}
@@ -1826,7 +1775,6 @@
 				},
 				{
 					"name": "XR CDP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure CDP NATIVE",
@@ -1843,7 +1791,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -1863,7 +1810,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n cdp\n interface {{cdp_lldp_test_interface}}\n cdp\n commit\n exit\nexit\"\n  }\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -1886,7 +1833,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-cdp:cdp",
 								"method": "GET",
 								"header": [
 									{
@@ -1906,7 +1852,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-cdp:cdp"
 							},
 							"response": []
 						},
@@ -1925,7 +1871,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -1945,7 +1890,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n no cdp\n commit\n exit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -1964,7 +1909,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-cdp:cdp",
 								"method": "GET",
 								"header": [
 									{
@@ -1984,7 +1928,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-cdp:cdp"
 							},
 							"response": []
 						}
@@ -1993,7 +1937,6 @@
 				},
 				{
 					"name": "XR LLDP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure LLDP NATIVE",
@@ -2010,7 +1953,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -2030,7 +1972,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n lldp\n commit\n exit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -2053,7 +1995,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
@@ -2073,7 +2014,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-lldp:lldp"
 							},
 							"response": []
 						},
@@ -2092,7 +2033,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -2112,7 +2052,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no lldp\n commit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -2131,7 +2071,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
@@ -2151,7 +2090,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-lldp:lldp"
 							},
 							"response": []
 						}
@@ -2160,12 +2099,10 @@
 				},
 				{
 					"name": "XR subinterface common",
-					"description": "",
 					"item": [
 						{
 							"name": "TEARDOWN: Delete subinterface",
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -2181,7 +2118,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -2199,7 +2136,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -2215,7 +2151,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"subinterface\": \n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"description\": \"testing subinterface\"\n            }\n           \n        }\n    \n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -2233,7 +2169,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -2249,7 +2184,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"enabled\": true,\n                \"description\": \"updated subinterface description\"\n            },\n            \n            \"frinx-openconfig-vlan:vlan\": {\n                \"config\": {\n                \t\"vlan-id\": {{vlan_id}}\n                }\n            }\n\n        }\n    ]\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -2273,7 +2208,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "GET",
 								"header": [
 									{
@@ -2293,7 +2227,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -2311,7 +2245,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -2327,7 +2260,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -2348,7 +2281,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "GET",
 								"header": [
 									{
@@ -2368,7 +2300,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXRN/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						}
@@ -2377,7 +2309,6 @@
 				},
 				{
 					"name": "XR BGP CRUD",
-					"description": "",
 					"item": [
 						{
 							"name": "TEARDOWN: Delete previouse bgp configuration",
@@ -2393,7 +2324,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -2409,7 +2339,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						},
@@ -2427,7 +2357,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -2443,7 +2372,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"protocol\": [\n        {\n            \"name\": \"{{bgp_process-name}}\",\n            \"identifier\": \"frinx-openconfig-policy-types:BGP\",\n            \"config\": {\n                \"name\": \"{{bgp_process-name}}\",\n                \"identifier\": \"frinx-openconfig-policy-types:BGP\"\n            },\n            \"bgp\": {\n                \"global\": {\n                    \"config\": {\n                        \"as\": {{bgp_as}}\n                    }\n                },\n                \"neighbors\": {\n                    \"neighbor\": [\n                        {\n                            \"neighbor-address\": \"{{ip1}}\",\n                            \"config\": {\n                                \"neighbor-address\": \"{{ip1}}\",\n                                \"peer-as\": {{bgp_peer-as}},\n                                \"enabled\": true\n                            }\n                        }\n                    ]\n                }\n            }\n        }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						},
@@ -2470,7 +2399,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}",
 								"method": "GET",
 								"header": [
 									{
@@ -2490,7 +2418,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						},
@@ -2508,7 +2436,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -2524,7 +2451,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"protocol\": [\n        {\n            \"name\": \"{{bgp_process-name}}\",\n            \"identifier\": \"frinx-openconfig-policy-types:BGP\",\n            \"config\": {\n                \"name\": \"{{bgp_process-name}}\",\n                \"identifier\": \"frinx-openconfig-policy-types:BGP\"\n            },\n            \"bgp\": {\n                \"global\": {\n                    \"config\": {\n                        \"as\": {{bgp_as2}}\n                    }\n                },\n                \"neighbors\": {\n                    \"neighbor\": [\n                        {\n                            \"neighbor-address\": \"{{bgp_ip2}}\",\n                            \"config\": {\n                                \"neighbor-address\": \"{{bgp_ip2}}\",\n                                \"peer-as\": {{bgp_peer-as}},\n                                \"enabled\": true\n                            }\n                        }\n                    ]\n                }\n            }\n        }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						},
@@ -2551,7 +2478,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}",
 								"method": "GET",
 								"header": [
 									{
@@ -2571,7 +2497,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						},
@@ -2589,7 +2515,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -2605,7 +2530,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						},
@@ -2631,7 +2556,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}",
 								"method": "GET",
 								"header": [
 									{
@@ -2651,7 +2575,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						}
@@ -2660,7 +2584,6 @@
 				},
 				{
 					"name": "XR RSVP CRUD",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Delete rsvp",
@@ -2686,25 +2609,22 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}",
 								"method": "DELETE",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}"
 							},
 							"response": []
 						},
@@ -2733,30 +2653,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}",
 								"method": "PUT",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"interface\": [\n         {\n             \"interface-id\": \"{{rsvp_intf-id}}\",\n             \"config\": {\n                 \"interface-id\": \"{{rsvp_intf-id}}\"\n             },\n             \"subscription\": {\n                \"config\": {\n                    \"frinx-mpls-rsvp-extension:bandwidth\": {{rsvp_bandwidth_create}}\n                }\n             }\n         }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}"
 							},
 							"response": []
 						},
@@ -2811,25 +2727,22 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}"
 							},
 							"response": []
 						},
@@ -2858,30 +2771,26 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}",
 								"method": "PUT",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									},
 									{
 										"key": "Content-Type",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"interface\": [\n         {\n             \"interface-id\": \"{{rsvp_intf-id}}\",\n             \"config\": {\n                 \"interface-id\": \"{{rsvp_intf-id}}\"\n             },\n             \"subscription\": {\n                \"config\": {\n                    \"frinx-mpls-rsvp-extension:bandwidth\": {{rsvp_bandwidth_update}}\n                }\n             }\n         }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}"
 							},
 							"response": []
 						},
@@ -2936,25 +2845,22 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}"
 							},
 							"response": []
 						},
@@ -2982,25 +2888,22 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}",
 								"method": "DELETE",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}"
 							},
 							"response": []
 						},
@@ -3030,25 +2933,22 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}",
 								"method": "GET",
 								"header": [
 									{
 										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4=",
-										"description": ""
+										"value": "Basic YWRtaW46YWRtaW4="
 									},
 									{
 										"key": "Accept",
-										"value": "application/json",
-										"description": ""
+										"value": "application/json"
 									}
 								],
 								"body": {
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{rsvp_ni_name}}/mpls/signaling-protocols/rsvp-te/interface-attributes/interface/{{rsvp_url_intf-id}}"
 							},
 							"response": []
 						}
@@ -3057,11 +2957,9 @@
 				},
 				{
 					"name": "XR MPLS CRUD",
-					"description": "",
 					"item": [
 						{
 							"name": "Mpls-te",
-							"description": "",
 							"item": [
 								{
 									"name": "SETUP: Delete mpls-te",
@@ -3087,25 +2985,22 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/te-interface-attributes/interface/{{mpls_url_intf_id}}",
 										"method": "DELETE",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/te-interface-attributes/interface/{{mpls_url_intf_id}}"
 									},
 									"response": []
 								},
@@ -3134,30 +3029,26 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/te-interface-attributes/interface/{{mpls_url_intf_id}}",
 										"method": "PUT",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											},
 											{
 												"key": "Content-Type",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"interface\": [\n        {\n            \"interface-id\": \"{{mpls_intf_id}}\",\n            \"config\": {\n                \"interface-id\": \"{{mpls_intf_id}}\"\n            }\n        }\n    ]\n}"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/te-interface-attributes/interface/{{mpls_url_intf_id}}"
 									},
 									"response": []
 								},
@@ -3211,25 +3102,22 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/te-interface-attributes/interface/{{mpls_url_intf_id}}",
 										"method": "GET",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/te-interface-attributes/interface/{{mpls_url_intf_id}}"
 									},
 									"response": []
 								},
@@ -3257,25 +3145,22 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/te-interface-attributes/interface/{{mpls_url_intf_id}}",
 										"method": "DELETE",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/te-interface-attributes/interface/{{mpls_url_intf_id}}"
 									},
 									"response": []
 								},
@@ -3305,25 +3190,22 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/te-interface-attributes/interface/{{mpls_url_intf_id}}",
 										"method": "GET",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/te-interface-attributes/interface/{{mpls_url_intf_id}}"
 									},
 									"response": []
 								}
@@ -3332,7 +3214,6 @@
 						},
 						{
 							"name": "Mpls tunnel",
-							"description": "",
 							"item": [
 								{
 									"name": "SETUP: Delete tunnel",
@@ -3358,25 +3239,22 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}",
 										"method": "DELETE",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}"
 									},
 									"response": []
 								},
@@ -3405,30 +3283,26 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}",
 										"method": "PUT",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											},
 											{
 												"key": "Content-Type",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"tunnel\": [\n         {\n             \"name\": \"{{mpls_tunnel_id}}\",\n             \"config\": {\n                 \"name\": \"{{mpls_tunnel_id}}\",\n                 \"shortcut-eligible\": {{mpls_elig_true}},\n                 \"metric-type\": \"frinx-openconfig-mpls-types:LSP_METRIC_ABSOLUTE\",\n                 \"metric\": {{mpls_metric_100}}\n             }\n         }\n    ]\n}"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}"
 									},
 									"response": []
 								},
@@ -3484,25 +3358,22 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}",
 										"method": "GET",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}"
 									},
 									"response": []
 								},
@@ -3531,30 +3402,26 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}",
 										"method": "PUT",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											},
 											{
 												"key": "Content-Type",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"tunnel\": [\n         {\n             \"name\": \"{{mpls_tunnel_id}}\",\n             \"config\": {\n                 \"name\": \"{{mpls_tunnel_id}}\",\n                 \"shortcut-eligible\": {{mpls_elig_true}},\n                 \"metric-type\": \"frinx-openconfig-mpls-types:LSP_METRIC_ABSOLUTE\",\n                 \"metric\": {{mpls_metric_200}}\n             }\n         }\n    ]\n}"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}"
 									},
 									"response": []
 								},
@@ -3610,30 +3477,26 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}",
 										"method": "GET",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											},
 											{
 												"key": "Content-Type",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}"
 									},
 									"response": []
 								},
@@ -3663,30 +3526,26 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}",
 										"method": "PUT",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											},
 											{
 												"key": "Content-Type",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"tunnel\": [\n         {\n             \"name\": \"{{mpls_tunnel_id}}\",\n             \"config\": {\n                 \"name\": \"{{mpls_tunnel_id}}\",\n                 \"shortcut-eligible\": {{mpls_elig_false}},\n                 \"metric-type\": \"frinx-openconfig-mpls-types:LSP_METRIC_ABSOLUTE\",\n                 \"metric\": {{mpls_metric_200}}\n             }\n         }\n    ]\n}"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}"
 									},
 									"response": []
 								},
@@ -3714,25 +3573,22 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}",
 										"method": "DELETE",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}"
 									},
 									"response": []
 								},
@@ -3762,25 +3618,22 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}",
 										"method": "GET",
 										"header": [
 											{
 												"key": "Authorization",
-												"value": "Basic YWRtaW46YWRtaW4=",
-												"description": ""
+												"value": "Basic YWRtaW46YWRtaW4="
 											},
 											{
 												"key": "Accept",
-												"value": "application/json",
-												"description": ""
+												"value": "application/json"
 											}
 										],
 										"body": {
 											"mode": "raw",
 											"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{mpls_ni_name}}/mpls/lsps/constrained-path/tunnels/tunnel/{{mpls_tunnel_id}}"
 									},
 									"response": []
 								}
@@ -3789,34 +3642,103 @@
 						}
 					],
 					"_postman_isSubFolder": true
-				}
-			]
-		},
-		{
-			"name": "IOS Classic",
-			"description": "",
-			"item": [
+				},
 				{
-					"name": "Classic General information",
-					"description": "",
+					"name": "XR OSPF CRUD",
 					"item": [
 						{
-							"name": "show all",
+							"name": "TEARDOWN: Delete previouse ospf configuration",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
 										"type": "text/javascript",
 										"exec": [
-											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"",
-											""
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 404;"
 										]
 									}
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/",
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{ospf_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf}}"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP: Configure ospf NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"protocol\": [\n        {\n            \"name\": {{ospf}},\n            \"identifier\": \"frinx-openconfig-policy-types:OSPF\",\n            \"config\": {\n                \"name\": {{ospf}},\n                \"identifier\": \"frinx-openconfig-policy-types:OSPF\"\n            },\n            \"ospfv2\": {\n                \"global\": {\n                    \"timers\": {\n                        \"max-metric\": {\n                            \"config\": {\n                                \"set\": true,\n                                \"timeout\": {{ospf_timeout}},\n                                \"include\": [ \n                                    \"frinx-openconfig-ospf-types:MAX_METRIC_INCLUDE_STUB\", \n                                    \"frinx-openconfig-ospf-types:MAX_METRIC_INCLUDE_TYPE2_EXTERNAL\",\n                                    \"frinx-openconfig-ospf-types:MAX_METRIC_INCLUDE\",\n                                    \"frinx-cisco-ospf-extension:MAX_METRIC_SUMMARY_LSA\"\n                                    \n                                ]\n                            }\n                        }\n                    }\n                },\n                \"areas\": {\n                    \"area\": [\n                        {\n                            \"identifier\":{{ospf_area_id}},\n                            \"config\": {\n                                \"identifier\": {{ospf_area_id}}\n                            },\n                            \"interfaces\": {\n                                \"interface\": [\n                                    {\n                                        \"id\": \"{{test_interface}}\",\n                                        \"config\": {\n                                            \"metric\": {{ospf_cost}}\n                                        },\n                                        \"interface-ref\": {\n                                            \"config\": {\n                                                \"interface\": \"{{test_interface}}\"\n                                            }\n                                        }\n                                    }\n                                ]\n                            }\n                        }\n                    ]\n                }\n            }\n        }\n    ]\n}"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{ospf_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show ospf process",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"var mystring = \"\\\"name\\\":\\\"\" + String (postman.getEnvironmentVariable(\"ospf\"))+\"\\\"\";",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring);",
+											"var mystring = \"\\\"timeout\\\":\" + String (postman.getEnvironmentVariable(\"ospf_timeout\"));",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring); ",
+											"var mystring = '\"identifier\":' + postman.getEnvironmentVariable(\"ospf_area_id\");",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+											"var mystring = '\"id\":\"' + postman.getEnvironmentVariable(\"test_interface\")+\"\\\"\";",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+											"var mystring = '\"metric\":' + postman.getEnvironmentVariable(\"ospf_cost\");",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);"
+										]
+									}
+								}
+							],
+							"request": {
 								"method": "GET",
 								"header": [
 									{
@@ -3836,7 +3758,216 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{ospf_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf}}"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP: Update ospf process",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"protocol\": [\n        {\n            \"name\": {{ospf}},\n            \"identifier\": \"frinx-openconfig-policy-types:OSPF\",\n            \"config\": {\n                \"name\": {{ospf}},\n                \"identifier\": \"frinx-openconfig-policy-types:OSPF\"\n            },\n            \"ospfv2\": {\n                \"global\": {\n                    \"timers\": {\n                        \"max-metric\": {\n                            \"config\": {\n                                \"set\": true,\n                                \"timeout\": {{ospf_timeout2}},\n                                \"include\": [ \n                                    \"frinx-openconfig-ospf-types:MAX_METRIC_INCLUDE_STUB\", \n                                    \"frinx-openconfig-ospf-types:MAX_METRIC_INCLUDE_TYPE2_EXTERNAL\",\n                                    \"frinx-openconfig-ospf-types:MAX_METRIC_INCLUDE\",\n                                    \"frinx-cisco-ospf-extension:MAX_METRIC_SUMMARY_LSA\"\n                                ]\n                            }\n                        }\n                    }\n                },\n                \"areas\": {\n                    \"area\": [\n                        {\n                            \"identifier\":{{ospf_area_id2}},\n                            \"config\": {\n                                \"identifier\": {{ospf_area_id2}}\n                            },\n                            \"interfaces\": {\n                                \"interface\": [\n                                    {\n                                        \"id\": \"{{test_interface}}\",\n                                        \"config\": {\n                                            \"metric\": {{ospf_cost2}}\n                                        },\n                                        \"interface-ref\": {\n                                            \"config\": {\n                                                \"interface\": \"{{test_interface}}\"\n                                            }\n                                        }\n                                    }\n                                ]\n                            }\n                        }\n                    ]\n                }\n            }\n        }\n    ]\n}"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{ospf_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show updated ospf process",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"var mystring = \"\\\"name\\\":\\\"\" + String (postman.getEnvironmentVariable(\"ospf\"))+\"\\\"\";",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring);",
+											"var mystring = \"\\\"timeout\\\":\" + String (postman.getEnvironmentVariable(\"ospf_timeout2\"));",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring); ",
+											"var mystring = '\"identifier\":' + postman.getEnvironmentVariable(\"ospf_area_id2\");",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+											"var mystring = '\"id\":\"' + postman.getEnvironmentVariable(\"test_interface\")+\"\\\"\";",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+											"var mystring = '\"metric\":' + postman.getEnvironmentVariable(\"ospf_cost2\");",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{ospf_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf}}"
+							},
+							"response": []
+						},
+						{
+							"name": "TEARDOWN: Delete ospf NATIVE",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{ospf_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show deleted ospf",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+											"",
+											"// console.log(\"Response: \" + responseBody)",
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;",
+											"",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{ospf_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf}}"
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "IOS Classic",
+			"item": [
+				{
+					"name": "Classic General information",
+					"item": [
+						{
+							"name": "show all",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/"
 							},
 							"response": []
 						},
@@ -3860,7 +3991,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/ios-essential:version",
 								"method": "GET",
 								"header": [
 									{
@@ -3880,7 +4010,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/ios-essential:version"
 							},
 							"response": []
 						}
@@ -3889,7 +4019,6 @@
 				},
 				{
 					"name": "Classic Mount",
-					"description": "",
 					"item": [
 						{
 							"name": "Mount IOS Classic",
@@ -3905,7 +4034,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 								"method": "PUT",
 								"header": [
 									{
@@ -3925,7 +4053,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"{{topology_port}}\",\n      \"cli-topology:transport-type\" : \"{{protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{username}}\",\n      \"cli-topology:password\" : \"{{password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \"cli-topology:dry-run-journal-size\": 150,\n\n      \"cli-topology:keepalive-delay\": 55,\n      \"cli-topology:keepalive-initial-delay\": 55,\n      \"cli-topology:keepalive-timeout\": 120\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS"
 							},
 							"response": []
 						},
@@ -3977,7 +4105,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 								"method": "GET",
 								"header": [
 									{
@@ -3997,7 +4124,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS"
 							},
 							"response": []
 						}
@@ -4006,7 +4133,6 @@
 				},
 				{
 					"name": "Classic Interface",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Create Loopback NATIVE",
@@ -4023,7 +4149,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -4043,7 +4168,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4065,7 +4190,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces",
 								"method": "GET",
 								"header": [
 									{
@@ -4085,7 +4209,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces"
 							},
 							"response": []
 						},
@@ -4107,7 +4231,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -4127,7 +4250,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -4145,7 +4268,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -4165,7 +4287,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno interface {{test_interface}}\nexit\"\n  }\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4186,7 +4308,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -4206,7 +4327,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -4215,7 +4336,6 @@
 				},
 				{
 					"name": "Classic Interface IP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Create Loopback NATIVE",
@@ -4232,7 +4352,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -4252,7 +4371,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4272,7 +4391,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
@@ -4292,7 +4410,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -4311,7 +4429,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -4331,7 +4448,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nip address {{ip41}} {{netmask}}\nipv6 address {{ipv61}} link-local\nno shutdown\nexit\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4353,7 +4470,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4",
 								"method": "GET",
 								"header": [
 									{
@@ -4373,7 +4489,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4"
 							},
 							"response": []
 						},
@@ -4395,7 +4511,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/{{ip41}}",
 								"method": "GET",
 								"header": [
 									{
@@ -4415,7 +4530,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/{{ip41}}"
 							},
 							"response": []
 						},
@@ -4436,7 +4551,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/255.255.255.255",
 								"method": "GET",
 								"header": [
 									{
@@ -4456,7 +4570,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}/subinterfaces/subinterface/{{ip_subinterface_index}}/frinx-openconfig-if-ip:ipv4/addresses/address/255.255.255.255"
 							},
 							"response": []
 						},
@@ -4475,7 +4589,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -4495,7 +4608,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nno ip address\nno ipv6 address\nno interface {{test_interface}}\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -4504,7 +4617,6 @@
 				},
 				{
 					"name": "Classic ospf/vrf",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure ip ospf and vrf NATIVE",
@@ -4521,7 +4633,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -4541,7 +4652,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{test_interface}}\nexit\nrouter ospf {{ospf}}\nrouter-id {{router}}\nnetwork {{net}} area {{area}}\ndefault-information originate always\nmpls ldp autoconfig area {{area}}\nexit\ninterface {{test_interface}}\nip address {{ip41}} {{netmask}}\nno shutdown\nexit\nrouter ospf {{ospf2}}\nnetwork {{ip41}} {{net2}} area {{area2}}\nexit\nip vrf {{vrf}}\nexit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4574,7 +4685,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances",
 								"method": "GET",
 								"header": [
 									{
@@ -4594,7 +4704,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances"
 							},
 							"response": []
 						},
@@ -4620,7 +4730,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf2}}/ospfv2/areas/area/{{area2}}/interfaces",
 								"method": "GET",
 								"header": [
 									{
@@ -4640,7 +4749,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/{{ospf2}}/ospfv2/areas/area/{{area2}}/interfaces"
 							},
 							"response": []
 						},
@@ -4667,7 +4776,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/666",
 								"method": "GET",
 								"header": [
 									{
@@ -4687,7 +4795,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:OSPF/666"
 							},
 							"response": []
 						},
@@ -4706,7 +4814,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -4726,7 +4833,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router ospf {{ospf}}\nno router ospf {{ospf2}}\nno interface {{test_interface}}\nno ip vrf {{vrf}}\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -4735,7 +4842,6 @@
 				},
 				{
 					"name": "Classic BGP summary",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure bgp NATIVE",
@@ -4752,7 +4858,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -4772,7 +4877,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n router bgp {{bgp}}\n bgp log-neighbor-changes\n no bgp default ipv4-unicast\n neighbor {{neighbor}} remote-as {{bgp}}\n neighbor {{neighbor}} update-source {{test_interface}}\n address-family ipv4\n network {{net3}} mask {{mask}}\n neighbor {{neighbor}} activate\n neighbor {{neighbor}} send-community both\n exit-address-family\nexit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4800,7 +4905,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}",
 								"method": "GET",
 								"header": [
 									{
@@ -4820,7 +4924,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
 							"response": []
 						},
@@ -4848,7 +4952,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_nonexisting-process-name}}",
 								"method": "GET",
 								"header": [
 									{
@@ -4868,7 +4971,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_nonexisting-process-name}}"
 							},
 							"response": []
 						},
@@ -4887,7 +4990,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -4907,7 +5009,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno router bgp {{bgp}}\nno interface {{test_interface}}\nexit\"\n  }\n}\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -4916,7 +5018,6 @@
 				},
 				{
 					"name": "Classic static route",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure static route NATIVE",
@@ -4933,7 +5034,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -4953,7 +5053,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nip route {{ip-route1}} {{mask}} {{ip2-route1}} {{ip3-route1}}\nip route {{ip-route2}} {{mask}} {{ip2-route2}}\nexit\"\n  }\n}\n\n\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -4982,7 +5082,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/default",
 								"method": "GET",
 								"header": [
 									{
@@ -5002,7 +5101,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/default"
 							},
 							"response": []
 						},
@@ -5030,7 +5129,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/xxx",
 								"method": "GET",
 								"header": [
 									{
@@ -5050,7 +5148,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/default/protocols/protocol/frinx-openconfig-policy-types:STATIC/xxx"
 							},
 							"response": []
 						},
@@ -5069,7 +5167,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -5089,7 +5186,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno ip route {{ip-route1}} {{mask}} {{ip2-route1}} {{ip3-route1}}\nno ip route {{ip-route2}} {{mask}} {{ip2-route2}}\nexit\"\n  }\n}\n\n\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						}
@@ -5098,7 +5195,6 @@
 				},
 				{
 					"name": "Classic Unmount",
-					"description": "",
 					"item": [
 						{
 							"name": "Unmount",
@@ -5114,7 +5210,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 								"method": "DELETE",
 								"header": [
 									{
@@ -5134,7 +5229,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS"
 							},
 							"response": []
 						},
@@ -5163,7 +5258,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 								"method": "GET",
 								"header": [
 									{
@@ -5183,7 +5277,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS"
 							},
 							"response": []
 						}
@@ -5192,12 +5286,10 @@
 				},
 				{
 					"name": "Classic journal/dry-run",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: delete loopback",
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -5217,7 +5309,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -5236,7 +5328,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -5256,7 +5347,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -5277,7 +5368,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/journal:read-journal",
 								"method": "POST",
 								"header": [
 									{
@@ -5297,7 +5387,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/journal:read-journal"
 							},
 							"response": []
 						},
@@ -5318,7 +5408,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "GET",
 								"header": [
 									{
@@ -5338,7 +5427,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -5357,7 +5446,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -5377,7 +5465,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -5398,7 +5486,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/journal:read-journal",
 								"method": "POST",
 								"header": [
 									{
@@ -5418,7 +5505,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/journal:read-journal"
 							},
 							"response": []
 						},
@@ -5437,7 +5524,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -5457,7 +5543,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						}
@@ -5466,7 +5552,6 @@
 				},
 				{
 					"name": "Classic CDP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure CDP NATIVE",
@@ -5483,7 +5568,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -5503,7 +5587,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n cdp run\n interface {{cdp_lldp_test_interface}}\n cdp enable\n exit\nexit\"\n  }\n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -5526,7 +5610,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-cdp:cdp",
 								"method": "GET",
 								"header": [
 									{
@@ -5546,7 +5629,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-cdp:cdp"
 							},
 							"response": []
 						},
@@ -5565,7 +5648,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -5585,7 +5667,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{cdp_lldp_test_interface}}\n no cdp enable\n exit\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -5609,7 +5691,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-cdp:cdp",
 								"method": "GET",
 								"header": [
 									{
@@ -5629,7 +5710,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-cdp:cdp"
 							},
 							"response": []
 						}
@@ -5638,7 +5719,6 @@
 				},
 				{
 					"name": "Classic LLDP",
-					"description": "",
 					"item": [
 						{
 							"name": "SETUP: Configure LLDP NATIVE",
@@ -5655,7 +5735,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -5675,7 +5754,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n lldp run\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -5698,7 +5777,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
@@ -5718,7 +5796,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-lldp:lldp"
 							},
 							"response": []
 						},
@@ -5737,7 +5815,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 								"method": "POST",
 								"header": [
 									{
@@ -5757,7 +5834,7 @@
 									"mode": "raw",
 									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no lldp run\nexit\"\n  }\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
 						},
@@ -5776,7 +5853,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-lldp:lldp",
 								"method": "GET",
 								"header": [
 									{
@@ -5796,7 +5872,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-lldp:lldp"
 							},
 							"response": []
 						}
@@ -5805,7 +5881,6 @@
 				},
 				{
 					"name": "Classic subinterface common",
-					"description": "",
 					"item": [
 						{
 							"name": "TEARDOWN: Delete subinterface",
@@ -5821,7 +5896,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -5837,7 +5911,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -5855,7 +5929,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -5871,7 +5944,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"subinterface\": \n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"description\": \"testing subinterface\"\n            }\n           \n        }\n    \n}"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -5889,7 +5962,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "PUT",
 								"header": [
 									{
@@ -5905,7 +5977,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"enabled\": true,\n                \"description\": \"updated subinterface description\"\n            },\n            \n            \"frinx-openconfig-vlan:vlan\": {\n                \"config\": {\n                \t\"vlan-id\": {{vlan_id}}\n                }\n            }\n\n        }\n    ]\n}\n"
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -5929,7 +6001,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "GET",
 								"header": [
 									{
@@ -5949,7 +6020,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -5967,7 +6038,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "DELETE",
 								"header": [
 									{
@@ -5983,7 +6053,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						},
@@ -6004,7 +6074,6 @@
 								}
 							],
 							"request": {
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}",
 								"method": "GET",
 								"header": [
 									{
@@ -6024,7 +6093,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"description": ""
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
 							},
 							"response": []
 						}
@@ -6033,11 +6102,9 @@
 				},
 				{
 					"name": "Classic L2P2P",
-					"description": "",
 					"item": [
 						{
 							"name": "Local Point Without Subif connects Remote Point",
-							"description": "",
 							"item": [
 								{
 									"name": "SETUP: Xconnect",
@@ -6054,7 +6121,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 										"method": "POST",
 										"header": [
 											{
@@ -6074,7 +6140,7 @@
 											"mode": "raw",
 											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n pseudowire-class {{l2p2p_show_networkinstance}}\n  encapsulation mpls\n  exit\n interface {{l2p2p_show_interface2}}\n  xconnect {{l2p2p_show_remoteip}} {{l2p2p_show_remotevccid}} pw-class {{l2p2p_show_networkinstance}}\n   exit\n  exit\n exit\"\n  }\n}\n\n"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 									},
 									"response": []
 								},
@@ -6101,7 +6167,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}",
 										"method": "GET",
 										"header": [
 											{
@@ -6121,7 +6186,7 @@
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}"
 									},
 									"response": []
 								},
@@ -6140,7 +6205,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 										"method": "POST",
 										"header": [
 											{
@@ -6160,7 +6224,7 @@
 											"mode": "raw",
 											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{l2p2p_show_interface2}}\nno xconnect\nexit\nno pseudowire-class {{l2p2p_show_networkinstance}}\nexit\"\n  }\n}\n\n"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 									},
 									"response": []
 								},
@@ -6182,7 +6246,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}",
 										"method": "GET",
 										"header": [
 											{
@@ -6202,7 +6265,7 @@
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}"
 									},
 									"response": []
 								}
@@ -6211,7 +6274,6 @@
 						},
 						{
 							"name": "Local Point With Subif connects Remote Point",
-							"description": "",
 							"item": [
 								{
 									"name": "TEARDOWN: Delete subinterface",
@@ -6227,7 +6289,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface1url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}",
 										"method": "DELETE",
 										"header": [
 											{
@@ -6243,7 +6304,7 @@
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface1url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
 									},
 									"response": []
 								},
@@ -6262,7 +6323,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 										"method": "POST",
 										"header": [
 											{
@@ -6282,7 +6342,7 @@
 											"mode": "raw",
 											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{l2p2p_show_interface2}}.{{l2p2p_show_sub_interface_index}}\nencapsulation dot1Q {{l2p2p_show_sub_interface_index}}\nxconnect {{l2p2p_show_remoteip}} {{l2p2p_show_remotevccid}} encapsulation mpls\nexit\nexit\nexit\"\n  }\n}\n\n"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 									},
 									"response": []
 								},
@@ -6310,7 +6370,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances",
 										"method": "GET",
 										"header": [
 											{
@@ -6330,7 +6389,7 @@
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances"
 									},
 									"response": []
 								},
@@ -6349,7 +6408,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 										"method": "POST",
 										"header": [
 											{
@@ -6369,7 +6427,7 @@
 											"mode": "raw",
 											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{l2p2p_show_interface2}}.{{l2p2p_show_sub_interface_index}}\nno xconnect\nno encapsulation dot1Q\nexit\nno interface {{l2p2p_show_interface2}}.{{l2p2p_show_sub_interface_index}}\nexit\"\n  }\n}\n\n"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 									},
 									"response": []
 								},
@@ -6397,7 +6455,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances",
 										"method": "GET",
 										"header": [
 											{
@@ -6417,7 +6474,7 @@
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances"
 									},
 									"response": []
 								}
@@ -6426,7 +6483,6 @@
 						},
 						{
 							"name": "Local Point Without Subif connects Local Point With Subif",
-							"description": "",
 							"item": [
 								{
 									"name": "TEARDOWN: Delete subinterface",
@@ -6442,7 +6498,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}",
 										"method": "DELETE",
 										"header": [
 											{
@@ -6458,7 +6513,7 @@
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
 									},
 									"response": []
 								},
@@ -6477,7 +6532,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 										"method": "POST",
 										"header": [
 											{
@@ -6497,7 +6551,7 @@
 											"mode": "raw",
 											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\nencapsulation dot1Q {{l2p2p_show_sub_interface_index}}\nexit\nconnect {{l2p2p_show_networkinstance}} {{l2p2p_show_interface2}} {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}} interworking ethernet\nexit\nexit\"\n  }\n}\n\n"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 									},
 									"response": []
 								},
@@ -6526,7 +6580,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}",
 										"method": "GET",
 										"header": [
 											{
@@ -6546,7 +6599,7 @@
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}"
 									},
 									"response": []
 								},
@@ -6565,7 +6618,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read",
 										"method": "POST",
 										"header": [
 											{
@@ -6585,7 +6637,7 @@
 											"mode": "raw",
 											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno connect {{l2p2p_show_networkinstance}}\nno interface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\nexit\"\n  }\n}\n\n"
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 									},
 									"response": []
 								},
@@ -6607,7 +6659,6 @@
 										}
 									],
 									"request": {
-										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}",
 										"method": "GET",
 										"header": [
 											{
@@ -6627,7 +6678,7 @@
 											"mode": "raw",
 											"raw": ""
 										},
-										"description": ""
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}"
 									},
 									"response": []
 								}
@@ -6641,7 +6692,6 @@
 		},
 		{
 			"name": "Mount/Unmount IOS",
-			"description": "",
 			"item": [
 				{
 					"name": "Mount WRONG IP",
@@ -6658,7 +6708,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "PUT",
 						"header": [
 							{
@@ -6678,7 +6727,7 @@
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip_wrong}}\",\n      \"cli-topology:port\" : \"{{classic_port}}\",\n      \"cli-topology:transport-type\" : \"{{classic_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{classic_username}}\",\n      \"cli-topology:password\" : \"{{classic_password}}\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS"
 					},
 					"response": []
 				},
@@ -6709,7 +6758,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "GET",
 						"header": [
 							{
@@ -6729,7 +6777,7 @@
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS"
 					},
 					"response": []
 				},
@@ -6748,7 +6796,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "PUT",
 						"header": [
 							{
@@ -6768,7 +6815,7 @@
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"{{classic_port}}\",\n      \"cli-topology:transport-type\" : \"{{classic_protocol}}\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"{{classic_username}}\",\n      \"cli-topology:password\" : \"{{classic_password}}\",\n      \n      \"cli-topology:journal-size\": 150,\n      \n      \"cli-topology:keepalive-delay\": 55,\n      \"cli-topology:keepalive-initial-delay\": 55,\n      \"cli-topology:keepalive-timeout\": 120\n\n    }\n  }"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS"
 					},
 					"response": []
 				},
@@ -6820,7 +6867,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "GET",
 						"header": [
 							{
@@ -6840,7 +6886,7 @@
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS"
 					},
 					"response": []
 				},
@@ -6867,7 +6913,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "DELETE",
 						"header": [
 							{
@@ -6887,7 +6932,7 @@
 							"mode": "raw",
 							"raw": ""
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS"
 					},
 					"response": []
 				},
@@ -6916,7 +6961,6 @@
 						}
 					],
 					"request": {
-						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS",
 						"method": "GET",
 						"header": [
 							{
@@ -6936,7 +6980,7 @@
 							"mode": "raw",
 							"raw": "{\n    \"network-topology:node\" :\n    {\n      \"network-topology:node-id\" : \"IOS2\",\n      \n      \"cli-topology:host\" : \"{{classic_ip}}\",\n      \"cli-topology:port\" : \"22\",\n      \"cli-topology:transport-type\" : \"ssh\",\n      \n      \"cli-topology:device-type\" : \"ios\",\n      \"cli-topology:device-version\" : \"*\",\n      \n      \"cli-topology:username\" : \"cisco\",\n      \"cli-topology:password\" : \"cisco\",\n      \n      \"cli-topology:journal-size\": 150\n    }\n  }"
 						},
-						"description": ""
+						"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS"
 					},
 					"response": []
 				}

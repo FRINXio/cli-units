@@ -224,6 +224,54 @@
       "key": "mpls_elig_false",
       "value": "false",
       "type": "boolean"
+    },
+    {
+      "enabled": true,
+      "key": "ospf_ni-name",
+      "value": "default",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ospf",
+      "value": "97",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ospf_timeout",
+      "value": "60",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ospf_area_id",
+      "value": "1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ospf_cost",
+      "value": "77",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ospf_timeout2",
+      "value": "30",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ospf_area_id2",
+      "value": "99",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "ospf_cost2",
+      "value": "30",
+      "type": "text"
     }
   ],
   "timestamp": 1512645751428,
