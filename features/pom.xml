@@ -158,6 +158,32 @@
       <artifactId>ios-xr-bgp-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>brocade-cli-init-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>brocade-essential-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>brocade-interface-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>brocade-network-instance-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>brocade-cdp-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>ios-xr-interface-unit</artifactId>
