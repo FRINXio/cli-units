@@ -125,7 +125,7 @@ public class IosCliInitializerUnit  implements TranslateUnit {
     /**
      * Initialize IOS CLI session to be usable by various CRUD and RPC handlers
      */
-    private static final class IosCliInitializer implements SessionInitializationStrategy {
+    public static final class IosCliInitializer implements SessionInitializationStrategy {
         private static final String PASSWORD_PROMPT = "Password:";
         private static final String PRIVILEGED_PROMPT_SUFFIX = "#";
         private static final String ENABLE_COMMAND = "enable";
@@ -137,7 +137,7 @@ public class IosCliInitializerUnit  implements TranslateUnit {
         private final CliNode context;
         private final RemoteDeviceId id;
 
-        IosCliInitializer(CliNode context, RemoteDeviceId id) {
+        public IosCliInitializer(CliNode context, RemoteDeviceId id) {
             this.context = context;
             this.id = id;
         }

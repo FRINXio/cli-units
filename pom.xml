@@ -26,10 +26,11 @@
   </prerequisites>
 
   <modules>
+    <module>ios-common</module>
     <module>ios</module>
     <module>ios-xr</module>
+    <module>brocade</module>
     <module>features</module>
-      <module>ios-common</module>
   </modules>
 
   <build>

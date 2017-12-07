@@ -39,7 +39,7 @@ public class VersionReader implements CliOperReader<Version, VersionBuilder> {
     public void readCurrentAttributes(@Nonnull final InstanceIdentifier<Version> id,
                                       @Nonnull final VersionBuilder builder,
                                       @Nonnull final ReadContext ctx) throws ReadFailedException {
-        parseShowVersion(blockingRead(SH_VERSION, cli, id), builder);
+        parseShowVersion(blockingRead(SH_VERSION, cli, id, ctx), builder);
     }
 
     private static final Pattern DESCRIPTION_LINE = Pattern.compile("System image file is \"(?<image>[^\"]+)\"");
