@@ -47,8 +47,8 @@ public class AreaInterfaceConfigWriter implements CliWriter<Config> {
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final OspfAreaIdentifier areaId = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Area.class)).get().getIdentifier();
-        final InterfaceKey intfId = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Interface.class)).get().getKey();
+        final OspfAreaIdentifier areaId = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Area.class)).get().getIdentifier();
+        final InterfaceKey intfId = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Interface.class)).get().getKey();
         blockingWriteAndRead(cli, instanceIdentifier, data,
                 "configure terminal",
                 f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
