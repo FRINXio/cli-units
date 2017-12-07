@@ -13,8 +13,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.io.Cli;
 import io.frinx.cli.handlers.network.instance.L2p2pWriter;
+import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Collections;
 import java.util.Objects;
@@ -34,6 +34,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.LOCAL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.REMOTE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
 
@@ -52,11 +53,11 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
 
         Set<String> usedInterfaces = getUsedInterfaces(id, writeContext);
 
-        ConnectionPoint connectionPoint1 = getCPoint(dataAfter, ConnectionPointsReader.POINT_1, 0);
-        Endpoint endpoint1 = getEndpoint(connectionPoint1, writeContext, usedInterfaces);
+        ConnectionPoint connectionPoint1 = getCPoint(dataAfter, ConnectionPointsReader.POINT_1);
+        Endpoint endpoint1 = getEndpoint(connectionPoint1, writeContext, usedInterfaces, true);
 
-        ConnectionPoint connectionPoint2 = getCPoint(dataAfter, ConnectionPointsReader.POINT_2, 1);
-        Endpoint endpoint2 = getEndpoint(connectionPoint2, writeContext, usedInterfaces);
+        ConnectionPoint connectionPoint2 = getCPoint(dataAfter, ConnectionPointsReader.POINT_2);
+        Endpoint endpoint2 = getEndpoint(connectionPoint2, writeContext, usedInterfaces, true);
 
         if (isLocal(endpoint1, endpoint2)) {
             writeLocalConnect(id, dataAfter, endpoint1, endpoint2);
@@ -148,7 +149,7 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
                 "exit");
     }
 
-    private static Endpoint getEndpoint(ConnectionPoint connectionPoint1, WriteContext writeContext, Set<String> usedInterfaces) {
+    private static Endpoint getEndpoint(ConnectionPoint connectionPoint1, WriteContext writeContext, Set<String> usedInterfaces, boolean isWrite) {
         Endpoint endpoint1 = connectionPoint1.getEndpoints().getEndpoint().get(0);
         checkArgument(endpoint1.getEndpointId().equals(ConnectionPointsReader.ENDPOINT_ID),
                 "Endpoint has to be named: %s, not %s", ConnectionPointsReader.ENDPOINT_ID, endpoint1.getConfig());
@@ -159,7 +160,9 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
             String ifcName = endpoint1.getLocal().getConfig().getInterface();
             ConnectionPointsReader.InterfaceId interfaceId = ConnectionPointsReader.InterfaceId.fromEndpoint(endpoint1);
 
-            Optional<Interface> ifcData = writeContext.readAfter(IIDs.INTERFACES.child(Interface.class, new InterfaceKey(ifcName)));
+            Optional<Interface> ifcData = isWrite ?
+                    writeContext.readAfter(IIDs.INTERFACES.child(Interface.class, new InterfaceKey(interfaceId.toParentIfcString()))) :
+                    writeContext.readBefore(IIDs.INTERFACES.child(Interface.class, new InterfaceKey(interfaceId.toParentIfcString())));
             checkArgument(ifcData.isPresent(), "Unknown interface %s, cannot configure l2p2p", ifcData);
 
             // Check interface not used already (or its parent)
@@ -170,18 +173,23 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
 
             Object subifc = endpoint1.getLocal().getConfig().getSubinterface();
             if (subifc != null) {
-                Optional<Subinterface> subData = writeContext.readAfter(
-                        IIDs.INTERFACES.child(Interface.class, new InterfaceKey(ifcName))
-                                .child(Subinterfaces.class)
-                                .child(Subinterface.class, new SubinterfaceKey(((Long) subifc))));
-                checkArgument(subData.isPresent(), "Unknown subinterface %s.%s, cannot configure l2p2p", ifcName, subData);
+                KeyedInstanceIdentifier<Subinterface, SubinterfaceKey> subIfcId = IIDs.INTERFACES
+                        .child(Interface.class, new InterfaceKey(ifcName))
+                        .child(Subinterfaces.class)
+                        .child(Subinterface.class, new SubinterfaceKey(((Long) subifc)));
+                Optional<Subinterface> subData = isWrite ? writeContext.readAfter(subIfcId) : writeContext.readBefore(subIfcId);
+                checkArgument(subData.isPresent(), "Unknown subinterface %s.%s, cannot configure l2p2p", interfaceId);
             }
         }
         return endpoint1;
     }
 
-    private static ConnectionPoint getCPoint(@Nonnull ConnectionPoints dataAfter, String expectedPointId, int index) {
-        ConnectionPoint connectionPoint = dataAfter.getConnectionPoint().get(index);
+    private static ConnectionPoint getCPoint(@Nonnull ConnectionPoints dataAfter, String expectedPointId) {
+        ConnectionPoint connectionPoint = dataAfter.getConnectionPoint().stream()
+                .filter(cp -> cp.getKey().getConnectionPointId().equals(expectedPointId))
+                .findFirst()
+                .get();
+
         checkArgument(connectionPoint.getConnectionPointId().equals(expectedPointId),
                 "Connection point has to be named: %s, not %s", expectedPointId, connectionPoint.getConfig());
         checkArgument(connectionPoint.getEndpoints().getEndpoint().size() == 1,
@@ -202,11 +210,11 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
     public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
                                                @Nonnull ConnectionPoints dataBefore,
                                                @Nonnull WriteContext writeContext) throws WriteFailedException.DeleteFailedException {
-        ConnectionPoint connectionPoint1 = getCPoint(dataBefore, ConnectionPointsReader.POINT_1, 0);
-        Endpoint endpoint1 = getEndpoint(connectionPoint1, writeContext, Collections.emptySet());
+        ConnectionPoint connectionPoint1 = getCPoint(dataBefore, ConnectionPointsReader.POINT_1);
+        Endpoint endpoint1 = getEndpoint(connectionPoint1, writeContext, Collections.emptySet(), false);
 
-        ConnectionPoint connectionPoint2 = getCPoint(dataBefore, ConnectionPointsReader.POINT_2, 1);
-        Endpoint endpoint2 = getEndpoint(connectionPoint2, writeContext, Collections.emptySet());
+        ConnectionPoint connectionPoint2 = getCPoint(dataBefore, ConnectionPointsReader.POINT_2);
+        Endpoint endpoint2 = getEndpoint(connectionPoint2, writeContext, Collections.emptySet(), false);
 
         if (isLocal(endpoint1, endpoint2)) {
             deleteLocalConnect(id);
