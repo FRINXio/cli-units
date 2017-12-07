@@ -6,13 +6,15 @@
       "enabled": true,
       "key": "odl_ip",
       "value": "localhost",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "xr_ip",
       "value": "192.168.1.214",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
@@ -60,25 +62,29 @@
       "enabled": true,
       "key": "topology_port",
       "value": "22",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "protocol",
       "value": "ssh",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "username",
       "value": "cisco",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "password",
       "value": "cisco",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
@@ -90,7 +96,8 @@
       "enabled": true,
       "key": "test_interface",
       "value": "Loopback97",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,

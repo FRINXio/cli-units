@@ -6,13 +6,15 @@
       "enabled": true,
       "key": "odl_ip",
       "value": "localhost",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "classic_ip",
       "value": "192.168.1.225",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
@@ -42,25 +44,29 @@
       "enabled": true,
       "key": "classic_port",
       "value": "22",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "classic_protocol",
       "value": "ssh",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "classic_username",
       "value": "cisco",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "classic_password",
       "value": "cisco",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     }
   ],
   "timestamp": 1508418152923,

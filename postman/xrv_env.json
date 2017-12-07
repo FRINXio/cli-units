@@ -6,13 +6,15 @@
       "enabled": true,
       "key": "odl_ip",
       "value": "localhost",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "xr_ip",
       "value": "192.168.1.213",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
@@ -108,25 +110,29 @@
       "enabled": true,
       "key": "topology_port",
       "value": "22",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "protocol",
       "value": "ssh",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "username",
       "value": "cisco",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "password",
       "value": "cisco",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
@@ -138,13 +144,15 @@
       "enabled": true,
       "key": "cdp_lldp_test_interface",
       "value": "GigabitEthernet0/0/0/0",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "test_interface",
       "value": "Loopback97",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
@@ -156,7 +164,8 @@
       "enabled": true,
       "key": "test_sub_interface",
       "value": "GigabitEthernet0%2F0%2F0%2F0",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,

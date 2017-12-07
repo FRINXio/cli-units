@@ -6,13 +6,15 @@
       "enabled": true,
       "key": "odl_ip",
       "value": "localhost",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "classic_ip",
       "value": "192.168.1.221",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
@@ -162,37 +164,43 @@
       "enabled": true,
       "key": "topology_port",
       "value": "22",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "protocol",
       "value": "ssh",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "username",
       "value": "cisco",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "password",
       "value": "cisco",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "cdp_lldp_test_interface",
       "value": "FastEthernet0/0",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "test_interface",
       "value": "Loopback97",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
@@ -204,7 +212,8 @@
       "enabled": true,
       "key": "test_sub_interface",
       "value": "GigabitEthernet2%2F0",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
@@ -228,13 +237,15 @@
       "enabled": true,
       "key": "l2p2p_show_interface2",
       "value": "GigabitEthernet3/0",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "l2p2p_show_interface2url",
       "value": "GigabitEthernet3%2F0",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
@@ -258,25 +269,29 @@
       "enabled": true,
       "key": "l2p2p_show_interface1",
       "value": "GigabitEthernet1/0",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "l2p2p_show_interface1url",
       "value": "GigabitEthernet1%2F0",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "l2p2p_show_interface3",
       "value": "GigabitEthernet2/0",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
       "key": "l2p2p_show_interface3url",
       "value": "GigabitEthernet2%2F0",
-      "type": "text"
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
