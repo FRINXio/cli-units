@@ -159,7 +159,7 @@ public class IosCliInitializerUnit  implements TranslateUnit {
                 // If already in privileged mode, don't do anything else
                 if (PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim()
                         .endsWith(PRIVILEGED_PROMPT_SUFFIX)) {
-                    LOG.info("{}: IOS cli session already initialized", id);
+                    LOG.info("{}: IOS cli session initialized successfully", id);
                     return;
                 }
 
