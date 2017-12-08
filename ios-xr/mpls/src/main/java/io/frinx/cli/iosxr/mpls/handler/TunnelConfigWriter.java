@@ -8,6 +8,7 @@
 
 package io.frinx.cli.iosxr.mpls.handler;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -30,13 +31,28 @@ public class TunnelConfigWriter implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class).getName();
+
+        checkTunnelConfig(data);
+
         blockingWriteAndRead(cli, id, data,
             "configure terminal",
             f("interface tunnel-te %s", name),
-            (data.isShortcutEligible()) ? "autoroute announce" : "",
+            (data.isShortcutEligible()) ? "autoroute announce" : "no autoroute announce",
             (data.getMetric() != null && LSPMETRICABSOLUTE.class.equals(data.getMetricType())) ? f("metric absolute %s", data.getMetric()) : "",
             "commit",
             "end");
+    }
+
+    private static void checkTunnelConfig(Config data) {
+
+        // TODO What if metric-type is set but metric is not
+        if (data.getMetric() != null) {
+            Preconditions.checkArgument(LSPMETRICABSOLUTE.class.equals(data.getMetricType()),
+                    "Only LSP_METRIC_ABSOLUTE metric type is supported");
+
+            Preconditions.checkArgument(data.isShortcutEligible(),
+                    "Cannot configure metric on non shortcut-eligible tunnel");
+        }
     }
 
     @Override
