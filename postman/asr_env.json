@@ -36,6 +36,12 @@
     },
     {
       "enabled": true,
+      "key": "attempts_3x",
+      "value": "3",
+      "type": "text"
+    },
+    {
+      "enabled": true,
       "key": "ip1",
       "value": "8.8.8.8",
       "type": "text"
@@ -143,6 +149,20 @@
     {
       "enabled": true,
       "key": "cdp_lldp_test_interface",
+      "value": "TenGigE0/0/2/1",
+      "type": "text",
+      "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
+      "key": "cdp_lldp_test_interface2",
+      "value": "TenGigE0/0/2/2",
+      "type": "text",
+      "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
+      "key": "cdp_lldp_test_interface3",
       "value": "TenGigE0/0/2/1",
       "type": "text",
       "description": "Please review and adapt before running tests"

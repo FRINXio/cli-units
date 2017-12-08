@@ -24,9 +24,9 @@ done
 
 ### Test for IOS XR
 XR_devices=("xrv_env.json" "asr_env.json" "xrv5_env.json")
-XR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "BGP summary" "BGP CRUD" "CDP" "LLDP" "subinterface common" "Unmount")
-XR5_folders=("Mount" "BGP CRUD" "RSVP CRUD" "MPLS CRUD" "OSPF CRUD" "Unmount")
-ASR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "BGP summary" "BGP CRUD" "Platform" "CDP" "LLDP" "subinterface common" "Unmount")
+XR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "CDP" "LLDP" "subinterface common" "BGP summary" "BGP CRUD" "Unmount")
+XR5_folders=("Mount" "RSVP CRUD" "MPLS CRUD" "OSPF CRUD" "BGP CRUD" "Unmount")
+ASR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "Platform" "CDP" "LLDP" "subinterface common" "BGP summary" "Unmount")
 
 for device in ${XR_devices[@]}
 do

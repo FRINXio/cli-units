@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "39be2c48-deea-9322-1983-8cf26603c212",
+		"_postman_id": "f0cb493c-947c-815e-9fc3-85f852be52f9",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -1229,7 +1229,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nrouter bgp {{bgp}}\nbgp router-id {{router}}\naddress-family ipv4 unicast\nexit\naddress-family vpnv4 unicast\nexit\nneighbor {{neighbor}}\nremote-as {{bgp}}\nupdate-source {{test_interface}}\nexit\nexit\ncommit\nexit\"\n  }\n}\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nrouter bgp {{bgp}}\nbgp router-id {{router}}\naddress-family ipv4 unicast\nexit\naddress-family vpnv4 unicast\nexit\nneighbor {{neighbor}}\nremote-as {{bgp}}\nupdate-source {{test_interface}}\ncommit\nend\"\n  }\n}\n"
 								},
 								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
@@ -1970,7 +1970,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n lldp\n commit\n exit\nexit\"\n  }\n}\n"
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n lldp\n commit\nend\"\n  }\n}\n"
 								},
 								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
@@ -1988,7 +1988,7 @@
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
 											"tests[\"01. Body matches string\"] = responseBody.has(\"lldp\");",
-											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")));",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\"))) || responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface2\"))) || responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface3\")));",
 											""
 										]
 									}
@@ -2201,7 +2201,7 @@
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
 											"",
 											"tests[\"01. Body matches string\"] = responseBody.has(\"updated subinterface description\");",
-											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")));",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"cdp_lldp_test_interface\")) + \".\" + String(postman.getEnvironmentVariable(\"test_sub_interface_index\")));",
 											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));"
 										]
 									}
