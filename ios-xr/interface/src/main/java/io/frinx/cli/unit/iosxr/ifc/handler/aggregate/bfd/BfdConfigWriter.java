@@ -48,7 +48,7 @@ public class BfdConfigWriter implements CliWriter<Config> {
                 "bfd address-family ipv4 fast-detect",
                 f("bfd address-family ipv4 multiplier %s", dataAfter.getMultiplier()),
                 f("bfd address-family ipv4 minimum-interval %s", dataAfter.getMinInterval()),
-                destinationIpv4 != null ? f("bfd address-family ipv4 destination %s", destinationIpv4) : "",
+                destinationIpv4 != null ? f("bfd address-family ipv4 destination %s", destinationIpv4.getValue()) : "",
                 "commit",
                 "end");
     }
