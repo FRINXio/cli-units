@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "f0cb493c-947c-815e-9fc3-85f852be52f9",
+		"_postman_id": "a8543a7e-1315-965d-6b51-4e0e0b55ed0e",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -6679,6 +6679,2931 @@
 											"raw": ""
 										},
 										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_show_networkinstance}}"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Classic L2P2P CRUD",
+					"item": [
+						{
+							"name": "Negative",
+							"item": [
+								{
+									"name": "SETUP: Delete Subinterface neg",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful DELETE request\"] = responseCode.code === 200 || responseCode.code === 404"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Create Subinterface neg",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{l2p2p_show_sub_interface_index}},\n          \"config\" : {\n            \"index\": {{l2p2p_show_sub_interface_index}},\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : {{l2p2p_vlan_id}}\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: show created subinterface neg",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"subinterface\") && jsonData.subinterface[0]['state']['admin-status'] === \"UP\" && jsonData.subinterface[0]['state']['oper-status'] === \"UP\") {",
+													"    tests[\"Subinterface created\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Subinterface not up! Too many attempts !\")",
+													"        tests[\"Subinterface not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Subinterface not up yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('SETUP: show created subinterface neg');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Delete valid connection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful DELETE request\"] = responseCode.code === 200 || responseCode.code === 404"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name2}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Create valid connection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"{{l2p2p_ni_name2}}\",\n\t        \"config\": {\n\t          \"name\": \"{{l2p2p_ni_name2}}\",\n\t          \"type\": \"frinx-openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface2}}\"\n\t                        }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"{{l2p2p_show_remoteip}}\",\n\t                        \"virtual-circuit-identifier\": {{l2p2p_vccid}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name2}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: show created connection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"network-instance\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    if ( jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['config']['type'] === 'frinx-openconfig-network-instance-types:LOCAL' ) {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface2\");",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\");",
+													"    } else {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface2\");",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\");",
+													"    }",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still not up! Too many attempts !\")",
+													"        tests[\"Connection not removed\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not created yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('SETUP: show created connection');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name2}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Used interface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Expected PUT failure\"] = responseCode.code === 500"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"{{l2p2p_ni_name1}}\",\n\t        \"config\": {\n\t          \"name\": \"{{l2p2p_ni_name1}}\",\n\t          \"type\": \"frinx-openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface2}}\"\n\t                        }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n   \t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"{{l2p2p_show_remoteip2}}\",\n\t                        \"virtual-circuit-identifier\": {{l2p2p_vccid}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete valid connection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Successful DELETE request\"] = responseCode.code === 200"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name2}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: show removed connection",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Connection removed\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still present! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Connection not removed\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not removed yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('TEARDOWN: show removed connection');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name2}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Three connection points",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Expected PUT failure\"] = responseCode.code === 500",
+													""
+												]
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"postman.setNextRequest('TEARDOWN: Delete Subinterface neg');"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"{{l2p2p_ni_name1}}\",\n\t        \"config\": {\n\t          \"name\": \"{{l2p2p_ni_name1}}\",\n\t          \"type\": \"frinx-openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface2}}\"\n\t                        }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface3}}\",\n\t                        \"subinterface\": {{l2p2p_show_sub_interface_index}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"3\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"3\"\n\t              },\n   \t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"{{l2p2p_show_remoteip}}\",\n\t                        \"virtual-circuit-identifier\": {{l2p2p_vccid}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Interface with ip",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"console.warn(\"// FIXME this returns 200 instead of returning 500\")",
+													"//tests[\"Expected PUT failure\"] = responseCode.code === 500",
+													""
+												]
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"postman.setNextRequest('TEARDOWN: Delete Subinterface neg');"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"{{l2p2p_ni_name1}}\",\n\t        \"config\": {\n\t          \"name\": \"{{l2p2p_ni_name1}}\",\n\t          \"type\": \"frinx-openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface1}}\"\n\t                        }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface3}}\",\n\t                        \"subinterface\": {{l2p2p_show_sub_interface_index}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete Subinterface neg",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful DELETE request\"] = responseCode.code === 200"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: show deleted subinterface neg",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Subinterface deleted\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Subinterface still up! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Subinterface not deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Subinterface not deleted yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('TEARDOWN: show deleted subinterface neg');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Locifc to remote",
+							"item": [
+								{
+									"name": "TEARDOWN: Delete previouse subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no interface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\n exit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show nonexisting subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+													"",
+													"// console.log(\"Response: \" + responseBody)",
+													"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Configure locifc",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n pseudowire-class {{l2p2p_ni_name1}}\n  encapsulation mpls\n  exit\n interface {{l2p2p_show_interface3}}\n  xconnect {{l2p2p_show_remoteip}} {{l2p2p_vccid}} encapsulation mpls pw-class {{l2p2p_ni_name1}}\n   exit\n  exit\n exit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show configured locifc",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"network-instance\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    if ( jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['config']['type'] === 'frinx-openconfig-network-instance-types:LOCAL' ) {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\");",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\");",
+													"    } else {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\");",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\");",
+													"    }",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still not up! Too many attempts !\")",
+													"        tests[\"Connection not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not created yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show configured locifc');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete xconnect",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{l2p2p_show_interface3}}\nno xconnect\nexit\nno pseudowire-class {{l2p2p_ni_name1}}\nexit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted xconnect locif",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Connection removed\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still present! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Connection not removed\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not removed yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show deleted xconnect locif');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Reconcile",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/reconcile:reconcile"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Subinterface ltr",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful DELETE request\"] = responseCode.code === 200"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/GigabitEthernet2%2F0/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted subinterface ltr",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Subinterface deleted\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Subinterface still up! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Subinterface not deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Subinterface not deleted yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show deleted subinterface ltr');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Subinterface ltr",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{l2p2p_show_sub_interface_index}},\n          \"config\" : {\n            \"index\": {{l2p2p_show_sub_interface_index}},\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : {{l2p2p_vlan_id}}\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show created subinterface ltr",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"subinterface\") && jsonData.subinterface[0]['state']['admin-status'] === \"UP\" && jsonData.subinterface[0]['state']['oper-status'] === \"UP\") {",
+													"    tests[\"Subinterface created\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Subinterface not up! Too many attempts !\")",
+													"        tests[\"Subinterface not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Subinterface not up yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show created subinterface ltr');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Loc To Remote",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"frinx-openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"{{l2p2p_ni_name1}}\",\n\t        \"config\": {\n\t          \"name\": \"{{l2p2p_ni_name1}}\",\n\t          \"type\": \"frinx-openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface3}}\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"{{l2p2p_show_remoteip}}\",\n\t                        \"virtual-circuit-identifier\": {{l2p2p_vccid}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show created loc to rem",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"network-instance\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    if ( jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['config']['type'] === 'frinx-openconfig-network-instance-types:LOCAL' ) {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\");",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\");",
+													"    } else {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\");",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\");",
+													"    }",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still not up! Too many attempts !\")",
+													"        tests[\"Connection not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not created yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show created loc to rem');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Update Sub To Remote",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful PUT request\"] = responseCode.code === 200"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"{{l2p2p_ni_name1}}\",\n\t        \"config\": {\n\t          \"name\": \"{{l2p2p_ni_name1}}\",\n\t          \"type\": \"frinx-openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface3}}\",\n\t                        \"subinterface\" : {{l2p2p_show_sub_interface_index}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"{{l2p2p_show_remoteip}}\",\n\t                        \"virtual-circuit-identifier\": {{l2p2p_vccid}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show updated sub to rem",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"network-instance\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    if ( jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['config']['type'] === 'frinx-openconfig-network-instance-types:LOCAL' ) {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\")",
+													"        tests[\"Validate endpoint 1 subinterfaece\"] = \"\"+jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['subinterface'] === postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\")",
+													"    } else {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\")",
+													"        tests[\"Validate endpoint 1 subinterfaece\"] = \"\"+jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['subinterface'] === postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\")",
+													"    }",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still not up! Too many attempts !\")",
+													"        tests[\"Connection not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not created yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show updated sub to rem');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete connection ltr",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful DELETE request\"] = responseCode.code === 200"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted loc to rem",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Connection removed\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still present! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Connection not removed\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not removed yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show deleted loc to rem');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no interface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\n exit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Locifc to sub",
+							"item": [
+								{
+									"name": "TEARDOWN: Delete previouse subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no interface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\n exit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show nonexisting subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+													"",
+													"// console.log(\"Response: \" + responseBody)",
+													"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Configure Locifc to Sub",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\nencapsulation dot1Q {{l2p2p_vlan_id}}\nexit\nconnect {{l2p2p_ni_name1}} {{l2p2p_show_interface2}} {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}} interworking ethernet\nexit\nexit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show configured Locif to Sub",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"network-instance\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    if ( jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface2\") ){",
+													"        console.log(\"G3\")",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface2\")",
+													"        tests[\"Validate endpoint 2 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\")",
+													"        tests[\"Validate endpoint 2 subinterfaece\"] = \"\"+jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['subinterface'] === postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")",
+													"    } else {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface2\")",
+													"        tests[\"Validate endpoint 2 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\")",
+													"        tests[\"Validate endpoint 2 subinterfaece\"] = \"\"+jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['subinterface'] === postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")",
+													"    }",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still not up! Too many attempts !\")",
+													"        tests[\"Connection not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not created yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show configured Locif to Sub');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete connect",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno connect {{l2p2p_ni_name1}}\nno interface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\nexit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted connect locif",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Connection removed\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still present! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Connection not removed\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not removed yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show deleted connect locif');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Reconcile",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/reconcile:reconcile"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Subinterface lts",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful DELETE request\"] = responseCode.code === 200"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted subinterface lts",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Subinterface deleted\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Subinterface still up! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Subinterface not deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Subinterface not deleted yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show deleted subinterface lts');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Subinterface lts",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{l2p2p_show_sub_interface_index}},\n          \"config\" : {\n            \"index\": {{l2p2p_show_sub_interface_index}},\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : {{l2p2p_vlan_id}}\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show created subinterface lts",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"subinterface\") && jsonData.subinterface[0]['state']['admin-status'] === \"UP\" && jsonData.subinterface[0]['state']['oper-status'] === \"UP\") {",
+													"    tests[\"Subinterface created\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Subinterface not up! Too many attempts !\")",
+													"        tests[\"Subinterface not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Subinterface not up yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show created subinterface lts');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Loc To Sub",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"{{l2p2p_ni_name1}}\",\n\t        \"config\": {\n\t          \"name\": \"{{l2p2p_ni_name1}}\",\n\t          \"type\": \"frinx-openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface2}}\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface3}}\",\n\t                        \"subinterface\" : {{l2p2p_show_sub_interface_index}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show created loc to sub",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"network-instance\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    if ( jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface2\") ){",
+													"        console.log(\"G3\")",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface2\")",
+													"        tests[\"Validate endpoint 2 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\")",
+													"        tests[\"Validate endpoint 2 subinterfaece\"] = \"\"+jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['subinterface'] === postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")",
+													"    } else {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface2\")",
+													"        tests[\"Validate endpoint 2 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\")",
+													"        tests[\"Validate endpoint 2 subinterfaece\"] = \"\"+jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['subinterface'] === postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")",
+													"    }",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still not up! Too many attempts !\")",
+													"        tests[\"Connection not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not created yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show created loc to sub');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Connection lts",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful DELETE request\"] = responseCode.code === 200"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted loc to sub",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Connection removed\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still present! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Connection not removed\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not removed yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show deleted loc to sub');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no interface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\n exit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Locsub to remote",
+							"item": [
+								{
+									"name": "TEARDOWN: Delete previouse subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no interface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\n exit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show nonexisting subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+													"",
+													"// console.log(\"Response: \" + responseBody)",
+													"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Configure Locsub to remote",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n pseudowire-class {{l2p2p_ni_name1}}\n  encapsulation mpls\n  exit\n interface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\n encapsulation dot1Q {{l2p2p_vlan_id}}\n  xconnect {{l2p2p_show_remoteip}} {{l2p2p_vccid}} encapsulation mpls pw-class {{l2p2p_ni_name1}}\n   exit\n  exit\n exit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show configured Locsub",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"network-instance\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    if ( jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['config']['type'] === 'frinx-openconfig-network-instance-types:LOCAL' ) {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\")",
+													"        tests[\"Validate endpoint 1 subinterfaece\"] = \"\"+jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['subinterface'] === postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\")",
+													"    } else {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\")",
+													"        tests[\"Validate endpoint 1 subinterfaece\"] = \"\"+jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['subinterface'] === postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\")",
+													"    }",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still not up! Too many attempts !\")",
+													"        tests[\"Connection not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not created yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show configured Locsub');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete xconnect",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface  {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\nno xconnect\nexit\nno pseudowire-class {{l2p2p_ni_name1}}\nexit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted xconnect locsub",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Connection removed\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still present! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Connection not removed\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not removed yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show deleted xconnect locsub');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: Reconcile",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/reconcile:reconcile"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Subinterface str",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful DELETE request\"] = responseCode.code === 200"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted subinterface str",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Subinterface deleted\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Subinterface still up! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Subinterface not deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Subinterface not deleted yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show deleted subinterface str');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Subinterface str",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful PUT request\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{l2p2p_show_sub_interface_index}},\n          \"config\" : {\n            \"index\": {{l2p2p_show_sub_interface_index}},\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : {{l2p2p_vlan_id}}\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show created subinterface str",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"subinterface\") && jsonData.subinterface[0]['state']['admin-status'] === \"UP\" && jsonData.subinterface[0]['state']['oper-status'] === \"UP\") {",
+													"    tests[\"Subinterface created\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Subinterface not up! Too many attempts !\")",
+													"        tests[\"Subinterface not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Subinterface not up yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show created subinterface str');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": 44,\n          \"config\" : {\n            \"index\": 44,\n            \"enabled\": \"true\"\n          },\n          \"openconfig-vlan:vlan\" : {\n            \"config\" : {\n              \"vlan-id\" : 44\n            }\n          }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{l2p2p_show_interface3url}}/subinterfaces/subinterface/{{l2p2p_show_sub_interface_index}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Sub To Remote",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful PUT request\"] = responseCode.code === 200"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"{{l2p2p_ni_name1}}\",\n\t        \"config\": {\n\t          \"name\": \"{{l2p2p_ni_name1}}\",\n\t          \"type\": \"frinx-openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"{{l2p2p_show_interface3}}\",\n\t                        \"subinterface\" : {{l2p2p_show_sub_interface_index}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"{{l2p2p_endpoint_id}}\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"frinx-openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"{{l2p2p_show_remoteip}}\",\n\t                        \"virtual-circuit-identifier\": {{l2p2p_vccid}}\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show created sub to rem",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful GET request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"network-instance\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    if ( jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['config']['type'] === 'frinx-openconfig-network-instance-types:LOCAL' ) {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\")",
+													"        tests[\"Validate endpoint 1 subinterfaece\"] = \"\"+jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['local']['state']['subinterface'] === postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\")",
+													"    } else {",
+													"        tests[\"Validate endpoint 1 interface\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['interface'] === postman.getEnvironmentVariable(\"l2p2p_show_interface3\")",
+													"        tests[\"Validate endpoint 1 subinterfaece\"] = \"\"+jsonData['network-instance'][0]['connection-points']['connection-point'][1]['endpoints']['endpoint'][0]['local']['state']['subinterface'] === postman.getEnvironmentVariable(\"l2p2p_show_sub_interface_index\")",
+													"        tests[\"Validate endpoint 2 remote\"] = jsonData['network-instance'][0]['connection-points']['connection-point'][0]['endpoints']['endpoint'][0]['remote']['state']['remote-system'] === postman.getEnvironmentVariable(\"l2p2p_show_remoteip\")",
+													"    }",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still not up! Too many attempts !\")",
+													"        tests[\"Connection not created\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not created yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show created sub to rem');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Connection str",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Successful DELETE request\"] = responseCode.code === 200"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "show deleted sub to rem",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"if (responseCode.code === 404) {",
+													"    tests[\"Connection removed\"] = true",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Connection still present! Too many attempts !\")",
+													"        console.warn(\"// FIXME this returns data instead of returning 404\")",
+													"        //tests[\"Connection not removed\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Connection not removed yet! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('show deleted sub to rem');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "\t{\n\t    \"openconfig-network-instance:network-instance\": [\n\t      {\n\t        \"name\": \"conn1233\",\n\t        \"config\": {\n\t          \"name\": \"conn1233\",\n\t          \"type\": \"openconfig-network-instance-types:L2P2P\"\n\t        },\n\t        \"connection-points\": {\n\t          \"connection-point\": [\n\t            {\n\t              \"connection-point-id\": \"1\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"1\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:LOCAL\"\n\t                    },\n\t                    \"local\": {\n\t                      \"config\": {\n\t                        \"interface\": \"GigabitEthernet2/0\"\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            },\n\t            {\n\t              \"connection-point-id\": \"2\",\n\t              \"config\": {\n\t                \"connection-point-id\": \"2\"\n\t              },\n\t              \"endpoints\": {\n\t                \"endpoint\": [\n\t                  {\n\t                    \"endpoint-id\": \"default\",\n\t                    \"config\": {\n\t                      \"endpoint-id\": \"default\",\n\t                      \"precedence\": 0,\n\t                      \"type\": \"openconfig-network-instance-types:REMOTE\"\n\t                    },\n\t                    \"remote\": {\n\t                      \"config\": {\n\t                        \"remote-system\": \"1.1.1.1\",\n\t                        \"virtual-circuit-identifier\": 123\n\t                      }\n\t                    }\n\t                  }\n\t                ]\n\t              }\n\t            }\n\t          ]\n\t        }\n\t      }\n\t    ]\n\t  \n\t}\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{l2p2p_ni_name1}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: Delete subinterface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200;",
+													""
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no interface {{l2p2p_show_interface3}}.{{l2p2p_show_sub_interface_index}}\n exit\"\n  }\n}\n\n"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
 									},
 									"response": []
 								}

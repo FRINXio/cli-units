@@ -61,7 +61,7 @@ done
 
 ### Test for IOS
 IOS_devices=("classic_152_env.json" "classic_1553_env.json" "xe_env.json")
-Classic_folders=("Mount" "General information" "Interface" "Interface IP" "ospf/vrf" "static route" "BGP summary" "journal/dry-run" "CDP" "subinterface common" "L2P2P" "Unmount")
+Classic_folders=("Mount" "General information" "Interface" "Interface IP" "ospf/vrf" "static route" "BGP summary" "journal/dry-run" "CDP" "subinterface common" "L2P2P" "L2P2P CRUD" "Unmount")
 XE_folders=("Mount" "General information" "Interface" "Interface IP" "ospf/vrf" "static route" "BGP summary" "journal/dry-run" "CDP" "LLDP" "subinterface common" "Unmount")
 
 for device in ${IOS_devices[@]}
