@@ -143,6 +143,12 @@
     },
     {
       "enabled": true,
+      "key": "bgp_group",
+      "value": "nbrgroup1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
       "key": "attempts_3x",
       "value": "3",
       "type": "text"
