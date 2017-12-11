@@ -22,7 +22,7 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
     private Cli cli;
 
     private static final String NO_DAMPENING = "no dampening";
-    private static final String EMPTY_COMMAND = "";
+    private static final String DEFAULT_DAMPENING_COMMAND = "dampening";
 
     public InterfaceDampingConfigWriter(Cli cli) {
         this.cli = cli;
@@ -56,7 +56,7 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
             return String.format("dampening %s", dataAfter.getHalfLife());
         }
 
-        return EMPTY_COMMAND;
+        return DEFAULT_DAMPENING_COMMAND;
     }
 
     private static void validateConfig(Config dataAfter) {
