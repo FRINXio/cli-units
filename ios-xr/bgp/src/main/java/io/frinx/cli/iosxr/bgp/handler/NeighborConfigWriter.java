@@ -11,8 +11,8 @@ package io.frinx.cli.iosxr.bgp.handler;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
@@ -21,9 +21,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
-public class NeighborConfigWriter implements CliWriter<Config> {
+public class NeighborConfigWriter implements BgpWriter<Config> {
 
     private Cli cli;
 
@@ -32,13 +30,12 @@ public class NeighborConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                       @Nonnull Config data,
-                                       @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
+                                              WriteContext writeContext) throws WriteFailedException {
         final Global g = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get().getGlobal();
         final String instName =
-            NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
-                "instance " + id.firstKeyOf(Protocol.class).getName();
+                NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
+                        "instance " + id.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, id, data,
                 "configure terminal",
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
@@ -50,14 +47,12 @@ public class NeighborConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                        @Nonnull Config dataBefore,
-                                        @Nonnull Config dataAfter,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+                                               WriteContext writeContext) throws WriteFailedException {
         final Global g = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get().getGlobal();
         final String instName =
-            NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
-                "instance " + id.firstKeyOf(Protocol.class).getName();
+                NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
+                        "instance " + id.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, id, dataAfter,
                 "configure terminal",
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
@@ -69,13 +64,12 @@ public class NeighborConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                        @Nonnull Config data,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config config, WriteContext writeContext)
+            throws WriteFailedException {
         final Global g = writeContext.readBefore(RWUtils.cutId(id, Bgp.class)).get().getGlobal();
         final String instName =
-            NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
-                "instance " + id.firstKeyOf(Protocol.class).getName();
+                NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
+                        "instance " + id.firstKeyOf(Protocol.class).getName();
         blockingDeleteAndRead(cli, id,
                 "configure terminal",
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),

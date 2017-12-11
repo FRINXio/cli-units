@@ -11,7 +11,7 @@ package io.frinx.cli.ospf.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.io.frinx.cli.handlers.ospf.OspfReader;
+import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import javax.annotation.Nonnull;

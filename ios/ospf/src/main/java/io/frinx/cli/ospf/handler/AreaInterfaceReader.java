@@ -14,7 +14,7 @@ import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.io.frinx.cli.handlers.ospf.OspfListReader;
+import io.frinx.cli.handlers.ospf.OspfListReader;
 import io.frinx.cli.io.Cli;
 import java.util.ArrayList;
 import java.util.List;

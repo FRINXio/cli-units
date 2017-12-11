@@ -10,7 +10,7 @@ package io.frinx.cli.iosxr.ospf.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.io.frinx.cli.handlers.ospf.OspfReader;
+import io.frinx.cli.handlers.ospf.OspfReader;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222._interface.ref.InterfaceRefBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222._interface.ref._interface.ref.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222._interface.ref._interface.ref.ConfigBuilder;
