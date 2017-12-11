@@ -42,6 +42,7 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
                 f("neighbor %s", id.firstKeyOf(Neighbor.class).getNeighborAddress().getIpv4Address().getValue()),
                 f("remote-as %s", data.getPeerAs().getValue()),
                 data.isEnabled() ? "no shutdown" : "shutdown",
+                data.getPeerGroup() != null ? f("use neighbor-group %s", data.getPeerGroup()) : "",
                 "commit",
                 "end");
     }
@@ -59,6 +60,7 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
                 f("neighbor %s", id.firstKeyOf(Neighbor.class).getNeighborAddress().getIpv4Address().getValue()),
                 f("remote-as %s", dataAfter.getPeerAs().getValue()),
                 dataAfter.isEnabled() ? "no shutdown" : "shutdown",
+                dataAfter.getPeerGroup() != null ? f("use neighbor-group %s", dataAfter.getPeerGroup()) : "",
                 "commit",
                 "end");
     }
