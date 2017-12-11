@@ -10,16 +10,14 @@ package io.frinx.cli.iosxr.bgp.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
-public class GlobalConfigWriter implements CliWriter<Config> {
+public class GlobalConfigWriter implements BgpWriter<Config> {
 
     private Cli cli;
 
@@ -28,7 +26,8 @@ public class GlobalConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
+                                              WriteContext writeContext) throws WriteFailedException {
         final String protName = id.firstKeyOf(Protocol.class).getName();
         String name = (protName.equals(NetworInstance.DEFAULT_NETWORK_NAME)) ? "" : " instance " + protName;
         blockingWriteAndRead(cli, id, data,
@@ -39,7 +38,15 @@ public class GlobalConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+                                               WriteContext writeContext) throws WriteFailedException {
+        deleteCurrentAttributesForType(id, dataBefore, writeContext);
+        writeCurrentAttributesForType(id, dataAfter, writeContext);
+    }
+
+    @Override
+    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
+                                               WriteContext writeContext) throws WriteFailedException {
         final String protName = id.firstKeyOf(Protocol.class).getName();
         String name = (protName.equals(NetworInstance.DEFAULT_NETWORK_NAME)) ? "" : " instance " + protName;
         blockingDeleteAndRead(cli, id,

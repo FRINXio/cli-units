@@ -10,8 +10,8 @@ package io.frinx.cli.iosxr.ospf.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.MAXMETRICSUMMARYLSA;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.MAXMETRICINCLUDE;
@@ -20,11 +20,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.timers.max.metric.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-
-public class MaxMetricConfigWriter implements CliWriter<Config> {
+public class MaxMetricConfigWriter implements OspfWriter<Config> {
 
     private final Cli cli;
 
@@ -33,7 +29,8 @@ public class MaxMetricConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
+                                              WriteContext writeContext) throws WriteFailedException {
         if (!data.isSet()) {
             deleteCurrentAttributes(instanceIdentifier, data, writeContext);
         }
@@ -62,14 +59,15 @@ public class MaxMetricConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributes(id, dataAfter, writeContext);
+    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+                                               WriteContext writeContext) throws WriteFailedException {
+        writeCurrentAttributesForType(id, dataAfter, writeContext);
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
+                                               WriteContext writeContext) throws WriteFailedException {
         final String timeout = (data.getTimeout() != null) ? "on-startup " + data.getTimeout() : "";
-        final List<String> includes = new ArrayList<>();
         final StringBuilder builder = new StringBuilder();
         for (Class<? extends MAXMETRICINCLUDE> include : data.getInclude()) {
             builder.append(parseIncludes(include));
