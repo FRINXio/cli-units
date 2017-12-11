@@ -63,7 +63,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
             blockingWriteAndRead(cli, id, data,
                     "configure terminal",
                     f("interface %s", getSubinterfaceName(id)),
-                    data.getDescription() == null ? "" : f("description %s", data.getDescription()),
+                    data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
                     data.isEnabled() ? "no shutdown" : "shutdown",
                     "commit",
                     "end");
@@ -89,7 +89,6 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 

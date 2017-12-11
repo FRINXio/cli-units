@@ -122,28 +122,12 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter, e);
         }
 
-        if (isPhysicalInterface(dataAfter)) {
-            updatePhysicalInterface(id, dataAfter);
-        } else if (isSupportedInterface(dataAfter)) {
-            deleteInterface(id, dataBefore);
+        if (isSupportedInterface(dataAfter)) {
             writeInterface(id, dataAfter);
         } else {
             throw new WriteFailedException.CreateFailedException(id, dataAfter,
                     new IllegalArgumentException("Unknown interface type: " + dataAfter.getType()));
         }
-    }
-
-    private void updatePhysicalInterface(InstanceIdentifier<Config> id, Config data)
-            throws WriteFailedException.CreateFailedException {
-
-        blockingWriteAndRead(cli, id, data,
-                "configure terminal",
-                f("interface %s", data.getName()),
-                data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
-                data.getMtu() == null ? "no mtu" : f("mtu %s", data.getMtu()),
-                data.isEnabled() ? "no shutdown" : "shutdown",
-                "commit",
-                "end");
     }
 
     @Override
