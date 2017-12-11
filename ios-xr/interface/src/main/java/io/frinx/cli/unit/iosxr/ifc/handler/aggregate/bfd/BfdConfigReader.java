@@ -59,7 +59,11 @@ public class BfdConfigReader implements CliConfigReader<Config, ConfigBuilder> {
         String output = blockingRead(String.format(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, ifcName),
                 cli, id, ctx);
 
-        if (!isSupportedBfdConfig(output)) {
+        ConfigBuilder configBuilder = new ConfigBuilder();
+        parseBfdConfig(output, configBuilder);
+        Config parsedBfdConfig = configBuilder.build();
+
+        if (!isSupportedBfdConfig(output) && !isNotEmpty(parsedBfdConfig)) {
             // we support only bfd configuration with mode set to ietf and
             // fast-detect enabled
             LOG.info("{}: The interface {} bfd configuration read from device is not supported."
@@ -67,7 +71,12 @@ public class BfdConfigReader implements CliConfigReader<Config, ConfigBuilder> {
             return;
         }
 
-        parseBfdConfig(output, builder);
+        builder.fieldsFrom(parsedBfdConfig);
+    }
+
+    private static boolean isNotEmpty(Config parsedBfdConfig) {
+        return parsedBfdConfig.getDestinationAddress() != null || parsedBfdConfig.getMinInterval() != null
+                || parsedBfdConfig.getMultiplier() != null;
     }
 
     private static final Pattern BFD_MODE_ITEF = Pattern.compile("\\s*bfd mode ietf\\s*");
