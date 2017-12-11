@@ -50,6 +50,8 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
         List<SubinterfaceKey> subinterfaceKeys = parseSubinterfaceIds(blockingRead(SH_INTERFACE, cli, instanceIdentifier, readContext), id);
 
         // Subinterface with ID 0 is reserved for IP addresses of the interface
+        // TODO should we check if the interface is IP-enabled?
+        // TODO what if subinterface .0 already exists on the device?
         subinterfaceKeys.add(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
         return subinterfaceKeys;
     }

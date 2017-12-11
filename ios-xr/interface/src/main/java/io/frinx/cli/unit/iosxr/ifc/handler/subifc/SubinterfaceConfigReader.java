@@ -48,8 +48,9 @@ public class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigB
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
 
-        // Only parse configuration for non 0 subifc
+        // Parse subifc's configuration from device only for non 0 subifc
         if (subKey.getIndex() == ZERO_SUBINTERFACE_ID) {
+            builder.setIndex(subKey.getIndex());
             return;
         }
 

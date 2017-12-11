@@ -49,7 +49,7 @@ public class SubinterfaceStateReader implements CliOperReader<State, StateBuilde
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> id, @Nonnull StateBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
 
-        // Only parse configuration for non 0 subifc
+        // Only parse configuration from device for non 0 subifc
         if (subKey.getIndex() == ZERO_SUBINTERFACE_ID) {
             return;
         }
