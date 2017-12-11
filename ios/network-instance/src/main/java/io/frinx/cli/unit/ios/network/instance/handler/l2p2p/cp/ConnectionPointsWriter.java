@@ -9,6 +9,7 @@
 package io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
@@ -21,6 +22,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface2;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.Ipv4;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.Addresses;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.Ipv6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.Subinterfaces;
@@ -30,6 +36,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.ConnectionPoint;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.endpoints.Endpoint;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.endpoints.endpoint.local.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L2P2P;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.LOCAL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.REMOTE;
@@ -160,28 +167,72 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
             String ifcName = endpoint1.getLocal().getConfig().getInterface();
             ConnectionPointsReader.InterfaceId interfaceId = ConnectionPointsReader.InterfaceId.fromEndpoint(endpoint1);
 
-            Optional<Interface> ifcData = isWrite ?
-                    writeContext.readAfter(IIDs.INTERFACES.child(Interface.class, new InterfaceKey(interfaceId.toParentIfcString()))) :
-                    writeContext.readBefore(IIDs.INTERFACES.child(Interface.class, new InterfaceKey(interfaceId.toParentIfcString())));
-            checkArgument(ifcData.isPresent(), "Unknown interface %s, cannot configure l2p2p", ifcData);
-
-            // Check interface not used already (or its parent)
-            checkArgument(!usedInterfaces.contains(interfaceId.toString()),
-                    "Interface %s already used in L2P2P network as: %s", interfaceId, interfaceId);
-            checkArgument(!usedInterfaces.contains(interfaceId.toParentIfcString()),
-                    "Interface %s already used in L2P2P network as: %s", interfaceId, interfaceId.toParentIfcString());
+            checkIfcExists(writeContext, isWrite, interfaceId);
+            checkIfcNotUsedAlready(usedInterfaces, interfaceId);
 
             Object subifc = endpoint1.getLocal().getConfig().getSubinterface();
             if (subifc != null) {
-                KeyedInstanceIdentifier<Subinterface, SubinterfaceKey> subIfcId = IIDs.INTERFACES
-                        .child(Interface.class, new InterfaceKey(ifcName))
-                        .child(Subinterfaces.class)
-                        .child(Subinterface.class, new SubinterfaceKey(((Long) subifc)));
-                Optional<Subinterface> subData = isWrite ? writeContext.readAfter(subIfcId) : writeContext.readBefore(subIfcId);
-                checkArgument(subData.isPresent(), "Unknown subinterface %s.%s, cannot configure l2p2p", interfaceId);
+                checkSubIfcExists(writeContext, isWrite, ifcName, interfaceId, (Long) subifc);
+            }
+
+            if (isWrite) {
+                checkInterfaceNoIp(writeContext, endpoint1.getLocal().getConfig(), interfaceId);
             }
         }
+
         return endpoint1;
+    }
+
+    private static void checkIfcNotUsedAlready(Set<String> usedInterfaces, ConnectionPointsReader.InterfaceId interfaceId) {
+        // Check interface not used already (or its parent)
+        checkArgument(!usedInterfaces.contains(interfaceId.toString()),
+                "Interface %s already used in L2P2P network as: %s", interfaceId, interfaceId);
+        checkArgument(!usedInterfaces.contains(interfaceId.toParentIfcString()),
+                "Interface %s already used in L2P2P network as: %s", interfaceId, interfaceId.toParentIfcString());
+    }
+
+    private static void checkSubIfcExists(WriteContext writeContext, boolean isWrite, String ifcName, ConnectionPointsReader.InterfaceId interfaceId, Long subifc) {
+        KeyedInstanceIdentifier<Subinterface, SubinterfaceKey> subIfcId = IIDs.INTERFACES
+                .child(Interface.class, new InterfaceKey(ifcName))
+                .child(Subinterfaces.class)
+                .child(Subinterface.class, new SubinterfaceKey(subifc));
+
+        Optional<Subinterface> subData = isWrite ? writeContext.readAfter(subIfcId) : writeContext.readBefore(subIfcId);
+        checkArgument(subData.isPresent(), "Unknown subinterface %s.%s, cannot configure l2p2p", interfaceId);
+    }
+
+    private static void checkIfcExists(WriteContext writeContext, boolean isWrite, ConnectionPointsReader.InterfaceId interfaceId) {
+        KeyedInstanceIdentifier<Interface, InterfaceKey> ifcId = IIDs.INTERFACES
+                .child(Interface.class, new InterfaceKey(interfaceId.toParentIfcString()));
+
+        Optional<Interface> ifcData = isWrite ? writeContext.readAfter(ifcId) : writeContext.readBefore(ifcId);
+        checkArgument(ifcData.isPresent(), "Unknown interface %s, cannot configure l2p2p", ifcData);
+    }
+
+    private static void checkInterfaceNoIp(WriteContext writeContext,
+                                           Config localConfig,
+                                           ConnectionPointsReader.InterfaceId interfaceId) {
+        Long subifcId = localConfig.getSubinterface() == null ? 0 : (Long) localConfig.getSubinterface();
+
+        KeyedInstanceIdentifier<Subinterface, SubinterfaceKey> subIfcId = IIDs.INTERFACES
+                .child(Interface.class, new InterfaceKey(localConfig.getInterface()))
+                .child(Subinterfaces.class)
+                .child(Subinterface.class, new SubinterfaceKey(subifcId));
+
+        Optional<Addresses> ipv4 = writeContext.readAfter(subIfcId.augmentation(Subinterface1.class)
+                .child(Ipv4.class)
+                .child(Addresses.class));
+        // Ensure no IPv4
+        checkState(!ipv4.isPresent() || ipv4.get().getAddress().isEmpty(),
+                "Interface: %s cannot be used in L2P2P. It has IP address configured: %s", interfaceId, ipv4);
+
+        Optional<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.Addresses> ipv6 = writeContext.readAfter(
+                subIfcId.augmentation(Subinterface2.class)
+                        .child(Ipv6.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.Addresses.class));
+        // Ensure no IPv6
+        checkState(!ipv6.isPresent() || ipv6.get().getAddress().isEmpty(),
+                "Interface: %s cannot be used in L2P2P. It has IPv6 address configured: %s", interfaceId, ipv6);
     }
 
     private static ConnectionPoint getCPoint(@Nonnull ConnectionPoints dataAfter, String expectedPointId) {
