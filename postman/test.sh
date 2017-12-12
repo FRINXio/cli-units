@@ -25,38 +25,38 @@ done
 ### Test for IOS XR
 XR_devices=("xrv_env.json" "asr_env.json" "xrv5_env.json")
 XR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "CDP" "LLDP" "subinterface common" "BGP summary" "BGP CRUD" "Unmount")
-XR5_folders=("Mount" "RSVP CRUD" "MPLS CRUD" "OSPF CRUD" "BGP CRUD" "Unmount")
-ASR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "Platform" "CDP" "LLDP" "subinterface common" "BGP summary" "Unmount")
+XR5_folders=("Mount" "RSVP CRUD" "MPLS CRUD" "OSPF CRUD" "BGP CRUD" "5 LAG without BFD" "Unmount")
+ASR_folders=("Mount" "General information" "Interface" "Interface IP" "ospf" "static route" "Platform" "CDP" "LLDP" "subinterface common" "BGP summary" "5 LAG without BFD" "5 LAG with BFD" "Unmount")
 
 for device in ${XR_devices[@]}
 do
    echo Collection running with $device
          if [ "$device" == "xrv_env.json" ]
-         then 
+         then
              for folder in "${XR_folders[@]}"
-             do   
+             do
                 newman run $collection --bail -e $device -n 1 --folder "XR $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing XR $folder FAILED" >> $file; fi
                 sleep 5
              done
          fi
-         
+
          if [ "$device" == "xrv5_env.json" ]
-         then 
+         then
              for folder in "${XR5_folders[@]}"
-             do   
+             do
                 newman run $collection --bail -e $device -n 1 --folder "XR $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing XR $folder FAILED" >> $file; fi
                 sleep 5
              done
          fi
 
          if [ "$device" == "asr_env.json" ]
-         then 
+         then
              for folder in "${ASR_folders[@]}"
-             do   
+             do
                 newman run $collection --bail -e $device -n 1 --folder "XR $folder"; if [ "$?" != "0" ]; then echo "Collection $collection with environment $device testing XR $folder FAILED" >> $file; fi
                 sleep 5
              done
-         fi 
+         fi
 done
 
 ### Test for IOS

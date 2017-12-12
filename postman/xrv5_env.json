@@ -278,6 +278,108 @@
       "key": "ospf_cost2",
       "value": "30",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_inf-id",
+      "value": "7029",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_description",
+      "value": "brundle",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_mtu",
+      "value": "324",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_ip",
+      "value": "71.71.71.71",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_prefix-length",
+      "value": "26",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_mask",
+      "value": "255.255.255.192",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_damp_half-life",
+      "value": "11",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_damp_reuse",
+      "value": "6666",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_damp_suppress",
+      "value": "8888",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_damp_max-supress",
+      "value": "22",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_load-interval",
+      "value": "60",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_min-links",
+      "value": "33",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_bfd_destination-address",
+      "value": "82.82.82.82",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_bfd_min-interval",
+      "value": "21456",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_bfd_multiplier",
+      "value": "44",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_enabled",
+      "value": "true",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lag_damp_enabled",
+      "value": "true",
+      "type": "text"
     }
   ],
   "timestamp": 1512645751428,
