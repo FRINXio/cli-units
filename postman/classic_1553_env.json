@@ -1,5 +1,5 @@
 {
-  "id": "bbf5cf86-79c0-73d7-1c26-b4bfb6ddbb6d",
+  "id": "51d27bc7-88c7-97cf-7f5d-35ff925f8eed",
   "name": "classic-testing 1.225",
   "values": [
     {
@@ -255,6 +255,12 @@
     },
     {
       "enabled": true,
+      "key": "l2p2p_show_remoteip2",
+      "value": "2.2.2.2",
+      "type": "text"
+    },
+    {
+      "enabled": true,
       "key": "l2p2p_show_remotevccid",
       "value": "456",
       "type": "text"
@@ -295,6 +301,36 @@
     },
     {
       "enabled": true,
+      "key": "l2p2p_ni_name1",
+      "value": "conn1233",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_ni_name2",
+      "value": "conn1234",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_vccid",
+      "value": "44",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_vlan_id",
+      "value": "45",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "l2p2p_endpoint_id",
+      "value": "default",
+      "type": "text"
+    },
+    {
+      "enabled": true,
       "key": "bgp_ni-name",
       "value": "default",
       "type": "text"
@@ -310,10 +346,16 @@
       "key": "bgp_nonexisting-process-name",
       "value": "xxx",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "show_attempts_count",
+      "value": "2",
+      "type": "text"
     }
   ],
-  "timestamp": 1512047209236,
+  "timestamp": 1512751706777,
   "_postman_variable_scope": "environment",
-  "_postman_exported_at": "2017-11-30T13:07:53.847Z",
+  "_postman_exported_at": "2017-12-08T16:48:29.485Z",
   "_postman_exported_using": "Postman/5.3.2"
 }
