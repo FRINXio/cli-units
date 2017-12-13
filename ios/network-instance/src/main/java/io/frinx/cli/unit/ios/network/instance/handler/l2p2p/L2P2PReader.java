@@ -31,7 +31,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class L2P2PReader implements CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>,
         CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
-    public static final String SH_INTERFACES_XCONNECT = "sh run | include interface|xconnect";
+    public static final String SH_INTERFACES_XCONNECT = "sh run | include ^interface|^ *xconnect";
     public static final Pattern XCONNECT_ID_LINE = Pattern.compile("(?<interface>\\S+)\\s+xconnect\\s+(?<ip>\\S+)\\s+(?<vccid>\\S+)\\s+(?<encaps>.*)");
     private static final Pattern PW_CLASS = Pattern.compile(".*pw-class (?<pwclass>\\S+)");
 
