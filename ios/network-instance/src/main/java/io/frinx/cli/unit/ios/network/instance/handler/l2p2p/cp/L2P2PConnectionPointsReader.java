@@ -21,13 +21,13 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.read.Reader;
 import io.frinx.cli.handlers.network.instance.L2p2pReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.registry.common.CompositeReader;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPointsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.ConnectionPoint;
@@ -46,11 +46,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.REMOTE;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<ConnectionPoints, ConnectionPointsBuilder> {
+public class L2P2PConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<ConnectionPoints, ConnectionPointsBuilder>,
+        CompositeReader.Child<ConnectionPoints, ConnectionPointsBuilder> {
 
     public static final String POINT_1 = "1";
     public static final String POINT_2 = "2";
@@ -58,14 +57,8 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
 
     private final Cli cli;
 
-    public ConnectionPointsReader(Cli cli) {
+    public L2P2PConnectionPointsReader(Cli cli) {
         this.cli = cli;
-    }
-
-    @Nonnull
-    @Override
-    public ConnectionPointsBuilder getBuilder(@Nonnull InstanceIdentifier<ConnectionPoints> id) {
-        return new ConnectionPointsBuilder();
     }
 
     @Override
@@ -158,7 +151,7 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
 
         IpAddress remoteIp = new IpAddress(new Ipv4Address(matcher.group("ip")));
         Long vccid = Long.valueOf(matcher.group("vccid"));
-        Remote remote = getXconnectRemote(isOper, remoteIp, vccid);
+        Remote remote = getRemote(isOper, remoteIp, vccid);
 
         Endpoint localEndpoint = getEndpoint(isOper, LOCAL.class)
                 .setLocal(local)
@@ -175,7 +168,7 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
         return Lists.newArrayList(point1Builder.build(), point2Builder.build());
     }
 
-    private ConnectionPointBuilder getConnectionPointBuilder(boolean isOper, Endpoint localEndpoint, String pointId) {
+    public static ConnectionPointBuilder getConnectionPointBuilder(boolean isOper, Endpoint localEndpoint, String pointId) {
         ConnectionPointBuilder point1Builder = new ConnectionPointBuilder();
         point1Builder.setConnectionPointId(pointId)
                 .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.ConfigBuilder()
@@ -192,7 +185,7 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
         return point1Builder;
     }
 
-    private static EndpointBuilder getEndpoint(boolean isOper, Class<? extends ENDPOINTTYPE> type) {
+    public static EndpointBuilder getEndpoint(boolean isOper, Class<? extends ENDPOINTTYPE> type) {
         EndpointBuilder localEndpointBuilder = new EndpointBuilder();
         localEndpointBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.endpoints.endpoint.ConfigBuilder()
                 .setEndpointId(ENDPOINT_ID)
@@ -211,7 +204,7 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
                 .setEndpointId(ENDPOINT_ID);
     }
 
-    private static Remote getXconnectRemote(boolean isOper, IpAddress remoteIp, Long vccid) {
+    public static Remote getRemote(boolean isOper, IpAddress remoteIp, Long vccid) {
         RemoteBuilder remoteBuilder = new RemoteBuilder();
         remoteBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.endpoints.endpoint.remote.ConfigBuilder()
                 .setRemoteSystem(remoteIp)
@@ -226,7 +219,7 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
         return remoteBuilder.build();
     }
 
-    private static Local getLocal(boolean isOper, InterfaceId ifcId) {
+    public static Local getLocal(boolean isOper, InterfaceId ifcId) {
         LocalBuilder localBuilder = new LocalBuilder();
         localBuilder.setConfig(new ConfigBuilder()
                 .setInterface(ifcId.ifc)
@@ -241,12 +234,7 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
         return localBuilder.build();
     }
 
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull ConnectionPoints readValue) {
-        ((NetworkInstanceBuilder) parentBuilder).setConnectionPoints(readValue);
-    }
-
-    static final class InterfaceId {
+    public static final class InterfaceId {
 
         private String ifc;
         private Long subifc;
@@ -256,7 +244,7 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
             this.subifc = subifc;
         }
 
-        static InterfaceId parse(String name) {
+        public static InterfaceId parse(String name) {
             String[] splitIfcName = name.split("\\.");
 
             String ifcRealName = splitIfcName.length == 2 ? splitIfcName[0] : name;
@@ -275,7 +263,7 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
             return ifc;
         }
 
-        static InterfaceId fromEndpoint(Endpoint endpoint1) {
+        public static InterfaceId fromEndpoint(Endpoint endpoint1) {
             return new InterfaceId(endpoint1.getLocal().getConfig().getInterface(),
                     ((Long) endpoint1.getLocal().getConfig().getSubinterface()));
         }

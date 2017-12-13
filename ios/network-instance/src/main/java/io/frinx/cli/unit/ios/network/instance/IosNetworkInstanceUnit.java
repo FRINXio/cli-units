@@ -8,7 +8,6 @@
 
 package io.frinx.cli.unit.ios.network.instance;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
@@ -20,16 +19,13 @@ import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.common.CompositeWriter;
 import io.frinx.cli.registry.spi.TranslateUnit;
-import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
+import io.frinx.cli.unit.ios.network.instance.handler.ConnectionPointsReader;
+import io.frinx.cli.unit.ios.network.instance.handler.ConnectionPointsWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigReader;
+import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigWriter;
+import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceStateReader;
-import io.frinx.cli.handlers.def.DefaultConfigWriter;
-import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PConfigWriter;
-import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.ConnectionPointsReader;
-import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.ConnectionPointsWriter;
-import io.frinx.cli.unit.ios.network.instance.handler.vrf.VrfConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolConfigReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolReader;
@@ -90,11 +86,7 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
         // No handling required on the network instance level
         wRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
 
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG,
-                        new CompositeWriter<>(Lists.newArrayList(
-                                new VrfConfigWriter(cli),
-                                new DefaultConfigWriter(),
-                                new L2P2PConfigWriter(cli)))),
+        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli)),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
 
         wRegistry.subtreeAddAfter(Sets.newHashSet(
