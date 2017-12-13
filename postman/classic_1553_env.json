@@ -25,7 +25,7 @@
     {
       "enabled": true,
       "key": "connect_attempts",
-      "value": "90",
+      "value": "120",
       "type": "text"
     },
     {
@@ -212,6 +212,13 @@
       "enabled": true,
       "key": "test_sub_interface",
       "value": "GigabitEthernet0%2F2",
+      "type": "text",
+      "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
+      "key": "test_sub_interface_url",
+      "value": "GigabitEthernet0/2",
       "type": "text",
       "description": "Please review and adapt before running tests"
     },

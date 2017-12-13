@@ -217,6 +217,13 @@
     },
     {
       "enabled": true,
+      "key": "test_sub_interface_url",
+      "value": "GigabitEthernet1",
+      "type": "text",
+      "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
       "key": "test_sub_interface_index",
       "value": "1",
       "type": "text"

@@ -2,8 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "85e6aa6e-65c7-2864-62de-c54425079e96",
-		"description": "",
+		"_postman_id": "fda0aa86-a3fe-2b29-4d05-631bf1f508b0",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
@@ -5247,7 +5246,7 @@
 											"script": {
 												"type": "text/javascript",
 												"exec": [
-													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
 												]
 											}
 										}
@@ -9926,8 +9925,7 @@
 									"script": {
 										"type": "text/javascript",
 										"exec": [
-											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											""
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
 										]
 									}
 								}
@@ -9969,17 +9967,12 @@
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
 											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ospf\")));",
 											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"router\")));",
-											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net\")));",
-											"tests[\"04. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"area\")));",
-											"tests[\"05. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip41\")));",
-											"tests[\"06. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"netmask\")));",
-											"tests[\"07. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ospf2\")));",
-											"tests[\"08. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip41\")));",
-											"tests[\"09. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net2\")));",
-											"tests[\"10. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"area2\")));",
-											"tests[\"11. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vrf\")));",
-											"",
-											""
+											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"area\")));",
+											"tests[\"04. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip41\")));",
+											"tests[\"05. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ospf2\")));",
+											"tests[\"06. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip41\")));",
+											"tests[\"07. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"area2\")));",
+											"tests[\"08. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vrf\")));"
 										]
 									}
 								}
@@ -10019,12 +10012,7 @@
 											"console.log(\"Response: \" + responseBody)",
 											"",
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_interface\")));",
-											"",
-											"",
-											"",
-											"",
-											""
+											"tests[\"Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_interface\")));"
 										]
 									}
 								}
@@ -10064,13 +10052,7 @@
 											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing static route\")",
 											"",
 											"// console.log(\"Response: \" + responseBody)",
-											"// tests[\"Status code is 404\"] = responseCode.code === 404;",
-											"",
-											"",
-											"",
-											"",
-											"",
-											""
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
 										]
 									}
 								}
@@ -10107,8 +10089,7 @@
 									"script": {
 										"type": "text/javascript",
 										"exec": [
-											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											""
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
 										]
 									}
 								}
@@ -11294,7 +11275,7 @@
 											"tests[\"Status code is 200\"] = responseCode.code === 200;",
 											"",
 											"tests[\"01. Body matches string\"] = responseBody.has(\"updated subinterface description\");",
-											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")));",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface_url\")) + \".\" + String(postman.getEnvironmentVariable(\"test_sub_interface_index\")));",
 											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));"
 										]
 									}
@@ -12398,15 +12379,6 @@
 													"console.log(\"Response: \" + responseBody)",
 													"tests[\"Expected PUT failure\"] = responseCode.code === 500",
 													""
-												]
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"type": "text/javascript",
-												"exec": [
-													"postman.setNextRequest('TEARDOWN: Delete Subinterface neg');"
 												]
 											}
 										}
