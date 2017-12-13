@@ -6,17 +6,15 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.unit.ios.essential.crud;
+package io.frinx.cli.unit.brocade.essential;
 
 import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.Version;
@@ -42,12 +40,9 @@ public class VersionReader implements CliOperReader<Version, VersionBuilder> {
         parseShowVersion(blockingRead(SH_VERSION, cli, id, ctx), builder);
     }
 
-    private static final Pattern DESCRIPTION_LINE = Pattern.compile("System image file is \"(?<image>[^\"]+)\"");
-    private static final Pattern FIRST_LINE = Pattern.compile("(?<osFamily>.+) Software, .*");
-    private static final Pattern VERSION_LINE = Pattern.compile(".+ Software, .*Version (?<version>.+)");
-    private static final Pattern REGISTRY_LINE = Pattern.compile("Configuration register .*is (?<registry>.+)");
-    private static final Pattern PROCESSOR_LINE = Pattern.compile("Processor board ID (?<processor>.+)");
-    private static final Pattern PLATFORM_AND_MEMORY_LINE = Pattern.compile("(?<platform>.+) with (?<memory>.+) bytes of memory.*");
+    private static final Pattern DESCRIPTION_LINE = Pattern.compile("Compiled on .* labeled as (?<image>\\S+)");
+    private static final Pattern VERSION_LINE = Pattern.compile("IronWare\\s+: Version (?<version>\\S+) Copyright.*");
+    private static final Pattern PLATFORM_LINE = Pattern.compile("(Chassis|System): (?<platform>[^(]+) \\(Serial #:\\s+(?<serial>[^,]+),\\s+Part #:\\s+(?<part>[^)]+)\\)");
 
     @VisibleForTesting
     static void parseShowVersion(String output, VersionBuilder builder) {
@@ -56,37 +51,18 @@ public class VersionReader implements CliOperReader<Version, VersionBuilder> {
                 matcher -> matcher.group("image"),
                 builder::setSysImage);
 
+        builder.setOsFamily("IronWare");
         parseField(output, 0,
-                FIRST_LINE::matcher,
-                matcher -> matcher.group("osFamily"),
-                builder::setOsFamily);
-
-        parseField(output, 0,
-                PLATFORM_AND_MEMORY_LINE::matcher,
-                matcher -> matcher.group("platform"),
-                builder::setPlatform);
-
-        // For IOS XE this will match IOS version
-        // but also the platform version.
-        // We want to parse the latter one.
-        parseFields(output, 0,
                 VERSION_LINE::matcher,
                 matcher -> matcher.group("version"),
-                Function.identity()).stream().reduce((a, b) -> b).ifPresent(builder::setOsVersion);
-
+                builder::setOsVersion);
         parseField(output, 0,
-                REGISTRY_LINE::matcher,
-                matcher -> matcher.group("registry"),
-                builder::setConfReg);
-
+                PLATFORM_LINE::matcher,
+                matcher -> matcher.group("platform"),
+                builder::setPlatform);
         parseField(output, 0,
-                PLATFORM_AND_MEMORY_LINE::matcher,
-                matcher -> matcher.group("memory"),
-                builder::setSysMemory);
-
-        parseField(output, 0,
-                PROCESSOR_LINE::matcher,
-                matcher -> matcher.group("processor"),
+                PLATFORM_LINE::matcher,
+                matcher -> matcher.group("serial"),
                 builder::setSerialId);
     }
 
