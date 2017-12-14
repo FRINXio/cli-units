@@ -19,6 +19,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class HoldTimeConfigWriter implements CliWriter<Config> {
     private Cli cli;
+    private static final String CARRIER_DELAY_COMMAND_TEMPLATE = "carrier-delay %s %s";
 
     public HoldTimeConfigWriter(Cli cli) {
         this.cli = cli;
@@ -30,12 +31,14 @@ public class HoldTimeConfigWriter implements CliWriter<Config> {
 
         String ifcName = id.firstKeyOf(Interface.class).getName();
 
+        String up = dataAfter.getUp() == null ? "" : f("up %s", dataAfter.getUp());
+        String down = dataAfter.getDown() == null ? "" : f("down %s", dataAfter.getDown());
+
         // TODO We should restrict this probably just to physical ifcs
         blockingWriteAndRead(cli, id, dataAfter,
                 "configure terminal",
                 f("interface %s", ifcName),
-                f("carrier-delay up %s", dataAfter.getUp()),
-                f("carrier-delay down %s", dataAfter.getDown()),
+                f(CARRIER_DELAY_COMMAND_TEMPLATE, up, down),
                 "commit",
                 "end");
     }
