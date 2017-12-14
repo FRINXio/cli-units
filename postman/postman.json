@@ -2,7 +2,8 @@
 	"variables": [],
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "fda0aa86-a3fe-2b29-4d05-631bf1f508b0",
+		"_postman_id": "373f3fd3-9936-ceb1-32d1-cd4f2c5f634d",
+		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
@@ -2432,7 +2433,11 @@
 											"var mystring = \"\\\"name\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_process-name\"))+\"\\\"\";",
 											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring); ",
 											"var mystring = '\"as\":' + postman.getEnvironmentVariable(\"bgp_as\");",
-											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);"
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+											"var mystring = '\"peer-as\":' + postman.getEnvironmentVariable(\"bgp_peer-as\");",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+											"var mystring = \"\\\"peer-group\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_group\"))+\"\\\"\";",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring); "
 										]
 									}
 								}
@@ -2568,6 +2573,105 @@
 							"response": []
 						},
 						{
+							"name": "SETUP Reconcile",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/reconcile:reconcile"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP Configure neighbor group",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n router bgp {{bgp_as}} instance {{bgp_process-name}}\n neighbor-group {{bgp_group}}\n commit\nend\"\n  }\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP Reconcile",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/reconcile:reconcile"
+							},
+							"response": []
+						},
+						{
 							"name": "Configure bgp NATIVE",
 							"event": [
 								{
@@ -2594,7 +2698,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"protocol\": [\n        {\n            \"name\": \"{{bgp_process-name}}\",\n            \"identifier\": \"frinx-openconfig-policy-types:BGP\",\n            \"config\": {\n                \"name\": \"{{bgp_process-name}}\",\n                \"identifier\": \"frinx-openconfig-policy-types:BGP\"\n            },\n            \"bgp\": {\n                \"global\": {\n                    \"config\": {\n                        \"as\": {{bgp_as}}\n                    }\n                },\n                \"neighbors\": {\n                    \"neighbor\": [\n                        {\n                            \"neighbor-address\": \"{{ip1}}\",\n                            \"config\": {\n                                \"neighbor-address\": \"{{ip1}}\",\n                                \"peer-as\": {{bgp_peer-as}},\n                                \"enabled\": true\n                            }\n                        }\n                    ]\n                }\n          \n            }\n        }\n    ]\n}"
+									"raw": "{\n    \"protocol\": [\n        {\n            \"name\": \"{{bgp_process-name}}\",\n            \"identifier\": \"frinx-openconfig-policy-types:BGP\",\n            \"config\": {\n                \"name\": \"{{bgp_process-name}}\",\n                \"identifier\": \"frinx-openconfig-policy-types:BGP\"\n            },\n            \"bgp\": {\n                \"global\": {\n                    \"config\": {\n                        \"as\": {{bgp_as}}\n                    }\n                },\n                \"neighbors\": {\n                    \"neighbor\": [\n                        {\n                            \"neighbor-address\": \"{{ip1}}\",\n                            \"config\": {\n                                \"neighbor-address\": \"{{ip1}}\",\n                                \"peer-group\": \"{{bgp_group}}\",\n                                \"peer-as\": {{bgp_peer-as}},\n                                \"enabled\": true\n                            }\n                        }\n                    ]\n                }\n          \n            }\n        }\n    ]\n}"
 								},
 								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
@@ -2617,7 +2721,11 @@
 											"var mystring = \"\\\"name\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_process-name\"))+\"\\\"\";",
 											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring); ",
 											"var mystring = '\"as\":' + postman.getEnvironmentVariable(\"bgp_as\");",
-											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);"
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+											"var mystring = '\"peer-as\":' + postman.getEnvironmentVariable(\"bgp_peer-as\");",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+											"var mystring = \"\\\"peer-group\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_group\"))+\"\\\"\";",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring); "
 										]
 									}
 								}
@@ -2673,7 +2781,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"protocol\": [\n        {\n            \"name\": \"{{bgp_process-name}}\",\n            \"identifier\": \"frinx-openconfig-policy-types:BGP\",\n            \"config\": {\n                \"name\": \"{{bgp_process-name}}\",\n                \"identifier\": \"frinx-openconfig-policy-types:BGP\"\n            },\n            \"bgp\": {\n                \"global\": {\n                    \"config\": {\n                        \"as\": {{bgp_as2}}\n                    }\n                },\n                \"neighbors\": {\n                    \"neighbor\": [\n                        {\n                            \"neighbor-address\": \"{{bgp_ip2}}\",\n                            \"config\": {\n                                \"neighbor-address\": \"{{bgp_ip2}}\",\n                                \"peer-as\": {{bgp_peer-as}},\n                                \"enabled\": true\n                            }\n                        }\n                    ]\n                }\n            }\n        }\n    ]\n}"
+									"raw": "{\n    \"protocol\": [\n        {\n            \"name\": \"{{bgp_process-name}}\",\n            \"identifier\": \"frinx-openconfig-policy-types:BGP\",\n            \"config\": {\n                \"name\": \"{{bgp_process-name}}\",\n                \"identifier\": \"frinx-openconfig-policy-types:BGP\"\n            },\n            \"bgp\": {\n                \"global\": {\n                    \"config\": {\n                        \"as\": {{bgp_as2}}\n                    }\n                },\n                \"neighbors\": {\n                    \"neighbor\": [\n                        {\n                            \"neighbor-address\": \"{{bgp_ip2}}\",\n                            \"config\": {\n                                \"neighbor-address\": \"{{bgp_ip2}}\",\n                                \"peer-group\": \"{{bgp_group2}}\",\n                                \"peer-as\": {{bgp_peer-as2}},\n                                \"enabled\": true\n                            }\n                        }\n                    ]\n                }\n            }\n        }\n    ]\n}"
 								},
 								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-network-instance:network-instances/network-instance/{{bgp_ni-name}}/protocols/protocol/frinx-openconfig-policy-types:BGP/{{bgp_process-name}}"
 							},
@@ -2696,7 +2804,11 @@
 											"var mystring = \"\\\"name\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_process-name\"))+\"\\\"\";",
 											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring); ",
 											"var mystring = '\"as\":' + postman.getEnvironmentVariable(\"bgp_as2\");",
-											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);"
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+											"var mystring = '\"peer-as\":' + postman.getEnvironmentVariable(\"bgp_peer-as2\");",
+											"tests[\"Body matches string \" + mystring] = responseBody.has(mystring);",
+											"var mystring = \"\\\"peer-group\\\":\\\"\" + String (postman.getEnvironmentVariable(\"bgp_group2\"))+\"\\\"\";",
+											"tests[\"Body matches string\" + mystring] = responseBody.has(mystring); "
 										]
 									}
 								}
@@ -3292,7 +3404,7 @@
 							"response": []
 						},
 						{
-							"name": "TEARDOWN: Delete previouse rsvp copy",
+							"name": "TEARDOWN: Delete previouse rsvp",
 							"event": [
 								{
 									"listen": "test",
