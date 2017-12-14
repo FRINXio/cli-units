@@ -1,5 +1,5 @@
 {
-  "id": "84b4962e-43e3-34e5-b2ca-1d62ad078d47",
+  "id": "3dfbe4c2-1b63-e095-9518-3faef843769e",
   "name": "xrv5_env.json",
   "values": [
     {
@@ -597,10 +597,67 @@
       "value": "Bundle-Ether666",
       "type": "text",
       "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
+      "key": "lacp_intf-id",
+      "value": "GigabitEthernet0/0/0/2",
+      "type": "text",
+      "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
+      "key": "lacp_url_intf-id",
+      "value": "GigabitEthernet0%2F0%2F0%2F2",
+      "type": "text",
+      "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
+      "key": "lacp_mode_xr_active",
+      "value": "active",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lacp_mode_active",
+      "value": "ACTIVE",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lacp_mode_passive",
+      "value": "PASSIVE",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lacp_interval_slow",
+      "value": "SLOW",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lacp_interval_fast",
+      "value": "FAST",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "lacp_bundle_id",
+      "value": "Bundle-Ether191",
+      "type": "text",
+      "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
+      "key": "lacp_bundle_id_nr",
+      "value": "191",
+      "type": "text"
     }
   ],
-  "timestamp": 1513257782227,
+  "timestamp": 1513369602733,
   "_postman_variable_scope": "environment",
-  "_postman_exported_at": "2017-12-14T13:23:04.532Z",
+  "_postman_exported_at": "2017-12-15T20:29:04.732Z",
   "_postman_exported_using": "Postman/5.4.0"
 }

@@ -1,9 +1,7 @@
 {
-	"variables": [],
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "b9c316a7-a3da-5b57-612a-3ce7461064d9",
-		"description": "",
+		"_postman_id": "46df1906-1b1c-c8ee-c514-8038aaa9ca6c",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
@@ -16472,6 +16470,1320 @@
 								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 							},
 							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "XR LACP CRUD",
+					"item": [
+						{
+							"name": "Interface",
+							"item": [
+								{
+									"name": "SETUP: LR0: Create empty interface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{lacp_intf-id}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:ethernetCsmacd\",\n                \"name\": \"{{lacp_intf-id}}\",\n                \"enabled\": false\n            },\n            \"subinterfaces\": {\n                \"subinterface\": [\n                    {\n                        \"index\": 0,\n                        \"config\": {\n                            \"index\": 0\n                        }\n                    }\n                ]\n            }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "LR0: show created empty interface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === false",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('L0: show created empty interface');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: LR1: Configure LACP",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\ninterface {{lacp_intf-id}}\nbundle id {{lacp_bundle_id_nr}} mode {{lacp_mode_xr_active}}\nlacp period short\ncommit\nend\"\n  }\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP LR1: Reconcile",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"tests[\"Status code is 200\"] = responseCode.code === 200;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/reconcile:reconcile"
+									},
+									"response": []
+								},
+								{
+									"name": "LR1: show configured lacp",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"id": "a93522be-efa4-443a-87b7-fefaf1cef7f6",
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === true",
+													"",
+													"    tests[\"Lacp - aggregate id\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-openconfig-if-aggregate:aggregate-id\"] === postman.getEnvironmentVariable(\"lacp_bundle_id\");",
+													"    tests[\"Lacp - interval\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:interval\"] === postman.getEnvironmentVariable(\"lacp_interval_fast\");",
+													"    tests[\"Lacp - mode\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:lacp-mode\"] === postman.getEnvironmentVariable(\"lacp_mode_active\");",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest(\"LR1: show configured lacp\");",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Lacp via interface",
+							"item": [
+								{
+									"name": "SETUP: L0: Create empty interface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{lacp_intf-id}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:ethernetCsmacd\",\n                \"name\": \"{{lacp_intf-id}}\",\n                \"enabled\": false\n            },\n            \"subinterfaces\": {\n                \"subinterface\": [\n                    {\n                        \"index\": 0,\n                        \"config\": {\n                            \"index\": 0\n                        }\n                    }\n                ]\n            }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "L0: show created empty interface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === false",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('L0: show created empty interface');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: L1 Create passive mode",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{lacp_intf-id}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:ethernetCsmacd\",\n                \"name\": \"{{lacp_intf-id}}\",\n                \"enabled\": false\n            },            \"subinterfaces\": {\n            \"subinterface\": [\n                    {\n                        \"index\": 0,\n                        \"config\": {\n                            \"index\": 0\n                        }\n                    }\n                ]\n            },\n            \"frinx-openconfig-if-ethernet:ethernet\": {\n                \"config\": {\n                    \"frinx-openconfig-if-aggregate:aggregate-id\": \"{{lacp_bundle_id}}\",\n                    \"lacp-mode\": \"{{lacp_mode_passive}}\"\n\t\t\t\t}\n            }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "L1 show created passive mode",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === true",
+													"",
+													"    tests[\"Lacp - aggregate id\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-openconfig-if-aggregate:aggregate-id\"] === postman.getEnvironmentVariable(\"lacp_bundle_id\");",
+													"    tests[\"Lacp - interval\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:interval\"] === postman.getEnvironmentVariable(\"lacp_interval_slow\");",
+													"    tests[\"Lacp - mode\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:lacp-mode\"] === postman.getEnvironmentVariable(\"lacp_mode_passive\");",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest(\"L1 show created passive mode\");",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: L2 Update active mode",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{lacp_intf-id}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:ethernetCsmacd\",\n                \"name\": \"{{lacp_intf-id}}\",\n                \"enabled\": false\n            },\n            \"subinterfaces\": {\n                \"subinterface\": [\n                    {\n                        \"index\": 0,\n                        \"config\": {\n                            \"index\": 0\n                        }\n                    }\n                ]\n            },\n            \"frinx-openconfig-if-ethernet:ethernet\": {\n                \"config\": {\n                    \"frinx-openconfig-if-aggregate:aggregate-id\": \"{{lacp_bundle_id}}\",\n                    \"lacp-mode\": \"{{lacp_mode_active}}\"\n\t\t\t\t}\n            }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "L2 show updated active mode",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === true",
+													"",
+													"    tests[\"Lacp - aggregate id\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-openconfig-if-aggregate:aggregate-id\"] === postman.getEnvironmentVariable(\"lacp_bundle_id\");",
+													"    tests[\"Lacp - interval\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:interval\"] === postman.getEnvironmentVariable(\"lacp_interval_slow\");",
+													"    tests[\"Lacp - mode\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:lacp-mode\"] === postman.getEnvironmentVariable(\"lacp_mode_active\");",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest(\"L2 show updated active mode\");",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: L3 Update period fast",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{lacp_intf-id}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:ethernetCsmacd\",\n                \"name\": \"{{lacp_intf-id}}\",\n                \"enabled\": false\n            },\n            \"subinterfaces\": {\n                \"subinterface\": [\n                    {\n                        \"index\": 0,\n                        \"config\": {\n                            \"index\": 0\n                        }\n                    }\n                ]\n            },\n            \"frinx-openconfig-if-ethernet:ethernet\": {\n                \"config\": {\n                    \"frinx-openconfig-if-aggregate:aggregate-id\": \"{{lacp_bundle_id}}\",\n                    \"lacp-mode\": \"{{lacp_mode_active}}\",\n                    \"interval\": \"{{lacp_interval_fast}}\"\n\t\t\t\t}\n            }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "L3 show updated period fast",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === true",
+													"",
+													"    tests[\"Lacp - aggregate id\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-openconfig-if-aggregate:aggregate-id\"] === postman.getEnvironmentVariable(\"lacp_bundle_id\");",
+													"    tests[\"Lacp - interval\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:interval\"] === postman.getEnvironmentVariable(\"lacp_interval_fast\");",
+													"    tests[\"Lacp - mode\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:lacp-mode\"] === postman.getEnvironmentVariable(\"lacp_mode_active\");",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest(\"L3 show updated period fast\");",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: L4 Delete bundle",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}/frinx-openconfig-if-ethernet:ethernet"
+									},
+									"response": []
+								},
+								{
+									"name": "L4: show cleaned empty interface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === false",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('L4: show cleaned empty interface');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Lacp via eth element",
+							"item": [
+								{
+									"name": "SETUP: LE0: Create empty interface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{lacp_intf-id}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:ethernetCsmacd\",\n                \"name\": \"{{lacp_intf-id}}\",\n                \"enabled\": false\n            },\n            \"subinterfaces\": {\n                \"subinterface\": [\n                    {\n                        \"index\": 0,\n                        \"config\": {\n                            \"index\": 0\n                        }\n                    }\n                ]\n            }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "LE0: show created empty interface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === false",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('LE0: show created empty interface');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: LE1 Create passive mode",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n            \"frinx-openconfig-if-ethernet:ethernet\": {\n                \"config\": {\n                    \"frinx-openconfig-if-aggregate:aggregate-id\": \"{{lacp_bundle_id}}\",\n                    \"lacp-mode\": \"{{lacp_mode_passive}}\"\n\t\t\t\t}\n            }\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}/frinx-openconfig-if-ethernet:ethernet"
+									},
+									"response": []
+								},
+								{
+									"name": "LE1 show created passive mode",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === true",
+													"",
+													"    tests[\"Lacp - aggregate id\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-openconfig-if-aggregate:aggregate-id\"] === postman.getEnvironmentVariable(\"lacp_bundle_id\");",
+													"    tests[\"Lacp - interval\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:interval\"] === postman.getEnvironmentVariable(\"lacp_interval_slow\");",
+													"    tests[\"Lacp - mode\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:lacp-mode\"] === postman.getEnvironmentVariable(\"lacp_mode_passive\");",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest(\"LE1 show created passive mode\");",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: LE2 Update active mode",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n            \"frinx-openconfig-if-ethernet:ethernet\": {\n                \"config\": {\n                    \"frinx-openconfig-if-aggregate:aggregate-id\": \"{{lacp_bundle_id}}\",\n                    \"lacp-mode\": \"{{lacp_mode_active}}\"\n\t\t\t\t}\n            }\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}/frinx-openconfig-if-ethernet:ethernet"
+									},
+									"response": []
+								},
+								{
+									"name": "LE2 show updated active mode",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === true",
+													"",
+													"    tests[\"Lacp - aggregate id\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-openconfig-if-aggregate:aggregate-id\"] === postman.getEnvironmentVariable(\"lacp_bundle_id\");",
+													"    tests[\"Lacp - interval\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:interval\"] === postman.getEnvironmentVariable(\"lacp_interval_slow\");",
+													"    tests[\"Lacp - mode\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:lacp-mode\"] === postman.getEnvironmentVariable(\"lacp_mode_active\");",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest(\"LE2 show updated active mode\");",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: LE3 Update period fast",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n            \"frinx-openconfig-if-ethernet:ethernet\": {\n                \"config\": {\n                    \"frinx-openconfig-if-aggregate:aggregate-id\": \"{{lacp_bundle_id}}\",\n                    \"lacp-mode\": \"{{lacp_mode_active}}\",\n                    \"interval\": \"{{lacp_interval_fast}}\"\n\t\t\t\t}\n            }\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}/frinx-openconfig-if-ethernet:ethernet"
+									},
+									"response": []
+								},
+								{
+									"name": "LE3 show updated period fast",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === true",
+													"",
+													"    tests[\"Lacp - aggregate id\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-openconfig-if-aggregate:aggregate-id\"] === postman.getEnvironmentVariable(\"lacp_bundle_id\");",
+													"    tests[\"Lacp - interval\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:interval\"] === postman.getEnvironmentVariable(\"lacp_interval_fast\");",
+													"    tests[\"Lacp - mode\"] = jsonData[\"interface\"][0][\"frinx-openconfig-if-ethernet:ethernet\"][\"config\"][\"frinx-lacp-lag-member:lacp-mode\"] === postman.getEnvironmentVariable(\"lacp_mode_active\");",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest(\"LE3 show updated period fast\");",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: LE4 Delete bundle",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}/frinx-openconfig-if-ethernet:ethernet"
+									},
+									"response": []
+								},
+								{
+									"name": "LE4: show cleaned empty interface",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Lacp - number of tested interfaces\"] = jsonData[\"interface\"].length === 1",
+													"",
+													"    tests[\"Lacp - name\"] = jsonData[\"interface\"][0][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - config name\"] = jsonData[\"interface\"][0][\"config\"][\"name\"] === postman.getEnvironmentVariable(\"lacp_intf-id\");",
+													"    tests[\"Lacp - ethernet presence\"] = \"frinx-openconfig-if-ethernet:ethernet\" in jsonData[\"interface\"][0] === false",
+													"",
+													"    ",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Interface not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('LE4: show cleaned empty interface');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
 						}
 					],
 					"_postman_isSubFolder": true
