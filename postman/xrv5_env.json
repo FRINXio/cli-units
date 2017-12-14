@@ -125,6 +125,12 @@
     },
     {
       "enabled": true,
+      "key": "bgp_peer-as2",
+      "value": "56000",
+      "type": "text"
+    },
+    {
+      "enabled": true,
       "key": "bgp_nonexisting-process-name",
       "value": "xxx",
       "type": "text"
@@ -145,6 +151,12 @@
       "enabled": true,
       "key": "bgp_group",
       "value": "nbrgroup1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "bgp_group2",
+      "value": "nbrgroup2",
       "type": "text"
     },
     {
