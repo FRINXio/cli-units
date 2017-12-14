@@ -67,6 +67,11 @@
             <artifactId>openconfig-if-ip</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-lacp</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
 
         <!-- Testing Dependencies -->
         <dependency>

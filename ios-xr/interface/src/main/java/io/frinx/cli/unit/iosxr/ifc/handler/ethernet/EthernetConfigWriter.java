@@ -20,10 +20,16 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member.rev171109.LacpEthConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.LacpActivityType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.LacpPeriodType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+// TODO support update?
 public class EthernetConfigWriter implements CliWriter<Config> {
+
+    private static final String BUNDLE_ID_COMMAND_TEMPLATE = "bundle id %s";
 
     private final Cli cli;
 
@@ -38,19 +44,46 @@ public class EthernetConfigWriter implements CliWriter<Config> {
 
         checkIfcType(ifcName);
 
+        configureLAG(ifcName, id, dataAfter);
+    }
+
+    private void configureLAG(String ifcName, InstanceIdentifier<Config> id, Config dataAfter)
+            throws WriteFailedException.CreateFailedException {
+
+        Config1 aggregationAug = dataAfter.getAugmentation(Config1.class);
+        LacpEthConfigAug lacpAug = dataAfter.getAugmentation(LacpEthConfigAug.class);
+
+        if (aggregationAug == null || aggregationAug.getAggregateId() == null) {
+            Preconditions.checkArgument(lacpAug != null,
+                    "Cannot configure lacp on non LAG enabled interface %s", ifcName);
+            return;
+        }
+
+        // TODO Exctract this to commands templates
+        String bundleId = getBundleId(aggregationAug.getAggregateId());
+        String bundleIdCommand = String.format(BUNDLE_ID_COMMAND_TEMPLATE, bundleId);
+        String intervalCommand = "";
+        String mode = "mode on";
+        if (lacpAug != null) {
+            mode = lacpAug.getLacpMode() == LacpActivityType.ACTIVE ? "mode active" : "mode passive";
+            intervalCommand = lacpAug.getInterval() != null && lacpAug.getInterval() == LacpPeriodType.FAST
+                    ? "lacp period short" : "no lacp period short";
+        }
+
         // TODO we should probably check if the logical aggregate interface
         // exists
         blockingWriteAndRead(cli, id, dataAfter,
                 "configure terminal",
                 f("interface %s" , ifcName),
-                f("bundle id %s mode on",
-                        getBundleId(dataAfter.getAugmentation(Config1.class).getAggregateId())),
+                bundleIdCommand + " " + mode,
+                intervalCommand,
                 "commit",
                 "end");
     }
 
     private static Pattern AGGREGATE_IFC_NAME = Pattern.compile("Bundle-Ether(?<id>\\d+)");
 
+    // TODO This should return long
     private static String getBundleId(String aggregateIfcName) {
         Matcher aggregateIfcNameMatcher = AGGREGATE_IFC_NAME.matcher(aggregateIfcName.trim());
 
@@ -58,14 +91,6 @@ public class EthernetConfigWriter implements CliWriter<Config> {
                 "aggregate-id %s should reference LAG interface", aggregateIfcName);
 
         return aggregateIfcNameMatcher.group("id");
-    }
-
-    @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
-                                        @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
-            throws WriteFailedException {
-        deleteCurrentAttributes(id, dataBefore, writeContext);
-        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
@@ -80,6 +105,7 @@ public class EthernetConfigWriter implements CliWriter<Config> {
                 "configure terminal",
                 f("interface %s", ifcName),
                 "no bundle id",
+                "no lacp period short",
                 "commit",
                 "end");
     }
