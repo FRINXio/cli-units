@@ -1,7 +1,8 @@
 {
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "66a21e32-410e-6c25-4e37-285205e96dbd",
+
+		"_postman_id": "46df1906-1b1c-c8ee-c514-8038aaa9ca6c",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
@@ -17779,6 +17780,894 @@
 											"raw": ""
 										},
 										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{lacp_url_intf-id}}"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "XR IFC ACL CRUD",
+					"item": [
+						{
+							"name": "ifc acl full",
+							"item": [
+								{
+									"name": "SETUP: IA0: Create ifc acls",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nipv4 access-list {{iacl_in-acl-name1}} 10 deny ipv4 any any\nipv4 access-list {{iacl_in-acl-name2}} 10 deny ipv4 any any\nipv4 access-list {{iacl_out-acl-name1}} 10 deny ipv4 any any\nipv4 access-list {{iacl_out-acl-name2}} 10 deny ipv4 any any\ncommit\nend\"\n  }\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: IA1: Create acl",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": [\n        {\n            \"id\": \"{{iacl_intf-id}}\",\n            \"config\": {\n                \"id\": \"{{iacl_intf-id}}\"\n            },\n            \"ingress-acl-sets\": {\n                \"ingress-acl-set\": [\n                    {\n                        \"set-name\": \"{{iacl_in-acl-name1}}\",\n                        \"type\": \"ACL_IPV4\",\n                        \"config\": {\n                            \"set-name\": \"{{iacl_in-acl-name1}}\",\n                            \"type\": \"ACL_IPV4\"\n                        }\n                    }\n                ]\n            },\n            \"egress-acl-sets\": {\n                \"egress-acl-set\": [\n                    {\n                        \"set-name\": \"{{iacl_out-acl-name1}}\",\n                        \"type\": \"ACL_IPV4\",\n                        \"config\": {\n                            \"set-name\": \"{{iacl_out-acl-name1}}\",\n                            \"type\": \"ACL_IPV4\"\n                        }\n                    }\n                ]\n            }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "IA1: show created acl",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Ifc acl - interface\"] = jsonData[\"interface\"].length === 1",
+													"    tests[\"Ifc acl - interface name1\"] = jsonData[\"interface\"][0][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"    tests[\"Ifc acl - interface name2\"] = jsonData[\"interface\"][0][\"config\"][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"",
+													"    tests[\"Ifc acl - ingress acl presence\"] = \"ingress-acl-sets\" in jsonData[\"interface\"][0]",
+													"    tests[\"Ifc acl - ingress acl name\"] = jsonData[\"interface\"][0][\"ingress-acl-sets\"][\"ingress-acl-set\"][0][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_in-acl-name1\")",
+													"    tests[\"Ifc acl - ingress acl name\"] = jsonData[\"interface\"][0][\"ingress-acl-sets\"][\"ingress-acl-set\"][0][\"config\"][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_in-acl-name1\")",
+													"",
+													"    tests[\"Ifc acl - egress acl presence\"] = \"egress-acl-sets\" in jsonData[\"interface\"][0]",
+													"    tests[\"Ifc acl - egress acl name\"] = jsonData[\"interface\"][0][\"egress-acl-sets\"][\"egress-acl-set\"][0][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_out-acl-name1\")",
+													"    tests[\"Ifc acl - egress acl name\"] = jsonData[\"interface\"][0][\"egress-acl-sets\"][\"egress-acl-set\"][0][\"config\"][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_out-acl-name1\")",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Ifc acl not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('IA1: show created acl');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: IA1: Update acl",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": [\n        {\n            \"id\": \"{{iacl_intf-id}}\",\n            \"config\": {\n                \"id\": \"{{iacl_intf-id}}\"\n            },\n            \"ingress-acl-sets\": {\n                \"ingress-acl-set\": [\n                    {\n                        \"set-name\": \"{{iacl_in-acl-name2}}\",\n                        \"type\": \"ACL_IPV4\",\n                        \"config\": {\n                            \"set-name\": \"{{iacl_in-acl-name2}}\",\n                            \"type\": \"ACL_IPV4\"\n                        }\n                    }\n                ]\n            },\n            \"egress-acl-sets\": {\n                \"egress-acl-set\": [\n                    {\n                        \"set-name\": \"{{iacl_out-acl-name2}}\",\n                        \"type\": \"ACL_IPV4\",\n                        \"config\": {\n                            \"set-name\": \"{{iacl_out-acl-name2}}\",\n                            \"type\": \"ACL_IPV4\"\n                        }\n                    }\n                ]\n            }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "IA1: show updated acl",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Ifc acl - interface\"] = jsonData[\"interface\"].length === 1",
+													"    tests[\"Ifc acl - interface name1\"] = jsonData[\"interface\"][0][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"    tests[\"Ifc acl - interface name2\"] = jsonData[\"interface\"][0][\"config\"][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"",
+													"    tests[\"Ifc acl - ingress acl presence\"] = \"ingress-acl-sets\" in jsonData[\"interface\"][0]",
+													"    tests[\"Ifc acl - ingress acl name\"] = jsonData[\"interface\"][0][\"ingress-acl-sets\"][\"ingress-acl-set\"][0][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_in-acl-name2\")",
+													"    tests[\"Ifc acl - ingress acl name\"] = jsonData[\"interface\"][0][\"ingress-acl-sets\"][\"ingress-acl-set\"][0][\"config\"][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_in-acl-name2\")",
+													"",
+													"    tests[\"Ifc acl - egress acl presence\"] = \"egress-acl-sets\" in jsonData[\"interface\"][0]",
+													"    tests[\"Ifc acl - egress acl name\"] = jsonData[\"interface\"][0][\"egress-acl-sets\"][\"egress-acl-set\"][0][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_out-acl-name2\")",
+													"    tests[\"Ifc acl - egress acl name\"] = jsonData[\"interface\"][0][\"egress-acl-sets\"][\"egress-acl-set\"][0][\"config\"][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_out-acl-name2\")",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Ifc acl not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('IA1: show updated acl');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: IA1: Delete acl",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "IA1: show deleted acl",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Ifc acl - interface\"] = jsonData[\"interface\"].length === 1",
+													"    tests[\"Ifc acl - interface name1\"] = jsonData[\"interface\"][0][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"    tests[\"Ifc acl - interface name2\"] = jsonData[\"interface\"][0][\"config\"][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"",
+													"    tests[\"Ifc acl - ingress acl presence\"] = \"ingress-acl-sets\" in jsonData[\"interface\"][0] === false",
+													"    tests[\"Ifc acl - egress acl presence\"] = \"egress-acl-sets\" in jsonData[\"interface\"][0] === false",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Ifc acl not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('IA1: show updated acl');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: IA0: Delete ifc acls",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno ipv4 access-list {{iacl_in-acl-name1}}\nno ipv4 access-list {{iacl_in-acl-name2}}\nno ipv4 access-list {{iacl_out-acl-name1}}\nno ipv4 access-list {{iacl_out-acl-name2}}\ncommit\nend\"\n  }\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "ifc acl parts",
+							"item": [
+								{
+									"name": "SETUP: IAP0: Create ifc acls",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nipv4 access-list {{iacl_in-acl-name1}} 10 deny ipv4 any any\nipv4 access-list {{iacl_in-acl-name2}} 10 deny ipv4 any any\nipv4 access-list {{iacl_out-acl-name1}} 10 deny ipv4 any any\nipv4 access-list {{iacl_out-acl-name2}} 10 deny ipv4 any any\ncommit\nend\"\n  }\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: IA2: Create acl ingress egress",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": [\n        {\n            \"id\": \"{{iacl_intf-id}}\",\n            \"config\": {\n                \"id\": \"{{iacl_intf-id}}\"\n            },\n            \"ingress-acl-sets\": {\n                \"ingress-acl-set\": [\n                    {\n                        \"set-name\": \"{{iacl_in-acl-name1}}\",\n                        \"type\": \"ACL_IPV4\",\n                        \"config\": {\n                            \"set-name\": \"{{iacl_in-acl-name1}}\",\n                            \"type\": \"ACL_IPV4\"\n                        }\n                    }\n                ]\n            },\n            \"egress-acl-sets\": {\n                \"egress-acl-set\": [\n                    {\n                        \"set-name\": \"{{iacl_out-acl-name1}}\",\n                        \"type\": \"ACL_IPV4\",\n                        \"config\": {\n                            \"set-name\": \"{{iacl_out-acl-name1}}\",\n                            \"type\": \"ACL_IPV4\"\n                        }\n                    }\n                ]\n            }\n        }\n    ]\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "IA2: show created acl",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Ifc acl - interface\"] = jsonData[\"interface\"].length === 1",
+													"    tests[\"Ifc acl - interface name1\"] = jsonData[\"interface\"][0][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"    tests[\"Ifc acl - interface name2\"] = jsonData[\"interface\"][0][\"config\"][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"",
+													"    tests[\"Ifc acl - ingress acl presence\"] = \"ingress-acl-sets\" in jsonData[\"interface\"][0]",
+													"    tests[\"Ifc acl - ingress acl name\"] = jsonData[\"interface\"][0][\"ingress-acl-sets\"][\"ingress-acl-set\"][0][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_in-acl-name1\")",
+													"    tests[\"Ifc acl - ingress acl name\"] = jsonData[\"interface\"][0][\"ingress-acl-sets\"][\"ingress-acl-set\"][0][\"config\"][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_in-acl-name1\")",
+													"",
+													"    tests[\"Ifc acl - egress acl presence\"] = \"egress-acl-sets\" in jsonData[\"interface\"][0]",
+													"    tests[\"Ifc acl - egress acl name\"] = jsonData[\"interface\"][0][\"egress-acl-sets\"][\"egress-acl-set\"][0][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_out-acl-name1\")",
+													"    tests[\"Ifc acl - egress acl name\"] = jsonData[\"interface\"][0][\"egress-acl-sets\"][\"egress-acl-set\"][0][\"config\"][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_out-acl-name1\")",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Ifc acl not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('IA2: show created acl');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: IA2: Update acl egress",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n            \"egress-acl-sets\": {\n                \"egress-acl-set\": [\n                    {\n                        \"set-name\": \"{{iacl_out-acl-name2}}\",\n                        \"type\": \"ACL_IPV4\",\n                        \"config\": {\n                            \"set-name\": \"{{iacl_out-acl-name2}}\",\n                            \"type\": \"ACL_IPV4\"\n                        }\n                    }\n                ]\n            }\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}/egress-acl-sets"
+									},
+									"response": []
+								},
+								{
+									"name": "IA2: show updated egress",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Ifc acl - interface\"] = jsonData[\"interface\"].length === 1",
+													"    tests[\"Ifc acl - interface name1\"] = jsonData[\"interface\"][0][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"    tests[\"Ifc acl - interface name2\"] = jsonData[\"interface\"][0][\"config\"][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"",
+													"    tests[\"Ifc acl - ingress acl presence\"] = \"ingress-acl-sets\" in jsonData[\"interface\"][0]",
+													"    tests[\"Ifc acl - ingress acl name\"] = jsonData[\"interface\"][0][\"ingress-acl-sets\"][\"ingress-acl-set\"][0][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_in-acl-name1\")",
+													"    tests[\"Ifc acl - ingress acl name\"] = jsonData[\"interface\"][0][\"ingress-acl-sets\"][\"ingress-acl-set\"][0][\"config\"][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_in-acl-name1\")",
+													"",
+													"    tests[\"Ifc acl - egress acl presence\"] = \"egress-acl-sets\" in jsonData[\"interface\"][0]",
+													"    tests[\"Ifc acl - egress acl name\"] = jsonData[\"interface\"][0][\"egress-acl-sets\"][\"egress-acl-set\"][0][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_out-acl-name2\")",
+													"    tests[\"Ifc acl - egress acl name\"] = jsonData[\"interface\"][0][\"egress-acl-sets\"][\"egress-acl-set\"][0][\"config\"][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_out-acl-name2\")",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Ifc acl not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('IA2: show updated egress');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: IA2 Update acl ingress",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n            \"ingress-acl-sets\": {\n                \"ingress-acl-set\": [\n                    {\n                        \"set-name\": \"{{iacl_in-acl-name2}}\",\n                        \"type\": \"ACL_IPV4\",\n                        \"config\": {\n                            \"set-name\": \"{{iacl_in-acl-name2}}\",\n                            \"type\": \"ACL_IPV4\"\n                        }\n                    }\n                ]\n            }\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}/ingress-acl-sets"
+									},
+									"response": []
+								},
+								{
+									"name": "IA2: show updated ingress",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Ifc acl - interface\"] = jsonData[\"interface\"].length === 1",
+													"    tests[\"Ifc acl - interface name1\"] = jsonData[\"interface\"][0][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"    tests[\"Ifc acl - interface name2\"] = jsonData[\"interface\"][0][\"config\"][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"",
+													"    tests[\"Ifc acl - ingress acl presence\"] = \"ingress-acl-sets\" in jsonData[\"interface\"][0]",
+													"    tests[\"Ifc acl - ingress acl name\"] = jsonData[\"interface\"][0][\"ingress-acl-sets\"][\"ingress-acl-set\"][0][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_in-acl-name2\")",
+													"    tests[\"Ifc acl - ingress acl name\"] = jsonData[\"interface\"][0][\"ingress-acl-sets\"][\"ingress-acl-set\"][0][\"config\"][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_in-acl-name2\")",
+													"",
+													"    tests[\"Ifc acl - egress acl presence\"] = \"egress-acl-sets\" in jsonData[\"interface\"][0]",
+													"    tests[\"Ifc acl - egress acl name\"] = jsonData[\"interface\"][0][\"egress-acl-sets\"][\"egress-acl-set\"][0][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_out-acl-name2\")",
+													"    tests[\"Ifc acl - egress acl name\"] = jsonData[\"interface\"][0][\"egress-acl-sets\"][\"egress-acl-set\"][0][\"config\"][\"set-name\"] === postman.getEnvironmentVariable(\"iacl_out-acl-name2\")",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Ifc acl not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('IA2: show updated ingress');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "SETUP: IA2: Delete acl",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "IA2: show deleted acl",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"GET - show created interface request\"] = responseCode.code === 200",
+													"",
+													"// attempts counter",
+													"var attempt = JSON.parse(postman.getEnvironmentVariable(\"attempt\"));",
+													"",
+													"var jsonData = JSON.parse(responseBody);",
+													"if (responseBody.has(\"interface\")) {",
+													"    // Reset attempt counter",
+													"    postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"    // asserts",
+													"    tests[\"Ifc acl - interface\"] = jsonData[\"interface\"].length === 1",
+													"    tests[\"Ifc acl - interface name1\"] = jsonData[\"interface\"][0][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"    tests[\"Ifc acl - interface name2\"] = jsonData[\"interface\"][0][\"config\"][\"id\"] === postman.getEnvironmentVariable(\"iacl_intf-id\")",
+													"",
+													"    tests[\"Ifc acl - ingress acl presence\"] = \"ingress-acl-sets\" in jsonData[\"interface\"][0] === false",
+													"    tests[\"Ifc acl - egress acl presence\"] = \"egress-acl-sets\" in jsonData[\"interface\"][0] === false",
+													"",
+													"} else {",
+													"    // If too many attempts, abort",
+													"    if (attempt > JSON.parse(postman.getEnvironmentVariable(\"show_attempts_count\"))) {",
+													"        // Reset attempt counter",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(1));",
+													"        console.log(\"Expected content not received yet ! Too many attempts !\")",
+													"        tests[\"Ifc acl not created/updated/deleted\"] = false",
+													"    } else {",
+													"        // Schedule next check attempt",
+													"        console.log(\"Data not received yet ! Waiting, attempt : \" + attempt)",
+													"        setTimeout(function(){}, JSON.parse(postman.getEnvironmentVariable(\"connect_attempt_delay\")));",
+													"        postman.setEnvironmentVariable(\"attempt\", JSON.stringify(attempt + 1));",
+													"        postman.setNextRequest('IA1: show updated acl');",
+													"    }",
+													"}"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-acl:acl/interfaces/interface/{{iacl_url_intf-id}}"
+									},
+									"response": []
+								},
+								{
+									"name": "TEARDOWN: IAP0: Delete ifc acls",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"exec": [
+													"console.log(\"Response: \" + responseBody)",
+													"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+												]
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Basic YWRtaW46YWRtaW4="
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\nno ipv4 access-list {{iacl_in-acl-name1}}\nno ipv4 access-list {{iacl_in-acl-name2}}\nno ipv4 access-list {{iacl_out-acl-name1}}\nno ipv4 access-list {{iacl_out-acl-name2}}\ncommit\nend\"\n  }\n}"
+										},
+										"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
 									},
 									"response": []
 								}

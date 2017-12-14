@@ -654,6 +654,44 @@
       "key": "lacp_bundle_id_nr",
       "value": "191",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "iacl_intf-id",
+      "value": "GigabitEthernet0/0/0/0",
+      "type": "text",
+      "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
+      "key": "iacl_url_intf-id",
+      "value": "GigabitEthernet0%2F0%2F0%2F0",
+      "type": "text",
+      "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
+      "key": "iacl_in-acl-name1",
+      "value": "inacl1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "iacl_in-acl-name2",
+      "value": "inacl2",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "iacl_out-acl-name1",
+      "value": "outacl1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "iacl_out-acl-name2",
+      "value": "outacl2",
+      "type": "text"
     }
   ],
   "timestamp": 1513369602733,
