@@ -69,6 +69,11 @@
             <version>${openconfig.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-policy-forwarding</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>ios-xr-bgp-unit</artifactId>
             <version>${cli.version}</version>

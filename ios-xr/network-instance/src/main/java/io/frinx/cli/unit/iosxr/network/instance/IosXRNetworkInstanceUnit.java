@@ -25,6 +25,9 @@ import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceConfigRea
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceStateReader;
 import io.frinx.cli.handlers.def.DefaultConfigWriter;
+import io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceConfigReader;
+import io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceConfigWriter;
+import io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolConfigReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolReader;
@@ -35,13 +38,23 @@ import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension.cisco.rev171109.NiPfIfCiscoAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ProtocolsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.InterfacesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.policy.forwarding.top.PolicyForwarding;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.policy.forwarding.top.PolicyForwardingBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class IosXRNetworkInstanceUnit implements TranslateUnit {
+
+    private static final InstanceIdentifier<Config> PF_IFC_CFG_ROOT_ID = InstanceIdentifier.create(Config.class);
+
     private static final Device IOS_ALL = new DeviceIdBuilder()
             .setDeviceType("ios xr")
             .setDeviceVersion("*")
@@ -89,6 +102,14 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
         rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
         rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader()));
+
+        // PF
+        rRegistry.addStructuralReader(IIDs.NE_NE_POLICYFORWARDING, PolicyForwardingBuilder.class);
+        rRegistry.addStructuralReader(IIDs.NE_NE_PO_INTERFACES, InterfacesBuilder.class);
+        rRegistry.add(
+                new GenericConfigListReader<>(IIDs.NE_NE_PO_IN_INTERFACE, new PolicyForwardingInterfaceReader(cli)));
+        rRegistry.add(
+                new GenericConfigReader<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli)));
     }
 
     private void provideWriters(@Nonnull ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
@@ -102,12 +123,20 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
 
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)));
+
+        // PF
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PO_IN_INTERFACE, new NoopCliListWriter<>()));
+        wRegistry.subtreeAddAfter(Sets.newHashSet(PF_IFC_CFG_ROOT_ID.augmentation(NiPfIfCiscoAug.class)),
+                new GenericWriter<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigWriter(cli)),
+                        /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228
-                .$YangModuleInfoImpl.getInstance());
+        return Sets.newHashSet(
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension.cisco.rev171109.$YangModuleInfoImpl.getInstance());
     }
 
     @Override
