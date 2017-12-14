@@ -139,6 +139,12 @@
         <bundle>mvn:io.frinx.cli/ios-xr-snmp-unit/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='cli-southbound-unit-ios-xr-logging' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-interface</feature>
+        <bundle>mvn:io.frinx.cli/ios-xr-logging-unit/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-ios-xr' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
@@ -149,6 +155,7 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-mpls</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-ospf</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-snmp</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-logging</feature>
     </feature>
 
     <feature name='cli-southbound-unit-brocade-common-cli-initializer' version='${project.version}'>

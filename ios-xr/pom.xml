@@ -33,6 +33,7 @@
     <module>mpls</module>
     <module>ospf</module>
     <module>snmp</module>
+    <module>logging</module>
   </modules>
 
   <build>
