@@ -34,6 +34,7 @@
     <module>ospf</module>
     <module>snmp</module>
     <module>logging</module>
+    <module>acl</module>
   </modules>
 
   <build>
