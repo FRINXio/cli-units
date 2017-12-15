@@ -342,6 +342,18 @@
       "key": "lag_damp_enabled",
       "value": "true",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "snmp_inf_id_physical",
+      "value": "TenGigE0/0/2/2",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "snmp_url_inf_id_physical",
+      "value": "TenGigE0%2F0%2F2%2F2",
+      "type": "text"
     }
   ],
   "timestamp": 1508791475317,
