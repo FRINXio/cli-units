@@ -49,6 +49,11 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config data,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (isPhysicalInterface(data)) {
+            throw new WriteFailedException.CreateFailedException(id, data,
+                    new IllegalArgumentException("Physical interface cannot be created"));
+        }
+
 
         if (isSupportedInterface(data)) {
             writeInterface(id, data);
@@ -122,7 +127,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter, e);
         }
 
-        if (isSupportedInterface(dataAfter)) {
+        // we support update also for physical interfaces
+        if (isSupportedInterface(dataAfter) || isPhysicalInterface(dataAfter)) {
             writeInterface(id, dataAfter);
         } else {
             throw new WriteFailedException.CreateFailedException(id, dataAfter,
