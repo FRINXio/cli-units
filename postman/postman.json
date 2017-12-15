@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "FRINX Unitpo",
-		"_postman_id": "0e1b4efb-23ea-49ff-50d5-653ed97ecf6b",
+		"_postman_id": "1b55a7a1-f969-d37a-5a14-7c98c0fa9bfa",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -2307,11 +2307,9 @@
 				},
 				{
 					"name": "XR 5 SNMP",
-					"description": "",
 					"item": [
 						{
 							"name": "SNMP on GigabitEthernet",
-							"description": "",
 							"item": [
 								{
 									"name": "SETUP: Configure disabled SNMP",
@@ -2763,7 +2761,6 @@
 						},
 						{
 							"name": "SNMP on LAG",
-							"description": "",
 							"item": [
 								{
 									"name": "TEARDOWN: Delete LAG interface",
@@ -3399,6 +3396,704 @@
 								}
 							],
 							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "XR subinterface common CRUD",
+					"item": [
+						{
+							"name": "TEARDOWN: Delete previouse subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no interface {{test_sub_interface}}.{{test_sub_interface_index}}\n interface {{test_sub_interface}}\n no ip address\n commit\n end\"\n  }\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
+							},
+							"response": []
+						},
+						{
+							"name": "show nonexisting subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+											"",
+											"// console.log(\"Response: \" + responseBody)",
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show interface null without ipv4",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"01. Body doesnt matches string\"] = !responseBody.has(String(postman.getEnvironmentVariable(\"net3\")));",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP Configure subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{test_sub_interface}}.{{test_sub_interface_index}}\n description testing subinterface\n encapsulation dot1Q {{vlan_id}}\n commit\n end\"\n  }\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
+							},
+							"response": []
+						},
+						{
+							"name": "show configured subinterface common",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"01. Body matches string\"] = responseBody.has(\"testing subinterface\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")) + \".\" + String(postman.getEnvironmentVariable(\"test_sub_interface_index\")));",
+											"//tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP Configure null subinterface ipv4",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{test_sub_interface}}\n ipv4 address {{net3}} {{netmask}}\n commit\n end\"\n  }\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
+							},
+							"response": []
+						},
+						{
+							"name": "show configured null interface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net3\")));"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP Reconcile",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/reconcile:reconcile"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete ipv4 from null subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}/ipv4"
+							},
+							"response": []
+						},
+						{
+							"name": "show deleted subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+											"",
+											"// console.log(\"Response: \" + responseBody)",
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "Create subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subinterface\": \n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"description\": \"testing subinterface\"\n            }\n           \n        }\n    \n}"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "Create vlan and update description",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"enabled\": true,\n                \"description\": \"updated subinterface description\"\n            },\n            \n            \"frinx-openconfig-vlan:vlan\": {\n                \"config\": {\n                \t\"vlan-id\": {{vlan_id}}\n                }\n            }\n\n        }\n    ]\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show subinterface common",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"01. Body matches string\"] = responseBody.has(\"updated subinterface description\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")) + \".\" + String(postman.getEnvironmentVariable(\"test_sub_interface_index\")));",
+											"//tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "Create ipv4",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index_null}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index_null}}\n            },\n            \"ipv4\": {\n                \"addresses\": {\n                    \"address\": {\n                        \"ip\": {{net3}},\n                        \"config\": {\n                            \"ip\": {{net3}},\n                            \"prefix-length\": 31\n                        }\n                    }\n                }\n            }\n        }\n    ]\n}"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show ipv4 subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net3\")));"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "Update ipv4",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index_null}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index_null}}\n            },\n            \"ipv4\": {\n                \"addresses\": {\n                    \"address\": {\n                        \"ip\": {{ip1}},\n                        \"config\": {\n                            \"ip\": {{ip1}},\n                            \"prefix-length\": 27\n                        }\n                    }\n                }\n            }\n        }\n    ]\n}"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/unified/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show updated ipv4 subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip1\")));"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/unified/node/IOSXR/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "TEARDOWN: Delete previouse subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no interface {{test_sub_interface}}.{{test_sub_interface_index}}\n interface {{test_sub_interface}}.{{test_sub_interface_index_null}}\n no ip address\n commit\n end\"\n  }\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOSXR/yang-ext:mount/cli-unit-generic:execute-and-read"
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -5357,227 +6052,6 @@
 					"_postman_isSubFolder": true
 				},
 				{
-					"name": "Classic subinterface common",
-					"item": [
-						{
-							"name": "TEARDOWN: Delete subinterface",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4="
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
-							},
-							"response": []
-						},
-						{
-							"name": "SETUP: Create subinterface",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4="
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"subinterface\": \n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"description\": \"testing subinterface\"\n            }\n           \n        }\n    \n}"
-								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
-							},
-							"response": []
-						},
-						{
-							"name": "SETUP: Create vlan and update description",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4="
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"enabled\": true,\n                \"description\": \"updated subinterface description\"\n            },\n            \n            \"frinx-openconfig-vlan:vlan\": {\n                \"config\": {\n                \t\"vlan-id\": {{vlan_id}}\n                }\n            }\n\n        }\n    ]\n}\n"
-								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
-							},
-							"response": []
-						},
-						{
-							"name": "show subinterface common",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"console.log(\"Response: \" + responseBody)",
-											"",
-											"tests[\"Status code is 200\"] = responseCode.code === 200;",
-											"",
-											"tests[\"01. Body matches string\"] = responseBody.has(\"updated subinterface description\");",
-											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")));",
-											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4="
-									},
-									{
-										"key": "Accept",
-										"value": "application/json"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
-							},
-							"response": []
-						},
-						{
-							"name": "TEARDOWN: Delete subinterface",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4="
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
-							},
-							"response": []
-						},
-						{
-							"name": "show deleted subinterface",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"type": "text/javascript",
-										"exec": [
-											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
-											"",
-											"// console.log(\"Response: \" + responseBody)",
-											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
-										]
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Basic YWRtaW46YWRtaW4="
-									},
-									{
-										"key": "Accept",
-										"value": "application/json"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
 					"name": "Classic L2P2P",
 					"item": [
 						{
@@ -6161,6 +6635,704 @@
 								}
 							],
 							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Classic subinterface common",
+					"item": [
+						{
+							"name": "TEARDOWN: Delete previouse subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no interface {{test_sub_interface}}.{{test_sub_interface_index}}\n interface {{test_sub_interface}}.{{test_sub_interface_index_null}}\n no ip address\n exit\n exit\"\n  }\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+							},
+							"response": []
+						},
+						{
+							"name": "show nonexisting subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+											"",
+											"// console.log(\"Response: \" + responseBody)",
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show interface null without ipv4",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"01. Body doesnt matches string\"] = !responseBody.has(String(postman.getEnvironmentVariable(\"net3\")));",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP Configure subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{test_sub_interface}}.{{test_sub_interface_index}}\n description testing subinterface\n encapsulation dot1Q {{vlan_id}}\n exit\n exit\"\n  }\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+							},
+							"response": []
+						},
+						{
+							"name": "show configured subinterface common",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"01. Body matches string\"] = responseBody.has(\"testing subinterface\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")) + \".\" + String(postman.getEnvironmentVariable(\"test_sub_interface_index\")));",
+											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP Configure null subinterface ipv4",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n interface {{test_sub_interface}}.{{test_sub_interface_index_null}}\n ip address {{net3}} {{netmask}}\n exit\n exit\"\n  }\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+							},
+							"response": []
+						},
+						{
+							"name": "show configured null interface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net3\")));"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "SETUP Reconcile",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Status code is 200\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/reconcile:reconcile"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete ipv4 from null subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}/ipv4"
+							},
+							"response": []
+						},
+						{
+							"name": "show deleted subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.warn(\"// FIXME this returns data instead of returning 404 for non existing IP\")",
+											"",
+											"// console.log(\"Response: \" + responseBody)",
+											"// tests[\"Status code is 404\"] = responseCode.code === 404;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "Create subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subinterface\": \n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"description\": \"testing subinterface\"\n            }\n           \n        }\n    \n}"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "Create vlan and update description",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index}},\n                \"enabled\": true,\n                \"description\": \"updated subinterface description\"\n            },\n            \n            \"frinx-openconfig-vlan:vlan\": {\n                \"config\": {\n                \t\"vlan-id\": {{vlan_id}}\n                }\n            }\n\n        }\n    ]\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show subinterface common",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"",
+											"tests[\"01. Body matches string\"] = responseBody.has(\"updated subinterface description\");",
+											"tests[\"02. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"test_sub_interface\")) + \".\" + String(postman.getEnvironmentVariable(\"test_sub_interface_index\")));",
+											"tests[\"03. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"vlan_id\")));",
+											""
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index}}"
+							},
+							"response": []
+						},
+						{
+							"name": "Create ipv4",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index_null}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index_null}}\n            },\n            \"ipv4\": {\n                \"addresses\": {\n                    \"address\": {\n                        \"ip\": {{net3}},\n                        \"config\": {\n                            \"ip\": {{net3}},\n                            \"prefix-length\": 31\n                        }\n                    }\n                }\n            }\n        }\n    ]\n}"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show ipv4 subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"net3\")));"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "Update ipv4",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200 || responseCode.code === 201;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subinterface\": [\n        {\n            \"index\": {{test_sub_interface_index_null}},\n            \"config\": {\n                \"index\": {{test_sub_interface_index_null}}\n            },\n            \"ipv4\": {\n                \"addresses\": {\n                    \"address\": {\n                        \"ip\": {{ip42}},\n                        \"config\": {\n                            \"ip\": {{ip42}},\n                            \"prefix-length\": 27\n                        }\n                    }\n                }\n            }\n        }\n    ]\n}"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "show updated ipv4 subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"console.log(\"Response: \" + responseBody)",
+											"",
+											"tests[\"Status code is 200\"] = responseCode.code === 200;",
+											"tests[\"01. Body matches string\"] = responseBody.has(String(postman.getEnvironmentVariable(\"ip42\")));"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operational/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_sub_interface_url}}/subinterfaces/subinterface/{{test_sub_interface_index_null}}"
+							},
+							"response": []
+						},
+						{
+							"name": "TEARDOWN: Delete previouse subinterface",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"exec": [
+											"tests[\"Success\"] = responseCode.code === 200;"
+										]
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Basic YWRtaW46YWRtaW4="
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"input\" :\n  {\n     \"ios-cli:command\" : \"conf t\n no interface {{test_sub_interface}}.{{test_sub_interface_index}}\n interface {{test_sub_interface}}.{{test_sub_interface_index_null}}\n no ip address\n exit\n exit\"\n  }\n}\n"
+								},
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS/yang-ext:mount/cli-unit-generic:execute-and-read"
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true

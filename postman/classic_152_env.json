@@ -48,6 +48,12 @@
     },
     {
       "enabled": true,
+      "key": "ip42",
+      "value": "28.28.28.2",
+      "type": "text"
+    },
+    {
+      "enabled": true,
       "key": "netmask",
       "value": "255.255.255.254",
       "type": "text"
@@ -210,14 +216,14 @@
     },
     {
       "enabled": true,
-      "key": "test_sub_interface",
+      "key": "test_sub_interface_url",
       "value": "GigabitEthernet2%2F0",
       "type": "text",
       "description": "Please review and adapt before running tests"
     },
     {
       "enabled": true,
-      "key": "test_sub_interface_url",
+      "key": "test_sub_interface",
       "value": "GigabitEthernet2/0",
       "type": "text",
       "description": "Please review and adapt before running tests"
@@ -226,6 +232,12 @@
       "enabled": true,
       "key": "test_sub_interface_index",
       "value": "1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "test_sub_interface_index_null",
+      "value": "0",
       "type": "text"
     },
     {
