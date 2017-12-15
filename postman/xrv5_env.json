@@ -560,6 +560,43 @@
       "value": "Bundle-Ether515",
       "type": "text",
       "description": "Please review and adapt before running tests"
+    },
+    {
+      "enabled": true,
+      "key": "pf_ni-name",
+      "value": "default",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "output_policy",
+      "value": "policy1",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "input_policy",
+      "value": "policy2",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "output_policy2",
+      "value": "policy3",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "input_policy2",
+      "value": "policy4",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "policy_interface",
+      "value": "Bundle-Ether666",
+      "type": "text",
+      "description": "Please review and adapt before running tests"
     }
   ],
   "timestamp": 1513257782227,
