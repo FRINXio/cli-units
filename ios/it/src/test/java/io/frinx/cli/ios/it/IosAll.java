@@ -48,12 +48,6 @@ import io.frinx.cli.unit.ios.init.IosCliInitializerUnit;
 import io.frinx.cli.unit.ios.lldp.LldpUnit;
 import io.frinx.cli.unit.ios.network.instance.IosNetworkInstanceUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
-import java.io.StringWriter;
-import java.net.InetSocketAddress;
-import java.security.Security;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -84,6 +78,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topo
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.credentials.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -97,6 +93,12 @@ import org.opendaylight.yangtools.yang.data.impl.schema.tree.InMemoryDataTreeFac
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.LoggerFactory;
+import java.io.StringWriter;
+import java.net.InetSocketAddress;
+import java.security.Security;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class IosAll {
 
@@ -129,6 +131,7 @@ public class IosAll {
     private static final KeepaliveCli.ReconnectListener RECONNECT_LISTENER = init -> {
         throw new RuntimeException("Disconnected !");
     };
+    public static final TopologyKey CLI_TOPO_KEY = new TopologyKey(new TopologyId("cli"));
 
     @Mock
     private DataBroker mockBroker;
@@ -153,7 +156,7 @@ public class IosAll {
 
         TranslateContext translateContext = reg.getTranslateContext(IOS_ALL);
 
-        RemoteDeviceId remoteId = new RemoteDeviceId(IOS_ID, IOS_ADDR);
+        RemoteDeviceId remoteId = new RemoteDeviceId(CLI_TOPO_KEY, IOS_ID, IOS_ADDR);
         cli = IOFactory.getIO(remoteId, CLI_CFG, translateContext.getInitializer(remoteId, CLI_CFG), EXECUTOR, RECONNECT_LISTENER)
                 .toCompletableFuture()
                 .get();
@@ -250,7 +253,7 @@ public class IosAll {
         TranslateRegistryImpl reg = getTranslateRegistry(mockBroker);
         TranslateContext translateContext = reg.getTranslateContext(IOS_ALL);
 
-        RemoteDeviceId remoteId = new RemoteDeviceId(IOS_ID, IOS_ADDR);
+        RemoteDeviceId remoteId = new RemoteDeviceId(CLI_TOPO_KEY, IOS_ID, IOS_ADDR);
 
         for (int i = 0; i < 20; i++) {
 
