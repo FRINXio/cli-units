@@ -17843,7 +17843,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli-dryrun/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -17881,7 +17881,7 @@
 									"mode": "raw",
 									"raw": "{\n    \"interface\": [\n        {\n            \"name\": \"{{test_interface}}\",\n            \"config\": {\n                \"type\": \"iana-if-type:softwareLoopback\",\n                \"enabled\": false,\n                \"name\": \"{{test_interface}}\"\n            }\n        }\n    ]\n}"
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli-dryrun/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						},
@@ -17921,7 +17921,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/journal:read-journal"
+								"url": "http://{{odl_ip}}:8181/restconf/operations/network-topology:network-topology/topology/cli-dryrun/node/IOS/yang-ext:mount/journal:read-journal"
 							},
 							"response": []
 						},
@@ -18077,7 +18077,7 @@
 									"mode": "raw",
 									"raw": ""
 								},
-								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli/node/IOS-dryrun/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
+								"url": "http://{{odl_ip}}:8181/restconf/config/network-topology:network-topology/topology/cli-dryrun/node/IOS/yang-ext:mount/frinx-openconfig-interfaces:interfaces/interface/{{test_interface}}"
 							},
 							"response": []
 						}
