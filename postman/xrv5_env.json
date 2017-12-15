@@ -436,6 +436,18 @@
       "key": "lag_damp_enabled",
       "value": "true",
       "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "snmp_inf_id_physical",
+      "value": "GigabitEthernet0/0/0/4",
+      "type": "text"
+    },
+    {
+      "enabled": true,
+      "key": "snmp_url_inf_id_physical",
+      "value": "GigabitEthernet0%2F0%2F0%2F4",
+      "type": "text"
     }
   ],
   "timestamp": 1512645751428,
