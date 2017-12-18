@@ -56,6 +56,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
 
         if (isSupportedInterface(data)) {
+            validateIfcNameAgainstType(data);
+            validateIfcConfiguration(data);
             writeInterface(id, data);
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
@@ -70,8 +72,6 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     private void writeInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.CreateFailedException {
 
-        validateIfcConfiguration(data);
-
         blockingWriteAndRead(cli, id, data,
                 "configure terminal",
                 f("interface %s", data.getName()),
@@ -83,8 +83,6 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     }
 
     private static void validateIfcConfiguration(Config data) {
-        validateIfcNameAgainstType(data);
-
         if (data.getType() == SoftwareLoopback.class) {
             checkArgument(data.getMtu() == null,
                     "Cannot configure mtu for interface %s of type SoftwareLoopback",
@@ -129,6 +127,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
         // we support update also for physical interfaces
         if (isSupportedInterface(dataAfter) || isPhysicalInterface(dataAfter)) {
+            validateIfcConfiguration(dataAfter);
             writeInterface(id, dataAfter);
         } else {
             throw new WriteFailedException.CreateFailedException(id, dataAfter,
@@ -153,8 +152,6 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
     private void deleteInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.DeleteFailedException {
-        validateIfcNameAgainstType(data);
-
         blockingDeleteAndRead(cli, id,
                 "configure terminal",
                 f("no interface %s", data.getName()),
