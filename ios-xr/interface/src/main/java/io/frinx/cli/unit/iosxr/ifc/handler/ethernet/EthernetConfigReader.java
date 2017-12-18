@@ -67,7 +67,7 @@ public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuild
 
     private static final Pattern BUNDLE_ID_LINE = Pattern.compile("\\s*bundle id (?<id>\\d+).*");
     private static final Pattern LACP_MODE_LINE = Pattern.compile("\\s*bundle id (?<id>\\d+) mode (?<mode>active|passive).*");
-    private static final Pattern LACP_PERIOD_LINE = Pattern.compile("\\s*lacp mode short.*");
+    private static final Pattern LACP_PERIOD_LINE = Pattern.compile("\\s*lacp period short.*");
 
     @VisibleForTesting
     static void parseEthernetConfig(String output, ConfigBuilder builder) {
