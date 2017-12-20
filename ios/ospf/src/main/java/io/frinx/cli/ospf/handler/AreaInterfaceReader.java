@@ -88,7 +88,7 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
 
     private static String getAreaId(AreaKey areaKey) {
         OspfAreaIdentifier id = areaKey.getIdentifier();
-        return id.getUint32() != null ? id.getUint32().toString() : id.getDottedQuad().getValue();
+        return areaIdToString(id);
     }
 
     @Override
@@ -107,5 +107,9 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
                                              @Nonnull InterfaceBuilder interfaceBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class).getId());
+    }
+
+    public static String areaIdToString(OspfAreaIdentifier areaId) {
+        return areaId.getUint32() != null ? areaId.getUint32().toString() : areaId.getDottedQuad().getValue();
     }
 }

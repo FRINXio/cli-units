@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.ospf;
+package io.frinx.cli.ospf.handler;
 
 import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
 import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
@@ -29,6 +29,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+// TODO This reader assumes that there is just one ospr or bgp per vrf
+// won't work correctly if there are more than one instances of same protocol
 public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
         OspfReader.OspfConfigReader<Protocol, ProtocolBuilder>,
         CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {

@@ -26,6 +26,8 @@ import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigReade
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceStateReader;
+import io.frinx.cli.unit.ios.network.instance.handler.vrf.VrfTableConnectionConfigWriter;
+import io.frinx.cli.unit.ios.network.instance.handler.vrf.VrfTableConnectionReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolConfigReader;
@@ -42,6 +44,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ProtocolsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.TableConnectionsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.table.connections.TableConnection;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -53,6 +57,7 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
             .setDeviceVersion("*")
             .build();
     public static final InstanceIdentifier<ConnectionPoints> CONN_PTS_ID = InstanceIdentifier.create(ConnectionPoints.class);
+    private static final InstanceIdentifier<TableConnection> TABLE_CONN_ID = InstanceIdentifier.create(TableConnection.class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -118,6 +123,12 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_INTERFACE, new VrfInterfaceWriter(cli)));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_IN_CONFIG, new NoopCliWriter<>()));
 
+        // Table connections for VRF
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_TABLECONNECTIONS, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_TA_TABLECONNECTION, new NoopCliListWriter<>()));
+        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_TA_TA_CONFIG, new VrfTableConnectionConfigWriter(cli)),
+                /*add after protocol writers*/ IIDs.NE_NE_PR_PR_CONFIG);
+
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
@@ -136,6 +147,11 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
         rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
         rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader()));
+
+        // Table connections for VRF
+        rRegistry.addStructuralReader(IIDs.NE_NE_TABLECONNECTIONS, TableConnectionsBuilder.class);
+        rRegistry.subtreeAdd(Sets.newHashSet(RWUtils.cutIdFromStart(IIDs.NE_NE_TA_TA_CONFIG, TABLE_CONN_ID)),
+                new GenericConfigListReader<>(IIDs.NE_NE_TA_TABLECONNECTION, new VrfTableConnectionReader(cli)));
 
         // Connection points for L2P2p
         rRegistry.subtreeAdd(Sets.newHashSet(
