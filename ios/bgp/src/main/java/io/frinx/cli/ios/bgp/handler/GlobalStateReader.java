@@ -9,6 +9,9 @@
 package io.frinx.cli.ios.bgp.handler;
 
 import com.google.common.annotations.VisibleForTesting;
+
+import java.util.regex.Pattern;
+
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpReader;
@@ -28,6 +31,8 @@ import javax.annotation.Nonnull;
 public class GlobalStateReader implements BgpReader.BgpOperReader<State, StateBuilder> {
 
     private Cli cli;
+    static final String SH_BGP= "sh bgp summ";
+    static final Pattern CONFIG_LINE = Pattern.compile("BGP router identifier (?<id>.+), local AS number (?<as>.+)");
 
     public GlobalStateReader(Cli cli) {
         this.cli = cli;
@@ -43,7 +48,7 @@ public class GlobalStateReader implements BgpReader.BgpOperReader<State, StateBu
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
-        parseGlobal(blockingRead(GlobalConfigReader.SH_BGP, cli, instanceIdentifier, ctx), stateBuilder);
+        parseGlobal(blockingRead(SH_BGP, cli, instanceIdentifier, ctx), stateBuilder);
     }
 
     @Override
@@ -54,12 +59,12 @@ public class GlobalStateReader implements BgpReader.BgpOperReader<State, StateBu
     @VisibleForTesting
     public static void parseGlobal(String output, StateBuilder sBuilder) {
         ParsingUtils.parseField(output, 0,
-                GlobalConfigReader.CONFIG_LINE::matcher,
+                CONFIG_LINE::matcher,
                 matcher -> matcher.group("id"),
                 value -> sBuilder.setRouterId(new DottedQuad(value)));
 
         ParsingUtils.parseField(output, 0,
-                GlobalConfigReader.CONFIG_LINE::matcher,
+                CONFIG_LINE::matcher,
                 matcher -> matcher.group("as"),
                 value -> sBuilder.setAs(new AsNumber(Long.valueOf(value))));
     }

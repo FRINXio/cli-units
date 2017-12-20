@@ -46,11 +46,6 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
             return Collections.emptyList();
         }
 
-        // FIXME implement BGP VRF-awareness
-        if (!DEFAULT_NETWORK.equals(iid.firstKeyOf(NetworkInstance.class))) {
-            LOG.info("BGP VRF-aware is not implemented yet.");
-            return Collections.emptyList();
-        }
         // IOS does not support multi-instance BGP therefore there is only default instance
         return ImmutableList.of(new ProtocolKey(TYPE, DEFAULT_BGP_INSTANCE));
     }
@@ -59,12 +54,17 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> iid,
                                              @Nonnull ProtocolBuilder builder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
-        // FIXME implement BGP VRF-awareness
+
         if (!DEFAULT_NETWORK.equals(iid.firstKeyOf(NetworkInstance.class))) {
-            LOG.info("BGP VRF-aware is not implemented yet.");
+            setBaseAttributes(iid, builder);
+            //todo check if more attributes need to be handled for BGP VRF-awareness
             return;
         }
 
+        setBaseAttributes(iid, builder);
+    }
+
+    private void setBaseAttributes(@Nonnull InstanceIdentifier<Protocol> iid, @Nonnull ProtocolBuilder builder) {
         ProtocolKey key = iid.firstKeyOf(Protocol.class);
         builder.setName(key.getName());
         builder.setIdentifier(key.getIdentifier());

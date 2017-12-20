@@ -28,6 +28,7 @@ public class VrfConfigWriter implements CliWriter<Config> {
     private static final String WRITE_TEMPLATE = "configure terminal\n" +
             "ip vrf %s\n" +
             "description %s\n" +
+            "rd %s\n" +
             "exit\n" +
             "exit";
 
@@ -40,7 +41,8 @@ public class VrfConfigWriter implements CliWriter<Config> {
             blockingWriteAndRead(cli, instanceIdentifier, config,
                     f(WRITE_TEMPLATE,
                             config.getName(),
-                            config.getDescription()));
+                            config.getDescription(),
+                            config.getRouteDistinguisher().getString()));
         }
     }
 

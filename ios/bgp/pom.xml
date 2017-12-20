@@ -53,6 +53,11 @@
             <version>${openconfig.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-local-routing</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry-api</artifactId>
             <version>${cli.version}</version>

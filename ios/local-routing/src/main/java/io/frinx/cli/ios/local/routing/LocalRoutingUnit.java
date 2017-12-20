@@ -13,19 +13,23 @@ import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
+import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.local.routing.handlers.NextHopConfigReader;
 import io.frinx.cli.ios.local.routing.handlers.NextHopReader;
 import io.frinx.cli.ios.local.routing.handlers.NextHopStateReader;
+import io.frinx.cli.ios.local.routing.handlers.ProtocolLocalAggregateConfigWriter;
 import io.frinx.cli.ios.local.routing.handlers.StaticConfigReader;
 import io.frinx.cli.ios.local.routing.handlers.StaticReader;
 import io.frinx.cli.ios.local.routing.handlers.StaticStateReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutesBuilder;
@@ -69,6 +73,15 @@ public class LocalRoutingUnit implements TranslateUnit {
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
         provideReaders(rRegistry, cli);
+        provideWriters(wRegistry, cli);
+    }
+
+    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new NoopCliWriter<>()));
+        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG,
+            new ProtocolLocalAggregateConfigWriter(cli)),
+            Sets.newHashSet(IIDs.NE_NETWORKINSTANCE, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG));
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {

@@ -31,6 +31,7 @@ public class NeighborStateReader implements BgpReader.BgpOperReader<State, State
 
     private Cli cli;
 
+    static final String SH_SUMM = "show bgp all summary | begin Neighbor";
     private static final String NEIGHBOR_LINE = "%s (?<ver>.+) (?<as>.+) (?<msgRcvd>.+) (?<msgSent>.+) (?<tblVer>.+) (?<inQ>.+) (?<outQ>.+) (?<time>.+) (?<pfxRcd>.+)";
 
     public NeighborStateReader(Cli cli) {
@@ -48,7 +49,7 @@ public class NeighborStateReader implements BgpReader.BgpOperReader<State, State
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
         String neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress().getIpv4Address().getValue();
-        String output = blockingRead(NeighborReader.SH_SUMM, cli, instanceIdentifier, ctx);
+        String output = blockingRead(SH_SUMM, cli, instanceIdentifier, ctx);
         readState(neighborIp,stateBuilder, output);
     }
 

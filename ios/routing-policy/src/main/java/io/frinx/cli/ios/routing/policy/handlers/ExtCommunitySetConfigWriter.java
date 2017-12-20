@@ -26,6 +26,17 @@ import io.frinx.cli.unit.utils.CliWriter;
 
 public class ExtCommunitySetConfigWriter  implements CliWriter<Config> {
 
+    // todo This now handles just one special case for cisco route-target-export/import.
+    // It checks defined sets for special defined sets with name <vrf>-route-target-import-set or
+    // <vrf>-route-target-export-set and parses vrfname (<vrf>) from it. This should be changed when routing-policy
+    // is handled correctly. In correct way we should listnen on inter-instance-policies in network instances,
+    // which refer to frinx-openconfig-routing-policy:routing-policy/policy-definitions. There we can find
+    // ext-community-set which points to frinx-openconfig-routing-policy:routing-policy/defined-sets where we can
+    // extract route-targets from ext-community-set/config.
+    // See https://github.com/FRINXio/translation-units-docs/blob/master/Configuration%20datasets/network-instances/l3vpn/network_instance_l3vpn_bgp.md
+    // for example.
+
+
     private static final String ROUTE_TARGET_TEMPLATE = "route-target %s %s\n";
     private static final String NO_ROUTE_TARGET_TEMPLATE = "no route-target %s %s\n";
     private static final String WRITE_TEMPLATE = "configure terminal\n" +
