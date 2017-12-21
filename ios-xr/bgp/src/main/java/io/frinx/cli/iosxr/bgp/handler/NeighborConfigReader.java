@@ -65,7 +65,11 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
             .child(Global.class)
             .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config.class))
-            .get();
+            .orNull();
+
+        if (globalConfig == null) {
+            return;
+        }
 
         IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress();
         configBuilder.setNeighborAddress(neighborIp);
