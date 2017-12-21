@@ -27,8 +27,8 @@
   </prerequisites>
 
   <properties>
-    <restconf.version>1.5.1-Carbon-SR1.3_1_1-frinxodl</restconf.version>
-    <netconf.version>1.2.1-Carbon-SR1.3_1_1-frinxodl</netconf.version>
+    <restconf.version>1.5.1-Carbon-SR1.3_1_2_rc1-frinxodl-SNAPSHOT</restconf.version>
+    <netconf.version>1.2.1-Carbon-SR1.3_1_2_rc1-frinxodl-SNAPSHOT</netconf.version>
     <cli.version>3.1.1.frinx</cli.version>
     <openconfig.version>3.1.1.frinx</openconfig.version>
   </properties>
