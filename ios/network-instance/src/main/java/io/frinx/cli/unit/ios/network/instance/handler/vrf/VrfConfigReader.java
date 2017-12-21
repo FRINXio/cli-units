@@ -8,6 +8,10 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 
+import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
+
+import java.util.regex.Pattern;
+
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -18,11 +22,14 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.RouteDistinguisher;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         CompositeReader.Child<Config, ConfigBuilder> {
 
+    private static final String SH_IP_VRF_CFG = "sh ip vrf %s";
+    private static final Pattern VRF_ID_LINE = Pattern.compile(" *(?<vrf>[\\S]+) *(?<rd>([\\S]+):([\\S]+)).*");
     private Cli cli;
 
     public VrfConfigReader(Cli cli) {
@@ -34,11 +41,21 @@ public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         if (isVrf(instanceIdentifier, readContext)) {
-            configBuilder.setName(instanceIdentifier.firstKeyOf(NetworkInstance.class).getName());
+            String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
+            configBuilder.setName(name);
             configBuilder.setType(L3VRF.class);
 
             // TODO set other attributes i.e. description
+            parseVrfConfig(blockingRead(String.format(SH_IP_VRF_CFG, name), cli, instanceIdentifier, readContext), configBuilder, name);
         }
+    }
+
+    private void parseVrfConfig(String output, ConfigBuilder builder, String vrf) {
+        builder.setName(vrf);
+        parseField(output,
+            VRF_ID_LINE::matcher,
+            matcher -> matcher.group("rd"),
+            rd -> builder.setRouteDistinguisher(new RouteDistinguisher(rd)));
     }
 
     private boolean isVrf(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {

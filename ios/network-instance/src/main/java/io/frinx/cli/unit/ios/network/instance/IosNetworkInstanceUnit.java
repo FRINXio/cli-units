@@ -27,9 +27,12 @@ import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigWrite
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceStateReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceReader;
+import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolConfigReader;
+import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolStateReader;
+import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
@@ -101,6 +104,20 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
                 RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_RE_CONFIG, CONN_PTS_ID)
                 ), new GenericWriter<>(IIDs.NE_NE_CONNECTIONPOINTS, new ConnectionPointsWriter(cli)),
                 /*handle after network instance configuration*/ IIDs.NE_NE_CONFIG);
+
+        //todo create proper writers once we support routing policies
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_INTERINSTANCEPOLICIES, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_APPLYPOLICY, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_AP_CONFIG, new NoopCliWriter<>()));
+
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)));
+
+        // Interfaces for VRF
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_INTERFACES, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_INTERFACE, new VrfInterfaceWriter(cli)));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_IN_CONFIG, new NoopCliWriter<>()));
+
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
