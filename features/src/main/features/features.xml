@@ -34,12 +34,12 @@
         <bundle>mvn:io.frinx.cli/common-handlers/{{VERSION}}</bundle>
     </feature>
 
-    <feature name='cli-southbound-unit-ios-essential' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
-        <feature version='${project.version}'>cli-southbound-ios-common-models</feature>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <bundle>mvn:io.frinx.cli/ios-essential-unit/{{VERSION}}</bundle>
-    </feature>
+    <!--<feature name='cli-southbound-unit-ios-essential' version='${project.version}'>-->
+        <!--<feature version='${project.version}'>cli-southbound-unit-generic</feature>-->
+        <!--<feature version='${project.version}'>cli-southbound-ios-common-models</feature>-->
+        <!--<feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>-->
+        <!--<bundle>mvn:io.frinx.cli/ios-essential-unit/{{VERSION}}</bundle>-->
+    <!--</feature>-->
 
     <feature name='cli-southbound-unit-ios-interfaces' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
@@ -98,7 +98,7 @@
     <feature name='cli-southbound-unit-ios' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-essential</feature>
+        <!--<feature version='${project.version}'>cli-southbound-unit-ios-essential</feature>-->
         <feature version='${project.version}'>cli-southbound-unit-ios-interfaces</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-bgp</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-rib</feature>
@@ -110,12 +110,12 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-lldp</feature>
     </feature>
 
-    <feature name='cli-southbound-unit-ios-xr-essential' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
-        <feature version='${project.version}'>cli-southbound-ios-common-models</feature>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-essential-unit/{{VERSION}}</bundle>
-    </feature>
+    <!--<feature name='cli-southbound-unit-ios-xr-essential' version='${project.version}'>-->
+        <!--<feature version='${project.version}'>cli-southbound-unit-generic</feature>-->
+        <!--<feature version='${project.version}'>cli-southbound-ios-common-models</feature>-->
+        <!--<feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>-->
+        <!--<bundle>mvn:io.frinx.cli/ios-xr-essential-unit/{{VERSION}}</bundle>-->
+    <!--</feature>-->
 
     <feature name='cli-southbound-unit-ios-xr-network-instance' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
@@ -168,7 +168,7 @@
     <feature name='cli-southbound-unit-ios-xr' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-essential</feature>
+        <!--<feature version='${project.version}'>cli-southbound-unit-ios-xr-essential</feature>-->
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-network-instance</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-bgp</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-interface</feature>
