@@ -18,6 +18,7 @@ import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ospf.handler.AreaConfigReader;
+import io.frinx.cli.ospf.handler.AreaInterfaceConfigReader;
 import io.frinx.cli.ospf.handler.AreaInterfaceConfigWriter;
 import io.frinx.cli.ospf.handler.AreaInterfaceReader;
 import io.frinx.cli.ospf.handler.AreaStateReader;
@@ -110,6 +111,7 @@ public class OspfUnit implements TranslateUnit {
         rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_STATE, new AreaStateReader()));
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_INTERFACES, InterfacesBuilder.class);
         rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new AreaInterfaceReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG, new AreaInterfaceConfigReader(cli)));
     }
 
     @Override

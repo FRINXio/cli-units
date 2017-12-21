@@ -30,11 +30,13 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                                                + "interface %s\n"
                                                + "ip vrf forwarding %s\n"
                                                + "ip ospf %s area %s\n"
+                                               + "ip ospf cost %s\n"
                                                + "end";
     private static final String DELETE_TEMPLATE = "configure terminal\n"
                                                 + "interface %s\n"
                                                 + "no ip vrf forwarding %s\n"
                                                 + "no ip ospf %s area %s\n"
+                                                + "no ip ospf cost\n"
                                                 + "end";
 
     public AreaInterfaceConfigWriter(final Cli cli) {
@@ -50,11 +52,16 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String protocolName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
 
+        // TODO if cost is null, this will result in invalid configuration
+        // command 'ip ospf cost null'. Do not even issue the command, if
+        // cost is null
+        Integer cost = data.getMetric() != null ? data.getMetric().getValue() : null;
+
         blockingWriteAndRead(cli, instanceIdentifier, data,
             f(WRITE_TEMPLATE,
                 intfId.getId(),
                 vrfName,
-                protocolName, AreaInterfaceReader.areaIdToString(areaId)));
+                protocolName, AreaInterfaceReader.areaIdToString(areaId), cost));
 
     }
 
