@@ -49,6 +49,7 @@
 
     <feature name='cli-southbound-unit-ios-bgp' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:io.frinx.cli/ios-bgp-unit/{{VERSION}}</bundle>
     </feature>
 
@@ -64,6 +65,7 @@
 
     <feature name='cli-southbound-unit-ios-ospf' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:io.frinx.cli/ios-ospf-unit/{{VERSION}}</bundle>
     </feature>
 
@@ -117,26 +119,33 @@
 
     <feature name='cli-southbound-unit-ios-xr-network-instance' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-bgp</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-ospf</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-bgp' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-bgp-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-interface' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-interface-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-mpls' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-interface</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-mpls-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-ospf' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-ospf-unit/{{VERSION}}</bundle>
     </feature>
 
@@ -185,6 +194,7 @@
 
     <feature name='cli-southbound-unit-brocade-interface' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/brocade-interface-unit/{{VERSION}}</bundle>
     </feature>
 
@@ -196,11 +206,13 @@
     <feature name='cli-southbound-unit-brocade-network-instance' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-unit-brocade-interface</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:io.frinx.cli/brocade-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-brocade' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <feature version='${project.version}'>cli-southbound-unit-brocade-common-cli-initializer</feature>
         <feature version='${project.version}'>cli-southbound-unit-brocade-essential</feature>
         <feature version='${project.version}'>cli-southbound-unit-brocade-interface</feature>
