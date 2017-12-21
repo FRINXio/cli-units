@@ -33,6 +33,7 @@
     <module>network-instance</module>
     <module>ospf</module>
     <module>local-routing</module>
+    <module>routing-policy</module>
     <module>cdp</module>
 
     <module>lldp</module>

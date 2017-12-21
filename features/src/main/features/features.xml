@@ -78,6 +78,11 @@
         <bundle>mvn:io.frinx.cli/ios-local-routing-unit/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='cli-southbound-unit-ios-routing-policy' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:io.frinx.cli/ios-routing-policy-unit/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-ios-lldp' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <bundle>mvn:io.frinx.cli/ios-lldp-unit/{{VERSION}}</bundle>
@@ -97,6 +102,7 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-rib</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-network-instance</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-local-routing</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-routing-policy</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-ospf</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-cdp</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-lldp</feature>
