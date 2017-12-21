@@ -25,13 +25,6 @@ public class VrfConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n" +
-            "ip vrf %s\n" +
-            "description %s\n" +
-            "rd %s\n" +
-            "exit\n" +
-            "exit";
-
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
@@ -39,10 +32,11 @@ public class VrfConfigWriter implements CliWriter<Config> {
         if(config.getType().equals(L3VRF.class)) {
 
             blockingWriteAndRead(cli, instanceIdentifier, config,
-                    f(WRITE_TEMPLATE,
-                            config.getName(),
-                            config.getDescription(),
-                            config.getRouteDistinguisher().getString()));
+                    "configure terminal",
+                            f("ip vrf %s", config.getName()),
+                            config.getDescription() == null ? "" : f("description %s", config.getDescription()),
+                            config.getRouteDistinguisher() == null ? "" : f("rd %s", config.getRouteDistinguisher().getString()),
+                            "end");
         }
     }
 
@@ -55,7 +49,7 @@ public class VrfConfigWriter implements CliWriter<Config> {
 
     private static final String DELETE_TEMPLATE = "configure terminal\n" +
             "no ip vrf %s\n" +
-            "exit";
+            "end";
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext)
