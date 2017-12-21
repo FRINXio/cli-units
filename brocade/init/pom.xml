@@ -20,11 +20,11 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>brocade-cli-init-unit</artifactId>
-    <version>3.1.1.rc6-frinx-SNAPSHOT</version>
+    <version>3.1.1.frinx</version>
     <packaging>bundle</packaging>
 
     <properties>
-        <cli.version>3.1.1.rc6-frinx-SNAPSHOT</cli.version>
+        <cli.version>3.1.1.frinx</cli.version>
     </properties>
 
     <dependencies>
