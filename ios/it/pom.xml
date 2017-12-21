@@ -76,12 +76,6 @@
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-essential-unit</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
             <artifactId>ios-network-instance-unit</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>

@@ -26,7 +26,7 @@
   </prerequisites>
 
   <modules>
-    <module>essential</module>
+    <!--<module>essential</module>-->
     <module>interface</module>
     <module>bgp</module>
     <module>rib</module>

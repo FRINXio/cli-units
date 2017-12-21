@@ -42,12 +42,17 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import io.frinx.cli.unit.generic.GenericTranslateUnit;
 import io.frinx.cli.unit.ios.cdp.IosCdpUnit;
-import io.frinx.cli.unit.ios.essential.IosEssentialUnit;
 import io.frinx.cli.unit.ios.ifc.IosInterfaceUnit;
 import io.frinx.cli.unit.ios.init.IosCliInitializerUnit;
 import io.frinx.cli.unit.ios.lldp.LldpUnit;
 import io.frinx.cli.unit.ios.network.instance.IosNetworkInstanceUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import java.io.StringWriter;
+import java.net.InetSocketAddress;
+import java.security.Security;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -93,12 +98,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.tree.InMemoryDataTreeFac
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.LoggerFactory;
-import java.io.StringWriter;
-import java.net.InetSocketAddress;
-import java.security.Security;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class IosAll {
 
@@ -212,7 +211,6 @@ public class IosAll {
         TranslateRegistryImpl reg = new TranslateRegistryImpl(mockBroker);
 
         new GenericTranslateUnit(reg).init();
-        new IosEssentialUnit(reg).init();
         new IosInterfaceUnit(reg).init();
         new BgpUnit(reg).init();
         new RibUnit(reg).init();
