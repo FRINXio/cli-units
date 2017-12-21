@@ -15,15 +15,14 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 
 public class AreaInterfaceConfigReaderTest {
 
-    private final String output = "Thu Nov 23 20:21:38.150 UTC\n" +
-            "\n" +
-            "Interfaces for OSPF 97\n" +
-            "\n" +
-            "Loopback88 is up, line protocol is up \n" +
-            "  Internet Address 8.8.8.8/24, Area 0\n" +
-            "  Process ID 97, Router ID 9.9.9.9, Network Type LOOPBACK, Cost: 1\n" +
-            "  Loopback interface is treated as a stub Host\n";
-
+    private final String output = "Thu Dec 21 15:40:02.857 UTC\n" +
+            "router ospf 100\n" +
+            " area 0\n" +
+            "  interface Loopback97\n" +
+            "   cost 1\n" +
+            "  !\n" +
+            " !\n" +
+            "!\n";
 
     @Test
     public void test() {
