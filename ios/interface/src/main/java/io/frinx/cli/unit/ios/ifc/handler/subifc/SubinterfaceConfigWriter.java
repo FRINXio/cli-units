@@ -43,8 +43,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                     f("interface %s", getSubinterfaceName(id)),
                     f("description %s", data.getDescription()),
                     data.isEnabled() ? "no shutdown" : "shutdown",
-                    "exit",
-                    "exit");
+                    "end");
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));
@@ -71,7 +70,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
             blockingDeleteAndRead(cli, id,
                     "configure terminal",
                     f("no interface %s", getSubinterfaceName(id)),
-                    "exit");
+                    "end");
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));

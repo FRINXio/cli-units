@@ -63,8 +63,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 f("interface loopback %s", matcher.group("number")),
                 f("description %s", data.getDescription()),
                 data.isEnabled() ? "no shutdown" : "shutdown",
-                "exit",
-                "exit");
+                "end");
     }
 
     public static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES = Collections.singleton(EthernetCsmacd.class);
@@ -105,8 +104,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 data.getDescription() == null ? "" : f("description %s", data.getDescription()),
                 data.getMtu() == null ? "" : f("mtu %s", data.getMtu()),
                 data.isEnabled() ? "no shutdown" : "shutdown",
-                "exit",
-                "exit");
+                "end");
     }
 
     @Override
@@ -137,6 +135,6 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 "configure terminal",
                 f("no interface loopback %s", matcher.group("number")),
-                "exit");
+                "end");
     }
 }

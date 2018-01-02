@@ -26,14 +26,12 @@ public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceK
     private static final String WRITE_TEMPLATE = "configure terminal\n" +
         "interface %s\n" +
         "ip vrf forwarding %s\n" +
-        "exit\n" +
-        "exit";
+        "end";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n" +
         "interface %s\n" +
         "no ip vrf forwarding %s\n" +
-        "exit\n" +
-        "exit";
+        "end";
 
     public VrfInterfaceWriter(Cli cli) {
         this.cli = cli;

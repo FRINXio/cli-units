@@ -42,8 +42,7 @@ public class ExtCommunitySetConfigWriter  implements CliWriter<Config> {
     private static final String WRITE_TEMPLATE = "configure terminal\n" +
         "ip vrf %s\n" +
         "%s\n" +
-        "exit\n" +
-        "exit";
+        "end";
     private Cli cli;
 
     public ExtCommunitySetConfigWriter(Cli cli) {

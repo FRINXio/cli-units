@@ -109,9 +109,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                         remote.getRemote().getConfig().getRemoteSystem().getIpv4Address().getValue(),
                         remote.getRemote().getConfig().getVirtualCircuitIdentifier(),
                         netName),
-                "exit",
-                "exit",
-                "exit");
+                "end");
     }
 
     private Endpoint getRemote(Endpoint endpoint1, Endpoint endpoint2) {
@@ -131,8 +129,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                 f("no pseudowire-class %s", netName),
                 f("interface %s", ifc1),
                 "no xconnect",
-                "exit",
-                "exit");
+                "end");
     }
 
     private void writeLocalConnect(InstanceIdentifier<ConnectionPoints> id,
@@ -145,8 +142,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
         blockingWriteAndRead(cli, id, dataAfter,
                 "conf t",
                 f("connect %s %s %s interworking ethernet", netName, ifc1, ifc2),
-                "exit",
-                "exit");
+                "end");
     }
 
     private void deleteLocalConnect(InstanceIdentifier<ConnectionPoints> id) throws WriteFailedException.DeleteFailedException {
@@ -154,7 +150,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
         blockingDeleteAndRead(cli, id,
                 "conf t",
                 f("no connect %s", netName),
-                "exit");
+                "end");
     }
 
     public static Endpoint getEndpoint(ConnectionPoint connectionPoint1, WriteContext writeContext, Set<String> usedInterfaces, boolean isWrite, boolean checkSubifc) {
