@@ -10,6 +10,7 @@ package io.frinx.cli.unit.ios.init;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
@@ -169,13 +170,11 @@ public class IosCliInitializerUnit  implements TranslateUnit {
                 // Check if we are actually in privileged mode
                 String prompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
 
-                if (!prompt.endsWith(PRIVILEGED_PROMPT_SUFFIX)) {
-                    LOG.warn("{}: IOS cli session initialization failed to enter privileged mode. Current prompt {}",
-                            id, prompt);
-                } else {
-                    LOG.info("{}: IOS cli session initialized successfully", id);
-                }
+                // If not, fail
+                Preconditions.checkState(prompt.endsWith(PRIVILEGED_PROMPT_SUFFIX),
+                        "%s: IOS cli session initialization failed to enter privileged mode. Current prompt: %s", id, prompt);
 
+                LOG.info("{}: IOS cli session initialized successfully", id);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
