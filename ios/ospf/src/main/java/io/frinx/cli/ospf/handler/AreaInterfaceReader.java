@@ -96,12 +96,6 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
         ((InterfacesBuilder) builder).setInterface(list);
     }
 
-    @Nonnull
-    @Override
-    public InterfaceBuilder getBuilder(@Nonnull InstanceIdentifier<Interface> instanceIdentifier) {
-        return new InterfaceBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                              @Nonnull InterfaceBuilder interfaceBuilder,

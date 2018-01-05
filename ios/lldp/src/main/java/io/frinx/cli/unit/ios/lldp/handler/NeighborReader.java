@@ -61,12 +61,6 @@ public class NeighborReader implements CliOperListReader<Neighbor, NeighborKey, 
         ((NeighborsBuilder) builder).setNeighbor(list);
     }
 
-    @Nonnull
-    @Override
-    public NeighborBuilder getBuilder(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier) {
-        return new NeighborBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
                                       @Nonnull NeighborBuilder neighborBuilder, @Nonnull ReadContext readContext)

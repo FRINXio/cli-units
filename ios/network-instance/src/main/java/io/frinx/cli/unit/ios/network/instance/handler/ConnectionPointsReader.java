@@ -21,7 +21,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPointsBuilder;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ConnectionPointsReader extends CompositeReader<ConnectionPoints, ConnectionPointsBuilder>
         implements CliConfigReader<ConnectionPoints, ConnectionPointsBuilder> {
@@ -31,12 +30,6 @@ public class ConnectionPointsReader extends CompositeReader<ConnectionPoints, Co
             add(new L2P2PConnectionPointsReader(cli));
             add(new L2VSIConnectionPointsReader(cli));
         }});
-    }
-
-    @Nonnull
-    @Override
-    public ConnectionPointsBuilder getBuilder(@Nonnull InstanceIdentifier<ConnectionPoints> id) {
-        return new ConnectionPointsBuilder();
     }
 
     @Override

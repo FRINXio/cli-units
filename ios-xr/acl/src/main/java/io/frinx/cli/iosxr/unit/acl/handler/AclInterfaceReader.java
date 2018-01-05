@@ -66,12 +66,6 @@ public class AclInterfaceReader implements CliListReader<Interface, InterfaceKey
         ((InterfacesBuilder) builder).setInterface(list);
     }
 
-    @Nonnull
-    @Override
-    public InterfaceBuilder getBuilder(@Nonnull InstanceIdentifier<Interface> instanceIdentifier) {
-        return new InterfaceBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull InterfaceBuilder interfaceBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         InterfaceKey key = instanceIdentifier.firstKeyOf(Interface.class);

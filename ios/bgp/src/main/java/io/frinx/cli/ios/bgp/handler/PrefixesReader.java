@@ -47,12 +47,6 @@ public class PrefixesReader implements BgpReader.BgpOperReader<Prefixes, Prefixe
         parsePrefixes(blockingRead(command, cli, instanceIdentifier, readContext), prefixesBuilder, neighborIp);
     }
 
-    @Nonnull
-    @Override
-    public PrefixesBuilder getBuilder(@Nonnull InstanceIdentifier<Prefixes> instanceIdentifier) {
-        return new PrefixesBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Prefixes prefixes) {
         ((StateBuilder) builder).setPrefixes(prefixes);

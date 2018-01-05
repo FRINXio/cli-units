@@ -60,10 +60,4 @@ public class TunnelReader implements MplsListReader.MplsConfigListReader<Tunnel,
         TunnelKey key = instanceIdentifier.firstKeyOf(Tunnel.class);
         tunnelBuilder.setName(key.getName());
     }
-
-    @Nonnull
-    @Override
-    public TunnelBuilder getBuilder(@Nonnull InstanceIdentifier<Tunnel> id) {
-        return new TunnelBuilder();
-    }
 }

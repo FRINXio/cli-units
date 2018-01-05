@@ -38,12 +38,6 @@ public class GlobalStateReader implements BgpReader.BgpOperReader<State, StateBu
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> instanceIdentifier) {
-        return new StateBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                              @Nonnull StateBuilder stateBuilder,

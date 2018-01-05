@@ -45,12 +45,6 @@ public class NextHopConfigReader implements LrReader.LrConfigReader<Config, Conf
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> id) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {

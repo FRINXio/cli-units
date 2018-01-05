@@ -56,12 +56,6 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
         neighborBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
     }
 
-    @Nonnull
-    @Override
-    public NeighborBuilder getBuilder(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier) {
-        return new NeighborBuilder();
-    }
-
     @VisibleForTesting
     public static List<NeighborKey> getNeighborKeys(String output) {
         return ParsingUtils.parseFields(output, 0,

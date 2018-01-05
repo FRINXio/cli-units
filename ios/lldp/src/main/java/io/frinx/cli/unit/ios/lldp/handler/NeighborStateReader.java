@@ -38,12 +38,6 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> instanceIdentifier) {
-        return new StateBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                       @Nonnull StateBuilder stateBuilder, @Nonnull ReadContext readContext)

@@ -118,10 +118,6 @@ public class BgpLocalAggregateReader implements CliListReader<Aggregate, Aggrega
 
     }
 
-    @Nonnull @Override public AggregateBuilder getBuilder(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier) {
-        return new AggregateBuilder();
-    }
-
     @Override public void readCurrentAttributes(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier,
         @Nonnull AggregateBuilder aggregateBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         aggregateBuilder.setKey(instanceIdentifier.firstKeyOf(Aggregate.class));

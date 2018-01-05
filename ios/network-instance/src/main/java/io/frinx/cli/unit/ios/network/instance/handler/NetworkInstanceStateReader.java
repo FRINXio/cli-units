@@ -39,12 +39,6 @@ public class NetworkInstanceStateReader extends CompositeReader<State, StateBuil
         }});
     }
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> instanceIdentifier) {
-        return new StateBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State config) {
         ((NetworkInstanceBuilder) builder).setState(config);

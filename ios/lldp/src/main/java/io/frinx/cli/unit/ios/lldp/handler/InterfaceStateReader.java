@@ -24,12 +24,6 @@ public class InterfaceStateReader implements CliOperReader<State, StateBuilder> 
 
     // FIXME duplicate with COnfigReader
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> instanceIdentifier) {
-        return new StateBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier, @Nonnull StateBuilder StateBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         StateBuilder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());

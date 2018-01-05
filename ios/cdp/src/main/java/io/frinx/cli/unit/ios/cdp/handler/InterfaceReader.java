@@ -59,12 +59,6 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
         ((InterfacesBuilder) builder).setInterface(list);
     }
 
-    @Nonnull
-    @Override
-    public InterfaceBuilder getBuilder(@Nonnull InstanceIdentifier<Interface> instanceIdentifier) {
-        return new InterfaceBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                       @Nonnull InterfaceBuilder interfaceBuilder,

@@ -37,12 +37,6 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull final InstanceIdentifier<Config> id) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void merge(@Nonnull final Builder<? extends DataObject> builder, @Nonnull final Config value) {
         ((InterfaceBuilder) builder).setConfig(value);

@@ -24,12 +24,6 @@ import javax.annotation.Nonnull;
 
 public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         configBuilder.setSetName(instanceIdentifier.firstKeyOf(EgressAclSet.class).getSetName());

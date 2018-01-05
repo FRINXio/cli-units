@@ -51,12 +51,6 @@ public class AfiSafiReader implements BgpListReader.BgpConfigListReader<AfiSafi,
         ((AfiSafisBuilder) parentBuilder).setAfiSafi(readValue);
     }
 
-    @Nonnull
-    @Override
-    public AfiSafiBuilder getBuilder(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier) {
-        return new AfiSafiBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         Class<? extends AFISAFITYPE> key = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();

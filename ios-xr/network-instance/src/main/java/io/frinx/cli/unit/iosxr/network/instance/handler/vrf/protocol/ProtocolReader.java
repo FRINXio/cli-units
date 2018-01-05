@@ -53,12 +53,6 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
         delegate.readCurrentAttributes(instanceIdentifier, protocolBuilder, readContext);
     }
 
-    @Nonnull
-    @Override
-    public ProtocolBuilder getBuilder(@Nonnull InstanceIdentifier<Protocol> id) {
-        return delegate.getBuilder(id);
-    }
-
     public static class ProtocolReaderComposite extends CompositeListReader<Protocol, ProtocolKey, ProtocolBuilder>
             implements CliConfigListReader<Protocol, ProtocolKey, ProtocolBuilder> {
 
@@ -72,12 +66,6 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
         @Override
         public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Protocol> list) {
             ((ProtocolsBuilder) builder).setProtocol(list);
-        }
-
-        @Nonnull
-        @Override
-        public ProtocolBuilder getBuilder(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier) {
-            return new ProtocolBuilder();
         }
     }
 }

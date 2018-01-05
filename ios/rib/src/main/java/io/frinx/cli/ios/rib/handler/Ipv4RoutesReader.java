@@ -90,12 +90,6 @@ public class Ipv4RoutesReader implements CliOperListReader<Route, RouteKey, Rout
         ((RoutesBuilder) builder).setRoute(list);
     }
 
-    @Nonnull
-    @Override
-    public RouteBuilder getBuilder(@Nonnull InstanceIdentifier<Route> instanceIdentifier) {
-        return new RouteBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Route> instanceIdentifier, @Nonnull RouteBuilder routeBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         RouteKey key = instanceIdentifier.firstKeyOf(Route.class);

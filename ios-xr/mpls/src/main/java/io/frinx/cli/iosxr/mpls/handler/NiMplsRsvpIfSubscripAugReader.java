@@ -53,12 +53,6 @@ public class NiMplsRsvpIfSubscripAugReader implements MplsReader.MplsConfigReade
         }
     }
 
-    @Nonnull
-    @Override
-    public NiMplsRsvpIfSubscripAugBuilder getBuilder(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id) {
-        return new NiMplsRsvpIfSubscripAugBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull NiMplsRsvpIfSubscripAug readValue) {
         ((ConfigBuilder) parentBuilder).addAugmentation(NiMplsRsvpIfSubscripAug.class, readValue);

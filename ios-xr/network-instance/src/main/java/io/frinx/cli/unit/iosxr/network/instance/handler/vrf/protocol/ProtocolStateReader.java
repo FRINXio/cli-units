@@ -23,12 +23,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ProtocolStateReader implements L3VrfReader.L3VrfOperReader<State, StateBuilder> {
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> instanceIdentifier) {
-        return new StateBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                    @Nonnull StateBuilder StateBuilder,

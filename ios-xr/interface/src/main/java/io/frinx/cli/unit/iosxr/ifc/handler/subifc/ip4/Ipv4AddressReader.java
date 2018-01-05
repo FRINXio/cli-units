@@ -72,12 +72,6 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
         ((AddressesBuilder) builder).setAddress(list);
     }
 
-    @Nonnull
-    @Override
-    public AddressBuilder getBuilder(@Nonnull InstanceIdentifier<Address> instanceIdentifier) {
-        return new AddressBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
                                       @Nonnull AddressBuilder addressBuilder,

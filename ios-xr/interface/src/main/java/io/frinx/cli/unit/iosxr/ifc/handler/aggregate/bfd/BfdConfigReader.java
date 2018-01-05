@@ -41,12 +41,6 @@ public class BfdConfigReader implements CliConfigReader<Config, ConfigBuilder> {
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> id) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {

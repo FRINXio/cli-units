@@ -35,12 +35,6 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> instanceIdentifier) {
-        return new StateBuilder();
-    }
-
     // Cannot use "sh cdp neighbors" here, The output table lacs any form to rely on and thus cannot be parsed
     private static final String SH_CDP_INTER_NEIGHBOR = "sh cdp neighbors %s detail | include Device ID|Interface";
 

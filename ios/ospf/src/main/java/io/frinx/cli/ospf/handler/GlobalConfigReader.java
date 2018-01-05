@@ -33,12 +33,6 @@ public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, C
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        return new ConfigBuilder();
-    }
-
     static final String SH_OSPF = "sh ip ospf %s";
     static final Pattern ROUTER_ID = Pattern.compile(".*?with ID (?<routerId>[^\\s]+).*");
 

@@ -99,12 +99,6 @@ public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, N
         ((NextHopsBuilder) builder).setNextHop(list);
     }
 
-    @Nonnull
-    @Override
-    public NextHopBuilder getBuilder(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier) {
-        return new NextHopBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
                                              @Nonnull NextHopBuilder nextHopBuilder,

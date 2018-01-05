@@ -25,12 +25,6 @@ public class AreaStateReader implements OspfReader.OspfOperReader<State, StateBu
 
     // FIXME Duplicate code with config
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> instanceIdentifier) {
-        return new StateBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier, @Nonnull StateBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         configBuilder.setIdentifier(instanceIdentifier.firstKeyOf(Area.class).getIdentifier());
