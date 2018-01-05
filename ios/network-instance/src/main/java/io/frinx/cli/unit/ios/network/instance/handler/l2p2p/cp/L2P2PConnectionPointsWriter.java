@@ -139,10 +139,12 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint1);
         L2P2PConnectionPointsReader.InterfaceId ifc2 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint2);
-        blockingWriteAndRead(cli, id, dataAfter,
+        String output = blockingWriteAndRead(cli, id, dataAfter,
                 "conf t",
                 f("connect %s %s %s interworking ethernet", netName, ifc1, ifc2),
                 "end");
+
+        checkState(!output.toLowerCase().contains("invalid command"), "Local connect configuration failed with output: %s", output);
     }
 
     private void deleteLocalConnect(InstanceIdentifier<ConnectionPoints> id) throws WriteFailedException.DeleteFailedException {
@@ -164,15 +166,17 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
             String ifcName = endpoint1.getLocal().getConfig().getInterface();
             L2P2PConnectionPointsReader.InterfaceId interfaceId = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint1);
 
-            checkIfcExists(writeContext, isWrite, interfaceId);
-            checkIfcNotUsedAlready(usedInterfaces, interfaceId);
+            if (isWrite) {
+                checkIfcExists(writeContext, isWrite, interfaceId);
+                checkIfcNotUsedAlready(usedInterfaces, interfaceId);
+            }
 
             Object subifc = endpoint1.getLocal().getConfig().getSubinterface();
             if (subifc != null) {
-                if (checkSubifc) {
-                    checkSubIfcExists(writeContext, isWrite, ifcName, interfaceId, (Long) subifc);
-                } else {
-                    checkSubIfcDoesntExist(writeContext, isWrite, ifcName, interfaceId, (Long) subifc);
+                if (checkSubifc && isWrite) {
+                    checkSubIfcExists(writeContext, ifcName, interfaceId, (Long) subifc);
+                } else if(isWrite) {
+                    checkSubIfcDoesntExist(writeContext, ifcName, interfaceId, (Long) subifc);
                 }
             }
 
@@ -192,23 +196,23 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                 "Interface %s already used in L2VPN network as: %s", interfaceId, interfaceId.toParentIfcString());
     }
 
-    private static void checkSubIfcExists(WriteContext writeContext, boolean isWrite, String ifcName, L2P2PConnectionPointsReader.InterfaceId interfaceId, Long subifc) {
+    private static void checkSubIfcExists(WriteContext writeContext, String ifcName, L2P2PConnectionPointsReader.InterfaceId interfaceId, Long subifc) {
         KeyedInstanceIdentifier<Subinterface, SubinterfaceKey> subIfcId = IIDs.INTERFACES
                 .child(Interface.class, new InterfaceKey(ifcName))
                 .child(Subinterfaces.class)
                 .child(Subinterface.class, new SubinterfaceKey(subifc));
 
-        Optional<Subinterface> subData = isWrite ? writeContext.readAfter(subIfcId) : writeContext.readBefore(subIfcId);
+        Optional<Subinterface> subData = writeContext.readAfter(subIfcId);
         checkArgument(subData.isPresent(), "Unknown subinterface %s.%s, cannot configure L2VPN", interfaceId);
     }
 
-    private static void checkSubIfcDoesntExist(WriteContext writeContext, boolean isWrite, String ifcName, L2P2PConnectionPointsReader.InterfaceId interfaceId, Long subifc) {
+    private static void checkSubIfcDoesntExist(WriteContext writeContext, String ifcName, L2P2PConnectionPointsReader.InterfaceId interfaceId, Long subifc) {
         KeyedInstanceIdentifier<Subinterface, SubinterfaceKey> subIfcId = IIDs.INTERFACES
                 .child(Interface.class, new InterfaceKey(ifcName))
                 .child(Subinterfaces.class)
                 .child(Subinterface.class, new SubinterfaceKey(subifc));
 
-        Optional<Subinterface> subData = isWrite ? writeContext.readAfter(subIfcId) : writeContext.readBefore(subIfcId);
+        Optional<Subinterface> subData = writeContext.readAfter(subIfcId);
         checkArgument(!subData.isPresent(), "Subinterface %s.%s already exists, cannot configure L2VPN", interfaceId);
     }
 
