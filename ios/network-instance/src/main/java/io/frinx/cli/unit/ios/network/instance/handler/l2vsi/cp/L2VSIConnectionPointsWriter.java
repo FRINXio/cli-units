@@ -180,7 +180,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         Map<String, Endpoint> locals = dataBefore.getConnectionPoint().stream()
                 // skip remote
                 .filter(cp -> !cp.getConnectionPointId().equals(L2VSIConnectionPointsReader.REMOTE_POINT_ID))
-                .map(cp -> new AbstractMap.SimpleEntry<>(cp.getConnectionPointId(), getEndpoint(cp, writeContext, Collections.emptySet(), true, false)))
+                .map(cp -> new AbstractMap.SimpleEntry<>(cp.getConnectionPointId(), getEndpoint(cp, writeContext, Collections.emptySet(), false, false)))
                 .map(this::ensureLocal)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
