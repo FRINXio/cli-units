@@ -28,12 +28,6 @@ public class TeInterfaceConfigReader implements MplsReader.MplsConfigReader<Conf
         configBuilder.setInterfaceId(instanceIdentifier.firstKeyOf(Interface.class).getInterfaceId());
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> id) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
         ((InterfaceBuilder) parentBuilder).setConfig(readValue);

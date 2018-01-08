@@ -28,12 +28,6 @@ public class InterfaceRefReader implements OspfReader.OspfConfigReader<Config, C
         configBuilder.setInterface(instanceIdentifier.firstKeyOf(Interface.class).getId());
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> id) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
         ((InterfaceRefBuilder) parentBuilder).setConfig(readValue);

@@ -65,12 +65,6 @@ public class PolicyForwardingInterfaceReader implements CliConfigListReader<Inte
         ((InterfacesBuilder) builder).setInterface(readData);
     }
 
-    @Nonnull
-    @Override
-    public InterfaceBuilder getBuilder(@Nonnull InstanceIdentifier<Interface> id) {
-        return new InterfaceBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> id, @Nonnull InterfaceBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {

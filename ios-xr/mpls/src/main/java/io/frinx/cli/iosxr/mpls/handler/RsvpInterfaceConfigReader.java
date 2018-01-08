@@ -28,12 +28,6 @@ public class RsvpInterfaceConfigReader implements MplsReader.MplsConfigReader<Co
         configBuilder.setInterfaceId(instanceIdentifier.firstKeyOf(Interface.class).getInterfaceId());
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> id) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
         ((InterfaceBuilder) parentBuilder).setConfig(readValue);

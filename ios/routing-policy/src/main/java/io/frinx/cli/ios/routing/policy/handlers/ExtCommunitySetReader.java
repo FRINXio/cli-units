@@ -147,10 +147,6 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
         ((ExtCommunitySetsBuilder) builder).setExtCommunitySet(readData);
     }
 
-    @Nonnull @Override public ExtCommunitySetBuilder getBuilder(@Nonnull InstanceIdentifier<ExtCommunitySet> id) {
-        return new ExtCommunitySetBuilder();
-    }
-
     @Override public void readCurrentAttributes(@Nonnull InstanceIdentifier<ExtCommunitySet> id,
         @Nonnull ExtCommunitySetBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
 

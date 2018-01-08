@@ -61,12 +61,6 @@ public class EgressAclSetReader implements CliListReader<EgressAclSet, EgressAcl
         ((EgressAclSetsBuilder) builder).setEgressAclSet(list);
     }
 
-    @Nonnull
-    @Override
-    public EgressAclSetBuilder getBuilder(@Nonnull InstanceIdentifier<EgressAclSet> instanceIdentifier) {
-        return new EgressAclSetBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<EgressAclSet> instanceIdentifier, @Nonnull EgressAclSetBuilder ingressAclSetBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         ingressAclSetBuilder.setSetName(instanceIdentifier.firstKeyOf(EgressAclSet.class).getSetName());

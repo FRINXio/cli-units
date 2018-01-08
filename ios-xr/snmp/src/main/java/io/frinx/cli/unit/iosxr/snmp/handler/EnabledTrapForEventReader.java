@@ -50,12 +50,6 @@ public class EnabledTrapForEventReader implements CliListReader<EnabledTrapForEv
         ((ConfigBuilder) builder).setEnabledTrapForEvent(list);
     }
 
-    @Nonnull
-    @Override
-    public EnabledTrapForEventBuilder getBuilder(@Nonnull InstanceIdentifier<EnabledTrapForEvent> instanceIdentifier) {
-        return new EnabledTrapForEventBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<EnabledTrapForEvent> instanceIdentifier, @Nonnull EnabledTrapForEventBuilder enabledTrapForEventBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final InterfaceId id = instanceIdentifier.firstKeyOf(Interface.class).getInterfaceId();

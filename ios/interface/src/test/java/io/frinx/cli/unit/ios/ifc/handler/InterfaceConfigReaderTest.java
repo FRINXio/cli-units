@@ -53,5 +53,4 @@ public class InterfaceConfigReaderTest {
         InterfaceConfigReader.parseInterface(SH_INTERFACE_RUN2, parsed, "FastEthernet0/0");
         assertEquals(EXPECTED_INTERFACE2, parsed.build());
     }
-
 }

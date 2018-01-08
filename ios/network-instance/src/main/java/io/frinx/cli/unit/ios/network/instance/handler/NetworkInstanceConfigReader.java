@@ -23,7 +23,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigBuilder>
     implements CliConfigReader<Config, ConfigBuilder> {
@@ -38,13 +37,6 @@ public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigB
             add(new L2VSIConfigReader(cli));
         }});
     }
-
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
         ((NetworkInstanceBuilder) builder).setConfig(config);

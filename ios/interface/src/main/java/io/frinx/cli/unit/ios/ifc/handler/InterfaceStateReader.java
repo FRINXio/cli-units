@@ -35,12 +35,6 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull final InstanceIdentifier<State> id) {
-        return new StateBuilder();
-    }
-
     @Override
     public void merge(@Nonnull final Builder<? extends DataObject> builder, @Nonnull final State value) {
         ((InterfaceBuilder) builder).setState(value);

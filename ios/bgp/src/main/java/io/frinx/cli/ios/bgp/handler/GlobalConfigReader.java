@@ -47,12 +47,6 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
         ((GlobalBuilder) builder).setConfig(config);

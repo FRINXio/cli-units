@@ -79,12 +79,6 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
         ((SubinterfacesBuilder) builder).setSubinterface(list);
     }
 
-    @Nonnull
-    @Override
-    public SubinterfaceBuilder getBuilder(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier) {
-        return new SubinterfaceBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Subinterface> id,
                                       @Nonnull SubinterfaceBuilder builder,

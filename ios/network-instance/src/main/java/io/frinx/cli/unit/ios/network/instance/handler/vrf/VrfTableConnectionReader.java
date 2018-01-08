@@ -95,10 +95,4 @@ public class VrfTableConnectionReader implements
                         .build())
                 .build();
     }
-
-    @Nonnull
-    @Override
-    public TableConnectionBuilder getBuilder(@Nonnull InstanceIdentifier<TableConnection> instanceIdentifier) {
-        return new TableConnectionBuilder();
-    }
 }

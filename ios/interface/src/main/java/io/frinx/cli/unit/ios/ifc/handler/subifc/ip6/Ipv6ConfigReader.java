@@ -42,12 +42,6 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
 
     public static final short DEFAULT_PREFIX_LENGHT = (short)64;
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                       @Nonnull ConfigBuilder configBuilder,

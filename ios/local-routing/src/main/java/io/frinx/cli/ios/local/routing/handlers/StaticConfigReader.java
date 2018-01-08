@@ -23,12 +23,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class StaticConfigReader implements LrReader.LrConfigReader<Config, ConfigBuilder> {
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,

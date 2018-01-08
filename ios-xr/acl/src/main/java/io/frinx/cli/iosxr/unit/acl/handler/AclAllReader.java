@@ -56,15 +56,10 @@ public class AclAllReader implements CliConfigListReader<AclSet, AclSetKey, AclS
         ((AclSetsBuilder) builder).setAclSet(readData);
     }
 
-    @Nonnull
-    @Override
-    public AclSetBuilder getBuilder(@Nonnull InstanceIdentifier<AclSet> id) {
-        return new AclSetBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<AclSet> id, @Nonnull AclSetBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
         builder.setName(id.firstKeyOf(AclSet.class).getName());
         builder.setType(ACLIPV4.class);
     }
 }
+

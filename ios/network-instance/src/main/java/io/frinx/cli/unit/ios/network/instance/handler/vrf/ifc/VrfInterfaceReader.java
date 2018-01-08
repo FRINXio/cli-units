@@ -112,12 +112,6 @@ public class VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader
         ((InterfacesBuilder) builder).setInterface(list);
     }
 
-    @Nonnull
-    @Override
-    public InterfaceBuilder getBuilder(@Nonnull InstanceIdentifier<Interface> instanceIdentifier) {
-        return new InterfaceBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                              @Nonnull InterfaceBuilder interfaceBuilder,

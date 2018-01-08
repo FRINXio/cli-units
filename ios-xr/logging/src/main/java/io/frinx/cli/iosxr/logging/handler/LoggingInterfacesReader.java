@@ -53,12 +53,6 @@ public class LoggingInterfacesReader implements CliConfigReader<Interfaces, Inte
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public InterfacesBuilder getBuilder(@Nonnull InstanceIdentifier<Interfaces> id) {
-        return new InterfacesBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interfaces> id, @Nonnull InterfacesBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {

@@ -47,12 +47,6 @@ public class LoadShareConfigReader implements MplsReader.MplsConfigReader<Config
             v -> builder.setLoadShare(Long.valueOf(v)));
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> id) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
         ((CiscoMplsTeExtensionBuilder) parentBuilder).setConfig(readValue);

@@ -103,12 +103,6 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
         ((StaticRoutesBuilder) builder).setStatic(list);
     }
 
-    @Nonnull
-    @Override
-    public StaticBuilder getBuilder(@Nonnull InstanceIdentifier<Static> instanceIdentifier) {
-        return new StaticBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Static> instanceIdentifier,
                                              @Nonnull StaticBuilder staticBuilder,

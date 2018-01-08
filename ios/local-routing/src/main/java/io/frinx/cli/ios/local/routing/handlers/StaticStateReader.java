@@ -23,12 +23,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class StaticStateReader implements LrReader.LrOperReader<State, StateBuilder> {
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> instanceIdentifier) {
-        return new StateBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier, @Nonnull StateBuilder stateBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         IpPrefix ipPrefix = instanceIdentifier.firstKeyOf(Static.class).getPrefix();

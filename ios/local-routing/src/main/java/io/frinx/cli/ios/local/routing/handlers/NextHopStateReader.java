@@ -45,12 +45,6 @@ public class NextHopStateReader implements LrReader.LrOperReader<State, StateBui
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> id) {
-        return new StateBuilder();
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> id, @Nonnull StateBuilder builder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {

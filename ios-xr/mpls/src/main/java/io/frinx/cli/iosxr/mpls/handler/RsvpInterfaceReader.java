@@ -92,9 +92,4 @@ public class RsvpInterfaceReader implements MplsListReader.MplsConfigListReader<
         interfaceBuilder.setInterfaceId(key.getInterfaceId());
     }
 
-    @Nonnull
-    @Override
-    public InterfaceBuilder getBuilder(@Nonnull InstanceIdentifier<Interface> id) {
-        return new InterfaceBuilder();
-    }
 }

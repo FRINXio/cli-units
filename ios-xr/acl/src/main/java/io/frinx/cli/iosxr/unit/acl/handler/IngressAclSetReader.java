@@ -14,6 +14,9 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.List;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSet;
@@ -24,11 +27,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 public class IngressAclSetReader implements CliListReader<IngressAclSet, IngressAclSetKey, IngressAclSetBuilder> {
 
@@ -60,12 +58,6 @@ public class IngressAclSetReader implements CliListReader<IngressAclSet, Ingress
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<IngressAclSet> list) {
         ((IngressAclSetsBuilder) builder).setIngressAclSet(list);
-    }
-
-    @Nonnull
-    @Override
-    public IngressAclSetBuilder getBuilder(@Nonnull InstanceIdentifier<IngressAclSet> instanceIdentifier) {
-        return new IngressAclSetBuilder();
     }
 
     @Override

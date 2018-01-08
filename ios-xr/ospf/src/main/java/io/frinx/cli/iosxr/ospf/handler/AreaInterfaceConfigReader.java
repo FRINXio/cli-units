@@ -56,12 +56,6 @@ public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Co
             value -> configBuilder.setMetric(new OspfMetric(Integer.parseInt(value))));
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> id) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
         ((InterfaceBuilder) parentBuilder).setConfig(readValue);

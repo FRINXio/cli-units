@@ -85,12 +85,6 @@ public class MaxMetricConfigReader implements OspfReader.OspfConfigReader<Config
         }
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
         ((MaxMetricBuilder) builder).setConfig(config);

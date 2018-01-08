@@ -39,12 +39,6 @@ public class SubinterfaceStateReader implements CliOperReader<State, StateBuilde
         this.cli = cli;
     }
 
-    @Nonnull
-    @Override
-    public StateBuilder getBuilder(@Nonnull InstanceIdentifier<State> id) {
-        return new StateBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> id, @Nonnull StateBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
@@ -55,8 +49,8 @@ public class SubinterfaceStateReader implements CliOperReader<State, StateBuilde
         }
 
         String subIfcName = getSubinterfaceName(id);
-
         String cmd = String.format(SH_SINGLE_INTERFACE, subIfcName);
+
         parseInterfaceState(blockingRead(cmd, cli, id, ctx), builder, subKey.getIndex(), subIfcName);
     }
 

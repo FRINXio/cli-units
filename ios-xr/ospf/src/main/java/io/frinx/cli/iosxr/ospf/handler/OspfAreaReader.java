@@ -72,10 +72,4 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         areaBuilder.setIdentifier(instanceIdentifier.firstKeyOf(Area.class).getIdentifier());
     }
-
-    @Nonnull
-    @Override
-    public AreaBuilder getBuilder(@Nonnull InstanceIdentifier<Area> instanceIdentifier) {
-        return new AreaBuilder();
-    }
 }

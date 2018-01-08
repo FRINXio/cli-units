@@ -62,10 +62,4 @@ public class TeInterfaceReader implements MplsListReader.MplsConfigListReader<In
         InterfaceKey key = instanceIdentifier.firstKeyOf(Interface.class);
         interfaceBuilder.setInterfaceId(key.getInterfaceId());
     }
-
-    @Nonnull
-    @Override
-    public InterfaceBuilder getBuilder(@Nonnull InstanceIdentifier<Interface> id) {
-        return new InterfaceBuilder();
-    }
 }

@@ -25,7 +25,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>
         implements CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
@@ -42,11 +41,5 @@ public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, 
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<NetworkInstance> list) {
         ((NetworkInstancesBuilder) builder).setNetworkInstance(list);
-    }
-
-    @Nonnull
-    @Override
-    public NetworkInstanceBuilder getBuilder(@Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier) {
-        return new NetworkInstanceBuilder();
     }
 }

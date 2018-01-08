@@ -45,12 +45,6 @@ public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Co
         }
     }
 
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        return new ConfigBuilder();
-    }
-
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
         ((InterfaceBuilder) builder).setConfig(config);

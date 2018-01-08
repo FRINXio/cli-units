@@ -43,12 +43,6 @@ public class AfiSafiReader implements CliOperListReader<AfiSafi, AfiSafiKey, Afi
         ((AfiSafisBuilder) parentBuilder).setAfiSafi(readValue);
     }
 
-    @Nonnull
-    @Override
-    public AfiSafiBuilder getBuilder(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier) {
-        return new AfiSafiBuilder();
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         Class<? extends AFISAFITYPE> key = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();
