@@ -252,5 +252,32 @@
       <artifactId>ios-lldp-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>huawei-cli-init-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>huawei-interface-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>huawei-network-instance-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>huawei-bgp-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>huawei-routing-policy-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
   </dependencies>
 </project>

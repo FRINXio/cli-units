@@ -238,11 +238,50 @@
         <feature version='${project.version}'>cli-southbound-unit-junos-common-cli-initializer</feature>
     </feature>
 
+    <feature name='cli-southbound-unit-huawei-cli-initializer' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-io</feature>
+        <bundle>mvn:io.frinx.cli/huawei-cli-init-unit/{{VERSION}}</bundle>
+    </feature>
+
+    <feature name='cli-southbound-unit-huawei-interface' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:io.frinx.cli/huawei-interface-unit/{{VERSION}}</bundle>
+    </feature>
+
+    <feature name='cli-southbound-unit-huawei-network-instance' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:io.frinx.cli/huawei-network-instance-unit/{{VERSION}}</bundle>
+    </feature>
+
+    <feature name='cli-southbound-unit-huawei-bgp' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-huawei-network-instance</feature>
+        <bundle>mvn:io.frinx.cli/huawei-bgp-unit/{{VERSION}}</bundle>
+    </feature>
+
+    <feature name='cli-southbound-unit-huawei-routing-policy' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-huawei-network-instance</feature>
+        <bundle>mvn:io.frinx.cli/huawei-routing-policy-unit/{{VERSION}}</bundle>
+    </feature>
+
+    <feature name='cli-southbound-unit-huawei' version='${project.version}'>
+        <feature version='${cli.version}'>cli-topology</feature>
+        <feature version='${project.version}'>cli-southbound-unit-huawei-cli-initializer</feature>
+        <feature version='${project.version}'>cli-southbound-unit-huawei-interface</feature>
+        <feature version='${project.version}'>cli-southbound-unit-huawei-network-instance</feature>
+        <feature version='${project.version}'>cli-southbound-unit-huawei-bgp</feature>
+        <feature version='${project.version}'>cli-southbound-unit-huawei-routing-policy</feature>
+    </feature>
+
     <feature name='cli-southbound-all-units' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-ios</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr</feature>
         <feature version='${project.version}'>cli-southbound-unit-brocade</feature>
         <feature version='${project.version}'>cli-southbound-unit-junos</feature>
+        <feature version='${project.version}'>cli-southbound-unit-huawei</feature>
     </feature>
 
 </features>
