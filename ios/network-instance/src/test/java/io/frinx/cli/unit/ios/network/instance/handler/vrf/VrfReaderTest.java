@@ -22,13 +22,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 public class VrfReaderTest {
 
     private static  final String SH_IP_VRF =
-            "  Name                             Default RD          Interfaces\n" +
-            "  DEP_1                            <not set>           GigabitEthernet1/0\n" +
-            "                                                       GigabitEthernet2/0\n" +
-            "  DEP_2                            <not set>           GigabitEthernet3/0";
+            "ip vrf DEP_1  \n" +
+            "ip vrf DEP_2  dfs dsf dsf\n" +
+            "ip vrf a\n";
 
     private static final List<NetworkInstanceKey> IDS_EXPECTED =
-            Lists.newArrayList("DEP_1", "DEP_2", "default")
+            Lists.newArrayList("DEP_1", "DEP_2", "a", "default")
                     .stream()
                     .map(NetworkInstanceKey::new)
                     .collect(Collectors.toList());

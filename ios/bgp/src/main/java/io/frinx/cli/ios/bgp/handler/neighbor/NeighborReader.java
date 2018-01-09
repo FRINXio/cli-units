@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.ios.bgp.handler;
+package io.frinx.cli.ios.bgp.handler.neighbor;
 
 import static io.frinx.cli.io.Cli.NEWLINE;
 import static io.frinx.cli.ios.bgp.handler.BgpProtocolReader.DEFAULT_BGP_INSTANCE;
@@ -29,7 +29,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.NeighborsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Address;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -70,7 +69,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll(" neighbor", "\n neighbor"), 0,
                 NEIGHBOR_LINE::matcher,
                 matcher -> matcher.group("neighborIp"),
-                (String value) -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
+                (String value) -> new NeighborKey(new IpAddress(value.toCharArray())));
         }
         return new ArrayList<>();
     }
@@ -82,13 +81,14 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
 
     @VisibleForTesting
     public static List<NeighborKey> getDefaultNeighborKeys(String output) {
-        String[] vrfSplit = getSplitedOutput(output);
-        if (vrfSplit.length > 1 && vrfSplit[0] != null) {
-            String defaultInstance = vrfSplit[0];
-            return ParsingUtils.parseFields(defaultInstance.replaceAll(" neighbor", "\n neighbor"), 0,
-                NEIGHBOR_LINE::matcher,
-                matcher -> matcher.group("neighborIp"),
-                (String value) -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
+        Optional<String> optionalVrfOutput =
+                Arrays.stream(getSplitedOutput(output)).filter(value -> !value.contains("vrf")).findFirst();
+
+        if(optionalVrfOutput.isPresent()) {
+            return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll(" neighbor", "\n neighbor"), 0,
+                    NEIGHBOR_LINE::matcher,
+                    matcher -> matcher.group("neighborIp"),
+                    (String value) -> new NeighborKey(new IpAddress(value.toCharArray())));
         }
         return new ArrayList<>();
     }

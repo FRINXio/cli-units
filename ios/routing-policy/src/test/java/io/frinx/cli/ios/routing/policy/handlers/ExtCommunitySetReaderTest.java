@@ -11,22 +11,20 @@ package io.frinx.cli.ios.routing.policy.handlers;
 import static io.frinx.cli.ios.routing.policy.handlers.ExtCommunitySetReader.ROUTE_TARGET_EXPORT_SET;
 import static io.frinx.cli.ios.routing.policy.handlers.ExtCommunitySetReader.ROUTE_TARGET_IMPORT_SET;
 
+import io.frinx.openconfig.openconfig.policy.IIDs;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpExtCommunityType;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.DefinedSets1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.DefinedSets2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.ExtCommunitySetConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.ext.community.set.top.ExtCommunitySets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.ext.community.set.top.ext.community.sets.ExtCommunitySet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.ext.community.set.top.ext.community.sets.ExtCommunitySetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.routing.policy.defined.sets.BgpDefinedSets;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpExtCommunityType;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
-
-import io.frinx.openconfig.openconfig.policy.IIDs;
 
 public class ExtCommunitySetReaderTest {
 
@@ -63,12 +61,12 @@ public class ExtCommunitySetReaderTest {
     private static final List<ExtCommunitySetKey> VRF3_RESULT = Collections.singletonList(
         new ExtCommunitySetKey(VRF_3 + ROUTE_TARGET_IMPORT_SET));
     private static final KeyedInstanceIdentifier<ExtCommunitySet, ExtCommunitySetKey> EXPORT_IID =
-        IIDs.RO_DEFINEDSETS.augmentation(DefinedSets1.class)
+        IIDs.RO_DEFINEDSETS.augmentation(DefinedSets2.class)
         .child(BgpDefinedSets.class)
         .child(ExtCommunitySets.class)
         .child(ExtCommunitySet.class, new ExtCommunitySetKey(VRF_1 + ROUTE_TARGET_EXPORT_SET));
     private static final KeyedInstanceIdentifier<ExtCommunitySet, ExtCommunitySetKey> IMPORT_IID =
-        IIDs.RO_DEFINEDSETS.augmentation(DefinedSets1.class)
+        IIDs.RO_DEFINEDSETS.augmentation(DefinedSets2.class)
         .child(BgpDefinedSets.class)
         .child(ExtCommunitySets.class)
         .child(ExtCommunitySet.class, new ExtCommunitySetKey(VRF_1 + ROUTE_TARGET_IMPORT_SET));
@@ -88,12 +86,6 @@ public class ExtCommunitySetReaderTest {
         new ExtCommunitySetConfig.ExtCommunityMember(new BgpExtCommunityType("100:1000")),
         new ExtCommunitySetConfig.ExtCommunityMember(new BgpExtCommunityType("100:1001")),
         new ExtCommunitySetConfig.ExtCommunityMember(new BgpExtCommunityType("100:1002")));
-
-
-    @Test
-    public void parseVrfIdsTest(){
-        Assert.assertTrue(VRF_RESULT.containsAll(ExtCommunitySetReader.parseVrfIds(SH_IP_VRF)));
-    }
 
     @Test
     public void parseExtCommunityIdsTest(){
@@ -129,6 +121,6 @@ public class ExtCommunitySetReaderTest {
 
     @Test
     public void getVrfNameTest(){
-        Assert.assertEquals(VRF_1, ExtCommunitySetReader.getVrfName(EXPORT_IID.getKey()));
+        Assert.assertEquals(VRF_1, ExtCommunitySetReader.getVrfName(EXPORT_IID.getKey()).get());
     }
 }

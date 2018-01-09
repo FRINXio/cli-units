@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.ios.bgp.handler;
+package io.frinx.cli.ios.bgp.handler.neighbor;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -14,18 +14,16 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpNeighborState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.StateBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborBuilder;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-import java.util.regex.Pattern;
 
 public class NeighborStateReader implements BgpReader.BgpOperReader<State, StateBuilder> {
 
@@ -42,7 +40,7 @@ public class NeighborStateReader implements BgpReader.BgpOperReader<State, State
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
-        String neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress().getIpv4Address().getValue();
+        String neighborIp = NeighborWriter.getNeighborIp(instanceIdentifier);
         String output = blockingRead(SH_SUMM, cli, instanceIdentifier, ctx);
         readState(neighborIp,stateBuilder, output);
     }

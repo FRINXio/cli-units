@@ -8,9 +8,10 @@
 
 package io.frinx.cli.ios.bgp;
 
-import io.frinx.cli.ios.bgp.handler.NeighborReader;
-import io.frinx.cli.ios.bgp.handler.NeighborStateReader;
-import io.frinx.cli.ios.bgp.handler.PrefixesReader;
+import io.frinx.cli.ios.bgp.handler.neighbor.NeighborReader;
+import io.frinx.cli.ios.bgp.handler.neighbor.NeighborStateReader;
+import io.frinx.cli.ios.bgp.handler.neighbor.PrefixesReader;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.state.PrefixesBuilder;
@@ -18,8 +19,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Address;
-
-import java.util.List;
 
 public class NeighborReaderTest {
 
@@ -36,20 +35,28 @@ public class NeighborReaderTest {
             "Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd\n" +
             "10.255.255.3    4        65000   23713   23711        1    0    0 2w0d            0\n";
 
-    private String summOutputNeighbors = "router bgp 65000\n" + " neighbor 3.3.3.3 remote-as 65000\n" + " address-family ipv4\n"
-        + "  neighbor 3.3.3.3 activate\n" + " address-family ipv4 vrf vrf1\n" + "  neighbor 1.2.3.4 remote-as 65000\n"
-        + "  neighbor 1.2.3.5 activate\n" + "  neighbor 1.2.3.5 remote-as 65000\n" + "  neighbor 1.2.3.4 activate\n"
-        + " address-family ipv4 vrf vrf2\n" + "  neighbor 2.2.0.1 remote-as 65000\n" + "  neighbor 2.2.0.1 activate\n";
+    private String summOutputNeighbors = "router bgp 65000\n" +
+            " neighbor 3.3.3.3 remote-as 65000\n" +
+            " address-family ipv4\n" +
+            "  neighbor 3.3.3.3 activate\n" +
+            " address-family ipv4 vrf vrf1\n" +
+            "  neighbor 1.2.3.4 remote-as 65000\n" +
+            "  neighbor 1.2.3.5 activate\n" +
+            "  neighbor 1.2.3.5 remote-as 65000\n" +
+            "  neighbor 1.2.3.4 activate\n" +
+            " address-family ipv4 vrf vrf2\n" +
+            "  neighbor 2.2.0.1 remote-as 65000\n" +
+            "  neighbor 2.2.0.1 activate\n";
 
     @Test
     public void testNeighborIds() {
         List<NeighborKey> keys = NeighborReader.getDefaultNeighborKeys(summOutputNeighbors);
         Assert.assertArrayEquals(new Ipv4Address[]{new Ipv4Address("3.3.3.3")},
-            keys.stream().map(NeighborKey::getNeighborAddress).map(IpAddress::getIpv4Address).toArray());
+                keys.stream().map(NeighborKey::getNeighborAddress).map(IpAddress::getIpv4Address).toArray());
 
         keys = NeighborReader.getVrfNeighborKeys(summOutputNeighbors, "vrf1");
         Assert.assertArrayEquals(new Ipv4Address[]{new Ipv4Address("1.2.3.4"), new Ipv4Address("1.2.3.5")},
-            keys.stream().map(NeighborKey::getNeighborAddress).map(IpAddress::getIpv4Address).toArray());
+                keys.stream().map(NeighborKey::getNeighborAddress).map(IpAddress::getIpv4Address).toArray());
 
         StateBuilder sBuilder = new StateBuilder();
         NeighborStateReader.readState("10.255.255.2", sBuilder, summOutput);
