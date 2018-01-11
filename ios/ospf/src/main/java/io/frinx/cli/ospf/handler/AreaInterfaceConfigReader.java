@@ -41,7 +41,7 @@ public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Co
 
         if (!output.isEmpty()) {
             configBuilder.setMetric(new OspfMetric(Integer.valueOf
-                    (output.replace(" ip ospf cost ", ""))));
+                    (output.replaceFirst("ip ospf cost ", ""))));
         }
     }
 
