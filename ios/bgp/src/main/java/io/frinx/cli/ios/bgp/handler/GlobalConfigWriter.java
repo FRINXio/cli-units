@@ -30,6 +30,7 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, config,
             "configure terminal",
             f("router bgp %s", config.getAs().getValue()),
+            config.getRouterId() == null ? "" : f("bgp router-id %s", config.getRouterId().getValue()),
             "end");
     }
 
