@@ -12,17 +12,26 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.read.GenericListReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.unit.acl.handler.*;
+import io.frinx.cli.iosxr.unit.acl.handler.AclAllReader;
+import io.frinx.cli.iosxr.unit.acl.handler.AclInterfaceConfigReader;
+import io.frinx.cli.iosxr.unit.acl.handler.AclInterfaceReader;
+import io.frinx.cli.iosxr.unit.acl.handler.EgressAclSetConfigReader;
+import io.frinx.cli.iosxr.unit.acl.handler.EgressAclSetConfigWriter;
+import io.frinx.cli.iosxr.unit.acl.handler.EgressAclSetReader;
+import io.frinx.cli.iosxr.unit.acl.handler.IngressAclSetConfigReader;
+import io.frinx.cli.iosxr.unit.acl.handler.IngressAclSetConfigWriter;
+import io.frinx.cli.iosxr.unit.acl.handler.IngressAclSetReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.acl.IIDs;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.InterfacesBuilder;
@@ -32,9 +41,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev17082
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
-
-import javax.annotation.Nonnull;
-import java.util.Set;
 
 public class AclUnit implements TranslateUnit {
 
@@ -98,17 +104,17 @@ public class AclUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IIDs.ACL, AclBuilder.class);
 
         rRegistry.addStructuralReader(IIDs.AC_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_CONFIG, new AclInterfaceConfigReader()));
 
         // ingress
         rRegistry.addStructuralReader(IIDs.AC_IN_IN_INGRESSACLSETS, IngressAclSetsBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigReader()));
 
         // egress
         rRegistry.addStructuralReader(IIDs.AC_IN_IN_EGRESSACLSETS, EgressAclSetsBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.AC_IN_IN_EG_EGRESSACLSET, new EgressAclSetReader(cli)));
+        rRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_IN_EG_EGRESSACLSET, new EgressAclSetReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigReader()));
 
         // sets
