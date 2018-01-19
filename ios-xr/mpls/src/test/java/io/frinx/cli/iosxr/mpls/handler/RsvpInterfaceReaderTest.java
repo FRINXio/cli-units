@@ -21,23 +21,14 @@ import java.util.stream.Collectors;
 
 public class RsvpInterfaceReaderTest {
 
-    private static final String OUTPUT = "Tue Nov 28 08:45:57.065 UTC\n" +
-        "\n" +
-        "*: RDM: Default I/F B/W % : 75% [default] (max resv/bc0), 0% [default] (bc1)\n" +
-        "\n" +
-        "Interface                 MaxBW (bps)  MaxFlow (bps) Allocated (bps)      MaxSub (bps) \n" +
-        "------------------------- ------------ ------------- -------------------- -------------\n" +
-        "Loopback87                       350K           350K             0 (  0%)            0 \n" +
-        "Loopback33                          0              0             0 (  0%)            0 ";
-
-    private static final String OUTPUT_ABBREVIATED_IFC_NAMES = "Sun Dec 10 22:55:01.826 UTC\n" +
-            "\n" +
-            "*: RDM: Default I/F B/W % : 75% [default] (max resv/bc0), 0% [default] (bc1)\n" +
-            "\n" +
-            "Interface   MaxBW (bps)  MaxFlow (bps) Allocated (bps)      MaxSub (bps) \n" +
-            "----------- ------------ ------------- -------------------- -------------\n" +
-            "Gi0/0/0/1          500K           500K             0 (  0%)            0 \n" +
-            "Lo97                  0              0             0 (  0%)            0 \n";
+    private static final String OUTPUT = "Fri Jan 19 11:52:35.794 UTC\n" +
+            "rsvp\n" +
+            "interface tunnel-te3100\n" +
+            "!\n" +
+            "interface Bundle-Ether100\n" +
+            "bandwidth 1\n" +
+            "!\n" +
+            "!\n";
 
     private static final String BW_OUTPUT = "Sun Dec 10 23:00:09.205 UTC\n" +
             "\n" +
@@ -98,24 +89,10 @@ public class RsvpInterfaceReaderTest {
 
     @Test
     public void testIds() {
-        List<InterfaceKey> keys = RsvpInterfaceReader.getShortInterfaceKeys(OUTPUT);
+        List<InterfaceKey> keys = RsvpInterfaceReader.getInterfaceKeys(OUTPUT);
         Assert.assertFalse(keys.isEmpty());
-        Assert.assertEquals(Lists.newArrayList("Loopback87", "Loopback33"),
+        Assert.assertEquals(Lists.newArrayList("tunnel-te3100", "Bundle-Ether100"),
             keys.stream().map(InterfaceKey::getInterfaceId).map(InterfaceId::getValue).collect(Collectors.toList()));
-
-        keys = RsvpInterfaceReader.getShortInterfaceKeys(OUTPUT_ABBREVIATED_IFC_NAMES);
-        Assert.assertFalse(keys.isEmpty());
-        Assert.assertEquals(Lists.newArrayList("Gi0/0/0/1", "Lo97"),
-                keys.stream().map(InterfaceKey::getInterfaceId).map(InterfaceId::getValue).collect(Collectors.toList()));
-    }
-
-    @Test
-    public void testGetLongIfcKey() {
-        Assert.assertEquals(new InterfaceKey(new InterfaceId("GigabitEthernet0/0/0/1")),
-                RsvpInterfaceReader.getLongKey(SH_INT_GI1));
-
-        Assert.assertEquals(new InterfaceKey(new InterfaceId("Loopback97")),
-                RsvpInterfaceReader.getLongKey(SH_INT_LO97));
     }
 
     @Test

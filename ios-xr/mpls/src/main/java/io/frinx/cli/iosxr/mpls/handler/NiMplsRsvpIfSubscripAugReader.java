@@ -25,11 +25,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev17082
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class NiMplsRsvpIfSubscripAugReader implements MplsReader.MplsConfigReader<NiMplsRsvpIfSubscripAug, NiMplsRsvpIfSubscripAugBuilder> {
 
     private Cli cli;
     private static final String SH_RSVP_INT = "show rsvp interface %s";
+    private static final Pattern IFACE_LINE = Pattern.compile("(?<name>[^\\s]+) (?<bandwidth>[0-9]+)(K?) (?<flow>[^\\s]+)(K?) (?<allocated>[0-9]+) \\( (?<bps>[0-9]+)%\\) (?<maxsub>.*)");
 
     public NiMplsRsvpIfSubscripAugReader(Cli cli) {
         this.cli = cli;
@@ -44,7 +46,7 @@ public class NiMplsRsvpIfSubscripAugReader implements MplsReader.MplsConfigReade
     @VisibleForTesting
     public static void parseConfig(String output, NiMplsRsvpIfSubscripAugBuilder builder) {
         Optional<String> bw = ParsingUtils.parseField(output.replaceAll("\\h+", " "), 0,
-            RsvpInterfaceReader.IFACE_LINE::matcher,
+            IFACE_LINE::matcher,
             matcher -> matcher.group("bandwidth"));
 
         // if 0, don't set bandwidth field at all
