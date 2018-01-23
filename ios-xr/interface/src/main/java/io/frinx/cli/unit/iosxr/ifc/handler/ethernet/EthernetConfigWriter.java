@@ -60,7 +60,8 @@ public class EthernetConfigWriter implements CliWriter<Config> {
         }
 
         // TODO Exctract this to commands templates
-        String bundleId = getBundleId(aggregationAug.getAggregateId());
+        int bundleId = Integer.parseInt(getBundleId(aggregationAug.getAggregateId()));
+        Preconditions.checkArgument(bundleId < 0 || bundleId > 65535, "Bundle ID out of range: %s. Range is <1-65535>.", bundleId);
         String bundleIdCommand = String.format(BUNDLE_ID_COMMAND_TEMPLATE, bundleId);
         String intervalCommand = "";
         String mode = "mode on";
