@@ -101,8 +101,11 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                     "Loopback name must be in format: Loopback45, not: %s", data.getName());
         } else if (data.getType() == Ieee8023adLag.class) {
             Matcher matcher = LAG_IFC_NAME_PATTERN.matcher(data.getName());
-            checkArgument(matcher.matches(),
+            boolean result = matcher.matches();
+            checkArgument(result,
                     "LAG interface name must be in format: Bundle-Ether45, not: %s", data.getName());
+            int bundleId = Integer.parseInt(matcher.group("number"));
+            checkArgument(bundleId < 0 || bundleId > 65535, "Bundle-Ether interface ID out of range: %s. Range is <1-65535>.", bundleId);
         } else {
             throw new IllegalArgumentException("Cannot create interface of type: " + data.getType());
         }
