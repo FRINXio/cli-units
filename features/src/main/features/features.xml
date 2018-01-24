@@ -220,10 +220,22 @@
         <feature version='${project.version}'>cli-southbound-unit-brocade-network-instance</feature>
     </feature>
 
+    <feature name='cli-southbound-unit-junos-common-cli-initializer' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-io</feature>
+        <bundle>mvn:io.frinx.cli/junos-cli-init-unit/{{VERSION}}</bundle>
+    </feature>
+
+    <feature name='cli-southbound-unit-junos' version='${project.version}'>
+        <feature version='${cli.version}'>cli-topology</feature>
+        <feature version='${project.version}'>cli-southbound-unit-junos-common-cli-initializer</feature>
+    </feature>
+
     <feature name='cli-southbound-all-units' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-ios</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr</feature>
         <feature version='${project.version}'>cli-southbound-unit-brocade</feature>
+        <feature version='${project.version}'>cli-southbound-unit-junos</feature>
     </feature>
 
 </features>
