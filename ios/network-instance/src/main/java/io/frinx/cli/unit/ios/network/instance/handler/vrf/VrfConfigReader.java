@@ -27,8 +27,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         CompositeReader.Child<Config, ConfigBuilder> {
 
-    private static final String SH_IP_VRF_CFG = "sh ip vrf %s";
-    private static final Pattern VRF_ID_LINE = Pattern.compile(" *(?<vrf>[\\S]+) *(?<rd>([\\S]+):([\\S]+)).*");
+    private static final String SH_IP_VRF_CFG = "sh run vrf %s";
+    private static final Pattern RD_LINE = Pattern.compile("\\s+rd (?<rd>([\\S]+):([\\S]+)).*");
     private Cli cli;
 
     public VrfConfigReader(Cli cli) {
@@ -49,7 +49,7 @@ public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         builder.setName(vrf);
         builder.setType(L3VRF.class);
         parseField(output,
-            VRF_ID_LINE::matcher,
+            RD_LINE::matcher,
             matcher -> matcher.group("rd"),
             rd -> builder.setRouteDistinguisher(new RouteDistinguisher(rd)));
 

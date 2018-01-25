@@ -29,8 +29,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-// TODO This reader assumes that there is just one ospr or bgp per vrf
-// won't work correctly if there are more than one instances of same protocol
 public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
         OspfReader.OspfConfigReader<Protocol, ProtocolBuilder>,
         CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
@@ -41,6 +39,7 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
         this.cli = cli;
     }
 
+    private static final String SH_RUN_INCLUDE_OSPF = "sh run | include ospf";
     private static final Pattern OSPF_NO_VRF = Pattern.compile("\\s*router ospf (?<id>[^\\s]+)\\s*");
     private static final Pattern OSPF_VRF = Pattern.compile("\\s*router ospf (?<id>[^\\s]+) vrf (?<vrf>[^\\s]+)\\s*");
 
@@ -49,7 +48,7 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
     public List<ProtocolKey> getAllIds(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier,
                                        @Nonnull ReadContext readContext)
             throws ReadFailedException {
-        String output = blockingRead("sh run | include ospf", cli, instanceIdentifier, readContext);
+        String output = blockingRead(SH_RUN_INCLUDE_OSPF, cli, instanceIdentifier, readContext);
         String vrfId = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
         if (vrfId.equals(DEFAULT_NETWORK_NAME)) {
@@ -66,6 +65,7 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
                     .filter(Matcher::matches)
                     .map(matcher -> matcher.group("id"))
                     .map(s -> new ProtocolKey(TYPE, s))
+                    .distinct()
                     .collect(Collectors.toList());
         }
     }

@@ -8,36 +8,38 @@
 
 package io.frinx.cli.ospf.handler;
 
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.OspfAreaIdentifier;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.InterfaceKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.Area;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import static com.google.common.base.Preconditions.checkArgument;
 
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import java.util.Collections;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Interfaces;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.OspfAreaIdentifier;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.Area;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
 
-    private final Cli cli;
     private static final String WRITE_TEMPLATE = "configure terminal\n"
-                                               + "interface %s\n"
-                                               + "ip vrf forwarding %s\n"
-                                               + "ip ospf %s area %s\n"
-                                               + "ip ospf cost %s\n"
-                                               + "end";
+            + "interface {$config.id}\n"
+            + "ip ospf {$ospf} area {$area}\n"
+            + "{.if ($config.metric) }ip ospf cost {$config.metric.value}\n{/if}"
+            + "end";
+
     private static final String DELETE_TEMPLATE = "configure terminal\n"
-                                                + "interface %s\n"
-                                                + "no ip vrf forwarding %s\n"
-                                                + "no ip ospf %s area %s\n"
-                                                + "no ip ospf cost\n"
-                                                + "end";
+            + "interface {$config.id}\n"
+            + "no ip ospf {$ospf} area {$area}\n"
+            + "no ip ospf cost\n"
+            + "end";
+
+    private final Cli cli;
 
     public AreaInterfaceConfigWriter(final Cli cli) {
         this.cli = cli;
@@ -47,21 +49,25 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
         final OspfAreaIdentifier areaId = instanceIdentifier.firstKeyOf(Area.class).getIdentifier();
-        final InterfaceKey intfId = instanceIdentifier.firstKeyOf(Interface.class);
-
-        String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String protocolName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
 
-        // TODO if cost is null, this will result in invalid configuration
-        // command 'ip ospf cost null'. Do not even issue the command, if
-        // cost is null
-        Integer cost = data.getMetric() != null ? data.getMetric().getValue() : null;
+        boolean ifcInVrf = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, IIDs.NE_NETWORKINSTANCE))
+                .transform(NetworkInstance::getInterfaces)
+                .transform(Interfaces::getInterface)
+                .or(Collections.emptyList())
+                .stream()
+                .anyMatch(i -> i.getId().equals(data.getId()));
+
+        checkArgument(ifcInVrf, "Interface: %s cannot be in OSPF router: %s, not in the same VRF", data.getId(), protocolName);
+
+        // TODO ifc has to have IP configured
+        // TODO check if ifc not present under different OSPF
 
         blockingWriteAndRead(cli, instanceIdentifier, data,
-            f(WRITE_TEMPLATE,
-                intfId.getId(),
-                vrfName,
-                protocolName, AreaInterfaceReader.areaIdToString(areaId), cost));
+                fT(WRITE_TEMPLATE,
+                        "config", data,
+                        "ospf", protocolName,
+                        "area", AreaInterfaceReader.areaIdToString(areaId)));
 
     }
 
@@ -75,15 +81,12 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
         final OspfAreaIdentifier areaId = instanceIdentifier.firstKeyOf(Area.class).getIdentifier();
-        final InterfaceKey intfId = instanceIdentifier.firstKeyOf(Interface.class);
-
-        String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String protocolName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
 
         blockingDeleteAndRead(cli, instanceIdentifier,
-            f(DELETE_TEMPLATE,
-                intfId.getId(),
-                vrfName,
-                protocolName, AreaInterfaceReader.areaIdToString(areaId)));
+                fT(DELETE_TEMPLATE,
+                        "config", data,
+                        "ospf", protocolName,
+                        "area", AreaInterfaceReader.areaIdToString(areaId)));
     }
 }

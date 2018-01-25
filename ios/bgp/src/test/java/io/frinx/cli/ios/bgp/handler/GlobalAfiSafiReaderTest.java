@@ -19,8 +19,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev
 
 public class GlobalAfiSafiReaderTest {
 
-    private static final String BGP_OUTPUT = "router bgp 65000\n" +
-            " address-family ipv4\n" +
+    private static final String BGP_OUTPUT = "router bgp 65000\r\n" +
+            " address-family ipv4\r\n" +
             " address-family ipv4 vrf a\n";
 
     @Test
