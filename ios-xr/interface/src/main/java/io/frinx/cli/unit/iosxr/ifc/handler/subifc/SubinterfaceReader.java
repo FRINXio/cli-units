@@ -14,12 +14,15 @@ import static io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader.parseAllInterf
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
@@ -50,9 +53,14 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
         List<SubinterfaceKey> subinterfaceKeys = parseSubinterfaceIds(blockingRead(SH_INTERFACE, cli, instanceIdentifier, readContext), id);
 
         // Subinterface with ID 0 is reserved for IP addresses of the interface
-        // TODO should we check if the interface is IP-enabled?
-        // TODO what if subinterface .0 already exists on the device?
-        subinterfaceKeys.add(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
+        InstanceIdentifier<Subinterface> zeroSubIfaceIid = RWUtils.replaceLastInId(instanceIdentifier,
+                new InstanceIdentifier.IdentifiableItem<>(Subinterface.class, new SubinterfaceKey(ZERO_SUBINTERFACE_ID)));
+        boolean hasIpv4Address = readContext.read(zeroSubIfaceIid.augmentation(Subinterface1.class)).isPresent();
+        boolean hasIpv6Address = readContext.read(zeroSubIfaceIid.augmentation(Subinterface2.class)).isPresent();
+        if (hasIpv4Address || hasIpv6Address) {
+            subinterfaceKeys.add(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
+        }
+
         return subinterfaceKeys;
     }
 
