@@ -121,11 +121,15 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>commons-net</groupId>
+      <artifactId>commons-net</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>ios-interface-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>ios-bgp-unit</artifactId>
@@ -136,13 +140,11 @@
       <artifactId>ios-rib-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>ios-network-instance-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>junos-cli-init-unit</artifactId>
@@ -218,6 +220,11 @@
     <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>ios-xr-acl-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>ios-xr-routing-policy-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

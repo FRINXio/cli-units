@@ -35,6 +35,7 @@
     <module>snmp</module>
     <module>logging</module>
     <module>acl</module>
+    <module>routing-policy</module>
   </modules>
 
   <build>

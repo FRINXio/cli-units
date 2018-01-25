@@ -50,6 +50,7 @@
     <feature name='cli-southbound-unit-ios-bgp' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-bgp-unit/{{VERSION}}</bundle>
     </feature>
 
@@ -165,6 +166,11 @@
         <bundle>mvn:io.frinx.cli/ios-xr-acl-unit/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='cli-southbound-unit-ios-xr-routing-policy' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:io.frinx.cli/ios-xr-routing-policy-unit/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-ios-xr' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
@@ -177,6 +183,7 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-snmp</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-logging</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-acl</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-routing-policy</feature>
     </feature>
 
     <feature name='cli-southbound-unit-brocade-common-cli-initializer' version='${project.version}'>
