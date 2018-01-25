@@ -58,14 +58,13 @@ public class InterfaceDampingConfigReader implements CliConfigReader<Config, Con
     static void parseDamping(String output, ConfigBuilder builder) {
 
         // damping is not enabled, until proven otherwise
-        builder.setEnabled(false);
         ParsingUtils.parseField(output, 0,
                 DAMPING_ENABLED::matcher,
                 matcher -> true,
                 builder::setEnabled);
 
         // if not enabled, don't even try to set other values
-        if (!builder.isEnabled()) {
+        if (builder.isEnabled() == null || !builder.isEnabled()) {
             return;
         }
 

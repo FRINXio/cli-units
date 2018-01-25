@@ -60,6 +60,7 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
     }
 
     private static void validateConfig(Config dataAfter) {
+        Preconditions.checkNotNull(dataAfter.isEnabled(), "Field enabled must be specified in damping.");
         Long halfLife = dataAfter.getHalfLife();
         Long reuseThreshold = dataAfter.getReuse();
         Long suppressThreshold = dataAfter.getSuppress();
