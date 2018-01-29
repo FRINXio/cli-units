@@ -23,11 +23,14 @@ import io.frinx.cli.unit.iosxr.snmp.handler.*;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.openconfig.openconfig.snmp.IIDs;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp._interface.config.EnabledTrapForEvent;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.top.SnmpBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.interfaces._interface.Config;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -78,8 +81,8 @@ public class SnmpUnit implements TranslateUnit {
 
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
         wRegistry.add(new GenericListWriter<>(IIDs.SN_IN_INTERFACE, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.SN_IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
-        wRegistry.add(new GenericListWriter<>(IIDs.SN_IN_IN_CO_ENABLEDTRAPFOREVENT, new NoopCliListWriter<>()));
+        wRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(Config.class).child(EnabledTrapForEvent.class)),
+                new GenericWriter<>(IIDs.SN_IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
