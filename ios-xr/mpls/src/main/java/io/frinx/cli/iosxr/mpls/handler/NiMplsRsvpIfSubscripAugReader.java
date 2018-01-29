@@ -30,8 +30,8 @@ import java.util.regex.Pattern;
 public class NiMplsRsvpIfSubscripAugReader implements MplsReader.MplsConfigReader<NiMplsRsvpIfSubscripAug, NiMplsRsvpIfSubscripAugBuilder> {
 
     private Cli cli;
-    private static final String SH_RSVP_INT = "show rsvp interface %s";
-    private static final Pattern IFACE_LINE = Pattern.compile("(?<name>[^\\s]+) (?<bandwidth>[0-9]+)(K?) (?<flow>[^\\s]+)(K?) (?<allocated>[0-9]+) \\( (?<bps>[0-9]+)%\\) (?<maxsub>.*)");
+    private static final String SH_RSVP_INT = "show run rsvp interface %s";
+    private static final Pattern IFACE_LINE = Pattern.compile("bandwidth (?<bandwidth>[0-9]+)(K?)");
 
     public NiMplsRsvpIfSubscripAugReader(Cli cli) {
         this.cli = cli;

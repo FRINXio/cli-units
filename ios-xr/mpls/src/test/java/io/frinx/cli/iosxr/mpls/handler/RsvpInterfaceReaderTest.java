@@ -26,66 +26,18 @@ public class RsvpInterfaceReaderTest {
             "interface tunnel-te3100\n" +
             "!\n" +
             "interface Bundle-Ether100\n" +
-            "bandwidth 1\n" +
+            "bandwidth 500\n" +
             "!\n" +
             "!\n";
 
-    private static final String BW_OUTPUT = "Sun Dec 10 23:00:09.205 UTC\n" +
-            "\n" +
-            "*: RDM: Default I/F B/W % : 75% [default] (max resv/bc0), 0% [default] (bc1)\n" +
-            "\n" +
-            "Interface   MaxBW (bps)  MaxFlow (bps) Allocated (bps)      MaxSub (bps) \n" +
-            "----------- ------------ ------------- -------------------- -------------\n" +
-            "Gi0/0/0/1          500K           500K             0 (  0%)            0 \n";
 
-    private static final String ZERO_BW_OUTPUT = "Sun Dec 10 22:59:20.458 UTC\n" +
-            "\n" +
-            "*: RDM: Default I/F B/W % : 75% [default] (max resv/bc0), 0% [default] (bc1)\n" +
-            "\n" +
-            "Interface   MaxBW (bps)  MaxFlow (bps) Allocated (bps)      MaxSub (bps) \n" +
-            "----------- ------------ ------------- -------------------- -------------\n" +
-            "Lo97                  0              0             0 (  0%)            0 \n";
-
-    private static final String SH_INT_GI1 = "Sun Dec 10 22:56:48.468 UTC\n" +
-            "GigabitEthernet0/0/0/1 is administratively down, line protocol is administratively down \n" +
-            "  Interface state transitions: 0\n" +
-            "  Hardware is GigabitEthernet, address is 0068.e790.3a02 (bia 0068.e790.3a02)\n" +
-            "  Internet address is Unknown\n" +
-            "  MTU 1514 bytes, BW 1000000 Kbit (Max: 1000000 Kbit)\n" +
-            "     reliability 255/255, txload 0/255, rxload 0/255\n" +
-            "  Encapsulation ARPA,\n" +
-            "  Full-duplex, 1000Mb/s, unknown, link type is force-up\n" +
-            "  output flow control is off, input flow control is off\n" +
-            "  Carrier delay (up) is 10 msec\n" +
-            "  loopback not set,\n" +
-            "  Last input never, output never\n" +
-            "  Last clearing of \"show interface\" counters never\n" +
-            "  5 minute input rate 0 bits/sec, 0 packets/sec\n" +
-            "  5 minute output rate 0 bits/sec, 0 packets/sec\n" +
-            "     0 packets input, 0 bytes, 0 total input drops\n" +
-            "     0 drops for unrecognized upper-level protocol\n" +
-            "     Received 0 broadcast packets, 0 multicast packets\n" +
-            "              0 runts, 0 giants, 0 throttles, 0 parity\n" +
-            "     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored, 0 abort\n" +
-            "     0 packets output, 0 bytes, 0 total output drops\n" +
-            "     Output 0 broadcast packets, 0 multicast packets\n" +
-            "     0 output errors, 0 underruns, 0 applique, 0 resets\n" +
-            "     0 output buffer failures, 0 output buffers swapped out\n" +
-            "     0 carrier transitions\n" +
-            "\n";
-
-    private static final String SH_INT_LO97 = "Sun Dec 10 22:55:50.502 UTC\n" +
-            "Loopback97 is administratively down, line protocol is administratively down \n" +
-            "  Interface state transitions: 2\n" +
-            "  Hardware is Loopback interface(s)\n" +
-            "  Internet address is Unknown\n" +
-            "  MTU 1500 bytes, BW 0 Kbit\n" +
-            "     reliability Unknown, txload Unknown, rxload Unknown\n" +
-            "  Encapsulation Loopback,  loopback not set,\n" +
-            "  Last link flapped 3d09h\n" +
-            "  Last input Unknown, output Unknown\n" +
-            "  Last clearing of \"show interface\" counters Unknown\n" +
-            "  Input/output data rate is disabled.";
+    private static final String ZERO_BW_OUTPUT = "Fri Jan 19 11:52:35.794 UTC\n" +
+            "rsvp\n" +
+            "interface tunnel-te3100\n" +
+            "!\n" +
+            "interface Bundle-Ether100\n" +
+            "!\n" +
+            "!\n";
 
     @Test
     public void testIds() {
@@ -98,7 +50,7 @@ public class RsvpInterfaceReaderTest {
     @Test
     public void testBandwidth() {
         NiMplsRsvpIfSubscripAugBuilder cb = new NiMplsRsvpIfSubscripAugBuilder();
-        NiMplsRsvpIfSubscripAugReader.parseConfig(BW_OUTPUT, cb);
+        NiMplsRsvpIfSubscripAugReader.parseConfig(OUTPUT, cb);
         Assert.assertEquals(Long.valueOf(500), cb.getBandwidth());
 
         NiMplsRsvpIfSubscripAugBuilder cb1 = new NiMplsRsvpIfSubscripAugBuilder();
