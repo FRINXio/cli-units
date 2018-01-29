@@ -43,8 +43,7 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
 
     static final String ROUTE_TARGET_EXPORT_SET = "-route-target-export-set";
     static final String ROUTE_TARGET_IMPORT_SET = "-route-target-import-set";
-    static final String RT = "rt";
-    private static final String SH_RUN_VRF_ID = "sh run vrf %s";
+    private static final String SH_RUN_VRF_ID = "sh run | include ^ip vrf|^ route-target";
     private static final Pattern VRF_ID_ROUTE_TARGET_EXPORT = Pattern.compile("route-target export (?<rt>[\\S].*)");
     private static final Pattern VRF_ID_ROUTE_TARGET_IMPORT = Pattern.compile("route-target import (?<rt>[\\S].*)");
     static final Pattern VRF_ID_ROUTE_TARGET = Pattern.compile("(?<vrf>\\S*)-route-target-(?<direction>import|export)-set");
@@ -57,6 +56,8 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
 
     @VisibleForTesting
     static List<ExtCommunitySetKey> parseExtCommunityIds(String output, String vrfName) {
+        output = realignOutput(output, vrfName);
+
         List<ExtCommunitySetKey> exportKeys = ParsingUtils.parseFields(output, 0,
                 VRF_ID_ROUTE_TARGET_EXPORT::matcher,
                 Matcher::matches,
@@ -72,6 +73,19 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
         extCommunitySetKeys.addAll(importKeys);
 
         return extCommunitySetKeys;
+    }
+
+    private static String realignOutput(String output, String vrfName) {
+        output = output.replaceAll("\\n|\\r", "");
+        output = output.replaceAll("ip vrf", "\nip vrf");
+
+        output = ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .filter(l -> l.contains("ip vrf " + vrfName))
+                .findFirst()
+                .orElse("")
+                .replaceAll("route-target", "\nroute-target");
+        return output;
     }
 
     @VisibleForTesting
@@ -93,7 +107,7 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
         List<ExtCommunitySetConfig.ExtCommunityMember> extCommunityMembers;
         extCommunityMembers = ParsingUtils.parseFields(output, 0,
                 vrfIdRouteTargetImport::matcher,
-                matcher -> matcher.group(RT),
+                matcher -> matcher.group("rt"),
                 value -> new ExtCommunitySetConfig.ExtCommunityMember(new BgpExtCommunityType(value)));
         configBuilder.setExtCommunityMember(extCommunityMembers);
     }
