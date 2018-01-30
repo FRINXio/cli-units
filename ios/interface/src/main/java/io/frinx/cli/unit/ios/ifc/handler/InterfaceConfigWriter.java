@@ -61,7 +61,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
                 "configure terminal",
                 f("interface loopback %s", matcher.group("number")),
-                f("description %s", data.getDescription()),
+                data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
                 data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
                 "end");
     }
@@ -101,8 +101,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
                 "configure terminal",
                 f("interface %s", data.getName()),
-                data.getDescription() == null ? "" : f("description %s", data.getDescription()),
-                data.getMtu() == null ? "" : f("mtu %s", data.getMtu()),
+                data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
+                data.getMtu() == null ? "no mtu" : f("mtu %s", data.getMtu()),
                 data.isEnabled() ? "no shutdown" : "shutdown",
                 "end");
     }

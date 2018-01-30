@@ -52,11 +52,19 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         if (!writeContext.readBefore(parentIfcId).isPresent()
                 && id.firstKeyOf(Subinterface.class).getIndex() == ZERO_SUBINTERFACE_ID) {
             Preconditions.checkArgument(data.getDescription() == null,
-                    "Cannot change description for .0 subinterface");
+                    "'description' cannot be specified for .0 subinterface. " +
+                            "Use 'description' under interface/config instead.");
+            Preconditions.checkArgument(data.isEnabled() == null,
+                    "'enabled' cannot be specified for .0 subinterface. " +
+                            "Use 'enabled' under interface/config instead.");
             return;
         }
 
-        checkNotZeroSubinterface(id);
+        if (isZeroSubinterface(id)) {
+            // do nothing for .0 subinterface because it represents physical interface which config is handled in interface/config
+            return;
+        }
+
         Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId).get().getConfig().getType();
 
         if(isSupportedType(parentIfcType)) {
@@ -73,14 +81,9 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         }
     }
 
-    static void checkNotZeroSubinterface(@Nonnull InstanceIdentifier<?> id) throws WriteFailedException {
+    private static boolean isZeroSubinterface(@Nonnull InstanceIdentifier<?> id) throws WriteFailedException {
         Long subifcIndex = id.firstKeyOf(Subinterface.class).getIndex();
-
-        // TODO Should we parametrize error message with more info?
-        // Like what do we want to change etc.
-        // TODO At least debug log this?
-        Preconditions.checkArgument(subifcIndex != ZERO_SUBINTERFACE_ID,
-                "Only IP configuration is allowed for .%s subinterface", subifcIndex);
+        return subifcIndex == ZERO_SUBINTERFACE_ID;
 
     }
 
@@ -105,7 +108,11 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
             return;
         }
 
-        checkNotZeroSubinterface(id);
+        if (isZeroSubinterface(id)) {
+            // do nothing for .0 subinterface because it represents physical interface which config is handled in interface/config
+            return;
+        }
+
         Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId).get().getConfig().getType();
 
         if(isSupportedType(parentIfcType)) {

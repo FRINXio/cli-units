@@ -8,13 +8,16 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc;
 
+import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
 import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -36,7 +39,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config dataAfter,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        SubinterfaceConfigWriter.checkNotZeroSubinterface(id);
+        checkNotZeroSubinterface(id);
 
         blockingWriteAndRead(cli, id, dataAfter,
                 f(WRITE_TEMPLATE,
@@ -65,11 +68,18 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        SubinterfaceConfigWriter.checkNotZeroSubinterface(id);
+        checkNotZeroSubinterface(id);
 
         blockingDeleteAndRead(cli, id,
                 f(DELETE_TEMPLATE,
                         getSubinterfaceName(id),
                         dataBefore.getVlanId().getVlanId().getValue()));
+    }
+
+    private static void checkNotZeroSubinterface(@Nonnull InstanceIdentifier<?> id) throws WriteFailedException {
+        Long subifcIndex = id.firstKeyOf(Subinterface.class).getIndex();
+        Preconditions.checkArgument(subifcIndex != ZERO_SUBINTERFACE_ID,
+                "Vlan configuration is not allowed for .%s subinterface", subifcIndex);
+
     }
 }
