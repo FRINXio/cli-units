@@ -27,6 +27,8 @@ public class StaticStateReader implements LrReader.LrOperReader<State, StateBuil
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier, @Nonnull StateBuilder stateBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         IpPrefix ipPrefix = instanceIdentifier.firstKeyOf(Static.class).getPrefix();
         stateBuilder.setPrefix(ipPrefix);
+
+        // FIXME only fill in prefix if the route is really in use by the router
     }
 
     @Override

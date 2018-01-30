@@ -8,6 +8,7 @@
 
 package io.frinx.cli.ios.local.routing.common;
 
+import io.frinx.cli.handlers.network.instance.L3VrfReader;
 import io.frinx.cli.registry.common.TypedReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.CliOperReader;
@@ -21,7 +22,7 @@ import org.opendaylight.yangtools.yang.binding.Identifier;
 /**
  * Lr version of reader. A mixin that checks if LR type is set in the protocol in the background.
  */
-public interface LrReader<O extends DataObject, B extends Builder<O>> extends TypedReader<O, B>, CliReader<O, B> {
+public interface LrReader<O extends DataObject, B extends Builder<O>> extends TypedReader<O, B>, CliReader<O, B>, L3VrfReader<O, B> {
 
     Class<STATIC> TYPE = STATIC.class;
 

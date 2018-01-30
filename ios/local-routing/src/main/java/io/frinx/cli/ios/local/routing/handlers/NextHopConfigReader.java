@@ -8,7 +8,7 @@
 
 package io.frinx.cli.ios.local.routing.handlers;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
+import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -25,19 +25,18 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHopKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.next.hop.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.next.hop.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NextHopConfigReader implements LrReader.LrConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_IP_STATIC_ROUTE_NETWORK = "sh ip static route %s | include %s";
-    private static final String SHOW_IP_STATIC_ROUTE_VRF_NETWORK = "sh ip static route vrf %s %s | include %s";
+    private static final String SHOW_IP_STATIC_ROUTE_DEFAULT = "sh run | include route %s %s";
+    private static final String SHOW_IP_STATIC_ROUTE_VRF = "sh run | include route vrf %s %s %s";
 
     private static final Pattern SPACE = Pattern.compile(" ");
-    private static final Pattern METRIC_LINE = Pattern.compile(".*\\[(?<metric>\\d+)/\\d+].*");
 
     private Cli cli;
 
@@ -48,24 +47,24 @@ public class NextHopConfigReader implements LrReader.LrConfigReader<Config, Conf
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
-        ProtocolKey protocolKey = id.firstKeyOf(Protocol.class);
+        NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
 
         StaticKey staticRouteKey = id.firstKeyOf(Static.class);
-        String ipPrefix = staticRouteKey.getPrefix().getIpv4Prefix().getValue();
+        String ipPrefix = NextHopReader.getDevicePrefix(staticRouteKey);
 
         NextHopKey nextHopKey = id.firstKeyOf(NextHop.class);
         String index = nextHopKey.getIndex();
 
-        String showCommand = protocolKey.getName().equals(DEFAULT_NETWORK_NAME)
-                ? String.format(SHOW_IP_STATIC_ROUTE_NETWORK, ipPrefix, switchIndex(index))
-                : String.format(SHOW_IP_STATIC_ROUTE_VRF_NETWORK, protocolKey.getName(), ipPrefix, switchIndex(index));
+        String showCommand = vrfKey.equals(DEFAULT_NETWORK)
+                ? String.format(SHOW_IP_STATIC_ROUTE_DEFAULT, ipPrefix, switchIndex(index))
+                : String.format(SHOW_IP_STATIC_ROUTE_VRF, vrfKey.getName(), ipPrefix, switchIndex(index));
 
         parseMetric(blockingRead(showCommand, cli, id, ctx), builder);
 
         builder.setIndex(index);
     }
 
-    private static String switchIndex(String index) {
+    static String switchIndex(String index) {
         return SPACE.splitAsStream(index)
                 .reduce((iFace, ipAddress) -> String.format("%s %s", ipAddress, iFace))
                 .orElse(index);
@@ -74,9 +73,13 @@ public class NextHopConfigReader implements LrReader.LrConfigReader<Config, Conf
     @VisibleForTesting
     static void parseMetric(String output, ConfigBuilder configBuilder) {
         ParsingUtils.parseField(output, 0,
-                METRIC_LINE::matcher,
-                matcher -> Long.valueOf(matcher.group("metric")),
-                configBuilder::setMetric);
+                StaticReader::getMatcher,
+                matcher -> matcher.group("metric") == null ? -1L : Long.valueOf(matcher.group("metric")),
+                metric -> {
+                    if (metric != -1) {
+                        configBuilder.setMetric(metric);
+                    }
+                });
     }
 
     @Override

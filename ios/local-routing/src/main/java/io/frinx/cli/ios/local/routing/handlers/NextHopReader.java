@@ -8,41 +8,34 @@
 
 package io.frinx.cli.ios.local.routing.handlers;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.local.routing.common.LrListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import javax.annotation.Nonnull;
+import org.apache.commons.net.util.SubnetUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.NextHopsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHop;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHopBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHopKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, NextHopKey, NextHopBuilder> {
 
-    private static final String SH_IP_ROUTE = "sh ip static route %s";
-    private static final String SH_IP_STATIC_ROUTE_VRF = "sh ip static route vrf %s %s";
-
-    private static final Pattern NEXT_HOP_INTERFACE_LINE =
-            Pattern.compile(".+] via (?<interface>\\w+) \\[.+");
-    private static final Pattern NEXT_HOP_IP_LINE =
-            Pattern.compile(".+] via (?<ipAddress>[\\d*\\.]+) \\[.+");
-    private static final Pattern NEXT_HOP_INTERFACE_IP_LINE =
-            Pattern.compile(".+] via (?<interface>[\\w[/]]+) (?<ipAddress>[\\d*\\.]+) \\[.+");
+    private static final String SH_IP_STATIC_ROUTE = "sh run | include route %s";
+    private static final String SH_IP_STATIC_ROUTE_VRF = "sh run | include route vrf %s %s";
 
     private Cli cli;
 
@@ -54,44 +47,64 @@ public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, N
     @Override
     public List<NextHopKey> getAllIdsForType(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
+        NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 
         StaticKey staticRouteKey = instanceIdentifier.firstKeyOf(Static.class);
-        String ipPrefix = staticRouteKey.getPrefix().getIpv4Prefix().getValue();
+        String ipPrefix = getDevicePrefix(staticRouteKey);
 
-        String showCommand = protocolKey.getName().equals(DEFAULT_NETWORK_NAME)
-                ? String.format(SH_IP_ROUTE, ipPrefix)
-                : String.format(SH_IP_STATIC_ROUTE_VRF, protocolKey.getName(), ipPrefix);
+        String cmd = vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ?
+                String.format(SH_IP_STATIC_ROUTE, ipPrefix) :
+                String.format(SH_IP_STATIC_ROUTE_VRF, vrfKey.getName(), ipPrefix);
 
-        return parseNextHopPrefixes(blockingRead(String.format(showCommand, ipPrefix),
-                cli, instanceIdentifier, readContext));
+        return parseNextHopPrefixes(blockingRead(cmd, cli, instanceIdentifier, readContext),
+                ipPrefix, vrfKey);
+    }
+
+    static String getDevicePrefix(StaticKey staticRouteKey) {
+        if (staticRouteKey.getPrefix().getIpv4Prefix() != null) {
+            SubnetUtils.SubnetInfo info = new SubnetUtils(staticRouteKey.getPrefix().getIpv4Prefix().getValue()).getInfo();
+            return String.format("%s %s", info.getNetworkAddress(), info.getNetmask());
+        } else {
+            return staticRouteKey.getPrefix().getIpv6Prefix().getValue();
+        }
     }
 
     @VisibleForTesting
-    static List<NextHopKey> parseNextHopPrefixes(String output) {
+    static List<NextHopKey> parseNextHopPrefixes(String output, String ipPrefix, NetworkInstanceKey vrfKey) {
         List<NextHopKey> nextHopKeyes = new ArrayList<>();
 
         nextHopKeyes.addAll(
                 ParsingUtils.parseFields(output, 0,
-                        NEXT_HOP_IP_LINE::matcher,
-                        matcher -> matcher.group("ipAddress"),
+                        NextHopReader::ipv4Matcher,
+                        NextHopReader::extractNextHopId,
                         NextHopKey::new));
 
         nextHopKeyes.addAll(
                 ParsingUtils.parseFields(output, 0,
-                        NEXT_HOP_INTERFACE_LINE::matcher,
-                        matcher -> matcher.group("interface"),
-                        NextHopKey::new));
-
-        nextHopKeyes.addAll(
-                ParsingUtils.parseFields(output, 0,
-                        NEXT_HOP_INTERFACE_IP_LINE::matcher,
-                        matcher ->
-                                String.format("%s %s", matcher.group("ipAddress"),
-                                        matcher.group("interface")),
+                        NextHopReader::ipv6Matcher,
+                        NextHopReader::extractNextHopId,
                         NextHopKey::new));
 
         return nextHopKeyes;
+    }
+
+    private static String extractNextHopId(Matcher m) {
+        String ip = m.group("ip");
+        String ifc = m.group("ifc");
+
+        if (ip != null) {
+            return ifc == null ? ip : String.format("%s %s", ip, ifc);
+        } else {
+            return ifc;
+        }
+    }
+
+    private static Matcher ipv4Matcher(String s) {
+        return StaticReader.ROUTE_LINE_IP.matcher(s);
+    }
+
+    private static Matcher ipv6Matcher(String s) {
+        return StaticReader.ROUTE_LINE_IP6.matcher(s);
     }
 
     @Override

@@ -8,22 +8,19 @@
 
 package io.frinx.cli.ios.local.routing.handlers;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.local.routing.common.LrListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.annotation.Nonnull;
-
 import org.apache.commons.net.util.SubnetUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
@@ -31,20 +28,21 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class StaticReader implements LrListReader.LrConfigListReader<Static, StaticKey, StaticBuilder> {
 
-    private static final String SH_IP_STATIC_ROUTE = "sh run | include ip route";
-    private static final Pattern IP_PREFIX_LINE_DEFAULT =
-            Pattern.compile("ip route (?<ip>(?!vrf)[\\S]+) (?<mask>[\\S]+).*");
-    private static final Pattern IP_PREFIX_LINE_VRF =
-            Pattern.compile("ip route vrf (?<vrf>[\\S]+) (?<ip>[\\S]+) (?<mask>[\\S]+).*");
+    private static final String SH_IP_STATIC_ROUTE = "sh run | include ip route|ipv6 route";
+
+    static final Pattern ROUTE_LINE_IP =
+            Pattern.compile("ip route (vrf \\S+)?\\s*(?<net>[\\d.]+)\\s*(?<mask>[\\d.]+)\\s*(?<ifc>[A-Z][\\w.]+)?\\s*(?<ip>[\\d]+.[\\d.]+)?\\s*(?<metric>[\\d]+)?.*");
+    static final Pattern ROUTE_LINE_IP6 =
+            Pattern.compile("ipv6 route (vrf \\S+)?\\s*(?<net>[\\d:/]+)\\s*(?<ifc>[A-Z][\\w.]+)?\\s*(?<ip>\\d*:[\\d:]+)?\\s*(?<metric>[\\d]+)?.*");
+
     private static final String GROUP_MASK = "mask";
-    private static final String GROUP_IP = "ip";
+    private static final String GROUP_IP = "net";
     private static final String GROUP_VRF = "vrf";
 
     private Cli cli;
@@ -54,21 +52,26 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
     }
 
     private static StaticKey resolveStaticKey(HashMap<String, String> value) {
-        SubnetUtils subnetUtils = new SubnetUtils(value.get(GROUP_IP), value.get(GROUP_MASK));
-        return new StaticKey(new IpPrefix(new Ipv4Prefix(subnetUtils.getInfo().getCidrSignature())));
-    }
+        String prefix;
 
-    private static HashMap<String, String> resolveGroupsVrf(Matcher m) {
-        HashMap<String, String> groups = resolveGroups(m);
-        groups.put(GROUP_VRF, m.group(GROUP_VRF));
-        return groups;
+        if (value.containsKey(GROUP_MASK)) {
+            SubnetUtils subnetUtils = new SubnetUtils(value.get(GROUP_IP), value.get(GROUP_MASK));
+            prefix = subnetUtils.getInfo().getCidrSignature();
+        } else {
+            prefix = value.get(GROUP_IP);
+        }
+
+        return new StaticKey(new IpPrefix(prefix.toCharArray()));
     }
 
     private static HashMap<String, String> resolveGroups(Matcher m) {
         HashMap<String, String> hashMap = new HashMap<>();
 
         hashMap.put(GROUP_IP, m.group(GROUP_IP));
-        hashMap.put(GROUP_MASK, m.group(GROUP_MASK));
+
+        if (m.pattern() == ROUTE_LINE_IP) {
+            hashMap.put(GROUP_MASK, m.group(GROUP_MASK));
+        }
 
         return hashMap;
     }
@@ -84,18 +87,29 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
 
     @VisibleForTesting
     static List<StaticKey> parseStaticPrefixes(String output, String vrfName) {
-        Pattern matchPattern = vrfName.equals(DEFAULT_NETWORK_NAME) ? IP_PREFIX_LINE_DEFAULT : IP_PREFIX_LINE_VRF;
+        output = filterVrf(output, vrfName);
 
-        if (vrfName.equals(DEFAULT_NETWORK_NAME)) {
-            return ParsingUtils.parseFields(output, 0, matchPattern::matcher, StaticReader::resolveGroups,
+        return ParsingUtils.parseFields(output, 0,
+                StaticReader::getMatcher,
+                StaticReader::resolveGroups,
                 StaticReader::resolveStaticKey);
-        } else {
-            return ParsingUtils.parseFields(output, 0,
-                matchPattern::matcher,
-                StaticReader::resolveGroupsVrf,
-                StaticReader::resolveStaticKey,
-                groupsHashMap -> groupsHashMap.get(GROUP_VRF).equals(vrfName));
-        }
+    }
+
+    static String filterVrf(String output, String vrfKey) {
+        Predicate<? super String> filter = vrfKey.equals(NetworInstance.DEFAULT_NETWORK_NAME) ?
+                s -> !s.contains("route vrf ") :
+                s -> s.contains("route vrf " + vrfKey);
+
+        output = ParsingUtils.NEWLINE.splitAsStream(output)
+                .filter(filter)
+                .reduce((s, s2) -> String.format("%s\n%s", s, s2))
+                .orElse("");
+        return output;
+    }
+
+    static Matcher getMatcher(String s) {
+        Matcher matcher = ROUTE_LINE_IP.matcher(s);
+        return matcher.matches() ? matcher : ROUTE_LINE_IP6.matcher(s);
     }
 
     @Override
