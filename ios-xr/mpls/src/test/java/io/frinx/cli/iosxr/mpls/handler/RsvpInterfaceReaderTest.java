@@ -34,7 +34,14 @@ public class RsvpInterfaceReaderTest {
     private static final String ZERO_BW_OUTPUT = "Fri Jan 19 11:52:35.794 UTC\n" +
             "rsvp\n" +
             "interface tunnel-te3100\n" +
+            "bandwidth\n" +
             "!\n" +
+            "interface Bundle-Ether100\n" +
+            "!\n" +
+            "!\n";
+
+    private static final String NO_BW_OUTPUT = "Fri Jan 19 11:52:35.794 UTC\n" +
+            "rsvp\n" +
             "interface Bundle-Ether100\n" +
             "!\n" +
             "!\n";
@@ -51,10 +58,14 @@ public class RsvpInterfaceReaderTest {
     public void testBandwidth() {
         NiMplsRsvpIfSubscripAugBuilder cb = new NiMplsRsvpIfSubscripAugBuilder();
         NiMplsRsvpIfSubscripAugReader.parseConfig(OUTPUT, cb);
-        Assert.assertEquals(Long.valueOf(500), cb.getBandwidth());
+        Assert.assertEquals(Long.valueOf(500), cb.getBandwidth().getUint32());
 
         NiMplsRsvpIfSubscripAugBuilder cb1 = new NiMplsRsvpIfSubscripAugBuilder();
         NiMplsRsvpIfSubscripAugReader.parseConfig(ZERO_BW_OUTPUT, cb1);
-        Assert.assertNull(cb1.getBandwidth());
+        Assert.assertEquals(NiMplsRsvpIfSubscripAugReader.DEFAULT, cb1.getBandwidth().getString());
+
+        NiMplsRsvpIfSubscripAugBuilder cb2 = new NiMplsRsvpIfSubscripAugBuilder();
+        NiMplsRsvpIfSubscripAugReader.parseConfig(NO_BW_OUTPUT, cb2);
+        Assert.assertNull(cb2.getBandwidth());
     }
 }
