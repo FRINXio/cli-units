@@ -62,7 +62,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 "configure terminal",
                 f("interface loopback %s", matcher.group("number")),
                 f("port-name %s", data.getDescription()),
-                data.isEnabled() ? "enable" : "disable",
+                data.isEnabled() != null && data.isEnabled() ? "enable" : "disable",
                 "end");
     }
 

@@ -75,7 +75,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 f("interface %s", data.getName()),
                 data.getMtu() == null ? "undo mtu" : f("mtu %s", data.getMtu()),
                 data.getDescription() == null ? "undo description" : f("description %s", data.getDescription()),
-                data.isEnabled() ? "undo shutdown" : "shutdown",
+                data.isEnabled() != null && data.isEnabled() ? "undo shutdown" : "shutdown",
                 "commit",
                 "return");
     }

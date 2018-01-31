@@ -64,7 +64,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                     "configure terminal",
                     f("interface %s", getSubinterfaceName(id)),
                     data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
-                    data.isEnabled() ? "no shutdown" : "shutdown",
+                    data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
                     "commit",
                     "end");
         } else {

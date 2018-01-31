@@ -62,7 +62,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 "configure terminal",
                 f("interface loopback %s", matcher.group("number")),
                 f("description %s", data.getDescription()),
-                data.isEnabled() ? "no shutdown" : "shutdown",
+                data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
                 "end");
     }
 
