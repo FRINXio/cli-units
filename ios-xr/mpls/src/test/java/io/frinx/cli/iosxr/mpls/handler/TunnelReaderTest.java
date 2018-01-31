@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.TunnelKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.rev170824.LSPMETRICABSOLUTE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Address;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class TunnelReaderTest {
         " autoroute announce\n" +
         "  metric absolute 15\n" +
         " !\n" +
+        " destination 192.168.1.50\n" +
         "!\n";
 
     @Test
@@ -52,5 +54,11 @@ public class TunnelReaderTest {
                 new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.ConfigBuilder();
         LoadShareConfigReader.parseConfig(TUNNEL_OUTPUT, cb1);
         Assert.assertEquals(30, cb1.getLoadShare().intValue());
+
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnel.p2p_top.p2p.tunnel.attributes.ConfigBuilder cb2 =
+                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnel.p2p_top.p2p.tunnel.attributes.ConfigBuilder();
+
+        P2pAttributesConfigReader.parseConfig(TUNNEL_OUTPUT, cb2);
+        Assert.assertEquals(new Ipv4Address("192.168.1.50"), cb2.getDestination().getIpv4Address());
     }
 }

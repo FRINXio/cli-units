@@ -34,6 +34,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev17082
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.SignalingProtocolsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.lsps.ConstrainedPathBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnel.p2p_top.P2pTunnelAttributesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.TunnelsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.SubscriptionBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.subscription.ConfigBuilder;
@@ -113,6 +114,8 @@ public class MplsUnit implements TranslateUnit {
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TUNNEL, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG, new TunnelConfigWriter(cli)));
         wRegistry.addAfter(new GenericWriter<>(CONFIG_IID, new LoadShareConfigWriter(cli)), IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG);
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_P2PTUNNELATTRIBUTES, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_P2_CONFIG, new P2pAttributesConfigWriter(cli)));
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
@@ -142,6 +145,8 @@ public class MplsUnit implements TranslateUnit {
         rRegistry.addStructuralReader(TE_EXT_IID, NiMplsTeTunnelCiscoAugBuilder.class);
         rRegistry.addStructuralReader(MPLS_EXT_IID, CiscoMplsTeExtensionBuilder.class);
         rRegistry.add(new GenericConfigReader<>(CONFIG_IID, new LoadShareConfigReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_NE_MP_LS_CO_TU_TU_P2PTUNNELATTRIBUTES, P2pTunnelAttributesBuilder.class);
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_LS_CO_TU_TU_P2_CONFIG, new P2pAttributesConfigReader(cli)));
     }
 
     private static final InstanceIdentifier<NiMplsTeTunnelCiscoAug> TE_EXT_IID = IIDs.NE_NE_MP_LS_CO_TU_TUNNEL.augmentation(NiMplsTeTunnelCiscoAug.class);
