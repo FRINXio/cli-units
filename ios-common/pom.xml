@@ -20,7 +20,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-ios-common</artifactId>
-    <version>3.1.2.rc1-frinx</version>
+    <version>3.1.2.rc2-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
