@@ -14,6 +14,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.mpls.MplsReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.MplsRsvpSubscriptionConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.NiMplsRsvpIfSubscripAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.NiMplsRsvpIfSubscripAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
@@ -31,7 +32,9 @@ public class NiMplsRsvpIfSubscripAugReader implements MplsReader.MplsConfigReade
 
     private Cli cli;
     private static final String SH_RSVP_INT = "show run rsvp interface %s";
-    private static final Pattern IFACE_LINE = Pattern.compile("bandwidth (?<bandwidth>[0-9]+)(K?)");
+    private static final Pattern IFACE_LINE = Pattern.compile("bandwidth(?<bandwidth>.*)(K?)");
+    @VisibleForTesting
+    public static final String DEFAULT = "default";
 
     public NiMplsRsvpIfSubscripAugReader(Cli cli) {
         this.cli = cli;
@@ -45,13 +48,19 @@ public class NiMplsRsvpIfSubscripAugReader implements MplsReader.MplsConfigReade
 
     @VisibleForTesting
     public static void parseConfig(String output, NiMplsRsvpIfSubscripAugBuilder builder) {
-        Optional<String> bw = ParsingUtils.parseField(output.replaceAll("\\h+", " "), 0,
+        Optional<String> bwOpt = ParsingUtils.parseField(output.replaceAll("\\h+", " "), 0,
             IFACE_LINE::matcher,
             matcher -> matcher.group("bandwidth"));
 
-        // if 0, don't set bandwidth field at all
-        if (bw.isPresent() && !"0".equals(bw.get())) {
-            builder.setBandwidth(Long.valueOf(bw.get()));
+        if (bwOpt.isPresent()) {
+            String bw = bwOpt.get().trim();
+            if ("".equals(bw)) {
+                // if only the word bandwidth is present, set to "default"
+                builder.setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(DEFAULT));
+            } else if (!"0".equals(bw)) {
+                // if 0, don't set bandwidth field at all
+                builder.setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(Long.valueOf(bw)));
+            }
         }
     }
 

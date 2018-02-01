@@ -12,6 +12,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.MplsRsvpSubscriptionConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.NiMplsRsvpIfSubscripAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -33,7 +34,7 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
             "configure terminal",
             "rsvp",
             f("interface %s", name),
-            f("bandwidth %s", data.getBandwidth()),
+            resolveBandwidth(data.getBandwidth()),
             "commit",
             "end");
     }
@@ -48,5 +49,14 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
             "no bandwidth",
             "commit",
             "end");
+    }
+
+    private String resolveBandwidth(MplsRsvpSubscriptionConfig.Bandwidth b) {
+        if (NiMplsRsvpIfSubscripAugReader.DEFAULT.equals(b.getString())) {
+            return "bandwidth";
+        } else if (b.getUint32() != null && b.getUint32() != 0) {
+            return f("bandwidth %s", b.getUint32());
+        }
+        return "";
     }
 }
