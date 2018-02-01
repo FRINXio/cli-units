@@ -20,6 +20,7 @@ import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.ios.ifc.IosInterfaceUnit;
 import io.frinx.cli.unit.ios.network.instance.handler.ConnectionPointsReader;
 import io.frinx.cli.unit.ios.network.instance.handler.ConnectionPointsWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigReader;
@@ -99,7 +100,9 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
         wRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
 
         wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli)),
-                /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
+                Sets.newHashSet(
+                /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG,
+                        IosInterfaceUnit.SUBIFC_VLAN_CFG_ID));
 
         wRegistry.subtreeAddAfter(Sets.newHashSet(
                 RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CONNECTIONPOINT, CONN_PTS_ID),
