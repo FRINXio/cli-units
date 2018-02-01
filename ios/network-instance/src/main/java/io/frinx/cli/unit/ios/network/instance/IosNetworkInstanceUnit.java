@@ -26,8 +26,6 @@ import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigReade
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceStateReader;
-import io.frinx.cli.unit.ios.network.instance.handler.vrf.VrfTableConnectionConfigWriter;
-import io.frinx.cli.unit.ios.network.instance.handler.vrf.VrfTableConnectionReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.LocalAggregateConfigReader;
@@ -37,6 +35,8 @@ import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolConfi
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolStateReader;
+import io.frinx.cli.unit.ios.network.instance.handler.vrf.table.TableConnectionConfigWriter;
+import io.frinx.cli.unit.ios.network.instance.handler.vrf.table.TableConnectionReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
@@ -120,21 +120,24 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_AP_CONFIG, new NoopCliWriter<>()));
 
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)));
+        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)),
+                IIDs.NE_NE_IN_INTERFACE);
 
         wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigWriter(cli)),
                 Sets.newHashSet(IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG));
 
         // Interfaces for VRF
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_INTERFACES, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_INTERFACE, new VrfInterfaceWriter(cli)));
+        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_IN_INTERFACE, new VrfInterfaceWriter(cli)),
+                IIDs.NE_NE_CONFIG);
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_IN_CONFIG, new NoopCliWriter<>()));
 
         // Table connections for VRF
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_TABLECONNECTIONS, new NoopCliWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_TA_TABLECONNECTION, new NoopCliListWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_TA_TA_CONFIG, new VrfTableConnectionConfigWriter(cli)),
-                /*add after protocol writers*/ IIDs.NE_NE_PR_PR_CONFIG);
+        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_TA_TA_CONFIG, new TableConnectionConfigWriter(cli)),
+                /*add after protocol writers*/
+                Sets.newHashSet(IIDs.NE_NE_PR_PR_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG));
 
     }
 
@@ -163,7 +166,7 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
         // Table connections for VRF
         rRegistry.addStructuralReader(IIDs.NE_NE_TABLECONNECTIONS, TableConnectionsBuilder.class);
         rRegistry.subtreeAdd(Sets.newHashSet(RWUtils.cutIdFromStart(IIDs.NE_NE_TA_TA_CONFIG, TABLE_CONN_ID)),
-                new GenericConfigListReader<>(IIDs.NE_NE_TA_TABLECONNECTION, new VrfTableConnectionReader(cli)));
+                new GenericConfigListReader<>(IIDs.NE_NE_TA_TABLECONNECTION, new TableConnectionReader(cli)));
 
         // Connection points for L2P2p
         rRegistry.subtreeAdd(Sets.newHashSet(

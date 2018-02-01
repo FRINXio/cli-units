@@ -29,7 +29,10 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area, AreaKey, AreaBuilder> {
-    private static final Pattern AREA_ID = Pattern.compile(".*?Area (?:BACKBONE\\()?(?<areaId>[0-9.]+).*");
+
+    private static final String SH_OSPF_AREAS = "sh run | include ip ospf %s area";
+
+    private static final Pattern AREA_ID = Pattern.compile("\\s*ip ospf (?<ospf>\\S+) area (?<area>\\S+).*");
 
     private final Cli cli;
 
@@ -42,14 +45,14 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
     public List<AreaKey> getAllIdsForType(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
                                           @Nonnull ReadContext readContext) throws ReadFailedException {
         String id = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        return parseAreasIds(blockingRead(String.format(GlobalConfigReader.SH_OSPF, id), cli, instanceIdentifier, readContext));
+        return parseAreasIds(blockingRead(String.format(SH_OSPF_AREAS, id), cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting
     public static List<AreaKey> parseAreasIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 AREA_ID::matcher,
-                m -> m.group("areaId"),
+                m -> m.group("area"),
                 area -> new AreaKey(getAreaIdentifier(area)));
     }
 

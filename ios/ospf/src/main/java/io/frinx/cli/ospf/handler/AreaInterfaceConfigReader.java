@@ -37,6 +37,9 @@ public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Co
                                              @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext)
             throws ReadFailedException {
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getId();
+
+        configBuilder.setId(ifcName);
+
         String output = blockingRead(String.format(SHOW_OSPF_IFC_COST, ifcName), cli, instanceIdentifier, readContext);
 
         if (!output.isEmpty()) {

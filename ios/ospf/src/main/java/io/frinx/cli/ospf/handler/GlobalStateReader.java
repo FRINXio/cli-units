@@ -8,18 +8,17 @@
 
 package io.frinx.cli.ospf.handler;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.GlobalBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.StateBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DottedQuad;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -34,18 +33,11 @@ public class GlobalStateReader implements OspfReader.OspfOperReader<State, State
 
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
-                                      @Nonnull StateBuilder configBuilder,
-                                      @Nonnull ReadContext ctx) throws ReadFailedException {
-        String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        parseGlobal(blockingRead(String.format(GlobalConfigReader.SH_OSPF, ospfId), cli, instanceIdentifier, ctx), configBuilder);
-    }
-
-    @VisibleForTesting
-    static void parseGlobal(String output, StateBuilder builder) {
-        ParsingUtils.parseField(output, 0,
-                GlobalConfigReader.ROUTER_ID::matcher,
-                matcher -> matcher.group("routerId"),
-                value -> builder.setRouterId(new DottedQuad(value)));
+                                             @Nonnull StateBuilder stateBuilder,
+                                             @Nonnull ReadContext ctx) throws ReadFailedException {
+        // FIXME Set config attributes from operational state e.g. use sh ip vrf here instead of sh run vrf
+        stateBuilder.fieldsFrom(ctx.read(RWUtils.cutId(instanceIdentifier, IIDs.NE_NE_PR_PR_OS_GLOBAL).child(Config.class)).get());
+        // TODO set state attributes
     }
 
     @Override

@@ -65,10 +65,16 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     }
 
     private static String realignOutput(String output) {
-        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), "");
-        withoutNewlines = withoutNewlines.replace("router bgp ", "\nrouter bgp");
-        withoutNewlines = withoutNewlines.replace("address-family", "\naddress-family");
-        return withoutNewlines;
+        output = output.replaceAll("\\n|\\r", "");
+        output = output.replace("router bgp ", "\nrouter bgp");
+        output = NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .filter(s -> s.startsWith("router bgp"))
+                .findFirst()
+                .orElse("");
+
+        output = output.replace("address-family", "\naddress-family");
+        return output;
     }
 
     @Override
