@@ -22,12 +22,12 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>huawei-interface-unit</artifactId>
-  <version>3.1.2.rc1-frinx-SNAPSHOT</version>
+  <version>3.1.2.rc1-frinx</version>
   <packaging>bundle</packaging>
 
   <properties>
-    <cli.version>3.1.2.rc1-frinx-SNAPSHOT</cli.version>
-    <openconfig.version>3.1.2.rc1-frinx-SNAPSHOT</openconfig.version>
+    <cli.version>3.1.2.rc1-frinx</cli.version>
+    <openconfig.version>3.1.2.rc1-frinx</openconfig.version>
   </properties>
 
   <dependencies>

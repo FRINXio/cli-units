@@ -28,7 +28,7 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>huawei</artifactId>
-  <version>3.1.2.rc1-frinx-SNAPSHOT</version>
+  <version>3.1.2.rc1-frinx</version>
   <packaging>pom</packaging>
 
   <build>

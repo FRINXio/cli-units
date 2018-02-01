@@ -20,7 +20,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>ios-essential-model</artifactId>
-    <version>3.1.2.rc1-frinx-SNAPSHOT</version>
+    <version>3.1.2.rc1-frinx</version>
     <packaging>bundle</packaging>
 
 </project>
