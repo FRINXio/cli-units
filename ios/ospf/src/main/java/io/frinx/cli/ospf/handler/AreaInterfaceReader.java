@@ -10,6 +10,7 @@ package io.frinx.cli.ospf.handler;
 
 import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
 import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
+import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -22,6 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.OspfAreaIdentifier;
@@ -37,10 +40,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
-    private static final String SHOW_OSPF_INT = "sh ip ospf %s int brie";
-    private static final Pattern INTERFACE_AREA =
-            Pattern.compile("(?<interface>[^\\s]+)\\s+(?<pid>[^\\s]+)\\s+(?<area>[^\\s]+)\\s+(?<ip>[^\\s]+)\\s+(?<cost>[^\\s]+).*");
-    private static final Pattern INTERFACE_ID_LINE = Pattern.compile("(?<id>[^\\s]+).*");
+    private static final String SHOW_OSPF_IFC = "sh run | include ^interface |^ ip ospf |^ ip vrf forwarding";
 
     private Cli cli;
 
@@ -52,36 +52,22 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     @Override
     public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
-        ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
         AreaKey areaKey = instanceIdentifier.firstKeyOf(Area.class);
+        String vrf = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
-        String output = blockingRead(String.format(SHOW_OSPF_INT, protocolKey.getName()), cli, instanceIdentifier, readContext);
+        String output = blockingRead(SHOW_OSPF_IFC, cli, instanceIdentifier, readContext);
 
-        // FIXME this conversion from short to long IFC name is duplicite with NetworkInstanceInterfaceReader
-        // TODO extract into utils or an interface with default method  and reuse
-        ArrayList<InterfaceKey> longNames = new ArrayList<>();
-        for (InterfaceKey shortIfcKey : parseInterfaceIds(areaKey, output)) {
-            String outputIfc = blockingRead(
-                    String.format("sh ip interface brief %s", shortIfcKey.getId()), cli, instanceIdentifier, readContext);
-            longNames.add(new InterfaceKey(
-                    parseField(outputIfc, 1,
-                            INTERFACE_ID_LINE::matcher,
-                            matcher -> matcher.group("id"))
-                            .orElse(shortIfcKey.getId())));
-        }
+        String realignedOutput = realignOSPFInterfaces(output);
 
-        return longNames;
-    }
-
-    @VisibleForTesting
-    static List<InterfaceKey> parseInterfaceIds(AreaKey areaKey, String output) {
-        return NEWLINE.splitAsStream(output)
+        // We are expecting just one OSPF instance per VRF, so we need to
+        // filter out interfaces just by VRF they belong to
+        return NEWLINE.splitAsStream(realignedOutput)
                 .map(String::trim)
-                .map(INTERFACE_AREA::matcher)
-                .filter(Matcher::matches)
-                // Filter out only current area
-                .filter(m -> m.group("area").equals(getAreaId(areaKey)))
-                .map(matcher -> matcher.group("interface"))
+                .filter(ifcLine -> DEFAULT_NETWORK_NAME.equals(vrf)
+                        || ifcLine.contains(String.format("ip vrf forwarding %s", vrf)))
+                .filter(ifcLine -> ifcLine.contains(String.format("area %s", areaIdToString(areaKey.getIdentifier()))))
+                .map(s -> s.split(" ")[0])
+                .map(String::trim)
                 .map(InterfaceKey::new)
                 .collect(Collectors.toList());
     }
@@ -105,5 +91,10 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
 
     public static String areaIdToString(OspfAreaIdentifier areaId) {
         return areaId.getUint32() != null ? areaId.getUint32().toString() : areaId.getDottedQuad().getValue();
+    }
+
+    private static String realignOSPFInterfaces(String output) {
+        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), "");
+        return withoutNewlines.replace("interface", "\n");
     }
 }
