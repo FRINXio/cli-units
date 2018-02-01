@@ -20,7 +20,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>models</artifactId>
-    <version>3.1.2.rc2-frinx-SNAPSHOT</version>
+    <version>3.1.2.rc2-frinx</version>
     <packaging>pom</packaging>
 
     <modules>
