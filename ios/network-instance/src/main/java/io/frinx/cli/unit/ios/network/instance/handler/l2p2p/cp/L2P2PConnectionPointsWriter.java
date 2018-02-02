@@ -46,6 +46,7 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
 
+    public static final int NET_NAME_LENGTH = 15;
     private Cli cli;
 
     public L2P2PConnectionPointsWriter(Cli cli) {
@@ -58,6 +59,9 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                                               @Nonnull WriteContext writeContext) throws WriteFailedException {
         checkArgument(dataAfter.getConnectionPoint().size() == 2,
                 "L2P2P network only supports 2 endpoints, but were: %s", dataAfter.getConnectionPoint());
+        String netName = id.firstKeyOf(NetworkInstance.class).getName();
+        checkArgument(netName.length() <= NET_NAME_LENGTH,
+                "L2P2P network name is too long: %s. Maximum chars is: %s", netName, NET_NAME_LENGTH);
 
         Set<String> usedInterfaces = getUsedInterfaces(id, writeContext);
 
