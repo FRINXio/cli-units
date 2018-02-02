@@ -8,6 +8,7 @@
 
 package io.frinx.cli.ospf.handler;
 
+import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -36,7 +37,10 @@ public class GlobalStateReader implements OspfReader.OspfOperReader<State, State
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
         // FIXME Set config attributes from operational state e.g. use sh ip vrf here instead of sh run vrf
-        stateBuilder.fieldsFrom(ctx.read(RWUtils.cutId(instanceIdentifier, IIDs.NE_NE_PR_PR_OS_GLOBAL).child(Config.class)).get());
+        Optional<Config> cfg = ctx.read(RWUtils.cutId(instanceIdentifier, IIDs.NE_NE_PR_PR_OS_GLOBAL).child(Config.class));
+        if (cfg.isPresent()) {
+            stateBuilder.fieldsFrom(cfg.get());
+        }
         // TODO set state attributes
     }
 
