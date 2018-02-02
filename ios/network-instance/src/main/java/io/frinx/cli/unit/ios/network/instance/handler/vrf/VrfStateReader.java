@@ -8,6 +8,7 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 
+import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -35,7 +36,10 @@ public class VrfStateReader implements CliOperReader<State, StateBuilder>,
                                       @Nonnull StateBuilder stateBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         // FIXME Set config attributes from operational state e.g. use sh ip vrf here instead of sh run vrf
-        stateBuilder.fieldsFrom(readContext.read(RWUtils.cutId(instanceIdentifier, IIDs.NE_NETWORKINSTANCE).child(Config.class)).get());
+        Optional<Config> cfg = readContext.read(RWUtils.cutId(instanceIdentifier, IIDs.NE_NETWORKINSTANCE).child(Config.class));
+        if (cfg.isPresent()) {
+            stateBuilder.fieldsFrom(cfg.get());
+        }
         // TODO set state attributes
     }
 
