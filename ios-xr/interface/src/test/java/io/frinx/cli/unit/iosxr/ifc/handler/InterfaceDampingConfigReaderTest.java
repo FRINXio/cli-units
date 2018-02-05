@@ -24,7 +24,6 @@ public class InterfaceDampingConfigReaderTest {
             "\n";
 
     private static final Config EXPECTED_NO_DAMPING_CONFIG = new ConfigBuilder()
-            .setEnabled(false)
             .build();
 
     private static final String SH_RUN_INT_DEFAULT_DAMPING = "Fri Nov 24 15:20:05.070 UTC\n" +
