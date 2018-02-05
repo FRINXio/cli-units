@@ -133,7 +133,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
             // TODO check service instance not in use
             blockingWriteAndRead(cli, id, dataAfter,
                             "conf t",
-                            f("interface %s", ifc1),
+                            f("interface %s", ifc1.toParentIfcString()),
                             f("service instance %s ethernet", cpId),
                             "encapsulation untagged",
                             f("bridge-domain %s", bdIndex),
@@ -158,7 +158,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
 
         blockingWriteAndRead(cli, id, dataBefore,
                         "conf t",
-                        f("interface %s", ifc1),
+                        f("interface %s", ifc1.toParentIfcString()),
                         f("no service instance %s ethernet", cpId),
                         "end");
     }
