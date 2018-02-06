@@ -27,6 +27,7 @@
 
   <modules>
     <!--<module>essential</module>-->
+    <module>ios-cli-init-unit</module>
     <module>interface</module>
     <module>bgp</module>
     <module>rib</module>
