@@ -30,7 +30,9 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = instanceIdentifier.firstKeyOf(Interface.class).getInterfaceId().getValue();
-        if (config.getEnabledTrapForEvent() == null || !LINKUPDOWN.class.equals(config.getEnabledTrapForEvent().get(0).getEventName())) {
+        if (config.getEnabledTrapForEvent() == null ||
+                config.getEnabledTrapForEvent().isEmpty() ||
+                !LINKUPDOWN.class.equals(config.getEnabledTrapForEvent().get(0).getEventName())) {
             return;
         }
         blockingWriteAndRead(cli, instanceIdentifier, config,
