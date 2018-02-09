@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.opendaylight.controller</groupId>
+        <artifactId>config-parent</artifactId>
+        <version>0.6.1-Carbon-SR1.3_1_2_rc5-frinxodl-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>io.frinx.cli</groupId>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>ios-platform-unit</artifactId>
+    <version>3.1.2.rc5-frinx-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+    <properties>
+        <cli.version>3.1.2.rc5-frinx-SNAPSHOT</cli.version>
+        <openconfig.version>3.1.2.rc5-frinx-SNAPSHOT</openconfig.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>translation-registry-api</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>utils-unit</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-platform</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
+    </dependencies>
+</project>

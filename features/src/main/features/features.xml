@@ -96,6 +96,11 @@
         <bundle>mvn:io.frinx.cli/ios-rib-unit/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='cli-southbound-unit-ios-platform' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:io.frinx.cli/ios-platform-unit/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-ios' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
@@ -109,6 +114,7 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-ospf</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-cdp</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-lldp</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-platform</feature>
     </feature>
 
     <!--<feature name='cli-southbound-unit-ios-xr-essential' version='${project.version}'>-->
