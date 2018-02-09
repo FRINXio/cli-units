@@ -31,7 +31,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PolicyForwardingInterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_SERVICE_POLICY_IFC = "sh run int %s | include ^ service-policy";
+    private static final String SHOW_SERVICE_POLICY_IFC = "sh run interface %s | include ^ service-policy";
     private static final Pattern INPUT_SERVICE_POLICY = Pattern.compile("\\s*service-policy input (?<policyMap>\\S+).*");
     private static final Pattern OUTPUT_SERVICE_POLICY = Pattern.compile("\\s*service-policy output (?<policyMap>\\S+).*");
 

@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class PolicyForwardingInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private final Cli cli;
-    private static final String SH_SERVICE_POLICY_INT = "sh run int | utility egrep \"^interface|^ service-policy input|^ service-policy output\"";
+    private static final String SH_SERVICE_POLICY_INT = "sh run interface | utility egrep \"^interface|^ service-policy input|^ service-policy output\"";
 
     public PolicyForwardingInterfaceReader(Cli cli) {
         this.cli = cli;
