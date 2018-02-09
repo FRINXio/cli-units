@@ -318,7 +318,10 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         // if-ethernet
         rRegistry.addStructuralReader(IFC_ETH_AUD_ID, org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.Interface1Builder.class);
         rRegistry.addStructuralReader(IFC_ETHERNET_ID, EthernetBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IFC_ETHERNET_CONFIG_ID, new EthernetConfigReader(cli)));
+        rRegistry.subtreeAdd(Sets.newHashSet(
+                IFC_ETH_CONFIG_ROOT_ID.augmentation(Config1.class),
+                IFC_ETH_CONFIG_ROOT_ID.augmentation(LacpEthConfigAug.class)),
+                new GenericConfigReader<>(IFC_ETHERNET_CONFIG_ID, new EthernetConfigReader(cli)));
     }
 
     @Override
