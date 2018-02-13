@@ -21,9 +21,23 @@ import java.util.stream.Collectors;
 
 public class TunnelReaderTest {
 
-    private static final String OUTPUT = "Wed Nov 29 09:38:07.070 UTC\n" +
-        "tunnel-te50 is down, line protocol is down \n" +
-        "tunnel-te55 is down, line protocol is down ";
+    private static final String SH_RUN_INT_OUTPUT = "Mon Feb 12 14:31:21.559 UTC\n" +
+            "interface Loopback97\n" +
+            "interface Loopback98\n" +
+            "interface Loopback99\n" +
+            "interface Loopback101\n" +
+            "interface Loopback199\n" +
+            "interface tunnel-te50\n" +
+            "interface tunnel-te55\n" +
+            "interface MgmtEth0/0/CPU0/0\n" +
+            "interface GigabitEthernet0/0/0/0\n" +
+            "interface GigabitEthernet0/0/0/0.0\n" +
+            "interface GigabitEthernet0/0/0/1\n" +
+            "interface GigabitEthernet0/0/0/1.100\n" +
+            "interface GigabitEthernet0/0/0/2\n" +
+            "interface GigabitEthernet0/0/0/3\n" +
+            "interface GigabitEthernet0/0/0/4\n" +
+            "interface GigabitEthernet0/0/0/5";
 
     private static final String TUNNEL_OUTPUT = "Wed Nov 29 10:01:16.985 UTC\n" +
         "interface tunnel-te50\n" +
@@ -36,7 +50,7 @@ public class TunnelReaderTest {
 
     @Test
     public void testIds() {
-        List<TunnelKey> keys = TunnelReader.getTunnelKeys(OUTPUT);
+        List<TunnelKey> keys = TunnelReader.getTunnelKeys(SH_RUN_INT_OUTPUT);
         Assert.assertFalse(keys.isEmpty());
         Assert.assertEquals(Lists.newArrayList("50", "55"),
                 keys.stream().map(TunnelKey::getName).collect(Collectors.toList()));

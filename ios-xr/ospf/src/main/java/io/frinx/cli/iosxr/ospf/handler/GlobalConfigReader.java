@@ -33,8 +33,8 @@ public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, C
         this.cli = cli;
     }
 
-    static final String SH_OSPF = "sh ip ospf %s";
-    private static final Pattern ROUTER_ID = Pattern.compile(".*?with ID (?<routerId>[^\\s]+).*");
+    static final String SH_OSPF = "show running-config router ospf %s | include ^ router-id";
+    private static final Pattern ROUTER_ID = Pattern.compile("router-id (?<routerId>[\\S]+)");
 
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,

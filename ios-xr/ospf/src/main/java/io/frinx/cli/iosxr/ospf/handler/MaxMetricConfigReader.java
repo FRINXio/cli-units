@@ -36,11 +36,13 @@ import java.util.regex.Pattern;
 
 public class MaxMetricConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
 
-    private static final Pattern MAX_METRIC_LINE = Pattern.compile("Originating router-LSAs with maximum metric");
-    private static final Pattern STARTUP_LINE = Pattern.compile("Condition: on start-up for (?<timeout>[\\d]+) seconds, State: (?<state>.+)");
-    private static final Pattern STUB_LINE = Pattern.compile("Advertise stub links with maximum metric in router-LSAs");
-    private static final Pattern SUMMARY_LINE = Pattern.compile("Advertise summary-LSAs.*");
-    private static final Pattern EXTERNAL_LINE = Pattern.compile("Advertise external-LSAs.*");
+    private static final Pattern MAX_METRIC_LINE = Pattern.compile(".*max-metric router-lsa.*");
+    private static final Pattern STARTUP_LINE = Pattern.compile(".*on-startup (?<timeout>\\d+).*");
+    private static final Pattern STUB_LINE = Pattern.compile(".*include-stub.*");
+    private static final Pattern SUMMARY_LINE = Pattern.compile(".*summary-lsa.*");
+    private static final Pattern EXTERNAL_LINE = Pattern.compile(".*external-lsa.*");
+
+    private static final String SH_RUN_OSPF_MAX_METRIC = "show running-config router ospf %s | include ^ max-metric";
 
     private Cli cli;
 
@@ -51,7 +53,7 @@ public class MaxMetricConfigReader implements OspfReader.OspfConfigReader<Config
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        parseTimers(blockingRead(String.format(GlobalConfigReader.SH_OSPF, ospfId), cli, instanceIdentifier, readContext), configBuilder);
+        parseTimers(blockingRead(String.format(SH_RUN_OSPF_MAX_METRIC, ospfId), cli, instanceIdentifier, readContext), configBuilder);
     }
 
     @VisibleForTesting

@@ -10,6 +10,8 @@ package io.frinx.cli.iosxr.ospf.handler;
 
 import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfReader;
@@ -36,8 +38,8 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
         this.cli = cli;
     }
 
-    private static final String OSPF_SUMM = "sh ospf %s summary";
-    private static final Pattern OSPF = Pattern.compile("Routing process \"ospf (?<id>[^\"]+)\"");
+    private static final String SH_RUN_OSPF = "show running-config router ospf | include ^router ospf";
+    private static final Pattern ROUTER_OSPF_LINE = Pattern.compile("router ospf (?<ospfName>\\S+)");
 
     @Nonnull
     @Override
@@ -45,11 +47,20 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
                                        @Nonnull ReadContext readContext)
             throws ReadFailedException {
         String vrfId = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        String output = blockingRead(String.format(OSPF_SUMM, vrfId.equals(DEFAULT_NETWORK_NAME) ? "" : "vrf " + vrfId), cli, instanceIdentifier, readContext);
 
+        // TODO We should add this check in all descendant readers
+        Preconditions.checkArgument(DEFAULT_NETWORK_NAME.equals(vrfId), "VRF-aware OSPF is not supported");
+
+        String output = blockingRead(SH_RUN_OSPF, cli, instanceIdentifier, readContext);
+
+        return parseOspfIds(output);
+    }
+
+    @VisibleForTesting
+    static List<ProtocolKey> parseOspfIds(String output) {
         return ParsingUtils.parseFields(output, 0,
-                OSPF::matcher,
-                matcher -> matcher.group("id"),
+                ROUTER_OSPF_LINE::matcher,
+                matcher -> matcher.group("ospfName"),
                 s -> new ProtocolKey(TYPE, s));
     }
 

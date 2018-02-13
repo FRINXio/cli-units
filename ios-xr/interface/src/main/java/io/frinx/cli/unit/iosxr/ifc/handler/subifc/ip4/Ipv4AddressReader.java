@@ -39,9 +39,9 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
         this.cli = cli;
     }
 
-    static final String SH_INTERFACE_IP = "sh ip inter %s | include Internet address";
+    static final String SH_RUN_INT_IP = "show running-config interface %s | include ^ ipv4 address";
     static final Pattern INTERFACE_IP_LINE =
-            Pattern.compile("Internet address is (?<ip>[^/]+)/(?<prefix>[0-9]+)");
+            Pattern.compile("ipv4 address (?<address>\\S+) (?<prefix>\\S+)");
 
     @Nonnull
     @Override
@@ -52,7 +52,7 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            return parseAddressIds(blockingRead(String.format(SH_INTERFACE_IP, id), cli, instanceIdentifier, readContext));
+            return parseAddressIds(blockingRead(String.format(SH_RUN_INT_IP, id), cli, instanceIdentifier, readContext));
         } else {
             return Collections.emptyList();
         }
@@ -62,7 +62,7 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
     static List<AddressKey> parseAddressIds(String output) {
         return parseFields(output, 0,
                 INTERFACE_IP_LINE::matcher,
-                m -> m.group("ip"),
+                m -> m.group("address"),
                 addr -> new AddressKey(new Ipv4AddressNoZone(addr)));
     }
 

@@ -14,30 +14,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 
 public class SubinterfaceReaderTest {
 
-    private static final String SH_IP_INT_BRIEF = "Fri Nov 24 12:12:01.693 UTC\n" +
-            "\n" +
-            "Interface                      IP-Address      Status          Protocol Vrf-Name\n" +
-            "Loopback0                      99.0.0.3        Shutdown        Down     default \n" +
-            "MgmtEth0/0/CPU0/0              192.168.1.213   Up              Up       default \n" +
-            "GigabitEthernet0/0/0/0         unassigned      Up              Up       default \n" +
-            "GigabitEthernet0/0/0/0.28      unassigned      Up              Down     default \n" +
-            "GigabitEthernet0/0/0/0.55      unassigned      Up              Down     default \n" +
-            "GigabitEthernet0/0/0/0.66      unassigned      Up              Up       default \n" +
-            "GigabitEthernet0/0/0/1         unassigned      Up              Up       default \n" +
-            "GigabitEthernet0/0/0/1.2       unassigned      Up              Up       default \n" +
-            "GigabitEthernet0/0/0/1.123     unassigned      Up              Up       default \n" +
-            "GigabitEthernet0/0/0/2         unassigned      Shutdown        Down     default \n" +
-            "GigabitEthernet0/0/0/3         unassigned      Shutdown        Down     default \n" +
-            "GigabitEthernet0/0/0/4         unassigned      Shutdown        Down     default \n" +
-            "GigabitEthernet0/0/0/5         unassigned      Shutdown        Down     default ";
+    private static final String SH_RUN_INT = "Mon Feb 12 09:40:30.672 UTC\n" +
+            "interface Loopback97\n" +
+            "interface Loopback98\n" +
+            "interface Loopback99\n" +
+            "interface Loopback101\n" +
+            "interface Loopback199\n" +
+            "interface MgmtEth0/0/CPU0/0\n" +
+            "interface GigabitEthernet0/0/0/0.100\n" +
+            "interface GigabitEthernet0/0/0/1\n" +
+            "interface GigabitEthernet0/0/0/1.100\n" +
+            "interface GigabitEthernet0/0/0/2\n" +
+            "interface GigabitEthernet0/0/0/3\n" +
+            "interface GigabitEthernet0/0/0/3.33\n" +
+            "interface GigabitEthernet0/0/0/3.65\n";
 
     private static final List<SubinterfaceKey> EXPECTED_SUBIFC_IDS =
-            Lists.newArrayList(28L, 55L, 66L)
+            Lists.newArrayList(33L, 65L)
             .stream()
             .map(SubinterfaceKey::new)
             .collect(Collectors.toList());
@@ -45,6 +42,6 @@ public class SubinterfaceReaderTest {
     @Test
     public void testParseSubinterfaceIds() {
         Assert.assertEquals(EXPECTED_SUBIFC_IDS,
-                SubinterfaceReader.parseSubinterfaceIds(SH_IP_INT_BRIEF, "GigabitEthernet0/0/0/0"));
+                SubinterfaceReader.parseSubinterfaceIds(SH_RUN_INT, "GigabitEthernet0/0/0/3"));
     }
 }

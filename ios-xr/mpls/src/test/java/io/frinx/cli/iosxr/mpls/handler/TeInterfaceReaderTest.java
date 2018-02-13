@@ -19,10 +19,9 @@ import java.util.stream.Collectors;
 
 public class TeInterfaceReaderTest {
 
-    private static final String OUTPUT = "Tue Nov 28 14:43:38.325 UTC\n" +
-        "  Link ID:: GigabitEthernet0/0/0/3 (192.168.111.10)\n" +
-        "  Link ID:: GigabitEthernet0/0/0/4 (0.0.0.0)\n";
-
+    private static final String OUTPUT = "Mon Feb 12 15:25:00.339 UTC\n" +
+            " interface GigabitEthernet0/0/0/3\n" +
+            " interface GigabitEthernet0/0/0/4";
     @Test
     public void testIds() {
         List<InterfaceKey> keys = TeInterfaceReader.getInterfaceKeys(OUTPUT);

@@ -8,6 +8,8 @@
 
 package io.frinx.cli.iosxr.mpls.handler;
 
+import static io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader.SH_RUN_INTERFACE;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -30,8 +32,7 @@ public class TunnelReader implements MplsListReader.MplsConfigListReader<Tunnel,
 
     private Cli cli;
 
-    private static final String SH_RSVP_INT = "show interfaces tunnel-te * | include line";
-    private static final Pattern IFACE_LINE = Pattern.compile("tunnel-te(?<name>[0-9]+) is (?<status>[^,]+), line protocol is (?<lineStatus>.+)");
+    private static final Pattern TUNNEL_TE_IFACE_LINE = Pattern.compile("interface tunnel-te(?<name>[0-9]+)");
 
     public TunnelReader(Cli cli) {
         this.cli = cli;
@@ -40,13 +41,13 @@ public class TunnelReader implements MplsListReader.MplsConfigListReader<Tunnel,
 
     @Override
     public List<TunnelKey> getAllIdsForType(@Nonnull InstanceIdentifier<Tunnel> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String output = blockingRead(SH_RSVP_INT, cli, instanceIdentifier, readContext);
+        String output = blockingRead(SH_RUN_INTERFACE, cli, instanceIdentifier, readContext);
         return getTunnelKeys(output);
     }
 
     @VisibleForTesting
-    public static List<TunnelKey> getTunnelKeys(String output) {
-        return ParsingUtils.parseFields(output, 0, IFACE_LINE::matcher,
+    static List<TunnelKey> getTunnelKeys(String output) {
+        return ParsingUtils.parseFields(output, 0, TUNNEL_TE_IFACE_LINE::matcher,
             matcher -> matcher.group("name"), TunnelKey::new);
     }
 
