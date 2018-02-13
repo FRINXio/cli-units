@@ -17,7 +17,7 @@
                interface="io.frinx.cli.registry.api.TranslationUnitCollector"/>
 
     <bean id="iosXrCliInitializerUnit"
-          class="io.frinx.cli.unit.ios.xr.init.IosCliInitializerUnit"
+          class="io.frinx.cli.unit.ios.xr.init.IosXrCliInitializerUnit"
           init-method="init" destroy-method="close">
         <argument ref="translationRegistry"/>
     </bean>

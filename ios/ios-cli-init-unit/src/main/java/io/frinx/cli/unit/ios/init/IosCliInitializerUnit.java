@@ -8,8 +8,6 @@
 
 package io.frinx.cli.unit.ios.init;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
@@ -23,21 +21,21 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.PrivilegedModeCredentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.credentials.LoginPassword;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.privileged.mode.credentials.IosEnablePassword;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.credentials.LoginPassword;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Translate unit that does not actually translate anything.
@@ -57,13 +55,6 @@ public class IosCliInitializerUnit  implements TranslateUnit {
 
     // TODO This is reused all over the units. Move this to som Util class so
     // we can reuse it.
-    // TODO XR devices does not actually have privileged exec mode, nor 'enable'
-    // command. For them, it should be sufficient to just configure terminal to
-    // length 0.
-    private static final Device IOS_XR = new DeviceIdBuilder()
-            .setDeviceType("ios xr")
-            .setDeviceVersion("*")
-            .build();
 
     private static final Device IOS = new DeviceIdBuilder()
             .setDeviceType("ios")
@@ -71,7 +62,6 @@ public class IosCliInitializerUnit  implements TranslateUnit {
             .build();
 
     private TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration iosXrReg;
     private TranslationUnitCollector.Registration iosReg;
 
 
@@ -81,15 +71,10 @@ public class IosCliInitializerUnit  implements TranslateUnit {
 
     public void init()
     {
-        iosXrReg = registry.registerTranslateUnit(IOS_XR, this);
         iosReg = registry.registerTranslateUnit(IOS, this);
     }
 
     public void close() {
-        if (iosXrReg != null) {
-            iosXrReg.close();
-        }
-
         if (iosReg != null) {
             iosReg.close();
         }
