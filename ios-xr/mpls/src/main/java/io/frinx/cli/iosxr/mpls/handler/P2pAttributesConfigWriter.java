@@ -33,21 +33,17 @@ public class P2pAttributesConfigWriter implements CliWriter<Config> {
         }
         final String name = id.firstKeyOf(Tunnel.class).getName();
         blockingWriteAndRead(cli, id, data,
-            "configure terminal",
             f("interface tunnel-te %s", name),
             f("destination %s", data.getDestination().getIpv4Address().getValue()),
-            "commit",
-            "end");
+            "exit");
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class).getName();
         blockingWriteAndRead(cli, id, data,
-            "configure terminal",
             f("interface tunnel-te %s", name),
             f("no destination %s", data.getDestination().getIpv4Address().getValue()),
-            "commit",
-            "end");
+            "exit");
     }
 }

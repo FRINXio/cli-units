@@ -35,12 +35,10 @@ public class TunnelConfigWriter implements CliWriter<Config> {
         checkTunnelConfig(data);
 
         blockingWriteAndRead(cli, id, data,
-            "configure terminal",
             f("interface tunnel-te %s", name),
             (data.isShortcutEligible()) ? "autoroute announce" : "no autoroute announce",
             (data.getMetric() != null && LSPMETRICABSOLUTE.class.equals(data.getMetricType())) ? f("metric absolute %s", data.getMetric()) : "",
-            "commit",
-            "end");
+            "exit");
     }
 
     private static void checkTunnelConfig(Config data) {
@@ -69,9 +67,6 @@ public class TunnelConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class).getName();
         blockingWriteAndRead(cli, id, data,
-            "configure terminal",
-            f("no interface tunnel-te %s", name),
-            "commit",
-            "end");
+            f("no interface tunnel-te %s", name));
     }
 }

@@ -31,24 +31,22 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull NiMplsRsvpIfSubscripAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
         blockingWriteAndRead(cli, id, data,
-            "configure terminal",
             "rsvp",
             f("interface %s", name),
             resolveBandwidth(data.getBandwidth()),
-            "commit",
-            "end");
+            "exit",
+            "exit");
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull NiMplsRsvpIfSubscripAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
         blockingWriteAndRead(cli, id, data,
-            "configure terminal",
             "rsvp",
             f("interface %s", name),
             "no bandwidth",
-            "commit",
-            "end");
+            "exit",
+            "exit");
     }
 
     private String resolveBandwidth(MplsRsvpSubscriptionConfig.Bandwidth b) {

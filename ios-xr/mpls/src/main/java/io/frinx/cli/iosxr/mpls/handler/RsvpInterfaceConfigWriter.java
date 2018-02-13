@@ -30,21 +30,18 @@ public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
         blockingWriteAndRead(cli, id, data,
-            "configure terminal",
             "rsvp",
             f("interface %s", name),
-            "commit",
-            "end");
+            "exit",
+            "exit");
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
         blockingWriteAndRead(cli, id, data,
-            "configure terminal",
             "rsvp",
             f("no interface %s", name),
-            "commit",
-            "end");
+            "exit");
     }
 }

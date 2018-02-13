@@ -33,11 +33,9 @@ public class LoadShareConfigWriter implements CliWriter<Config> {
             return;
         }
         blockingWriteAndRead(cli, id, data,
-            "configure terminal",
             f("interface tunnel-te %s", name),
             f("load-share %s", data.getLoadShare()),
-            "commit",
-            "end");
+            "exit");
     }
 
     @Override
@@ -54,10 +52,8 @@ public class LoadShareConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class).getName();
         blockingWriteAndRead(cli, id, data,
-            "configure terminal",
             f("interface tunnel-te %s", name),
             f("no load-share %s", data.getLoadShare()),
-            "commit",
-            "end");
+            "exit");
     }
 }
