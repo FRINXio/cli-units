@@ -75,13 +75,11 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             throws WriteFailedException.CreateFailedException {
 
         blockingWriteAndRead(cli, id, data,
-                "configure terminal",
                 f("interface %s", data.getName()),
                 data.getMtu() == null ? "no mtu" : f("mtu %s", data.getMtu()),
                 data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
                 data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
-                "commit",
-                "end");
+                "exit");
     }
 
     private static void validateIfcConfiguration(Config data) {
@@ -158,9 +156,6 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     private void deleteInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.DeleteFailedException {
         blockingDeleteAndRead(cli, id,
-                "configure terminal",
-                f("no interface %s", data.getName()),
-                "commit",
-                "end");
+                f("no interface %s", data.getName()));
     }
 }

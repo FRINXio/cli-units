@@ -42,15 +42,13 @@ public class BfdConfigWriter implements CliWriter<Config> {
         Ipv4Address destinationIpv4 = destinationAddress != null ? destinationAddress.getIpv4Address() : null;
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "configure terminal",
                 f("interface %s", ifcName),
                 "bfd mode ietf",
                 "bfd address-family ipv4 fast-detect",
                 f("bfd address-family ipv4 multiplier %s", dataAfter.getMultiplier()),
                 f("bfd address-family ipv4 minimum-interval %s", dataAfter.getMinInterval()),
                 destinationIpv4 != null ? f("bfd address-family ipv4 destination %s", destinationIpv4.getValue()) : "",
-                "commit",
-                "end");
+                "exit");
     }
 
     private static void validateConfig(Config dataAfter) {
@@ -87,10 +85,8 @@ public class BfdConfigWriter implements CliWriter<Config> {
         checkIfcType(ifcName);
 
         blockingDeleteAndRead(cli, id,
-                "configure terminal",
                 f("interface %s", ifcName),
                 "no bfd",
-                "commit",
-                "end");
+                "exit");
     }
 }

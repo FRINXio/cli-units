@@ -69,12 +69,10 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
 
         if(isSupportedType(parentIfcType)) {
             blockingWriteAndRead(cli, id, data,
-                    "configure terminal",
                     f("interface %s", getSubinterfaceName(id)),
                     data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
                     data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
-                    "commit",
-                    "end");
+                    "exit");
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));
@@ -117,10 +115,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
 
         if(isSupportedType(parentIfcType)) {
             blockingDeleteAndRead(cli, id,
-                    "configure terminal",
-                    f("no interface %s", getSubinterfaceName(id)),
-                    "commit",
-                    "end");
+                    f("no interface %s", getSubinterfaceName(id)));
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));

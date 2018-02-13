@@ -50,7 +50,7 @@ public class SubinterfaceVlanConfigReader implements CliConfigReader<Config, Con
 
         String subIfcName = getSubinterfaceName(id);
 
-        String output = blockingRead(String.format("sh run interface %s", subIfcName), cli, id, ctx);
+        String output = blockingRead(String.format("do sh run interface %s", subIfcName), cli, id, ctx);
         parseVlanTag(output, builder);
     }
 

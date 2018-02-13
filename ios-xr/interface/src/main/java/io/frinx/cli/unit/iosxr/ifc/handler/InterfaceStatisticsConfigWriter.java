@@ -33,11 +33,9 @@ public class InterfaceStatisticsConfigWriter implements CliWriter<Config> {
         validateConfig(dataAfter);
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "configure terminal",
                 f("interface %s", ifcName),
                 f("load-interval %s", dataAfter.getLoadInterval()),
-                "commit",
-                "end");
+                "exit");
     }
 
     private static void validateConfig(Config dataAfter) {
@@ -66,10 +64,8 @@ public class InterfaceStatisticsConfigWriter implements CliWriter<Config> {
         String ifcName = id.firstKeyOf(Interface.class).getName();
 
         blockingDeleteAndRead(cli, id,
-                "configure terminal",
                 f("interface %s", ifcName),
                 "no load-interval",
-                "commit",
-                "end");
+                "exit");
     }
 }

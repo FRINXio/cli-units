@@ -40,7 +40,7 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
         this.cli = cli;
     }
 
-    static final String SH_INTERFACE_IP = "show running-config interface %s | include ^ ipv6 address";
+    static final String SH_INTERFACE_IP = "do show running-config interface %s | include ^ ipv6 address";
     static final Pattern IPV6_LOCAL_ADDRESS = Pattern.compile("ipv6 address (?<ipv6local>[^\\s]+) link-local");
     static final Pattern IPV6_UNICAST_ADDRESS = Pattern.compile("ipv6 address (?<ipv6unicast>[a-fA-F0-9:]+)/(?<prefix>[\\d]+)");
 

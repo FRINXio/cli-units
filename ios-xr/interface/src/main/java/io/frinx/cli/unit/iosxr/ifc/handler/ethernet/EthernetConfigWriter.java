@@ -75,12 +75,10 @@ public class EthernetConfigWriter implements CliWriter<Config> {
         // TODO we should probably check if the logical aggregate interface
         // exists
         blockingWriteAndRead(cli, id, dataAfter,
-                "configure terminal",
                 f("interface %s" , ifcName),
                 bundleIdCommand + " " + mode,
                 intervalCommand,
-                "commit",
-                "end");
+                "exit");
     }
 
     private static Pattern AGGREGATE_IFC_NAME = Pattern.compile("Bundle-Ether(?<id>\\d+)");
@@ -104,12 +102,10 @@ public class EthernetConfigWriter implements CliWriter<Config> {
         checkIfcType(ifcName);
 
         blockingDeleteAndRead(cli, id,
-                "configure terminal",
                 f("interface %s", ifcName),
                 "no bundle id",
                 "no lacp period short",
-                "commit",
-                "end");
+                "exit");
     }
 
     private static void checkIfcType(String ifcName) {

@@ -39,11 +39,9 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
         String dampConfCommand = getDampeningCommand(dataAfter);
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "configure terminal",
                 f("interface %s", ifcName),
                 dampConfCommand,
-                "commit",
-                "end");
+                "exit");
     }
 
     private static String getDampeningCommand(Config dataAfter) {
@@ -124,10 +122,8 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
         String ifcName = id.firstKeyOf(Interface.class).getName();
 
         blockingDeleteAndRead(cli, id,
-                "configure terminal",
                 f("interface %s", ifcName),
                 NO_DAMPENING,
-                "commit",
-                "end");
+                "exit");
     }
 }

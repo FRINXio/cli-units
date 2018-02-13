@@ -36,11 +36,9 @@ public class HoldTimeConfigWriter implements CliWriter<Config> {
 
         // TODO We should restrict this probably just to physical ifcs
         blockingWriteAndRead(cli, id, dataAfter,
-                "configure terminal",
                 f("interface %s", ifcName),
                 f(CARRIER_DELAY_COMMAND_TEMPLATE, up, down),
-                "commit",
-                "end");
+                "exit");
     }
 
     @Override
@@ -57,10 +55,8 @@ public class HoldTimeConfigWriter implements CliWriter<Config> {
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
         blockingDeleteAndRead(cli, id,
-                "configure terminal",
                 f("interface %s", ifcName),
                 f("no carrier-delay"),
-                "commit",
-                "end");
+                "exit");
     }
 }
