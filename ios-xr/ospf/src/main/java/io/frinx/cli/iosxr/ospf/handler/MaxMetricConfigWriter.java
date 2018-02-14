@@ -40,11 +40,9 @@ public class MaxMetricConfigWriter implements OspfWriter<Config> {
             builder.append(parseIncludes(include));
         }
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                "configure terminal",
                 f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
                 f("max-metric router-lsa %s %s", timeout, builder.toString()),
-                "commit",
-                "end");
+                "exit");
     }
 
     private String parseIncludes(Class<? extends MAXMETRICINCLUDE> include) {
@@ -73,10 +71,8 @@ public class MaxMetricConfigWriter implements OspfWriter<Config> {
             builder.append(parseIncludes(include));
         }
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                "configure terminal",
                 f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
                 f("no max-metric router-lsa %s %s", timeout, builder.toString()),
-                "commit",
-                "end");
+                "exit");
     }
 }

@@ -29,10 +29,8 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
                                               WriteContext writeContext) throws WriteFailedException {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                "configure terminal",
                 f("router ospf %s", processName),
-                "commit",
-                "end");
+                "exit");
     }
 
     @Override
@@ -47,9 +45,6 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
                                                WriteContext writeContext) throws WriteFailedException {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                "configure terminal",
-                f("no router ospf %s", processName),
-                "commit",
-                "end");
+                f("no router ospf %s", processName));
     }
 }

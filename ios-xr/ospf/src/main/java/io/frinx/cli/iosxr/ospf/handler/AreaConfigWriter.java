@@ -29,11 +29,10 @@ public class AreaConfigWriter implements OspfWriter<Config> {
                                               WriteContext writeContext) throws WriteFailedException {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                "configure terminal",
                 f("router ospf %s", processName),
                 f("area %s", AreaInterfaceReader.areaIdToString(data.getIdentifier())),
-                "commit",
-                "end");
+                "exit",
+                "exit");
     }
 
     @Override
@@ -48,10 +47,8 @@ public class AreaConfigWriter implements OspfWriter<Config> {
                                                WriteContext writeContext) throws WriteFailedException {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                "configure terminal",
                 f("router ospf %s", processName),
                 f("no area %s", AreaInterfaceReader.areaIdToString(data.getIdentifier())),
-                "commit",
-                "end");
+                "exit");
     }
 }

@@ -38,13 +38,13 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
         final InterfaceKey intfId =
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Interface.class)).get().getKey();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                "configure terminal",
                 f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 f("cost %s", data.getMetric().getValue()),
-                "commit",
-                "end");
+                "exit",
+                "exit",
+                "exit");
     }
 
     @Override
@@ -61,11 +61,10 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
         final InterfaceKey intfId =
                 writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Interface.class)).get().getKey();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                "configure terminal",
                 f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("no interface %s", intfId.getId()),
-                "commit",
-                "end");
+                "exit",
+                "exit");
     }
 }

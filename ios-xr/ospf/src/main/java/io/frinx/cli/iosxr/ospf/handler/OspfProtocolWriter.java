@@ -29,10 +29,8 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
             throws WriteFailedException {
         final String processName = id.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, id, data,
-                "configure terminal",
                 f("router ospf %s", processName),
-                "commit",
-                "end");
+                "exit");
     }
 
     @Override
@@ -47,9 +45,6 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
             throws WriteFailedException {
         final String processName = id.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, id, data,
-                "configure terminal",
-                f("no router ospf %s", processName),
-                "commit",
-                "end");
+                f("no router ospf %s", processName));
     }
 }

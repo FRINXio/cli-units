@@ -38,7 +38,7 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
         this.cli = cli;
     }
 
-    private static final String SH_RUN_OSPF = "show running-config router ospf | include ^router ospf";
+    private static final String SH_RUN_OSPF = "do show running-config router ospf | include ^router ospf";
     private static final Pattern ROUTER_OSPF_LINE = Pattern.compile("router ospf (?<ospfName>\\S+)");
 
     @Nonnull
