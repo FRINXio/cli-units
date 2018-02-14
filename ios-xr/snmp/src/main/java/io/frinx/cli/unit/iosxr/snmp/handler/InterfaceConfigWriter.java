@@ -36,21 +36,17 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
             return;
         }
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            "configure terminal",
             f("snmp-server interface %s", name),
             "no notification linkupdown disable",
-            "commit",
-            "end");
+            "exit");
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = instanceIdentifier.firstKeyOf(Interface.class).getInterfaceId().getValue();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            "configure terminal",
             f("snmp-server interface %s", name),
             "notification linkupdown disable",
-            "commit",
-            "end");
+            "exit");
     }
 }

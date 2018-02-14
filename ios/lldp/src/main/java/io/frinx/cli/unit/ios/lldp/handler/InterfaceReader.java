@@ -27,7 +27,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
-    private static final String SHOW_LLDP_INTERFACE = "sh lldp interface";
+    private static final String SHOW_LLDP_INTERFACE = "do show lldp interface";
     private static final Pattern INTERFACE_PATTERN = Pattern.compile("(?<interface>^[\\S&&[^:]]+):");
 
     private Cli cli;
