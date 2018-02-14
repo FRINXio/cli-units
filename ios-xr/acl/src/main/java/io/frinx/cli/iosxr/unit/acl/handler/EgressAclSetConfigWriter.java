@@ -55,11 +55,9 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
         checkArgument(aclSetExists, "Acl: %s does not exist, cannot configure ACLs", config.getSetName());
 
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                "configure terminal",
                 f("interface %s", name),
                 f("ipv4 access-group %s egress", config.getSetName()),
-                "commit",
-                "end");
+                "exit");
     }
 
     @Override
@@ -75,10 +73,8 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
         }
 
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            "configure terminal",
             f("interface %s", name),
             f("no ipv4 access-group %s egress", config.getSetName()),
-            "commit",
-            "end");
+            "exit");
     }
 }
