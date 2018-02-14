@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
-    private static final String SH_NEI = "show bgp instance %s neighbor nsr";
+    private static final String SH_NEI = "do show bgp instance %s neighbor nsr";
     private static final Pattern NEIGHBOR_LINE = Pattern.compile("BGP neighbor is (?<neighborIp>.+)");
 
     private Cli cli;

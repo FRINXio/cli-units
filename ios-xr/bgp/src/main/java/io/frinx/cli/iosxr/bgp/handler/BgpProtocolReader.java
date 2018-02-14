@@ -8,18 +8,16 @@
 
 package io.frinx.cli.iosxr.bgp.handler;
 
-import com.google.common.collect.ImmutableList;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-
-import io.frinx.cli.unit.utils.ParsingUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
@@ -29,7 +27,7 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
         BgpReader.BgpConfigReader<Protocol, ProtocolBuilder>,
         CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
-    private static final String SHOW_BGP_INSTANCES = "show bgp instances";
+    private static final String SHOW_BGP_INSTANCES = "do show bgp instances";
     public static final Pattern INSTANCE_LINE = Pattern.compile("(?<id>[0-9.]+) (?<vrf>[^\\s]+) (?<instance>[^\\s]+) (?<as>[0-9.]+) (?<vrfs>[0-9.]+) (?<afi>.*)");
     private final Cli cli;
 

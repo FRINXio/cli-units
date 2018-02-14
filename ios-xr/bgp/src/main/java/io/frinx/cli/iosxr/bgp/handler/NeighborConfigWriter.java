@@ -37,14 +37,13 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
                 NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
                         "instance " + id.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, id, data,
-                "configure terminal",
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("neighbor %s", id.firstKeyOf(Neighbor.class).getNeighborAddress().getIpv4Address().getValue()),
                 f("remote-as %s", data.getPeerAs().getValue()),
                 data.isEnabled() ? "no shutdown" : "shutdown",
                 data.getPeerGroup() != null ? f("use neighbor-group %s", data.getPeerGroup()) : "",
-                "commit",
-                "end");
+                "exit",
+                "exit");
     }
 
     @Override
@@ -55,14 +54,13 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
                 NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
                         "instance " + id.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, id, dataAfter,
-                "configure terminal",
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("neighbor %s", id.firstKeyOf(Neighbor.class).getNeighborAddress().getIpv4Address().getValue()),
                 f("remote-as %s", dataAfter.getPeerAs().getValue()),
                 dataAfter.isEnabled() ? "no shutdown" : "shutdown",
                 dataAfter.getPeerGroup() != null ? f("use neighbor-group %s", dataAfter.getPeerGroup()) : "",
-                "commit",
-                "end");
+                "exit",
+                "exit");
     }
 
     @Override
@@ -73,10 +71,8 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
                 NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
                         "instance " + id.firstKeyOf(Protocol.class).getName();
         blockingDeleteAndRead(cli, id,
-                "configure terminal",
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("no neighbor %s", id.firstKeyOf(Neighbor.class).getNeighborAddress().getIpv4Address().getValue()),
-                "commit",
-                "end");
+                "exit");
     }
 }

@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 
 public class AfiSafiReader implements BgpListReader.BgpConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
-    private static final String SH_AFI = "show bgp neighbor %s | begin For Address Family";
+    private static final String SH_AFI = "do show bgp neighbor %s | begin For Address Family";
     private static final Pattern FAMILY_LINE = Pattern.compile("(.*)For Address Family: (?<family>[^\\n].*)");
     private Cli cli;
 

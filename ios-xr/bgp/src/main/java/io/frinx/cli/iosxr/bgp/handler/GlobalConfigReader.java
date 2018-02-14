@@ -30,8 +30,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
 
-    private static final String SH_BGP= "sh bgp %s summary";
-    private static final String SH_BGP_INSTANCE = "show bgp instances | include %s";
+    private static final String SH_BGP= "do sh bgp %s summary";
+    private static final String SH_BGP_INSTANCE = "do show bgp instances | include %s";
     private static final Pattern CONFIG_LINE = Pattern.compile("BGP router identifier (?<id>.+), local AS number (?<as>.+)");
 
     private Cli cli;

@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
     // show run router bgp 65555 instance bla vrf b neighbor 192.168.1.1
-    private static final String SH_NEI = "show running-config router bgp %s %s %s neighbor %s";
+    private static final String SH_NEI = "do show running-config router bgp %s %s %s neighbor %s";
     private static final Pattern SHUTDOWN_LINE = Pattern.compile("shutdown");
     private static final Pattern REMOTE_AS_LINE = Pattern.compile("remote-as (?<remoteAs>.+)");
     private static final Pattern NEIGHBOR_LINE = Pattern.compile("use neighbor-group (?<group>.+)");

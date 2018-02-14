@@ -31,10 +31,8 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
         final String protName = id.firstKeyOf(Protocol.class).getName();
         String name = (protName.equals(NetworInstance.DEFAULT_NETWORK_NAME)) ? "" : " instance " + protName;
         blockingWriteAndRead(cli, id, data,
-                "configure terminal",
                 f("router bgp %s %s", data.getAs().getValue(), name),
-                "commit",
-                "end");
+                "exit");
     }
 
     @Override
@@ -50,9 +48,6 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
         final String protName = id.firstKeyOf(Protocol.class).getName();
         String name = (protName.equals(NetworInstance.DEFAULT_NETWORK_NAME)) ? "" : " instance " + protName;
         blockingDeleteAndRead(cli, id,
-                "configure terminal",
-                f("no router bgp %s %s",  data.getAs().getValue(), name),
-                "commit",
-                "end");
+                f("no router bgp %s %s",  data.getAs().getValue(), name));
     }
 }
