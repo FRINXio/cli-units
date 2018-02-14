@@ -55,11 +55,9 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
         }
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "configure terminal",
                 f("interface %s", ifcName),
                 command,
-                "commit",
-                "end");
+                "exit");
     }
 
     @Override
@@ -71,11 +69,9 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
         checkLoggingConfig(ifcName, writeContext, false);
 
         blockingDeleteAndRead(cli, id,
-                "configure terminal",
                 f("interface %s", ifcName),
                 NO_LOGGING_COMMAND,
-                "commit",
-                "end");
+                "exit");
     }
 
     private static void checkLoggingConfig(String ifcName, WriteContext wContext, boolean isWrite) {

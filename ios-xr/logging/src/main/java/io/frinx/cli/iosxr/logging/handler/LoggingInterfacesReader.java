@@ -39,7 +39,7 @@ public class LoggingInterfacesReader implements CliConfigReader<Interfaces, Inte
     private final Cli cli;
 
     private static final String SH_RUN_INTERFACE_LOGGING =
-            "show running-config | utility egrep \"^interface|^ logging events link-status\"";
+            "do show running-config | utility egrep \"^interface|^ logging events link-status\"";
 
     static final EnabledLoggingForEvent LINK_UP_DOWN_EVENT =
             new EnabledLoggingForEventBuilder()
