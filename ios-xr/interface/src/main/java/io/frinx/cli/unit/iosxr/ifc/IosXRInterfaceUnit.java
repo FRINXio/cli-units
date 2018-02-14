@@ -12,7 +12,6 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
@@ -27,7 +26,6 @@ import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceDampingConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceDampingConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader;
-import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceStatisticsConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceStatisticsConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigReader;
@@ -39,7 +37,6 @@ import io.frinx.cli.unit.iosxr.ifc.handler.ethernet.EthernetConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
-import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceStateReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceVlanConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceVlanConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4.Ipv4AddressReader;
@@ -262,13 +259,11 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         rRegistry.addStructuralReader(IIDs.INTERFACES, InterfacesBuilder.class);
         rRegistry.add(new GenericConfigListReader<>(IIDs.IN_INTERFACE, new InterfaceReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.IN_IN_STATE, new InterfaceStateReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));
 
         rRegistry.addStructuralReader(IIDs.IN_IN_SUBINTERFACES, SubinterfacesBuilder.class);
         rRegistry.add(new GenericConfigListReader<>(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.IN_IN_SU_SU_STATE, new SubinterfaceStateReader(cli)));
 
         rRegistry.addStructuralReader(SUBIFC_IPV4_AUG_ID, Subinterface1Builder.class);
         rRegistry.addStructuralReader(SUBIFC_IPV4_ID, Ipv4Builder.class);
@@ -288,18 +283,15 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         rRegistry.add(new GenericConfigReader<>(SUBIFC_VLAN_CFG_ID, new SubinterfaceVlanConfigReader(cli)));
 
         // hold-time
-        // TODO provide also hold-time state reader
         rRegistry.addStructuralReader(IIDs.IN_IN_HOLDTIME, HoldTimeBuilder.class);
         rRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_HO_CONFIG, new HoldTimeConfigReader(cli)));
 
         // if-aggregation
-        // TODO provide also aggregation state reader
         rRegistry.addStructuralReader(IFC_AGGREGATION_AUG_ID, Interface1Builder.class);
         rRegistry.addStructuralReader(IFC_AGGREGATION_ID, AggregationBuilder.class);
         rRegistry.add(new GenericConfigReader<>(IFC_AGGREGATION_CFG_ID, new AggregateConfigReader(cli)));
 
         // bfd
-        // TODO provide reader also for bfd state
         rRegistry.addStructuralReader(IFC_LAG_BFD_AUG_ID, IfLagBfdAugBuilder.class);
         rRegistry.addStructuralReader(IFC_LAG_BFD_ID, BfdBuilder.class);
         rRegistry.add(new GenericConfigReader<>(IFC_LAG_BFD_CFG_ID, new BfdConfigReader(cli)));
