@@ -28,7 +28,7 @@ public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         CompositeReader.Child<Config, ConfigBuilder> {
 
     private static final String SH_IP_VRF_CFG = "sh run vrf %s";
-    private static final Pattern RD_LINE = Pattern.compile("\\s+rd (?<rd>([\\S]+):([\\S]+)).*");
+    static final Pattern RD_LINE = Pattern.compile("\\s*rd (?<rd>([\\S]+):([\\S]+)).*");
     private Cli cli;
 
     public VrfConfigReader(Cli cli) {
