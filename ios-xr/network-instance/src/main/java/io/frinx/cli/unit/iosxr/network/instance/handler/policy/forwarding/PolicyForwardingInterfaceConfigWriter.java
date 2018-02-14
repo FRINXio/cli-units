@@ -55,7 +55,6 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
         }
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "configure terminal",
                 f("interface %s", ifcName),
                 pfIfAug.getInputServicePolicy() != null
                         ? f("service-policy input %s", pfIfAug.getInputServicePolicy())
@@ -63,8 +62,7 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
                 pfIfAug.getOutputServicePolicy() != null
                         ? f("service-policy output %s", pfIfAug.getOutputServicePolicy())
                         : "no service-policy output",
-                "commit",
-                "end");
+                "exit");
     }
 
     private static List<String> parsePolicies(String policies) {
@@ -81,12 +79,10 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
         String ifcName = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
 
         blockingDeleteAndRead(cli, id,
-                "configure terminal",
                 f("interface %s", ifcName),
                 "no service-policy output",
                 "no service-policy input",
-                "commit",
-                "end");
+                "exit");
 
     }
 }
