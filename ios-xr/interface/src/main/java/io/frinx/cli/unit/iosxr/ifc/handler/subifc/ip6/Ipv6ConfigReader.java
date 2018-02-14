@@ -20,6 +20,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import java.util.Arrays;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressBuilder;
@@ -40,7 +41,7 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         this.cli = cli;
     }
 
-    public static final short DEFAULT_PREFIX_LENGHT = (short)64;
+    private static final short DEFAULT_PREFIX_LENGHT = (short)64;
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
@@ -52,17 +53,25 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             Ipv6AddressNoZone address = id.firstKeyOf(Address.class).getIp();
-            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name), cli, id, readContext), address);
+            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name),
+                    cli, id, readContext), address);
         }
     }
 
     @VisibleForTesting
     static void parseAddressConfig(ConfigBuilder configBuilder, String output, Ipv6AddressNoZone address) {
+        Optional<String> optionalAddressLine = NEWLINE.splitAsStream(output)
+                .filter(line -> line.contains(address.getValue()))
+                .findAny();
+
+        if (!optionalAddressLine.isPresent()) {
+            return;
+        }
+
         configBuilder.setIp(address);
         configBuilder.setPrefixLength(DEFAULT_PREFIX_LENGHT);
-        output = String.valueOf(
-                Arrays.stream(output.split(NEWLINE.pattern())).filter(line -> line.contains(address.getValue())).findAny());
-        parseField(output,
+
+        parseField(optionalAddressLine.get(),
                 IPV6_UNICAST_ADDRESS::matcher,
                 m -> Short.parseShort(m.group("prefix")),
                 configBuilder::setPrefixLength);

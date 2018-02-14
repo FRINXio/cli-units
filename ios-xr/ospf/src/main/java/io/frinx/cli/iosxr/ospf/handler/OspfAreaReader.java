@@ -8,7 +8,6 @@
 
 package io.frinx.cli.iosxr.ospf.handler;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfListReader;
@@ -29,7 +28,10 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area, AreaKey, AreaBuilder> {
-    private static final Pattern AREA_ID = Pattern.compile(".*?Area (?:BACKBONE\\()?(?<areaId>[0-9.]+).*");
+
+    private static final String SH_RUN_OSPF_AREA = "show running-config router ospf %s | include ^ area";
+
+    private static final Pattern AREA_ID = Pattern.compile("area (?<areaId>[0-9.]+)");
 
     private final Cli cli;
 
@@ -42,18 +44,17 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
     public List<AreaKey> getAllIdsForType(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
                                           @Nonnull ReadContext readContext) throws ReadFailedException {
         String id = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        return parseAreasIds(blockingRead(String.format(GlobalConfigReader.SH_OSPF, id), cli, instanceIdentifier, readContext));
+        return parseAreasIds(blockingRead(String.format(SH_RUN_OSPF_AREA, id), cli, instanceIdentifier, readContext));
     }
 
-    @VisibleForTesting
-    public static List<AreaKey> parseAreasIds(String output) {
+    private static List<AreaKey> parseAreasIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 AREA_ID::matcher,
                 m -> m.group("areaId"),
                 area -> new AreaKey(getAreaIdentifier(area)));
     }
 
-    public static OspfAreaIdentifier getAreaIdentifier(String area) {
+    private static OspfAreaIdentifier getAreaIdentifier(String area) {
         if (area.contains(".")) {
             return new OspfAreaIdentifier(new DottedQuad(area));
         } else {

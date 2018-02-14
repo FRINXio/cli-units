@@ -8,7 +8,7 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader.SH_INTERFACE;
+import static io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader.SH_RUN_INTERFACE;
 import static io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader.parseAllInterfaceIds;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -50,7 +50,7 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
         String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
 
-        List<SubinterfaceKey> subinterfaceKeys = parseSubinterfaceIds(blockingRead(SH_INTERFACE, cli, instanceIdentifier, readContext), id);
+        List<SubinterfaceKey> subinterfaceKeys = parseSubinterfaceIds(blockingRead(SH_RUN_INTERFACE, cli, instanceIdentifier, readContext), id);
 
         // Subinterface with ID 0 is reserved for IP addresses of the interface
         InstanceIdentifier<Subinterface> zeroSubIfaceIid = RWUtils.replaceLastInId(instanceIdentifier,

@@ -15,6 +15,7 @@ import io.fd.honeycomb.translate.impl.read.GenericListReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
@@ -24,6 +25,7 @@ import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.openconfig.openconfig.snmp.IIDs;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp._interface.config.EnabledTrapForEvent;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.top.SnmpBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
@@ -37,6 +39,8 @@ import java.util.Collections;
 import java.util.Set;
 
 public class SnmpUnit implements TranslateUnit {
+
+    private static final InstanceIdentifier<Interfaces> IFCS_ID = InstanceIdentifier.create(Interfaces.class);
 
     private static final Device IOS_ALL = new DeviceIdBuilder()
             .setDeviceType("ios xr")
@@ -87,10 +91,11 @@ public class SnmpUnit implements TranslateUnit {
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         rRegistry.addStructuralReader(IIDs.SNMP, SnmpBuilder.class);
-        rRegistry.addStructuralReader(IIDs.SN_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericListReader<>(IIDs.SN_IN_INTERFACE, new InterfaceReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.SN_IN_IN_CONFIG, new InterfaceConfigReader()));
-        rRegistry.add(new GenericListReader<>(IIDs.SN_IN_IN_CO_ENABLEDTRAPFOREVENT, new EnabledTrapForEventReader(cli)));
+        rRegistry.subtreeAdd(Sets.newHashSet(
+                RWUtils.cutIdFromStart(IIDs.SN_IN_INTERFACE, IFCS_ID),
+                RWUtils.cutIdFromStart(IIDs.SN_IN_IN_CONFIG, IFCS_ID),
+                RWUtils.cutIdFromStart(IIDs.SN_IN_IN_CO_ENABLEDTRAPFOREVENT, IFCS_ID)),
+                new GenericConfigReader<>(IIDs.SN_INTERFACES, new SnmpInterfacesReader(cli)));
     }
 
     @Override

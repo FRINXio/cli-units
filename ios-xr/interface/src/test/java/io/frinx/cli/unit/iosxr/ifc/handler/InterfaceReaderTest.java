@@ -17,39 +17,43 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 
 public class InterfaceReaderTest {
 
-    private static String SH_IP_INT_BRIE = "Fri Nov 24 09:37:44.937 UTC\n" +
-            "\n" +
-            "Interface                      IP-Address      Status          Protocol Vrf-Name\n" +
-            "Loopback0                      99.0.0.3        Up              Up       default \n" +
-            "MgmtEth0/0/CPU0/0              192.168.1.213   Up              Up       default \n" +
-            "GigabitEthernet0/0/0/0         unassigned      Up              Up       default \n" +
-            "GigabitEthernet0/0/0/0.28      unassigned      Up              Down     default \n" +
-            "GigabitEthernet0/0/0/0.69      unassigned      Up              Down     default \n" +
-            "GigabitEthernet0/0/0/1         unassigned      Up              Up       default \n" +
-            "GigabitEthernet0/0/0/1.2       unassigned      Up              Up       default \n" +
-            "GigabitEthernet0/0/0/1.123     unassigned      Up              Up       default \n" +
-            "GigabitEthernet0/0/0/3         unassigned      Shutdown        Down     default";
+    private static String SH_RUN_INT = "Mon Feb 12 09:40:30.672 UTC\n" +
+            "interface Loopback97\n" +
+            "interface Loopback98\n" +
+            "interface Loopback99\n" +
+            "interface Loopback101\n" +
+            "interface Loopback199\n" +
+            "interface MgmtEth0/0/CPU0/0\n" +
+            "interface GigabitEthernet0/0/0/0\n" +
+            "interface GigabitEthernet0/0/0/1\n" +
+            "interface GigabitEthernet0/0/0/1.100\n" +
+            "interface GigabitEthernet0/0/0/2\n" +
+            "interface GigabitEthernet0/0/0/3\n" +
+            "interface GigabitEthernet0/0/0/3.33\n" +
+            "interface GigabitEthernet0/0/0/3.65\n" +
+            "interface GigabitEthernet0/0/0/5";
 
     private static List<InterfaceKey> EXPECTED_ALL_IDS =
-            Lists.newArrayList("Loopback0", "MgmtEth0/0/CPU0/0",
-                    "GigabitEthernet0/0/0/0", "GigabitEthernet0/0/0/0.28", "GigabitEthernet0/0/0/0.69",
-                    "GigabitEthernet0/0/0/1", "GigabitEthernet0/0/0/1.2", "GigabitEthernet0/0/0/1.123",
-                    "GigabitEthernet0/0/0/3")
+            Lists.newArrayList("Loopback97", "Loopback98", "Loopback99", "Loopback101", "Loopback199",
+                    "MgmtEth0/0/CPU0/0", "GigabitEthernet0/0/0/0", "GigabitEthernet0/0/0/1",
+                    "GigabitEthernet0/0/0/1.100", "GigabitEthernet0/0/0/2", "GigabitEthernet0/0/0/3",
+                    "GigabitEthernet0/0/0/3.33", "GigabitEthernet0/0/0/3.65", "GigabitEthernet0/0/0/5")
                     .stream().map(InterfaceKey::new).collect(Collectors.toList());
 
     private static List<InterfaceKey> EXPECTED_IDS =
-            Lists.newArrayList("Loopback0", "MgmtEth0/0/CPU0/0", "GigabitEthernet0/0/0/0",
-                    "GigabitEthernet0/0/0/1", "GigabitEthernet0/0/0/3")
+            Lists.newArrayList("Loopback97", "Loopback98", "Loopback99", "Loopback101", "Loopback199",
+                    "MgmtEth0/0/CPU0/0", "GigabitEthernet0/0/0/0", "GigabitEthernet0/0/0/1", "GigabitEthernet0/0/0/2",
+                    "GigabitEthernet0/0/0/3", "GigabitEthernet0/0/0/5")
                     .stream().map(InterfaceKey::new).collect(Collectors.toList());
 
     @Test
     public void testParseAllInterfaceIds() {
-        Assert.assertEquals(EXPECTED_ALL_IDS, InterfaceReader.parseAllInterfaceIds(SH_IP_INT_BRIE));
+        Assert.assertEquals(EXPECTED_ALL_IDS, InterfaceReader.parseAllInterfaceIds(SH_RUN_INT));
     }
 
     @Test
     public void testParseInterfaceIds() {
-        Assert.assertEquals(EXPECTED_IDS, InterfaceReader.parseInterfaceIds(SH_IP_INT_BRIE));
+        Assert.assertEquals(EXPECTED_IDS, InterfaceReader.parseInterfaceIds(SH_RUN_INT));
     }
 
 }

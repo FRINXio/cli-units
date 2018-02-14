@@ -20,18 +20,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 
 public class MaxMetricConfigReaderTest {
 
-    private final String output = "Originating router-LSAs with maximum metric\n" +
-            "    Condition: on start-up for 150 seconds, State: inactive\n" +
-            "       Advertise stub links with maximum metric in router-LSAs\n" +
-            "       Advertise summary-LSAs with metric 16711680\n" +
-            "       Advertise external-LSAs with metric 16711680";
+    private final String output = "Wed Feb 14 13:31:07.209 UTC\n" +
+            " max-metric router-lsa on-startup 60 include-stub summary-lsa external-lsa";
 
 
     @Test
     public void test() {
         ConfigBuilder builder = new ConfigBuilder();
         MaxMetricConfigReader.parseTimers(output, builder);
-        Assert.assertEquals(150, builder.getTimeout().intValue());
+        Assert.assertEquals(60, builder.getTimeout().intValue());
 
         Assert.assertEquals(Lists.newArrayList(MAXMETRICINCLUDESTUB.class, MAXMETRICSUMMARYLSA.class, MAXMETRICINCLUDETYPE2EXTERNAL.class),
                 builder.getInclude());

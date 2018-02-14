@@ -31,24 +31,26 @@ public class TeInterfaceReader implements MplsListReader.MplsConfigListReader<In
 
     private Cli cli;
 
-    private static final String SHOW_MPLS_INT = "show mpls traffic-eng link-management interfaces | include Link ID";
-    private static final Pattern INTF_LINE = Pattern.compile("Link ID:: (?<name>[^\\s]+).*");
+    private static final String SHOW_RUN_MPLS_INT = "show running-config mpls traffic-eng | include ^ interface";
+    // TODO Reuse pattern from ifc translate unit
+    private static final Pattern INTF_LINE = Pattern.compile("interface (?<id>\\S+)");
 
     public TeInterfaceReader(Cli cli) {
         this.cli = cli;
     }
 
     @Override
-    public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String output = blockingRead(SHOW_MPLS_INT, cli, instanceIdentifier, readContext);
+    public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+                                               @Nonnull ReadContext readContext) throws ReadFailedException {
+        String output = blockingRead(SHOW_RUN_MPLS_INT, cli, instanceIdentifier, readContext);
         return getInterfaceKeys(output);
     }
 
     @VisibleForTesting
-    public static List<InterfaceKey> getInterfaceKeys(String output) {
+    static List<InterfaceKey> getInterfaceKeys(String output) {
         return ParsingUtils.parseFields(output, 0,
             INTF_LINE::matcher,
-            matcher -> matcher.group("name"),
+            matcher -> matcher.group("id"),
             v -> new InterfaceKey(new InterfaceId(v)));
     }
 
