@@ -54,7 +54,7 @@ public class EthernetConfigWriter implements CliWriter<Config> {
         LacpEthConfigAug lacpAug = dataAfter.getAugmentation(LacpEthConfigAug.class);
 
         if (aggregationAug == null || aggregationAug.getAggregateId() == null) {
-            Preconditions.checkArgument(lacpAug != null,
+            Preconditions.checkArgument(lacpAug == null,
                     "Cannot configure lacp on non LAG enabled interface %s", ifcName);
             return;
         }
