@@ -17,6 +17,8 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.event.types.rev171024.LINKUPDOWN;
@@ -40,11 +42,14 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
     private static final String SH_RUN_SNM_IFCS =
             "show running-config snmp-server | utility egrep \"^snmp-server interface|^ notification linkupdown disable\"";
 
+    // TODO try to reuse pattern from interface translate unit's interface reader
+    private static final Pattern INTERFACE_ID = Pattern.compile(".*interface (?<id>\\S+).*");
+
     private static final EnabledTrapForEvent LINK_UP_DOWN_EVENT = new EnabledTrapForEventBuilder()
             .setEventName(LINKUPDOWN.class)
             .build();
 
-    private static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST =
+    static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST =
             Collections.singletonList(LINK_UP_DOWN_EVENT);
 
     private Cli cli;
@@ -57,17 +62,20 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interfaces> instanceIdentifier,
                                       @Nonnull InterfacesBuilder interfacesBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        parseInterfaceS(blockingRead(SH_RUN_SNM_IFCS,
+        parseInterfaces(blockingRead(SH_RUN_SNM_IFCS,
                 cli, instanceIdentifier, readContext), interfacesBuilder);
     }
 
     @VisibleForTesting
-    public static void parseInterfaceS(String snmpInterfaceOutput, InterfacesBuilder interfacesBuilder) {
+    static void parseInterfaces(String snmpInterfaceOutput, InterfacesBuilder interfacesBuilder) {
         String realignedOutput = realignSnmpDisabledInterfacesOutput(snmpInterfaceOutput);
 
         List<InterfaceKey> ifcKeyes = NEWLINE.splitAsStream(realignedOutput)
                 .map(String::trim)
                 .filter(ifcLine -> !ifcLine.contains("notification linkupdown disable"))
+                .map(INTERFACE_ID::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("id"))
                 .map(InterfaceId::new)
                 .map(InterfaceKey::new)
                 .collect(Collectors.toList());
@@ -101,6 +109,6 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
 
     private static String realignSnmpDisabledInterfacesOutput(String output) {
         String withoutNewlines = output.replaceAll(NEWLINE.pattern(), "");
-        return withoutNewlines.replace("interface ", "\n");
+        return withoutNewlines.replace("snmp-server", "\n");
     }
 }
