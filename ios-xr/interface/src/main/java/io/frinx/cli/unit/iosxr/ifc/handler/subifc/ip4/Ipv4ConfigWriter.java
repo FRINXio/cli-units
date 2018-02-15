@@ -8,9 +8,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -21,6 +18,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import static com.google.common.base.Preconditions.checkArgument;
+import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
 
 public class Ipv4ConfigWriter implements CliWriter<Config> {
 
@@ -32,7 +31,7 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE = "configure terminal\n" +
             "interface %s\n" +
-            "ip address %s %s\n" +
+            "ipv4 address %s %s\n" +
             "commit\n" +
             "end";
 
@@ -82,7 +81,7 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
 
     private static final String DELETE_TEMPLATE = "configure terminal\n" +
             "interface %s\n" +
-            "no ip address %s %s\n" +
+            "no ipv4 address %s %s\n" +
             "commit\n" +
             "end";
 
