@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 public class TunnelConfigReader implements MplsReader.MplsConfigReader<Config, ConfigBuilder> {
 
-    static final String SH_RUN_TUNNEL = "show run interface tunnel-te%s";
+    static final String SH_RUN_TUNNEL = "show running-config interface tunnel-te%s";
     private static final Pattern AUTOROUTE_LINE = Pattern.compile("autoroute announce");
     private static final Pattern METRIC_LINE = Pattern.compile("metric absolute (?<metric>.*)");
     private final Cli cli;

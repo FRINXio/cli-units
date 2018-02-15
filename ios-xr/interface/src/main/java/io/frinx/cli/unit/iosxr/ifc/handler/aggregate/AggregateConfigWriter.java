@@ -35,7 +35,7 @@ public class AggregateConfigWriter implements CliWriter<Config> {
         validateConfig(dataAfter);
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "conf terminal",
+                "configure terminal",
                 f("interface %s", ifcName),
                 f("bundle minimum-active links %s", dataAfter.getMinLinks()),
                 "commit",
@@ -74,7 +74,7 @@ public class AggregateConfigWriter implements CliWriter<Config> {
         checkIfcType(ifcName);
 
         blockingDeleteAndRead(cli, id,
-                "conf terminal",
+                "configure terminal",
                 f("interface %s", ifcName),
                 "no bundle minimum-active links",
                 "commit",

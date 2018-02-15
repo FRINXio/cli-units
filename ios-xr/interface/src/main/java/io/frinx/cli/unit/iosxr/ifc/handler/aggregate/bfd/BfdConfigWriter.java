@@ -42,7 +42,7 @@ public class BfdConfigWriter implements CliWriter<Config> {
         Ipv4Address destinationIpv4 = destinationAddress != null ? destinationAddress.getIpv4Address() : null;
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "conf t",
+                "configure terminal",
                 f("interface %s", ifcName),
                 "bfd mode ietf",
                 "bfd address-family ipv4 fast-detect",
@@ -87,7 +87,7 @@ public class BfdConfigWriter implements CliWriter<Config> {
         checkIfcType(ifcName);
 
         blockingDeleteAndRead(cli, id,
-                "conf t",
+                "configure terminal",
                 f("interface %s", ifcName),
                 "no bfd",
                 "commit",

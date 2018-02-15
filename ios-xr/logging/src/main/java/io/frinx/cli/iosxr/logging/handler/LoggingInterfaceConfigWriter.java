@@ -55,7 +55,7 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
         }
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "conf t",
+                "configure terminal",
                 f("interface %s", ifcName),
                 command,
                 "commit",
@@ -71,7 +71,7 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
         checkLoggingConfig(ifcName, writeContext, false);
 
         blockingDeleteAndRead(cli, id,
-                "conf t",
+                "configure terminal",
                 f("interface %s", ifcName),
                 NO_LOGGING_COMMAND,
                 "commit",

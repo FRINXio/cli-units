@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 public class AclAllReader implements CliConfigListReader<AclSet, AclSetKey, AclSetBuilder> {
 
-    private static final String SH_ACCESS_LISTS = "show run ipv4 access-list | include access-list";
+    private static final String SH_ACCESS_LISTS = "show running-config ipv4 access-list | include access-list";
     private static final Pattern ACL_LINE = Pattern.compile("ipv4 access-list (?<name>.+)");
 
     private final Cli cli;

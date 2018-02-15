@@ -31,7 +31,7 @@ public class RsvpInterfaceReader implements MplsListReader.MplsConfigListReader<
 
     private Cli cli;
 
-    private static final String SH_RSVP_INT = "show run rsvp";
+    private static final String SH_RSVP_INT = "show running-config rsvp";
     static final Pattern IFACE_LINE = Pattern.compile("interface (?<name>.*)");
 
     public RsvpInterfaceReader(Cli cli) {
