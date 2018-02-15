@@ -1,0 +1,143 @@
+/*
+ * Copyright © 2018 FRINX s.r.o. All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the FRINX ODL End User License Agreement which accompanies this distribution,
+ * and is available at https://frinx.io/wp-content/uploads/2017/01/EULA_ODL_20170104_v102.pdf
+ */
+
+package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6;
+
+import com.google.common.base.Optional;
+import io.fd.honeycomb.translate.write.WriteContext;
+import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.io.Cli;
+import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import java.util.concurrent.CompletableFuture;
+import org.hamcrest.CoreMatchers;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface2;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.Ipv6;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.RouterAdvertisement;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.router.advertisement.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.router.advertisement.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.Subinterfaces;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L2vlan;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+
+public class Ipv6AdvertisementConfigWriterTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    private Cli cliMock;
+    private WriteContext context;
+
+    @Before
+    public void setUp() throws Exception {
+        cliMock = Mockito.mock(Cli.class);
+        context = Mockito.mock(WriteContext.class);
+
+        Mockito.when(cliMock.executeAndRead(Mockito.any()))
+            .then(invocation -> CompletableFuture.completedFuture(""));
+    }
+
+    @Test
+    public void settingAdvertisement_LAGInterface_goldenPathTest() throws WriteFailedException {
+        Mockito.when(context.readAfter(Mockito.any()))
+            .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
+
+        final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
+
+        writer.writeCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID, TestData.SUPPRESS_TRUE_DATA, context);
+
+        Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(Mockito.any());
+    }
+
+    @Test
+    public void settingAdvertisement_nonLAGInterface() throws WriteFailedException {
+        Mockito.when(context.readAfter(Mockito.any()))
+            .then(invocation -> Optional.of(TestData.INTERFACE_WRONG_TYPE));
+
+        final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(CoreMatchers.allOf(
+            CoreMatchers.containsString(Ipv6CheckUtil.CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX),
+            CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
+            CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
+        ));
+
+        writer.writeCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID, TestData.SUPPRESS_TRUE_DATA, context);
+    }
+
+    @Test
+    public void deleteAdvertisement_LAGInterface() throws WriteFailedException {
+        Mockito.when(context.readAfter(Mockito.any()))
+            .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
+
+        final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
+
+        writer.deleteCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID, TestData.SUPPRESS_TRUE_DATA, context);
+
+        Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(Mockito.any());
+    }
+
+    @Test
+    public void deleteAdvertisement_nonLAGInterface() throws WriteFailedException {
+        Mockito.when(context.readAfter(Mockito.any()))
+            .then(invocation -> Optional.of(TestData.INTERFACE_WRONG_TYPE));
+
+        final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(CoreMatchers.allOf(
+            CoreMatchers.containsString(Ipv6CheckUtil.CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX),
+            CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
+            CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
+        ));
+
+        writer.deleteCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID, TestData.SUPPRESS_TRUE_DATA, context);
+    }
+
+    static class TestData {
+
+        static final String INTERFACE_NAME = "GigabitEthernet 0/0/0/0";
+        static final long SUBINTERFACE_INDEX = 0L;
+
+        static final Config SUPPRESS_TRUE_DATA = new ConfigBuilder()
+            .setSuppress(true)
+            .build();
+        static final Interface INTERFACE_CORRECT_TYPE = new InterfaceBuilder()
+            .setName(INTERFACE_NAME)
+            .setConfig(
+                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                    .setType(Ieee8023adLag.class)
+                    .build())
+            .build();
+        static final Interface INTERFACE_WRONG_TYPE = new InterfaceBuilder()
+            .setName(INTERFACE_NAME)
+            .setConfig(
+                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                    .setType(L2vlan.class)
+                    .build())
+            .build();
+
+        static final InstanceIdentifier<Interface> INTERFACE_IID =
+            IIDs.INTERFACES.child(Interface.class, new InterfaceKey(INTERFACE_NAME));
+        static final InstanceIdentifier<Config> ADVERTISEMENT_CONFIG_IID = INTERFACE_IID
+            .child(Subinterfaces.class)
+            .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX)).augmentation(Subinterface2.class)
+            .child(Ipv6.class).child(RouterAdvertisement.class).child(Config.class);
+    }
+}
