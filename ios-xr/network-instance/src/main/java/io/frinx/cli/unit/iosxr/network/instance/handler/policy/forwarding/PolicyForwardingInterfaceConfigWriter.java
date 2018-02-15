@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
-    private static final String SHOW_ALL_POLICIES = "sh run policy-map | include ^policy-map";
+    private static final String SHOW_ALL_POLICIES = "show running-config policy-map | include ^policy-map";
 
     public PolicyForwardingInterfaceConfigWriter(Cli cli) {
         this.cli = cli;
@@ -61,7 +61,7 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
         checkPoliciesExist(pfIfAug, policyList);
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "conf t",
+                "configure terminal",
                 f("interface %s", ifcName),
                 pfIfAug.getInputServicePolicy() != null
                         ? f("service-policy input %s", pfIfAug.getInputServicePolicy())
@@ -95,7 +95,7 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
         String ifcName = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
 
         blockingDeleteAndRead(cli, id,
-                "conf t",
+                "configure terminal",
                 f("interface %s", ifcName),
                 "no service-policy output",
                 "no service-policy input",

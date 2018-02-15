@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EgressAclSetReader implements CliConfigListReader<EgressAclSet, EgressAclSetKey, EgressAclSetBuilder> {
 
-    private static final String SH_ACL_INTF = "show run interface %s";
+    private static final String SH_ACL_INTF = "show running-config interface %s";
     private static final Pattern ACL_LINE = Pattern.compile("ipv4 access-group (?<name>.+) egress");
 
     private final Cli cli;
