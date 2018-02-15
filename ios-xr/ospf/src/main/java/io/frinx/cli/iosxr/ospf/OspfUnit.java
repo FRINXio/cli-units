@@ -77,7 +77,8 @@ public class OspfUnit implements TranslateUnit {
     }
 
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigWriter(cli)));
+        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigWriter(cli)),
+                IIDs.NE_NE_PR_PR_CONFIG);
         wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TI_MA_CONFIG, new MaxMetricConfigWriter(cli)),
                 IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
         
