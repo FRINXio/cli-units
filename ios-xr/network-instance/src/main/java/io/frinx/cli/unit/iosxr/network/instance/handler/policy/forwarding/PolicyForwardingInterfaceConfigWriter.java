@@ -16,7 +16,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -30,7 +29,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
-    private static final String SHOW_ALL_POLICIES = "show running-config policy-map | include ^policy-map";
 
     public PolicyForwardingInterfaceConfigWriter(Cli cli) {
         this.cli = cli;
@@ -56,10 +54,6 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
             return;
         }
 
-        String policies = blockingWriteAndRead(cli, id, dataAfter, SHOW_ALL_POLICIES);
-        List<String> policyList = parsePolicies(policies);
-        checkPoliciesExist(pfIfAug, policyList);
-
         blockingWriteAndRead(cli, id, dataAfter,
                 "configure terminal",
                 f("interface %s", ifcName),
@@ -79,14 +73,6 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
                 .map(policyLine -> policyLine.split(" ")[1])
                 .map(String::trim)
                 .collect(Collectors.toList());
-    }
-
-    private static void checkPoliciesExist(NiPfIfCiscoAug pfIfAug, List<String> policyList) {
-        policyList.add(null);
-        Preconditions.checkArgument(policyList.contains(pfIfAug.getInputServicePolicy())
-                && policyList.contains(pfIfAug.getOutputServicePolicy()),
-                "Cannot configure %s policy-forwarding configuration,"
-                        + " specifies policies do not exist, avalaible policies %s", pfIfAug, policyList);
     }
 
     @Override
