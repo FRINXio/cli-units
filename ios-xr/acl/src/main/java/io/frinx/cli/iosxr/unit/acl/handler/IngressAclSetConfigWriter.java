@@ -22,22 +22,19 @@ import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
+import io.frinx.cli.iosxr.unit.acl.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
-import java.util.Collections;
-import java.util.List;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSets;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSetsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.top.Acl;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class IngressAclSetConfigWriter implements CliWriter<Config> {
-
-    static final AclSets EMPTY_ACLS = new AclSetsBuilder().setAclSet(Collections.emptyList()).build();
 
     private final Cli cli;
 
@@ -49,24 +46,19 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
 
-        // Check interface exists
-        boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey(name)))
-                .isPresent();
-        checkArgument(ifcExists, "Interface: %s does not exist, cannot configure ACLs", name);
+        InterfaceCheckUtil.checkInterface(writeContext, name);
+        final InstanceIdentifier<AclSets> aclSetIID = RWUtils.cutId(instanceIdentifier, Acl.class).child(AclSets.class);
+        AclUtil.checkAclExists(aclSetIID, config, writeContext);
 
-        final AclSets aclSets = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Acl.class).child(AclSets.class)).or(EMPTY_ACLS);
+        final Class<? extends ACLTYPE> aclType = config.getType();
+        checkArgument(aclType != null, "Missing acl type");
 
-        // Check acl exists
-        final List<AclSet> sets = aclSets.getAclSet() == null ? Collections.emptyList() : aclSets.getAclSet();
-        boolean aclSetExists = sets.stream()
-                .map(AclSet::getName)
-                .anyMatch(it -> it.equals(config.getSetName()));
-        checkArgument(aclSetExists, "Acl: %s does not exist, cannot configure ACLs", config.getSetName());
+        final String aclCommand =
+            f("%s access-group %s ingress", AclUtil.getStringType(aclType), config.getSetName());
 
         blockingWriteAndRead(cli, instanceIdentifier, config,
             f("interface %s", name),
-            f("ipv4 access-group %s ingress", config.getSetName()),
+            aclCommand,
             "exit");
     }
 
@@ -90,9 +82,15 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
             return;
         }
 
+        final Class<? extends ACLTYPE> aclType = config.getType();
+        checkArgument(aclType != null, "Missing acl type");
+
+        final String aclCommand =
+            f("no %s access-group %s ingress", AclUtil.getStringType(aclType), config.getSetName());
+
         blockingWriteAndRead(cli, instanceIdentifier, config,
             f("interface %s", name),
-            f("no ipv4 access-group %s ingress", config.getSetName()),
+            aclCommand,
             "exit");
     }
 }

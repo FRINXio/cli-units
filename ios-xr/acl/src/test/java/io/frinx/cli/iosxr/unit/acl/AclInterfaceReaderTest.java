@@ -52,7 +52,7 @@ public class AclInterfaceReaderTest {
             "!\n"+
             "interface GigabitEthernet0/0/0/1\n"+
             " shutdown\n"+
-            " ipv4 access-group bla ingress\n"+
+            " ipv6 access-group bla ingress\n"+
             "!\n";
 
     private static final String OUTPUT_INGRESS = "interface tunnel-te55\n"+

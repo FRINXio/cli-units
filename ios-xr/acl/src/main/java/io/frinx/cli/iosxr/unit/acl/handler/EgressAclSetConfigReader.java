@@ -18,28 +18,61 @@ package io.frinx.cli.iosxr.unit.acl.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
+import io.frinx.cli.iosxr.unit.acl.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
+import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
 public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+
+    private static final String SH_ACL_INTF = "do show running-config interface %s";
+    private static final Pattern ACL_LINE = Pattern.compile("(?<type>.+) access-group (?<name>.+) egress");
+    private final Cli cli;
+
+    public EgressAclSetConfigReader(final Cli cli) {
+        this.cli = cli;
+    }
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        configBuilder.setSetName(instanceIdentifier.firstKeyOf(EgressAclSet.class).getSetName());
-        configBuilder.setType(ACLIPV4.class);
+        final String name = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
+        InterfaceCheckUtil.checkInterface(readContext, name);
+
+        final String setName = instanceIdentifier.firstKeyOf(EgressAclSet.class).getSetName();
+
+        final String readCommand = f(SH_ACL_INTF, instanceIdentifier.firstKeyOf(Interface.class).getId().getValue());
+        final String readConfig = blockingRead(
+            readCommand,
+            cli,
+            instanceIdentifier,
+            readContext
+        );
+
+        parseAclConfig(readConfig, configBuilder, setName);
     }
 
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
         ((EgressAclSetBuilder) builder).setConfig(config);
+    }
+
+    private void parseAclConfig(final String output, final ConfigBuilder configBuilder, final String setName) {
+        configBuilder.setSetName(setName);
+
+        ParsingUtils.parseField(output, 0,
+            ACL_LINE::matcher,
+            matcher -> AclUtil.getType(matcher.group("type")),
+            configBuilder::setType);
     }
 }

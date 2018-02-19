@@ -20,12 +20,13 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.unit.acl.handler.util.InterfaceCheckUtil;
+import io.frinx.cli.iosxr.unit.acl.handler.util.NameTypeEntry;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetBuilder;
@@ -39,7 +40,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, IngressAclSetKey, IngressAclSetBuilder> {
 
     private static final String SH_ACL_INTF = "do show running-config interface %s";
-    private static final Pattern ACL_LINE = Pattern.compile("ipv4 access-group (?<name>.+) ingress");
+    private static final Pattern ACL_LINE = Pattern.compile("(?<type>.+) access-group (?<name>.+) ingress");
 
     private final Cli cli;
 
@@ -58,10 +59,10 @@ public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, I
     public static List<IngressAclSetKey> parseAclKeys(String output) {
         return ParsingUtils.parseFields(output, 0,
             ACL_LINE::matcher,
-            matcher -> matcher.group("name"),
-            v -> new IngressAclSetKey(v, ACLIPV4.class));
+            NameTypeEntry::fromMatcher,
+            nameTypeEntry -> new IngressAclSetKey(nameTypeEntry.getName(), nameTypeEntry.getType())
+        );
     }
-
 
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<IngressAclSet> list) {
@@ -70,7 +71,11 @@ public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, I
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<IngressAclSet> instanceIdentifier, @Nonnull IngressAclSetBuilder ingressAclSetBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        ingressAclSetBuilder.setSetName(instanceIdentifier.firstKeyOf(IngressAclSet.class).getSetName());
-        ingressAclSetBuilder.setType(ACLIPV4.class);
+        final String name = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
+        InterfaceCheckUtil.checkInterface(readContext, name);
+
+        final IngressAclSetKey key = instanceIdentifier.firstKeyOf(IngressAclSet.class);
+        ingressAclSetBuilder.setType(key.getType());
+        ingressAclSetBuilder.setSetName(key.getSetName());
     }
 }
