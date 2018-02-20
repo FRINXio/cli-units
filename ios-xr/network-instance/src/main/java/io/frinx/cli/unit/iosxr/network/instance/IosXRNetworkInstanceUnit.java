@@ -40,6 +40,8 @@ import io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding.Policy
 import io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolConfigReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
+import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolLocalAggregateConfigWriter;
+import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolLocalAggregateReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolStateReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
@@ -48,6 +50,9 @@ import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.Config2;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.LocalAggregatesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.Aggregate;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension.cisco.rev171109.NiPfIfCiscoAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ProtocolsBuilder;
@@ -111,6 +116,15 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
                 new GenericConfigListReader<>(IIDs.NE_NE_PO_IN_INTERFACE, new PolicyForwardingInterfaceReader(cli)));
         rRegistry.add(
                 new GenericConfigReader<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli)));
+
+
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, LocalAggregatesBuilder.class);
+        rRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(Aggregate.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class),
+                InstanceIdentifier.create(Aggregate.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class)
+                        .augmentation(Config2.class)),
+                new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new ProtocolLocalAggregateReader(cli)));
     }
 
     private void provideWriters(@Nonnull ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
@@ -124,7 +138,10 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
 
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)));
-
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new NoopCliListWriter<>()));
+        wRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class)
+                .augmentation(Config2.class)),new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new ProtocolLocalAggregateConfigWriter(cli)));
         // PF
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PO_IN_INTERFACE, new NoopCliListWriter<>()));
         wRegistry.subtreeAddAfter(Sets.newHashSet(PF_IFC_CFG_ROOT_ID.augmentation(NiPfIfCiscoAug.class)),
@@ -137,7 +154,8 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
         return Sets.newHashSet(
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension.cisco.rev171109.$YangModuleInfoImpl.getInstance());
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension.cisco.rev171109.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.$YangModuleInfoImpl.getInstance());
     }
 
     @Override

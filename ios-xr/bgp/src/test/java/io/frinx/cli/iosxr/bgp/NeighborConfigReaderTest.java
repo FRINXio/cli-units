@@ -16,7 +16,7 @@
 
 package io.frinx.cli.iosxr.bgp;
 
-import io.frinx.cli.iosxr.bgp.handler.NeighborConfigReader;
+import io.frinx.cli.iosxr.bgp.handler.neighbor.NeighborConfigReader;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder;
@@ -32,7 +32,14 @@ public class NeighborConfigReaderTest {
             "  shutdown\n" +
             " neighbor 8.8.8.8\n" +
             "  remote-as 65000\n" +
-            "  use neighbor-group nbrgroup1";
+            "  use neighbor-group nbrgroup1" +
+            " neighbor 7.7.7.7\n" +
+            "  remote-as 65000\n" +
+            "  use neighbor-group nbrgroup1" +
+            "  description test" +
+            "  password encrypted GCHKNJDJSADNKLSAND" +
+            "  send-community-ebgp" +
+            "  remove-private-AS";
 
     @Test
     public void test() {
@@ -53,5 +60,15 @@ public class NeighborConfigReaderTest {
         Assert.assertEquals(5000, builder.getPeerAs().getValue().intValue());
         Assert.assertFalse(builder.isEnabled());
         Assert.assertNull(builder.getPeerGroup());
+
+        builder = new ConfigBuilder();
+        NeighborConfigReader.readNeighbor(OUTPUT, builder, "7.7.7.7");
+        Assert.assertEquals(65000, builder.getPeerAs().getValue().intValue());
+        Assert.assertTrue(builder.isEnabled());
+        Assert.assertEquals("nbrgroup1", builder.getPeerGroup());
+        Assert.assertEquals("test", builder.getDescription());
+        Assert.assertEquals("GCHKNJDJSADNKLSAND", builder.getAuthPassword().getValue());
+        Assert.assertNotNull(builder.getSendCommunity());
+        Assert.assertNotNull(builder.getRemovePrivateAs());
     }
 }

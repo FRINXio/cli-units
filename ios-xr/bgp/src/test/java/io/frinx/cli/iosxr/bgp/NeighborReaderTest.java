@@ -17,7 +17,7 @@
 package io.frinx.cli.iosxr.bgp;
 
 import com.google.common.collect.Lists;
-import io.frinx.cli.iosxr.bgp.handler.NeighborReader;
+import io.frinx.cli.iosxr.bgp.handler.neighbor.NeighborReader;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;

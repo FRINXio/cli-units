@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.iosxr.bgp.handler;
+package io.frinx.cli.iosxr.bgp.handler.neighbor;
 
 import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
 
@@ -32,7 +32,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.CommunityType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.PRIVATEASREMOVEALL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.RoutingPassword;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
 import org.opendaylight.yangtools.concepts.Builder;
@@ -45,10 +48,14 @@ import java.util.regex.Pattern;
 public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
 
-    private static final String SH_NEI = "do show running-config router bgp %s %s | utility egrep \"^ neighbor |^  remote-as|^  use neighbor-group|^  shutdown\"";
-    private static final Pattern SHUTDOWN_LINE = Pattern.compile(".*shutdown.*");
+    private static final String SH_NEI = "do show running-config router bgp %s %s neighbor %s";
     private static final Pattern REMOTE_AS_LINE = Pattern.compile(".*remote-as (?<remoteAs>\\S+).*");
     private static final Pattern NEIGHBOR_LINE = Pattern.compile(".*use neighbor-group (?<group>\\S+).*");
+    private static final Pattern PASSWORD_LINE = Pattern.compile(".*password encrypted (?<password>\\S+).*");
+    private static final Pattern SHUTDOWN_LINE = Pattern.compile(".*shutdown.*");
+    private static final Pattern DESCRIPTION_LINE = Pattern.compile(".*description (?<description>\\S+).*");
+    private static final Pattern SEND_COMMUNITY_LINE = Pattern.compile(".*send-community-ebgp.*");
+    private static final Pattern REMOVE_AS_LINE = Pattern.compile(".*remove-private-AS.*");
 
     private Cli cli;
 
@@ -77,11 +84,11 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
         IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress();
         configBuilder.setNeighborAddress(neighborIp);
 
-        String address = neighborIp.getIpv4Address().getValue();
+        String address = new String(neighborIp.getValue());
         String insName = instanceIdentifier.firstKeyOf(Protocol.class).getName().equals(NetworInstance.DEFAULT_NETWORK_NAME) ?
                 "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class).getName();
 
-        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs().getValue().intValue(), insName), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs().getValue().intValue(), insName, address), cli, instanceIdentifier, readContext);
 
         readNeighbor(output, configBuilder, address);
     }
@@ -105,6 +112,26 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
 
         // use neighbor-group iBGP
         ParsingUtils.parseField(neighbor, NEIGHBOR_LINE::matcher, matcher -> matcher.group("group"), configBuilder::setPeerGroup);
+
+        // password
+        ParsingUtils.parseField(output, PASSWORD_LINE::matcher,
+                matcher -> matcher.group("password"),
+                password -> configBuilder.setAuthPassword(new RoutingPassword(password)));
+
+        // description
+        ParsingUtils.parseField(output, DESCRIPTION_LINE::matcher,
+                matcher -> matcher.group("description"),
+                password -> configBuilder.setDescription(password));
+
+        // send-community-ebgp
+        ParsingUtils.parseField(output, SEND_COMMUNITY_LINE::matcher,
+                matcher -> matcher.matches(),
+                matches -> configBuilder.setSendCommunity(matches ? CommunityType.BOTH : null));
+
+        // remove-private-AS
+        ParsingUtils.parseField(output, REMOVE_AS_LINE::matcher,
+                matcher -> matcher.matches(),
+                matches -> configBuilder.setRemovePrivateAs(matches ? PRIVATEASREMOVEALL.class : null));
     }
 
     private static String realignOutput(String output) {

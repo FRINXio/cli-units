@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.iosxr.bgp.handler;
+package io.frinx.cli.iosxr.bgp.handler.neighbor;
 
 import static io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader.DEFAULT_BGP_INSTANCE;
 

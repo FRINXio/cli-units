@@ -37,27 +37,32 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
-        final String protName = id.firstKeyOf(Protocol.class).getName();
-        String name = (protName.equals(NetworInstance.DEFAULT_NETWORK_NAME)) ? "" : " instance " + protName;
+        final String instName = getProtoInstanceName(id);
         blockingWriteAndRead(cli, id, data,
-                f("router bgp %s %s", data.getAs().getValue(), name),
+                f("router bgp %s %s", data.getAs().getValue(), instName),
+                data.getRouterId() != null ? f("bgp router-id %s", data.getRouterId().getValue()) : "no bgp router-id",
                 "exit");
     }
 
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) {
+                                               WriteContext writeContext) throws WriteFailedException {
         final String protName = id.firstKeyOf(Protocol.class).getName();
         Preconditions.checkArgument(dataBefore.getAs().equals(dataAfter.getAs()),
                 "Cannot update AS number. Only one BGP instance in instance '{}' is allowed.", protName);
+        writeCurrentAttributesForType(id, dataAfter, writeContext);
     }
 
     @Override
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
-        final String protName = id.firstKeyOf(Protocol.class).getName();
-        String name = (protName.equals(NetworInstance.DEFAULT_NETWORK_NAME)) ? "" : " instance " + protName;
+        final String instName = getProtoInstanceName(id);
         blockingDeleteAndRead(cli, id,
-                f("no router bgp %s %s",  data.getAs().getValue(), name));
+                f("no router bgp %s %s",  data.getAs().getValue(), instName));
+    }
+
+    public static String getProtoInstanceName(InstanceIdentifier<?> id) {
+        return NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
+                "instance " + id.firstKeyOf(Protocol.class).getName();
     }
 }

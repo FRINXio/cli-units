@@ -22,7 +22,7 @@ import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.bgp.handler.NeighborConfigWriter;
+import io.frinx.cli.iosxr.bgp.handler.neighbor.NeighborConfigWriter;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,6 +31,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.AfiSafis;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
@@ -58,6 +59,8 @@ public class NeighborConfigWriterTest {
     private static final String WRITE_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "remote-as 65500\n" +
+            "no password\n" +
+            "no description\n" +
             "no shutdown\n" +
             "use neighbor-group ibgp\n" +
             "exit\n" +
@@ -66,6 +69,8 @@ public class NeighborConfigWriterTest {
     private static final String UPDATE_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "remote-as 65501\n" +
+            "no password\n" +
+            "no description\n" +
             "shutdown\n" +
             "use neighbor-group ebgp\n" +
             "exit\n" +
@@ -74,6 +79,8 @@ public class NeighborConfigWriterTest {
     private static final String UPDATE_CLEAN_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "no remote-as\n" +
+            "no password\n" +
+            "no description\n" +
             "shutdown\n" +
             "no use neighbor-group\n" +
             "exit\n" +
@@ -127,7 +134,7 @@ public class NeighborConfigWriterTest {
                 new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder()
                         .setType(L3VRF.class).build();
 
-        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(c)).thenReturn(Optional.of(b));
+        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(c)).thenReturn(Optional.of(b)).thenReturn(Optional.absent());
         Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(c)).thenReturn(Optional.of(b));
     }
 
@@ -170,6 +177,10 @@ public class NeighborConfigWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
+        Bgp b = new BgpBuilder().setGlobal(new GlobalBuilder()
+                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder()
+                        .setAs(new AsNumber(65505L)).build()).build()).build();
+        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(b));
         this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());

@@ -40,7 +40,7 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
         CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
 
-    static final String DEFAULT_BGP_INSTANCE = "default";
+    public static final String DEFAULT_BGP_INSTANCE = "default";
 
     private static final String SHOW_RUN_ROUTER_BGP = "do show running-config router bgp | include ^router bgp";
     private static final Pattern INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9.]+) instance (?<instance>[\\S]+)");

@@ -32,14 +32,16 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.GlobalBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.yang.rev170403.DottedQuad;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_RUN_BGP = "do show running-config router bgp | include ^router bgp";
+    private static final String SH_RUN_BGP = "do show running-config router bgp";
     private static final Pattern CONFIG_LINE = Pattern.compile(".*router bgp (?<as>\\S+).*");
+    private static final Pattern ROUTER_ID_LINE = Pattern.compile(".*bgp router-id (?<id>\\S+).*");
 
     private Cli cli;
 
@@ -63,8 +65,10 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
         if (DEFAULT_BGP_INSTANCE.equals(name)) {
             parseDefaultAs(output, configBuilder);
         } else {
-            parseAs(blockingRead(SH_RUN_BGP, cli, instanceIdentifier, readContext), name, configBuilder);
+            parseAs(output, name, configBuilder);
         }
+
+        parseRouterId(output, configBuilder);
     }
 
     @VisibleForTesting
@@ -93,5 +97,16 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
                 .map(AsNumber::new)
                 .findFirst()
                 .ifPresent(cBuilder::setAs);
+    }
+
+    public static void parseRouterId(String output, ConfigBuilder configBuilder) {
+        NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .map(ROUTER_ID_LINE::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("id"))
+                .map(DottedQuad::new)
+                .findFirst()
+                .ifPresent(configBuilder::setRouterId);
     }
 }
