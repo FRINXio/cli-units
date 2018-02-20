@@ -8,13 +8,13 @@
 
 package io.frinx.cli.handlers.bgp;
 
-import io.frinx.cli.registry.common.TypedWriter;
+import io.frinx.cli.handlers.network.instance.L3VrfWriter;
 import io.frinx.cli.unit.utils.CliWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 
-public interface BgpWriter<O extends DataObject> extends TypedWriter<O>, CliWriter<O> {
+public interface BgpWriter<O extends DataObject> extends L3VrfWriter<O>, CliWriter<O> {
 
     @Override
     default Identifier<? extends DataObject> getKey() {
