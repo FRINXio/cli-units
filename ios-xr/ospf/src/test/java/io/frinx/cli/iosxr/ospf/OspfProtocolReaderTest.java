@@ -6,10 +6,11 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package io.frinx.cli.iosxr.ospf.handler;
+package io.frinx.cli.iosxr.ospf;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.handlers.ospf.OspfReader;
+import io.frinx.cli.iosxr.ospf.handler.OspfProtocolReader;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;

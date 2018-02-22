@@ -14,10 +14,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
-import java.util.List;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension.cisco.rev171109.NiPfIfCiscoAug;
@@ -65,12 +62,13 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
                 "exit");
     }
 
-    private static List<String> parsePolicies(String policies) {
-        return ParsingUtils.NEWLINE.splitAsStream(policies)
-                .map(String::trim)
-                .map(policyLine -> policyLine.split(" ")[1])
-                .map(String::trim)
-                .collect(Collectors.toList());
+    @Override
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        // You cannot 'modify' the policy on router. Router error:
+        // !!% The service policy under consideration can't be modified: A service policy already exists. Modification is not allowed
+        // therefore issue a delete first anyway
+        deleteCurrentAttributes(id, dataBefore, writeContext);
+        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override

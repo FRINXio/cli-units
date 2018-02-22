@@ -36,13 +36,15 @@ public class MaxMetricConfigWriter implements OspfWriter<Config> {
         }
         final String timeout = (data.getTimeout() != null) ? "on-startup " + data.getTimeout() : "";
         final StringBuilder builder = new StringBuilder();
-        for (Class<? extends MAXMETRICINCLUDE> include : data.getInclude()) {
-            builder.append(parseIncludes(include));
+        if (data.getInclude() != null) {
+            for (Class<? extends MAXMETRICINCLUDE> include : data.getInclude()) {
+                builder.append(parseIncludes(include));
+            }
         }
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
-                f("max-metric router-lsa %s %s", timeout, builder.toString()),
-                "exit");
+            f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
+            f("max-metric router-lsa %s %s", timeout, builder.toString()),
+            "exit");
     }
 
     private String parseIncludes(Class<? extends MAXMETRICINCLUDE> include) {
@@ -67,12 +69,14 @@ public class MaxMetricConfigWriter implements OspfWriter<Config> {
                                                WriteContext writeContext) throws WriteFailedException {
         final String timeout = (data.getTimeout() != null) ? "on-startup " + data.getTimeout() : "";
         final StringBuilder builder = new StringBuilder();
-        for (Class<? extends MAXMETRICINCLUDE> include : data.getInclude()) {
-            builder.append(parseIncludes(include));
+        if (data.getInclude() != null) {
+            for (Class<? extends MAXMETRICINCLUDE> include : data.getInclude()) {
+                builder.append(parseIncludes(include));
+            }
         }
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
-                f("no max-metric router-lsa %s %s", timeout, builder.toString()),
-                "exit");
+            f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
+            f("no max-metric router-lsa %s %s", timeout, builder.toString()),
+            "exit");
     }
 }

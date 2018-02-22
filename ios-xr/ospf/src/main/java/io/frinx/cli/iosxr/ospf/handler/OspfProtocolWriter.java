@@ -36,8 +36,7 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
-        deleteCurrentAttributes(id, dataBefore, writeContext);
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+        // NOOP
     }
 
     @Override

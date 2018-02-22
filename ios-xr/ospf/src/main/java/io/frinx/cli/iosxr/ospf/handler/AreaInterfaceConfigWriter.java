@@ -41,16 +41,15 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                 f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
-                f("cost %s", data.getMetric().getValue()),
+                data.getMetric() != null ? f("cost %s", data.getMetric().getValue()) : "no cost",
                 "exit",
                 "exit",
                 "exit");
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter, WriteContext writeContext) throws WriteFailedException {
-        deleteCurrentAttributesForType(id, dataBefore, writeContext);
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+    public void updateCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config dataBefore, Config dataAfter, WriteContext writeContext) throws WriteFailedException {
+        writeCurrentAttributesForType(instanceIdentifier, dataAfter, writeContext);
     }
 
     @Override

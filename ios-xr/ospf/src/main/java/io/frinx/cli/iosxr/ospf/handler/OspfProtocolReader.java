@@ -57,7 +57,7 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
     }
 
     @VisibleForTesting
-    static List<ProtocolKey> parseOspfIds(String output) {
+    public static List<ProtocolKey> parseOspfIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 ROUTER_OSPF_LINE::matcher,
                 matcher -> matcher.group("ospfName"),

@@ -42,6 +42,13 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter,
+                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+        deleteCurrentAttributes(id, dataBefore, writeContext);
+        writeCurrentAttributes(id, dataAfter, writeContext);
+    }
+
+    @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = instanceIdentifier.firstKeyOf(Interface.class).getInterfaceId().getValue();
         blockingWriteAndRead(cli, instanceIdentifier, config,
