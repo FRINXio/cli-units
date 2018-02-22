@@ -39,9 +39,9 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
         blockingWriteAndRead(cli, id, data,
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("neighbor %s", id.firstKeyOf(Neighbor.class).getNeighborAddress().getIpv4Address().getValue()),
-                f("remote-as %s", data.getPeerAs().getValue()),
-                data.isEnabled() ? "no shutdown" : "shutdown",
-                data.getPeerGroup() != null ? f("use neighbor-group %s", data.getPeerGroup()) : "",
+                data.getPeerAs() != null ? f("remote-as %s", data.getPeerAs().getValue()) : "no remote-as",
+                data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
+                data.getPeerGroup() != null ? f("use neighbor-group %s", data.getPeerGroup()) : "no use neighbor-group",
                 "exit",
                 "exit");
     }
@@ -49,18 +49,7 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
-        final Global g = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get().getGlobal();
-        final String instName =
-                NetworInstance.DEFAULT_NETWORK_NAME.equals(id.firstKeyOf(Protocol.class).getName()) ? "" :
-                        "instance " + id.firstKeyOf(Protocol.class).getName();
-        blockingWriteAndRead(cli, id, dataAfter,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("neighbor %s", id.firstKeyOf(Neighbor.class).getNeighborAddress().getIpv4Address().getValue()),
-                f("remote-as %s", dataAfter.getPeerAs().getValue()),
-                dataAfter.isEnabled() ? "no shutdown" : "shutdown",
-                dataAfter.getPeerGroup() != null ? f("use neighbor-group %s", dataAfter.getPeerGroup()) : "",
-                "exit",
-                "exit");
+        writeCurrentAttributesForType(id, dataAfter, writeContext);
     }
 
     @Override

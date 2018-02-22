@@ -61,6 +61,14 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
     }
 
     @Override
+    public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id,
+                                        @Nonnull final Config dataBefore,
+                                        @Nonnull final Config dataAfter,
+                                        @Nonnull final WriteContext writeContext) throws WriteFailedException {
+        writeCurrentAttributes(id, dataAfter, writeContext);
+    }
+
+    @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
 

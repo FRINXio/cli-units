@@ -8,6 +8,7 @@
 
 package io.frinx.cli.iosxr.bgp.handler;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.bgp.BgpWriter;
@@ -37,9 +38,10 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
 
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
-        deleteCurrentAttributesForType(id, dataBefore, writeContext);
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+                                               WriteContext writeContext) {
+        final String protName = id.firstKeyOf(Protocol.class).getName();
+        Preconditions.checkArgument(dataBefore.getAs().equals(dataAfter.getAs()),
+                "Cannot update AS number. Only one BGP instance in instance '{}' is allowed.", protName);
     }
 
     @Override
