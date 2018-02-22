@@ -37,6 +37,14 @@ public class TeInterfaceConfigWriter  implements CliWriter<Config> {
     }
 
     @Override
+    public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id,
+                                        @Nonnull final Config dataBefore,
+                                        @Nonnull final Config dataAfter,
+                                        @Nonnull final WriteContext writeContext) {
+        // NOOP
+    }
+
+    @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
         blockingWriteAndRead(cli, id, data,

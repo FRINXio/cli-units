@@ -49,6 +49,15 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
             "exit");
     }
 
+    @Override
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull NiMplsRsvpIfSubscripAug dataBefore, @Nonnull NiMplsRsvpIfSubscripAug dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (dataAfter.getBandwidth() == null) {
+            deleteCurrentAttributes(id, dataBefore, writeContext);
+        } else {
+            writeCurrentAttributes(id, dataAfter, writeContext);
+        }
+    }
+
     private String resolveBandwidth(MplsRsvpSubscriptionConfig.Bandwidth b) {
         if (NiMplsRsvpIfSubscripAugReader.DEFAULT.equals(b.getString())) {
             return "bandwidth";

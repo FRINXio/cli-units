@@ -37,7 +37,7 @@ public class TunnelConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
             f("interface tunnel-te %s", name),
             (data.isShortcutEligible()) ? "autoroute announce" : "no autoroute announce",
-            (data.getMetric() != null && LSPMETRICABSOLUTE.class.equals(data.getMetricType())) ? f("metric absolute %s", data.getMetric()) : "",
+            (data.getMetric() != null && LSPMETRICABSOLUTE.class.equals(data.getMetricType())) ? f("metric absolute %s", data.getMetric()) : "no metric absolute",
             "exit");
     }
 
@@ -58,7 +58,6 @@ public class TunnelConfigWriter implements CliWriter<Config> {
                                         @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        this.deleteCurrentAttributes(id, dataBefore, writeContext);
         this.writeCurrentAttributes(id, dataAfter, writeContext);
     }
 

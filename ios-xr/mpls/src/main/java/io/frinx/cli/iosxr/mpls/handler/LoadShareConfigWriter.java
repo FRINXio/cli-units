@@ -43,8 +43,11 @@ public class LoadShareConfigWriter implements CliWriter<Config> {
                                         @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        this.deleteCurrentAttributes(id, dataBefore, writeContext);
-        this.writeCurrentAttributes(id, dataAfter, writeContext);
+        if (dataAfter.getLoadShare() == null) {
+            this.deleteCurrentAttributes(id, dataBefore, writeContext);
+        } else {
+            this.writeCurrentAttributes(id, dataAfter, writeContext);
+        }
     }
 
 

@@ -39,6 +39,15 @@ public class P2pAttributesConfigWriter implements CliWriter<Config> {
     }
 
     @Override
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (dataAfter.getDestination() == null) {
+            deleteCurrentAttributes(id, dataBefore, writeContext);
+        } else {
+            writeCurrentAttributes(id, dataAfter, writeContext);
+        }
+    }
+
+    @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class).getName();
         blockingWriteAndRead(cli, id, data,
