@@ -52,8 +52,11 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        deleteCurrentAttributes(id, dataBefore, writeContext);
-        writeCurrentAttributes(id, dataAfter, writeContext);
+        if (dataAfter.getVlanId() == null) {
+            deleteCurrentAttributes(id, dataBefore, writeContext);
+        } else {
+            writeCurrentAttributes(id, dataAfter, writeContext);
+        }
     }
 
     private static final String DELETE_TEMPLATE =

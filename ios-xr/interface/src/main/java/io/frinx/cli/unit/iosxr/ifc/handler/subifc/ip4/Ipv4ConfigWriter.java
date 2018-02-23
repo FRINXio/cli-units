@@ -8,6 +8,9 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
+
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -18,8 +21,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
 
 public class Ipv4ConfigWriter implements CliWriter<Config> {
 
@@ -71,8 +72,11 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config after,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         try {
-            deleteCurrentAttributes(instanceIdentifier, before, writeContext);
-            writeCurrentAttributes(instanceIdentifier, after, writeContext);
+            if (after.getIp() == null) {
+                deleteCurrentAttributes(instanceIdentifier, before, writeContext);
+            } else {
+                writeCurrentAttributes(instanceIdentifier, after, writeContext);
+            }
         } catch (WriteFailedException e) {
             throw new WriteFailedException.UpdateFailedException(instanceIdentifier, before, after, e);
         }

@@ -27,7 +27,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev17050
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-// TODO support update?
 public class EthernetConfigWriter implements CliWriter<Config> {
 
     private static final String BUNDLE_ID_COMMAND_TEMPLATE = "bundle id %s";
@@ -91,6 +90,14 @@ public class EthernetConfigWriter implements CliWriter<Config> {
                 "aggregate-id %s should reference LAG interface", aggregateIfcName);
 
         return aggregateIfcNameMatcher.group("id");
+    }
+
+    @Override
+    public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id,
+                                        @Nonnull final Config dataBefore,
+                                        @Nonnull final Config dataAfter,
+                                        @Nonnull final WriteContext writeContext) throws WriteFailedException {
+        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override

@@ -45,9 +45,11 @@ public class HoldTimeConfigWriter implements CliWriter<Config> {
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
-
-        deleteCurrentAttributes(id, dataBefore, writeContext);
-        writeCurrentAttributes(id, dataAfter, writeContext);
+        if (dataAfter.getDown() == null && dataAfter.getUp() == null) {
+            deleteCurrentAttributes(id, dataBefore, writeContext);
+        } else {
+            writeCurrentAttributes(id, dataAfter, writeContext);
+        }
     }
 
     @Override
