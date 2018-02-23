@@ -8,13 +8,15 @@
 
 package io.frinx.cli.iosxr.bgp.handler;
 
+import static io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader.DEFAULT_BGP_INSTANCE;
+import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config;
@@ -22,17 +24,14 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.GlobalBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.yang.rev170403.DottedQuad;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-
-    private static final String SH_BGP= "do sh bgp %s summary";
-    private static final String SH_BGP_INSTANCE = "do show bgp instances | include %s";
-    private static final Pattern CONFIG_LINE = Pattern.compile("BGP router identifier (?<id>.+), local AS number (?<as>.+)");
+    private static final String SH_RUN_BGP = "do show running-config router bgp | include ^router bgp";
+    private static final Pattern CONFIG_LINE = Pattern.compile(".*router bgp (?<as>\\S+).*");
 
     private Cli cli;
 
@@ -49,26 +48,42 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String name = instanceIdentifier.firstKeyOf(Protocol.class).getName().toString();
-        // if the instance of bgp is not running, it does not return router ID nor AS
-        parseRouterId(blockingRead(String.format(SH_BGP, (NetworInstance.DEFAULT_NETWORK_NAME.equals(name)) ? "" : "instance " + name),
-                cli, instanceIdentifier, readContext), configBuilder);
-        parseAs(blockingRead(String.format(SH_BGP_INSTANCE, name), cli, instanceIdentifier, readContext), configBuilder);
+        final String name = instanceIdentifier.firstKeyOf(Protocol.class).getName();
+
+        String output = blockingRead(SH_RUN_BGP, cli, instanceIdentifier, readContext);
+
+        if (DEFAULT_BGP_INSTANCE.equals(name)) {
+            parseDefaultAs(output, configBuilder);
+        } else {
+            parseAs(blockingRead(SH_RUN_BGP, cli, instanceIdentifier, readContext), name, configBuilder);
+        }
     }
 
     @VisibleForTesting
-    public static void parseRouterId(String output, ConfigBuilder cBuilder) {
-        ParsingUtils.parseField(output, 0,
-            CONFIG_LINE::matcher,
-            matcher -> matcher.group("id"),
-            value -> cBuilder.setRouterId(new DottedQuad(value)));
+    public static void parseDefaultAs(String output, ConfigBuilder configBuilder) {
+        NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .filter(defBgp -> !defBgp.contains("instance"))
+                .map(CONFIG_LINE::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("as"))
+                .map(Long::valueOf)
+                .map(AsNumber::new)
+                .findFirst()
+                .ifPresent(configBuilder::setAs);
     }
 
     @VisibleForTesting
-    public static void parseAs(String output, ConfigBuilder cBuilder) {
-        ParsingUtils.parseField(output.replaceAll("\\h+", " "),
-            BgpProtocolReader.INSTANCE_LINE::matcher,
-            matcher -> matcher.group("as"),
-            value -> cBuilder.setAs(new AsNumber(Long.valueOf(value))));
+    public static void parseAs(String output, String name, ConfigBuilder cBuilder) {
+        NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .filter(bgp -> bgp.contains(String.format("instance %s", name)))
+                .map(CONFIG_LINE::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("as"))
+                .map(Long::valueOf)
+                .map(AsNumber::new)
+                .findFirst()
+                .ifPresent(cBuilder::setAs);
     }
 }

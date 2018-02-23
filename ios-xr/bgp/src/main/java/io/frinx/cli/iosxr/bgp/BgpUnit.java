@@ -12,12 +12,15 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.bgp.handler.*;
+import io.frinx.cli.iosxr.bgp.handler.GlobalConfigReader;
+import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.iosxr.bgp.handler.NeighborConfigReader;
+import io.frinx.cli.iosxr.bgp.handler.NeighborConfigWriter;
+import io.frinx.cli.iosxr.bgp.handler.NeighborReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
@@ -26,16 +29,11 @@ import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.afi.safi.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.afi.safi.StateBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.AfiSafisBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.BgpBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.GlobalBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.NeighborsBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class BgpUnit implements TranslateUnit {
@@ -95,9 +93,6 @@ public class BgpUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NEIGHBORS, NeighborsBuilder.class);
         rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader(cli)));
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS, AfiSafisBuilder.class);
-        rRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(AfiSafi.class).child(Config.class)),
-                new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, new AfiSafiReader(cli)));
     }
 
     @Override
