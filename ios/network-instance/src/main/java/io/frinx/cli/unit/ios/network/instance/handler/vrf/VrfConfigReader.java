@@ -8,8 +8,10 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 
+import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
 import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -27,8 +29,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         CompositeReader.Child<Config, ConfigBuilder> {
 
-    private static final String SH_IP_VRF_CFG = "sh run vrf %s";
-    static final Pattern RD_LINE = Pattern.compile("\\s*rd (?<rd>([\\S]+):([\\S]+)).*");
+    private static final String SH_IP_VRF_CFG = "show running-config | include ^ip vrf|^ rd";
+    private static final Pattern RD_LINE = Pattern.compile(".*rd (?<rd>(\\S+):(\\S+)).*");
     private Cli cli;
 
     public VrfConfigReader(Cli cli) {
@@ -41,14 +43,25 @@ public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         if (isVrf(instanceIdentifier, readContext)) {
             String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-            parseVrfConfig(blockingRead(String.format(SH_IP_VRF_CFG, name), cli, instanceIdentifier, readContext), configBuilder, name);
+            parseVrfConfig(blockingRead(SH_IP_VRF_CFG, cli, instanceIdentifier, readContext),
+                    configBuilder, name);
         }
     }
 
-    private void parseVrfConfig(String output, ConfigBuilder builder, String vrf) {
+    @VisibleForTesting
+    static void parseVrfConfig(String output, ConfigBuilder builder, String vrf) {
+        String realignedOutput = realignOutput(output);
+
+        String config = NEWLINE.splitAsStream(realignedOutput)
+                .filter(vrfConfigLine -> vrfConfigLine.contains(String.format("ip vrf %s ", vrf)))
+                .findAny()
+                .orElseThrow(() ->
+                        new IllegalArgumentException(String.format("Vrf %s not present in config %s", vrf, output)));
+
         builder.setName(vrf);
         builder.setType(L3VRF.class);
-        parseField(output,
+
+        parseField(config,
             RD_LINE::matcher,
             matcher -> matcher.group("rd"),
             rd -> builder.setRouteDistinguisher(new RouteDistinguisher(rd)));
@@ -58,5 +71,15 @@ public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
 
     private boolean isVrf(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {
         return VrfReader.getAllIds(id, readContext, cli, this).contains(id.firstKeyOf(NetworkInstance.class));
+    }
+
+    private static String realignOutput(String output) {
+        String withoutNewlines = output.replaceAll("[\r\n]", "");
+        // We want to see the output in the form
+        // " \nip vrf VRF  rd RD ip vrf VRF_WITHOUT_RD \nip vrf ANOTHER_VRF  rd RD \nip vrf ANOTHER_VRF_WITHOUT_RD ".
+        // Note the space after each vrf name. That way we can distinguish VRFs
+        // with names that are prefixes of name of some another VRFs in the
+        // following processing of the config.
+        return withoutNewlines.replaceAll("$", " ").replaceAll("ip vrf ", " \nip vrf ");
     }
 }
