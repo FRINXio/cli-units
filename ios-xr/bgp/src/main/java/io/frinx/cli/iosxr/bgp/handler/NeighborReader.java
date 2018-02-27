@@ -27,7 +27,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.NeighborsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Address;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -85,6 +84,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
         return ParsingUtils.parseFields(output, 0,
                 NEIGHBOR_LINE::matcher,
                 matcher -> matcher.group("neighborIp"),
-                value -> new NeighborKey(new IpAddress(new Ipv4Address(value.trim()))));
+                // TODO Do not use IpAddress(char[] _value) constructor
+                value -> new NeighborKey(new IpAddress(value.trim().toCharArray())));
     }
 }
