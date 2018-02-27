@@ -8,15 +8,22 @@
 
 package io.frinx.cli.iosxr.bgp.handler;
 
+import static io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader.DEFAULT_BGP_INSTANCE;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.Collections;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.NeighborsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
@@ -31,8 +38,8 @@ import java.util.regex.Pattern;
 
 public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
-    private static final String SH_NEI = "do show bgp instance %s neighbor nsr";
-    private static final Pattern NEIGHBOR_LINE = Pattern.compile("BGP neighbor is (?<neighborIp>.+)");
+    private static final String SH_NEI = "do show running-config router bgp %s %s | include ^ neighbor";
+    private static final Pattern NEIGHBOR_LINE = Pattern.compile("neighbor (?<neighborIp>.+)");
 
     private Cli cli;
 
@@ -46,9 +53,26 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
     }
 
     @Override
-    public List<NeighborKey> getAllIdsForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<NeighborKey> getAllIdsForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
+                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         final String protName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        return getNeighborKeys(blockingRead(String.format(SH_NEI, protName), cli, instanceIdentifier, readContext));
+        final String instance = DEFAULT_BGP_INSTANCE.equals(protName) ? "" : String.format("instance %s", protName);
+
+        // TODO Same as in NeighborConfigReader
+        final Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
+                .child(Global.class)
+                .child(Config.class))
+                .orNull();
+
+        if (globalConfig == null || globalConfig.getAs() == null) {
+            // TODO Should we fail instead??
+            return Collections.emptyList();
+        }
+
+        Long as = globalConfig.getAs().getValue();
+
+        return getNeighborKeys(blockingRead(String.format(SH_NEI, as.intValue(), instance),
+                cli, instanceIdentifier, readContext));
     }
 
     @Override

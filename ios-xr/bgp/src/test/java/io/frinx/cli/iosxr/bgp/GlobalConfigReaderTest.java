@@ -15,13 +15,23 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 
 public class GlobalConfigReaderTest {
 
-    private final String output = "Fri Nov 24 13:51:29.234 UTC\n" +
-            "1   bgp2_1      default             2525      0       none";
+    private final String output = "Thu Feb 22 22:59:47.601 UTC\n" +
+            "router bgp 1 instance inst\n" +
+            "router bgp 65505 instance test\n" +
+            "router bgp 1";
 
     @Test
     public void testGlobal() {
         ConfigBuilder builder = new ConfigBuilder();
-        GlobalConfigReader.parseAs(output, builder);
-        Assert.assertEquals(Long.valueOf(2525), builder.getAs().getValue());
+        GlobalConfigReader.parseAs(output, "inst", builder);
+        Assert.assertEquals(Long.valueOf(1), builder.getAs().getValue());
+
+        builder = new ConfigBuilder();
+        GlobalConfigReader.parseDefaultAs(output,  builder);
+        Assert.assertEquals(Long.valueOf(1), builder.getAs().getValue());
+
+        builder = new ConfigBuilder();
+        GlobalConfigReader.parseAs(output, "test", builder);
+        Assert.assertEquals(Long.valueOf(65505), builder.getAs().getValue());
     }
 }
