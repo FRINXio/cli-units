@@ -52,10 +52,11 @@ public class ComponentStateReader implements CliOperReader<State, StateBuilder> 
 
         stateBuilder.setName(name);
         stateBuilder.setId(name);
+
         ParsingUtils.parseField(cardLine, 0,
                 LINE::matcher,
                 m -> m.group("type"),
-                stateBuilder::setDescription);
+                desc -> stateBuilder.setDescription(desc.trim()));
 
         ParsingUtils.parseField(cardLine, 0,
                 LINE::matcher,
