@@ -133,4 +133,15 @@ public class EthernetConfigWriterTest {
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue());
     }
+
+    @Test
+    public void updateEmptyConfig() throws WriteFailedException {
+        // This simulates CCASP-172 issue, where we update get empty config
+        Config newData = new ConfigBuilder()
+                .build();
+
+        this.writer.updateCurrentAttributes(iid, data, newData, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue());
+    }
 }

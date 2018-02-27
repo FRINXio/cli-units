@@ -97,7 +97,15 @@ public class EthernetConfigWriter implements CliWriter<Config> {
                                         @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributes(id, dataAfter, writeContext);
+        Config1 aggregationAug = dataAfter.getAugmentation(Config1.class);
+        LacpEthConfigAug lacpAug = dataAfter.getAugmentation(LacpEthConfigAug.class);
+
+        if (aggregationAug == null && lacpAug == null) {
+            // TODO Probably not needed after CCASP-172 is fixed
+            deleteCurrentAttributes(id, dataBefore, writeContext);
+        } else {
+            writeCurrentAttributes(id, dataAfter, writeContext);
+        }
     }
 
     @Override
