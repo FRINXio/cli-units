@@ -26,6 +26,10 @@ public class NeighborReaderTest {
             " neighbor 6.6.6.6\n" +
             " neighbor 8.8.8.8";
 
+    private static final String IPV6_NEIGHBORS_OUTPUT = "Tue Feb 27 08:53:41.685 UTC\n" +
+            " neighbor 6.6.6.6\n" +
+            " neighbor dead:beef::1";
+
     private static final List<NeighborKey> EXPECTED_KEYS = Lists.newArrayList("5.5.5.5", "6.6.6.6", "8.8.8.8")
             .stream()
             .map(Ipv4Address::new)
@@ -33,8 +37,16 @@ public class NeighborReaderTest {
             .map(NeighborKey::new)
             .collect(Collectors.toList());
 
+    private static final List<NeighborKey> EXPECTED_IPV6_KEYS = Lists.newArrayList("6.6.6.6", "dead:beef::1")
+            .stream()
+            .map(String::toCharArray)
+            .map(IpAddress::new)
+            .map(NeighborKey::new)
+            .collect(Collectors.toList());
+
     @Test
     public void testGetNeighborKeys() {
         Assert.assertEquals(EXPECTED_KEYS, NeighborReader.getNeighborKeys(OUTPUT));
+        Assert.assertEquals(EXPECTED_IPV6_KEYS, NeighborReader.getNeighborKeys(IPV6_NEIGHBORS_OUTPUT));
     }
 }
