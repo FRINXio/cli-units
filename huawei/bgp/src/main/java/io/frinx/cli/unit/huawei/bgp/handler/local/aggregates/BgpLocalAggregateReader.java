@@ -41,8 +41,8 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
     private static final String GROUP_IP = "ip";
     private static final String GROUP_MASK = "mask";
     private static final String DISPLAY_BGP_NETWORK_CONFIG =
-            "display current-configuration configuration bgp | include |^ ipv4-family|^ *network";
-    private static final Pattern NEIGHBOR_LINE = Pattern.compile("network (?<ip>\\S*) mask (?<mask>\\S*).*");
+            "display current-configuration configuration bgp | include ^ ipv4-family|^ *network";
+    private static final Pattern NEIGHBOR_LINE = Pattern.compile("network (?<ip>\\S*) (?<mask>\\S*).*");
     private final Cli cli;
 
     public BgpLocalAggregateReader(Cli cli) {
@@ -100,7 +100,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
     static List<AggregateKey> getDefaultAggregateKeys(String output) {
         Optional<String> optionalVrfOutput =
                 Arrays.stream(NeighborReader.getSplitedOutput(output))
-                        .filter(value -> !value.contains("vrf"))
+                        .filter(value -> !value.contains("vpn-instance"))
                         .reduce((s1, s2) -> s1 + s2);
 
         if (optionalVrfOutput.isPresent()) {

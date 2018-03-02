@@ -6,7 +6,6 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-
 package io.frinx.cli.unit.huawei.network.instance;
 
 import com.google.common.collect.Sets;
@@ -25,6 +24,9 @@ import io.frinx.cli.unit.huawei.network.instance.handler.NetworkInstanceConfigWr
 import io.frinx.cli.unit.huawei.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.ifc.L3VrfInterfaceReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.ifc.L3VrfInterfaceWriter;
+import io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.protocol.LocalAggregateConfigReader;
+import io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.protocol.LocalAggregateConfigWriter;
+import io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.protocol.LocalAggregateReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.protocol.ProtocolConfigReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.protocol.ProtocolConfigWriter;
 import io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.protocol.ProtocolReader;
@@ -34,6 +36,7 @@ import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.LocalAggregatesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ProtocolsBuilder;
@@ -86,13 +89,17 @@ public class VrpNetworkInstanceUnit implements TranslateUnit {
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
 
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)));
-
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter()));
 
         // Interfaces for VRF
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_INTERFACES, new NoopCliWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_INTERFACE, new L3VrfInterfaceWriter(cli)));
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_IN_CONFIG, new NoopCliWriter<>()));
+
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new NoopCliWriter<>()));
+        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigWriter(cli)),
+                Sets.newHashSet(IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG));
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
@@ -109,6 +116,11 @@ public class VrpNetworkInstanceUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
         rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
+
+        // Local aggregates
+        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, LocalAggregatesBuilder.class);
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new LocalAggregateReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigReader(cli)));
     }
 
     @Override

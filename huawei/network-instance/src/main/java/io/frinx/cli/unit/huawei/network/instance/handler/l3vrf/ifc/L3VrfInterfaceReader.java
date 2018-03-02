@@ -10,11 +10,14 @@ package io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.ifc;
 
 import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -31,6 +34,8 @@ public class L3VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListRead
 
     private static final String DISPLAY_IFC_VRF_CONFIG =
             "display current-configuration interface | include ^interface|^ ip binding vpn-instance";
+    private static final Pattern INTERFACE_ID_PATTERN = Pattern.compile("^interface (?<id>\\S+).*");
+
 
     private final Cli cli;
 
@@ -44,15 +49,36 @@ public class L3VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListRead
                                                @Nonnull ReadContext ctx) throws ReadFailedException {
         final String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
-        String output = blockingRead(DISPLAY_IFC_VRF_CONFIG, cli, instanceIdentifier, ctx)
-                .replace("display current-configuration interface | include ^interface|^ ip binding vpn-instance", "");
+        String output = blockingRead(DISPLAY_IFC_VRF_CONFIG, cli, instanceIdentifier, ctx);
+
+        return parseVrfInterfacesIds(output, name);
+    }
+
+    @VisibleForTesting
+    static List<InterfaceKey> parseVrfInterfacesIds(String output, String vrfName) {
         String realignedOutput = realignVrfInterfacesOutput(output);
+
+        if (NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfName)) {
+            return parseDefaultVrfInterfacesIds(realignedOutput);
+        }
 
         return NEWLINE.splitAsStream(realignedOutput)
                 .map(String::trim)
-                .filter(line -> line.contains(String.format("ip binding vpn-instance %s", name))
-                        == !name.equals(NetworInstance.DEFAULT_NETWORK_NAME))
-                .map(line -> line.split(" ")[0])
+                .filter(line -> line.contains(String.format("ip binding vpn-instance %s", vrfName)))
+                .map(INTERFACE_ID_PATTERN::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("id"))
+                .map(InterfaceKey::new)
+                .collect(Collectors.toList());
+    }
+
+    private static List<InterfaceKey> parseDefaultVrfInterfacesIds(String realignedOutput) {
+        return NEWLINE.splitAsStream(realignedOutput)
+                .map(String::trim)
+                .filter(line -> !line.contains("ip binding vpn-instance"))
+                .map(INTERFACE_ID_PATTERN::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("id"))
                 .map(InterfaceKey::new)
                 .collect(Collectors.toList());
     }
@@ -71,7 +97,7 @@ public class L3VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListRead
     }
 
     private static String realignVrfInterfacesOutput(String output) {
-        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), "");
-        return withoutNewlines.replace("interface ", "\n");
+        String withoutNewlines = output.replaceAll("[\r\n]", "");
+        return withoutNewlines.replace("interface ", " \ninterface ");
     }
 }

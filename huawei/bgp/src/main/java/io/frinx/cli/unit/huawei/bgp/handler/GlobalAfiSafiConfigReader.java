@@ -24,12 +24,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalAfiSafiConfigReader implements BgpListReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private Cli cli;
-
-    public GlobalAfiSafiConfigReader(final Cli cli) {
-        this.cli = cli;
-    }
-
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,

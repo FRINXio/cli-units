@@ -38,32 +38,32 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
 
     private final Cli cli;
 
-    private static final String ENTER_AFI_SAFI = "{% if ($afi_safi) %}" +
-            "address-family {$afi_safi}" +
-            "{% if ($vrf) %}" +
-            " vrf {$vrf}" +
-            "{% else %}" +
-            "{% endif %}" +
-            "\n" +
+    private static final String ENTER_AFI_SAFI = "{% if ($vrf) %}" +
+            "ipv4-family vpn-instance {$vrf}\n" +
+            "{% elseif ($afi_safi) %}" +
+            "ipv4-family {$afi_safi}\n" +
             "{% endif %}";
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n" +
+    private static final String WRITE_TEMPLATE = "system-view\n" +
+            "bgp {$as}\n" +
+
+            // Enter afi + VRF
+            ENTER_AFI_SAFI +
+
+            "network {$network} {.if ($mask) }{$mask}{/if}\n" +
+            "commit\n" +
+            "return";
+
+    private static final String DELETE_TEMPLATE = "system-view\n" +
             "router bgp {$as}\n" +
 
             // Enter afi + VRF
             ENTER_AFI_SAFI +
 
-            "network {$network} {.if ($mask) }mask {$mask}{/if}\n" +
-            "end";
+            "no network {$network} {.if ($mask) }{$mask}{/if}\n" +
+            "commit\n" +
+            "return";
 
-    private static final String DELETE_TEMPLATE = "configure terminal\n" +
-            "router bgp {$as}\n" +
-
-            // Enter afi + VRF
-            ENTER_AFI_SAFI +
-
-            "no network {$network} {.if ($mask) }mask {$mask}{/if}\n" +
-            "end";
 
     public BgpLocalAggregateConfigWriter(Cli cli) {
         this.cli = cli;
@@ -142,8 +142,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                     fT(DELETE_TEMPLATE,
                             "as", bgp.get().getGlobal().getConfig().getAs().getValue(),
                             "network", getNetAddress(config.getPrefix()),
-                            "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(),
-                            "mask", getNetMask(config.getPrefix())));
+                            "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName()));
         } else {
             for (AfiSafi afiSafi : afiSafis) {
                 blockingDeleteAndRead(cli, instanceIdentifier,
@@ -151,8 +150,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                                 "as", bgp.get().getGlobal().getConfig().getAs().getValue(),
                                 "network", getNetAddress(config.getPrefix()),
                                 "afi_safi", GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afiSafi.getAfiSafiName()),
-                                "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(),
-                                "mask", getNetMask(config.getPrefix())));
+                                "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName()));
             }
         }
     }

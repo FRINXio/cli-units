@@ -34,33 +34,34 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
     private static final String GLOBAL_BGP_AFI_SAFI = "system-view\n" +
             "bgp %s\n" +
             "ipv4-family %s\n" +
-            "return\n" +
-            "commit";
+            "commit\n" +
+            "return";
 
     private static final String GLOBAL_BGP_AFI_SAFI_DELETE = "system-view\n" +
             "bgp %s\n" +
             "undo ipv4-family %s\n" +
-            "return\n" +
-            "commit";
+            "commit\n" +
+            "return";
 
     private static final String VRF_BGP_AFI_SAFI = "system-view\n" +
             "bgp %s\n" +
             "ipv4-family vpn-instance %s\n" +
-            "return\n" +
-            "commit";
+            "commit\n" +
+            "return";
+
 
     private static final String VRF_BGP_AFI_SAFI_DELETE = "system-view\n" +
             "bgp %s\n" +
             "undo ipv4-family vpn-instance %s\n" +
-            "return\n" +
-            "commit";
+            "commit\n" +
+            "return";
 
     static final String VRF_BGP_AFI_SAFI_ROUTER_ID = "system-view\n" +
             "bgp %s\n" +
             "ipv4-family vpn-instance %s\n" +
             "router-id %s\n" +
-            "return\n" +
-            "commit";
+            "commit\n" +
+            "return";
 
     private Cli cli;
 

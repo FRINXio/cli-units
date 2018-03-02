@@ -54,7 +54,7 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
     public static class ProtocolReaderComposite extends CompositeListReader<Protocol, ProtocolKey, ProtocolBuilder>
             implements CliConfigListReader<Protocol, ProtocolKey, ProtocolBuilder> {
 
-        public ProtocolReaderComposite(Cli cli) {
+        ProtocolReaderComposite(Cli cli) {
             super(new ArrayList<ListReaderCustomizer<Protocol, ProtocolKey, ProtocolBuilder>>() {{
                 add(new BgpProtocolReader(cli));
             }});

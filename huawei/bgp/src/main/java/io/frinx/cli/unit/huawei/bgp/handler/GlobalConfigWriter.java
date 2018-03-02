@@ -10,7 +10,6 @@ package io.frinx.cli.unit.huawei.bgp.handler;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiConfigWriter.VRF_BGP_AFI_SAFI_ROUTER_ID;
-import static io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiConfigWriter.toDeviceAddressFamily;
 
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
@@ -90,10 +89,14 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
                     "return");
 
             // Make sure to set/update router ID for each family set for this VRF/BGP
+            if (config.getRouterId() == null) {
+                return;
+            }
+
             Set<AfiSafi> allAfiSafis = getAfiSafis(writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).orNull());
             for (AfiSafi afiSafi : allAfiSafis) {
                 blockingWriteAndRead(f(VRF_BGP_AFI_SAFI_ROUTER_ID,
-                        config.getAs().getValue(), toDeviceAddressFamily(afiSafi.getAfiSafiName()),
+                        config.getAs().getValue(),
                         vrfKey.getName(),
                         config.getRouterId().getValue()),
                         cli, id, config);

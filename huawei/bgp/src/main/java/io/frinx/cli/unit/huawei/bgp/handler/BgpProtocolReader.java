@@ -46,7 +46,7 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
             return Collections.emptyList();
         }
 
-        // IOS does not support multi-instance BGP therefore there is only default instance
+        // HUAWEI does not support multi-instance BGP therefore there is only default instance
         return ImmutableList.of(new ProtocolKey(TYPE, DEFAULT_BGP_INSTANCE));
     }
 

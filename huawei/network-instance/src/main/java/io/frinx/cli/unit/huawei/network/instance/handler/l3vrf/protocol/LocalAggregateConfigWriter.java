@@ -11,14 +11,14 @@ package io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.protocol;
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeWriter;
-import io.frinx.cli.unit.huawei.bgp.handler.BgpProtocolWriter;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
+import io.frinx.cli.unit.huawei.bgp.handler.local.aggregates.BgpLocalAggregateConfigWriter;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config;
 
-public class ProtocolConfigWriter extends CompositeWriter<Config> {
+public class LocalAggregateConfigWriter extends CompositeWriter<Config> {
 
-    public ProtocolConfigWriter() {
+    public LocalAggregateConfigWriter(final Cli cli) {
         super(Lists.newArrayList(
-                new BgpProtocolWriter()
+                new BgpLocalAggregateConfigWriter(cli)
         ));
     }
 }

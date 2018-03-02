@@ -29,9 +29,7 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
                                        @Nonnull WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
-
         if(config.getType().equals(L3VRF.class)) {
-
             blockingWriteAndRead(cli, instanceIdentifier, config,
                     "system-view",
                     f("ip vpn-instance %s", config.getName()),
@@ -44,11 +42,6 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
         }
     }
 
-    private static final String DELETE_TEMPLATE = "system-view\n" +
-            "undo ip vpn-instance %s\n" +
-            "commit\n" +
-            "return";
-
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config, @Nonnull WriteContext writeContext)
@@ -57,8 +50,10 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
         if(config.getType().equals(L3VRF.class)) {
 
             blockingDeleteAndRead(cli, instanceIdentifier,
-                    f(DELETE_TEMPLATE,
-                            config.getName()));
+                    "system-view",
+                    f("undo ip vpn-instance %s", config.getName()),
+                    "commit",
+                    "return");
         }
     }
 }

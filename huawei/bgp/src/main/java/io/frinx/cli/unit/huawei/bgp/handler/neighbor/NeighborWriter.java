@@ -66,10 +66,10 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
             "bgp {$as}\n" +
 
             "{.if ($afi_safi) }ipv4-family {$afi_safi}\n{/if}" +
-            "undo neighbor {$neighbor_ip} enable\n" +
+            "undo peer {$neighbor_ip} enable\n" +
             "{.if ($afi_safi) }quit\n{/if}" +
 
-            "undo peer {$neighbor_ip} as-remote {$neighbor.config.peer_as.value}\n" +
+            "undo peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n" +
 
             "commit\n" +
             "return";
@@ -80,7 +80,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
             // //Active the neighbor. Either under address family, or globally if no family present
             "ipv4-family vpn-instance {$vrf}\n" +
 
-            "peer {$neighbor_ip} as-remote {$neighbor.config.peer_as.value}\n" +
+            "peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n" +
 
             //Set policies
             NEIGHBOR_POLICIES +
@@ -95,7 +95,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
             "ipv4-family vpn-instance {$vrf}\n" +
             "undo peer {$neighbor_ip} enable\n" +
-            "undo peer {$neighbor_ip} as-remote {$neighbor.config.peer_as.value}\n" +
+            "undo peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n" +
 
             "commit\n" +
             "return";

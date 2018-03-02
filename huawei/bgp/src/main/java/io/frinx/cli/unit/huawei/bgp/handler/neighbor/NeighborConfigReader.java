@@ -43,7 +43,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
     private static final Pattern NEIGHBOR_ACTIVATE_PATTERN =
             Pattern.compile("peer (?<neighborIp>\\S*) enable.*");
     private static final Pattern REMOTE_AS_PATTERN =
-            Pattern.compile("peer (?<neighborIp>\\S*) as-remote (?<remoteAs>\\S*).*");
+            Pattern.compile("peer (?<neighborIp>\\S*) as-number (?<remoteAs>\\S*).*");
 
     private final Cli cli;
 
