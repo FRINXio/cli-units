@@ -55,8 +55,7 @@ public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         String config = NEWLINE.splitAsStream(realignedOutput)
                 .filter(vrfConfigLine -> vrfConfigLine.contains(String.format("ip vrf %s ", vrf)))
                 .findAny()
-                .orElseThrow(() ->
-                        new IllegalArgumentException(String.format("Vrf %s not present in config %s", vrf, output)));
+                .orElse("");
 
         builder.setName(vrf);
         builder.setType(L3VRF.class);
