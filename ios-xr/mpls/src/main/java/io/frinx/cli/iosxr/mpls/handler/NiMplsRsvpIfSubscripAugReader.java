@@ -59,9 +59,14 @@ public class NiMplsRsvpIfSubscripAugReader implements MplsReader.MplsConfigReade
                 builder.setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(DEFAULT));
             } else if (!"0".equals(bw)) {
                 // if 0, don't set bandwidth field at all
-                builder.setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(Long.valueOf(bw)));
+                // if non-zero, change to bps on output
+                builder.setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(bps(Long.valueOf(bw))));
             }
         }
+    }
+
+    private static Long bps(Long kbps) {
+        return kbps*1000;
     }
 
     @Override

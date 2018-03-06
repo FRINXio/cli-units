@@ -82,7 +82,7 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
     }
 
     private void initializeData() {
-        data = new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(5L))
+        data = new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(5000L))
                 .build();
     }
 
@@ -98,7 +98,7 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
     public void update() throws WriteFailedException {
         // change bandwidth to different number
         NiMplsRsvpIfSubscripAug newData = new NiMplsRsvpIfSubscripAugBuilder()
-                .setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(10L))
+                .setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(10000L))
                 .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);

@@ -62,8 +62,12 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
         if (NiMplsRsvpIfSubscripAugReader.DEFAULT.equals(b.getString())) {
             return "bandwidth";
         } else if (b.getUint32() != null && b.getUint32() != 0) {
-            return f("bandwidth %s", b.getUint32());
+            return f("bandwidth %s", kbps(b.getUint32()));
         }
         return "";
+    }
+
+    private static Long kbps(Long bps) {
+        return bps/1000;
     }
 }

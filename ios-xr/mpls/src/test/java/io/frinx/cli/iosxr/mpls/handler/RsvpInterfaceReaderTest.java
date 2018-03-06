@@ -58,7 +58,7 @@ public class RsvpInterfaceReaderTest {
     public void testBandwidth() {
         NiMplsRsvpIfSubscripAugBuilder cb = new NiMplsRsvpIfSubscripAugBuilder();
         NiMplsRsvpIfSubscripAugReader.parseConfig(OUTPUT, cb);
-        Assert.assertEquals(Long.valueOf(500), cb.getBandwidth().getUint32());
+        Assert.assertEquals(Long.valueOf(500000), cb.getBandwidth().getUint32());
 
         NiMplsRsvpIfSubscripAugBuilder cb1 = new NiMplsRsvpIfSubscripAugBuilder();
         NiMplsRsvpIfSubscripAugReader.parseConfig(ZERO_BW_OUTPUT, cb1);
