@@ -47,6 +47,7 @@
     <module>utils</module>
     <module>routing-policy</module>
     <module>netflow</module>
+    <module>qos</module>
   </modules>
 
   <build>
