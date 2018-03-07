@@ -42,7 +42,7 @@ public class MaxMetricConfigReader implements OspfReader.OspfConfigReader<Config
     private static final Pattern SUMMARY_LINE = Pattern.compile(".*summary-lsa.*");
     private static final Pattern EXTERNAL_LINE = Pattern.compile(".*external-lsa.*");
 
-    private static final String SH_RUN_OSPF_MAX_METRIC = "show running-config router ospf %s | include ^ max-metric";
+    private static final String SH_RUN_OSPF_MAX_METRIC = "do show running-config router ospf %s | include ^ max-metric";
 
     private Cli cli;
 
