@@ -117,7 +117,7 @@ public class OspfTableConnectionWriter implements
                                                Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
         deleteCurrentAttributesForType(id, dataBefore, writeContext);
-        deleteCurrentAttributesForType(id, dataBefore, writeContext);
+        writeCurrentAttributesForType(id, dataAfter, writeContext);
     }
 
     @Override
