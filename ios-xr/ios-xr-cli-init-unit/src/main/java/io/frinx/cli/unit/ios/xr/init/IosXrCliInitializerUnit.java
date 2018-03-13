@@ -21,8 +21,8 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.spi.write.CommitFailedException;
-import io.fd.honeycomb.translate.spi.write.PostFailedHook;
 import io.fd.honeycomb.translate.spi.write.PostCommitHook;
+import io.fd.honeycomb.translate.spi.write.PostFailedHook;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
@@ -33,10 +33,12 @@ import io.frinx.cli.io.impl.cli.PromptResolutionStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
@@ -141,6 +143,14 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
                 throw new WriterRegistry.Reverter.RevertFailedException(e);
             }
         };
+    }
+
+    @Override
+    public Set<Pattern> getErrorPatterns() {
+        return Sets.newLinkedHashSet(Arrays.asList(
+            Pattern.compile("\\s*\\^.*", Pattern.DOTALL),
+            Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL)
+        ));
     }
 
     @Override

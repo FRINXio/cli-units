@@ -21,7 +21,6 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
-import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,7 +68,6 @@ public class EthernetConfigWriter implements CliWriter<Config> {
 
         // TODO Exctract this to commands templates
         int bundleId = Integer.parseInt(getBundleId(aggregationAug.getAggregateId()));
-        Preconditions.checkArgument(InterfaceConfigWriter.LAG_INDEX_RANGE_CONDITION.apply(bundleId), "Bundle ID out of range: %s. Range is <1-65535>.", bundleId);
         String bundleIdCommand = String.format(BUNDLE_ID_COMMAND_TEMPLATE, bundleId);
         String intervalCommand = "";
         String mode = "mode on";
