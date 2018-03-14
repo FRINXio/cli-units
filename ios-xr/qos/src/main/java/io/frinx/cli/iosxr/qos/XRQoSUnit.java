@@ -19,18 +19,42 @@ package io.frinx.cli.iosxr.qos;
 import static io.frinx.cli.iosxr.IosXrDevices.IOS_XR_ALL;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
+import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
+import io.fd.honeycomb.translate.impl.read.GenericListReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.qos.handler.classifier.ActionConfigReader;
+import io.frinx.cli.iosxr.qos.handler.classifier.ClassifierConfigReader;
+import io.frinx.cli.iosxr.qos.handler.classifier.ClassifierReader;
+import io.frinx.cli.iosxr.qos.handler.classifier.ConditionsReader;
+import io.frinx.cli.iosxr.qos.handler.classifier.RemarkConfigReader;
+import io.frinx.cli.iosxr.qos.handler.classifier.TermReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.openconfig.openconfig.qos.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv6ConditionAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosRemarkQosGroupAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.TermsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.Term;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.ActionsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.Conditions;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.RemarkBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.ClassifiersBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.top.QosBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class XRQoSUnit implements TranslateUnit {
+
+    private static final InstanceIdentifier<Conditions> CONDITIONS_ID = InstanceIdentifier.create(Conditions.class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -64,16 +88,47 @@ public class XRQoSUnit implements TranslateUnit {
     }
 
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
-
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
+        rRegistry.addStructuralReader(IIDs.QOS, QosBuilder.class);
+        rRegistry.addStructuralReader(IIDs.QO_CLASSIFIERS, ClassifiersBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.QO_CL_CLASSIFIER, new ClassifierReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.QO_CL_CL_CONFIG, new ClassifierConfigReader()));
+        rRegistry.addStructuralReader(IIDs.QO_CL_CL_TERMS, TermsBuilder.class);
 
+        rRegistry.subtreeAdd(Sets.newHashSet(
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CONFIG, InstanceIdentifier.create(Term.class))
+        ), new GenericListReader<>(IIDs.QO_CL_CL_TE_TERM, new TermReader(cli)));
+
+        rRegistry.subtreeAdd(Sets.newHashSet(
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CONDITIONS.augmentation(QosConditionAug.class), CONDITIONS_ID),
+
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_IPV4, CONDITIONS_ID),
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_IP_CONFIG, CONDITIONS_ID),
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_IP_CONFIG.augmentation(QosIpv4ConditionAug.class), CONDITIONS_ID),
+
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_IPV6, CONDITIONS_ID),
+            RWUtils.cutIdFromStart(IIDs.QOS_CLA_CLA_TER_TER_CON_IPV_CONFIG, CONDITIONS_ID),
+            RWUtils.cutIdFromStart(IIDs.QOS_CLA_CLA_TER_TER_CON_IPV_CONFIG.augmentation(QosIpv6ConditionAug.class), CONDITIONS_ID),
+
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_MPLS, CONDITIONS_ID),
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_MP_CONFIG, CONDITIONS_ID)
+        ), new GenericConfigReader<>(IIDs.QO_CL_CL_TE_TE_CONDITIONS, new ConditionsReader(cli)));
+
+        rRegistry.addStructuralReader(IIDs.QO_CL_CL_TE_TE_ACTIONS, ActionsBuilder.class);
+        rRegistry.add(new GenericConfigReader<>(IIDs.QO_CL_CL_TE_TE_AC_CONFIG, new ActionConfigReader(cli)));
+        rRegistry.addStructuralReader(IIDs.QO_CL_CL_TE_TE_AC_REMARK, RemarkBuilder.class);
+        rRegistry.subtreeAdd(Sets.newHashSet(
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_AC_RE_CONFIG.augmentation(QosRemarkQosGroupAug.class),
+                    InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.Config.class))
+        ), new GenericConfigReader<>(IIDs.QO_CL_CL_TE_TE_AC_RE_CONFIG, new RemarkConfigReader(cli)));
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet($YangModuleInfoImpl.getInstance());
+        return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.$YangModuleInfoImpl.getInstance());
     }
 
     @Override

@@ -35,6 +35,7 @@
     <properties>
         <cli.version>3.1.3.rc1-frinx-SNAPSHOT</cli.version>
         <openconfig.version>3.1.3.rc1-frinx-SNAPSHOT</openconfig.version>
+        <honeycomb.version>1.17.10-Carbon-SR1.3_1_3_rc1-frinxodl-SNAPSHOT</honeycomb.version>
     </properties>
 
     <dependencies>
@@ -53,11 +54,26 @@
             <artifactId>ios-xr-utils</artifactId>
             <version>${cli.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>translate-impl</artifactId>
+            <version>${honeycomb.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>utils-unit</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
 
         <!-- Openconfig models -->
         <dependency>
             <groupId>io.frinx.openconfig</groupId>
             <artifactId>openconfig-qos</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-acl</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
 
