@@ -25,15 +25,16 @@ import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.AfiSafis;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class NeighborConfigWriter implements BgpWriter<Config> {
 
@@ -52,20 +53,20 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
             "{% endif %}" +
             "{% if ($config.auth_password) %}" +
                 "password clear {$config.auth_password.value}\n" +
-            "{% elseIf ($oldConfig.auth_password) %}" +
+            "{% elseIf ($oldConfig.auth_password|onempty(EMPTY) == EMPTY) %}" +
                 "no password\n" +
             "{% endif %}" +
             "{% if ($config.description) %}" +
                 "description {$config.description}\n" +
-            "{% elseIf ($oldConfig.description) %}" +
+            "{% elseIf ($oldConfig.description|onempty(EMPTY) == EMPTY) %}" +
                 "no description\n" +
             "{% endif %}" +
+            "{.if ($enabled == TRUE) }no shutdown\n{.else}shutdown\n{/if}" +
             "{% if ($config.peer_group) %}" +
                 "use neighbor-group {$config.peer_group}\n" +
             "{% elseIf ($oldConfig.peer_group) %}" +
                 "no use neighbor-group\n" +
             "{% endif %}" +
-            "{.if ($enabled == TRUE) }no shutdown\n{.else}shutdown\n{/if}" +
             "{% loop in $afiSafis as $afiSafi}\n" +
                 "address-family {$afiSafi}\n" +
                 "{% if ($config.send_community) %}" +

@@ -31,6 +31,13 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
 
     private static final String NO_DAMPENING = "no dampening";
     private static final String DEFAULT_DAMPENING_COMMAND = "dampening";
+    private static final String WRITE_CURR_ATTR = "interface {$ifcName}\n" +
+            "{$dampConfCommand}\n" +
+            "exit";
+
+    private static final String DELETE_CURR_ATTR = "interface {$ifcName}\n" +
+            NO_DAMPENING + "\n" +
+            "exit";
 
     public InterfaceDampingConfigWriter(Cli cli) {
         this.cli = cli;
@@ -46,10 +53,9 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
 
         String dampConfCommand = getDampeningCommand(dataAfter);
 
-        blockingWriteAndRead(cli, id, dataAfter,
-                f("interface %s", ifcName),
-                dampConfCommand,
-                "exit");
+        blockingWriteAndRead(cli, id, dataAfter, fT(WRITE_CURR_ATTR,
+                "ifcName", ifcName,
+                "dampConfCommand", dampConfCommand));
     }
 
     private static String getDampeningCommand(Config dataAfter) {
@@ -128,9 +134,7 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
 
-        blockingDeleteAndRead(cli, id,
-                f("interface %s", ifcName),
-                NO_DAMPENING,
-                "exit");
+        blockingDeleteAndRead(cli, id, fT(DELETE_CURR_ATTR,
+                "ifcName", ifcName));
     }
 }

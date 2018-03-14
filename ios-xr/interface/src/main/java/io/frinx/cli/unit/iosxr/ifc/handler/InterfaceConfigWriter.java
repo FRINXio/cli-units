@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -35,7 +33,24 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
 public final class InterfaceConfigWriter implements CliWriter<Config> {
+
+    static final String WRITE_CURR_ATTR = "interface {$data.name}\n" +
+            "{% if(!$data.mtu) %}no mtu\n{% else %}mtu {$data.mtu}\n{% endif %}" +
+            "{% if(!$data.description) %}no description\n{% else %}description {$data.description}\n{% endif %}" +
+            "{% if($shutdown == TRUE) %}no shutdown\n{% else %}shutdown\n{% endif %}" +
+            "exit";
+
+    static final String DELETE_CURR_ATTR = "no interface {$data.name}";
 
     private Cli cli;
 
@@ -80,12 +95,9 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     private void writeInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.CreateFailedException {
 
-        blockingWriteAndRead(cli, id, data,
-                f("interface %s", data.getName()),
-                data.getMtu() == null ? "no mtu" : f("mtu %s", data.getMtu()),
-                data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
-                data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
-                "exit");
+        blockingWriteAndRead(cli, id, data, fT(WRITE_CURR_ATTR,
+                "data", data,
+                "shutdown", data.isEnabled()));
     }
 
     private static void validateIfcConfiguration(Config data) {
@@ -159,7 +171,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
     private void deleteInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.DeleteFailedException {
-        blockingDeleteAndRead(cli, id,
-                f("no interface %s", data.getName()));
+        blockingDeleteAndRead(cli, id, fT(DELETE_CURR_ATTR,
+                "data", data));
     }
 }

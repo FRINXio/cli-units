@@ -16,14 +16,11 @@
 
 package io.frinx.cli.iosxr.bgp;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
-
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.neighbor.NeighborConfigWriter;
-import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,29 +50,38 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
+import java.util.concurrent.CompletableFuture;
+
+import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
 public class NeighborConfigWriterTest {
 
     private static final String WRITE_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "remote-as 65500\n" +
-            "use neighbor-group ibgp\n" +
+            "no password\n" +
+            "no description\n" +
             "no shutdown\n" +
+            "use neighbor-group ibgp\n" +
             "exit\n" +
             "exit\n";
 
     private static final String UPDATE_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "remote-as 65501\n" +
-            "use neighbor-group ebgp\n" +
+            "no password\n" +
+            "no description\n" +
             "shutdown\n" +
+            "use neighbor-group ebgp\n" +
             "exit\n" +
             "exit\n";
 
     private static final String UPDATE_CLEAN_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "no remote-as\n" +
-            "no use neighbor-group\n" +
+            "no password\n" +
+            "no description\n" +
             "shutdown\n" +
+            "no use neighbor-group\n" +
             "exit\n" +
             "exit\n";
 

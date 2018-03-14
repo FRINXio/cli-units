@@ -24,19 +24,25 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.transport.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class NeighborTransportConfigWriter  implements BgpWriter<Config> {
 
     private Cli cli;
     private Pattern LOOPBACK_PATTERN = Pattern.compile("[Ll]oopback(?<index>\\d+)");
 
+    static final String MOD_CURR_ATTR = "router bgp {$as.config.as.value} {$instName}\n" +
+            "neighbor {$neighbAddr}\n" +
+            "{% if ($isLoopback == TRUE) %}update-source loopback {$match:}\n{%else%}no update-source\n{%endif}" +
+            "exit\n" +
+            "exit";
 
     public NeighborTransportConfigWriter(Cli cli) {
         this.cli = cli;
@@ -56,12 +62,12 @@ public class NeighborTransportConfigWriter  implements BgpWriter<Config> {
         if (!matcher.matches()) {
             return;
         }
-        blockingWriteAndRead(cli, id, config,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
-                f("update-source loopback %s", matcher.group("index")),
-                "exit",
-                "exit");
+        blockingWriteAndRead(cli, id, config, fT(MOD_CURR_ATTR,
+                "as", g,
+                "instName", instName,
+                "neighbAddr", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
+                "isLoopback", true,
+                "match", matcher.group("index")));
     }
 
     @Override
@@ -79,12 +85,12 @@ public class NeighborTransportConfigWriter  implements BgpWriter<Config> {
                 isLoopback = true;
             }
         }
-        blockingWriteAndRead(cli, id, dataAfter,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
-                isLoopback ? f("update-source loopback %s", matcher.group("index")) : "no update-source",
-                "exit",
-                "exit");
+        blockingWriteAndRead(cli, id, dataAfter, fT(MOD_CURR_ATTR,
+                "as", g,
+                "instName", instName,
+                "neighbAddr", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
+                "isLoopback", isLoopback,
+                "match", matcher.group("index")));
     }
 
     @Override
@@ -95,11 +101,9 @@ public class NeighborTransportConfigWriter  implements BgpWriter<Config> {
         }
         final Global g = bgpOptional.get().getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingDeleteAndRead(cli, id,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
-                "no update-source",
-                "exit",
-                "exit");
+        blockingDeleteAndRead(cli, id, fT(MOD_CURR_ATTR,
+                "as", g,
+                "instName", instName,
+                "neighbAddr", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())));
     }
 }

@@ -28,6 +28,9 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
 
     private Cli cli;
 
+    static final String MOD_CURR_ATTR = "{% if ($delete) %}no {% endif %}router ospf {$procName}\n" +
+            "exit";
+
     public OspfProtocolWriter(Cli cli) {
         this.cli = cli;
     }
@@ -36,9 +39,8 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException {
         final String processName = id.firstKeyOf(Protocol.class).getName();
-        blockingWriteAndRead(cli, id, data,
-                f("router ospf %s", processName),
-                "exit");
+        blockingWriteAndRead(cli, id, data, fT(MOD_CURR_ATTR,
+                "procName", processName));
     }
 
     @Override
@@ -51,7 +53,8 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException {
         final String processName = id.firstKeyOf(Protocol.class).getName();
-        blockingWriteAndRead(cli, id, data,
-                f("no router ospf %s", processName));
+        blockingWriteAndRead(cli, id, data, fT(MOD_CURR_ATTR,
+                "delete", true,
+                "procName", processName));
     }
 }

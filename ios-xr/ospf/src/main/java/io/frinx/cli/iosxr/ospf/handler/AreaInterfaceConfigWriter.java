@@ -34,6 +34,14 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
 
     private final Cli cli;
 
+    static final String MOD_CURR_ATTR = "router ospf {$name}\n" +
+            "area {$areaId}\n" +
+            "{% if ($delete) %}no {%endif%}interface {$int.id}\n" +
+            "{% if (!$delete) %}{% if ($data.metric) %}cost {$data.metric.value:}\n{% else %}no cost\n{% endif %}" +
+            "exit\n{%endif%}" +
+            "exit\n" +
+            "exit";
+
     public AreaInterfaceConfigWriter(final Cli cli) {
         this.cli = cli;
     }
@@ -45,14 +53,11 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Area.class)).get().getIdentifier();
         final InterfaceKey intfId =
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Interface.class)).get().getKey();
-        blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
-                f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
-                f("interface %s", intfId.getId()),
-                data.getMetric() != null ? f("cost %s", data.getMetric().getValue()) : "no cost",
-                "exit",
-                "exit",
-                "exit");
+        blockingWriteAndRead(cli, instanceIdentifier, data, fT(MOD_CURR_ATTR,
+            "name", instanceIdentifier.firstKeyOf(Protocol.class).getName(),
+                "areaId", AreaInterfaceReader.areaIdToString(areaId),
+                "int", intfId,
+                "data", data));
     }
 
     @Override
@@ -67,11 +72,10 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                 writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Area.class)).get().getIdentifier();
         final InterfaceKey intfId =
                 writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Interface.class)).get().getKey();
-        blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
-                f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
-                f("no interface %s", intfId.getId()),
-                "exit",
-                "exit");
+        blockingWriteAndRead(cli, instanceIdentifier, data, fT(MOD_CURR_ATTR,
+                "name", instanceIdentifier.firstKeyOf(Protocol.class).getName(),
+                "areaId", AreaInterfaceReader.areaIdToString(areaId),
+                "int", intfId,
+                "delete", true));
     }
 }

@@ -16,9 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -26,8 +23,6 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
@@ -36,7 +31,20 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nonnull;
+import java.util.Set;
+
+import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
+import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
+
 public class SubinterfaceConfigWriter implements CliWriter<Config> {
+
+    static final String WRITE_CURR_ATTR = "interface {$subIntName}\n" +
+            "{% if($data.description|onempty(EMPTY) == EMPTY) %}no description\n{% else %}description {$data.description:}\n{% endif %}" +
+            "{% if($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}" +
+            "exit";
+
+    static final String DELETE_CURR_ATTR = "no interface {$subIntName}";
 
     private Cli cli;
 
@@ -76,11 +84,10 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId).get().getConfig().getType();
 
         if(isSupportedType(parentIfcType)) {
-            blockingWriteAndRead(cli, id, data,
-                    f("interface %s", getSubinterfaceName(id)),
-                    data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
-                    data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
-                    "exit");
+            blockingWriteAndRead(cli, id, data, fT(WRITE_CURR_ATTR,
+                    "subIntName", getSubinterfaceName(id),
+                    "data", data,
+                    "enabled", data.isEnabled()));
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));
@@ -122,8 +129,8 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId).get().getConfig().getType();
 
         if(isSupportedType(parentIfcType)) {
-            blockingDeleteAndRead(cli, id,
-                    f("no interface %s", getSubinterfaceName(id)));
+            blockingDeleteAndRead(cli, id, fT(DELETE_CURR_ATTR,
+                    "subIntName", getSubinterfaceName(id)));
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));

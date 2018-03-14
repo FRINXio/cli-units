@@ -20,14 +20,26 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222._interface.phys.holdtime.top.hold.time.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nonnull;
+
 public class HoldTimeConfigWriter implements CliWriter<Config> {
+
+    static final String WRITE_CURR_ATTR = "interface {$ifcName}\n" +
+            //About this i was not sure. command template looked strange.
+            // There was 2 variables but nothing was sending any string into that variables.
+            //So i used String variables up and down which was the only one's which was defined and not used.
+            "carrier-delay {$up} {$down}\n" +
+            "exit";
+
+    static final String DELETE_CURR_ATTR = "interface {$ifcName}\n" +
+            "no carrier-delay\n" +
+            "exit";
+
     private Cli cli;
-    private static final String CARRIER_DELAY_COMMAND_TEMPLATE = "carrier-delay %s %s";
 
     public HoldTimeConfigWriter(Cli cli) {
         this.cli = cli;
@@ -43,10 +55,10 @@ public class HoldTimeConfigWriter implements CliWriter<Config> {
         String down = dataAfter.getDown() == null ? "" : f("down %s", dataAfter.getDown());
 
         // TODO We should restrict this probably just to physical ifcs
-        blockingWriteAndRead(cli, id, dataAfter,
-                f("interface %s", ifcName),
-                f(CARRIER_DELAY_COMMAND_TEMPLATE, up, down),
-                "exit");
+        blockingWriteAndRead(cli, id, dataAfter, fT(WRITE_CURR_ATTR,
+                "ifcName", ifcName,
+                "up", up,
+                "down", down));
     }
 
     @Override
@@ -64,9 +76,7 @@ public class HoldTimeConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
-        blockingDeleteAndRead(cli, id,
-                f("interface %s", ifcName),
-                f("no carrier-delay"),
-                "exit");
+        blockingDeleteAndRead(cli, id, fT(DELETE_CURR_ATTR,
+                "ifcName", ifcName));
     }
 }

@@ -16,17 +16,18 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4;
 
-import static io.frinx.cli.unit.huawei.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+
+import javax.annotation.Nonnull;
+
+import static io.frinx.cli.unit.huawei.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
 
 public class Ipv4ConfigWriter implements CliWriter<Config> {
 
@@ -36,9 +37,9 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE = "system-view\n" +
-            "interface %s\n" +
-            "ip address %s %s\n" +
+    public static final String WRITE_TEMPLATE = "system-view\n" +
+            "interface {$ifcName}\n" +
+            "{% if($delete) %}undo ip address\n{% else %}ip address {$config.ip.value:} {$config.prefix_length:}{%endif%}\n" +
             "commit\n" +
             "return";
 
@@ -56,10 +57,9 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
 
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                f(WRITE_TEMPLATE,
-                        ifcName,
-                        config.getIp().getValue(),
-                        config.getPrefixLength()));
+                fT(WRITE_TEMPLATE,
+                        "ifcName", ifcName,
+                        "config", config));
     }
 
     @Override

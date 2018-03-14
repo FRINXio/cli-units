@@ -22,7 +22,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.netflow.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.iosxr.netflow.handler.util.NetflowUtils;
 import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.NETFLOWTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.ingress.flows.ingress.flow.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.interfaces.Interface;
@@ -30,6 +29,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev18
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+
+import javax.annotation.Nonnull;
 
 public class IngressFlowConfigWriter implements CliWriter<Config> {
 
@@ -42,6 +43,11 @@ public class IngressFlowConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
+    static final String MOD_CURR_ATTR = "interface {$ifcName}\n" +
+            "{% if ($delete) %}no {%endif%}flow {$netflowType} monitor {$dataAfter.monitor_name}" +
+            "{% if ($dataAfter.sampler_name|onempty(EMPTY) != EMPTY) %}{% if (!$delete) %} sampler {$dataAfter.sampler_name}{%endif%}{%endif%} ingress\n" +
+            "exit";
+
     @SuppressWarnings("Duplicates")
     @Override
     public void writeCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id, @Nonnull final Config dataAfter,
@@ -52,10 +58,10 @@ public class IngressFlowConfigWriter implements CliWriter<Config> {
         String dampConfCommand = getNetflowCommand(dataAfter);
 
         String ifcName = interfaceKey.getId().getValue();
-        blockingWriteAndRead(cli, id, dataAfter,
-            f("interface %s", ifcName),
-            dampConfCommand,
-            "exit");
+        blockingWriteAndRead(cli, id, dataAfter, fT(MOD_CURR_ATTR,
+                "ifcName", ifcName,
+                "netflowType", NetflowUtils.getNetflowStringType(dataAfter.getNetflowType()),
+                "dataAfter", dataAfter));
     }
 
     private String getNetflowCommand(final Config dataAfter) {
@@ -79,10 +85,11 @@ public class IngressFlowConfigWriter implements CliWriter<Config> {
         String deleteCommand = getNoNetflowCommand(dataBefore);
 
         String ifcName = id.firstKeyOf(Interface.class).getId().getValue();
-        blockingDeleteAndRead(cli, id,
-            f("interface %s", ifcName),
-            deleteCommand,
-            "exit");
+        blockingDeleteAndRead(cli, id, fT(MOD_CURR_ATTR,
+                "ifcName", ifcName,
+                "netflowType", NetflowUtils.getNetflowStringType(dataBefore.getNetflowType()),
+                "dataAfter", dataBefore,
+                "delete", true));
     }
 
     private String getNoNetflowCommand(final Config dataAfter) {

@@ -27,6 +27,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L3VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceKey> {
 
+    static final String CHANGE_CURR_ATTR_fTYPE = "system-view\n" +
+            "interface {$ifcId}\n" +
+            "{% if($delete) %}undo ip binding vpn-instance {$vrfName}\n{% else %}ip binding vpn-instance {$vrfName}\n{% endif %}" +
+            "commit\n" +
+            "return";
+
     private final Cli cli;
 
     public L3VrfInterfaceWriter(Cli cli) {
@@ -39,12 +45,9 @@ public class L3VrfInterfaceWriter implements L3VrfListWriter<Interface, Interfac
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String ifcId = ifc.getId();
 
-        blockingWriteAndRead(cli, instanceIdentifier, ifc,
-                "system-view",
-                f("interface %s", ifcId),
-                f("ip binding vpn-instance %s", vrfName),
-                "commit",
-                "return");
+        blockingWriteAndRead(cli, instanceIdentifier, ifc, fT(CHANGE_CURR_ATTR_fTYPE,
+                "ifcId", ifcId,
+                "vrfName", vrfName));
     }
 
     @Override
@@ -60,11 +63,9 @@ public class L3VrfInterfaceWriter implements L3VrfListWriter<Interface, Interfac
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String ifcId = ifc.getId();
 
-        blockingDeleteAndRead(cli, instanceIdentifier,
-                "system-view",
-                f("interface %s", ifcId),
-                f("undo ip binding vpn-instance %s", vrfName),
-                "commit",
-                "return");
+        blockingDeleteAndRead(cli, instanceIdentifier, fT(CHANGE_CURR_ATTR_fTYPE,
+                "delete", true,
+                "ifcId", ifcId,
+                "vrfName", vrfName));
     }
 }

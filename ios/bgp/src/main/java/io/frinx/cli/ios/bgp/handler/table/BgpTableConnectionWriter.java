@@ -24,9 +24,6 @@ import io.frinx.cli.handlers.network.instance.L3VrfWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Protocols;
@@ -43,6 +40,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.OSPF;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class BgpTableConnectionWriter implements
         L3VrfWriter<Config> {
 
@@ -52,7 +53,7 @@ public class BgpTableConnectionWriter implements
             "{.if ($vrf) } vrf {$vrf}{/if}" +
             "\n" +
             "{.if ($add) }{.else}no {/if}" +
-            "redistribute {$protocol} {$protocol_id}" +
+            "redistribute {$protocol} {$protocol_id.name}" +
             "{.if ($vrf) } vrf {$vrf}{/if}" +
             "{.if ($add) }{.if ($policy) } route-map {$policy}{/if}{/if}" +
             "\n" +
@@ -113,7 +114,7 @@ public class BgpTableConnectionWriter implements
                             "family", toDeviceAddressFamily(tableConnectionKey.getAddressFamily()),
                             "add", add ? true : null,
                             "protocol", toDeviceProtocol(srcProto.getIdentifier()),
-                            "protocol_id", srcProto.getName(),
+                            "protocol_id", srcProto,
                             "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(),
                             "policy", importPolicy.isEmpty() ? null : importPolicy.get(0)));
         }

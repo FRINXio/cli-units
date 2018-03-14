@@ -34,6 +34,20 @@ public class AreaInterfaceMplsSyncConfigWriter implements OspfWriter<Config> {
 
     private final Cli cli;
 
+    static final String WRITE_CURR_ATTR = "router ospf {$name}\n" +
+            "area {$areaId}\n" +
+            "interface {$intfId.id}\n" +
+            "{% if ($delete) %}no mpls ldp sync\n{% else %}" +
+                "{% if ($enabled) %}" +
+                    "{% if($enabled == TRUE) %}mpls ldp sync\n{% else %}mpls ldp sync disable\n{%endif%}" +
+                "{%else}" +
+                    "{% if ($update) %}no mpls ldp sync\n{% else %}{% endif %}" +
+                "{%endif%}" +
+            "{% endif %}" +
+            "exit\n" +
+            "exit\n" +
+            "exit";
+
     public AreaInterfaceMplsSyncConfigWriter(final Cli cli) {
         this.cli = cli;
     }
@@ -44,14 +58,11 @@ public class AreaInterfaceMplsSyncConfigWriter implements OspfWriter<Config> {
         final OspfAreaIdentifier areaId =
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Area.class)).get().getIdentifier();
         final InterfaceKey intfId = instanceIdentifier.firstKeyOf(Interface.class);
-        blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
-                f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
-                f("interface %s", intfId.getId()),
-                data.isEnabled() != null ? (data.isEnabled() ? "mpls ldp sync" : "mpls ldp sync disable") : "",
-                "exit",
-                "exit",
-                "exit");
+        blockingWriteAndRead(cli, instanceIdentifier, data, fT(WRITE_CURR_ATTR,
+                "name", instanceIdentifier.firstKeyOf(Protocol.class).getName(),
+                "areaId", AreaInterfaceReader.areaIdToString(areaId),
+                "intfId", intfId,
+                "enabled", data.isEnabled()));
     }
 
     @Override
@@ -59,14 +70,12 @@ public class AreaInterfaceMplsSyncConfigWriter implements OspfWriter<Config> {
         final OspfAreaIdentifier areaId =
                 writeContext.readAfter(RWUtils.cutId(id, Area.class)).get().getIdentifier();
         final InterfaceKey intfId = id.firstKeyOf(Interface.class);
-        blockingWriteAndRead(cli, id, dataAfter,
-                f("router ospf %s", id.firstKeyOf(Protocol.class).getName()),
-                f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
-                f("interface %s", intfId.getId()),
-                dataAfter.isEnabled() != null ? (dataAfter.isEnabled() ? "mpls ldp sync" : "mpls ldp sync disable") : "no mpls ldp sync",
-                "exit",
-                "exit",
-                "exit");
+        blockingWriteAndRead(cli, id, dataAfter, fT(WRITE_CURR_ATTR,
+                "name", id.firstKeyOf(Protocol.class).getName(),
+                "areaId", AreaInterfaceReader.areaIdToString(areaId),
+                "intfId", intfId,
+                "enabled", dataAfter.isEnabled(),
+                "update", true));
     }
 
     @Override
@@ -74,13 +83,10 @@ public class AreaInterfaceMplsSyncConfigWriter implements OspfWriter<Config> {
                                                WriteContext writeContext) throws WriteFailedException {
         final OspfAreaIdentifier areaId = instanceIdentifier.firstKeyOf(Area.class).getIdentifier();
         final InterfaceKey intfId = instanceIdentifier.firstKeyOf(Interface.class);
-        blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
-                f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
-                f("interface %s", intfId.getId()),
-                "no mpls ldp sync" ,
-                "exit",
-                "exit",
-                "exit");
+        blockingWriteAndRead(cli, instanceIdentifier, data, fT(WRITE_CURR_ATTR,
+                "name", instanceIdentifier.firstKeyOf(Protocol.class).getName(),
+                "areaId", AreaInterfaceReader.areaIdToString(areaId),
+                "intfId", intfId,
+                "delete", true));
     }
 }

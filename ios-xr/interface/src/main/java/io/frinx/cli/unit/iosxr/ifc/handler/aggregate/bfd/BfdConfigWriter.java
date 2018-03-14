@@ -22,14 +22,27 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigReader;
 import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd.rev171024.bfd.top.bfd.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nonnull;
+
 public class BfdConfigWriter implements CliWriter<Config> {
+
+    static final String WRITE_CURR_ATTR = "interface {$ifcName}\n" +
+            "bfd mode ietf\n" +
+            "bfd address-family ipv4 fast-detect\n" +
+            "{% if($dataAft.multiplier) %}bfd address-family ipv4 multiplier {$dataAft.multiplier}\n{% else %}no bfd address-family ipv4 multiplier\n{% endif %}" +
+            "{% if($dataAft.min_interval) %}bfd address-family ipv4 minimum-interval {$dataAft.min_interval}\n{% else %}no bfd address-family ipv4 minimum-interval\n{% endif %}" +
+            "{% if($destIp4) %}bfd address-family ipv4 destination {$destIp4.value}\n{% else %}no bfd address-family ipv4 destination\n{% endif %}" +
+            "exit";
+
+    static final String DELETE_CURR_ATTR = "interface {$ifcName}\n" +
+            "no bfd\n" +
+            "exit";
 
     private final Cli cli;
 
@@ -49,14 +62,10 @@ public class BfdConfigWriter implements CliWriter<Config> {
         IpAddress destinationAddress = dataAfter.getDestinationAddress();
         Ipv4Address destinationIpv4 = destinationAddress != null ? destinationAddress.getIpv4Address() : null;
 
-        blockingWriteAndRead(cli, id, dataAfter,
-                f("interface %s", ifcName),
-                "bfd mode ietf",
-                "bfd address-family ipv4 fast-detect",
-                dataAfter.getMultiplier() != null ? f("bfd address-family ipv4 multiplier %s", dataAfter.getMultiplier()) : "no bfd address-family ipv4 multiplier",
-                dataAfter.getMinInterval() != null ? f("bfd address-family ipv4 minimum-interval %s", dataAfter.getMinInterval()) : "no bfd address-family ipv4 minimum-interval",
-                destinationIpv4 != null ? f("bfd address-family ipv4 destination %s", destinationIpv4.getValue()) : "no bfd address-family ipv4 destination",
-                "exit");
+        blockingWriteAndRead(cli, id, dataAfter, fT(WRITE_CURR_ATTR,
+                "ifcName", ifcName,
+                "dataAft", dataAfter,
+                "destIp4", destinationIpv4));
     }
 
     private static void validateConfig(Config dataAfter) {
@@ -91,9 +100,7 @@ public class BfdConfigWriter implements CliWriter<Config> {
 
         checkIfcType(ifcName);
 
-        blockingDeleteAndRead(cli, id,
-                f("interface %s", ifcName),
-                "no bfd",
-                "exit");
+        blockingDeleteAndRead(cli, id, fT(DELETE_CURR_ATTR,
+                "ifcName", ifcName));
     }
 }

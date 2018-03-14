@@ -16,13 +16,10 @@
 
 package io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
-
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +41,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwar
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.policy.forwarding.top.PolicyForwarding;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
+
+import java.util.concurrent.CompletableFuture;
+
+import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
 
 public class PolicyForwardingInterfaceConfigWriterTest {
 

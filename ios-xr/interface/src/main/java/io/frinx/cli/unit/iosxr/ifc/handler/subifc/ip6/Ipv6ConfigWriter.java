@@ -33,6 +33,14 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class Ipv6ConfigWriter implements CliWriter<Config> {
 
+    static final String WRITE_CURR_ATTR = "interface {$ifcName}\n" +
+            "{$dampConfCommand}\n" +
+            "exit";
+
+    static final String DELETE_CURR_ATTR = "interface {$ifcName}\n" +
+            "{$noIpv6AddressCmd}\n" +
+            "exit";
+
     private static final String NO_IPV6_ADDRESS_CMD = "no ipv6 address";
     private final Cli cli;
     static final String MISSING_IP_ADDRESS_MSG = "Missing IP address";
@@ -53,10 +61,9 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
         // ipv6 <address> <IPv6 Prefix/length>
         String dampConfCommand = f("ipv6 address %s/%s", dataAfter.getIp().getValue(), dataAfter.getPrefixLength());
 
-        blockingWriteAndRead(cli, id, dataAfter,
-            f("interface %s", ifcName),
-            dampConfCommand,
-            "exit");
+        blockingWriteAndRead(cli, id, dataAfter, fT(WRITE_CURR_ATTR,
+                "ifcName", ifcName,
+                "dampConfCommand", dampConfCommand));
     }
 
     private void validateConfig(final InstanceIdentifier<Config> id,
@@ -84,9 +91,8 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
         String ifcName = id.firstKeyOf(Interface.class).getName();
         Long subifcIndex = id.firstKeyOf(Subinterface.class).getIndex();
 
-        blockingDeleteAndRead(cli, id,
-            f("interface %s", ifcName, subifcIndex),
-            NO_IPV6_ADDRESS_CMD,
-            "exit");
+        blockingDeleteAndRead(cli, id, fT(DELETE_CURR_ATTR,
+                "ifcName", ifcName,
+                "noIpv6AddressCmd", NO_IPV6_ADDRESS_CMD));
     }
 }

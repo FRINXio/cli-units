@@ -33,6 +33,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class TpIdInterfaceWriter implements CliWriter<Config1> {
 
+    static final String MOD_CURR_ATTR = "configure terminal\n" +
+            "tag-type {$tpId} {$typeOnDev} {$ifc}\n" +
+            "end";
+
     private Cli cli;
 
     public TpIdInterfaceWriter(Cli cli) {
@@ -50,10 +54,10 @@ public final class TpIdInterfaceWriter implements CliWriter<Config1> {
 
         String tpIdForDevice = getTpIdForDevice(dataAfter);
 
-        blockingWriteAndRead(cli, id, dataAfter,
-                "configure terminal",
-                f("tag-type %s %s %s", tpIdForDevice, typeOnDevice, ifcNumber),
-                "end");
+        blockingWriteAndRead(cli, id, dataAfter, fT(MOD_CURR_ATTR,
+                "tpId", tpIdForDevice,
+                "typeOnDev", typeOnDevice,
+                "ifc", ifcNumber));
     }
 
     private static String getTpIdForDevice(@Nonnull Config1 dataAfter) {
@@ -76,9 +80,9 @@ public final class TpIdInterfaceWriter implements CliWriter<Config1> {
 
         String tpIdForDevice = getTpIdForDevice(dataBefore);
 
-        blockingDeleteAndRead(cli, id,
-                "configure terminal",
-                f("tag-type %s %s %s", tpIdForDevice, typeOnDevice, ifcNumber),
-                "end");
+        blockingDeleteAndRead(cli, id, fT(MOD_CURR_ATTR,
+                "tpId", tpIdForDevice,
+                "typeOnDev", typeOnDevice,
+                "ifc", ifcNumber));
     }
 }

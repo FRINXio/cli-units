@@ -28,6 +28,9 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
 
     private Cli cli;
 
+    static final String WRITE_CURR_ATTR = "{% if ($delete) %}no {% endif %}router ospf {$procName}\n" +
+            "exit";
+
     public GlobalConfigWriter(Cli cli) {
         this.cli = cli;
     }
@@ -36,9 +39,8 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", processName),
-                "exit");
+        blockingWriteAndRead(cli, instanceIdentifier, data, fT(WRITE_CURR_ATTR,
+                "procName", processName));
     }
 
     @Override
@@ -51,7 +53,8 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("no router ospf %s", processName));
+        blockingWriteAndRead(cli, instanceIdentifier, data, fT(WRITE_CURR_ATTR,
+                "delete", true,
+                "procName", processName));
     }
 }

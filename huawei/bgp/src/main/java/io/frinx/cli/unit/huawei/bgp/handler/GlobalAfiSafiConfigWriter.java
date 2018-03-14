@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.huawei.bgp.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -29,45 +27,33 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV4UNICAST;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV6UNICAST;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.L3VPNIPV4UNICAST;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.L3VPNIPV6UNICAST;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.yang.rev170403.DottedQuad;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
 
-    private static final String GLOBAL_BGP_AFI_SAFI = "system-view\n" +
-            "bgp %s\n" +
-            "ipv4-family %s\n" +
+    static final String GLOBAL_BGP_AFI_SAFI = "system-view\n" +
+            "bgp {$as}\n" +
+            "{% if($delete) %}undo ipv4-family {$vrfName}{% else %}ipv4-family {$vrfName}\n{% endif %}" +
             "commit\n" +
             "return";
 
-    private static final String GLOBAL_BGP_AFI_SAFI_DELETE = "system-view\n" +
-            "bgp %s\n" +
-            "undo ipv4-family %s\n" +
+    static final String VRF_BGP_AFI_SAFI = "system-view\n" +
+            "bgp {$as}\n" +
+            "{% if($delete) %}undo ipv4-family vpn-instance {$vrfName}\n{% else %}ipv4-family vpn-instance {$vrfName}\n{% endif %}" +
             "commit\n" +
             "return";
 
-    private static final String VRF_BGP_AFI_SAFI = "system-view\n" +
-            "bgp %s\n" +
-            "ipv4-family vpn-instance %s\n" +
-            "commit\n" +
-            "return";
-
-
-    private static final String VRF_BGP_AFI_SAFI_DELETE = "system-view\n" +
-            "bgp %s\n" +
-            "undo ipv4-family vpn-instance %s\n" +
-            "commit\n" +
-            "return";
 
     static final String VRF_BGP_AFI_SAFI_ROUTER_ID = "system-view\n" +
-            "bgp %s\n" +
-            "ipv4-family vpn-instance %s\n" +
-            "router-id %s\n" +
+            "bgp {%as}\n" +
+            "ipv4-family vpn-instance {%vrfName}\n" +
+            "routerId {$config.router_id.value}\n" +
             "commit\n" +
             "return";
 
@@ -96,12 +82,14 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
             DottedQuad routerId = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get().getGlobal().getConfig().getRouterId();
 
             if(routerId == null) {
-                blockingWriteAndRead(f(VRF_BGP_AFI_SAFI,
-                        as, toDeviceAddressFamily(config.getAfiSafiName()), vrfName),
+                blockingWriteAndRead(fT(VRF_BGP_AFI_SAFI,
+                        "as", as,
+                        "vrfName", vrfName),
                         cli, id, config);
             } else {
-                blockingWriteAndRead(f(VRF_BGP_AFI_SAFI_ROUTER_ID,
-                        as, toDeviceAddressFamily(config.getAfiSafiName()), vrfName, routerId.getValue()),
+                blockingWriteAndRead(fT(VRF_BGP_AFI_SAFI_ROUTER_ID,
+                        "as", as,
+                        "vrfName", vrfName),
                         cli, id, config);
             }
         }
@@ -139,12 +127,16 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         Long as = writeContext.readBefore(RWUtils.cutId(id, Global.class)).get().getConfig().getAs().getValue();
 
         if(vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
-            blockingWriteAndRead(f(GLOBAL_BGP_AFI_SAFI_DELETE,
-                    as, toDeviceAddressFamily(config.getAfiSafiName())),
+            blockingWriteAndRead(fT(GLOBAL_BGP_AFI_SAFI,
+                    "as", as,
+                    "vrfName", vrfName,
+                    "delete", true),
                     cli, id, config);
         } else {
-            blockingWriteAndRead(f(VRF_BGP_AFI_SAFI_DELETE,
-                    as, toDeviceAddressFamily(config.getAfiSafiName()), vrfName),
+            blockingWriteAndRead(fT(VRF_BGP_AFI_SAFI,
+                    "as", as,
+                    "vrfName", vrfName,
+                    "delete", true),
                     cli, id, config);
         }
     }

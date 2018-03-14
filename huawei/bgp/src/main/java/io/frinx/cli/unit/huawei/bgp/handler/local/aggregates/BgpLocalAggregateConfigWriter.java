@@ -25,11 +25,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiConfigWriter;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalConfigWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.apache.commons.net.util.SubnetUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
@@ -42,14 +37,18 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
 
     private final Cli cli;
 
-    private static final String ENTER_AFI_SAFI = "{% if ($vrf) %}" +
-            "ipv4-family vpn-instance {$vrf}\n" +
-            "{% elseif ($afi_safi) %}" +
-            "ipv4-family {$afi_safi}\n" +
+    private static final String ENTER_AFI_SAFI = "{% if ($vrf) %}ipv4-family vpn-instance {$vrf}\n" +
+            "{% elseif ($afi_safi) %}ipv4-family {$afi_safi}\n" +
             "{% endif %}";
 
     private static final String WRITE_TEMPLATE = "system-view\n" +

@@ -16,25 +16,40 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import java.util.Collections;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
 public final class InterfaceConfigWriter implements CliWriter<Config> {
+
+    static final String WRITE_OR_UPDATE_INTERF = "system-view\n" +
+            "interface {$data.name}\n" +
+            "{% if($data.mtu) %}mtu {$data.mtu}\n{% else %}undo mtu\n{% endif %}" +
+            "{% if($data.description) %}description {$data.description}\n{% else %}undo description\n{% endif %}" +
+            "{% if(enabled == TRUE) %}undo shutdown\n{% else %}shutdown\n{% endif %}" +
+            "commit\n" +
+            "return";
+
+    static final String DELETE_INTERFACE = "system-view\n" +
+            "undo interface {$data.name}\n" +
+            "commit\n" +
+            "return";
+
 
     private Cli cli;
 
@@ -78,14 +93,9 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     private void writeOrUpdateInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.CreateFailedException {
 
-        blockingWriteAndRead(cli, id, data,
-                "system-view",
-                f("interface %s", data.getName()),
-                data.getMtu() == null ? "undo mtu" : f("mtu %s", data.getMtu()),
-                data.getDescription() == null ? "undo description" : f("description %s", data.getDescription()),
-                data.isEnabled() != null && data.isEnabled() ? "undo shutdown" : "shutdown",
-                "commit",
-                "return");
+        blockingWriteAndRead(cli, id, data, fT(WRITE_OR_UPDATE_INTERF,
+                "data", data,
+                "enabled", data.isEnabled()));
     }
 
     private static void validateIfcConfiguration(Config data) {
@@ -153,10 +163,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
     private void deleteInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.DeleteFailedException {
-        blockingDeleteAndRead(cli, id,
-                "system-view",
-                f("undo interface %s", data.getName()),
-                "commit",
-                "return");
+        blockingDeleteAndRead(cli, id, fT(DELETE_INTERFACE,
+                "data", data));
+
     }
 }

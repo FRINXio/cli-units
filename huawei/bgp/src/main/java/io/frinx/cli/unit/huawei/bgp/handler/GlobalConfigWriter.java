@@ -53,7 +53,31 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.BGP;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiConfigWriter.VRF_BGP_AFI_SAFI_ROUTER_ID;
+
 public class GlobalConfigWriter implements BgpWriter<Config> {
+
+    static final String WRITE_CURR_ATTR = "system-view\n" +
+            "bgp {$config.as.value}\n" +
+            "{% if($config.router_id) %}router-id {$config.router_id.value:}\n{% else %}undo router-id\n{% endif %}" +
+            "commit\n" +
+            "return";
+
+    static final String DELETE_CURR_ATTR = "system-view\n" +
+            "{% if($delete) %}undo bgp {$config.as.value}\n{% else %}bgp {$config.as.value}\n{% endif %}" +
+            "commit\n" +
+            "return";
 
     private Cli cli;
 
@@ -72,13 +96,8 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
 
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             // Only set global router id for default network
-            blockingWriteAndRead(cli, id, config,
-                    "system-view",
-                    f("bgp %s", config.getAs().getValue()),
-                    config.getRouterId() == null ? "undo router-id"
-                            : f("router-id %s", config.getRouterId().getValue()),
-                    "commit",
-                    "return");
+            blockingWriteAndRead(cli, id, config, fT(WRITE_CURR_ATTR,
+                    "config", config));
         } else {
             // Compare AS for global and current VRF. Must match for IOS
             writeContext.readAfter(IIDs.NETWORKINSTANCES.child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK).child(Protocols.class))
@@ -90,11 +109,8 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
                     .ifPresent(globalAs -> checkArgument(globalAs.equals(config.getAs()),
                             "BGP for VRF contains different AS: %s than global BGP: %s", config.getAs(), globalAs));
 
-            blockingWriteAndRead(cli, id, config,
-                    "system-view",
-                    f("bgp %s", config.getAs().getValue()),
-                    "commit",
-                    "return");
+            blockingWriteAndRead(cli, id, config, fT(
+                    "config", config));
         }
     }
 
@@ -115,11 +131,9 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
         // delete global BGP
         // TODO add a check, if this is the last VRF to have BGP configured (also not in default), delete
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
-            blockingDeleteAndRead(cli, id,
-                    "system-view",
-                    f("undo bgp %s", config.getAs().getValue()),
-                    "commit",
-                    "return");
+            blockingDeleteAndRead(cli, id,fT(DELETE_CURR_ATTR,
+                    "delete", true,
+                    "config", config));
         }
     }
 

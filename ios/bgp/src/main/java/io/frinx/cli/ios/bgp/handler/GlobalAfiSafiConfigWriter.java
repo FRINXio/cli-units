@@ -16,8 +16,6 @@
 
 package io.frinx.cli.ios.bgp.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -37,32 +35,34 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.yang.rev170403.DottedQuad;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
 
     private static final String GLOBAL_BGP_AFI_SAFI = "configure terminal\n" +
-            "router bgp %s\n" +
-            "address-family %s\n" +
+            "router bgp {$as}\n" +
+            "address-family {$afi_safi}n" +
             "end";
 
     private static final String GLOBAL_BGP_AFI_SAFI_DELETE = "configure terminal\n" +
-            "router bgp %s\n" +
-            "no address-family %s\n" +
+            "router bgp {%as}\n" +
+            "no address-family {$afi_safi}\n" +
             "end";
 
     private static final String VRF_BGP_AFI_SAFI = "configure terminal\n" +
-            "router bgp %s\n" +
-            "address-family %s vrf %s\n" +
+            "router bgp {$as}\n" +
+            "address-family {$afi_safi} vrf {$vrfName}\n" +
             "end";
 
     private static final String VRF_BGP_AFI_SAFI_DELETE = "configure terminal\n" +
-            "router bgp %s\n" +
-            "no address-family %s vrf %s\n" +
+            "router bgp {$as}n" +
+            "no address-family {$afi_safi} vrf {$vrfName}\n" +
             "end";
 
     static final String VRF_BGP_AFI_SAFI_ROUTER_ID = "configure terminal\n" +
-            "router bgp %s\n" +
-            "address-family %s vrf %s\n" +
-            "bgp router-id %s\n" +
+            "router bgp {$as}\n" +
+            "address-family {$afi_safi} vrf {$vrfName}\n" +
+            "bgp router-id {$router_id.value}\n" +
             "end";
 
     private Cli cli;
@@ -81,7 +81,8 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
 
         if(vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             blockingWriteAndRead(f(GLOBAL_BGP_AFI_SAFI,
-                    as, toDeviceAddressFamily(config.getAfiSafiName())),
+                    "as", as,
+                    "afi_safi", toDeviceAddressFamily(config.getAfiSafiName())),
                     cli, id, config);
         } else {
             checkArgument(writeContext.readAfter(RWUtils.cutId(id, NetworkInstance.class)).get().getConfig().getRouteDistinguisher() != null,
@@ -91,11 +92,16 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
 
             if(routerId == null) {
                 blockingWriteAndRead(f(VRF_BGP_AFI_SAFI,
-                        as, toDeviceAddressFamily(config.getAfiSafiName()), vrfName),
+                        "as", as,
+                        "afi_safi", toDeviceAddressFamily(config.getAfiSafiName()),
+                        "vrfName", vrfName),
                         cli, id, config);
             } else {
                 blockingWriteAndRead(f(VRF_BGP_AFI_SAFI_ROUTER_ID,
-                        as, toDeviceAddressFamily(config.getAfiSafiName()), vrfName, routerId.getValue()),
+                        "as", as,
+                        "afi_safi", toDeviceAddressFamily(config.getAfiSafiName()),
+                        "vrfName", vrfName,
+                        "router_id", routerId),
                         cli, id, config);
             }
         }
@@ -138,11 +144,14 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
 
         if(vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             blockingWriteAndRead(f(GLOBAL_BGP_AFI_SAFI_DELETE,
-                    as, toDeviceAddressFamily(config.getAfiSafiName())),
+                    "as", as,
+                    "afi_safi", toDeviceAddressFamily(config.getAfiSafiName())),
                     cli, id, config);
         } else {
             blockingWriteAndRead(f(VRF_BGP_AFI_SAFI_DELETE,
-                    as, toDeviceAddressFamily(config.getAfiSafiName()), vrfName),
+                    "as", as,
+                    "afi_safi", toDeviceAddressFamily(config.getAfiSafiName()),
+                    "vrfName", vrfName),
                     cli, id, config);
         }
     }

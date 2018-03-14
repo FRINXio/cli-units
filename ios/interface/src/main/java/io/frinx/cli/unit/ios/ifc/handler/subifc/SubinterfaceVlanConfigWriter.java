@@ -16,17 +16,18 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
-
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+
+import javax.annotation.Nonnull;
+
+import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
+import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
 
 public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
 
@@ -36,11 +37,11 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n" +
-            "interface %s\n" +
-            "encapsulation dot1Q %s\n" +
+    static final String MOD_TEMPLATE = "configure terminal\n" +
+            "interface {$subInterName}\n" +
+            "{%if ($delete) %}no{%endif%}encapsulation dot1Q {$vlanId.vlan_id.vlan_id.value}\n" +
             "end";
-
+    static String mod;
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config dataAfter,
@@ -51,10 +52,11 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
             throw new WriteFailedException.CreateFailedException(id, dataAfter,
                     new IllegalArgumentException("Unable to manage Vlan for subinterface: " + ZERO_SUBINTERFACE_ID));
         } else {
+
             blockingWriteAndRead(cli, id, dataAfter,
-                    f(WRITE_TEMPLATE,
-                            getSubinterfaceName(id),
-                            dataAfter.getVlanId().getVlanId().getValue()));
+                    fT(MOD_TEMPLATE,
+                            "subInterName", getSubinterfaceName(id),
+                            "vlanId", dataAfter));
         }
     }
 
@@ -67,10 +69,6 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
-    private static final String DELETE_TEMPLATE = "configure terminal\n" +
-            "interface %s\n" +
-            "no encapsulation dot1Q %s\n" +
-            "end";
 
 
     @Override
@@ -84,9 +82,11 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
                     new IllegalArgumentException("Unable to manage Vlan for subinterface: " + ZERO_SUBINTERFACE_ID));
         } else {
             blockingDeleteAndRead(cli, id,
-                    f(DELETE_TEMPLATE,
-                            getSubinterfaceName(id),
-                            dataBefore.getVlanId().getVlanId().getValue()));
+                    fT(MOD_TEMPLATE,
+                            "delete", true,
+                            "subInterName", getSubinterfaceName(id),
+                            "vlanId", dataBefore));
         }
     }
+
 }

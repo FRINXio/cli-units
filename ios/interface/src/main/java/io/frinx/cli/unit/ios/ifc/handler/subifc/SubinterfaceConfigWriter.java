@@ -16,21 +16,32 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigWriter.PHYS_IFC_TYPES;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
-
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nonnull;
+
+import static io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigWriter.PHYS_IFC_TYPES;
+import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
+
 public class SubinterfaceConfigWriter implements CliWriter<Config> {
+
+    static final String WRITE_CURRENT_ATTRIBUTES = "configure terminal\n" +
+            "interface {$subInterName}\n" +
+            "description {$data.description}\n" +
+            "{% if ($enabled == TRUE) %}no shutdown\n{% else %}shutdown\n{% endif %}" +
+            "end";
+
+    static final String DELETE_CURRENT_ATTRIBUTES = "configure termina\n" +
+            "no interface {$subInterName}\n" +
+            "end";
 
     private Cli cli;
 
@@ -46,12 +57,10 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId).get().getConfig().getType();
 
         if(PHYS_IFC_TYPES.contains(parentIfcType)) {
-            blockingWriteAndRead(cli, id, data,
-                    "configure terminal",
-                    f("interface %s", getSubinterfaceName(id)),
-                    f("description %s", data.getDescription()),
-                    data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
-                    "end");
+            blockingWriteAndRead(cli, id, data, fT(WRITE_CURRENT_ATTRIBUTES,
+                    "subInterName", getSubinterfaceName(id),
+                    "data", data,
+                    "enabled", data.isEnabled()));
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));
@@ -75,10 +84,8 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId).get().getConfig().getType();
 
         if(PHYS_IFC_TYPES.contains(parentIfcType)) {
-            blockingDeleteAndRead(cli, id,
-                    "configure terminal",
-                    f("no interface %s", getSubinterfaceName(id)),
-                    "end");
+            blockingDeleteAndRead(cli, id, fT(DELETE_CURRENT_ATTRIBUTES,
+                    "subInterName", getSubinterfaceName(id)));
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));

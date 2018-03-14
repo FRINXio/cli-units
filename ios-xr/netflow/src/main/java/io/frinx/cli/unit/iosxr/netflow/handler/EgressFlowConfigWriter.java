@@ -22,8 +22,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.netflow.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.iosxr.netflow.handler.util.NetflowUtils;
 import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.NETFLOWTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.egress.netflow.top.egress.flows.egress.flow.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.interfaces.InterfaceKey;
@@ -31,12 +29,16 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nonnull;
+
 public class EgressFlowConfigWriter implements CliWriter<Config> {
 
-    private static final String FLOW_CMD_WITH_SAMPLER = "flow %s monitor %s sampler %s egress";
-    private static final String FLOW_CMD_WITHOUT_SAMPLER = "flow %s monitor %s egress";
-    private static final String NO_FLOW_CMD = "no flow %s monitor %s egress";
     private final Cli cli;
+
+    static final String MOD_CURR_ATTR = "interface {$ifcName}\n" +
+            "{% if ($delete) %}no {%endif%}flow {$netflowType} monitor {$dataAfter.monitor_name} " +
+            "{% if ($dataAfter.sampler_name|onempty(EMPTY) != EMPTY) %} {% if (!$delete) %}sampler {$dataAfter.sampler_name} {%endif%}{%endif%}egress\n" +
+            "exit";
 
     public EgressFlowConfigWriter(final Cli cli) {
         this.cli = cli;
@@ -49,26 +51,11 @@ public class EgressFlowConfigWriter implements CliWriter<Config> {
         InterfaceCheckUtil.checkInterfaceTypeWithException(id, EthernetCsmacd.class, Ieee8023adLag.class);
         final InterfaceKey interfaceKey = NetflowUtils.checkInterfaceExists(id, writeContext);
 
-        String dampConfCommand = getNetflowCommand(dataAfter);
-
         String ifcName = interfaceKey.getId().getValue();
-        blockingWriteAndRead(cli, id, dataAfter,
-            f("interface %s", ifcName),
-            dampConfCommand,
-            "exit");
-    }
-
-    private String getNetflowCommand(final Config dataAfter) {
-        final String monitorName = dataAfter.getMonitorName();
-        final Class<? extends NETFLOWTYPE> netflowType = dataAfter.getNetflowType();
-        final String samplerName = dataAfter.getSamplerName();
-
-        //flow ipv6|ipv4 <monitor name> sampler <sampler name> egress
-        if (samplerName != null && !samplerName.isEmpty()) {
-            return f(FLOW_CMD_WITH_SAMPLER, NetflowUtils.getNetflowStringType(netflowType), monitorName, samplerName);
-        } else {
-            return f(FLOW_CMD_WITHOUT_SAMPLER, NetflowUtils.getNetflowStringType(netflowType), monitorName);
-        }
+        blockingWriteAndRead(cli, id, dataAfter, fT(MOD_CURR_ATTR,
+                "ifcName", ifcName,
+                "netflowType", NetflowUtils.getNetflowStringType(dataAfter.getNetflowType()),
+                "dataAfter", dataAfter));
     }
 
     @Override
@@ -76,20 +63,12 @@ public class EgressFlowConfigWriter implements CliWriter<Config> {
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
         InterfaceCheckUtil.checkInterfaceTypeWithException(id, EthernetCsmacd.class, Ieee8023adLag.class);
 
-        String deleteCommand = getNoNetflowCommand(dataBefore);
-
         String ifcName = id.firstKeyOf(Interface.class).getId().getValue();
-        blockingDeleteAndRead(cli, id,
-            f("interface %s", ifcName),
-            deleteCommand,
-            "exit");
-    }
-
-    private String getNoNetflowCommand(final Config dataAfter) {
-        final String monitorName = dataAfter.getMonitorName();
-        final Class<? extends NETFLOWTYPE> netflowType = dataAfter.getNetflowType();
-
-        return f(NO_FLOW_CMD, NetflowUtils.getNetflowStringType(netflowType), monitorName);
+        blockingDeleteAndRead(cli, id, fT(MOD_CURR_ATTR,
+                "ifcName", ifcName,
+                "netFlowType", NetflowUtils.getNetflowStringType(dataBefore.getNetflowType()),
+                "dataAfter", dataBefore,
+                "delete", true));
     }
 
     @Override

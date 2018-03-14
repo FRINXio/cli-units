@@ -40,8 +40,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.top.Acl;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class EgressAclSetConfigWriter implements CliWriter<Config> {
+import javax.annotation.Nonnull;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
+public class EgressAclSetConfigWriter implements CliWriter<Config> {
+    static final String MOD_CURR_ATTR = "interface {$name}\n" +
+            "{% if($delete) %}no {%endif%}{$aclType} access-group {$config.set_name} egress\n";
     private final Cli cli;
 
     public EgressAclSetConfigWriter(Cli cli) {
@@ -51,23 +56,19 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
-        InterfaceCheckUtil.checkInterface(writeContext, interfaceName);
+        final String name = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
+        InterfaceCheckUtil.checkInterface(writeContext, name);
         final InstanceIdentifier<AclSets> aclSetIID = RWUtils.cutId(instanceIdentifier, Acl.class).child(AclSets.class);
         AclUtil.checkAclExists(aclSetIID, config, writeContext);
 
         final Class<? extends ACLTYPE> aclType = config.getType();
         checkArgument(aclType != null, "Missing acl type");
 
-        checkEgressAclSetConfigExists(instanceIdentifier, aclType, writeContext, interfaceName);
-
-        final String aclCommand =
-            f("%s access-group %s egress", AclUtil.getStringType(aclType), config.getSetName());
-
-        blockingWriteAndRead(cli, instanceIdentifier, config,
-            f("interface %s", interfaceName),
-            aclCommand,
-            "exit");
+        checkEgressAclSetConfigExists(instanceIdentifier, aclType, writeContext, name);
+        blockingWriteAndRead(cli, instanceIdentifier, config,fT(MOD_CURR_ATTR,
+                "name", name,
+                "aclType", AclUtil.getStringType(aclType),
+                "config", config));
     }
 
     private void checkEgressAclSetConfigExists(final InstanceIdentifier<Config> instanceIdentifier,
@@ -121,12 +122,10 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
         final Class<? extends ACLTYPE> aclType = config.getType();
         checkArgument(aclType != null, "Missing acl type");
 
-        final String aclCommand =
-            f("no %s access-group %s egress", AclUtil.getStringType(aclType), config.getSetName());
-
-        blockingWriteAndRead(cli, instanceIdentifier, config,
-            f("interface %s", name),
-            aclCommand,
-            "exit");
+        blockingWriteAndRead(cli, instanceIdentifier, config, fT(MOD_CURR_ATTR,
+                "delete", true,
+                "name", name,
+                "aclType", AclUtil.getStringType(aclType),
+                "config", config));
     }
 }

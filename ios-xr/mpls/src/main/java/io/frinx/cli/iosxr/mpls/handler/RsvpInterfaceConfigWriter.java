@@ -30,6 +30,11 @@ public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
+    private static final String MOD_CURR_ATTR = "rsvp\n" +
+            "{% if ($delete) %}no {%endif %}interface {$name}\n" +
+            "{% if (!$delete) %}exit{%endif%}\n" +
+            "exit";
+
     public RsvpInterfaceConfigWriter(Cli cli) {
         this.cli = cli;
     }
@@ -37,11 +42,8 @@ public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
-        blockingWriteAndRead(cli, id, data,
-            "rsvp",
-            f("interface %s", name),
-            "exit",
-            "exit");
+        blockingWriteAndRead(cli, id, data, fT(MOD_CURR_ATTR,
+                "name", name));
     }
 
     @Override
@@ -55,9 +57,8 @@ public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
-        blockingWriteAndRead(cli, id, data,
-            "rsvp",
-            f("no interface %s", name),
-            "exit");
+        blockingWriteAndRead(cli, id, data, fT(MOD_CURR_ATTR,
+                "delete", true,
+                "name", name));
     }
 }

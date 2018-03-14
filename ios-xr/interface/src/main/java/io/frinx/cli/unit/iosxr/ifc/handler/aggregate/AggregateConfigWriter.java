@@ -21,12 +21,17 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.aggregation.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nonnull;
+
 public class AggregateConfigWriter implements CliWriter<Config> {
+
+    static final String MOD_CURR_ATTR = "interface {$ifcName}\n" +
+            "{% if($delete) %}no {% endif %}bundle minimum-active links{% if(!$delete) %} {$dataAft.min_links:}{%endif%}\n" +
+            "exit";
 
     private final Cli cli;
 
@@ -42,10 +47,9 @@ public class AggregateConfigWriter implements CliWriter<Config> {
         checkIfcType(ifcName);
         validateConfig(dataAfter);
 
-        blockingWriteAndRead(cli, id, dataAfter,
-                f("interface %s", ifcName),
-                f("bundle minimum-active links %s", dataAfter.getMinLinks()),
-                "exit");
+        blockingWriteAndRead(cli, id, dataAfter, fT(MOD_CURR_ATTR,
+                "ifcName", ifcName,
+                "dataAft", dataAfter));
     }
 
     private static void validateConfig(Config config)  {
@@ -79,9 +83,8 @@ public class AggregateConfigWriter implements CliWriter<Config> {
 
         checkIfcType(ifcName);
 
-        blockingDeleteAndRead(cli, id,
-                f("interface %s", ifcName),
-                "no bundle minimum-active links",
-                "exit");
+        blockingDeleteAndRead(cli, id, fT(MOD_CURR_ATTR,
+                "delete ", true,
+                "ifcName", ifcName));
     }
 }

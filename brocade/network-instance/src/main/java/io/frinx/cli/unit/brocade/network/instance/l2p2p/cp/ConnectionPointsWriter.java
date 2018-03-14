@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.brocade.network.instance.l2p2p.cp;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -25,11 +23,6 @@ import io.frinx.cli.handlers.network.instance.L2p2pWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
@@ -41,9 +34,38 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.REMOTE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
 
     private Cli cli;
+
+    static final String MOD_VLL = "conf t\n" +
+            "router mpls\n" +
+            "{% if ($delete) %}no {% endif %}vll {$netName} {$remote.remote.config.virtual_circuit_identifier}\n" +
+            "{% if (!$delete) %}vll-peer {$remote.remote.config.remote_system.ipv4_address.value}\n" +
+                "{% if ($local.config.subinterface) %}vlan {$local.config.subinterface}\ntag {$ifcType} {$ifcNumber}\n" +
+                "{% else %}untag {$ifcType} {$ifcNumber}\n{% endif %}" +
+            "{% endif %}" +
+            "end";
+
+    static final String MOD_LOCAL_VLL = "conf t\n" +
+            "router mpls\n" +
+            "{% if ($delete) %}no {% endif %}vll-local {$netName}\n" +
+            "{% if (!$delete) %}" +
+                "{% if ($endpoint.local.config.subinterface) %}vlan {$endpoint.local.config.subinterface}\n" +
+                    "tag {$ifcType} {$ifcName}\n" +
+                "{% else %}" +
+                    "untag {$ifcType} {$ifcName}\n" +
+                "{% endif %}" +
+            "{% endif %}" +
+            "end";
 
     public ConnectionPointsWriter(Cli cli) {
         this.cli = cli;
@@ -104,31 +126,12 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
         String ifcType = InterfaceConfigReader.getTypeOnDevice(interfaceData.getConfig().getType());
         String ifcNumber = InterfaceConfigReader.getIfcNumber(ifc1.toParentIfcString());
 
-        blockingWriteAndRead(cli, id, dataAfter,
-                "conf t",
-                "router mpls",
-                f("vll %s %s", netName, remote.getRemote().getConfig().getVirtualCircuitIdentifier()),
-                f("vll-peer %s", remote.getRemote().getConfig().getRemoteSystem().getIpv4Address().getValue()),
-                "end");
-
-        if (local.getLocal().getConfig().getSubinterface() == null) {
-            // With subifc
-            blockingWriteAndRead(cli, id, dataAfter,
-                    "conf t",
-                    "router mpls",
-                    f("vll %s %s", netName, remote.getRemote().getConfig().getVirtualCircuitIdentifier()),
-                    f("untag %s %s", ifcType, ifcNumber),
-                    "end");
-        } else {
-            // Without subifc
-            blockingWriteAndRead(cli, id, dataAfter,
-                    "conf t",
-                    "router mpls",
-                    f("vll %s %s", netName, remote.getRemote().getConfig().getVirtualCircuitIdentifier()),
-                    f("vlan %s", local.getLocal().getConfig().getSubinterface()),
-                    f("tag %s %s", ifcType, ifcNumber),
-                    "end");
-        }
+        blockingWriteAndRead(cli, id, dataAfter, fT(MOD_VLL,
+                "netName", netName,
+                "remote", remote,
+                "local", local,
+                "ifcType", ifcType,
+                "ifcNumber", ifcNumber));
     }
 
     private Endpoint getRemote(Endpoint endpoint1, Endpoint endpoint2) {
@@ -144,11 +147,10 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
         Endpoint remote = getRemote(endpoint1, endpoint2);
 
-        blockingDeleteAndRead(cli, id,
-                "conf t",
-                "router mpls",
-                f("no vll %s %s", netName, remote.getRemote().getConfig().getVirtualCircuitIdentifier()),
-                "end");
+        blockingDeleteAndRead(cli, id, fT(MOD_VLL,
+                "netName", netName,
+                "circId", remote,
+                "delete", true));
     }
 
     private void writeVllLocal(InstanceIdentifier<ConnectionPoints> id,
@@ -174,33 +176,18 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
         String ifcType = InterfaceConfigReader.getTypeOnDevice(interfaceData.getConfig().getType());
         String ifcNumber = InterfaceConfigReader.getIfcNumber(ifc.toParentIfcString());
 
-        if (endpoint.getLocal().getConfig().getSubinterface() == null) {
-            // With subifc
-            blockingWriteAndRead(cli, id, dataAfter,
-                    "conf t",
-                    "router mpls",
-                    f("vll-local %s", netName),
-                    f("untag %s %s", ifcType, ifcNumber),
-                    "end");
-        } else {
-            // Without subifc
-            blockingWriteAndRead(cli, id, dataAfter,
-                    "conf t",
-                    "router mpls",
-                    f("vll-local %s", netName),
-                    f("vlan %s", endpoint.getLocal().getConfig().getSubinterface()),
-                    f("tag %s %s", ifcType, ifcNumber),
-                    "end");
-        }
+        blockingWriteAndRead(cli, id, dataAfter, fT(MOD_LOCAL_VLL,
+                "netName", netName,
+                "ifcType", ifcType,
+                "ifcName", ifcNumber,
+                "endpoint", endpoint));
     }
 
     private void deleteVllLocal(InstanceIdentifier<ConnectionPoints> id) throws WriteFailedException.DeleteFailedException {
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
-        blockingDeleteAndRead(cli, id,
-                "conf t",
-                "router mpls",
-                f("no vll-local %s", netName),
-                "end");
+        blockingDeleteAndRead(cli, id, fT(MOD_LOCAL_VLL,
+                "netName", netName,
+                "delete", true));
     }
 
     private static Endpoint getEndpoint(ConnectionPoint connectionPoint1, WriteContext writeContext, Set<String> usedInterfaces, boolean isWrite) {
