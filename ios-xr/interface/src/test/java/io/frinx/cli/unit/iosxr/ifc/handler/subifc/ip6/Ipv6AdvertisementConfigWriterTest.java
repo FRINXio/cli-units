@@ -68,7 +68,8 @@ public class Ipv6AdvertisementConfigWriterTest {
 
         final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
 
-        writer.writeCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID, TestData.SUPPRESS_TRUE_DATA, context);
+        final String interfaceName = TestData.INTERFACE_CORRECT_TYPE.getName();
+        writer.writeCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID(interfaceName), TestData.SUPPRESS_TRUE_DATA, context);
 
         Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(Mockito.any());
     }
@@ -76,7 +77,7 @@ public class Ipv6AdvertisementConfigWriterTest {
     @Test
     public void settingAdvertisement_nonLAGInterface() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_WRONG_TYPE));
+            .then(invocation -> Optional.of(TestData.INTERFACE_VLAN_TYPE));
 
         final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
 
@@ -87,7 +88,8 @@ public class Ipv6AdvertisementConfigWriterTest {
             CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
         ));
 
-        writer.writeCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID, TestData.SUPPRESS_TRUE_DATA, context);
+        final String interfaceName = TestData.INTERFACE_VLAN_TYPE.getName();
+        writer.writeCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID(interfaceName), TestData.SUPPRESS_TRUE_DATA, context);
     }
 
     @Test
@@ -97,7 +99,8 @@ public class Ipv6AdvertisementConfigWriterTest {
 
         final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
 
-        writer.deleteCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID, TestData.SUPPRESS_TRUE_DATA, context);
+        final String interfaceName = TestData.INTERFACE_CORRECT_TYPE.getName();
+        writer.deleteCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID(interfaceName), TestData.SUPPRESS_TRUE_DATA, context);
 
         Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(Mockito.any());
     }
@@ -105,7 +108,7 @@ public class Ipv6AdvertisementConfigWriterTest {
     @Test
     public void deleteAdvertisement_nonLAGInterface() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_WRONG_TYPE));
+            .then(invocation -> Optional.of(TestData.INTERFACE_VLAN_TYPE));
 
         final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
 
@@ -116,12 +119,14 @@ public class Ipv6AdvertisementConfigWriterTest {
             CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
         ));
 
-        writer.deleteCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID, TestData.SUPPRESS_TRUE_DATA, context);
+        final String interfaceName = TestData.INTERFACE_VLAN_TYPE.getName();
+        writer.deleteCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID(interfaceName), TestData.SUPPRESS_TRUE_DATA, context);
     }
 
     static class TestData {
 
         static final String INTERFACE_NAME = "GigabitEthernet 0/0/0/0";
+        static final String INTERFACE_NAME_VLAN = "vlan 1";
         static final long SUBINTERFACE_INDEX = 0L;
 
         static final Config SUPPRESS_TRUE_DATA = new ConfigBuilder()
@@ -134,19 +139,24 @@ public class Ipv6AdvertisementConfigWriterTest {
                     .setType(Ieee8023adLag.class)
                     .build())
             .build();
-        static final Interface INTERFACE_WRONG_TYPE = new InterfaceBuilder()
-            .setName(INTERFACE_NAME)
+        static final Interface INTERFACE_VLAN_TYPE = new InterfaceBuilder()
+            .setName(INTERFACE_NAME_VLAN)
             .setConfig(
                 new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
                     .setType(L2vlan.class)
                     .build())
             .build();
 
-        static final InstanceIdentifier<Interface> INTERFACE_IID =
-            IIDs.INTERFACES.child(Interface.class, new InterfaceKey(INTERFACE_NAME));
-        static final InstanceIdentifier<Config> ADVERTISEMENT_CONFIG_IID = INTERFACE_IID
-            .child(Subinterfaces.class)
-            .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX)).augmentation(Subinterface2.class)
-            .child(Ipv6.class).child(RouterAdvertisement.class).child(Config.class);
+        static final InstanceIdentifier<Interface> INTERFACE_IID(final String interfaceName) {
+            return IIDs.INTERFACES.child(Interface.class, new InterfaceKey(interfaceName));
+        }
+
+
+        static final InstanceIdentifier<Config> ADVERTISEMENT_CONFIG_IID(final String interfaceName) {
+            return INTERFACE_IID(interfaceName)
+                .child(Subinterfaces.class)
+                .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX)).augmentation(Subinterface2.class)
+                .child(Ipv6.class).child(RouterAdvertisement.class).child(Config.class);
+        }
     }
 }

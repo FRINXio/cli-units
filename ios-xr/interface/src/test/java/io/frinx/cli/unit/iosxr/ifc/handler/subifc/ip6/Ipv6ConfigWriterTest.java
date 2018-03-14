@@ -83,7 +83,7 @@ public class Ipv6ConfigWriterTest {
 
         final Ipv6ConfigWriter writer = new Ipv6ConfigWriter(cliMock);
 
-        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID, TestData.IPV6_ADDRESS_CONFIG, context);
+        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG, context);
 
         Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue());
@@ -103,7 +103,7 @@ public class Ipv6ConfigWriterTest {
             CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
         ));
 
-        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID, TestData.IPV6_ADDRESS_CONFIG, context);
+        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_VLAN, TestData.IPV6_ADDRESS_CONFIG, context);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class Ipv6ConfigWriterTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(CoreMatchers.containsString(Ipv6ConfigWriter.MISSING_IP_ADDRESS_MSG));
 
-        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID, TestData.IPV6_ADDRESS_CONFIG_NO_ADDRESS, context);
+        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG_NO_ADDRESS, context);
     }
 
     @Test
@@ -129,7 +129,7 @@ public class Ipv6ConfigWriterTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(CoreMatchers.containsString(Ipv6ConfigWriter.MISSING_PREFIX_LENGTH_MSG));
 
-        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID, TestData.IPV6_ADDRESS_CONFIG_NO_PREFIX, context);
+        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG_NO_PREFIX, context);
     }
 
     @Test
@@ -139,7 +139,7 @@ public class Ipv6ConfigWriterTest {
 
         final Ipv6ConfigWriter writer = new Ipv6ConfigWriter(cliMock);
 
-        writer.deleteCurrentAttributes(TestData.ADDRESS_CONFIG_IID, TestData.IPV6_ADDRESS_CONFIG, context);
+        writer.deleteCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG, context);
 
         Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue());
@@ -148,13 +148,25 @@ public class Ipv6ConfigWriterTest {
     private static class TestData {
 
         static final String INTERFACE_NAME = "GigabitEthernet 0/0/0/0";
+        static final String INTERFACE_NAME_WRONG = "vlan 1";
         static final long SUBINTERFACE_INDEX = 0L;
         private static final Ipv6AddressNoZone IPV6_ADDRESS = new Ipv6AddressNoZone("1::");
 
-        static final InstanceIdentifier<Interface> INTERFACE_IID =
-            IIDs.INTERFACES.child(Interface.class, new InterfaceKey(INTERFACE_NAME));
-        static final InstanceIdentifier<Config> ADDRESS_CONFIG_IID =
-            INTERFACE_IID.child(Subinterfaces.class)
+        static InstanceIdentifier<Interface> INTERFACE_IID(final String interfaceName) {
+            return IIDs.INTERFACES.child(Interface.class, new InterfaceKey(interfaceName));
+        }
+
+        static final InstanceIdentifier<Config> ADDRESS_CONFIG_IID_CORRECT =
+            INTERFACE_IID(INTERFACE_NAME).child(Subinterfaces.class)
+                .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX))
+                .augmentation(Subinterface2.class)
+                .child(Ipv6.class)
+                .child(Addresses.class)
+                .child(Address.class, new AddressKey(IPV6_ADDRESS))
+                .child(Config.class);
+
+        static final InstanceIdentifier<Config> ADDRESS_CONFIG_IID_VLAN =
+            INTERFACE_IID(INTERFACE_NAME_WRONG).child(Subinterfaces.class)
                 .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX))
                 .augmentation(Subinterface2.class)
                 .child(Ipv6.class)
@@ -170,7 +182,7 @@ public class Ipv6ConfigWriterTest {
                     .build())
             .build();
         static final Interface INTERFACE_WRONG_TYPE = new InterfaceBuilder()
-            .setName(INTERFACE_NAME)
+            .setName(INTERFACE_NAME_WRONG)
             .setConfig(
                 new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
                     .setType(L2vlan.class)

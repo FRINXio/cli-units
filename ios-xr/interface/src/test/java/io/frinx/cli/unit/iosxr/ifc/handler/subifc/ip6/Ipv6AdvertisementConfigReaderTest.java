@@ -26,7 +26,6 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.concurrent.CompletableFuture;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,8 +43,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.Subinterfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L2vlan;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -105,32 +102,33 @@ public class Ipv6AdvertisementConfigReaderTest {
 
         final Ipv6AdvertisementConfigReader reader = new Ipv6AdvertisementConfigReader(cliMock);
 
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(CoreMatchers.allOf(
-            CoreMatchers.containsString(Ipv6CheckUtil.CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX),
-            CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
-            CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
-        ));
+        final ConfigBuilder configBuilder = new ConfigBuilder();
+        reader.readCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID_VLAN_INTERFACE, configBuilder, context);
 
-        reader.readCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID, new ConfigBuilder(), context);
+        final ConfigBuilder emptyBuilder = new ConfigBuilder();
+        Assert.assertEquals(emptyBuilder.getInterval(), configBuilder.getInterval());
+        Assert.assertEquals(emptyBuilder.getLifetime(), configBuilder.getLifetime());
+        Assert.assertEquals(emptyBuilder.isSuppress(), configBuilder.isSuppress());
     }
 
     static class TestData {
 
         static final String INTERFACE_NAME = "GigabitEthernet 0/0/0/0";
+        static final String INTERFACE_NAME_VLAN = "vlan 1";
         static final long SUBINTERFACE_INDEX = 0L;
 
         static final Interface INTERFACE_WRONG_TYPE = new InterfaceBuilder()
-            .setName(INTERFACE_NAME)
+            .setName(INTERFACE_NAME_VLAN)
             .setConfig(
                 new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
                     .setType(L2vlan.class)
                     .build())
             .build();
 
-        static final InstanceIdentifier<Interface> INTERFACE_IID =
-            IIDs.INTERFACES.child(Interface.class, new InterfaceKey(INTERFACE_NAME));
-        static final InstanceIdentifier<Config> ADVERTISEMENT_CONFIG_IID = INTERFACE_IID
+        static final InstanceIdentifier<Interface> INTERFACE_IID_VLAN =
+            IIDs.INTERFACES.child(Interface.class, new InterfaceKey(INTERFACE_NAME_VLAN));
+
+        static final InstanceIdentifier<Config> ADVERTISEMENT_CONFIG_IID_VLAN_INTERFACE = INTERFACE_IID_VLAN
             .child(Subinterfaces.class)
             .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX)).augmentation(Subinterface2.class)
             .child(Ipv6.class).child(RouterAdvertisement.class).child(Config.class);
