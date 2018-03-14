@@ -45,6 +45,7 @@
     <module>logging</module>
     <module>acl</module>
     <module>routing-policy</module>
+    <module>netflow</module>
   </modules>
 
   <build>
