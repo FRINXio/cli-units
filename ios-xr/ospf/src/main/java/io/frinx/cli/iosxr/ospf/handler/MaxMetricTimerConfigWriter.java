@@ -20,39 +20,68 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.MAXMETRICONSWITCHOVER;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.MAXMETRICSUMMARYLSA;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.MAXMETRICINCLUDE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.MAXMETRICINCLUDESTUB;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.MAXMETRICINCLUDETYPE2EXTERNAL;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.timers.max.metric.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.max.metrics.fields.max.metric.timers.max.metric.timer.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.MAXMETRICONSYSTEMBOOT;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class MaxMetricConfigWriter implements OspfWriter<Config> {
+public class MaxMetricTimerConfigWriter implements OspfWriter<Config> {
 
     private final Cli cli;
 
-    public MaxMetricConfigWriter(Cli cli) {
+    public MaxMetricTimerConfigWriter(Cli cli) {
         this.cli = cli;
     }
 
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
-        if (!data.isSet()) {
-            deleteCurrentAttributes(instanceIdentifier, data, writeContext);
-        }
-        final String timeout = (data.getTimeout() != null) ? "on-startup " + data.getTimeout() : "";
-        final StringBuilder builder = new StringBuilder();
-        if (data.getInclude() != null) {
-            for (Class<? extends MAXMETRICINCLUDE> include : data.getInclude()) {
-                builder.append(parseIncludes(include));
-            }
-        }
         blockingWriteAndRead(cli, instanceIdentifier, data,
             f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
-            f("max-metric router-lsa %s %s", timeout, builder.toString()),
+            getMaxMetricCommands(data, false),
             "exit");
+    }
+
+    @Override
+    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+                                               WriteContext writeContext) throws WriteFailedException {
+        deleteCurrentAttributesForType(id, dataBefore, writeContext);
+        writeCurrentAttributesForType(id, dataAfter, writeContext);
+    }
+
+    @Override
+    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
+                                               WriteContext writeContext) throws WriteFailedException {
+
+        blockingWriteAndRead(cli, instanceIdentifier, data,
+            f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
+            getMaxMetricCommands(data, true),
+            "exit");
+    }
+
+    private String getMaxMetricCommands(Config data, boolean delete) {
+        final String timeout = (data.getTimeout() != null) ? data.getTimeout().toString() : "";
+        final StringBuilder includes = new StringBuilder();
+        if (data.getInclude() != null) {
+            for (Class<? extends MAXMETRICINCLUDE> include : data.getInclude()) {
+                includes.append(parseIncludes(include));
+            }
+        }
+        final String prefix = delete ? "no " : "";
+        String trigger_cmd;
+        if (data.getTrigger().equals(MAXMETRICONSYSTEMBOOT.class)) {
+            trigger_cmd = "on-startup";
+        } else if (data.getTrigger().equals(MAXMETRICONSWITCHOVER.class)){
+            trigger_cmd = "on-switchover";
+        } else {
+            return f("%smax-metric router-lsa %s", prefix, includes.toString());
+        }
+        return f("%smax-metric router-lsa %s %s %s", prefix, trigger_cmd, timeout, includes.toString());
     }
 
     private String parseIncludes(Class<? extends MAXMETRICINCLUDE> include) {
@@ -64,27 +93,5 @@ public class MaxMetricConfigWriter implements OspfWriter<Config> {
             return "summary-lsa ";
         }
         return "";
-    }
-
-    @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
-    }
-
-    @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
-                                               WriteContext writeContext) throws WriteFailedException {
-        final String timeout = (data.getTimeout() != null) ? "on-startup " + data.getTimeout() : "";
-        final StringBuilder builder = new StringBuilder();
-        if (data.getInclude() != null) {
-            for (Class<? extends MAXMETRICINCLUDE> include : data.getInclude()) {
-                builder.append(parseIncludes(include));
-            }
-        }
-        blockingWriteAndRead(cli, instanceIdentifier, data,
-            f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
-            f("no max-metric router-lsa %s %s", timeout, builder.toString()),
-            "exit");
     }
 }
