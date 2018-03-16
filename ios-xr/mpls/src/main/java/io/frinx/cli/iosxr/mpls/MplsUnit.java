@@ -16,6 +16,8 @@
 
 package io.frinx.cli.iosxr.mpls;
 
+import static io.frinx.cli.iosxr.IosXrDevices.IOS_XR_ALL;
+
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
@@ -24,12 +26,28 @@ import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.mpls.handler.*;
+import io.frinx.cli.iosxr.mpls.handler.LoadShareConfigReader;
+import io.frinx.cli.iosxr.mpls.handler.LoadShareConfigWriter;
+import io.frinx.cli.iosxr.mpls.handler.NiMplsRsvpIfSubscripAugReader;
+import io.frinx.cli.iosxr.mpls.handler.NiMplsRsvpIfSubscripAugWriter;
+import io.frinx.cli.iosxr.mpls.handler.P2pAttributesConfigReader;
+import io.frinx.cli.iosxr.mpls.handler.P2pAttributesConfigWriter;
+import io.frinx.cli.iosxr.mpls.handler.RsvpInterfaceConfigReader;
+import io.frinx.cli.iosxr.mpls.handler.RsvpInterfaceConfigWriter;
+import io.frinx.cli.iosxr.mpls.handler.RsvpInterfaceReader;
+import io.frinx.cli.iosxr.mpls.handler.TeInterfaceConfigReader;
+import io.frinx.cli.iosxr.mpls.handler.TeInterfaceConfigWriter;
+import io.frinx.cli.iosxr.mpls.handler.TeInterfaceReader;
+import io.frinx.cli.iosxr.mpls.handler.TunnelConfigReader;
+import io.frinx.cli.iosxr.mpls.handler.TunnelConfigWriter;
+import io.frinx.cli.iosxr.mpls.handler.TunnelReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.CiscoMplsTeExtension;
@@ -48,20 +66,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev17082
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.subscription.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.RsvpTeBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te.InterfaceAttributesBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-import javax.annotation.Nonnull;
-import java.util.Set;
-
 public class MplsUnit implements TranslateUnit {
-
-    private static final Device IOS_ALL = new DeviceIdBuilder()
-            .setDeviceType("ios xr")
-            .setDeviceVersion("*")
-            .build();
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -71,7 +79,7 @@ public class MplsUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = registry.registerTranslateUnit(IOS_ALL, this);
+        reg = registry.registerTranslateUnit(IOS_XR_ALL, this);
     }
 
     public void close() {

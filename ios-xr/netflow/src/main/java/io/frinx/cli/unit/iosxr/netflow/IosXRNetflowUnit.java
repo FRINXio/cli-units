@@ -16,6 +16,8 @@
 
 package io.frinx.cli.unit.iosxr.netflow;
 
+import static io.frinx.cli.iosxr.IosXrDevices.IOS_XR_ALL;
+
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
@@ -47,11 +49,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public final class IosXRNetflowUnit implements TranslateUnit {
-
-    private static final Device IOS_XR_ALL = new DeviceIdBuilder()
-        .setDeviceType("ios xr")
-        .setDeviceVersion("*")
-        .build();
 
     private final TranslationUnitCollector registry;
     private Registration reg;

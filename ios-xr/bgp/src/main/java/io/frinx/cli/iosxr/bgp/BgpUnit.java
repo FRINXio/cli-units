@@ -16,6 +16,8 @@
 
 package io.frinx.cli.iosxr.bgp;
 
+import static io.frinx.cli.iosxr.IosXrDevices.IOS_XR_ALL;
+
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
@@ -40,16 +42,9 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.BgpBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.GlobalBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.NeighborsBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class BgpUnit implements TranslateUnit {
-
-    private static final Device IOS_ALL = new DeviceIdBuilder()
-            .setDeviceType("ios xr")
-            .setDeviceVersion("*")
-            .build();
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -59,7 +54,7 @@ public class BgpUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = registry.registerTranslateUnit(IOS_ALL, this);
+        reg = registry.registerTranslateUnit(IOS_XR_ALL, this);
     }
 
     public void close() {

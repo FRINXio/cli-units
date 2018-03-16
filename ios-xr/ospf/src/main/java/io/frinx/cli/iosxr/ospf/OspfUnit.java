@@ -16,6 +16,8 @@
 
 package io.frinx.cli.iosxr.ospf;
 
+import static io.frinx.cli.iosxr.IosXrDevices.IOS_XR_ALL;
+
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
@@ -24,7 +26,19 @@ import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.ospf.handler.*;
+import io.frinx.cli.iosxr.ospf.handler.AreaConfigReader;
+import io.frinx.cli.iosxr.ospf.handler.AreaConfigWriter;
+import io.frinx.cli.iosxr.ospf.handler.AreaInterfaceConfigReader;
+import io.frinx.cli.iosxr.ospf.handler.AreaInterfaceConfigWriter;
+import io.frinx.cli.iosxr.ospf.handler.AreaInterfaceMplsSyncConfigReader;
+import io.frinx.cli.iosxr.ospf.handler.AreaInterfaceMplsSyncConfigWriter;
+import io.frinx.cli.iosxr.ospf.handler.AreaInterfaceReader;
+import io.frinx.cli.iosxr.ospf.handler.GlobalConfigReader;
+import io.frinx.cli.iosxr.ospf.handler.GlobalConfigWriter;
+import io.frinx.cli.iosxr.ospf.handler.InterfaceRefReader;
+import io.frinx.cli.iosxr.ospf.handler.MaxMetricConfigReader;
+import io.frinx.cli.iosxr.ospf.handler.MaxMetricConfigWriter;
+import io.frinx.cli.iosxr.ospf.handler.OspfAreaReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
@@ -33,7 +47,6 @@ import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222._interface.ref.InterfaceRefBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.InterfacesBuilder;
@@ -44,16 +57,9 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.timers.MaxMetricBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.Ospfv2Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.AreasBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class OspfUnit implements TranslateUnit {
-
-    private static final Device IOS_ALL = new DeviceIdBuilder()
-            .setDeviceType("ios xr")
-            .setDeviceVersion("*")
-            .build();
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -63,13 +69,14 @@ public class OspfUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = registry.registerTranslateUnit(IOS_ALL, this);
+        reg = registry.registerTranslateUnit(IOS_XR_ALL, this);
     }
 
     public void close() {
         if (reg != null) {
             reg.close();
         }
+
     }
 
     @Override

@@ -138,21 +138,29 @@
         <!--<bundle>mvn:io.frinx.cli/ios-xr-essential-unit/{{VERSION}}</bundle>-->
     <!--</feature>-->
 
+    <feature name='cli-southbound-unit-ios-xr-utils' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:io.frinx.cli/ios-xr-utils/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-ios-xr-network-instance' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-bgp</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-ospf</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-bgp' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-bgp-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-interface' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-interface-unit/{{VERSION}}</bundle>
     </feature>
@@ -161,38 +169,45 @@
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-interface</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-mpls-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-ospf' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-ospf-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-snmp' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-snmp-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-logging' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-interface</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-logging-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-acl' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-acl-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-routing-policy' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-routing-policy-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-netflow' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-netflow-unit/{{VERSION}}</bundle>
     </feature>
 

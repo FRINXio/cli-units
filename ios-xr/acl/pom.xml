@@ -75,6 +75,11 @@
             <artifactId>common-handlers</artifactId>
             <version>${cli.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>ios-xr-utils</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
 
         <!-- Testing Dependencies -->
         <dependency>

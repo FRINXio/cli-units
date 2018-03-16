@@ -29,7 +29,7 @@
     </parent>
 
     <groupId>io.frinx.cli</groupId>
-    <artifactId>ios-xr-interface-unit</artifactId>
+    <artifactId>ios-xr-utils</artifactId>
     <version>3.1.3.rc1-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
@@ -49,42 +49,6 @@
             <artifactId>translation-registry-spi</artifactId>
             <version>${cli.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>io-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>utils-unit</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-utils</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-        </dependency>
-
-        <!-- Openconfig models -->
-        <dependency>
-            <groupId>io.frinx.openconfig</groupId>
-            <artifactId>openconfig-if-ip</artifactId>
-            <version>${openconfig.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.openconfig</groupId>
-            <artifactId>openconfig-lacp</artifactId>
-            <version>${openconfig.version}</version>
-        </dependency>
 
         <!-- Testing Dependencies -->
         <dependency>
@@ -98,4 +62,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+
 </project>

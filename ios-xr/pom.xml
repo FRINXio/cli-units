@@ -44,6 +44,7 @@
     <module>snmp</module>
     <module>logging</module>
     <module>acl</module>
+    <module>utils</module>
     <module>routing-policy</module>
     <module>netflow</module>
   </modules>

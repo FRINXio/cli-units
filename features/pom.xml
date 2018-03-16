@@ -212,6 +212,11 @@
     </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
+      <artifactId>ios-xr-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
       <artifactId>ios-xr-logging-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
