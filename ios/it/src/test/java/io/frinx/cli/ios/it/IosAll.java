@@ -58,6 +58,7 @@ import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.security.Security;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -164,7 +165,7 @@ public class IosAll {
         TranslateContext translateContext = reg.getTranslateContext(IOS_ALL);
 
         RemoteDeviceId remoteId = new RemoteDeviceId(CLI_TOPO_KEY, IOS_ID, IOS_ADDR);
-        cli = IOFactory.getIO(remoteId, CLI_CFG, translateContext.getInitializer(remoteId, CLI_CFG), EXECUTOR, RECONNECT_LISTENER)
+        cli = IOFactory.getIO(remoteId, CLI_CFG, translateContext.getInitializer(remoteId, CLI_CFG), EXECUTOR, RECONNECT_LISTENER, Collections.emptySet())
                 .toCompletableFuture()
                 .get();
 
@@ -263,7 +264,7 @@ public class IosAll {
 
         for (int i = 0; i < 20; i++) {
 
-            Cli io = IOFactory.getIO(remoteId, CLI_CFG, translateContext.getInitializer(remoteId, CLI_CFG), EXECUTOR, RECONNECT_LISTENER)
+            Cli io = IOFactory.getIO(remoteId, CLI_CFG, translateContext.getInitializer(remoteId, CLI_CFG), EXECUTOR, RECONNECT_LISTENER, Collections.emptySet())
                     .toCompletableFuture()
                     .get();
 
