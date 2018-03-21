@@ -109,12 +109,12 @@ public class VrpCliInitializerUnit implements TranslateUnit {
 
                 // Set terminal length to 0 to prevent "--More--" situation
                 LOG.debug("{}: Setting terminal length to 0 to prevent \"--More--\" situation", id);
+                String s = session.readUntilTimeout(READ_TIMEOUT_SECONDS);
                 write(session, newline, SET_TERMINAL_LENGTH_COMMAND);
-                session.readUntilTimeout(READ_TIMEOUT_SECONDS);
-
-                session.readUntilTimeout(READ_TIMEOUT_SECONDS);
+                s += session.readUntilTimeout(READ_TIMEOUT_SECONDS);
 
                 LOG.info("{}: VRP cli session initialized successfully", id);
+                LOG.debug("{}: VRP cli session initialization output: {}", id, s);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
