@@ -48,6 +48,7 @@
     <module>routing-policy</module>
     <module>netflow</module>
     <module>qos</module>
+    <module>configuration-metadata</module>
   </modules>
 
   <build>

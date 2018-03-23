@@ -179,7 +179,11 @@
       <artifactId>ios-xr-bgp-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>ios-xr-configuration-metadata-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>brocade-cli-init-unit</artifactId>
