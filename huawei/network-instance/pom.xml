@@ -84,11 +84,6 @@
     <artifactId>openconfig-network-instance</artifactId>
     <version>${openconfig.version}</version>
   </dependency>
-  <dependency>
-    <groupId>io.frinx.openconfig</groupId>
-    <artifactId>openconfig-local-routing</artifactId>
-    <version>${openconfig.version}</version>
-  </dependency>
 
   <!-- Testing Dependencies -->
   <dependency>

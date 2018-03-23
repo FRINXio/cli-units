@@ -73,8 +73,8 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-ospf</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-bgp</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-local-routing</feature>
         <bundle>mvn:io.frinx.cli/ios-network-instance-unit/{{VERSION}}</bundle>
-        <bundle>mvn:io.frinx.cli/ios-local-routing-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-ospf' version='${project.version}'>
@@ -90,6 +90,7 @@
 
     <feature name='cli-southbound-unit-ios-local-routing' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-local-routing-unit/{{VERSION}}</bundle>
     </feature>
@@ -271,13 +272,14 @@
     <feature name='cli-southbound-unit-huawei-network-instance' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
-        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-huawei-bgp</feature>
         <bundle>mvn:io.frinx.cli/huawei-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-huawei-bgp' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
-        <feature version='${project.version}'>cli-southbound-unit-huawei-network-instance</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/huawei-bgp-unit/{{VERSION}}</bundle>
     </feature>
 
