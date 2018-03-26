@@ -35,30 +35,25 @@ import io.frinx.cli.unit.iosxr.netflow.handler.EgressFlowReader;
 import io.frinx.cli.unit.iosxr.netflow.handler.IngressFlowConfigReader;
 import io.frinx.cli.unit.iosxr.netflow.handler.IngressFlowConfigWriter;
 import io.frinx.cli.unit.iosxr.netflow.handler.IngressFlowReader;
+import io.frinx.cli.unit.iosxr.netflow.handler.NetflowInterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.netflow.handler.NetflowInterfaceReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
+import io.frinx.cli.unit.utils.NoopCliWriter;
+import io.frinx.openconfig.openconfig.netflow.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.egress.netflow.top.EgressFlowsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.IngressFlowsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.top.NetflowBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public final class IosXRNetflowUnit implements TranslateUnit {
 
     private final TranslationUnitCollector registry;
     private Registration reg;
-
-    // netflow IIDs
-    private final InstanceIdentifier<Interface> NETFLOW_INTERFACE = io.frinx.openconfig.openconfig.netflow.IIDs.NE_IN_INTERFACE;
-    private final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.ingress.flows.ingress.flow.Config> NETFLOW_INGRESS_CONFIG_IID =
-        io.frinx.openconfig.openconfig.netflow.IIDs.NE_IN_IN_IN_IN_CONFIG;
-    private final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.egress.netflow.top.egress.flows.egress.flow.Config> NETFLOW_EGRESS_CONFIG_IID =
-        io.frinx.openconfig.openconfig.netflow.IIDs.NE_IN_IN_EG_EG_CONFIG;
 
     public IosXRNetflowUnit(@Nonnull final TranslationUnitCollector registry) {
         this.registry = registry;
@@ -97,24 +92,32 @@ public final class IosXRNetflowUnit implements TranslateUnit {
     }
 
     private void provideWriters(final ModifiableWriterRegistryBuilder wRegistry, final Cli cli) {
-        wRegistry.add(new GenericWriter<>(io.frinx.openconfig.openconfig.netflow.IIDs.NE_IN_IN_IN_INGRESSFLOW, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(NETFLOW_INGRESS_CONFIG_IID, new IngressFlowConfigWriter(cli)));
-        wRegistry.add(new GenericWriter<>(io.frinx.openconfig.openconfig.netflow.IIDs.NE_IN_IN_EG_EGRESSFLOW, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(NETFLOW_EGRESS_CONFIG_IID, new EgressFlowConfigWriter(cli)));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_INTERFACES, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_INTERFACE, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_CONFIG, new NoopCliWriter<>()));
+
+        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_INGRESSFLOWS, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_IN_INGRESSFLOW, new NoopCliListWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_IN_IN_CONFIG, new IngressFlowConfigWriter(cli)));
+
+        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_EGRESSFLOWS, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_EG_EGRESSFLOW, new NoopCliListWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_EG_EG_CONFIG, new EgressFlowConfigWriter(cli)));
     }
 
     private void provideReaders(final ModifiableReaderRegistryBuilder rRegistry, final Cli cli) {
-        rRegistry.addStructuralReader(io.frinx.openconfig.openconfig.netflow.IIDs.NETFLOW, NetflowBuilder.class);
-        rRegistry.addStructuralReader(io.frinx.openconfig.openconfig.netflow.IIDs.NE_INTERFACES, org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.InterfacesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(NETFLOW_INTERFACE, new NetflowInterfaceReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NETFLOW, NetflowBuilder.class);
+        rRegistry.addStructuralReader(IIDs.NE_INTERFACES, InterfacesBuilder.class);
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_IN_INTERFACE, new NetflowInterfaceReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_IN_IN_CONFIG, new NetflowInterfaceConfigReader()));
 
-        rRegistry.addStructuralReader(io.frinx.openconfig.openconfig.netflow.IIDs.NE_IN_IN_INGRESSFLOWS, IngressFlowsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(io.frinx.openconfig.openconfig.netflow.IIDs.NE_IN_IN_IN_INGRESSFLOW, new IngressFlowReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(NETFLOW_INGRESS_CONFIG_IID, new IngressFlowConfigReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_IN_IN_INGRESSFLOWS, IngressFlowsBuilder.class);
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_IN_IN_IN_INGRESSFLOW, new IngressFlowReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_IN_IN_IN_IN_CONFIG, new IngressFlowConfigReader(cli)));
 
-        rRegistry.addStructuralReader(io.frinx.openconfig.openconfig.netflow.IIDs.NE_IN_IN_EGRESSFLOWS, EgressFlowsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(io.frinx.openconfig.openconfig.netflow.IIDs.NE_IN_IN_EG_EGRESSFLOW, new EgressFlowReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(NETFLOW_EGRESS_CONFIG_IID, new EgressFlowConfigReader(cli)));
+        rRegistry.addStructuralReader(IIDs.NE_IN_IN_EGRESSFLOWS, EgressFlowsBuilder.class);
+        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_IN_IN_EG_EGRESSFLOW, new EgressFlowReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.NE_IN_IN_EG_EG_CONFIG, new EgressFlowConfigReader(cli)));
     }
 
     @Override

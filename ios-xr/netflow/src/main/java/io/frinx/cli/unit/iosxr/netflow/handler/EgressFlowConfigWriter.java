@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EgressFlowConfigWriter implements CliWriter<Config> {
 
-    private static final String FLOW_CMD_WITH_SAMPLER = "flow %s monitor %s sampler %s engress";
+    private static final String FLOW_CMD_WITH_SAMPLER = "flow %s monitor %s sampler %s egress";
     private static final String FLOW_CMD_WITHOUT_SAMPLER = "flow %s monitor %s egress";
     private static final String NO_FLOW_CMD = "no flow %s monitor %s egress";
     private final Cli cli;
