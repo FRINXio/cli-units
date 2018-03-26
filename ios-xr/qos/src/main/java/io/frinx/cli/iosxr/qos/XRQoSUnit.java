@@ -29,12 +29,17 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.qos.handler.classifier.ActionConfigReader;
 import io.frinx.cli.iosxr.qos.handler.classifier.ActionConfigWriter;
 import io.frinx.cli.iosxr.qos.handler.classifier.ClassifierConfigReader;
-import io.frinx.cli.iosxr.qos.handler.classifier.ClassifierWriter;
 import io.frinx.cli.iosxr.qos.handler.classifier.ClassifierReader;
+import io.frinx.cli.iosxr.qos.handler.classifier.ClassifierWriter;
 import io.frinx.cli.iosxr.qos.handler.classifier.ConditionsReader;
 import io.frinx.cli.iosxr.qos.handler.classifier.RemarkConfigReader;
 import io.frinx.cli.iosxr.qos.handler.classifier.RemarkConfigWriter;
 import io.frinx.cli.iosxr.qos.handler.classifier.TermReader;
+import io.frinx.cli.iosxr.qos.handler.scheduler.InputConfigReader;
+import io.frinx.cli.iosxr.qos.handler.scheduler.InputReader;
+import io.frinx.cli.iosxr.qos.handler.scheduler.OneRateTwoColorConfigReader;
+import io.frinx.cli.iosxr.qos.handler.scheduler.SchedulerPolicyReader;
+import io.frinx.cli.iosxr.qos.handler.scheduler.SchedulerReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliWriter;
@@ -45,6 +50,7 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv6ConditionAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosMaxQueueDepthMsAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosRemarkQosGroupAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.TermsBuilder;
@@ -54,6 +60,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.RemarkBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.ClassifiersBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.OneRateTwoColorBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.InputsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.SchedulerPoliciesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicy;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.SchedulersBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.Scheduler;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.top.QosBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -154,8 +166,25 @@ public class XRQoSUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IIDs.QO_CL_CL_TE_TE_AC_REMARK, RemarkBuilder.class);
         rRegistry.subtreeAdd(Sets.newHashSet(
             RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_AC_RE_CONFIG.augmentation(QosRemarkQosGroupAug.class),
-                    InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.Config.class))
+                InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.Config.class))
         ), new GenericConfigReader<>(IIDs.QO_CL_CL_TE_TE_AC_RE_CONFIG, new RemarkConfigReader(cli)));
+
+        rRegistry.addStructuralReader(IIDs.QO_SCHEDULERPOLICIES, SchedulerPoliciesBuilder.class);
+        rRegistry.subtreeAdd(Sets.newHashSet(
+            RWUtils.cutIdFromStart(IIDs.QO_SC_SC_CONFIG, InstanceIdentifier.create(SchedulerPolicy.class))),
+            new GenericListReader<>(IIDs.QO_SC_SCHEDULERPOLICY, new SchedulerPolicyReader(cli)));
+        rRegistry.addStructuralReader(IIDs.QO_SC_SC_SCHEDULERS, SchedulersBuilder.class);
+        rRegistry.subtreeAdd(Sets.newHashSet(
+            RWUtils.cutIdFromStart(IIDs.QO_SC_SC_SC_SC_CONFIG, InstanceIdentifier.create(Scheduler.class))
+        ), new GenericListReader<>(IIDs.QO_SC_SC_SC_SCHEDULER, new SchedulerReader(cli)));
+        rRegistry.addStructuralReader(IIDs.QO_SC_SC_SC_SC_INPUTS, InputsBuilder.class);
+        rRegistry.add(new GenericListReader<>(IIDs.QO_SC_SC_SC_SC_IN_INPUT, new InputReader(cli)));
+        rRegistry.add(new GenericConfigReader<>(IIDs.QO_SC_SC_SC_SC_IN_IN_CONFIG, new InputConfigReader(cli)));
+        rRegistry.addStructuralReader(IIDs.QO_SC_SC_SC_SC_ONERATETWOCOLOR, OneRateTwoColorBuilder.class);
+        rRegistry.subtreeAdd(Sets.newHashSet(
+            RWUtils.cutIdFromStart(IIDs.QO_SC_SC_SC_SC_ON_CONFIG.augmentation(QosMaxQueueDepthMsAug.class),
+                InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.Config.class))
+        ), new GenericConfigReader<>(IIDs.QO_SC_SC_SC_SC_ON_CONFIG, new OneRateTwoColorConfigReader(cli)));
     }
 
     @Override
