@@ -36,12 +36,16 @@ import io.frinx.cli.iosxr.qos.handler.classifier.RemarkConfigReader;
 import io.frinx.cli.iosxr.qos.handler.classifier.RemarkConfigWriter;
 import io.frinx.cli.iosxr.qos.handler.classifier.TermReader;
 import io.frinx.cli.iosxr.qos.handler.scheduler.InputConfigReader;
+import io.frinx.cli.iosxr.qos.handler.scheduler.InputConfigWriter;
 import io.frinx.cli.iosxr.qos.handler.scheduler.InputReader;
 import io.frinx.cli.iosxr.qos.handler.scheduler.OneRateTwoColorConfigReader;
+import io.frinx.cli.iosxr.qos.handler.scheduler.OneRateTwoColorConfigWriter;
 import io.frinx.cli.iosxr.qos.handler.scheduler.SchedulerPolicyReader;
+import io.frinx.cli.iosxr.qos.handler.scheduler.SchedulerPolicyWriter;
 import io.frinx.cli.iosxr.qos.handler.scheduler.SchedulerReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.qos.IIDs;
 import java.util.Collections;
@@ -133,6 +137,18 @@ public class XRQoSUnit implements TranslateUnit {
                RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_AC_RE_CONFIG.augmentation(QosRemarkQosGroupAug.class),
                    InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.Config.class))
         ), new GenericWriter<>(IIDs.QO_CL_CL_TE_TE_AC_RE_CONFIG, new RemarkConfigWriter(cli)));
+
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SCHEDULERPOLICIES, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SCHEDULERPOLICY, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SCHEDULER, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_CONFIG, new SchedulerPolicyWriter(cli)));
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_CONFIG, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_INPUTS, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_IN_INPUT, new NoopCliListWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_IN_IN_CONFIG, new InputConfigWriter(cli)));
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_ONERATETWOCOLOR, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_ON_CONFIG, new OneRateTwoColorConfigWriter(cli)));
+        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_ON_CONFIG.augmentation(QosMaxQueueDepthMsAug.class), new NoopCliWriter<>()));
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
