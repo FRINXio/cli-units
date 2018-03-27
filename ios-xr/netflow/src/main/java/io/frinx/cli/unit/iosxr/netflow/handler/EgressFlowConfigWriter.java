@@ -97,6 +97,7 @@ public class EgressFlowConfigWriter implements CliWriter<Config> {
                                         @Nonnull final Config dataAfter, @Nonnull final WriteContext writeContext)
         throws WriteFailedException {
 
+        deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 }
