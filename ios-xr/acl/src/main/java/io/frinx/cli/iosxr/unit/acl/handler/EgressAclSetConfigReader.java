@@ -37,11 +37,15 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_ACL_INTF = "do show running-config interface %s";
-    private static final Pattern ACL_LINE = Pattern.compile("(?<type>.+) access-group (?<name>.+) egress");
     private final Cli cli;
 
     public EgressAclSetConfigReader(final Cli cli) {
         this.cli = cli;
+    }
+
+    private Pattern aclLine(final String name) {
+        final String regex = f("(?<type>.+) access-group %s egress", name);
+        return Pattern.compile(regex);
     }
 
     @Override
@@ -70,8 +74,10 @@ public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigB
     private void parseAclConfig(final String output, final ConfigBuilder configBuilder, final String setName) {
         configBuilder.setSetName(setName);
 
+        final Pattern aclLine = aclLine(setName);
+
         ParsingUtils.parseField(output, 0,
-            ACL_LINE::matcher,
+            aclLine::matcher,
             matcher -> AclUtil.getType(matcher.group("type")),
             configBuilder::setType);
     }
