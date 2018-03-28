@@ -19,11 +19,8 @@ package io.frinx.cli.iosxr.unit.acl.handler;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
 import io.frinx.cli.iosxr.unit.acl.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSetBuilder;
@@ -36,26 +33,21 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_ACL_INTF = "do show running-config interface %s";
+    static final String SH_ACL_INTF = "do show running-config interface %s";
     private final Cli cli;
 
     public EgressAclSetConfigReader(final Cli cli) {
         this.cli = cli;
     }
 
-    private Pattern aclLine(final String name) {
-        final String regex = f("(?<type>.+) access-group %s egress", name);
-        return Pattern.compile(regex);
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String name = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
-        InterfaceCheckUtil.checkInterface(readContext, name);
+        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
+        InterfaceCheckUtil.checkInterface(readContext, interfaceName);
 
         final String setName = instanceIdentifier.firstKeyOf(EgressAclSet.class).getSetName();
 
-        final String readCommand = f(SH_ACL_INTF, instanceIdentifier.firstKeyOf(Interface.class).getId().getValue());
+        final String readCommand = f(SH_ACL_INTF, interfaceName);
         final String readConfig = blockingRead(
             readCommand,
             cli,
@@ -63,22 +55,11 @@ public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigB
             readContext
         );
 
-        parseAclConfig(readConfig, configBuilder, setName);
+        EgressAclSetReader.parseAcl(readConfig, configBuilder, setName);
     }
 
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
         ((EgressAclSetBuilder) builder).setConfig(config);
-    }
-
-    private void parseAclConfig(final String output, final ConfigBuilder configBuilder, final String setName) {
-        configBuilder.setSetName(setName);
-
-        final Pattern aclLine = aclLine(setName);
-
-        ParsingUtils.parseField(output, 0,
-            aclLine::matcher,
-            matcher -> AclUtil.getType(matcher.group("type")),
-            configBuilder::setType);
     }
 }
