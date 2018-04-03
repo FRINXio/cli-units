@@ -58,6 +58,7 @@ public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, I
         return Pattern.compile(regex);
     }
 
+    @VisibleForTesting
     static void parseAcl(final String output, final Builder configBuilder, final String setName) {
         Preconditions.checkArgument(
             configBuilder instanceof IngressAclSetBuilder || configBuilder instanceof ConfigBuilder

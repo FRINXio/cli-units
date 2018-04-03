@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.ModificationCache;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
 import io.frinx.openconfig.openconfig.acl.IIDs;
 import java.util.concurrent.CompletableFuture;
 import org.hamcrest.CoreMatchers;
@@ -64,6 +65,22 @@ public class IngressAclSetConfigReaderTest {
             .then(invocation -> modificationCacheMock);
         Mockito.when(context.getModificationCache().containsKey(Mockito.any()))
             .then(invocation -> true);
+    }
+
+    @Test
+    public void parseTest() {
+        final String setName = "IPV4_ACL_EXAMPLE2";
+        final String type = "ipv4";
+        String readOutput = "Tue Apr  3 01:10:12.042 UTC\n"
+            + "interface Bundle-Ether666\n"
+            + " " + type + " access-group " + setName + " ingress\n"
+            + "!";
+
+        final ConfigBuilder builder = new ConfigBuilder();
+        IngressAclSetReader.parseAcl(readOutput, builder, setName);
+
+        assertEquals(builder.getSetName(), setName);
+        assertEquals(builder.getType(), AclUtil.getType(type));
     }
 
     @Test
