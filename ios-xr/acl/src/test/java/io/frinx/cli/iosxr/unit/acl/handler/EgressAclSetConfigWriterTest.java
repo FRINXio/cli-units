@@ -71,6 +71,9 @@ public class EgressAclSetConfigWriterTest {
 
                 return invocation.callRealMethod();
             });
+        Mockito.when(context.readBefore(Mockito.any()))
+            .then(invocation -> Optional.absent());
+
     }
 
     @Before
