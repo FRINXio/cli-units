@@ -31,7 +31,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.AfiSafis;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
@@ -59,30 +58,24 @@ public class NeighborConfigWriterTest {
     private static final String WRITE_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "remote-as 65500\n" +
-            "no password\n" +
-            "no description\n" +
-            "no shutdown\n" +
             "use neighbor-group ibgp\n" +
+            "no shutdown\n" +
             "exit\n" +
             "exit\n";
 
     private static final String UPDATE_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "remote-as 65501\n" +
-            "no password\n" +
-            "no description\n" +
-            "shutdown\n" +
             "use neighbor-group ebgp\n" +
+            "shutdown\n" +
             "exit\n" +
             "exit\n";
 
     private static final String UPDATE_CLEAN_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "no remote-as\n" +
-            "no password\n" +
-            "no description\n" +
-            "shutdown\n" +
             "no use neighbor-group\n" +
+            "shutdown\n" +
             "exit\n" +
             "exit\n";
 

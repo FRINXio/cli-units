@@ -17,7 +17,7 @@
 
 package io.frinx.cli.iosxr.ospf;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.frinx.cli.iosxr.ospf.handler.MaxMetricTimerConfigReader;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class MaxMetricTimerConfigReaderTest {
         MaxMetricTimerConfigReader.parseTimers(output, builder);
         Assert.assertEquals(60, builder.getTimeout().intValue());
 
-        Assert.assertEquals(Lists.newArrayList(MAXMETRICINCLUDESTUB.class, MAXMETRICSUMMARYLSA.class, MAXMETRICINCLUDETYPE2EXTERNAL.class),
-                builder.getInclude());
+        Assert.assertTrue(builder.getInclude().containsAll(
+                Sets.newHashSet(MAXMETRICINCLUDESTUB.class, MAXMETRICSUMMARYLSA.class, MAXMETRICINCLUDETYPE2EXTERNAL.class)));
     }
 }
