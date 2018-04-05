@@ -30,8 +30,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.Config2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.Config2Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.NiProtAggAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.NiProtAggAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.LocalAggregatesBuilder;
@@ -111,7 +111,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
         builder.setPrefix(key.getPrefix());
         ConfigBuilder configBuilder = new ConfigBuilder().setPrefix(key.getPrefix());
         if (policies.isPresent()) {
-            configBuilder.addAugmentation(Config2.class, new Config2Builder().setApplyPolicy(policies.get()).build());
+            configBuilder.addAugmentation(NiProtAggAug.class, new NiProtAggAugBuilder().setApplyPolicy(policies.get()).build());
         }
         builder.setConfig(configBuilder.build());
     }

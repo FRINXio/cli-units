@@ -26,7 +26,7 @@ import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
 import java.util.Collections;
 import java.util.stream.Collectors;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.Config2;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.NiProtAggAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config;
@@ -78,8 +78,8 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                 "Address-family for network doesn't exist");
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         String policy = null;
-        if (config.getAugmentation(Config2.class) != null) {
-            policy = config.getAugmentation(Config2.class).getApplyPolicy();
+        if (config.getAugmentation(NiProtAggAug.class) != null) {
+            policy = config.getAugmentation(NiProtAggAug.class).getApplyPolicy();
         }
         blockingWriteAndRead(fT(LOCAL_AGGREGATE_CONFIG,
                 "as",  g.getConfig().getAs().getValue(),
@@ -106,12 +106,12 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                 "Address-family for network doesn't exist");
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         String oldPolicy = null;
-        if (dataBefore.getAugmentation(Config2.class) != null) {
-            oldPolicy = dataBefore.getAugmentation(Config2.class).getApplyPolicy();
+        if (dataBefore.getAugmentation(NiProtAggAug.class) != null) {
+            oldPolicy = dataBefore.getAugmentation(NiProtAggAug.class).getApplyPolicy();
         }
         String newPolicy = null;
-        if (dataAfter.getAugmentation(Config2.class) != null) {
-            newPolicy = dataAfter.getAugmentation(Config2.class).getApplyPolicy();
+        if (dataAfter.getAugmentation(NiProtAggAug.class) != null) {
+            newPolicy = dataAfter.getAugmentation(NiProtAggAug.class).getApplyPolicy();
         }
         blockingWriteAndRead(fT(LOCAL_AGGREGATE_CONFIG,
                 "as",  g.getConfig().getAs().getValue(),
@@ -141,8 +141,8 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
         }
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         String policy = null;
-        if (config.getAugmentation(Config2.class) != null) {
-            policy = config.getAugmentation(Config2.class).getApplyPolicy();
+        if (config.getAugmentation(NiProtAggAug.class) != null) {
+            policy = config.getAugmentation(NiProtAggAug.class).getApplyPolicy();
         }
         blockingDeleteAndRead(fT(LOCAL_AGGREGATE_CONFIG,
                 "as",  g.getConfig().getAs().getValue(),
