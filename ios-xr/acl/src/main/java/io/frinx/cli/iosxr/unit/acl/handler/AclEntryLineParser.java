@@ -392,6 +392,9 @@ public class AclEntryLineParser {
             String ip = words.poll();
             return new Ipv4Prefix(ip + "/" + mask);
         } else {
+            if (!first.contains("/")) {
+                first = first + "/32";
+            }
             return new Ipv4Prefix(first);
         }
     }
@@ -406,6 +409,9 @@ public class AclEntryLineParser {
             String ip = words.poll();
             return new Ipv6Prefix(ip + "/" + mask);
         } else {
+            if (!first.contains("/")) {
+                first = first + "/128";
+            }
             return new Ipv6Prefix(first);
         }
     }
