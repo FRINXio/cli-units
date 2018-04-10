@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.ApplyPolicyBuilder;
@@ -62,15 +63,16 @@ public class NeighborPolicyConfigReader implements BgpReader.BgpConfigReader<Con
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String ipAddress = NeighborWriter.getNeighborIp(instanceIdentifier);
 
-        parseConfigAttributes(blockingRead(String.format(NeighborConfigReader.SH_SUMM, ipAddress), cli, instanceIdentifier, readContext),
-                configBuilder, vrfName);
+        String output = blockingRead(String.format(NeighborConfigReader.SH_SUMM, ipAddress), cli, instanceIdentifier, readContext);
+        String[] outputLines = NeighborReader.splitOutput(output);
+        Stream<String> outputStream = Arrays.stream(outputLines)
+                .filter(line -> !line.contains("address-family"));
+
+        parseConfigAttributes(configBuilder, vrfName, outputStream);
     }
 
     @VisibleForTesting
-    static void parseConfigAttributes(String output, ConfigBuilder configBuilder, String vrfName) {
-
-        String[] vrfSplit = NeighborReader.getSplitedOutput(output);
-
+    public static void parseConfigAttributes(ConfigBuilder configBuilder, String vrfName, Stream<String> vrfSplit) {
         if (NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfName)) {
             parseDefault(configBuilder, vrfSplit);
         } else {
@@ -78,8 +80,8 @@ public class NeighborPolicyConfigReader implements BgpReader.BgpConfigReader<Con
         }
     }
 
-    private static void parseDefault(ConfigBuilder configBuilder, String[] output) {
-        Optional<String> defaultNetworkNeighbors = Arrays.stream(output)
+    private static void parseDefault(ConfigBuilder configBuilder, Stream<String> output) {
+        Optional<String> defaultNetworkNeighbors = output
                 .filter(value -> !value.contains("vrf"))
                 .reduce((s, s2) -> s + s2);
 
@@ -97,18 +99,23 @@ public class NeighborPolicyConfigReader implements BgpReader.BgpConfigReader<Con
                 m -> m.group("updateSource"),
                 Function.identity());
 
-        configBuilder.setImportPolicy(inPolicies);
+        if (!inPolicies.isEmpty()) {
+            configBuilder.setImportPolicy(inPolicies);
+        }
 
         List<String> outPolicies = ParsingUtils.parseFields(processed, 0, NEIGHBOR_POLICY_OUT_PATTERN::matcher,
                 m -> m.group("updateSource"),
                 Function.identity());
 
-        configBuilder.setExportPolicy(outPolicies);
+        if (!outPolicies.isEmpty()) {
+            configBuilder.setExportPolicy(outPolicies);
+        }
     }
 
-    private static void parseVrf(ConfigBuilder configBuilder, String vrfName, String[] output) {
-        Optional<String> optionalVrfOutput =
-                Arrays.stream(output).filter(value -> value.contains(vrfName)).findFirst();
+    private static void parseVrf(ConfigBuilder configBuilder, String vrfName, Stream<String> output) {
+        Optional<String> optionalVrfOutput = output
+                        .filter(value -> value.contains(vrfName))
+                        .findFirst();
 
         setAttributes(configBuilder, optionalVrfOutput.orElse(""));
     }

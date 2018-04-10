@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.ios.bgp;
+package io.frinx.cli.ios.bgp.handler.neighbor;
 
-import io.frinx.cli.ios.bgp.handler.neighbor.NeighborReader;
-import io.frinx.cli.ios.bgp.handler.neighbor.NeighborStateReader;
-import io.frinx.cli.ios.bgp.handler.neighbor.PrefixesReader;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,14 +40,21 @@ public class NeighborReaderTest {
             "Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd\n" +
             "10.255.255.3    4        65000   23713   23711        1    0    0 2w0d            0\n";
 
-    private String summOutputNeighbors = "router bgp 65000\n" +
+    public static final String SUMM_OUTPUT_NEIGHBORS = "router bgp 65000\n" +
             " neighbor 3.3.3.3 remote-as 65000\n" +
+            " neighbor 3.3.3.4 peer-group abcd\n" +
+            " neighbor abcd peer-group\n" +
             " address-family ipv4\n" +
             "  neighbor 3.3.3.3 activate\n" +
             " address-family ipv4 vrf vrf1\n" +
+            "  neighbor abcdVRF peer-group\n" +
+            "  neighbor abcdVRF2 peer-group\n" +
             "  neighbor 1.2.3.4 remote-as 65000\n" +
+            "  neighbor DEAD:BAAA::1 remote-as 65000\n" +
+            "  neighbor 1.2.3.4 password abcd\n" +
             "  neighbor 1.2.3.5 activate\n" +
             "  neighbor 1.2.3.5 remote-as 65000\n" +
+            "  neighbor 1.2.3.5 password 7 JHJASDH78DH\n" +
             "  neighbor 1.2.3.4 activate\n" +
             " address-family ipv4 vrf vrf2\n" +
             "  neighbor 2.2.0.1 remote-as 65000\n" +
@@ -58,13 +62,13 @@ public class NeighborReaderTest {
 
     @Test
     public void testNeighborIds() {
-        List<NeighborKey> keys = NeighborReader.getDefaultNeighborKeys(summOutputNeighbors);
-        Assert.assertArrayEquals(new Ipv4Address[]{new Ipv4Address("3.3.3.3")},
+        List<NeighborKey> keys = NeighborReader.getDefaultNeighborKeys(SUMM_OUTPUT_NEIGHBORS);
+        Assert.assertArrayEquals(new Ipv4Address[]{new Ipv4Address("3.3.3.3"), new Ipv4Address("3.3.3.4")},
                 keys.stream().map(NeighborKey::getNeighborAddress).map(IpAddress::getIpv4Address).toArray());
 
-        keys = NeighborReader.getVrfNeighborKeys(summOutputNeighbors, "vrf1");
-        Assert.assertArrayEquals(new Ipv4Address[]{new Ipv4Address("1.2.3.4"), new Ipv4Address("1.2.3.5")},
-                keys.stream().map(NeighborKey::getNeighborAddress).map(IpAddress::getIpv4Address).toArray());
+        keys = NeighborReader.getVrfNeighborKeys(SUMM_OUTPUT_NEIGHBORS, "vrf1");
+        Assert.assertArrayEquals(new String[]{"1.2.3.4", "DEAD:BAAA::1", "1.2.3.5"},
+                keys.stream().map(NeighborKey::getNeighborAddress).map(IpAddress::getValue).map(String::new).toArray());
 
         StateBuilder sBuilder = new StateBuilder();
         NeighborStateReader.readState("10.255.255.2", sBuilder, summOutput);

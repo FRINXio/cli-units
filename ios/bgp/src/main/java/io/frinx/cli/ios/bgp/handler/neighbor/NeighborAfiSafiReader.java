@@ -26,6 +26,7 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -60,11 +61,12 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
 
         String neighborIp = NeighborWriter.getNeighborIp(id);
-        return getAfiKeys(blockingRead(String.format(NeighborConfigReader.SH_SUMM, neighborIp), cli, id, readContext), vrfKey);
+        return getAfiKeys(blockingRead(String.format(NeighborConfigReader.SH_SUMM, neighborIp), cli, id, readContext), vrfKey,
+                line -> line.contains("activate"));
     }
 
     @VisibleForTesting
-    static List<AfiSafiKey> getAfiKeys(String output, NetworkInstanceKey vrfKey) {
+    public static List<AfiSafiKey> getAfiKeys(String output, NetworkInstanceKey vrfKey, Predicate<String> filterActiveFamilies) {
         output = output.replaceAll("\\n|\\r", "");
         output = output.replaceAll("address-family", "\naddress-family");
 
@@ -74,7 +76,7 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
                     // Skip header line(s)
                     .map(String::trim)
                     .filter(line -> !line.contains("vrf"))
-                    .filter(line -> line.contains("activate"))
+                    .filter(filterActiveFamilies)
                     .map(FAMILY_LINE::matcher)
                     .filter(Matcher::matches)
                     .map(m -> m.group("family"))
@@ -88,7 +90,7 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
             return ParsingUtils.NEWLINE.splitAsStream(output)
                     // Skip header line(s)
                     .map(String::trim)
-                    .filter(line -> line.contains("activate"))
+                    .filter(filterActiveFamilies)
                     .map(FAMILY_LINE_VRF::matcher)
                     .filter(Matcher::matches)
                     .filter(m -> m.group("vrf").equals(vrfName))

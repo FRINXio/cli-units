@@ -59,7 +59,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
     @VisibleForTesting
     static List<AggregateKey> getVrfAggregateKeys(String output, String vrfName) {
         Optional<String> optionalVrfOutput =
-                Arrays.stream(NeighborReader.getSplitedOutput(output))
+                Arrays.stream(NeighborReader.splitOutput(output))
                         .filter(value -> value.contains(vrfName))
                         .reduce((s1, s2) -> s1 + s2);
 
@@ -79,7 +79,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
     @VisibleForTesting
     static List<AggregateKey> getDefaultAggregateKeys(String output) {
         Optional<String> optionalVrfOutput =
-                Arrays.stream(NeighborReader.getSplitedOutput(output))
+                Arrays.stream(NeighborReader.splitOutput(output))
                         .filter(value -> !value.contains("vrf"))
                         .reduce((s1, s2) -> s1 + s2);
 

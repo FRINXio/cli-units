@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
@@ -43,23 +44,26 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
-    private static final String SH_SUMM = "sh run | include ^router bgp|^ *address-family|^ *neighbor";
-    private static final Pattern NEIGHBOR_LINE = Pattern.compile("neighbor (?<neighborIp>\\S*) .*");
+    public static final String SH_SUMM = "sh run | include ^router bgp|^ *address-family|^ *neighbor";
+    private static final Pattern NEIGHBOR_LINE = Pattern.compile("neighbor (?<id>[0-9A-F.:]*) (remote-as|peer-group) \\S+");
+    private static final Function<String, NeighborKey> TO_NEIGH_KEY = (String value) -> new NeighborKey(new IpAddress(value.toCharArray()));
+
     private Cli cli;
 
     public NeighborReader(Cli cli) {
         this.cli = cli;
     }
 
-    @Override public List<NeighborKey> getAllIdsForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
-        @Nonnull ReadContext readContext) throws ReadFailedException {
+    @Override
+    public List<NeighborKey> getAllIdsForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
+                                              @Nonnull ReadContext readContext) throws ReadFailedException {
 
         String networkInstanceName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         if (DEFAULT_BGP_INSTANCE.equals(networkInstanceName)) {
             return getDefaultNeighborKeys(blockingRead(SH_SUMM, cli, instanceIdentifier, readContext));
         } else {
             return getVrfNeighborKeys(blockingRead(SH_SUMM, cli, instanceIdentifier, readContext),
-                networkInstanceName);
+                    networkInstanceName);
         }
     }
 
@@ -70,40 +74,39 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
 
     @VisibleForTesting
     public static List<NeighborKey> getVrfNeighborKeys(String output, String vrfName) {
-        Optional<String> optionalVrfOutput =
-            Arrays.stream(getSplitedOutput(output)).filter(value -> value.contains(vrfName)).findFirst();
-
-        if(optionalVrfOutput.isPresent()) {
-            return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll(" neighbor", "\n neighbor"), 0,
-                NEIGHBOR_LINE::matcher,
-                matcher -> matcher.group("neighborIp"),
-                (String value) -> new NeighborKey(new IpAddress(value.toCharArray())));
-        }
-        return new ArrayList<>();
+        return parseKeys(Arrays.stream(splitOutput(output))
+                        .filter(value -> value.contains(vrfName))
+                        .findFirst(),
+                TO_NEIGH_KEY, NEIGHBOR_LINE);
     }
 
-    @Override public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
-        @Nonnull NeighborBuilder neighborBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    @Override
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
+                                             @Nonnull NeighborBuilder neighborBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         neighborBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
     }
 
     @VisibleForTesting
     public static List<NeighborKey> getDefaultNeighborKeys(String output) {
-        Optional<String> optionalVrfOutput =
-                Arrays.stream(getSplitedOutput(output)).filter(value -> !value.contains("vrf")).findFirst();
+        return parseKeys(Arrays.stream(splitOutput(output))
+                        .filter(value -> !value.contains("vrf"))
+                        .findFirst(),
+                TO_NEIGH_KEY, NEIGHBOR_LINE);
+    }
 
-        if(optionalVrfOutput.isPresent()) {
+    public static <T> List<T> parseKeys(Optional<String> optionalVrfOutput, Function<String, T> transform, Pattern neighborLine) {
+        if (optionalVrfOutput.isPresent()) {
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll(" neighbor", "\n neighbor"), 0,
-                    NEIGHBOR_LINE::matcher,
-                    matcher -> matcher.group("neighborIp"),
-                    (String value) -> new NeighborKey(new IpAddress(value.toCharArray())));
+                    neighborLine::matcher,
+                    matcher -> matcher.group("id"),
+                    transform);
         }
         return new ArrayList<>();
     }
 
-    public static String[] getSplitedOutput(String output) {
+    public static String[] splitOutput(String output) {
         return output.replaceAll(NEWLINE, "").replaceAll("\r", "")
-            .replaceAll(" address-family ipv4 vrf", "\n address-family ipv4 vrf")
-            .split("\\n");
+                .replaceAll(" address-family", "\n address-family")
+                .split("\\n");
     }
 }

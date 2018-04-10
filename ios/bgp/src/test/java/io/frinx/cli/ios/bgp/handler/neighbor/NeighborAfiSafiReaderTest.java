@@ -57,23 +57,23 @@ public class NeighborAfiSafiReaderTest {
 
     @Test
     public void testAllIds() throws Exception {
-        List<AfiSafiKey> defaults = NeighborAfiSafiReader.getAfiKeys(OUTPUT, NetworInstance.DEFAULT_NETWORK);
+        List<AfiSafiKey> defaults = NeighborAfiSafiReader.getAfiKeys(OUTPUT, NetworInstance.DEFAULT_NETWORK, line -> line.contains("activate"));
         assertEquals(defaults.size(), 1);
         assertThat(defaults, hasItem(new AfiSafiKey(IPV4UNICAST.class)));
 
-        defaults = NeighborAfiSafiReader.getAfiKeys(OUTPUT2, NetworInstance.DEFAULT_NETWORK);
+        defaults = NeighborAfiSafiReader.getAfiKeys(OUTPUT2, NetworInstance.DEFAULT_NETWORK, line -> line.contains("activate"));
         assertEquals(defaults.size(), 1);
         assertThat(defaults, hasItem(new AfiSafiKey(IPV4UNICAST.class)));
 
-        List<AfiSafiKey> abcds = NeighborAfiSafiReader.getAfiKeys(OUTPUT, new NetworkInstanceKey("abcd"));
+        List<AfiSafiKey> abcds = NeighborAfiSafiReader.getAfiKeys(OUTPUT, new NetworkInstanceKey("abcd"), line -> line.contains("activate"));
         assertEquals(abcds.size(), 1);
         assertThat(abcds, hasItem(new AfiSafiKey(IPV4UNICAST.class)));
 
-        abcds = NeighborAfiSafiReader.getAfiKeys(OUTPUT3, new NetworkInstanceKey("abcd"));
+        abcds = NeighborAfiSafiReader.getAfiKeys(OUTPUT3, new NetworkInstanceKey("abcd"), line -> line.contains("activate"));
         assertEquals(abcds.size(), 1);
         assertThat(abcds, hasItem(new AfiSafiKey(IPV4UNICAST.class)));
 
-        List<AfiSafiKey> abcds2 = NeighborAfiSafiReader.getAfiKeys(OUTPUT, new NetworkInstanceKey("abcd2"));
+        List<AfiSafiKey> abcds2 = NeighborAfiSafiReader.getAfiKeys(OUTPUT, new NetworkInstanceKey("abcd2"), line -> line.contains("activate"));
         assertEquals(abcds2.size(), 0);
     }
 }

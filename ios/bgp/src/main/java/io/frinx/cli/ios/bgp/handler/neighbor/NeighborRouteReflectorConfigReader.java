@@ -27,31 +27,28 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupTransportConfig;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.TransportBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.transport.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.transport.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflectorBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.route.reflector.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.route.reflector.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NeighborTransportConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
+public class NeighborRouteReflectorConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private static final Pattern NEIGHBOR_UPDATE_SOURCE_PATTERN =
-            Pattern.compile("neighbor (?<neighborIp>\\S*) update-source (?<updateSource>\\S*).*");
-    private static final Pattern NEIGHBOR_PASSIVE =
-            Pattern.compile("neighbor (?<neighborIp>\\S*) transport connection-mode passive.*");
+    private static final Pattern NEIGHBOR_RR_CLIENT_PATTERN =
+            Pattern.compile("neighbor (?<neighborIp>\\S*) (?<client>route-reflector-client)");
 
     private final Cli cli;
 
-    public NeighborTransportConfigReader(Cli cli) {
+    public NeighborRouteReflectorConfigReader(Cli cli) {
         this.cli = cli;
     }
 
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((TransportBuilder) builder).setConfig(config);
+        ((RouteReflectorBuilder) builder).setConfig(config);
     }
 
     @Override
@@ -86,30 +83,15 @@ public class NeighborTransportConfigReader implements BgpReader.BgpConfigReader<
     }
 
     private static void setAttributes(ConfigBuilder configBuilder, String output) {
-        setUpdateSource(configBuilder, output);
-        setPassive(configBuilder, output);
+        setClient(configBuilder, output);
     }
 
-    private static void setUpdateSource(ConfigBuilder configBuilder, String defaultInstance) {
+    private static void setClient(ConfigBuilder configBuilder, String defaultInstance) {
         String processed = defaultInstance.replaceAll(" neighbor", "\n neighbor");
 
-        ParsingUtils.parseField(processed, 0, NEIGHBOR_UPDATE_SOURCE_PATTERN::matcher,
-                m -> m.group("updateSource"),
-                updateSource -> configBuilder.setLocalAddress(parseLocalAddress(updateSource)));
-    }
-
-    private static void setPassive(ConfigBuilder configBuilder, String defaultInstance) {
-        // Default
-        configBuilder.setPassiveMode(false);
-
-        String processed = defaultInstance.replaceAll(" neighbor", "\n neighbor");
-        ParsingUtils.parseField(processed, 0, NEIGHBOR_PASSIVE::matcher,
-                m -> true,
-                configBuilder::setPassiveMode);
-    }
-
-    private static BgpCommonNeighborGroupTransportConfig.LocalAddress parseLocalAddress(String updateSource) {
-        return new BgpCommonNeighborGroupTransportConfig.LocalAddress(updateSource);
+        ParsingUtils.parseField(processed, 0, NEIGHBOR_RR_CLIENT_PATTERN::matcher,
+                m -> m.group("client"),
+                client -> configBuilder.setRouteReflectorClient(true));
     }
 
     private static void parseVrf(ConfigBuilder configBuilder, String vrfName, String[] output) {
