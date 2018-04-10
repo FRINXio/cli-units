@@ -213,6 +213,7 @@
 
     <feature name='cli-southbound-unit-ios-xr-qos' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-xr-qos-unit/{{VERSION}}</bundle>
     </feature>
 
