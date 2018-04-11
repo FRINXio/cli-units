@@ -135,7 +135,7 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
                 // if this execution fails, the return to config mode was unsuccessful
                 // the check if we are again in config mode is done automatically, so if no exception
                 // is thrown, consider this as a success
-                cli.executeAndRead("exit\nno\nconfig").toCompletableFuture().get();
+                cli.executeAndRead("clear").toCompletableFuture().get();
                 LOG.info("Reverting configuration on device successful.");
                 throw new WriterRegistry.Reverter.RevertSuccessException(s);
             } catch (InterruptedException | ExecutionException e) {
