@@ -60,12 +60,6 @@ public class EthernetConfigWriter implements CliWriter<Config> {
         Config1 aggregationAug = dataAfter.getAugmentation(Config1.class);
         LacpEthConfigAug lacpAug = dataAfter.getAugmentation(LacpEthConfigAug.class);
 
-        if (aggregationAug == null || aggregationAug.getAggregateId() == null) {
-            Preconditions.checkArgument(lacpAug == null,
-                    "Cannot configure lacp on non LAG enabled interface %s", ifcName);
-            return;
-        }
-
         // TODO Exctract this to commands templates
         int bundleId = Integer.parseInt(getBundleId(aggregationAug.getAggregateId()));
         String bundleIdCommand = String.format(BUNDLE_ID_COMMAND_TEMPLATE, bundleId);
