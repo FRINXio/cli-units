@@ -73,6 +73,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.routing.policy.defined.sets.BgpDefinedSets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.routing.policy.defined.sets.BgpDefinedSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.SetCommunity;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.Inline;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.reference.top.Reference;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.defined.sets.top.DefinedSetsBuilder;
@@ -156,6 +157,11 @@ public class RoutingPolicyUnit implements TranslateUnit {
     public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.set.community.Config> SET_COMMUNITY_ACT_CFG_ID =
             SET_COMMUNITY_ACT_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.set.community.Config.class);
     public static final InstanceIdentifier<Reference> SET_COMMUNITY_ACT_REF_ID = SET_COMMUNITY_ACT_ID.child(Reference.class);
+    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.reference.top.reference.Config> SET_COMMUNITY_ACT_REF_CFG_ID =
+            SET_COMMUNITY_ACT_REF_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.reference.top.reference.Config.class);
+    public static final InstanceIdentifier<Inline> SET_COMMUNITY_ACT_INLINE_ID = SET_COMMUNITY_ACT_ID.child(Inline.class);
+    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.inline.Config> SET_COMMUNITY_ACT_INLINE_CFG_ID =
+            SET_COMMUNITY_ACT_INLINE_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.inline.Config.class);
 
     public static final Set<InstanceIdentifier<?>> STATEMENTS_ACTIONS_SUBTREES = Sets.newHashSet(
             RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_ACTIONS, STATEMENTS_ID),
@@ -172,7 +178,10 @@ public class RoutingPolicyUnit implements TranslateUnit {
             // Community set
             RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_ID, STATEMENTS_ID),
             RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_CFG_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_REF_ID, STATEMENTS_ID)
+            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_REF_ID, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_REF_CFG_ID, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_INLINE_ID, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_INLINE_CFG_ID, STATEMENTS_ID)
     );
 
     // Statements

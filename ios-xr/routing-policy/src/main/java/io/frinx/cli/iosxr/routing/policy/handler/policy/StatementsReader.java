@@ -20,6 +20,7 @@ import static io.frinx.cli.iosxr.routing.policy.handler.policy.ActionsParser.EMP
 import static io.frinx.cli.iosxr.routing.policy.handler.policy.ActionsParser.parseActions;
 import static io.frinx.cli.iosxr.routing.policy.handler.policy.ConditionParser.EMPTY_CONDITIONS;
 import static io.frinx.cli.iosxr.routing.policy.handler.policy.ConditionParser.parseConditions;
+import static java.util.stream.Collectors.toList;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
@@ -37,13 +38,14 @@ import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.ActionsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.Conditions;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.ConditionsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.definitions.top.policy.definitions.PolicyDefinition;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.definitions.top.policy.definitions.PolicyDefinitionBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.definitions.top.policy.definitions.PolicyDefinitionKey;
@@ -139,46 +141,91 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
      */
     private static class StatementsAccumulator {
 
-        // FIXME what about or in conditions
-        // FIXME what about multiple conditions of the same type in a single if ? destination in XX and destination in YY
-        // Right now, parsing is best effor, we parse what we can and ignore the rest
-        // ... but the result openconfig configuration might not conform to reality
+        // Conditions with or are split into multiple conditions and parsed as different statements with identical actions
+        //  this will cause different rendering when writing back to device
+        //  e.g. "if a or b then c" will result in "if a then c elseif b then c"
+        //  which is functionally compatible
+        // Nested Ifs are not supported
+        // If/elseif/else are not preserved, each of them creates a statement
+        // Parsing is best effort, we parse what we can and ignore the rest
 
-        String IF = INDENT + "if";
-        String ELSEIF = INDENT + "elseif";
-        String ELSE = INDENT + "else";
-        String ENDIF = INDENT + "endif";
+        private static final String IF = INDENT + "if";
+        private static final String ELSEIF = INDENT + "elseif";
+        private static final String ELSE = INDENT + "else";
+        private static final String ENDIF = INDENT + "endif";
+        private static final Pattern OR = Pattern.compile(" or ");
 
         private final List<StatementBuilder> builders = Lists.newArrayList();
+        private int statementsToParseActionsFor = 1;
 
         void accept(String line) {
             StatementBuilder currentBuilder = builders.isEmpty() ? newBuilder() : currentBuilder();
 
             // Conditional statements, supported only on top level
             if (line.startsWith(IF) || line.startsWith(ELSEIF) || line.startsWith(ELSE)) {
-                line = line.trim();
-                currentBuilder = newBuilder();
-                Conditions conds = parseConditions(line);
+                statementsToParseActionsFor = 1;
 
-                // Do not set empty
-                if (!EMPTY_CONDITIONS.equals(conds)) {
-                    currentBuilder.setConditions(conds);
+                // If there is or in the conditions, treat every section as a separate condition, create separate
+                // statement for it
+                if (line.contains(OR.pattern())) {
+                    List<String> ors = OR.splitAsStream(line).map(condition -> IF + " " + condition).collect(toList());
+                    statementsToParseActionsFor = ors.size();
+                    ors.forEach(this::acceptConditions);
+                } else {
+                    acceptConditions(line);
                 }
             } else if (line.startsWith(ENDIF)) {
                 // Close builder
                 newBuilder();
+                statementsToParseActionsFor = 1;
             } else {
-                // Action statements supported on top level and 1 nested level
-                line = line.trim();
-                Actions actions = currentBuilder.getActions();
-                ActionsBuilder actionsBuilder = actions == null ? new ActionsBuilder() : new ActionsBuilder(actions);
-                parseActions(actionsBuilder, line);
-                Actions build = actionsBuilder.build();
-
-                // Do not set empty
-                if (!EMPTY_ACTIONS.equals(build)) {
-                    currentBuilder.setActions(build);
+                if (statementsToParseActionsFor == 1) {
+                    acceptActions(line, currentBuilder);
+                } else {
+                    // fill multiple previously created statements with same actions
+                    for (int i = 0; i < statementsToParseActionsFor; i++) {
+                        acceptActions(line, currentBuilder);
+                        currentBuilder = builders.get(builders.size() - i - 2);
+                    }
                 }
+            }
+        }
+
+        private void acceptActions(String line, StatementBuilder currentBuilder) {
+            // Action statements supported on top level and 1 nested level
+            line = line.trim();
+            Actions actions = currentBuilder.getActions();
+            ActionsBuilder actionsBuilder = actions == null ? new ActionsBuilder() : new ActionsBuilder(actions);
+
+            // Getting conditions again, since the apply policy action is located under conditions in the model
+            Conditions conditions = currentBuilder.getConditions();
+            ConditionsBuilder conditionsBuilder = conditions == null ? new ConditionsBuilder() : new ConditionsBuilder(conditions);
+
+            parseActions(actionsBuilder, conditionsBuilder, line);
+            Actions newActions = actionsBuilder.build();
+            Conditions newConditions = conditionsBuilder.build();
+
+            // Do not set empty
+            if (!EMPTY_ACTIONS.equals(newActions)) {
+                currentBuilder.setActions(newActions);
+            }
+
+            // Do not set empty
+            if (!EMPTY_CONDITIONS.equals(newConditions)) {
+                currentBuilder.setConditions(newConditions);
+            }
+        }
+
+        private void acceptConditions(String line) {
+            StatementBuilder currentBuilder;
+            line = line.trim();
+
+            currentBuilder = newBuilder();
+            Conditions conds = parseConditions(line);
+
+            // Do not set empty
+            if (!EMPTY_CONDITIONS.equals(conds)) {
+                currentBuilder.setConditions(conds);
             }
         }
 
@@ -203,7 +250,7 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
             List<Statement> unnamendStatements = builders.stream()
                     .map(StatementBuilder::build)
                     .filter(o -> !EMPTY_STATEMENT.equals(o))
-                    .collect(Collectors.toList());
+                    .collect(toList());
 
             // Add name based on statement index
             return IntStream.range(0, unnamendStatements.size())
@@ -215,7 +262,7 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
                                     .setName(Integer.toString(e.getKey()))
                                     .build())
                             .build())
-                    .collect(Collectors.toList());
+                    .collect(toList());
         }
     }
 
