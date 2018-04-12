@@ -96,6 +96,6 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
 
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
 
-        blockingWriteAndRead(cli, instanceIdentifier, config, f(DELETE_TEMPLATE, ifcName));
+        blockingDeleteAndRead(f(DELETE_TEMPLATE, ifcName),cli, instanceIdentifier);
     }
 }

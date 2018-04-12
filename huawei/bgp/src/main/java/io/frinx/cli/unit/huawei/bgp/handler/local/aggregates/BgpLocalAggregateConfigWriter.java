@@ -63,12 +63,12 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
             "return";
 
     private static final String DELETE_TEMPLATE = "system-view\n" +
-            "router bgp {$as}\n" +
+            "bgp {$as}\n" +
 
             // Enter afi + VRF
             ENTER_AFI_SAFI +
 
-            "no network {$network} {.if ($mask) }{$mask}{/if}\n" +
+            "undo network {$network} {.if ($mask) }{$mask}{/if}\n" +
             "commit\n" +
             "return";
 
@@ -158,7 +158,8 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                                 "as", bgp.get().getGlobal().getConfig().getAs().getValue(),
                                 "network", getNetAddress(config.getPrefix()),
                                 "afi_safi", GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afiSafi.getAfiSafiName()),
-                                "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName()));
+                                "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(),
+                                "mask", getNetMask(config.getPrefix())));
             }
         }
     }

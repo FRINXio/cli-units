@@ -16,13 +16,16 @@
 
 package io.frinx.cli.unit.huawei.network.instance.handler.l3vrf;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.RouteDistinguisher;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L3VrfConfigWriter implements CliWriter<Config> {
@@ -49,6 +52,28 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
                     "return");
         }
     }
+
+    @Override
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+                                        @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
+            throws WriteFailedException {
+
+        RouteDistinguisher rdBefore = dataBefore.getRouteDistinguisher();
+        RouteDistinguisher rdAfter = dataAfter.getRouteDistinguisher();
+
+        Preconditions.checkArgument(Objects.equals(rdBefore, rdAfter),
+                "Cannot update route distinguisher once l3vrf already created");
+
+        if(dataAfter.getType().equals(L3VRF.class)) {
+            blockingWriteAndRead(cli, id, dataAfter,
+                    "system-view",
+                    f("ip vpn-instance %s", dataAfter.getName()),
+                    dataAfter.getDescription() == null ? "undo description" : f("description %s", dataAfter.getDescription()),
+                    "commit",
+                    "return");
+        }
+    }
+
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,

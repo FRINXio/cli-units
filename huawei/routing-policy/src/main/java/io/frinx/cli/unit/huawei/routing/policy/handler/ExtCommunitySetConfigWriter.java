@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ExtCommunitySetConfigWriter implements CliWriter<Config> {
 
-    // todo This now handles just one special case for cisco route-target-export/import.
+    // todo This now handles just one special case for huawei route-target-export/import.
     // It checks defined sets for special defined sets with name <vrf>-route-target-import-set or
     // <vrf>-route-target-export-set and parses vrfname (<vrf>) from it. This should be changed when routing-policy
     // is handled correctly. In correct way we should listnen on inter-instance-policies in network instances,

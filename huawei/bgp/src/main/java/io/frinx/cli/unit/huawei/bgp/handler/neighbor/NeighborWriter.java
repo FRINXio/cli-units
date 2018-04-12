@@ -55,7 +55,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
     static final String NEIGHBOR_GLOBAL = "system-view\n" +
             "bgp {$as}\n" +
-            "peer {$neighbor_ip} as-remote {$neighbor.config.peer_as.value}\n" +
+            "peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n" +
 
             // //Active the neighbor. Either under address family, or globally if no family present
             "{.if ($afi_safi) }ipv4-family {$afi_safi}\n{/if}" +
@@ -77,7 +77,8 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
             "undo peer {$neighbor_ip} enable\n" +
             "{.if ($afi_safi) }quit\n{/if}" +
 
-            "undo peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n" +
+            "undo peer {$neighbor_ip}\n" +
+            "Y\n" +
 
             "commit\n" +
             "return";
@@ -103,8 +104,8 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
             "ipv4-family vpn-instance {$vrf}\n" +
             "undo peer {$neighbor_ip} enable\n" +
-            "undo peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n" +
-
+            "undo peer {$neighbor_ip} \n" +
+            "Y\n" +
             "commit\n" +
             "return";
 
