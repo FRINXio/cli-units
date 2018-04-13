@@ -26,19 +26,24 @@ import java.util.stream.Collectors;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.BgpActions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.Actions;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.Conditions;
 
 class ActionsRenderer {
 
     private static final CliFormatter FORMAT = new CliFormatter() {};
 
-    static List<String> renderActions(Actions actions) {
-        if (actions == null) {
-            return Collections.emptyList();
-        }
-
+    static List<String> renderActions(Actions actions, Conditions conditions) {
         List<String> actionsStrings = new ArrayList<>();
-        actionsStrings.addAll(renderBgpActions(actions));
-        actionsStrings.addAll(renderGlobalActions(actions));
+
+        if (actions != null) {
+            actionsStrings.addAll(renderBgpActions(actions));
+        }
+        if (conditions != null) {
+            actionsStrings.addAll(renderApplyPolicy(conditions));
+        }
+        if (actions != null) {
+            actionsStrings.addAll(renderGlobalActions(actions));
+        }
 
         return actionsStrings.stream()
                 .map(String::trim)
@@ -59,6 +64,7 @@ class ActionsRenderer {
         actionStrings.add(FORMAT.fT(SET_LOCAL_PREF_TEMPLATE, "config", bgpActions));
         actionStrings.add(FORMAT.fT(SET_PREPEND_AS_TEMPLATE, "config", bgpActions));
         actionStrings.add(FORMAT.fT(SET_COMMUNITY_TEMPLATE, "config", bgpActions));
+        actionStrings.add(FORMAT.fT(SET_NEXT_HOP_TEMPLATE, "config", bgpActions));
 
         return actionStrings;
     }
@@ -66,6 +72,13 @@ class ActionsRenderer {
     private static List<String> renderGlobalActions(Actions actions) {
         return Collections.singletonList(FORMAT.fT(GLOBAL_ACTION_TEMPLATE, "config", actions));
     }
+
+    private static List<String> renderApplyPolicy(Conditions conditions) {
+        return Collections.singletonList(FORMAT.fT(APPLY_POLICY_TEMPLATE, "config", conditions));
+    }
+
+    private static final String APPLY_POLICY_TEMPLATE =
+            "{.if ($config.config.call_policy)}apply {$config.config.call_policy}{.endif}";
 
     private static final String GLOBAL_ACTION_TEMPLATE =
             "{.if ($config.config.policy_result.name|lc =~ /reject/)}" + ActionsParser.DROP + "{.endif}" +
@@ -82,10 +95,22 @@ class ActionsRenderer {
 
     private static final String SET_COMMUNITY_TEMPLATE =
             "{.if ($config.set_community.reference.config.community_set_ref)}set community {$config.set_community.reference.config.community_set_ref}{.endif}" +
+            "{.if ($config.set_community.inline.config.communities)}set community " +
+                "({% loop in $config.set_community.inline.config.communities as $c %}" +
+                    "{$c.bgp_std_community_type.string}" +
+                    "{% divider %}, {% enddivider %}" +
+                    "{% onEmpty %}" +
+                "{% endloop %})" +
+            "{.endif}" +
             "{.if ($config.set_community.config.options == ADD)} additive{.endif}";
 
     private static final String SET_PREPEND_AS_TEMPLATE =
             "{.if ($config.set_as_path_prepend.config.asn.value)}prepend as-path {$config.set_as_path_prepend.config.asn.value}{.endif}" +
             "{.if ($config.set_as_path_prepend.config.repeat_n)} {$config.set_as_path_prepend.config.repeat_n}{.endif}";
+
+    private static final String SET_NEXT_HOP_TEMPLATE =
+            "{.if ($config.config.set_next_hop.enumeration)}set next-hop self{.endif}" +
+            "{.if ($config.config.set_next_hop.ip_address.ipv4_address.value)}set next-hop {$config.config.set_next_hop.ip_address.ipv4_address.value}{.endif}" +
+            "{.if ($config.config.set_next_hop.ip_address.ipv6_address.value)}set next-hop {$config.config.set_next_hop.ip_address.ipv6_address.value}{.endif}";
 
 }

@@ -16,9 +16,12 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.policy;
 
+import static io.frinx.cli.iosxr.routing.policy.handler.policy.StatementsTest.getSetCommInlineAction;
 import static org.junit.Assert.assertEquals;
 
+import com.google.common.collect.Lists;
 import org.junit.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.BgpSetCommunityOptionType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.BgpActionsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 
@@ -55,4 +58,18 @@ public class ActionsParserTest {
                         .build(),
                 builder.build().getSetAsPathPrepend().getConfig());
     }
+
+    @Test
+    public void testParseCommunity() throws Exception {
+        BgpActionsBuilder builder = new BgpActionsBuilder();
+        ActionsParser.parseSetCommunity("set community (17676:320, 17676:430, 17676:436)", builder);
+        assertEquals(getSetCommInlineAction(Lists.newArrayList("17676:320", "17676:430", "17676:436"), null),
+                builder.build().getSetCommunity());
+
+        builder = new BgpActionsBuilder();
+        ActionsParser.parseSetCommunity("set community (17676:320) additive", builder);
+        assertEquals(getSetCommInlineAction(Lists.newArrayList("17676:320"), BgpSetCommunityOptionType.ADD),
+                builder.build().getSetCommunity());
+    }
+
 }

@@ -102,7 +102,7 @@ public class StatementsWriter implements CliWriter<Statements> {
         List<String> statementStrings = new ArrayList<>();
         for (Statement statement : statements) {
             List<String> conditions = ConditionRenderer.renderConditions(statement.getConditions());
-            List<String> actions = ActionsRenderer.renderActions(statement.getActions());
+            List<String> actions = ActionsRenderer.renderActions(statement.getActions(), statement.getConditions());
 
             if(actions.isEmpty())
                 continue;

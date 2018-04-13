@@ -16,31 +16,41 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.policy;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.BgpNextHopType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.BgpSetCommunityOptionType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.BgpSetMedType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.SetCommunityActionCommon;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.SetCommunityInlineConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.SetAsPathPrependBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.BgpActions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.BgpActionsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.SetCommunityBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.InlineBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.reference.top.ReferenceBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.PolicyResultType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.ActionsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.ConditionsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddressBuilder;
 
 class ActionsParser {
 
     static final Actions EMPTY_ACTIONS = new ActionsBuilder().build();
 
-    static void parseActions(ActionsBuilder actionsBuilder, String line) {
+    static void parseActions(ActionsBuilder actionsBuilder, ConditionsBuilder conditionsBuilder, String line) {
+        parseApplyPolicyCondition(line, conditionsBuilder);
         parseGlobalAction(actionsBuilder, line);
         parseBgpActions(line, actionsBuilder);
     }
@@ -62,6 +72,7 @@ class ActionsParser {
         parseSetLocalPref(line, bgpActsBuilder);
         parsePrependAsPath(line, bgpActsBuilder);
         parseSetCommunity(line, bgpActsBuilder);
+        parseSetNextHop(line, bgpActsBuilder);
 
         Actions2Builder bgpCondsAugmentBuilder = new Actions2Builder();
         BgpActions build = bgpActsBuilder.build();
@@ -96,12 +107,41 @@ class ActionsParser {
 
             ConfigBuilder cfgBuilder = builder.getConfig() == null ? new ConfigBuilder() : new ConfigBuilder(builder.getConfig());
             builder.setConfig(cfgBuilder
-                    .setSetLocalPref(Long.valueOf(value))
+                    .setSetLocalPref(value)
                     .build());
         }
     }
 
-    private static final Pattern SET_COMM = Pattern.compile("set community (?<value>\\S+)(?<additive> additive)?");
+    private static final Pattern NEXT_HOP = Pattern.compile("set next-hop (?<value>\\S+).*");
+    private static final Pattern NP_TYPE_SELF = Pattern.compile("self");
+    private static final Pattern NP_TYPE_IP = Pattern.compile("[0-9a-f.:]+");
+
+    @VisibleForTesting
+    static void parseSetNextHop(String line, BgpActionsBuilder builder) {
+        Matcher matcher = NEXT_HOP.matcher(line);
+        if (matcher.matches()) {
+            String val = matcher.group("value");
+            BgpNextHopType value;
+            if (NP_TYPE_SELF.matcher(val).matches()) {
+                value = new BgpNextHopType(BgpNextHopType.Enumeration.SELF);
+            } else if (NP_TYPE_IP.matcher(val).matches()) {
+                value = new BgpNextHopType(IpAddressBuilder.getDefaultInstance(val));
+            } else {
+                // not supported by model
+                return;
+            }
+
+            ConfigBuilder cfgBuilder = builder.getConfig() == null ? new ConfigBuilder() : new ConfigBuilder(builder.getConfig());
+            builder.setConfig(cfgBuilder
+                    .setSetNextHop(value)
+                    .build());
+        }
+    }
+
+    private static final Pattern SET_COMM = Pattern.compile("set community (?<value>[^\\s()]+)(?<additive> additive)?");
+    private static final Pattern SET_COMM_INLINE = Pattern.compile("set community \\((?<value>.+)\\)(?<additive> additive)?");
+    private static final Pattern INLINE_COM_SEPARATOR = Pattern.compile(",\\s");
+    private static final Pattern INLINE_COM = Pattern.compile("[0-9:]+");
 
     @VisibleForTesting
     static void parseSetCommunity(String line, BgpActionsBuilder builder) {
@@ -121,7 +161,38 @@ class ActionsParser {
                                     .build())
                             .build())
                     .build());
+
+            return;
         }
+
+        matcher = SET_COMM_INLINE.matcher(line);
+        if (matcher.matches()) {
+            String val = matcher.group("value");
+            List<SetCommunityInlineConfig.Communities> parsedCommunities = INLINE_COM_SEPARATOR.splitAsStream(val)
+                    .filter(c -> INLINE_COM.matcher(c).matches())
+                    .map(ActionsParser::parseSingleInlineCommunity)
+                    .collect(toList());
+            String additive = matcher.group("additive");
+
+            builder.setSetCommunity(new SetCommunityBuilder()
+                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.set.community.ConfigBuilder()
+                            .setMethod(SetCommunityActionCommon.Method.INLINE)
+                            .setOptions(Strings.isNullOrEmpty(additive) ? null : BgpSetCommunityOptionType.ADD)
+                            .build())
+                    .setInline(new InlineBuilder()
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.inline.ConfigBuilder()
+                                    .setCommunities(parsedCommunities)
+                                    .build())
+                            .build())
+                    .build());
+        }
+    }
+
+    private static SetCommunityInlineConfig.Communities parseSingleInlineCommunity(String s) {
+        SetCommunityInlineConfig.Communities communities = new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(s));
+        // This is a workaround, if we don't call getValue, the _value field will not be set and then equals method does not work as expected
+        communities.getValue();
+        return communities;
     }
 
     private static final Pattern PREPEND_AS = Pattern.compile("prepend as-path (?<value>\\S+)\\s*(?<repeat>[0-9]*)");
@@ -208,6 +279,28 @@ class ActionsParser {
         } else if (DONE.matcher(line).find()) {
             b.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.actions.ConfigBuilder()
                     .setPolicyResult(PolicyResultType.ACCEPTROUTE)
+                    .build());
+        }
+    }
+
+    private static final Pattern APPLY_POLICY = Pattern.compile("apply (?<value>\\S+).*");
+
+    @VisibleForTesting
+    static void parseApplyPolicyCondition(String line, ConditionsBuilder b) {
+        if (b.getConfig() != null && b.getConfig().getCallPolicy() != null) {
+            // Policy already parsed for statement
+            return;
+        }
+
+        Matcher matcher = APPLY_POLICY.matcher(line);
+        if (matcher.matches()) {
+
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.conditions.ConfigBuilder builder = b.getConfig() == null ?
+                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.conditions.ConfigBuilder() :
+                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.conditions.ConfigBuilder(b.getConfig());
+
+            b.setConfig(builder
+                    .setCallPolicy(matcher.group("value"))
                     .build());
         }
     }
