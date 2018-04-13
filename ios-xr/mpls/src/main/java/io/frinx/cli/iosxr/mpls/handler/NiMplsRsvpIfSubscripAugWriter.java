@@ -20,14 +20,17 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.MplsRsvpSubscriptionConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.NiMplsRsvpIfSubscripAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
 public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubscripAug> {
+
+    private static final String BW_FORMAT = "0.###";
 
     private Cli cli;
 
@@ -70,12 +73,13 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
         if (NiMplsRsvpIfSubscripAugReader.DEFAULT.equals(b.getString())) {
             return "bandwidth";
         } else if (b.getUint32() != null && b.getUint32() != 0) {
-            return f("bandwidth %s", kbps(b.getUint32()));
+            NumberFormat formatter = new DecimalFormat(BW_FORMAT);
+            return f("bandwidth %s", formatter.format(kbps(b.getUint32())));
         }
         return "";
     }
 
-    private static Long kbps(Long bps) {
-        return bps/1000;
+    private static double kbps(Long bps) {
+        return bps.doubleValue()/1000;
     }
 }

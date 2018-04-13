@@ -47,7 +47,7 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
 
     private static final String UPDATE_INPUT = "rsvp\n" +
             "interface Loopback0\n" +
-            "bandwidth 10\n" +
+            "bandwidth 1.005\n" +
             "exit\n" +
             "exit\n";
 
@@ -106,7 +106,7 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
     public void update() throws WriteFailedException {
         // change bandwidth to different number
         NiMplsRsvpIfSubscripAug newData = new NiMplsRsvpIfSubscripAugBuilder()
-                .setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(10000L))
+                .setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(1005L))
                 .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
