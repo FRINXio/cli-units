@@ -26,12 +26,19 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.HopRange;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.IcmpMsgType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.IcmpBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.DROP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.FORWARDINGACTION;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
@@ -41,12 +48,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.action.top.ActionsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.action.top.actions.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.Ipv4Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.Ipv6Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.Transport;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.TransportBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.ADDRESSFAMILY;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.IPV4;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.IPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPICMP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPPROTOCOL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPTCP;
@@ -88,34 +93,40 @@ public class AclEntryLineParser {
         return Optional.empty();
     }
 
-    static AclEntry parseLine(String line, Class<? extends ADDRESSFAMILY> addressFamily) {
-        checkArgument(IPV4.class.equals(addressFamily) || IPV6.class.equals(addressFamily),
-                "Unsupported address family " + addressFamily);
+    static AclEntry parseLine(final AclEntryBuilder builder, String line, Class<? extends ACLTYPE> aclType) {
+
+        checkArgument(ACLIPV4.class.equals(aclType) || ACLIPV6.class.equals(aclType),
+                "Unsupported ACL type" + aclType);
         Queue<String> words = Lists.newLinkedList(Arrays.asList(line.split("\\s")));
         long sequenceId = Long.parseLong(words.poll());
-        AclEntryBuilder builder = new AclEntryBuilder();
         // sequence id
         builder.setSequenceId(sequenceId);
+        builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.acl.entry.ConfigBuilder()
+            .setSequenceId(sequenceId)
+            .build()
+        );
         // fwd action
         Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
         builder.setActions(createActions(fwdAction));
         // protocol
         IpProtocolType ipProtocolType = parseProtocol(words.poll());
         if (ipProtocolType != null) {
-            if (IPV4.class.equals(addressFamily)) {
+            if (ACLIPV4.class.equals(aclType)) {
                 Ipv4Builder ipv4Builder = new Ipv4Builder();
                 ParseIpv4LineResult parseIpv4LineResult = parseIpv4Line(ipProtocolType, words);
                 ipv4Builder.setConfig(parseIpv4LineResult.ipv4ProtocolFieldsConfig);
                 builder.setIpv4(ipv4Builder.build());
                 builder.setTransport(parseIpv4LineResult.transport);
-            } else if (IPV6.class.equals(addressFamily)) {
+                builder.addAugmentation(AclEntry1.class, parseIpv4LineResult.icmpMsgTypeAugment);
+            } else if (ACLIPV6.class.equals(aclType)) {
                 Ipv6Builder ipv6Builder = new Ipv6Builder();
                 ParseIpv6LineResult parseIpv6LineResult = parseIpv6Line(ipProtocolType, words);
                 ipv6Builder.setConfig(parseIpv6LineResult.ipv6ProtocolFieldsConfig);
                 builder.setIpv6(ipv6Builder.build());
                 builder.setTransport(parseIpv6LineResult.transport);
+                builder.addAugmentation(AclEntry1.class, parseIpv6LineResult.icmpMsgTypeAugment);
             } else {
-                throw new IllegalArgumentException("Not supported:" + addressFamily);
+                throw new IllegalArgumentException("Not supported:" + aclType);
             }
         }
         return builder.build();
@@ -140,10 +151,15 @@ public class AclEntryLineParser {
     private static class ParseIpv4LineResult {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config ipv4ProtocolFieldsConfig;
         final Transport transport;
+        final AclEntry1 icmpMsgTypeAugment;
 
-        ParseIpv4LineResult(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config ipv4ProtocolFieldsConfig, Transport transport) {
+        ParseIpv4LineResult(
+            Config ipv4ProtocolFieldsConfig,
+            Transport transport,
+            final AclEntry1 icmpMsgTypeAugment) {
             this.ipv4ProtocolFieldsConfig = ipv4ProtocolFieldsConfig;
             this.transport = transport;
+            this.icmpMsgTypeAugment = icmpMsgTypeAugment;
         }
     }
 
@@ -164,43 +180,59 @@ public class AclEntryLineParser {
             addTransport = true;
             transportConfigBuilder.setDestinationPort(parsePortNumRange(words));
         }
-        Config1Builder augment = new Config1Builder();
-        if (IP_PROTOCOL_ICMP.equals(ipProtocolType)) {
-            Optional<Short> maybeMsgType = tryToParseIcmpType(words.peek());
-            if (maybeMsgType.isPresent()) {
-                words.poll();
-                augment.setIcmpMessageType(maybeMsgType.get());
-            }
 
-        }
+        //icmp
+        final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words);
+
         // ttl
+        Config1Builder hopRangeAugment = new Config1Builder();
+        //noinspection Duplicates
         if (!words.isEmpty() && "ttl".equals(words.peek())) {
             Entry<Integer, Integer> ttlRange = parseTTLRange(words);
             int lowerEndpoint = ttlRange.getKey();
             int upperEndpoint = ttlRange.getValue();
-            if (lowerEndpoint == 0) {
-                // fill the openconfig compliant hop-limit
-                ipv4ProtocolFieldsConfigBuilder.setHopLimit((short) upperEndpoint);
-            }
-            augment.setHopRange(new HopRange(lowerEndpoint + ".." + upperEndpoint));
+            hopRangeAugment.setHopRange(new HopRange(lowerEndpoint + ".." + upperEndpoint));
         }
-        if (augment.getHopRange() != null || augment.getIcmpMessageType() != null) {
-            ipv4ProtocolFieldsConfigBuilder.addAugmentation(Config1.class, augment.build());
+        if (hopRangeAugment.getHopRange() != null) {
+            ipv4ProtocolFieldsConfigBuilder.addAugmentation(Config1.class, hopRangeAugment.build());
         }
         Transport transport = null;
         if (addTransport) {
             transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
         }
-        return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), transport);
+        return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);
+    }
+
+    private static AclEntry1 parseIcmpMsgType(final IpProtocolType ipProtocolType, final Queue<String> words) {
+        final AclEntry1Builder icmpMsgTypeAugment = new AclEntry1Builder();
+        if (IP_PROTOCOL_ICMP.equals(ipProtocolType)) {
+            Optional<Short> maybeMsgType = tryToParseIcmpType(words.peek());
+            if (maybeMsgType.isPresent()) {
+                words.poll();
+                icmpMsgTypeAugment.setIcmp(new IcmpBuilder()
+                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.icmp.ConfigBuilder()
+                                .setMsgType(new IcmpMsgType(maybeMsgType.get()))
+                                .build()
+                        ).build()
+                );
+                return icmpMsgTypeAugment.build();
+            }
+        }
+        return null;
     }
 
     private static class ParseIpv6LineResult {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config ipv6ProtocolFieldsConfig;
         final Transport transport;
+        final AclEntry1 icmpMsgTypeAugment;
 
-        ParseIpv6LineResult(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config ipv6ProtocolFieldsConfig, Transport transport) {
+        ParseIpv6LineResult(
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config ipv6ProtocolFieldsConfig,
+            Transport transport,
+            final AclEntry1 icmpMsgTypeAugment) {
             this.ipv6ProtocolFieldsConfig = ipv6ProtocolFieldsConfig;
             this.transport = transport;
+            this.icmpMsgTypeAugment = icmpMsgTypeAugment;
         }
     }
 
@@ -222,33 +254,27 @@ public class AclEntryLineParser {
             addTransport = true;
             transportConfigBuilder.setDestinationPort(parsePortNumRange(words));
         }
-        Config2Builder augment = new Config2Builder();
-        if (IP_PROTOCOL_ICMP.equals(ipProtocolType)) {
-            Optional<Short> maybeMsgType = tryToParseIcmpType(words.peek());
-            if (maybeMsgType.isPresent()) {
-                words.poll();
-                augment.setIcmpMessageType(maybeMsgType.get());
-            }
-        }
+
+        //icmp
+        final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words);
+
         // ttl
+        Config2Builder hopRangeAugment = new Config2Builder();
+        //noinspection Duplicates
         if (!words.isEmpty() && "ttl".equals(words.peek())) {
             Entry<Integer, Integer> ttlRange = parseTTLRange(words);
             int lowerEndpoint = ttlRange.getKey();
             int upperEndpoint = ttlRange.getValue();
-            if (lowerEndpoint == 0) {
-                // fill the openconfig compliant hop-limit
-                ipv6ProtocolFieldsConfigBuilder.setHopLimit((short) upperEndpoint);
-            }
-            augment.setHopRange(new HopRange(lowerEndpoint + ".." + upperEndpoint));
+            hopRangeAugment.setHopRange(new HopRange(lowerEndpoint + ".." + upperEndpoint));
         }
-        if (augment.getHopRange() != null || augment.getIcmpMessageType() != null) {
-            ipv6ProtocolFieldsConfigBuilder.addAugmentation(Config2.class, augment.build());
+        if (hopRangeAugment.getHopRange() != null) {
+            ipv6ProtocolFieldsConfigBuilder.addAugmentation(Config2.class, hopRangeAugment.build());
         }
         Transport transport = null;
         if (addTransport) {
             transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
         }
-        return new ParseIpv6LineResult(ipv6ProtocolFieldsConfigBuilder.build(), transport);
+        return new ParseIpv6LineResult(ipv6ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);
     }
 
     private static Optional<Short> tryToParseIcmpType(String word) {

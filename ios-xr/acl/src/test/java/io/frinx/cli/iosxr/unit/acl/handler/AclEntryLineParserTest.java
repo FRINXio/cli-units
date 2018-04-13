@@ -23,23 +23,29 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Optional;
 import org.junit.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.HopRange;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.IcmpMsgType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.IcmpBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.DROP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.FORWARDINGACTION;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.acl.entry.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.action.top.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.Ipv4Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.Ipv6Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.Transport;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.TransportBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.IPV4;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.IPV6;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.HopRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPICMP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPPROTOCOL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPTCP;
@@ -54,26 +60,43 @@ public class AclEntryLineParserTest {
 
     static AclEntry createIpv4AclEntry(long sequenceId, Class<? extends FORWARDINGACTION> fwdAction,
                                        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config ipv4Config,
-                                       Transport transport) {
-        return createAclEntry(sequenceId, fwdAction, ipv4Config, null, transport);
+                                       Transport transport,
+                                       Short icmpMessageType) {
+        return createAclEntry(sequenceId, fwdAction, ipv4Config, null, transport, icmpMessageType);
+    }
 
+    static AclEntry createIpv4AclEntry(long sequenceId, Class<? extends FORWARDINGACTION> fwdAction,
+                                       org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config ipv4Config,
+                                       Transport transport) {
+        return createAclEntry(sequenceId, fwdAction, ipv4Config, null, transport, null);
+    }
+
+    static AclEntry createIpv6AclEntry(long sequenceId, Class<? extends FORWARDINGACTION> fwdAction,
+                                       org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config ipv6Config,
+                                       Transport transport,
+                                       Short icmpMessageType) {
+        return createAclEntry(sequenceId, fwdAction, null, ipv6Config, transport, icmpMessageType);
     }
 
     static AclEntry createIpv6AclEntry(long sequenceId, Class<? extends FORWARDINGACTION> fwdAction,
                                        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config ipv6Config,
                                        Transport transport) {
-        return createAclEntry(sequenceId, fwdAction, null, ipv6Config, transport);
+        return createAclEntry(sequenceId, fwdAction, null, ipv6Config, transport, null);
     }
 
     static AclEntry createAclEntry(long sequenceId, Class<? extends FORWARDINGACTION> fwdAction,
-                                   org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config ipv4Config,
+                                   Config ipv4Config,
                                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config ipv6Config,
-                                   Transport transport) {
+                                   Transport transport, final Short icmpMessageType) {
 
         Actions actions = AclEntryLineParser.createActions(fwdAction);
         AclEntryBuilder builder = new AclEntryBuilder();
         // sequence id
         builder.setSequenceId(sequenceId);
+        builder.setConfig(new ConfigBuilder()
+            .setSequenceId(sequenceId)
+            .build()
+        );
         // fwd action
         builder.setActions(actions);
         builder.setTransport(transport);
@@ -83,6 +106,17 @@ public class AclEntryLineParserTest {
         } else {
             // ipv6
             builder.setIpv6(new Ipv6Builder().setConfig(ipv6Config).build());
+        }
+        if (icmpMessageType != null) {
+            builder.addAugmentation(AclEntry1.class, new AclEntry1Builder()
+                .setIcmp(new IcmpBuilder()
+                    .setConfig(
+                        new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.icmp.ConfigBuilder()
+                            .setMsgType(new IcmpMsgType((short) 8))
+                            .build()
+                    ).build()
+                ).build()
+            );
         }
         return builder.build();
     }
@@ -143,7 +177,6 @@ public class AclEntryLineParserTest {
             configBuilder.setProtocol(new IpProtocolType(IPICMP.class));
             configBuilder.setSourceAddress(new Ipv4Prefix("1.1.1.1/32"));
             configBuilder.setDestinationAddress(new Ipv4Prefix("2.2.2.2/32"));
-            configBuilder.setHopLimit((short) 10);
             configBuilder.addAugmentation(Config1.class, new Config1Builder().setHopRange(new HopRange("0..10")).build());
 
             expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(), null));
@@ -196,16 +229,15 @@ public class AclEntryLineParserTest {
             configBuilder.setProtocol(new IpProtocolType(IPICMP.class));
             configBuilder.setSourceAddress(IPV4_HOST_ANY);
             configBuilder.setDestinationAddress(IPV4_HOST_ANY);
-            configBuilder.addAugmentation(Config1.class, new Config1Builder().setIcmpMessageType((short) 8).build());
 
-            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null));
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null, (short) 8));
         }
 
         // verify expected results
         for (Entry<Long, AclEntry> entry : expectedResults.entrySet()) {
             long sequenceId = entry.getKey();
             String line = AclEntryLineParser.findLineWithSequenceId(sequenceId, lines).get();
-            AclEntry parsed = AclEntryLineParser.parseLine(line, IPV4.class);
+            AclEntry parsed = AclEntryLineParser.parseLine(new AclEntryBuilder(), line, ACLIPV4.class);
             assertEquals(entry.getValue(), parsed);
         }
     }
@@ -303,16 +335,15 @@ public class AclEntryLineParserTest {
             configBuilder.setDestinationAddress(new Ipv6Prefix("::1/128"));
             configBuilder.addAugmentation(Config2.class, new Config2Builder()
                             .setHopRange(new HopRange("11..9"))
-                            .setIcmpMessageType((short) 8)
                             .build());
-            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null));
+            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null, (short) 8));
         }
 
         // verify expected results
         for (Entry<Long, AclEntry> entry : expectedResults.entrySet()) {
             long sequenceId = entry.getKey();
             String line = AclEntryLineParser.findLineWithSequenceId(sequenceId, lines).get();
-            AclEntry parsed = AclEntryLineParser.parseLine(line, IPV6.class);
+            AclEntry parsed = AclEntryLineParser.parseLine(new AclEntryBuilder(), line, ACLIPV6.class);
             assertEquals(entry.getValue(), parsed);
         }
 

@@ -21,10 +21,12 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListWriter;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
@@ -44,16 +46,20 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
 
-
     private static final int MAX_TTL = 255;
+    private static final String RANGE_SEPARATOR = "..";
+    private static final Function<String, String> WRONG_RANGE_FORMAT_MSG = rangeString -> String.format(
+        "incorrect range format, range parameter should contains two numbers separated by '%s', entered: %s",
+        RANGE_SEPARATOR, rangeString);
+
     private final String ACL_IP_ENTRY = "{$type} access-list {$acl_name}\n" +
-            "{.if ($delete == TRUE) }no {/if}{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr}{$acl_ttl}\n" +
+            "{.if ($delete == TRUE) }no {/if}{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_ttl}\n" +
             "exit\n";
     private final String ACL_TCP_ENTRY = "{$type} access-list {$acl_name}\n" +
-            "{.if ($delete == TRUE) }no {/if}{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_src_port} {$acl_dst_addr} {$acl_dst_port}{$acl_ttl}\n" +
+            "{.if ($delete == TRUE) }no {/if}{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_src_port} {$acl_dst_addr} {$acl_dst_port} {$acl_ttl}\n" +
             "exit\n";
     private final String ACL_ICMP_ENTRY = "{$type} access-list {$acl_name}\n" +
-            "{.if ($delete == TRUE) }no {/if}{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_icmp_msg_type}{$acl_ttl}\n" +
+            "{.if ($delete == TRUE) }no {/if}{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_icmp_msg_type} {$acl_ttl}\n" +
             "exit\n";
     private final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
 
@@ -158,16 +164,14 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
     }
 
     private void processIpv4(AclEntry entry, MaxMetricCommandDTO commandVars) {
-        if(entry.getIpv4().getConfig().getHopLimit() != null) {
-            commandVars.acl_ttl = f(" ttl eq %s", entry.getIpv4().getConfig().getHopLimit().toString());
-        } else if (entry.getIpv4().getConfig().getAugmentation(Config1.class) != null &&
+        if (entry.getIpv4().getConfig().getAugmentation(Config1.class) != null &&
                 entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange() != null) {
-            commandVars.acl_ttl = f(" ttl range %s",
-                    entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange().getValue());
+            commandVars.acl_ttl = formatTTL(entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange().getValue());
         }
         if (entry.getIpv4().getConfig().getAugmentation(Config1.class) != null &&
                 entry.getIpv4().getConfig().getAugmentation(Config1.class) != null) {
-            commandVars.acl_icmp_msg_type = entry.getIpv4().getConfig().getAugmentation(Config1.class).getIcmpMessageType().toString();
+            commandVars.acl_icmp_msg_type =
+                entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString();
         }
         commandVars.acl_src_addr = Preconditions.checkNotNull(entry.getIpv4().getConfig().getSourceAddress()).getValue();
         commandVars.acl_dst_addr = Preconditions.checkNotNull(entry.getIpv4().getConfig().getDestinationAddress()).getValue();
@@ -176,16 +180,15 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
     }
 
     private void processIpv6(AclEntry entry, MaxMetricCommandDTO commandVars) {
-        if(entry.getIpv6().getConfig().getHopLimit() != null) {
-            commandVars.acl_ttl = f(" ttl eq %s", entry.getIpv6().getConfig().getHopLimit().toString());
-        } else if (entry.getIpv6().getConfig().getAugmentation(Config2.class) != null &&
+        if (entry.getIpv6().getConfig().getAugmentation(Config2.class) != null &&
                 entry.getIpv6().getConfig().getAugmentation(Config2.class).getHopRange() != null) {
-            commandVars.acl_ttl = f(" ttl range %s",
-                    entry.getIpv6().getConfig().getAugmentation(Config2.class).getHopRange().getValue());
+            commandVars.acl_ttl =
+                formatTTL(entry.getIpv6().getConfig().getAugmentation(Config2.class).getHopRange().getValue());
         }
         if (entry.getIpv6().getConfig().getAugmentation(Config2.class) != null &&
                 entry.getIpv6().getConfig().getAugmentation(Config2.class) != null) {
-            commandVars.acl_icmp_msg_type = entry.getIpv6().getConfig().getAugmentation(Config2.class).getIcmpMessageType().toString();
+            commandVars.acl_icmp_msg_type =
+                entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString();
         }
         commandVars.acl_src_addr = Preconditions.checkNotNull(entry.getIpv6().getConfig().getSourceAddress()).getValue();
         commandVars.acl_dst_addr = Preconditions.checkNotNull(entry.getIpv6().getConfig().getDestinationAddress()).getValue();
@@ -273,6 +276,42 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
         } else {
             return "eq any";
         }
+    }
+
+    private String formatTTL(final String rangeString) {
+        Preconditions.checkArgument(rangeString.contains(RANGE_SEPARATOR), "incorrect range format %s", rangeString);
+        final String[] rangeParams = rangeString.split("\\.\\.");
+        Preconditions.checkArgument(rangeParams.length == 2, WRONG_RANGE_FORMAT_MSG.apply(rangeString));
+        final int minRangeParam;
+        final int maxRangeParam;
+        try {
+            minRangeParam = Integer.valueOf(rangeParams[0]);
+            maxRangeParam = Integer.valueOf(rangeParams[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(WRONG_RANGE_FORMAT_MSG.apply(rangeString));
+        }
+
+        String ttlString = "ttl";
+        if (minRangeParam == maxRangeParam) {
+            ttlString = ttlString + " eq " + minRangeParam;
+        } else if (minRangeParam < maxRangeParam) {
+            if (minRangeParam == 0) {
+                ttlString = ttlString + " lt " + (maxRangeParam + 1);
+            } else if (maxRangeParam == MAX_TTL) {
+                ttlString = ttlString + " gt " + (minRangeParam - 1);
+            } else {
+                ttlString = ttlString + " range " + minRangeParam + " " + maxRangeParam;
+            }
+        } else {
+            // minRangeParam > maxRangeParam
+            // |0, .........., maxRangeParam, minParamRange, .........., MAX_TTL|
+            Preconditions.checkArgument(minRangeParam - maxRangeParam == 2,
+                "incorrect range param for 'neq', first range param has to be greater then second by 2, entered: %s",
+                rangeString);
+            ttlString = ttlString + " neq " + (minRangeParam - 1);
+        }
+
+        return ttlString;
     }
 
     private class MaxMetricCommandDTO {
