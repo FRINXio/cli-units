@@ -41,19 +41,18 @@ public class TunnelConfigWriterTest {
     private static final String WRITE_INPUT = "interface tunnel-te 55\n" +
         "autoroute announce\n" +
         "metric absolute 5\n" +
-        "exit\n";
+        "root\n";
 
     private static final String UPDATE_INPUT = "interface tunnel-te 55\n" +
         "autoroute announce\n" +
-        "metric absolute 20\n" +
-        "exit\n";
+        "no metric absolute\n" +
+        "root\n";
 
     private static final String UPDATE_CLEAN_INPUT = "interface tunnel-te 55\n" +
         "no autoroute announce\n" +
-        "no metric absolute\n" +
-        "exit\n";
+        "root\n";
 
-    private static final String DELETE_INPUT = "no interface tunnel-te 55\n";
+    private static final String DELETE_INPUT = "no interface tunnel-te 55\n\n";
 
     @Mock
     private Cli cli;
@@ -98,10 +97,8 @@ public class TunnelConfigWriterTest {
 
     @Test
     public void update() throws WriteFailedException {
-        // change metric
+        // remove metric
         Config newData = new ConfigBuilder().setShortcutEligible(true)
-                .setMetricType(LSPMETRICABSOLUTE.class)
-                .setMetric(20)
                 .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
@@ -112,7 +109,7 @@ public class TunnelConfigWriterTest {
 
     @Test
     public void updateClean() throws WriteFailedException {
-        // remove metric, autoroute
+        // remove autoroute
         Config newData = new ConfigBuilder().setShortcutEligible(false).build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
