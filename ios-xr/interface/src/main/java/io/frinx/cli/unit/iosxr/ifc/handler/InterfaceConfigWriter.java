@@ -25,7 +25,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -48,7 +47,6 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
     public static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES =
             Collections.singleton(EthernetCsmacd.class);
-    public static final Function<Integer, Boolean> LAG_INDEX_RANGE_CONDITION = index -> index > 0 && index < 65536;
 
 
     public InterfaceConfigWriter(Cli cli) {
@@ -112,8 +110,6 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             boolean result = matcher.matches();
             checkArgument(result,
                     "LAG interface name must be in format: Bundle-Ether45, not: %s", data.getName());
-            int bundleId = Integer.parseInt(matcher.group("number"));
-            checkArgument(LAG_INDEX_RANGE_CONDITION.apply(bundleId), "Bundle-Ether interface ID out of range: %s. Range is <1-65535>.", bundleId);
         } else {
             throw new IllegalArgumentException("Cannot create interface of type: " + data.getType());
         }
