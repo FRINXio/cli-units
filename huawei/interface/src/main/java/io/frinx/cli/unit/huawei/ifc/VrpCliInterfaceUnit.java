@@ -130,7 +130,7 @@ public class VrpCliInterfaceUnit implements TranslateUnit {
 
         wRegistry.add(new GenericWriter<>(SUBIFC_IPV4_ADDRESS_ID, new NoopCliListWriter<>()));
         wRegistry.addAfter(new GenericWriter<>(SUBIFC_IPV4_CFG_ID, new Ipv4ConfigWriter(cli)),
-                IIDs.IN_IN_CONFIG);
+                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_IN_INTERFACE);
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
