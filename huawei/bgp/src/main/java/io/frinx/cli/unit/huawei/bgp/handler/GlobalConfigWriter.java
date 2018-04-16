@@ -95,20 +95,6 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
                     f("bgp %s", config.getAs().getValue()),
                     "commit",
                     "return");
-
-            // Make sure to set/update router ID for each family set for this VRF/BGP
-            if (config.getRouterId() == null) {
-                return;
-            }
-
-            Set<AfiSafi> allAfiSafis = getAfiSafis(writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).orNull());
-            for (AfiSafi afiSafi : allAfiSafis) {
-                blockingWriteAndRead(f(VRF_BGP_AFI_SAFI_ROUTER_ID,
-                        config.getAs().getValue(),
-                        vrfKey.getName(),
-                        config.getRouterId().getValue()),
-                        cli, id, config);
-            }
         }
     }
 
