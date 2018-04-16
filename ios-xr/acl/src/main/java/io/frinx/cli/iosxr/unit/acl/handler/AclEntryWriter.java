@@ -47,19 +47,23 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
 
     private static final int MAX_TTL = 255;
+    private static final int MAX_PORT = 65535;
     private static final String RANGE_SEPARATOR = "..";
     private static final Function<String, String> WRONG_RANGE_FORMAT_MSG = rangeString -> String.format(
         "incorrect range format, range parameter should contains two numbers separated by '%s', entered: %s",
         RANGE_SEPARATOR, rangeString);
 
     private final String ACL_IP_ENTRY = "{$type} access-list {$acl_name}\n" +
-            "{.if ($delete == TRUE) }no {/if}{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_ttl}\n" +
+            "{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_ttl}\n" +
             "exit\n";
     private final String ACL_TCP_ENTRY = "{$type} access-list {$acl_name}\n" +
-            "{.if ($delete == TRUE) }no {/if}{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_src_port} {$acl_dst_addr} {$acl_dst_port} {$acl_ttl}\n" +
+            "{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_src_port} {$acl_dst_addr} {$acl_dst_port} {$acl_ttl}\n" +
             "exit\n";
     private final String ACL_ICMP_ENTRY = "{$type} access-list {$acl_name}\n" +
-            "{.if ($delete == TRUE) }no {/if}{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_icmp_msg_type} {$acl_ttl}\n" +
+            "{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_icmp_msg_type} {$acl_ttl}\n" +
+            "exit\n";
+    private final String ACL_DELETE = "{$type} access-list {$acl_name}\n" +
+            "no {$acl_seq_id}\n" +
             "exit\n";
     private final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
 
@@ -73,7 +77,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<AclEntry> id,
                                        @Nonnull AclEntry entry,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        processChange(id, entry, false);
+        processChange(id, entry);
     }
 
     @Override
@@ -82,19 +86,28 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
                                         @Nonnull AclEntry dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         //overwrite the entry since sequence-id is the same
-        processChange(id, dataAfter, false);
+        processChange(id, dataAfter);
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<AclEntry> id,
                                         @Nonnull AclEntry dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        processChange(id, dataBefore, true);
+        AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
+        final String aclType = aclSetKey.getType().equals(ACLIPV4.class) ? "ipv4" : "ipv6";
+        final String aclName = aclSetKey.getName();
+        final String aclSequenceId = dataBefore.getSequenceId().toString();
+
+        blockingWriteAndRead(
+            fT(ACL_DELETE,
+                "type", aclType,
+                "acl_name", aclName,
+                "acl_seq_id", aclSequenceId),
+            cli, id, dataBefore);
     }
 
     private void processChange(@Nonnull InstanceIdentifier<AclEntry> id,
-                               @Nonnull AclEntry entry,
-                               boolean delete) throws WriteFailedException.CreateFailedException {
+                               @Nonnull AclEntry entry) throws WriteFailedException.CreateFailedException {
         MaxMetricCommandDTO commandVars = new MaxMetricCommandDTO();
         AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
         commandVars.acl_name = aclSetKey.getName();
@@ -125,8 +138,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
                         "acl_protocol", commandVars.acl_protocol,
                         "acl_src_addr", commandVars.acl_src_addr,
                         "acl_dst_addr", commandVars.acl_dst_addr,
-                        "acl_ttl", commandVars.acl_ttl,
-                        "delete", delete),
+                        "acl_ttl", commandVars.acl_ttl),
                         cli, id, entry);
                 break;
             case "udp":
@@ -141,8 +153,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
                         "acl_src_port", commandVars.acl_src_port,
                         "acl_dst_addr", commandVars.acl_dst_addr,
                         "acl_dst_port", commandVars.acl_dst_port,
-                        "acl_ttl", commandVars.acl_ttl,
-                        "delete", delete),
+                        "acl_ttl", commandVars.acl_ttl),
                         cli, id, entry);
                 break;
             case "icmp":
@@ -156,8 +167,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
                         "acl_src_addr", commandVars.acl_src_addr,
                         "acl_dst_addr", commandVars.acl_dst_addr,
                         "acl_icmp_msg_type", commandVars.acl_icmp_msg_type,
-                        "acl_ttl", commandVars.acl_ttl,
-                        "delete", delete),
+                        "acl_ttl", commandVars.acl_ttl),
                         cli, id, entry);
                 break;
         }
@@ -166,7 +176,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
     private void processIpv4(AclEntry entry, MaxMetricCommandDTO commandVars) {
         if (entry.getIpv4().getConfig().getAugmentation(Config1.class) != null &&
                 entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange() != null) {
-            commandVars.acl_ttl = formatTTL(entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange().getValue());
+            commandVars.acl_ttl =
+                formatTTL(entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange().getValue());
         }
         if (entry.getIpv4().getConfig().getAugmentation(Config1.class) != null &&
                 entry.getIpv4().getConfig().getAugmentation(Config1.class) != null) {
@@ -250,17 +261,17 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
             return f("eq %s", port.getPortNumber().getValue());
         } else if (port.getString() != null) {
             Matcher matcher = PORT_RANGE_PATTERN.matcher(port.getString());
-            if (matcher.find()) {
+            if (!matcher.find()) {
                 LOG.warn("Wrong protocol range value: {}", port.getString());
                 return "";
             }
             int from = Integer.valueOf(matcher.group("from"));
             int to = Integer.valueOf(matcher.group("to"));
             if (from == 0) {
-                return f("lt %s", to-1);
+                return f("lt %s", to+1);
             }
-            if (to == MAX_TTL) {
-                return f("gt %s", from +1);
+            if (to == MAX_PORT) {
+                return f("gt %s", from-1);
             }
             if (from == to) {
                 return f("eq %s", from);
