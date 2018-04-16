@@ -53,7 +53,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
     private static final Pattern NEIGHBOR_LINE = Pattern.compile(".*use neighbor-group (?<group>\\S+).*");
     private static final Pattern PASSWORD_LINE = Pattern.compile(".*password encrypted (?<password>\\S+).*");
     private static final Pattern SHUTDOWN_LINE = Pattern.compile(".*shutdown.*");
-    private static final Pattern DESCRIPTION_LINE = Pattern.compile(".*description (?<description>\\S+).*");
+    private static final Pattern DESCRIPTION_LINE = Pattern.compile(".*description (?<description>.+)");
     private static final Pattern SEND_COMMUNITY_LINE = Pattern.compile(".*send-community-ebgp.*");
     private static final Pattern REMOVE_AS_LINE = Pattern.compile(".*remove-private-AS.*");
 
