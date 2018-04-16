@@ -43,7 +43,9 @@ public class NeighborAfiSafiPrefixLimitConfigWriter implements BgpWriter<Config>
     static final String NEIGHBOR_AFI_PREFIX_LIMIT ="router bgp {$as} {$instance}\n" +
             "neighbor {$address}\n" +
             "address-family {$afiSafi}\n" +
-            "{.if ($config.max_prefixes) }maximum-prefix {$config.max_prefixes}\n{.else}no maximum-prefix\n{/if}" +
+            "{.if ($config.max_prefixes) }maximum-prefix {$config.max_prefixes}{.else}no maximum-prefix{/if}" +
+            "{.if ($config.shutdown_threshold_pct.value) } {$config.shutdown_threshold_pct.value}{/if}" +
+            "\n" +
             "exit\n" +
             "exit\n" +
             "exit\n";
@@ -61,6 +63,7 @@ public class NeighborAfiSafiPrefixLimitConfigWriter implements BgpWriter<Config>
                                               WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
+        validate(config);
         final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         blockingWriteAndRead(fT(NEIGHBOR_AFI_PREFIX_LIMIT,
@@ -70,6 +73,11 @@ public class NeighborAfiSafiPrefixLimitConfigWriter implements BgpWriter<Config>
                 "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class).getAfiSafiName()),
                 "config", config),
                 cli, id, config);
+    }
+
+    private static void validate(Config config) {
+        if (config.getShutdownThresholdPct() != null)
+            Preconditions.checkArgument(config.getMaxPrefixes() != null, "shutdown-threshold-pct cannot be defined when max-prefixes is missing");
     }
 
     @Override

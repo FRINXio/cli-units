@@ -16,6 +16,7 @@
 
 package io.frinx.cli.iosxr.bgp.handler.neighbor;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -38,8 +39,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV4UNICAST;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV6UNICAST;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.Percentage;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
@@ -48,7 +49,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class NeighborAfiSafiPrefixLimitConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_NEI = "do show running-config router bgp %s %s neighbor %s address-family %s";
-    private static final Pattern UPADTE_SOURCE_LINE = Pattern.compile("maximum-prefix (?<prefixCount>.+) .*");
+    public static final Pattern MAX_PREFIX_LINE = Pattern.compile("maximum-prefix (?<prefixCount>\\d+) ?(?<maxPrefixThreshold>\\d+)?");
 
     private Cli cli;
 
@@ -88,10 +89,19 @@ public class NeighborAfiSafiPrefixLimitConfigReader implements BgpReader.BgpConf
         String afiName = GlobalAfiSafiReader.transformAfiToString(instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName());
 
         String output = blockingRead(String.format(SH_NEI, globalConfig.getAs().getValue().intValue(), insName, address, afiName), cli, instanceIdentifier, readContext);
+        parsePrefixLimit(output, configBuilder);
 
+    }
+
+    @VisibleForTesting
+    static void parsePrefixLimit(String output, ConfigBuilder configBuilder) {
         ParsingUtils.parseField(output.trim(), 0,
-                UPADTE_SOURCE_LINE::matcher,
+                MAX_PREFIX_LINE::matcher,
                 matcher -> matcher.group("prefixCount"),
                 count -> configBuilder.setMaxPrefixes(Long.valueOf(count)));
+        ParsingUtils.parseField(output.trim(), 0,
+                MAX_PREFIX_LINE::matcher,
+                matcher -> matcher.group("maxPrefixThreshold"),
+                count -> configBuilder.setShutdownThresholdPct(new Percentage(Short.valueOf(count))));
     }
 }

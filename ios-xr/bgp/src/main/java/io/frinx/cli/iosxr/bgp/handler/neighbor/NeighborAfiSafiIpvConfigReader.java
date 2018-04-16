@@ -82,6 +82,8 @@ public abstract class NeighborAfiSafiIpvConfigReader implements BgpReader.BgpCon
 
         String output = blockingRead(String.format(SH_NEI, globalConfig.getAs().getValue().intValue(), insName, address, afiName), cli, instanceIdentifier, readContext);
 
+        // default is disabled
+        configBuilder.setSendDefaultRoute(false);
         ParsingUtils.parseField(output.trim(), 0,
                 DEFAULT_ORIGINATE_LINE::matcher,
                 matcher -> matcher.matches(),

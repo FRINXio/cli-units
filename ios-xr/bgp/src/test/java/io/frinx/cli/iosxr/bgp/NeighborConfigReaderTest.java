@@ -32,14 +32,14 @@ public class NeighborConfigReaderTest {
             "  shutdown\n" +
             " neighbor 8.8.8.8\n" +
             "  remote-as 65000\n" +
-            "  use neighbor-group nbrgroup1" +
+            "  use neighbor-group nbrgroup1\n" +
             " neighbor 7.7.7.7\n" +
             "  remote-as 65000\n" +
-            "  use neighbor-group nbrgroup1" +
-            "  description test" +
-            "  password encrypted GCHKNJDJSADNKLSAND" +
-            "  send-community-ebgp" +
-            "  remove-private-AS";
+            "  use neighbor-group nbrgroup1\n" +
+            "  description test desc\n" +
+            "  password encrypted GCHKNJDJSADNKLSAND\n" +
+            "  send-community-ebgp\n" +
+            "  remove-private-AS\n";
 
     @Test
     public void test() {
@@ -66,7 +66,7 @@ public class NeighborConfigReaderTest {
         Assert.assertEquals(65000, builder.getPeerAs().getValue().intValue());
         Assert.assertTrue(builder.isEnabled());
         Assert.assertEquals("nbrgroup1", builder.getPeerGroup());
-        Assert.assertEquals("test", builder.getDescription());
+        Assert.assertEquals("test desc", builder.getDescription());
         Assert.assertEquals("GCHKNJDJSADNKLSAND", builder.getAuthPassword().getValue());
         Assert.assertNotNull(builder.getSendCommunity());
         Assert.assertNotNull(builder.getRemovePrivateAs());
