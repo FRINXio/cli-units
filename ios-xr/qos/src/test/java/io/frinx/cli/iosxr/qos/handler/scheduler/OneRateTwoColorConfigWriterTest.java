@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.qos.handler.scheduler.OneRateTwoColorConfigWriter;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,7 +69,7 @@ public class OneRateTwoColorConfigWriterTest {
             "class map1\n" +
             "no bandwidth\n" +
             "no bandwidth remaining\n" +
-            "no police rate\n" +
+            "no police\n" +
             "no queue-limit\n" +
             "root\n";
 

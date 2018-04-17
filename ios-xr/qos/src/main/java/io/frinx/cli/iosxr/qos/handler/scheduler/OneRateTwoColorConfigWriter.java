@@ -37,7 +37,7 @@ public class OneRateTwoColorConfigWriter implements CliWriter<Config> {
             "class {$className}\n" +
             "{% if ($config.cir_pct) %}bandwidth percent {$config.cir_pct.value}\n{% else %}no bandwidth\n{% endif %}" +
             "{% if ($config.cir_pct_remaining) %}bandwidth remaining percent {$config.cir_pct_remaining.value}\n{% else %}no bandwidth remaining\n{% endif %}" +
-            "{% if ($config.max_queue_depth_percent) %}police rate percent {$config.max_queue_depth_percent.value}\n{% else %}no police rate\n{% endif %}" +
+            "{% if ($config.max_queue_depth_percent) %}police rate percent {$config.max_queue_depth_percent.value}\n{% else %}no police\n{% endif %}" +
             "{% if ($aug) %}{% if ($aug.max_queue_depth_ms) %}" +
             "queue-limit {$aug.max_queue_depth_ms} ms\n{% endif %}" +
             "{% else %}no queue-limit\n" +
