@@ -53,11 +53,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.Transport;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.TransportBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPICMP;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPPROTOCOL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPTCP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPUDP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IpProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange.Enumeration;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.PortNumber;
@@ -74,7 +74,6 @@ public class AclEntryLineParser {
     private static final IpProtocolType IP_PROTOCOL_ICMP = new IpProtocolType(IPICMP.class);
     private static final IpProtocolType IP_PROTOCOL_TCP = new IpProtocolType(IPTCP.class);
     private static final IpProtocolType IP_PROTOCOL_UDP = new IpProtocolType(IPUDP.class);
-    private static final IpProtocolType IP_PROTOCOL_IP = new IpProtocolType(IPPROTOCOL.class);
     public static final Pattern ZERO_TO_255_PATTERN = Pattern.compile("^2[0-5][0-5]|2[0-4][0-9]|1?[0-9]?[0-9]$");
 
     static Optional<String> findAclEntryWithSequenceId(InstanceIdentifier<?> id, String lines) {
@@ -166,19 +165,16 @@ public class AclEntryLineParser {
     private static ParseIpv4LineResult parseIpv4Line(IpProtocolType ipProtocolType, Queue<String> words) {
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder ipv4ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
         ipv4ProtocolFieldsConfigBuilder.setProtocol(ipProtocolType);
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
-        boolean addTransport = false;
+
         // src
         ipv4ProtocolFieldsConfigBuilder.setSourceAddress(parseIpv4Prefix(words));
-        if (!words.isEmpty() && isPortNumRange(words.peek())) {
-            addTransport = true;
-            transportConfigBuilder.setSourcePort(parsePortNumRange(words));
-        }
         // dst
         ipv4ProtocolFieldsConfigBuilder.setDestinationAddress(parseIpv4Prefix(words));
-        if (!words.isEmpty() && isPortNumRange(words.peek())) {
-            addTransport = true;
-            transportConfigBuilder.setDestinationPort(parsePortNumRange(words));
+
+        // transport
+        Transport transport = null;
+        if (ipProtocolType.equals(IP_PROTOCOL_TCP) || ipProtocolType.equals(IP_PROTOCOL_UDP)) {
+            transport = parseTransport(words);
         }
 
         //icmp
@@ -196,11 +192,24 @@ public class AclEntryLineParser {
         if (hopRangeAugment.getHopRange() != null) {
             ipv4ProtocolFieldsConfigBuilder.addAugmentation(Config1.class, hopRangeAugment.build());
         }
-        Transport transport = null;
-        if (addTransport) {
-            transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
-        }
+
         return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);
+    }
+
+    private static Transport parseTransport(
+        final Queue<String> words) {
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
+        if (!words.isEmpty() && isPortNumRange(words.peek())) {
+            transportConfigBuilder.setSourcePort(parsePortNumRange(words));
+        } else {
+            transportConfigBuilder.setSourcePort(new PortNumRange(Enumeration.ANY));
+        }
+        if (!words.isEmpty() && isPortNumRange(words.peek())) {
+            transportConfigBuilder.setDestinationPort(parsePortNumRange(words));
+        } else {
+            transportConfigBuilder.setDestinationPort(new PortNumRange(Enumeration.ANY));
+        }
+        return new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
     }
 
     private static AclEntry1 parseIcmpMsgType(final IpProtocolType ipProtocolType, final Queue<String> words) {
@@ -395,7 +404,8 @@ public class AclEntryLineParser {
         switch (protocol) {
             case "ipv4":
             case "ipv6":
-                return IP_PROTOCOL_IP;
+                LOG.debug("Skipping IP protocol {}", protocol);
+                return null;
             case "udp":
                 return IP_PROTOCOL_UDP;
             case "tcp":
