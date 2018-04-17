@@ -16,7 +16,6 @@
 
 package io.frinx.cli.iosxr.qos.handler.classifier;
 
-import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -24,16 +23,15 @@ import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosRemarkQosGroupAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.Actions;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class RemarkConfigWriter implements CliWriter<Config> {
-
-    private Cli cli;
+public class ActionsWriter implements CliWriter<Actions> {
 
     private static final String WRITE_CURR_ATTR = "policy-map {$name}\n" +
-        "class {$className}\n" +
+        "{% if ($delete) %}no {% endif %}class {$className}\n" +
+        "{% if (!$delete) %}" +
         "{% if ($mpls) %}" +
         "set mpls experimental topmost {$mpls}\n{% else %}" +
         "no set mpls experimental topmost\n{% endif %}" +
@@ -43,40 +41,48 @@ public class RemarkConfigWriter implements CliWriter<Config> {
         "{% if ($aug.set_precedences) %}" +
         "set precedence {% loop in $aug.set_precedences as $prec %}" + ClassifierWriter.LIST_PREC + "{% else %}" +
         "no set precedence\n{% endif %}" +
-        "root";
+        "{% endif %}root";
 
-    public RemarkConfigWriter(Cli cli) {
+    private Cli cli;
+
+    public ActionsWriter(Cli cli) {
         this.cli = cli;
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Actions> instanceIdentifier, @Nonnull Actions actions, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
-        final String policyName = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Actions.class)).get().getConfig().getTargetGroup();
+        final String policyName = actions.getConfig().getTargetGroup();
+        final Config remark = actions.getRemark().getConfig();
         if (policyName != null) {
-            QosRemarkQosGroupAug aug = config.getAugmentation(QosRemarkQosGroupAug.class);
-            blockingWriteAndRead(cli, instanceIdentifier, config, fT(WRITE_CURR_ATTR,
+            QosRemarkQosGroupAug aug = remark.getAugmentation(QosRemarkQosGroupAug.class);
+            blockingWriteAndRead(cli, instanceIdentifier, actions, fT(WRITE_CURR_ATTR,
                 "name", policyName,
                 "className", className,
-                "mpls", config.getSetMplsTc(),
+                "mpls", remark.getSetMplsTc(),
                 "aug", aug));
         }
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        deleteCurrentAttributes(id, dataBefore, writeContext);
-        writeCurrentAttributes(id, dataAfter, writeContext);
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Actions> id, @Nonnull Actions dataBefore, @Nonnull Actions dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        // policy reference changed
+        if (!dataBefore.getConfig().getTargetGroup().equals(dataAfter.getConfig().getTargetGroup())) {
+            deleteCurrentAttributes(id, dataBefore,writeContext);
+            writeCurrentAttributes(id, dataAfter, writeContext);
+        } else {
+            // only attributes changed, we're safe to 'write'
+            writeCurrentAttributes(id, dataAfter, writeContext);
+        }
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Actions> instanceIdentifier, @Nonnull Actions actions, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
-        final String policyName = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Actions.class)).get().getConfig().getTargetGroup();
+        final String policyName = actions.getConfig().getTargetGroup();
         if (policyName != null) {
-            blockingWriteAndRead(cli, instanceIdentifier, config, fT(WRITE_CURR_ATTR,
-                "name", policyName,
-                "className", className));
+            blockingWriteAndRead(cli, instanceIdentifier, actions, fT(WRITE_CURR_ATTR,
+                "name", policyName, "className", className, "delete", true));
         }
     }
 }

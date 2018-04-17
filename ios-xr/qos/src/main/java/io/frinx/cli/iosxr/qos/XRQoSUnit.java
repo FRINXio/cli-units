@@ -17,6 +17,7 @@
 package io.frinx.cli.iosxr.qos;
 
 import static io.frinx.cli.iosxr.IosXrDevices.IOS_XR_ALL;
+
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
@@ -27,13 +28,12 @@ import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.qos.handler.classifier.ActionConfigReader;
-import io.frinx.cli.iosxr.qos.handler.classifier.ActionConfigWriter;
+import io.frinx.cli.iosxr.qos.handler.classifier.ActionsWriter;
 import io.frinx.cli.iosxr.qos.handler.classifier.ClassifierConfigReader;
 import io.frinx.cli.iosxr.qos.handler.classifier.ClassifierReader;
 import io.frinx.cli.iosxr.qos.handler.classifier.ClassifierWriter;
 import io.frinx.cli.iosxr.qos.handler.classifier.ConditionsReader;
 import io.frinx.cli.iosxr.qos.handler.classifier.RemarkConfigReader;
-import io.frinx.cli.iosxr.qos.handler.classifier.RemarkConfigWriter;
 import io.frinx.cli.iosxr.qos.handler.classifier.TermReader;
 import io.frinx.cli.iosxr.qos.handler.scheduler.InputConfigReader;
 import io.frinx.cli.iosxr.qos.handler.scheduler.InputConfigWriter;
@@ -59,6 +59,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.TermsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.Term;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.ActionsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.Conditions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.RemarkBuilder;
@@ -79,6 +80,8 @@ public class XRQoSUnit implements TranslateUnit {
     private static final InstanceIdentifier<Conditions> CONDITIONS_ID = InstanceIdentifier.create(Conditions.class);
 
     private static final InstanceIdentifier<Classifier> CLASSIFIER_ID = InstanceIdentifier.create(Classifier.class);
+
+    private static final InstanceIdentifier<Actions> ACTIONS_ID = InstanceIdentifier.create(Actions.class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -130,13 +133,12 @@ public class XRQoSUnit implements TranslateUnit {
             RWUtils.cutIdFromStart(IIDs.QOS_CLA_CLA_TER_TER_CON_IPV_CONFIG, CLASSIFIER_ID),
             RWUtils.cutIdFromStart(IIDs.QOS_CLA_CLA_TER_TER_CON_IPV_CONFIG.augmentation(QosIpv6ConditionAug.class), CLASSIFIER_ID)),
             new GenericWriter<>(IIDs.QO_CL_CLASSIFIER, new ClassifierWriter(cli)));
-        wRegistry.add(new GenericWriter<>(IIDs.QO_CL_CL_TE_TE_ACTIONS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.QO_CL_CL_TE_TE_AC_CONFIG, new ActionConfigWriter(cli)));
-        wRegistry.add(new GenericWriter<>(IIDs.QO_CL_CL_TE_TE_AC_REMARK, new NoopCliWriter<>()));
         wRegistry.subtreeAdd(Sets.newHashSet(
-               RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_AC_RE_CONFIG.augmentation(QosRemarkQosGroupAug.class),
-                   InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.Config.class))
-        ), new GenericWriter<>(IIDs.QO_CL_CL_TE_TE_AC_RE_CONFIG, new RemarkConfigWriter(cli)));
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_AC_CONFIG, ACTIONS_ID),
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_AC_REMARK, ACTIONS_ID),
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_AC_RE_CONFIG, ACTIONS_ID),
+            RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_AC_RE_CONFIG.augmentation(QosRemarkQosGroupAug.class), ACTIONS_ID)),
+            new GenericWriter<>(IIDs.QO_CL_CL_TE_TE_ACTIONS, new ActionsWriter(cli)));
 
         wRegistry.add(new GenericWriter<>(IIDs.QO_SCHEDULERPOLICIES, new NoopCliWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SCHEDULERPOLICY, new NoopCliWriter<>()));

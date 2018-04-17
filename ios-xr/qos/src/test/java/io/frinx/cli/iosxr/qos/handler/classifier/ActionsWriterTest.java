@@ -16,7 +16,6 @@
 
 package io.frinx.cli.iosxr.qos.handler.classifier;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -37,15 +36,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.TermKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.ActionsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.RemarkBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.Classifiers;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.ClassifierKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
-public class RemarkConfigWriterTest {
+public class ActionsWriterTest {
 
     private static final String WRITE_INPUT = "policy-map plmap\n" +
         "class map1\n" +
@@ -62,8 +61,12 @@ public class RemarkConfigWriterTest {
         "root\n";
 
     private static final String DELETE_INPUT = "policy-map plmap\n" +
+        "no class map1\n" +
+        "root\n";
+
+    private static final String UPDATE_POLICY_INPUT = "policy-map plmap1\n" +
         "class map1\n" +
-        "no set mpls experimental topmost\n" +
+        "set mpls experimental topmost 1\n" +
         "no set qos-group\n" +
         "no set precedence\n" +
         "root\n";
@@ -74,7 +77,7 @@ public class RemarkConfigWriterTest {
     @Mock
     private WriteContext context;
 
-    private RemarkConfigWriter writer;
+    private ActionsWriter writer;
 
     private ArgumentCaptor<String> response = ArgumentCaptor.forClass(String.class);
 
@@ -83,8 +86,7 @@ public class RemarkConfigWriterTest {
         .child(Terms.class).child(Term.class, new TermKey("all")).child(Actions.class);
 
     // test data
-    private Actions a;
-    private Config data;
+    private Actions data;
 
     @Before
     public void setUp() {
@@ -92,25 +94,26 @@ public class RemarkConfigWriterTest {
 
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
 
-        this.writer = new RemarkConfigWriter(this.cli);
+        this.writer = new ActionsWriter(this.cli);
 
         initializeData();
     }
 
     private void initializeData() {
-        data = new ConfigBuilder().setSetMplsTc((short) 1).addAugmentation(QosRemarkQosGroupAug.class,
-            new QosRemarkQosGroupAugBuilder()
-                .setSetQosGroup(30)
-                .setSetPrecedences(Lists.newArrayList(Precedence.FlashOverride))
+        data = new ActionsBuilder()
+            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.ConfigBuilder()
+                .setTargetGroup("plmap").build())
+            .setRemark(new RemarkBuilder()
+                .setConfig(new ConfigBuilder()
+                    .setSetMplsTc((short) 1)
+                    .addAugmentation(QosRemarkQosGroupAug.class,
+                    new QosRemarkQosGroupAugBuilder()
+                        .setSetQosGroup(30)
+                        .setSetPrecedences(Lists.newArrayList(Precedence.FlashOverride))
+                    .build())
+                .build())
             .build())
         .build();
-
-        a = new ActionsBuilder()
-            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.ConfigBuilder()
-                .setTargetGroup("plmap").build()).build();
-
-        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(a));
-        Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(a));
     }
 
     @Test
@@ -123,18 +126,43 @@ public class RemarkConfigWriterTest {
 
     @Test
     public void update() throws WriteFailedException {
-        data = new ConfigBuilder().setSetMplsTc((short) 2).addAugmentation(QosRemarkQosGroupAug.class,
-            new QosRemarkQosGroupAugBuilder()
-                .setSetQosGroup(40)
-                .setSetPrecedences(Lists.newArrayList(Precedence.Immediate))
+        data = new ActionsBuilder()
+            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.ConfigBuilder()
+                .setTargetGroup("plmap").build())
+            .setRemark(new RemarkBuilder()
+                .setConfig(new ConfigBuilder()
+                    .setSetMplsTc((short) 2).addAugmentation(QosRemarkQosGroupAug.class,
+                    new QosRemarkQosGroupAugBuilder()
+                        .setSetQosGroup(40)
+                        .setSetPrecedences(Lists.newArrayList(Precedence.Immediate))
+                    .build())
+                .build())
             .build())
         .build();
 
         this.writer.updateCurrentAttributes(piid, data, data, context);
 
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue());
+    }
+
+    @Test
+    public void updatePolicy() throws WriteFailedException {
+        Actions newData = new ActionsBuilder()
+                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.ConfigBuilder()
+                        .setTargetGroup("plmap1").build())
+                .setRemark(new RemarkBuilder()
+                        .setConfig(new ConfigBuilder()
+                                .setSetMplsTc((short) 1)
+                                .build())
+                        .build())
+                .build();
+
+        this.writer.updateCurrentAttributes(piid, data, newData, context);
+
         Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0));
-        Assert.assertEquals(UPDATE_INPUT, response.getAllValues().get(1));
+        Assert.assertEquals(UPDATE_POLICY_INPUT, response.getAllValues().get(1));
     }
 
     @Test
