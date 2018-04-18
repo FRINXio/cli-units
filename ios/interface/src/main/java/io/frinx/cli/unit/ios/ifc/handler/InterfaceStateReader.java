@@ -56,7 +56,7 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
         parseInterfaceState(blockingRead(String.format(SH_SINGLE_INTERFACE, name), cli, id, ctx), builder, name);
     }
 
-    public static final String SH_SINGLE_INTERFACE = "do show interface %s";
+    public static final String SH_SINGLE_INTERFACE = "show interface %s";
 
     public static final Pattern STATUS_LINE =
             Pattern.compile("(?<id>.+)[.\\s]* (?<admin>up|down).*, line protocol is (?<line>up|down).*");
