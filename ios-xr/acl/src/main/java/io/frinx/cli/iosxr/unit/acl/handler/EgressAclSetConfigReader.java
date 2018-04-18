@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    static final String SH_ACL_INTF = "do show running-config interface %s";
+    static final String SH_ACL_INTF = "show running-config interface %s";
     private final Cli cli;
 
     public EgressAclSetConfigReader(final Cli cli) {

@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 public class NiMplsRsvpIfSubscripAugReader implements MplsReader.MplsConfigReader<NiMplsRsvpIfSubscripAug, NiMplsRsvpIfSubscripAugBuilder> {
 
     private Cli cli;
-    private static final String SH_RSVP_INT = "do show running-config rsvp interface %s";
+    private static final String SH_RSVP_INT = "show running-config rsvp interface %s";
     private static final Pattern IFACE_LINE = Pattern.compile("bandwidth(?<bandwidth>.*)(K?)");
     @VisibleForTesting
     public static final String DEFAULT = "default";

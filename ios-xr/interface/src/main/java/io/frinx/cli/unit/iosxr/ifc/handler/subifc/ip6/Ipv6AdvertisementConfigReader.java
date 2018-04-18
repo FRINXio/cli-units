@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class Ipv6AdvertisementConfigReader implements TypedReader<Config, ConfigBuilder>, CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_SINGLE_SUB_INTERFACE_CFG = "do show running-config interface %s";
+    private static final String SH_SINGLE_SUB_INTERFACE_CFG = "show running-config interface %s";
     private static final Pattern IPV6_ADVERTISEMENT_ENABLED = Pattern.compile("\\s*ipv6 nd suppress-ra.*");
 
     private final Cli cli;

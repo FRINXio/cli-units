@@ -41,7 +41,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class AclInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private final Cli cli;
-    private static final String SH_IFACES = "do show running-config interface";
+    private static final String SH_IFACES = "show running-config interface";
     private static final Pattern IFACE_LINE = Pattern.compile("interface (?<name>.+)");
 
     public AclInterfaceReader(Cli cli) {

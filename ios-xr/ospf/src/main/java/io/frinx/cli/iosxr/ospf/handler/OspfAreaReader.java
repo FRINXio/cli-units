@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area, AreaKey, AreaBuilder> {
 
-    private static final String SH_RUN_OSPF_AREA = "do show running-config router ospf %s | include ^ area";
+    private static final String SH_RUN_OSPF_AREA = "show running-config router ospf %s | include ^ area";
 
     private static final Pattern AREA_ID = Pattern.compile("area (?<areaId>[0-9.]+)");
 

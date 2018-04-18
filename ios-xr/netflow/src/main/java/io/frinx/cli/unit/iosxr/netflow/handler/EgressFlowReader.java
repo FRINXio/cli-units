@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EgressFlowReader implements TypedListReader<EgressFlow, EgressFlowKey, EgressFlowBuilder>, CliConfigListReader<EgressFlow, EgressFlowKey, EgressFlowBuilder> {
 
-    private static final String SH_NETFLOW_INTF = "do show running-config interface %s | include egress";
+    private static final String SH_NETFLOW_INTF = "show running-config interface %s | include egress";
     private static final Pattern FLOW_LINE = Pattern.compile("flow (?<type>.+) monitor \\S+( sampler .+)? egress");
 
     private final Cli cli;

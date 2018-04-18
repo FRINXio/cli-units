@@ -43,7 +43,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class IngressFlowReader implements TypedListReader<IngressFlow, IngressFlowKey, IngressFlowBuilder>, CliConfigListReader<IngressFlow, IngressFlowKey, IngressFlowBuilder> {
 
-    private static final String SH_NETFLOW_INTF = "do show running-config interface %s | include ingress";
+    private static final String SH_NETFLOW_INTF = "show running-config interface %s | include ingress";
     private static final Pattern FLOW_LINE = Pattern.compile("flow (?<type>.+) monitor \\S+( sampler .+)? ingress");
 
     private final Cli cli;

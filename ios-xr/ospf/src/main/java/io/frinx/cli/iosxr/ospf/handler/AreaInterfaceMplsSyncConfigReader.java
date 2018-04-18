@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AreaInterfaceMplsSyncConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_OSPF_INT = "do show running-config router ospf %s area %s interface %s";
+    private static final String SHOW_OSPF_INT = "show running-config router ospf %s area %s interface %s";
     private static final Pattern MPLS_SYNC_LINE = Pattern.compile("mpls ldp sync(?<disable> disable)*");
     private final Cli cli;
 

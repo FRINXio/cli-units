@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OneRateTwoColorConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    public static final String SH_POLICY_MAP = "do show running-config policy-map %s | begin class %s";
+    public static final String SH_POLICY_MAP = "show running-config policy-map %s | begin class %s";
     private static final Pattern RATE_LINE = Pattern.compile("police rate percent (?<rate>.+)");
     private static final Pattern QUEUE_LINE = Pattern.compile("queue-limit (?<queue>.+) ms");
     private static final Pattern BW_REM_LINE = Pattern.compile("bandwidth remaining percent (?<rem>.+)");

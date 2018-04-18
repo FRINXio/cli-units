@@ -45,7 +45,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class NeighborAfiSafiApplyPolicyConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
     public static final String NEXTHOPSELF_POLICY_NAME = "nexthopself";
-    private static final String SH_NEI = "do show running-config router bgp %s %s neighbor %s address-family %s";
+    private static final String SH_NEI = "show running-config router bgp %s %s neighbor %s address-family %s";
     private static final Pattern ROUTE_POLICY_IN_LINE = Pattern.compile("route-policy (?<policyName>.+) in");
     private static final Pattern ROUTE_POLICY_OUT_LINE = Pattern.compile("route-policy (?<policyName>.+) out");
     private static final Pattern NEXT_HOP_SELF_LINE = Pattern.compile("next-hop-self");

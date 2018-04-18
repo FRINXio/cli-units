@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ClassifierReader implements CliConfigListReader<Classifier, ClassifierKey, ClassifierBuilder> {
 
-    static final String SH_CLASS_MAPS = "do show running-config class-map | include ^class-map";
+    static final String SH_CLASS_MAPS = "show running-config class-map | include ^class-map";
     private static final Pattern CLASSIFIER_NAME_LINE = Pattern.compile("class-map match-(any|all) (?<name>.+)");
 
     private Cli cli;

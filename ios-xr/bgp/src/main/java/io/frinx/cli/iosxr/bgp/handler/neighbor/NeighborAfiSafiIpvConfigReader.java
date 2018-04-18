@@ -41,7 +41,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public abstract class NeighborAfiSafiIpvConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_NEI = "do show running-config router bgp %s %s neighbor %s address-family %s";
+    private static final String SH_NEI = "show running-config router bgp %s %s neighbor %s address-family %s";
     private static final Pattern DEFAULT_ORIGINATE_LINE = Pattern.compile("default-originate");
 
     private Cli cli;

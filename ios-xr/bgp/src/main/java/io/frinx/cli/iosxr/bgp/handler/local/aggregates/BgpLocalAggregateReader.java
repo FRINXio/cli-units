@@ -47,7 +47,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReader<Aggregate, AggregateKey, AggregateBuilder> {
 
-    private static final String SH_BGP = "do show running-config router bgp %s %s";
+    private static final String SH_BGP = "show running-config router bgp %s %s";
     private static final Pattern NETWORK_LINE = Pattern.compile("network (?<prefix>\\S+)(?<policy> route-policy (?<policyName>\\S+))*");
 
     private Cli cli;

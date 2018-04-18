@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class TermReader implements CliConfigListReader<Term, TermKey, TermBuilder> {
 
-    static final String SH_TERMS = "do show running-config class-map %s | include match";
+    static final String SH_TERMS = "show running-config class-map %s | include match";
     private static final Pattern CLASS_TYPE_LINE = Pattern.compile("class-map match-(?<type>.+) (?<name>.+)");
     private static final Pattern MATCH_LINE = Pattern.compile("match (?<condition>.+)");
 

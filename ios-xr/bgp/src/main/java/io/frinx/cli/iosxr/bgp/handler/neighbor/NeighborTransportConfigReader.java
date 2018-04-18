@@ -41,7 +41,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborTransportConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_NEI = "do show running-config router bgp %s %s neighbor %s";
+    private static final String SH_NEI = "show running-config router bgp %s %s neighbor %s";
     private static final Pattern UPADTE_SOURCE_LINE = Pattern.compile("update-source (?<iface>.+)");
 
     private Cli cli;

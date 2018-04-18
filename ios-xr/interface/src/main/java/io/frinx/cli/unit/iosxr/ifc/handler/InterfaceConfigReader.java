@@ -59,7 +59,7 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
         parseInterface(blockingRead(String.format(SH_SINGLE_INTERFACE_CFG, name), cli, id, ctx), builder, name);
     }
 
-    public static final String SH_SINGLE_INTERFACE_CFG = "do show running-config interface %s";
+    public static final String SH_SINGLE_INTERFACE_CFG = "show running-config interface %s";
 
     public static final Pattern SHUTDOWN_LINE = Pattern.compile("shutdown");
     public static final Pattern MTU_LINE = Pattern.compile("\\s*mtu (?<mtu>.+)$");

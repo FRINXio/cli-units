@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AsPathSetReader implements CliConfigListReader<AsPathSet, AsPathSetKey, AsPathSetBuilder> {
 
-    private static final String SH_ALL_PREFIX_SETS = "do show running-config | include ^as-path-set";
+    private static final String SH_ALL_PREFIX_SETS = "show running-config | include ^as-path-set";
     private static final Pattern ID_PATTERN = Pattern.compile("as-path-set (?<id>\\S+)");
 
     private final Cli cli;

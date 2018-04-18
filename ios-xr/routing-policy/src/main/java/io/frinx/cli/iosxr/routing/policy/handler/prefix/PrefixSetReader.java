@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixSetReader implements CliConfigListReader<PrefixSet, PrefixSetKey, PrefixSetBuilder> {
 
-    private static final String SH_ALL_PREFIX_SETS = "do show running-config | include ^prefix-set";
+    private static final String SH_ALL_PREFIX_SETS = "show running-config | include ^prefix-set";
     private static final Pattern ID_PATTERN = Pattern.compile("prefix-set (?<id>\\S+)");
 
     private final Cli cli;

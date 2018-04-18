@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
 public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
 
-    private static final String SH_NEI = "do show running-config router bgp %s %s neighbor %s";
+    private static final String SH_NEI = "show running-config router bgp %s %s neighbor %s";
     private static final Pattern REMOTE_AS_LINE = Pattern.compile(".*remote-as (?<remoteAs>\\S+).*");
     private static final Pattern NEIGHBOR_LINE = Pattern.compile(".*use neighbor-group (?<group>\\S+).*");
     private static final Pattern PASSWORD_LINE = Pattern.compile(".*password encrypted (?<password>\\S+).*");

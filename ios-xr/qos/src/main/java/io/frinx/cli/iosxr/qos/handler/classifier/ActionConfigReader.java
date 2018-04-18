@@ -34,7 +34,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ActionConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_POLICY_MAPS = "do show run policy-map | utility egrep \"^policy-map| class %s\"";
+    private static final String SH_POLICY_MAPS = "show running-config policy-map | utility egrep \"^policy-map| class %s\"";
     private static final String RAW_POLICY_LINE = "(.*)policy-map (?<name>.+) class %s(.*)";
 
     private Cli cli;

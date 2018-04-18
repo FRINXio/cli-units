@@ -53,8 +53,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
-    private static final String SH_AFI = "do show running-config router bgp %s %s neighbor %s | include address-family";
-    private static final String SH_AFI_SECTION = "do show running-config router bgp %s %s neighbor %s address-family %s";
+    private static final String SH_AFI = "show running-config router bgp %s %s neighbor %s | include address-family";
+    private static final String SH_AFI_SECTION = "show running-config router bgp %s %s neighbor %s address-family %s";
     private static final Pattern FAMILY_LINE = Pattern.compile("(.*)address-family (?<family>[^\\n].*)");
     private static final Pattern SOFT_RECONFIGURATION_LINE = Pattern.compile("soft-reconfiguration inbound(?<always> always)*");
     private Cli cli;

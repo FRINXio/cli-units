@@ -41,7 +41,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixReader implements CliConfigListReader<Prefix, PrefixKey, PrefixBuilder> {
 
-    private static final String SH_PREFIX_SET = "do show running-config prefix-set %s";
+    private static final String SH_PREFIX_SET = "show running-config prefix-set %s";
     private static final Pattern PREFIX_PATTERN = Pattern.compile("\\s+(?<network>[0-9a-f.:]+)/?(?<mask>[0-9]*)?\\s*(?<modifiers>.*)\\s*");
 
     private static final Pattern GE_PATTERN = Pattern.compile(".*ge (?<value>[0-9]+)\\s*.*");

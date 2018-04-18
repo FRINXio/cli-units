@@ -48,7 +48,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborAfiSafiPrefixLimitConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_NEI = "do show running-config router bgp %s %s neighbor %s address-family %s";
+    private static final String SH_NEI = "show running-config router bgp %s %s neighbor %s address-family %s";
     public static final Pattern MAX_PREFIX_LINE = Pattern.compile("maximum-prefix (?<prefixCount>\\d+) ?(?<maxPrefixThreshold>\\d+)?");
 
     private Cli cli;

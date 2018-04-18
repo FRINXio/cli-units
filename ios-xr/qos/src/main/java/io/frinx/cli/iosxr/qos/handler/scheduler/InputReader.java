@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InputReader implements CliConfigListReader<Input, InputKey, InputBuilder> {
 
-    private static final String SH_POLICY_MAP_CLASSES = "do show run policy-map %s | include class";
+    private static final String SH_POLICY_MAP_CLASSES = "show running-config policy-map %s | include class";
 
     private Cli cli;
 

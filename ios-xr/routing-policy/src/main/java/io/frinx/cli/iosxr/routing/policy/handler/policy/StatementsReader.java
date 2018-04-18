@@ -61,7 +61,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class StatementsReader implements CliConfigReader<Statements, StatementsBuilder> {
 
-    private static final String SH_PREFIX_SET = "do show running-config route-policy %s";
+    private static final String SH_PREFIX_SET = "show running-config route-policy %s";
 
     private Cli cli;
 

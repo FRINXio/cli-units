@@ -45,7 +45,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class EgressFlowConfigReader implements TypedReader<Config, ConfigBuilder>, CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_SINGLE_INTERFACE_FLOW_CFG =
-        "do show running-config interface %s | include flow %s monitor";
+        "show running-config interface %s | include flow %s monitor";
     private static final Pattern FLOW_MONITOR =
         Pattern.compile("flow (?<type>.+) monitor (?<monitorName>\\S+)( sampler (?<samplerName>.+))? egress");
 

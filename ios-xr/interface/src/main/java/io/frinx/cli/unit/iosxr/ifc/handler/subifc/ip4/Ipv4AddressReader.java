@@ -47,7 +47,7 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
         this.cli = cli;
     }
 
-    static final String SH_RUN_INT_IP = "do show running-config interface %s | include ^ ipv4 address";
+    static final String SH_RUN_INT_IP = "show running-config interface %s | include ^ ipv4 address";
     static final Pattern INTERFACE_IP_LINE =
             Pattern.compile("ipv4 address (?<address>\\S+) (?<prefix>\\S+)");
 

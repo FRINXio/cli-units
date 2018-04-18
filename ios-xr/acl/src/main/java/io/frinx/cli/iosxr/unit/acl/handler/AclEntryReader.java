@@ -46,8 +46,8 @@ import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AclEntryReader implements TypedListReader<AclEntry, AclEntryKey, AclEntryBuilder>, CliConfigListReader<AclEntry, AclEntryKey, AclEntryBuilder> {
-    private static final String SH_ACCESS_LISTS_IPV4 = "do show running-config ipv4 access-list %s";
-    private static final String SH_ACCESS_LISTS_IPV6 = "do show running-config ipv6 access-list %s";
+    private static final String SH_ACCESS_LISTS_IPV4 = "show running-config ipv4 access-list %s";
+    private static final String SH_ACCESS_LISTS_IPV6 = "show running-config ipv6 access-list %s";
     private static final Map<Class<? extends ACLTYPE>, String> TYPES_TO_COMMANDS = ImmutableMap.of(
             ACLIPV4.class, SH_ACCESS_LISTS_IPV4,
             ACLIPV6.class, SH_ACCESS_LISTS_IPV6

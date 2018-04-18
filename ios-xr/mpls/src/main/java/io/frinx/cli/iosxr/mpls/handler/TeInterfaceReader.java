@@ -39,7 +39,7 @@ public class TeInterfaceReader implements MplsListReader.MplsConfigListReader<In
 
     private Cli cli;
 
-    private static final String SHOW_RUN_MPLS_INT = "do show running-config mpls traffic-eng | include ^ interface";
+    private static final String SHOW_RUN_MPLS_INT = "show running-config mpls traffic-eng | include ^ interface";
     // TODO Reuse pattern from ifc translate unit
     private static final Pattern INTF_LINE = Pattern.compile("interface (?<id>\\S+)");
 

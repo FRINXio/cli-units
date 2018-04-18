@@ -42,7 +42,7 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
 
     public static final String DEFAULT_BGP_INSTANCE = "default";
 
-    private static final String SHOW_RUN_ROUTER_BGP = "do show running-config router bgp | include ^router bgp";
+    private static final String SHOW_RUN_ROUTER_BGP = "show running-config router bgp | include ^router bgp";
     private static final Pattern INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9.]+) instance (?<instance>[\\S]+)");
     private static final Pattern DEFAULT_INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9]+)");
     private final Cli cli;

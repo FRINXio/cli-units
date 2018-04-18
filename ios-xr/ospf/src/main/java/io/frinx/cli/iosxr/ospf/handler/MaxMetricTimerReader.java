@@ -49,7 +49,7 @@ public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader
             "(?<summaryLsa> summary-lsa)*" +
             "(?<externalLsa> external-lsa)*");
 
-    public static final String SH_RUN_OSPF_MAX_METRIC = "do show running-config router ospf %s | include ^ max-metric";
+    public static final String SH_RUN_OSPF_MAX_METRIC = "show running-config router ospf %s | include ^ max-metric";
 
     private Cli cli;
 

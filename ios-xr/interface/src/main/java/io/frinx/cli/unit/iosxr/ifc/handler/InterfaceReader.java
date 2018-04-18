@@ -42,7 +42,7 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
         this.cli = cli;
     }
 
-    public static final String SH_RUN_INTERFACE = "do show running-config interface | include ^interface";
+    public static final String SH_RUN_INTERFACE = "show running-config interface | include ^interface";
 
     @Nonnull
     @Override

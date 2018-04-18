@@ -39,7 +39,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_RUN_BGP = "do show running-config router bgp";
+    private static final String SH_RUN_BGP = "show running-config router bgp";
     private static final Pattern CONFIG_LINE = Pattern.compile(".*router bgp (?<as>\\S+).*");
     private static final Pattern ROUTER_ID_LINE = Pattern.compile(".*bgp router-id (?<id>\\S+).*");
 

@@ -42,7 +42,7 @@ public class PolicyForwardingInterfaceReader implements CliConfigListReader<Inte
 
     private final Cli cli;
     private static final String SH_SERVICE_POLICY_INT =
-            "do show running-config interface | utility egrep \"^interface|^ service-policy input|^ service-policy output\"";
+            "show running-config interface | utility egrep \"^interface|^ service-policy input|^ service-policy output\"";
 
     public PolicyForwardingInterfaceReader(Cli cli) {
         this.cli = cli;

@@ -43,7 +43,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, IngressAclSetKey, IngressAclSetBuilder> {
 
-    private static final String SH_ACL_INTF = "do show running-config interface %s";
+    private static final String SH_ACL_INTF = "show running-config interface %s";
     private static final Pattern ALL_INGRESS_ACLS_LINE =
         Pattern.compile("(?<type>.+) access-group (?<name>.+) ingress.*", Pattern.DOTALL);
 

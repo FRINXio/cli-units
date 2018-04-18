@@ -42,7 +42,7 @@ public class NetflowInterfaceReader implements CliConfigListReader<Interface, In
 
     private static final Pattern CONTAINS_NETFLOW = Pattern.compile("flow .+ monitor \\S+( sampler .+)? (ingress|egress)");
     private final Cli cli;
-    private static final String SH_IFACES = "do show running-config interface";
+    private static final String SH_IFACES = "show running-config interface";
     private static final Pattern IFACE_LINE = Pattern.compile("interface (?<name>.+)");
 
     public NetflowInterfaceReader(Cli cli) {

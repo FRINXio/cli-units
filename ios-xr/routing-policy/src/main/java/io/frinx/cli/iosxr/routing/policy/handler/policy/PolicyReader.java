@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PolicyReader implements CliConfigListReader<PolicyDefinition, PolicyDefinitionKey, PolicyDefinitionBuilder> {
 
-    private static final String SH_ALL_POLICY = "do show running-config | include ^route-policy";
+    private static final String SH_ALL_POLICY = "show running-config | include ^route-policy";
     private static final Pattern ID_PATTERN = Pattern.compile("route-policy (?<id>\\S+)");
 
     private final Cli cli;

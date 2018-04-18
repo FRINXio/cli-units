@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborEbgpConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_NEI = "do show running-config router bgp %s %s neighbor %s";
+    private static final String SH_NEI = "show running-config router bgp %s %s neighbor %s";
     private static final Pattern EBGP_MULTIHOP_LINE = Pattern.compile("ebgp-multihop (?<hopCount>.+)");
 
     private Cli cli;

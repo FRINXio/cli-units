@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class RemarkConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_POLICY_MAPS = "do show running-config policy-map %s | include set";
+    private static final String SH_POLICY_MAPS = "show running-config policy-map %s | include set";
 
     private static final Pattern MPLS_LINE = Pattern.compile("set mpls experimental topmost (?<mpls>.+)");
     private static final Pattern QOS_LINE = Pattern.compile("set qos-group (?<qos>.+)");

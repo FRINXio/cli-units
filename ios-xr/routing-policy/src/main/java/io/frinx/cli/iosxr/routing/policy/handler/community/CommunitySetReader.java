@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class CommunitySetReader implements CliConfigListReader<CommunitySet, CommunitySetKey, CommunitySetBuilder> {
 
-    private static final String SH_ALL_PREFIX_SETS = "do show running-config | include ^community-set";
+    private static final String SH_ALL_PREFIX_SETS = "show running-config | include ^community-set";
     private static final Pattern ID_PATTERN = Pattern.compile("community-set (?<id>\\S+)");
 
     private final Cli cli;

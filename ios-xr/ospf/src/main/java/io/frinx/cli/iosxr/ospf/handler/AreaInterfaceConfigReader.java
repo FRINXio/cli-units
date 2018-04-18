@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 
 public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_OSPF_INT = "do show running-config router ospf %s area %s interface %s";
+    private static final String SHOW_OSPF_INT = "show running-config router ospf %s area %s interface %s";
     private static final Pattern COST_LINE = Pattern.compile("cost (?<cost>.+)");
     private final Cli cli;
 
