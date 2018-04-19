@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.ospf.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -26,6 +24,7 @@ import io.frinx.cli.io.Cli;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+
 import io.frinx.cli.unit.utils.ParsingUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
@@ -42,8 +41,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
-
-    private static final String SHOW_OSPF_INT = "do show running-config router ospf %s | utility egrep \"^ area|^  interface\"";
+    private static final String SHOW_OSPF_INT = "do show running-config router ospf %s area %s interface";
     private static final Pattern INTERFACE_NAME_LINE = Pattern.compile("interface (?<name>.*)");
 
     private Cli cli;
@@ -59,18 +57,13 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
         ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
         AreaKey areaKey = instanceIdentifier.firstKeyOf(Area.class);
 
-        String output = blockingRead(String.format(SHOW_OSPF_INT, protocolKey.getName()), cli, instanceIdentifier, readContext);
-        return parseInterfaceIds(output, areaIdToString(areaKey.getIdentifier()));
+        String output = blockingRead(String.format(SHOW_OSPF_INT, protocolKey.getName(), areaIdToString(areaKey.getIdentifier())), cli, instanceIdentifier, readContext);
+        return parseInterfaceIds(output);
     }
 
     @VisibleForTesting
-    public static List<InterfaceKey> parseInterfaceIds(String output, String areaId) {
-        String areaLine = NEWLINE.splitAsStream(realignOutput(output))
-                .filter(line -> line.contains(String.format("area %s", areaId)))
-                .findFirst()
-                .orElse("");
-
-        return ParsingUtils.parseFields(areaLine.replaceAll("interface", "\ninterface"), 0,
+    public static List<InterfaceKey> parseInterfaceIds(String output) {
+        return ParsingUtils.parseFields(output, 0,
                 INTERFACE_NAME_LINE::matcher,
                 matcher -> matcher.group("name"),
                 InterfaceKey::new);
@@ -90,10 +83,5 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
                                              @Nonnull InterfaceBuilder interfaceBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class).getId());
-    }
-
-    static String realignOutput(String output) {
-        String withoutNewlines = output.replaceAll("\r|\n", "");
-        return withoutNewlines.replace("area", "\narea");
     }
 }
