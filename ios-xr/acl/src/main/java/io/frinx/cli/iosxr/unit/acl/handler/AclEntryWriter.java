@@ -180,15 +180,15 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
             commandVars.acl_ttl =
                 formatTTL(entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange().getValue());
         }
-        if (entry.getIpv4().getConfig().getAugmentation(Config1.class) != null &&
-                entry.getIpv4().getConfig().getAugmentation(Config1.class) != null) {
+        if (entry.getAugmentation(AclEntry1.class) != null &&
+            entry.getAugmentation(AclEntry1.class).getIcmp() != null) {
             commandVars.acl_icmp_msg_type =
                 entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString();
         }
         commandVars.acl_src_addr = Preconditions.checkNotNull(entry.getIpv4().getConfig().getSourceAddress()).getValue();
         commandVars.acl_dst_addr = Preconditions.checkNotNull(entry.getIpv4().getConfig().getDestinationAddress()).getValue();
         commandVars.acl_protocol = Preconditions.checkNotNull(
-                parseProtocol(entry.getIpv4().getConfig().getProtocol().getIdentityref(), commandVars.type));
+                formatProtocol(entry.getIpv4().getConfig().getProtocol().getIdentityref(), commandVars.type));
     }
 
     private void processIpv6(AclEntry entry, MaxMetricCommandDTO commandVars) {
@@ -197,15 +197,15 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
             commandVars.acl_ttl =
                 formatTTL(entry.getIpv6().getConfig().getAugmentation(Config2.class).getHopRange().getValue());
         }
-        if (entry.getIpv6().getConfig().getAugmentation(Config2.class) != null &&
-                entry.getIpv6().getConfig().getAugmentation(Config2.class) != null) {
+        if (entry.getAugmentation(AclEntry1.class) != null &&
+            entry.getAugmentation(AclEntry1.class).getIcmp() != null) {
             commandVars.acl_icmp_msg_type =
                 entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString();
         }
         commandVars.acl_src_addr = Preconditions.checkNotNull(entry.getIpv6().getConfig().getSourceAddress()).getValue();
         commandVars.acl_dst_addr = Preconditions.checkNotNull(entry.getIpv6().getConfig().getDestinationAddress()).getValue();
         commandVars.acl_protocol = Preconditions.checkNotNull(
-                parseProtocol(entry.getIpv6().getConfig().getProtocol().getIdentityref(), commandVars.type));
+                formatProtocol(entry.getIpv6().getConfig().getProtocol().getIdentityref(), commandVars.type));
     }
 
     private void processTransport(AclEntry entry, MaxMetricCommandDTO commandVars) {
@@ -234,7 +234,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
     }
 
     @Nullable
-    private static String parseProtocol(Class<? extends IPPROTOCOL> protocol, String type) {
+    private static String formatProtocol(Class<? extends IPPROTOCOL> protocol, String type) {
         if (protocol.equals(IPPROTOCOL.class)) {
             return type;
         } else if (protocol.equals(IPUDP.class)) {
