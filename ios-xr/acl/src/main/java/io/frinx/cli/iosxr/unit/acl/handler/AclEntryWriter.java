@@ -52,6 +52,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
     private static final Function<String, String> WRONG_RANGE_FORMAT_MSG = rangeString -> String.format(
         "incorrect range format, range parameter should contains two numbers separated by '%s', entered: %s",
         RANGE_SEPARATOR, rangeString);
+    private static final String ANY = "any";
 
     private final String ACL_IP_ENTRY = "{$type} access-list {$acl_name}\n" +
             "{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_ttl}\n" +
@@ -210,10 +211,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
     private void processTransport(AclEntry entry, MaxMetricCommandDTO commandVars) {
         if (entry.getTransport() != null && entry.getTransport().getConfig() != null) {
             if (entry.getTransport().getConfig().getSourcePort() != null) {
-                commandVars.acl_src_port = parsePort(entry.getTransport().getConfig().getSourcePort());
+                commandVars.acl_src_port = formatPort(entry.getTransport().getConfig().getSourcePort());
             }
             if (entry.getTransport().getConfig().getDestinationPort() != null) {
-                commandVars.acl_dst_port = parsePort(entry.getTransport().getConfig().getDestinationPort());
+                commandVars.acl_dst_port = formatPort(entry.getTransport().getConfig().getDestinationPort());
             }
         }
     }
@@ -256,10 +257,14 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
         }
     }
 
-    private String parsePort(PortNumRange port) {
+    private String formatPort(PortNumRange port) {
         if (port.getPortNumber() != null) {
             return f("eq %s", port.getPortNumber().getValue());
         } else if (port.getString() != null) {
+            if (ANY.equalsIgnoreCase(port.getString())) {
+                return "";
+            }
+
             Matcher matcher = PORT_RANGE_PATTERN.matcher(port.getString());
             if (!matcher.find()) {
                 LOG.warn("Wrong protocol range value: {}", port.getString());
@@ -284,9 +289,9 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
             }
             LOG.warn("Wrong protocol range value: {}", port.getString());
             return "";
-        } else {
-            return "eq any";
         }
+
+        return "";
     }
 
     private String formatTTL(final String rangeString) {
