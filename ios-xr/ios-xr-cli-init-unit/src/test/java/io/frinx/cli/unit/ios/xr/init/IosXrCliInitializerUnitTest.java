@@ -21,9 +21,7 @@ import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
+import io.frinx.cli.topology.RemoteDeviceId;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,6 +30,14 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Predicate;
 
 public class IosXrCliInitializerUnitTest {
 
@@ -58,20 +64,25 @@ public class IosXrCliInitializerUnitTest {
         this.unit = new IosXrCliInitializerUnit(this.registry);
     }
 
-    private CompletableFuture prepareCommit() {
+    private CompletableFuture prepareCommit() throws Exception {
         Cli cli = Mockito.mock(Cli.class);
         Mockito.when(this.context.getTransport()).thenReturn(cli);
 
 
         CompletionStage future = Mockito.mock(CompletionStage.class);
         CompletableFuture cFuture = Mockito.mock(CompletableFuture.class);
-        Mockito.when(cli.executeAndRead(Mockito.anyString())).thenReturn(future);
         Mockito.when(future.toCompletableFuture()).thenReturn(cFuture);
+        Mockito.when(cli.executeAndRead(Mockito.anyString())).thenReturn(future);
+        Mockito.when(cli.executeAndSwitchPrompt(Mockito.anyString(), Mockito.any(Predicate.class))).thenReturn(future);
+        RemoteDeviceId device = new RemoteDeviceId(new TopologyKey(new TopologyId("cli")),
+                "deviceId",
+                new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 1234));
+        unit.getInitializer(device, new CliNodeBuilder().build());
         return cFuture;
     }
 
     @Test
-    public void testSuccessCommit() throws ExecutionException, InterruptedException {
+    public void testSuccessCommit() throws Exception {
         CompletableFuture cFuture = prepareCommit();
         Mockito.when(cFuture.get()).thenReturn(SUCCESS_COMMIT);
         try {
@@ -86,7 +97,7 @@ public class IosXrCliInitializerUnitTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
-    public void testFailedCommit() throws ExecutionException, InterruptedException, CommitFailedException {
+    public void testFailedCommit() throws Exception {
         CompletableFuture cFuture = prepareCommit();
         Mockito.when(cFuture.get()).thenReturn(FAILED_COMMIT);
         thrown.expect(CommitFailedException.class);
@@ -94,7 +105,7 @@ public class IosXrCliInitializerUnitTest {
     }
 
     @Test
-    public void testRevertSuccessCommitFailed() throws ExecutionException, InterruptedException, WriterRegistry.Reverter.RevertSuccessException, WriterRegistry.Reverter.RevertFailedException {
+    public void testRevertSuccessCommitFailed() throws Exception {
         CompletableFuture cFuture = prepareCommit();
         // doesn't matter what we return
         Mockito.when(cFuture.get()).thenReturn("");
@@ -103,7 +114,7 @@ public class IosXrCliInitializerUnitTest {
     }
 
     @Test
-    public void testRevertFailedCommitFailed() throws ExecutionException, InterruptedException, WriterRegistry.Reverter.RevertSuccessException, WriterRegistry.Reverter.RevertFailedException {
+    public void testRevertFailedCommitFailed() throws Exception {
         CompletableFuture cFuture = prepareCommit();
         Mockito.when(cFuture.get()).thenThrow(InterruptedException.class);
         thrown.expect(WriterRegistry.Reverter.RevertFailedException.class);
