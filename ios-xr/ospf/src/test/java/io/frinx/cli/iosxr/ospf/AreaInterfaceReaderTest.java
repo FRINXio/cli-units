@@ -24,24 +24,19 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 
 public class AreaInterfaceReaderTest {
 
-    private static final String OUTPUT = "Fri Feb 23 06:02:43.733 UTC\n" +
-            " area 1\n" +
-            "  interface Loopback4\n" +
-            "  interface Loopback97\n" +
-            "  interface GigabitEthernet0/0/0/3\n" +
-            "  interface GigabitEthernet0/0/0/4\n" +
-            " area 4\n" +
-            "  interface GigabitEthernet0/0/0/2";
+    private static final String OUTPUT = "Mon Dec  4 16:39:10.453 UTC\n"+
+            "router ospf 1\n"+
+            " area 0\n"+
+            "  interface Loopback0\n"+
+            "  !\n"+
+            "  interface GigabitEthernet0/0/0/2\n"+
+            "  !\n"+
+            " !\n"+
+            "!\n";
 
     @Test
     public void test() {
-
-        Assert.assertArrayEquals(
-                Lists.newArrayList("Loopback4", "Loopback97", "GigabitEthernet0/0/0/3", "GigabitEthernet0/0/0/4").toArray(),
-                AreaInterfaceReader.parseInterfaceIds(OUTPUT, "1").stream().map(InterfaceKey::getId).toArray());
-
-        Assert.assertArrayEquals(
-                Lists.newArrayList("GigabitEthernet0/0/0/2").toArray(),
-                AreaInterfaceReader.parseInterfaceIds(OUTPUT, "4").stream().map(InterfaceKey::getId).toArray());
+        Assert.assertEquals(Lists.newArrayList("Loopback0", "GigabitEthernet0/0/0/2").toArray(),
+                AreaInterfaceReader.parseInterfaceIds(OUTPUT).stream().map(InterfaceKey::getId).toArray());
     }
 }
