@@ -27,7 +27,6 @@ import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
-import java.util.List;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
@@ -47,37 +46,17 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
             "neighbor {$address}\n" +
             "address-family {$afiSafi}\n" +
             "{% loop in $config.import_policy as $inPolicy}\n" +
-                "route-policy {$inPolicy} in\n" +
+                "{.if ($delete)}no {/if}route-policy {$inPolicy} in\n" +
             "{% onEmpty %}" +
             "{% endloop %}" +
             "{% loop in $config.export_policy as $outPolicy}\n" +
-                "{.if ($outPolicy == $nexthopself) }next-hop-self\n{.else}route-policy {$outPolicy} out\n{/if}" +
+                "{.if ($outPolicy == $nexthopself) }" +
+                    "{.if ($delete)}no {/if}next-hop-self\n" +
+                "{.else}" +
+                    "{.if ($delete)}no {/if}route-policy {$outPolicy} out\n" +
+                "{/if}" +
             "{% onEmpty %}" +
             "{% endloop %}" +
-            "exit\n" +
-            "exit\n" +
-            "exit\n";
-
-    static final String UPDATE_NEIGHBOR_AFI_APPLY_POLICY ="router bgp {$as} {$instance}\n" +
-            "neighbor {$address}\n" +
-            "address-family {$afiSafi}\n" +
-            "no route-policy\n" +
-            "{% loop in $config.import_policy as $inPolicy}\n" +
-                "route-policy {$inPolicy} in\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "{% loop in $config.export_policy as $outPolicy}\n" +
-                "{.if ($outPolicy == $nexthopself) }next-hop-self\n{.else}route-policy {$outPolicy} out\n{/if}" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "exit\n" +
-            "exit\n" +
-            "exit\n";
-
-    static final String DELETE_NEIGHBOR_AFI_APPLY_POLICY ="router bgp {$as} {$instance}\n" +
-            "neighbor {$address}\n" +
-            "address-family {$afiSafi}\n" +
-            "no route-policy\n" +
             "exit\n" +
             "exit\n" +
             "exit\n";
@@ -102,18 +81,8 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
-        Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
-        Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
-        final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingWriteAndRead(fT(UPDATE_NEIGHBOR_AFI_APPLY_POLICY,
-                "as", g.getConfig().getAs().getValue(),
-                "instance", instName,
-                "address", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class).getAfiSafiName()),
-                "nexthopself", NEXTHOPSELF_POLICY_NAME,
-                "config", dataAfter),
-                cli, id, dataAfter);
+        deleteCurrentAttributesForType(id, dataBefore, writeContext);
+        writeCurrentAttributesForType(id, dataAfter, writeContext);
     }
 
     @Override
@@ -125,11 +94,14 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
         }
         final Global g = bgpOptional.get().getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingDeleteAndRead(fT(DELETE_NEIGHBOR_AFI_APPLY_POLICY,
+        blockingWriteAndRead(fT(WRITE_NEIGHBOR_AFI_APPLY_POLICY,
                 "as", g.getConfig().getAs().getValue(),
                 "instance", instName,
                 "address", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class).getAfiSafiName())),
-                cli, id);
+                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class).getAfiSafiName()),
+                "nexthopself", NEXTHOPSELF_POLICY_NAME,
+                "config", config,
+                "delete", true),
+                cli, id, config);
     }
 }
