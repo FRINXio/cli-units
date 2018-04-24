@@ -45,9 +45,9 @@
     <module>routing-policy</module>
     <module>cdp</module>
     <module>platform</module>
-
     <module>lldp</module>
     <module>it</module>
+    <module>configuration-metadata</module>
   </modules>
 
   <build>
