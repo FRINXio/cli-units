@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.ios.xr.init;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
@@ -37,8 +38,10 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -46,7 +49,7 @@ import java.util.regex.Pattern;
 
 /**
  * Translate unit that does not actually translate anything.
- *
+ * <p>
  * This translate unit's only responsibility is to properly initialize IOS-XR cli
  * session. That is, upon establishing connection to IOS-XR device, enter Privileged
  * EXEC mode by issuing the 'enable' command.
@@ -71,8 +74,7 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
         this.registry = registry;
     }
 
-    public void init()
-    {
+    public void init() {
         iosXrReg = registry.registerTranslateUnit(IOS_XR, this);
     }
 
@@ -128,10 +130,14 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
                 Cli cli = context.getTransport();
                 String s = cli.executeAndRead("commit").toCompletableFuture().get();
                 if (s.contains(CONFIG_FAILED_PREFIX)) {
-                    LOG.warn("Commit failed. Reason: {}", s);
-                    throw new CommitFailedException(s);
+                    LOG.warn("{}: Commit failed - {}", deviceId, s);
+                    String reason = cli.executeAndRead("show configuration failed inheritance")
+                            .toCompletableFuture()
+                            .get();
+                    LOG.warn("{}: Reason of commit failure - {}", deviceId, reason);
+                    throw new CommitFailedException(reason);
                 } else {
-                    LOG.info("Commit successful");
+                    LOG.debug("{}: Commit successful", deviceId);
                     try {
                         initializer.tryToExitConfigurationMode(cli);
                     } catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -140,39 +146,49 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
                     }
                 }
             } catch (InterruptedException | ExecutionException e) {
-                LOG.warn("Sending commit failed. Reason: {}", e.getMessage(), e);
+                LOG.warn("{}: Sending commit failed. Reason: {}", deviceId, e.getMessage(), e);
             }
         };
     }
 
     @Override
-    public PostFailedHook getPostFailedHook(Context context)  {
-        return () -> {
+    public PostFailedHook getPostFailedHook(Context context) {
+        return (causingException) -> {
             Cli cli = context.getTransport();
-            try {
-                String s = cli.executeAndRead("show configuration failed inheritance").toCompletableFuture().get();
-                LOG.warn("Configuration failed: {}", s);
+            String message = Optional.ofNullable(causingException)
+                    .map(this::getBottomErrorMessage)
+                    .orElse("Unknown reason.");
+            LOG.warn("{}: Configuration failed: {}", deviceId, message);
 
+            try {
                 // if this execution fails, the return to config mode was unsuccessful
                 // the check if we are again in config mode is done automatically, so if no exception
                 // is thrown, consider this as a success
                 cli.executeAndSwitchPrompt("abort", IosXrCliInitializer.IS_PRIVELEGE_PROMPT)
                         .toCompletableFuture().get();
-                LOG.info("Reverting configuration on device successful.");
-                throw new WriterRegistry.Reverter.RevertSuccessException(s);
+                LOG.debug("{}: Revert successful.", deviceId);
+                throw new WriterRegistry.Reverter.RevertSuccessException(message);
             } catch (InterruptedException | ExecutionException e) {
-                LOG.warn("Failed to abort commit. Reason: {}", e.getMessage(), e);
+                LOG.warn("{}: Failed to abort commit. Reason: {}", deviceId, e.getMessage(), e);
                 throw new WriterRegistry.Reverter.RevertFailedException(e);
             }
         };
     }
 
+    private @Nullable String getBottomErrorMessage(Throwable throwable) {
+        Throwable cause = throwable;
+        while (cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        return Strings.emptyToNull(cause.getMessage());
+    }
+
     @Override
     public Set<Pattern> getErrorPatterns() {
         return Sets.newLinkedHashSet(Arrays.asList(
-            Pattern.compile("\\s*\\^.*", Pattern.DOTALL),
-            Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL),
-            Pattern.compile("\\% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
+                Pattern.compile("\\s*\\^.*", Pattern.DOTALL),
+                Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL),
+                Pattern.compile("\\% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
         ));
     }
 

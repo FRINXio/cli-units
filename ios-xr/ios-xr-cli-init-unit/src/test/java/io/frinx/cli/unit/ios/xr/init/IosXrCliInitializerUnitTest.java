@@ -18,6 +18,7 @@ package io.frinx.cli.unit.ios.xr.init;
 
 import io.fd.honeycomb.translate.spi.write.CommitFailedException;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
+import io.fd.honeycomb.translate.write.registry.WriterRegistry.BulkUpdateException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
@@ -110,7 +111,7 @@ public class IosXrCliInitializerUnitTest {
         // doesn't matter what we return
         Mockito.when(cFuture.get()).thenReturn("");
         thrown.expect(WriterRegistry.Reverter.RevertSuccessException.class);
-        this.unit.getPostFailedHook(this.context).run();
+        this.unit.getPostFailedHook(this.context).run(null);
     }
 
     @Test
@@ -118,6 +119,6 @@ public class IosXrCliInitializerUnitTest {
         CompletableFuture cFuture = prepareCommit();
         Mockito.when(cFuture.get()).thenThrow(InterruptedException.class);
         thrown.expect(WriterRegistry.Reverter.RevertFailedException.class);
-        this.unit.getPostFailedHook(this.context).run();
+        this.unit.getPostFailedHook(this.context).run(null);
     }
 }
