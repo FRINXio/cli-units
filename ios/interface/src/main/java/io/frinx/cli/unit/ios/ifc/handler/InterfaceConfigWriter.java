@@ -16,36 +16,24 @@
 
 package io.frinx.cli.unit.ios.ifc.handler;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import java.util.Collections;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.google.common.base.Preconditions.checkArgument;
-
 public final class InterfaceConfigWriter implements CliWriter<Config> {
-
-    static final String MOD_INTERFACE = "configure terminal\n" +
-            "interface {%if ($isLoop) %}loopback {$name}{%else%}{$data.name}{%endif%}\n" +
-            "{% if ($data.description|onempty(EMPTY) == EMPTY) %}no description\n{% else %}description {$data.description}\n{% endif %}" +
-            "{% if(!$isLoop) %}{% if($data.mtu|onempty(EMPTY) == EMPTY) %}no mtu\n{%else}mtu {$data.mtu}\n{%endif%}{%endif%}" +
-            "{% if($dEnable == TRUE) %}no shutdown\n{% else %}shutdown\n{% endif %}" +
-            "end";
-
-    static final String DELETE_LOOPB_INTERFACE = "configure terminal\n" +
-            "no interface loopback {$number}\n" +
-            "end";
 
     private Cli cli;
 
@@ -78,12 +66,12 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             throw new WriteFailedException.CreateFailedException(id, data, e);
         }
 
-        blockingWriteAndRead(cli, id, data,fT(MOD_INTERFACE,
-                "isLoop", true,
-                "name", matcher.group("number"),
-                "data", data,
-                "dEnable", data.isEnabled()));
-
+        blockingWriteAndRead(cli, id, data,
+                "configure terminal",
+                f("interface loopback %s", matcher.group("number")),
+                data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
+                data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
+                "end");
     }
 
     public static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES = Collections.singleton(EthernetCsmacd.class);
@@ -118,10 +106,13 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     private void updatePhysicalInterface(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
 
-        blockingWriteAndRead(cli, id, data,fT(MOD_INTERFACE,
-                "data", data,
-                "dEnable", data.isEnabled()));
-
+        blockingWriteAndRead(cli, id, data,
+                "configure terminal",
+                f("interface %s", data.getName()),
+                data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
+                data.getMtu() == null ? "no mtu" : f("mtu %s", data.getMtu()),
+                data.isEnabled() ? "no shutdown" : "shutdown",
+                "end");
     }
 
     @Override
@@ -149,7 +140,9 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             throw new WriteFailedException.DeleteFailedException(id, e);
         }
 
-        blockingDeleteAndRead(cli, id,fT(DELETE_LOOPB_INTERFACE,
-                "name", matcher.group("number")));
+        blockingDeleteAndRead(cli, id,
+                "configure terminal",
+                f("no interface loopback %s", matcher.group("number")),
+                "end");
     }
 }

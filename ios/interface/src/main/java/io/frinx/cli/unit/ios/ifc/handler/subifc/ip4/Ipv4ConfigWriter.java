@@ -16,20 +16,19 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
+
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import javax.annotation.Nonnull;
 import org.apache.commons.net.util.SubnetUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
 
 public class Ipv4ConfigWriter implements CliWriter<Config> {
 
@@ -39,9 +38,9 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String MOD_TEMPLATE = "configure terminal\n" +
-            "interface {$ifcName}\n" +
-            "{% if ($delete) %}no{%endif%}ip address {$config.ip.value} {$info.netmask}\n" +
+    private static final String WRITE_TEMPLATE = "configure terminal\n" +
+            "interface %s\n" +
+            "ip address %s %s\n" +
             "end";
 
     @Override
@@ -58,10 +57,10 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         SubnetUtils.SubnetInfo info = getSubnetInfo(config);
 
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                fT(MOD_TEMPLATE,
-                        "ifcName", getIfcName(instanceIdentifier),
-                        "config", config,
-                        "info", info));
+                f(WRITE_TEMPLATE,
+                        getIfcName(instanceIdentifier),
+                        config.getIp().getValue(),
+                        info.getNetmask()));
     }
 
     private static SubnetUtils.SubnetInfo getSubnetInfo(@Nonnull Config config) {
@@ -88,6 +87,11 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         }
     }
 
+    private static final String DELETE_TEMPLATE = "configure terminal\n" +
+            "interface %s\n" +
+            "no ip address %s %s\n" +
+            "end";
+
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
@@ -99,11 +103,10 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
 
             try {
                 blockingWriteAndRead(cli, instanceIdentifier, config,
-                        fT(MOD_TEMPLATE,
-                                "delete", true,
-                                "ifcName", getIfcName(instanceIdentifier),
-                                "config", config,
-                                "info", info));
+                        f(DELETE_TEMPLATE,
+                                getIfcName(instanceIdentifier),
+                                config.getIp().getValue(),
+                                info.getNetmask()));
             } catch (WriteFailedException.CreateFailedException e) {
                 throw new WriteFailedException.DeleteFailedException(instanceIdentifier, e);
             }

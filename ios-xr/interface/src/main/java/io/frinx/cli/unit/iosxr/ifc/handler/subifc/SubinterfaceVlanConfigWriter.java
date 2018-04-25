@@ -16,19 +16,18 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc;
 
+import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
+import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
+
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
 
 public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
 
@@ -38,9 +37,9 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String MOD_TEMPLATE =
-            "interface {$subIntName}\n" +
-            "{% if ($delete) %}no{%endif%}encapsulation dot1Q {$vlanId.vlan_id.vlan_id.value}\n" +
+    private static final String WRITE_TEMPLATE =
+            "interface %s\n" +
+            "encapsulation dot1Q %s\n" +
             "exit";
 
     @Override
@@ -50,9 +49,9 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
         checkNotZeroSubinterface(id);
 
         blockingWriteAndRead(cli, id, dataAfter,
-                fT(MOD_TEMPLATE,
-                        "subIntName", getSubinterfaceName(id),
-                        "vlanId", dataAfter));
+                f(WRITE_TEMPLATE,
+                        getSubinterfaceName(id),
+                        dataAfter.getVlanId().getVlanId().getValue()));
 
     }
 
@@ -68,6 +67,11 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
         }
     }
 
+    private static final String DELETE_TEMPLATE =
+            "interface %s\n" +
+            "no encapsulation dot1Q %s\n" +
+            "exit";
+
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
@@ -76,10 +80,9 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
         checkNotZeroSubinterface(id);
 
         blockingDeleteAndRead(cli, id,
-                fT(MOD_TEMPLATE,
-                        "delete", true,
-                        "subIntName", getSubinterfaceName(id),
-                        "vlanId", dataBefore));
+                f(DELETE_TEMPLATE,
+                        getSubinterfaceName(id),
+                        dataBefore.getVlanId().getVlanId().getValue()));
     }
 
     private static void checkNotZeroSubinterface(@Nonnull InstanceIdentifier<?> id) throws WriteFailedException {

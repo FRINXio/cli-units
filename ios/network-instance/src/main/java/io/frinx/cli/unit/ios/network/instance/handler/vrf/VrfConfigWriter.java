@@ -23,13 +23,12 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.RouteDistinguisher;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
 
 public class VrfConfigWriter implements CliWriter<Config> {
 
@@ -55,6 +54,7 @@ public class VrfConfigWriter implements CliWriter<Config> {
 
             blockingWriteAndRead(cli, instanceIdentifier, config,
                     fT(WRITE_TEMPLATE,
+                            "vrf", config.getName(),
                             "config", config));
         }
     }

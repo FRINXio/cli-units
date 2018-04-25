@@ -39,9 +39,9 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String MOD_TEMPLATE = "configure terminal\n" +
-            "interface {$ifcName}\n" +
-            "{% if ($delete) %}no{%endif%}{$addComm}\n" +
+    private static final String WRITE_TEMPLATE = "configure terminal\n" +
+            "interface %s\n" +
+            "%s\n" +
             "end";
     private static final Pattern LINK_LOCAL = Pattern.compile("[Ff][Ee][89AaBb].*");
 
@@ -57,9 +57,9 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
         }
 
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                fT(MOD_TEMPLATE,
-                        "ifcName", getIfcName(instanceIdentifier),
-                        "addComm", createAddressCommand(config)));
+                f(WRITE_TEMPLATE,
+                        getIfcName(instanceIdentifier),
+                        createAddressCommand(config)));
     }
 
     private static String createAddressCommand(Config config) {
@@ -100,6 +100,10 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
         }
     }
 
+    private static final String DELETE_TEMPLATE = "configure terminal\n" +
+            "interface %s\n" +
+            "no %s\n" +
+            "end";
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
@@ -111,10 +115,9 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
 
             try {
                 blockingWriteAndRead(cli, instanceIdentifier, config,
-                        fT(MOD_TEMPLATE,
-                                "delete", true,
-                                "ifcName", getIfcName(instanceIdentifier),
-                                "addComm", createAddressCommand(config)));
+                        f(DELETE_TEMPLATE,
+                                getIfcName(instanceIdentifier),
+                                createAddressCommand(config)));
             } catch (WriteFailedException.CreateFailedException e) {
                 throw new WriteFailedException.DeleteFailedException(instanceIdentifier, e);
             }

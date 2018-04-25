@@ -28,22 +28,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.RouteDistinguisher;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
 public class L3VrfConfigWriter implements CliWriter<Config> {
-
-    static final String WRITE_CURR_ATTR = "system-view\n" +
-            "ip vpn-instance {$config.name}\n" +
-            "{% if($config.description) %}description {$config.description}\n{% endif %}\n" +
-            "ipv4-family\n" +
-            "{% if($config.route_distinguisher.string) %}route-distinguisher {$config.route_distinguisher.string}\n{% endif %}" +
-            "commit\n" +
-            "return";
-
-    static final String DELETE_CURR_ATTR = "system-view\n" +
-            "undo ip vpn-instance {$config.name}\n" +
-            "commit\n" +
-            "return";
 
     private final Cli cli;
 
@@ -56,8 +41,15 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
                                        @Nonnull WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
         if(config.getType().equals(L3VRF.class)) {
-            blockingWriteAndRead(cli, instanceIdentifier, config, fT(WRITE_CURR_ATTR,
-                    "config", config));
+            blockingWriteAndRead(cli, instanceIdentifier, config,
+                    "system-view",
+                    f("ip vpn-instance %s", config.getName()),
+                    config.getDescription() == null ? "" : f("description %s", config.getDescription()),
+                    "ipv4-family",
+                    config.getRouteDistinguisher() == null ? ""
+                            : f("route-distinguisher %s", config.getRouteDistinguisher().getString()),
+                    "commit",
+                    "return");
         }
     }
 
@@ -90,8 +82,11 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
 
         if(config.getType().equals(L3VRF.class)) {
 
-            blockingDeleteAndRead(cli, instanceIdentifier, fT(DELETE_CURR_ATTR,
-                    "config", config));
+            blockingDeleteAndRead(cli, instanceIdentifier,
+                    "system-view",
+                    f("undo ip vpn-instance %s", config.getName()),
+                    "commit",
+                    "return");
         }
     }
 }

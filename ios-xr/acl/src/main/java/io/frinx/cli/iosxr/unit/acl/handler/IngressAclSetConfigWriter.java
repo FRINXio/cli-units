@@ -40,15 +40,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.top.Acl;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
-import static com.google.common.base.Preconditions.checkArgument;
-
 public class IngressAclSetConfigWriter implements CliWriter<Config> {
-
-    static final String MOD_CURR_ATTR = "interface {$name}\n" +
-            "{% if ($delete) %}no {%endif%}{$aclType} access-group {$config.set_name} ingress\n" +
-            "exit\n";
 
     private final Cli cli;
 
@@ -68,10 +60,14 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
         checkArgument(aclType != null, "Missing acl type");
 
         checkIngressAclSetConfigExists(instanceIdentifier, aclType, writeContext, interfaceName);
-        blockingWriteAndRead(cli, instanceIdentifier, config, fT(MOD_CURR_ATTR,
-                "name", interfaceName,
-                "aclType", AclUtil.getStringType(aclType),
-                "config", config));
+
+        final String aclCommand =
+            f("%s access-group %s ingress", AclUtil.getStringType(aclType), config.getSetName());
+
+        blockingWriteAndRead(cli, instanceIdentifier, config,
+            f("interface %s", interfaceName),
+            aclCommand,
+            "exit");
     }
 
     private void checkIngressAclSetConfigExists(final InstanceIdentifier<Config> instanceIdentifier,
@@ -122,10 +118,12 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
         final Class<? extends ACLTYPE> aclType = config.getType();
         checkArgument(aclType != null, "Missing acl type");
 
-        blockingWriteAndRead(cli, instanceIdentifier, config, fT(MOD_CURR_ATTR,
-                "delete", true,
-                "name", name,
-                "aclType", AclUtil.getStringType(aclType),
-                "config", config));
+        final String aclCommand =
+            f("no %s access-group %s ingress", AclUtil.getStringType(aclType), config.getSetName());
+
+        blockingWriteAndRead(cli, instanceIdentifier, config,
+            f("interface %s", name),
+            aclCommand,
+            "exit");
     }
 }

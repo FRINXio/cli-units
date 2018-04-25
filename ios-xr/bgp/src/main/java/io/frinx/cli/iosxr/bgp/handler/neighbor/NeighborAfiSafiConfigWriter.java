@@ -40,14 +40,6 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
         this.cli = cli;
     }
 
-    static final String MOD_CURR_ATTR = "router bgp {$as.config.as.value} {$instName}\n" +
-            "neighbor {$neighbAddr}\n" +
-            "{% if ($delete) %}no {%endif%}address-family {$afiSafi}\n" +
-            "{% if (!$delete) %}{$reConfCommand:}\n{%endif%}" +
-            "exit\n" +
-            "exit\n" +
-            "exit";
-
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
                                               WriteContext writeContext) throws WriteFailedException {
@@ -55,12 +47,14 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
         Preconditions.checkArgument(bgpOptional.isPresent());
         final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingWriteAndRead(cli, id, config, fT(MOD_CURR_ATTR,
-                "as", g,
-                "instName", instName,
-                "neighbAddr", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName()),
-                "reConfCommand", getReconfigurationCommand(config, false)));
+        blockingWriteAndRead(cli, id, config,
+                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
+                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
+                f("address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
+                getReconfigurationCommand(config, false),
+                "exit",
+                "exit",
+                "exit");
     }
 
     @Override
@@ -79,12 +73,14 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
             delete = true;
             reconfig = dataBefore;
         }
-        blockingWriteAndRead(cli, id, dataAfter, fT(MOD_CURR_ATTR,
-                "as", g,
-                "instName", instName,
-                "neighbAddr", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(dataAfter.getAfiSafiName()),
-                "reConfCommand", getReconfigurationCommand(reconfig, delete)));
+        blockingWriteAndRead(cli, id, dataAfter,
+                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
+                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
+                f("address-family %s", GlobalAfiSafiReader.transformAfiToString(dataAfter.getAfiSafiName())),
+                getReconfigurationCommand(reconfig, delete),
+                "exit",
+                "exit",
+                "exit");
     }
 
     @Override
@@ -96,12 +92,12 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
         }
         final Global g = bgpOptional.get().getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingDeleteAndRead(cli, id, fT(MOD_CURR_ATTR,
-                "as", g,
-                "instName", instName,
-                "neighbAddr", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName()),
-                "delete", true));
+        blockingDeleteAndRead(cli, id,
+                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
+                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
+                f("no address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
+                "exit",
+                "exit");
     }
 
     private String getReconfigurationCommand(Config config, boolean delete) {

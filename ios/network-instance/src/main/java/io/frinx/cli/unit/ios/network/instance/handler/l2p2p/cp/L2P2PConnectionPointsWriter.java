@@ -16,12 +16,20 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.network.instance.L2p2pWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.Ipv4;
@@ -44,39 +52,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
-import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
-
 public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
-
-    static final String WRITE_X_CONNECT = "conf t\n" +
-            "pseudowire-class {$netName}\n" +
-            "encapsulation mpls\n" +
-            "exit\n" +
-            "interface {$ifc1}\n" +
-            "xconnect {$remote.remote.config.remote_system.ipv4_address.value} {$remote.remote.config.virtual_circuit_identifier} pw-class {$netName}\n" +
-            "end";
-
-    private static final String DELETE_X_CONNECT = "conf t" +
-            "no pseudowire-class {$name}\n" +
-            "interface {$ifc1}\n" +
-            "no connect\n" +
-            "end";
-
-    private static final String WRITE_LOCAL_CONNECT = "conf t\n" +
-            "connect {$netName} {$ifc1} {$ifc2} interworking ethernet\n" +
-            "end";
-
-    private static final String DELETE_LOCAL_CONNECT = "conf t\n" +
-            "no connect {$netName}\n" +
-            "end";
-
 
     public static final int NET_NAME_LENGTH = 15;
     private Cli cli;
@@ -135,11 +111,17 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(local);
         Endpoint remote = getRemote(endpoint1, endpoint2);
 
-        blockingWriteAndRead(cli, id, dataAfter,fT(WRITE_X_CONNECT,
-                "netName", netName,
-                "ifc1", ifc1,
-                "remote", remote));
-
+        blockingWriteAndRead(cli, id, dataAfter,
+                "conf t",
+                f("pseudowire-class %s", netName),
+                "encapsulation mpls",
+                "exit",
+                f("interface %s", ifc1),
+                f("xconnect %s %s pw-class %s",
+                        remote.getRemote().getConfig().getRemoteSystem().getIpv4Address().getValue(),
+                        remote.getRemote().getConfig().getVirtualCircuitIdentifier(),
+                        netName),
+                "end");
     }
 
     private Endpoint getRemote(Endpoint endpoint1, Endpoint endpoint2) {
@@ -154,9 +136,12 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                                 Endpoint endpoint1, Endpoint endpoint2) throws WriteFailedException.DeleteFailedException {
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(getLocal(endpoint1, endpoint2));
-        blockingDeleteAndRead(cli, id, fT(DELETE_X_CONNECT,
-                "netName", netName,
-                "ifc1", ifc1));
+        blockingDeleteAndRead(cli, id,
+                "conf t",
+                f("no pseudowire-class %s", netName),
+                f("interface %s", ifc1),
+                "no xconnect",
+                "end");
     }
 
     private void writeLocalConnect(InstanceIdentifier<ConnectionPoints> id,
@@ -166,19 +151,20 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint1);
         L2P2PConnectionPointsReader.InterfaceId ifc2 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint2);
-        String output = blockingWriteAndRead(cli, id, dataAfter, fT(WRITE_LOCAL_CONNECT,
-                "netName", netName,
-                "ifc1", ifc1,
-                "ifc2", ifc2));
+        String output = blockingWriteAndRead(cli, id, dataAfter,
+                "conf t",
+                f("connect %s %s %s interworking ethernet", netName, ifc1, ifc2),
+                "end");
 
         checkState(!output.toLowerCase().contains("invalid command"), "Local connect configuration failed with output: %s", output);
     }
 
     private void deleteLocalConnect(InstanceIdentifier<ConnectionPoints> id) throws WriteFailedException.DeleteFailedException {
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
-        blockingDeleteAndRead(cli, id, fT(DELETE_LOCAL_CONNECT,
-                "netName", netName));
-
+        blockingDeleteAndRead(cli, id,
+                "conf t",
+                f("no connect %s", netName),
+                "end");
     }
 
     public static Endpoint getEndpoint(ConnectionPoint connectionPoint1, WriteContext writeContext, Set<String> usedInterfaces, boolean isWrite, boolean checkSubifc) {

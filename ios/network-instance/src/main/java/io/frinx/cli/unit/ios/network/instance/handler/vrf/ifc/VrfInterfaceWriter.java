@@ -32,9 +32,14 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceKey> {
 
     private final Cli cli;
-    private static final String MOD_TEMPLATE = "configure terminal\n" +
-            "interface {$anInt.id}\n" +
-            "{% if ($delete) %}no{%endif%}ip vrf forwarding {$netInstanceKey.config.name}\n" +
+    private static final String WRITE_TEMPLATE = "configure terminal\n" +
+            "interface %s\n" +
+            "ip vrf forwarding %s\n" +
+            "end";
+
+    private static final String DELETE_TEMPLATE = "configure terminal\n" +
+            "interface %s\n" +
+            "no ip vrf forwarding %s\n" +
             "end";
 
     public VrfInterfaceWriter(Cli cli) {
@@ -54,9 +59,9 @@ public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceK
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance.class)).get();
 
         blockingWriteAndRead(cli, instanceIdentifier, anInterface,
-                fT(MOD_TEMPLATE,
-                        "anIntId", anInterface,
-                        "netInstanceKey", networkInstance));
+                f(WRITE_TEMPLATE,
+                        anInterface.getId(),
+                        networkInstance.getConfig().getName()));
     }
 
     @Override
@@ -80,8 +85,8 @@ public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceK
         }
 
         blockingDeleteAndRead(cli, instanceIdentifier,
-                fT(MOD_TEMPLATE,
-                       "anIntId", anInterface,
-                        "netInstKeyName", networkInstanceKey));
+                f(DELETE_TEMPLATE,
+                        anInterface.getId(),
+                        networkInstanceKey.getName()));
     }
 }

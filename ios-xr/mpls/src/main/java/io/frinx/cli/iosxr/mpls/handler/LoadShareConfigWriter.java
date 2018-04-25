@@ -34,19 +34,16 @@ public class LoadShareConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    public static final String MOD_CURR_ATTR = "interface tunnel-te {$name}\n" +
-            "{% if($delete) %}no {%endif%}load-share {$data.load_share}\n" +
-            "exit";
-
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class).getName();
         if (data.getLoadShare() == null) {
             return;
         }
-        blockingWriteAndRead(cli, id, data, fT(MOD_CURR_ATTR,
-                "name", name,
-                "data", data));
+        blockingWriteAndRead(cli, id, data,
+            f("interface tunnel-te %s", name),
+            f("load-share %s", data.getLoadShare()),
+            "exit");
     }
 
     @Override
@@ -65,9 +62,9 @@ public class LoadShareConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class).getName();
-        blockingWriteAndRead(cli, id, data, fT(MOD_CURR_ATTR,
-                "delete", true,
-                "name", name,
-                "data", data));
+        blockingWriteAndRead(cli, id, data,
+            f("interface tunnel-te %s", name),
+            f("no load-share %s", data.getLoadShare()),
+            "exit");
     }
 }

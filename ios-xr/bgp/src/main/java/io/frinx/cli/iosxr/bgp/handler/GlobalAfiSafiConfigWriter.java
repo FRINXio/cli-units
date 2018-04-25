@@ -36,11 +36,6 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         this.cli = cli;
     }
 
-    static final String MOD_CURR_ATTR = "router bgp {$as.config.as.value} {$instName}\n" +
-            "{% if {$delete) %}no {%endif%}address-family {$afiSafi}\n" +
-            "{% if {!$delete %}exit\n{%endif%}" +
-            "exit";
-
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
                                               WriteContext writeContext) throws WriteFailedException {
@@ -48,10 +43,11 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         Preconditions.checkArgument(bgpOptional.isPresent());
         final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingWriteAndRead(cli, id, config, fT(MOD_CURR_ATTR,
-                "as", g.getConfig().getAs().getValue(),
-                "instName", instName,
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())));
+        blockingWriteAndRead(cli, id, config,
+                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
+                f("address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
+                "exit",
+                "exit");
     }
 
     @Override
@@ -69,10 +65,9 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         }
         final Global g = bgpOptional.get().getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingWriteAndRead(cli, id, config, fT(MOD_CURR_ATTR,
-                "as", g.getConfig().getAs().getValue(),
-                "instName", instName,
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName()),
-                "delete", true));
+        blockingWriteAndRead(cli, id, config,
+                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
+                f("no address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
+                "exit");
     }
 }

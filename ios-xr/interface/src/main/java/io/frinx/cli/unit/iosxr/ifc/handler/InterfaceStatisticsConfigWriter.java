@@ -21,18 +21,13 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.statistics.top.statistics.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
 public class InterfaceStatisticsConfigWriter implements CliWriter<Config> {
     private Cli cli;
-
-    static final String MOD_CURR_ATTR = "interface {$ifcName}\n" +
-            "{%if ($delete) %}no {%endif%}load-interval {%if(!$delete) %}{$loadInterval.load_interval}{%endif%}\n" +
-            "exit";
 
     public InterfaceStatisticsConfigWriter(Cli cli) {
         this.cli = cli;
@@ -44,9 +39,10 @@ public class InterfaceStatisticsConfigWriter implements CliWriter<Config> {
         String ifcName = id.firstKeyOf(Interface.class).getName();
 
         if (validateConfig(dataAfter)) {
-            blockingWriteAndRead(cli, id, dataAfter, fT(MOD_CURR_ATTR,
-                    "ifcName", ifcName,
-                    "loadInterval", dataAfter));
+            blockingWriteAndRead(cli, id, dataAfter,
+                    f("interface %s", ifcName),
+                    f("load-interval %s", dataAfter.getLoadInterval()),
+                    "exit");
         }
     }
 
@@ -83,8 +79,9 @@ public class InterfaceStatisticsConfigWriter implements CliWriter<Config> {
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
 
-        blockingDeleteAndRead(cli, id, fT(MOD_CURR_ATTR,
-                "delete", true,
-                "ifcName", ifcName));
+        blockingDeleteAndRead(cli, id,
+                f("interface %s", ifcName),
+                "no load-interval",
+                "exit");
     }
 }

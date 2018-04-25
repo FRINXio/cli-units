@@ -38,31 +38,26 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
         this.cli = cli;
     }
 
-    private static final String WRITE_CURR_ATTR = "rsvp\n" +
-            "interface {$name}\n" +
-            "{$bandwidth}\n" +
-            "exit\n" +
-            "exit";
-
-    private static final String DELETE_CURR_ATTR = "rsvp\n" +
-            "interface {$name}\n" +
-            "no bandwidth\n" +
-            "exit\n" +
-            "exit";
-
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull NiMplsRsvpIfSubscripAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
-        blockingWriteAndRead(cli, id, data, fT(WRITE_CURR_ATTR,
-                "name", name,
-                "bandwidth", resolveBandwidth(data.getBandwidth())));
+        blockingWriteAndRead(cli, id, data,
+            "rsvp",
+            f("interface %s", name),
+            resolveBandwidth(data.getBandwidth()),
+            "exit",
+            "exit");
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull NiMplsRsvpIfSubscripAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
-        blockingWriteAndRead(cli, id, data, fT(DELETE_CURR_ATTR,
-                "name", name));
+        blockingWriteAndRead(cli, id, data,
+            "rsvp",
+            f("interface %s", name),
+            "no bandwidth",
+            "exit",
+            "exit");
     }
 
     @Override

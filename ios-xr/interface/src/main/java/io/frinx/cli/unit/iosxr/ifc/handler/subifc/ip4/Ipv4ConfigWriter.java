@@ -16,20 +16,19 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
+
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import javax.annotation.Nonnull;
 import org.apache.commons.net.util.SubnetUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
 
 public class Ipv4ConfigWriter implements CliWriter<Config> {
 
@@ -39,9 +38,9 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    static final String WRITE_TEMPLATE =
-            "interface {$ifcName}\n" +
-            "ipv4 address {$ip.ip.value} {$netMask.netmask}\n" +
+    private static final String WRITE_TEMPLATE =
+            "interface %s\n" +
+            "ipv4 address %s %s\n" +
             "exit";
 
     @Override
@@ -58,10 +57,10 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         SubnetUtils.SubnetInfo info = getSubnetInfo(config);
 
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                fT(WRITE_TEMPLATE,
-                        "ifcName", getIfcName(instanceIdentifier),
-                        "ip", config,
-                        "netMask", info));
+                f(WRITE_TEMPLATE,
+                        getIfcName(instanceIdentifier),
+                        config.getIp().getValue(),
+                        info.getNetmask()));
     }
 
     private static SubnetUtils.SubnetInfo getSubnetInfo(@Nonnull Config config) {
@@ -92,8 +91,8 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     }
 
     private static final String DELETE_TEMPLATE =
-            "interface {$ifcName}\n" +
-            "no ipv4 address {$ip.ip.value} {$netMask.netmask}\n" +
+            "interface %s\n" +
+            "no ipv4 address %s %s\n" +
             "exit";
 
     @Override
@@ -107,10 +106,10 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
 
             try {
                 blockingWriteAndRead(cli, instanceIdentifier, config,
-                        fT(DELETE_TEMPLATE,
-                                "ifcName", getIfcName(instanceIdentifier),
-                                "ip", config,
-                                "netMask", info));
+                        f(DELETE_TEMPLATE,
+                                getIfcName(instanceIdentifier),
+                                config.getIp().getValue(),
+                                info.getNetmask()));
             } catch (WriteFailedException.CreateFailedException e) {
                 throw new WriteFailedException.DeleteFailedException(instanceIdentifier, e);
             }

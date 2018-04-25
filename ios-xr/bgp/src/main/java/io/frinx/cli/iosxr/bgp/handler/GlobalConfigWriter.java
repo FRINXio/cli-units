@@ -34,18 +34,14 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
         this.cli = cli;
     }
 
-    static final String MOD_CURR_ATTR = "{% if ($delete) %}no {%endif%}router bgp {$data.as.value} {$instName}\n" +
-            "{% if (!$delete) %}{% if ($eRoutID) %}bgp router-id {$data.router_id.value}\n{%else%}no bgp router-id\n{%endif%}{%endif%}" +
-            "exit";
-
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
         final String instName = getProtoInstanceName(id);
-        blockingWriteAndRead(cli, id, data, fT(MOD_CURR_ATTR,
-                "data", data,
-                "instName", instName,
-                "eRoutID", data.getRouterId()));
+        blockingWriteAndRead(cli, id, data,
+                f("router bgp %s %s", data.getAs().getValue(), instName),
+                data.getRouterId() != null ? f("bgp router-id %s", data.getRouterId().getValue()) : "no bgp router-id",
+                "exit");
     }
 
     @Override
@@ -61,10 +57,8 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
         final String instName = getProtoInstanceName(id);
-        blockingDeleteAndRead(cli, id, fT(MOD_CURR_ATTR,
-                "data", data,
-                "instName", instName,
-                "delete", true));
+        blockingDeleteAndRead(cli, id,
+                f("no router bgp %s %s",  data.getAs().getValue(), instName));
     }
 
     public static String getProtoInstanceName(InstanceIdentifier<?> id) {

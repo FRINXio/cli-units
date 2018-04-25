@@ -23,6 +23,8 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import java.util.List;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.logging._interface.config.EnabledLoggingForEvent;
@@ -32,22 +34,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-
 public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
 
     private final Cli cli;
     private static final String NO_LOGGING_COMMAND = "no logging events link-status";
     private static final String LOGGING_COMMAND = "logging events link-status";
-
-    private static final String WRITE_CURR_ATTR = "interface {$ifcName}\n" +
-            "{$eventList}" +
-            "exit";
-
-    private static final String DELETE_CURR_ATTR = "interface {$ifcName}\n" +
-            NO_LOGGING_COMMAND + "\n" +
-            "exit";
 
     public LoggingInterfaceConfigWriter(Cli cli) {
         this.cli = cli;
@@ -71,9 +62,10 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
                     enabledLoggingForEventList, ifcName, LoggingInterfacesReader.LINK_UP_DOWN_EVENT);
         }
 
-        blockingWriteAndRead(cli, id, dataAfter, fT(WRITE_CURR_ATTR,
-                "ifcName", ifcName,
-                "eventList", command));
+        blockingWriteAndRead(cli, id, dataAfter,
+                f("interface %s", ifcName),
+                command,
+                "exit");
     }
 
     @Override
@@ -92,8 +84,10 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
         // TODO this check is possibly not needed for delete
         checkLoggingConfig(ifcName, writeContext, false);
 
-        blockingDeleteAndRead(cli, id, fT(DELETE_CURR_ATTR,
-                "ifcName", ifcName));
+        blockingDeleteAndRead(cli, id,
+                f("interface %s", ifcName),
+                NO_LOGGING_COMMAND,
+                "exit");
     }
 
     private static void checkLoggingConfig(String ifcName, WriteContext wContext, boolean isWrite) {

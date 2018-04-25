@@ -25,6 +25,8 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.all.afi.safi.common.PrefixLimitBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.all.afi.safi.common.prefix.limit.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.all.afi.safi.common.prefix.limit.ConfigBuilder;
@@ -43,9 +45,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-import java.util.regex.Pattern;
 
 public class NeighborAfiSafiPrefixLimitConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
@@ -100,9 +99,9 @@ public class NeighborAfiSafiPrefixLimitConfigReader implements BgpReader.BgpConf
                 MAX_PREFIX_LINE::matcher,
                 matcher -> matcher.group("prefixCount"),
                 count -> configBuilder.setMaxPrefixes(Long.valueOf(count)));
-            ParsingUtils.parseField(output.trim(), 0,
-                    MAX_PREFIX_LINE::matcher,
-                    matcher -> matcher.group("maxPrefixThreshold"),
-                    count -> configBuilder.setShutdownThresholdPct(new Percentage(Short.valueOf((count)))));
+        ParsingUtils.parseField(output.trim(), 0,
+                MAX_PREFIX_LINE::matcher,
+                matcher -> matcher.group("maxPrefixThreshold"),
+                count -> configBuilder.setShutdownThresholdPct(new Percentage(Short.valueOf(count))));
     }
 }

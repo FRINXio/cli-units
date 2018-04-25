@@ -34,19 +34,16 @@ public class P2pAttributesConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    static final String MOD_CURR_ATTR = "interface tunnel-te {$name}\n" +
-            "{% if ($delete) %}no {%endif%}destination {$ipv4.destination.ipv4_address.value}\n" +
-            "exit";
-
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (data.getDestination() == null) {
             return;
         }
         final String name = id.firstKeyOf(Tunnel.class).getName();
-        blockingWriteAndRead(cli, id, data, fT(MOD_CURR_ATTR,
-                "name", name,
-                "ipv4", data));
+        blockingWriteAndRead(cli, id, data,
+            f("interface tunnel-te %s", name),
+            f("destination %s", data.getDestination().getIpv4Address().getValue()),
+            "exit");
     }
 
     @Override
@@ -61,8 +58,9 @@ public class P2pAttributesConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class).getName();
-        blockingWriteAndRead(cli, id, data, fT(MOD_CURR_ATTR,
-                "name", name,
-                "ipv4", data));
+        blockingWriteAndRead(cli, id, data,
+            f("interface tunnel-te %s", name),
+            f("no destination %s", data.getDestination().getIpv4Address().getValue()),
+            "exit");
     }
 }

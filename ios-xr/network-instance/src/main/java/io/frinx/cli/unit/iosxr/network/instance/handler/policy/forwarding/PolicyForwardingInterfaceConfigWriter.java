@@ -15,22 +15,21 @@
  */
 package io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding;
 
+import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
+
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension.cisco.rev171109.NiPfIfCiscoAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.interfaces._interface.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
 
 public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> {
 
@@ -39,16 +38,6 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
     public PolicyForwardingInterfaceConfigWriter(Cli cli) {
         this.cli = cli;
     }
-
-    static final String WRITE_CURR_ATTR = "interface {$ifcName}\n" +
-            "{% if ($data.input_service_policy) %}service-policy input {$data.input_service_policy}\n{% else %}no service-policy input\n{%endif%}" +
-            "{% if ($data.output_service_policy) %}service-policy output {$data.output_service_policy}\n{% else %}no service-policy output\n{%endif%}" +
-            "exit";
-
-    static final String DELETE_CURR_ATTR = "interface {$ifcName}\n" +
-            "no service-policy output\n" +
-            "no service-policy input\n" +
-            "exit";
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
@@ -70,9 +59,15 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
             return;
         }
 
-        blockingWriteAndRead(cli, id, dataAfter, fT(WRITE_CURR_ATTR,
-                "ifcName", ifcName,
-                "data", pfIfAug));
+        blockingWriteAndRead(cli, id, dataAfter,
+                f("interface %s", ifcName),
+                pfIfAug.getInputServicePolicy() != null
+                        ? f("service-policy input %s", pfIfAug.getInputServicePolicy())
+                        : "no service-policy input",
+                pfIfAug.getOutputServicePolicy() != null
+                        ? f("service-policy output %s", pfIfAug.getOutputServicePolicy())
+                        : "no service-policy output",
+                "exit");
     }
 
     @Override
@@ -89,7 +84,11 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
 
-        blockingDeleteAndRead(cli, id, fT(DELETE_CURR_ATTR,
-                "ifcName", ifcName));
+        blockingDeleteAndRead(cli, id,
+                f("interface %s", ifcName),
+                "no service-policy output",
+                "no service-policy input",
+                "exit");
+
     }
 }

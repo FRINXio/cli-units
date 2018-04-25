@@ -31,14 +31,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class Ipv6AdvertisementConfigWriter implements CliWriter<Config> {
 
-    static final String WRITE_CURR_ATTR = "interface {$ifcName}\n" +
-            "{$dampConfCommand}\n" +
-            "exit";
-
-    static final String DELETE_CURR_ATTR = "interface {$ifcName}\n" +
-            "{$noIpv6NdSuppress}\n" +
-            "exit";
-
     private static final String IPV6_ND_SUPPRESS = "ipv6 nd suppress";
     private static final String NO_IPV6_ND_SUPPRESS = "no ipv6 nd suppress";
     private final Cli cli;
@@ -58,9 +50,10 @@ public class Ipv6AdvertisementConfigWriter implements CliWriter<Config> {
 
         String dampConfCommand = getAdvertisementCommand(dataAfter);
 
-        blockingWriteAndRead(cli, id, dataAfter, fT(WRITE_CURR_ATTR,
-                "ifcName", ifcName,
-                "dampConfCommand", dampConfCommand));
+        blockingWriteAndRead(cli, id, dataAfter,
+            f("interface %s", ifcName),
+            dampConfCommand,
+            "exit");
     }
 
     private String getAdvertisementCommand(final Config dataAfter) {
@@ -80,9 +73,10 @@ public class Ipv6AdvertisementConfigWriter implements CliWriter<Config> {
         Ipv6CheckUtil.checkParentInterfaceTypeWithExeption(ifcName, EthernetCsmacd.class, Ieee8023adLag.class);
         Ipv6CheckUtil.checkSubInterfaceIdWithExeption(subIfcIndex, SubinterfaceReader.ZERO_SUBINTERFACE_ID);
 
-        blockingDeleteAndRead(cli, id, fT(DELETE_CURR_ATTR,
-                "ifcName", ifcName,
-                "noIpv6NdSuppress", NO_IPV6_ND_SUPPRESS));
+        blockingDeleteAndRead(cli, id,
+            f("interface %s", ifcName),
+            NO_IPV6_ND_SUPPRESS,
+            "exit");
     }
 
     @Override

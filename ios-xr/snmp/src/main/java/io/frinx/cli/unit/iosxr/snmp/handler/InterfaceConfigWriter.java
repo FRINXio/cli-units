@@ -35,10 +35,6 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    static final String MOD_CURR_ATTR = "snmp-server interface {$name}\n" +
-            "{% if ($write) %}no {% endif %}notification linkupdown disable\n" +
-            "exit";
-
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = instanceIdentifier.firstKeyOf(Interface.class).getInterfaceId().getValue();
@@ -47,9 +43,10 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
                 !LINKUPDOWN.class.equals(config.getEnabledTrapForEvent().get(0).getEventName())) {
             return;
         }
-        blockingWriteAndRead(cli, instanceIdentifier, config, fT(MOD_CURR_ATTR,
-                "write", true,
-                "name", name));
+        blockingWriteAndRead(cli, instanceIdentifier, config,
+            f("snmp-server interface %s", name),
+            "no notification linkupdown disable",
+            "exit");
     }
 
     @Override
@@ -62,7 +59,9 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = instanceIdentifier.firstKeyOf(Interface.class).getInterfaceId().getValue();
-        blockingWriteAndRead(cli, instanceIdentifier, config, fT(MOD_CURR_ATTR,
-                "name", name));
+        blockingWriteAndRead(cli, instanceIdentifier, config,
+            f("snmp-server interface %s", name),
+            "notification linkupdown disable",
+            "exit");
     }
 }

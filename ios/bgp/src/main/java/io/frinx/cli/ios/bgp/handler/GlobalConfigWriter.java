@@ -16,6 +16,10 @@
 
 package io.frinx.cli.ios.bgp.handler;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter.VRF_BGP_AFI_SAFI_ROUTER_ID;
+import static io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter.toDeviceAddressFamily;
+
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -23,6 +27,15 @@ import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpGlobalBase;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpNeighborAfiSafiList;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpNeighborBase;
@@ -41,34 +54,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.BGP;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter.VRF_BGP_AFI_SAFI_ROUTER_ID;
-import static io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter.toDeviceAddressFamily;
-
 public class GlobalConfigWriter implements BgpWriter<Config> {
-
-    static final String SET_GLOBAL_ROUTER_ID = "configure terminal\n" +
-            "router bgp {$config.as.value:}\n" +
-            "{% if ($config.router_id.value|onempty(EMPTY) == EMPTY %}no bgp router id\n{% else %}bgp router-id {$config.router_id.value:}\n{% endif %}" +
-            "end";
-
-    static final String WRITE_AS = "configure terminal\n" +
-            "router bgp {$config.as.value:}\n" +
-            "end";
-
-    static final String DELETE_BGP_GLOBAL_CONF = "configure terminal\n" +
-            "no router bgp {$config.as.value:}\n" +
-            "end";
 
     private Cli cli;
 
@@ -86,9 +72,11 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
 
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             // Only set global router id for default network
-            blockingWriteAndRead(cli, id, config,f(SET_GLOBAL_ROUTER_ID,
-                    "config", config));
-
+            blockingWriteAndRead(cli, id, config,
+                "configure terminal",
+                f("router bgp %s", config.getAs().getValue()),
+                config.getRouterId() == null ? "no bgp router id" : f("bgp router-id %s", config.getRouterId().getValue()),
+                "end");
         } else {
             // Compare AS for global and current VRF. Must match for IOS
             writeContext.readAfter(IIDs.NETWORKINSTANCES.child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK).child(Protocols.class))
@@ -100,8 +88,10 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
                     .ifPresent(globalAs -> checkArgument(globalAs.equals(config.getAs()),
                             "BGP for VRF contains different AS: %s than global BGP: %s", config.getAs(), globalAs));
 
-            blockingWriteAndRead(cli, id, config,f(WRITE_AS,
-                    "config", config));
+            blockingWriteAndRead(cli, id, config,
+                    "configure terminal",
+                    f("router bgp %s", config.getAs().getValue()),
+                    "end");
 
             // Make sure to set/update router ID for each family set for this VRF/BGP
             if (config.getRouterId() == null) {
@@ -137,8 +127,9 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
         // TODO add a check, if this is the last VRF to have BGP configured (also not in default), delete
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             blockingDeleteAndRead(cli, id,
-                    f(DELETE_BGP_GLOBAL_CONF,
-                            "config", config));
+                    "configure terminal",
+                    f("no router bgp %s", config.getAs().getValue()),
+                    "end");
         }
     }
 

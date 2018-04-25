@@ -16,6 +16,11 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.l2vsi.cp;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter.getCPoint;
+import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter.getEndpoint;
+import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter.getUsedInterfaces;
+
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -23,6 +28,13 @@ import io.frinx.cli.handlers.network.instance.L2vsiWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.AbstractMap;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
@@ -32,45 +44,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.REMOTE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter.getCPoint;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter.getEndpoint;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter.getUsedInterfaces;
-
 public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints> {
-
-    private static final String WRITE_AUTODISCOVERY = "conf t\n" +
-            "l2 vfi {$netName} autodiscovery\n" +
-            "vpn id {$remoteEndpoin.remote.config.virtual_circuit_identifier}\n" +
-            "bridge-domain {$bdIndex}\n" +
-            "end";
-
-    private static final String DELETE_AUTODISCOVERY = "conf t\n" +
-            "no l2 vfi {$netName} autodiscovery\n" +
-            "end";
-
-    static final String WRITE_LOCAL = "conf t\n" +
-            "interface {$ifc1}\n" +
-            "service instance {$cpId} ethernet\n" +
-            "{% if(!$subInterface.local.config.subinterface) %}encapsulation untagged\n{% else %}" +
-            "encapsulation dot1q {$subInterface.local.config.subinterface}\n" +
-            "rewrite ingress tag pop 1 symmetric\n{% endif %}" +
-            "bridge-domain {$bdIndex}\n" +
-            "end";
-
-    static final String DELETE_LOCAL = "conf t\n" +
-            "interface {$ifc1}\n" +
-            "no service instance {$cpuId} ethernet\n" +
-            "end";
-
 
     public static final String SH_RUN_INCLUDE_BRIDGE_DOMAIN = "sh run | include bridge-domain";
     private Cli cli;
@@ -121,10 +95,12 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         // FIXME check bridge domain not in use
         // FIXME check vfi not in use
 
-        blockingWriteAndRead(cli, id, dataAfter, fT(WRITE_AUTODISCOVERY,
-                "netName", netName,
-                "vCircId", remoteEndpoint,
-                "bdIndex", bdIndex));
+        blockingWriteAndRead(cli, id, dataAfter,
+                "conf t",
+                f("l2 vfi %s autodiscovery", netName),
+                f("vpn id %s", remoteEndpoint.getRemote().getConfig().getVirtualCircuitIdentifier()),
+                f("bridge-domain %s", bdIndex),
+                "end");
     }
 
     private int findNextFreeBd(InstanceIdentifier<ConnectionPoints> id, String netName, ConnectionPoints dataAfter) throws WriteFailedException.CreateFailedException {
@@ -152,19 +128,35 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
     private void deleteAutodiscovery(Endpoint remoteEndpoint, InstanceIdentifier<ConnectionPoints> id, ConnectionPoints dataBefore) throws WriteFailedException.CreateFailedException {
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
 
-        blockingWriteAndRead(cli, id, dataBefore, fT(DELETE_AUTODISCOVERY,
-                "netName", netName));
+        blockingWriteAndRead(cli, id, dataBefore,
+                "conf t",
+                f("no l2 vfi %s autodiscovery", netName),
+                "end");
     }
 
     private void writeLocal(String cpId, Endpoint endpoint, InstanceIdentifier<ConnectionPoints> id, ConnectionPoints dataAfter, int bdIndex) throws WriteFailedException.CreateFailedException {
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint);
 
-        // TODO check service instance not in use
-        blockingWriteAndRead(cli, id, dataAfter,fT(WRITE_LOCAL,
-                "ifc1", ifc1.toParentIfcString(),
-                "cpId", cpId,
-                "subInterface", endpoint,
-                "bdIndex", bdIndex));
+        if (endpoint.getLocal().getConfig().getSubinterface() == null) {
+            // TODO check service instance not in use
+            blockingWriteAndRead(cli, id, dataAfter,
+                            "conf t",
+                            f("interface %s", ifc1.toParentIfcString()),
+                            f("service instance %s ethernet", cpId),
+                            "encapsulation untagged",
+                            f("bridge-domain %s", bdIndex),
+                            "end");
+        } else {
+            // TODO check service instance not in use
+            blockingWriteAndRead(cli, id, dataAfter,
+                            "conf t",
+                            f("interface %s", ifc1.toParentIfcString()),
+                            f("service instance %s ethernet", cpId),
+                            f("encapsulation dot1q %s", endpoint.getLocal().getConfig().getSubinterface()),
+                            "rewrite ingress tag pop 1 symmetric",
+                            f("bridge-domain %s", bdIndex),
+                            "end");
+        }
     }
 
     private void deleteLocal(String cpId, Endpoint endpoint, InstanceIdentifier<ConnectionPoints> id, ConnectionPoints dataBefore) throws WriteFailedException.CreateFailedException {
@@ -172,9 +164,11 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint);
 
-        blockingWriteAndRead(cli, id, dataBefore, fT(DELETE_LOCAL,
-                "ifc1", ifc1.toParentIfcString(),
-                "cpId", cpId));
+        blockingWriteAndRead(cli, id, dataBefore,
+                        "conf t",
+                        f("interface %s", ifc1.toParentIfcString()),
+                        f("no service instance %s ethernet", cpId),
+                        "end");
     }
 
     private Map.Entry<String, Endpoint> ensureLocal(AbstractMap.SimpleEntry<String, Endpoint> endpoint) {
