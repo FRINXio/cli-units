@@ -90,14 +90,17 @@ public class StatementsWriter implements CliWriter<Statements> {
             "{.if ($wasIf)}  else{.else}  {.endif}" +
             "if {$conditions|join( and )} then\n" +
             "    {$actions|join(\n    )}" +
+            "{% elseif ($actions) %}" +
+            "{.if ($wasIf)}  else\n    {$actions|join(\n    )}{.else}  {$actions|join(\n  )}{.endif}" +
+            "\n" +
             "{% else %}" +
             "{.if ($wasIf)}  endif\n{.endif}" +
-            "  {$actions|join(\n  )}" +
             "{% endif %}";
 
     @VisibleForTesting
     static String processStatements(List<Statement> statements, String rpName, CliFormatter format) {
         boolean wasIf = false;
+        boolean wasElse = false;
 
         List<String> statementStrings = new ArrayList<>();
         for (Statement statement : statements) {
@@ -112,13 +115,14 @@ public class StatementsWriter implements CliWriter<Statements> {
                     "conditions", !conditions.isEmpty() ? conditions : null,
                     "actions", actions));
 
+            wasElse = wasIf && conditions.isEmpty();
             wasIf = !conditions.isEmpty();
         }
         // Do one more empty statement, just to close previous if block if there was any
         statementStrings.add(format.fT(STATEMENT_TEMPLATE,
-                "wasIf", wasIf ? true : null,
+                "wasIf", wasIf || wasElse ? true : null,
                 "conditions", null,
-                "actions", Collections.emptyList()));
+                "actions", null));
 
         return format.fT(POLICY_TEMPLATE,
                 "policy", rpName,
