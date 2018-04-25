@@ -23,7 +23,6 @@ import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosRemarkQosGroupAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.Actions;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -53,13 +52,12 @@ public class ActionsWriter implements CliWriter<Actions> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Actions> instanceIdentifier, @Nonnull Actions actions, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
         final String policyName = actions.getConfig().getTargetGroup();
-        final Config remark = actions.getRemark().getConfig();
         if (policyName != null) {
-            QosRemarkQosGroupAug aug = remark.getAugmentation(QosRemarkQosGroupAug.class);
+            QosRemarkQosGroupAug aug = actions.getRemark() != null ? actions.getRemark().getConfig().getAugmentation(QosRemarkQosGroupAug.class) : null;
             blockingWriteAndRead(cli, instanceIdentifier, actions, fT(WRITE_CURR_ATTR,
                 "name", policyName,
                 "className", className,
-                "mpls", remark.getSetMplsTc(),
+                "mpls", actions.getRemark() != null ? actions.getRemark().getConfig().getSetMplsTc() : null,
                 "aug", aug));
         }
     }
