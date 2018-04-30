@@ -63,7 +63,11 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Conditions> instanceIdentifier, @Nonnull ConditionsBuilder conditionsBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         String name = instanceIdentifier.firstKeyOf(Classifier.class).getName();
         String line = instanceIdentifier.firstKeyOf(Term.class).getId();
-        String output = blockingRead(f(TermReader.SH_TERMS, name), cli, instanceIdentifier, readContext);
+        String output = blockingRead(f(TermReader.SH_TERMS_ALL, name), cli, instanceIdentifier, readContext);
+
+        if (output.equals("")) {
+            output = blockingRead(f(TermReader.SH_TERMS_ANY, name), cli, instanceIdentifier, readContext);
+        }
         filterParsing(output, line, conditionsBuilder);
     }
 
