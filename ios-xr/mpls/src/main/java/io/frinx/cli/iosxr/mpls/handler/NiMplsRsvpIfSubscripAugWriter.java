@@ -72,7 +72,7 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
     private String resolveBandwidth(MplsRsvpSubscriptionConfig.Bandwidth b) {
         if (NiMplsRsvpIfSubscripAugReader.DEFAULT.equals(b.getString())) {
             return "bandwidth";
-        } else if (b.getUint32() != null && b.getUint32() != 0) {
+        } else if (b.getUint32() != null) {
             NumberFormat formatter = new DecimalFormat(BW_FORMAT);
             return f("bandwidth %s", formatter.format(kbps(b.getUint32())));
         }
