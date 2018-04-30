@@ -56,7 +56,7 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, dataAfter,
             f("interface %s", ifcName),
             dampConfCommand,
-            "exit");
+            "root");
     }
 
     private void validateConfig(final InstanceIdentifier<Config> id,
@@ -87,6 +87,6 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
             f("interface %s", ifcName, subifcIndex),
             NO_IPV6_ADDRESS_CMD,
-            "exit");
+            "root");
     }
 }

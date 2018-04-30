@@ -44,7 +44,7 @@ public class MaxMetricTimerConfigWriter implements OspfWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, data,
             f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
             getMaxMetricCommands(data, false),
-            "exit");
+            "root");
     }
 
     @Override
@@ -61,7 +61,7 @@ public class MaxMetricTimerConfigWriter implements OspfWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, data,
             f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
             getMaxMetricCommands(data, true),
-            "exit");
+            "root");
     }
 
     private String getMaxMetricCommands(Config data, boolean delete) {

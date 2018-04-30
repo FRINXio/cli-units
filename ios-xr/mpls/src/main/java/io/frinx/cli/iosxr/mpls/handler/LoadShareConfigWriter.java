@@ -43,7 +43,7 @@ public class LoadShareConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
             f("interface tunnel-te %s", name),
             f("load-share %s", data.getLoadShare()),
-            "exit");
+            "root");
     }
 
     @Override
@@ -65,6 +65,6 @@ public class LoadShareConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
             f("interface tunnel-te %s", name),
             f("no load-share %s", data.getLoadShare()),
-            "exit");
+            "root");
     }
 }

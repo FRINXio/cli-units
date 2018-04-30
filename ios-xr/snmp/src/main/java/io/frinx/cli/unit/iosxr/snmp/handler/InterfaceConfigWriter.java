@@ -46,7 +46,7 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, config,
             f("snmp-server interface %s", name),
             "no notification linkupdown disable",
-            "exit");
+            "root");
     }
 
     @Override
@@ -62,6 +62,6 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, config,
             f("snmp-server interface %s", name),
             "notification linkupdown disable",
-            "exit");
+            "root");
     }
 }

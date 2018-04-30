@@ -41,7 +41,7 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
         blockingWriteAndRead(cli, id, data,
                 f("router bgp %s %s", data.getAs().getValue(), instName),
                 data.getRouterId() != null ? f("bgp router-id %s", data.getRouterId().getValue()) : "no bgp router-id",
-                "exit");
+                "root");
     }
 
     @Override

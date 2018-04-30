@@ -77,7 +77,7 @@ public class EthernetConfigWriter implements CliWriter<Config> {
                 f("interface %s" , ifcName),
                 bundleIdCommand + " " + mode,
                 intervalCommand,
-                "exit");
+                "root");
     }
 
     private static Pattern AGGREGATE_IFC_NAME = Pattern.compile("Bundle-Ether(?<id>\\d+)");
@@ -120,7 +120,7 @@ public class EthernetConfigWriter implements CliWriter<Config> {
                 f("interface %s", ifcName),
                 "no bundle id",
                 "no lacp period short",
-                "exit");
+                "root");
     }
 
     private static void checkIfcType(String ifcName) {

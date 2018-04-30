@@ -62,7 +62,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                 "{% endif %}" +
             "{% onEmpty %}" +
             "{% endloop %}" +
-            "exit\n";
+            "root\n";
 
     public BgpLocalAggregateConfigWriter(Cli cli) {
         this.cli = cli;

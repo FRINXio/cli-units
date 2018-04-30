@@ -57,9 +57,7 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
                 "{/if}" +
             "{% onEmpty %}" +
             "{% endloop %}" +
-            "exit\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,

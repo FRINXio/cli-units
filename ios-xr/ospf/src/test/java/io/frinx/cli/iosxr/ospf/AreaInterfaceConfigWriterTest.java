@@ -54,31 +54,24 @@ public class AreaInterfaceConfigWriterTest {
             "area 1000\n" +
             "interface Loopback97\n" +
             "cost 300\n" +
-            "exit\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     private static final String UPDATE_COST_INPUT = "router ospf default\n" +
             "area 1000\n" +
             "interface Loopback97\n" +
             "cost 500\n" +
-            "exit\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     private static final String REMOVE_COST_INPUT = "router ospf default\n" +
             "area 1000\n" +
             "interface Loopback97\n" +
             "no cost\n" +
-            "exit\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     private static final String DELETE_INPUT = "router ospf default\n" +
             "area 1000\n" +
             "no interface Loopback97\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     @Mock
     private Cli cli;

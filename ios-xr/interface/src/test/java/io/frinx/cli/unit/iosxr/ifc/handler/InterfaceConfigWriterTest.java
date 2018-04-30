@@ -40,21 +40,21 @@ public class InterfaceConfigWriterTest {
         "mtu 35\n" +
         "description test desc\n" +
         "no shutdown\n" +
-        "exit\n";
+        "root\n";
 
     private static final String UPDATE_INPUT =
         "interface Bundle-Ether45\n" +
         "mtu 50\n" +
         "description updated desc\n" +
         "shutdown\n" +
-        "exit\n";
+        "root\n";
 
     private static final String UPDATE_CLEAN_INPUT =
         "interface Bundle-Ether45\n" +
         "no mtu\n" +
         "no description\n" +
         "shutdown\n" +
-        "exit\n";
+        "root\n";
 
     private static final String DELETE_INPUT =
         "no interface Bundle-Ether45\n";

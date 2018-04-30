@@ -44,9 +44,7 @@ public class NeighborAfiSafiIpvConfigWriter implements BgpWriter<Config> {
             "neighbor {$address}\n" +
             "address-family {$afiSafi}\n" +
             "{.if ($sendDefaultRoute == TRUE) }default-originate\n{.else}no default-originate\n{/if}" +
-            "exit\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,

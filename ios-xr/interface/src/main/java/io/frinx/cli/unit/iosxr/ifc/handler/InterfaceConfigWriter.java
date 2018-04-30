@@ -85,7 +85,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 data.getMtu() == null ? "no mtu" : f("mtu %s", data.getMtu()),
                 data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
                 data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
-                "exit");
+                "root");
     }
 
     private static void validateIfcConfiguration(Config data) {

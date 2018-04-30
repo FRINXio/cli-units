@@ -49,9 +49,7 @@ public class AreaInterfaceEnableBfdConfigWriter implements OspfWriter<Config> {
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 data.isEnabled() != null ? (data.isEnabled() ? "bfd fast-detect" : "bfd fast-detect disable") : "",
-                "exit",
-                "exit",
-                "exit");
+                "root");
     }
 
     @Override
@@ -64,9 +62,7 @@ public class AreaInterfaceEnableBfdConfigWriter implements OspfWriter<Config> {
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 dataAfter.isEnabled() != null ? (dataAfter.isEnabled() ? "bfd fast-detect" : "bfd fast-detect disable") : "no bfd fast-detect",
-                "exit",
-                "exit",
-                "exit");
+                "root");
     }
 
     @Override
@@ -79,8 +75,6 @@ public class AreaInterfaceEnableBfdConfigWriter implements OspfWriter<Config> {
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 "no bfd fast-detect" ,
-                "exit",
-                "exit",
-                "exit");
+                "root");
     }
 }

@@ -53,7 +53,7 @@ public class Ipv6AdvertisementConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, dataAfter,
             f("interface %s", ifcName),
             dampConfCommand,
-            "exit");
+            "root");
     }
 
     private String getAdvertisementCommand(final Config dataAfter) {
@@ -76,7 +76,7 @@ public class Ipv6AdvertisementConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
             f("interface %s", ifcName),
             NO_IPV6_ND_SUPPRESS,
-            "exit");
+            "root");
     }
 
     @Override

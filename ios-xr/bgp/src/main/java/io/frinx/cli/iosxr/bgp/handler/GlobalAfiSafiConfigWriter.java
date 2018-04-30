@@ -46,8 +46,7 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         blockingWriteAndRead(cli, id, config,
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
-                "exit",
-                "exit");
+                "root");
     }
 
     @Override
@@ -68,6 +67,6 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         blockingWriteAndRead(cli, id, config,
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("no address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
-                "exit");
+                "root");
     }
 }

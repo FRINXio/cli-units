@@ -35,11 +35,11 @@ public class SnmpInterfaceConfigWriterTest {
 
     private static final String WRITE_INPUT = "snmp-server interface Loopback0\n" +
             "no notification linkupdown disable\n" +
-            "exit\n";
+            "root\n";
 
     private static final String DELETE_INPUT = "snmp-server interface Loopback0\n" +
             "notification linkupdown disable\n" +
-            "exit\n";
+            "root\n";
 
     @Mock
     private Cli cli;

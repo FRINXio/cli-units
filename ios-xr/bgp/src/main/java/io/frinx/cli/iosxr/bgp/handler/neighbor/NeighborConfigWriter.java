@@ -81,8 +81,7 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
                 "exit\n" +
             "{% onEmpty %}" +
             "{% endloop %}" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
@@ -147,6 +146,6 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("no neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
-                "exit");
+                "root");
     }
 }

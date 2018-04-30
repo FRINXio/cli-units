@@ -45,8 +45,7 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
             "rsvp",
             f("interface %s", name),
             resolveBandwidth(data.getBandwidth()),
-            "exit",
-            "exit");
+            "root");
     }
 
     @Override
@@ -56,8 +55,7 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
             "rsvp",
             f("interface %s", name),
             "no bandwidth",
-            "exit",
-            "exit");
+            "root");
     }
 
     @Override

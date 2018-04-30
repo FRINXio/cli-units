@@ -60,28 +60,25 @@ public class NeighborConfigWriterTest {
             "remote-as 65500\n" +
             "use neighbor-group ibgp\n" +
             "no shutdown\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     private static final String UPDATE_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "remote-as 65501\n" +
             "use neighbor-group ebgp\n" +
             "shutdown\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     private static final String UPDATE_CLEAN_INPUT = "router bgp 65505 instance test\n" +
             "neighbor 192.168.1.1\n" +
             "no remote-as\n" +
             "no use neighbor-group\n" +
             "shutdown\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     private static final String DELETE_INPUT = "router bgp 65505 instance test\n" +
             "no neighbor 192.168.1.1\n" +
-            "exit\n";
+            "root\n";
 
     @Mock
     private Cli cli;

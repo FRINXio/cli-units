@@ -42,26 +42,22 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
     private static final String WRITE_INPUT = "rsvp\n" +
             "interface Loopback0\n" +
             "bandwidth 5\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     private static final String UPDATE_INPUT = "rsvp\n" +
             "interface Loopback0\n" +
             "bandwidth 1.005\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     private static final String UPDATE_DEFAULT_BW_INPUT = "rsvp\n" +
             "interface Loopback0\n" +
             "bandwidth\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     private static final String DELETE_INPUT = "rsvp\n" +
             "interface Loopback0\n" +
             "no bandwidth\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     @Mock
     private Cli cli;

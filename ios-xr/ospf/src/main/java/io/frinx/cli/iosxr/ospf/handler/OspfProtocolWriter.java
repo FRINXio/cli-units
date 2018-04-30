@@ -38,7 +38,7 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
         final String processName = id.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, id, data,
                 f("router ospf %s", processName),
-                "exit");
+                "root");
     }
 
     @Override

@@ -80,7 +80,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                     f("interface %s", getSubinterfaceName(id)),
                     data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
                     data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
-                    "exit");
+                    "root");
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));

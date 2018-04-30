@@ -49,7 +49,7 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, dataAfter,
                 f("interface %s", ifcName),
                 dampConfCommand,
-                "exit");
+                "root");
     }
 
     private static String getDampeningCommand(Config dataAfter) {
@@ -131,6 +131,6 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 f("interface %s", ifcName),
                 NO_DAMPENING,
-                "exit");
+                "root");
     }
 }

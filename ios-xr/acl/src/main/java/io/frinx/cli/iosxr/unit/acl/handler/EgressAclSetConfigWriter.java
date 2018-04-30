@@ -67,7 +67,7 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, config,
             f("interface %s", interfaceName),
             aclCommand,
-            "exit");
+            "root");
     }
 
     private void checkEgressAclSetConfigExists(final InstanceIdentifier<Config> instanceIdentifier,
@@ -127,6 +127,6 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, config,
             f("interface %s", name),
             aclCommand,
-            "exit");
+            "root");
     }
 }

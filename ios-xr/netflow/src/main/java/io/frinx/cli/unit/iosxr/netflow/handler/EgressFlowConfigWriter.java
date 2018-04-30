@@ -55,7 +55,7 @@ public class EgressFlowConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, dataAfter,
             f("interface %s", ifcName),
             dampConfCommand,
-            "exit");
+            "root");
     }
 
     private String getNetflowCommand(final Config dataAfter) {
@@ -82,7 +82,7 @@ public class EgressFlowConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
             f("interface %s", ifcName),
             deleteCommand,
-            "exit");
+            "root");
     }
 
     private String getNoNetflowCommand(final Config dataAfter) {

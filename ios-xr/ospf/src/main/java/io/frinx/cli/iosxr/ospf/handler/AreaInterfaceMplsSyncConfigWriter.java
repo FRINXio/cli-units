@@ -49,9 +49,7 @@ public class AreaInterfaceMplsSyncConfigWriter implements OspfWriter<Config> {
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 data.isEnabled() != null ? (data.isEnabled() ? "mpls ldp sync" : "mpls ldp sync disable") : "",
-                "exit",
-                "exit",
-                "exit");
+                "root");
     }
 
     @Override
@@ -64,9 +62,7 @@ public class AreaInterfaceMplsSyncConfigWriter implements OspfWriter<Config> {
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 dataAfter.isEnabled() != null ? (dataAfter.isEnabled() ? "mpls ldp sync" : "mpls ldp sync disable") : "no mpls ldp sync",
-                "exit",
-                "exit",
-                "exit");
+                "root");
     }
 
     @Override
@@ -79,8 +75,6 @@ public class AreaInterfaceMplsSyncConfigWriter implements OspfWriter<Config> {
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 "no mpls ldp sync" ,
-                "exit",
-                "exit",
-                "exit");
+                "root");
     }
 }

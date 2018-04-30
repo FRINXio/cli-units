@@ -67,7 +67,7 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
                 pfIfAug.getOutputServicePolicy() != null
                         ? f("service-policy output %s", pfIfAug.getOutputServicePolicy())
                         : "no service-policy output",
-                "exit");
+                "root");
     }
 
     @Override
@@ -88,7 +88,7 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
                 f("interface %s", ifcName),
                 "no service-policy output",
                 "no service-policy input",
-                "exit");
+                "root");
 
     }
 }

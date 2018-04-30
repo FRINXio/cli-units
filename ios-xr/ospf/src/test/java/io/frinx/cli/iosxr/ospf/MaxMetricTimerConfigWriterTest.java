@@ -47,23 +47,23 @@ public class MaxMetricTimerConfigWriterTest {
 
     private static final String WRITE_INPUT = "router ospf default\n" +
             "max-metric router-lsa summary-lsa include-stub external-lsa \n" +
-            "exit\n";
+            "root\n";
 
     private static final String WRITE_NO_INCLUDE_INPUT = "router ospf default\n" +
             "max-metric router-lsa \n" +
-            "exit\n";
+            "root\n";
 
     private static final String UPDATE_INPUT = "router ospf default\n" +
             "max-metric router-lsa summary-lsa include-stub \n" +
-            "exit\n";
+            "root\n";
 
     private static final String REMOVE_TIMEOUT_INPUT = "router ospf default\n" +
             "max-metric router-lsa summary-lsa include-stub external-lsa \n" +
-            "exit\n";
+            "root\n";
 
     private static final String DELETE_INPUT = "router ospf default\n" +
             "no max-metric router-lsa summary-lsa include-stub external-lsa \n" +
-            "exit\n";
+            "root\n";
 
     @Mock
     private Cli cli;

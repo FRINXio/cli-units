@@ -50,9 +50,7 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 data.getMetric() != null ? f("cost %s", data.getMetric().getValue()) : "no cost",
-                "exit",
-                "exit",
-                "exit");
+                "root");
     }
 
     @Override
@@ -71,7 +69,6 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                 f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("no interface %s", intfId.getId()),
-                "exit",
-                "exit");
+                "root");
     }
 }

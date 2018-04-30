@@ -46,7 +46,7 @@ public class BfdConfigWriterTest {
             "bfd address-family ipv4 multiplier 5\n" +
             "bfd address-family ipv4 minimum-interval 1000\n" +
             "bfd address-family ipv4 destination 192.168.1.1\n" +
-            "exit\n";
+            "root\n";
 
     private static final String UPDATE_INPUT =
             "interface Bundle-Ether55\n" +
@@ -55,7 +55,7 @@ public class BfdConfigWriterTest {
             "bfd address-family ipv4 multiplier 10\n" +
             "bfd address-family ipv4 minimum-interval 2000\n" +
             "bfd address-family ipv4 destination 192.168.1.2\n" +
-            "exit\n";
+            "root\n";
 
     private static final String UPDATE_CLEAN_INPUT =
             "interface Bundle-Ether55\n" +
@@ -64,12 +64,12 @@ public class BfdConfigWriterTest {
             "no bfd address-family ipv4 multiplier\n" +
             "no bfd address-family ipv4 minimum-interval\n" +
             "no bfd address-family ipv4 destination\n" +
-            "exit\n";
+            "root\n";
 
     private static final String DELETE_INPUT =
             "interface Bundle-Ether55\n" +
             "no bfd\n" +
-            "exit\n";
+            "root\n";
 
     @Mock
     private Cli cli;

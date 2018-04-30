@@ -46,7 +46,7 @@ public class HoldTimeConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, dataAfter,
                 f("interface %s", ifcName),
                 f(CARRIER_DELAY_COMMAND_TEMPLATE, up, down),
-                "exit");
+                "root");
     }
 
     @Override
@@ -67,6 +67,6 @@ public class HoldTimeConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 f("interface %s", ifcName),
                 f("no carrier-delay"),
-                "exit");
+                "root");
     }
 }

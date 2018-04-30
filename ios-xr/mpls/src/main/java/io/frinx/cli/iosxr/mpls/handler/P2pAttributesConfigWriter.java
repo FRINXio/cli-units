@@ -43,7 +43,7 @@ public class P2pAttributesConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
             f("interface tunnel-te %s", name),
             f("destination %s", data.getDestination().getIpv4Address().getValue()),
-            "exit");
+            "root");
     }
 
     @Override
@@ -61,6 +61,6 @@ public class P2pAttributesConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
             f("interface tunnel-te %s", name),
             f("no destination %s", data.getDestination().getIpv4Address().getValue()),
-            "exit");
+            "root");
     }
 }

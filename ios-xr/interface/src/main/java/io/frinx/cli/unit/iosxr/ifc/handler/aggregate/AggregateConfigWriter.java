@@ -45,7 +45,7 @@ public class AggregateConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, dataAfter,
                 f("interface %s", ifcName),
                 f("bundle minimum-active links %s", dataAfter.getMinLinks()),
-                "exit");
+                "root");
     }
 
     private static void validateConfig(Config config)  {
@@ -82,6 +82,6 @@ public class AggregateConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 f("interface %s", ifcName),
                 "no bundle minimum-active links",
-                "exit");
+                "root");
     }
 }

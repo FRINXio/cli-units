@@ -40,8 +40,7 @@ public class TeInterfaceConfigWriter  implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
             "mpls traffic-eng",
             f("interface %s", name),
-            "exit",
-            "exit");
+            "root");
     }
 
     @Override
@@ -58,6 +57,6 @@ public class TeInterfaceConfigWriter  implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
             "mpls traffic-eng",
             f("no interface %s", name),
-            "exit");
+            "root");
     }
 }

@@ -65,7 +65,7 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, dataAfter,
                 f("interface %s", ifcName),
                 command,
-                "exit");
+                "root");
     }
 
     @Override
@@ -87,7 +87,7 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 f("interface %s", ifcName),
                 NO_LOGGING_COMMAND,
-                "exit");
+                "root");
     }
 
     private static void checkLoggingConfig(String ifcName, WriteContext wContext, boolean isWrite) {

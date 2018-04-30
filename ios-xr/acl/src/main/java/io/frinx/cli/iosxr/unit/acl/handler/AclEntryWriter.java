@@ -56,16 +56,16 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
 
     private final String ACL_IP_ENTRY = "{$type} access-list {$acl_name}\n" +
             "{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_ttl}\n" +
-            "exit\n";
+            "root\n";
     private final String ACL_TCP_ENTRY = "{$type} access-list {$acl_name}\n" +
             "{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_src_port} {$acl_dst_addr} {$acl_dst_port} {$acl_ttl}\n" +
-            "exit\n";
+            "root\n";
     private final String ACL_ICMP_ENTRY = "{$type} access-list {$acl_name}\n" +
             "{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_icmp_msg_type} {$acl_ttl}\n" +
-            "exit\n";
+            "root\n";
     private final String ACL_DELETE = "{$type} access-list {$acl_name}\n" +
             "no {$acl_seq_id}\n" +
-            "exit\n";
+            "root\n";
     private final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
 
     private final Cli cli;

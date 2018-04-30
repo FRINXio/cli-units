@@ -46,17 +46,13 @@ public class NeighborAfiSafiPrefixLimitConfigWriter implements BgpWriter<Config>
             "{.if ($config.max_prefixes) }maximum-prefix {$config.max_prefixes}{.else}no maximum-prefix{/if}" +
             "{.if ($config.shutdown_threshold_pct.value) } {$config.shutdown_threshold_pct.value}{/if}" +
             "\n" +
-            "exit\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     static final String DELETE_NEIGHBOR_AFI_PREFIX_LIMIT ="router bgp {$as} {$instance}\n" +
             "neighbor {$address}\n" +
             "address-family {$afiSafi}\n" +
             "no maximum-prefix\n" +
-            "exit\n" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,

@@ -67,7 +67,7 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, config,
             f("interface %s", interfaceName),
             aclCommand,
-            "exit");
+            "root");
     }
 
     private void checkIngressAclSetConfigExists(final InstanceIdentifier<Config> instanceIdentifier,
@@ -124,6 +124,6 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, config,
             f("interface %s", name),
             aclCommand,
-            "exit");
+            "root");
     }
 }

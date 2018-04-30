@@ -52,9 +52,7 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
                 f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
                 f("address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
                 getReconfigurationCommand(config, false),
-                "exit",
-                "exit",
-                "exit");
+                "root");
     }
 
     @Override
@@ -78,9 +76,7 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
                 f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
                 f("address-family %s", GlobalAfiSafiReader.transformAfiToString(dataAfter.getAfiSafiName())),
                 getReconfigurationCommand(reconfig, delete),
-                "exit",
-                "exit",
-                "exit");
+                "root");
     }
 
     @Override
@@ -96,8 +92,7 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
                 f("no address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
-                "exit",
-                "exit");
+                "root");
     }
 
     private String getReconfigurationCommand(Config config, boolean delete) {

@@ -60,8 +60,7 @@ public class NeighborTransportConfigWriter  implements BgpWriter<Config> {
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
                 f("update-source loopback %s", matcher.group("index")),
-                "exit",
-                "exit");
+                "root");
     }
 
     @Override
@@ -83,8 +82,7 @@ public class NeighborTransportConfigWriter  implements BgpWriter<Config> {
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
                 isLoopback ? f("update-source loopback %s", matcher.group("index")) : "no update-source",
-                "exit",
-                "exit");
+                "root");
     }
 
     @Override
@@ -99,7 +97,6 @@ public class NeighborTransportConfigWriter  implements BgpWriter<Config> {
                 f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
                 f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
                 "no update-source",
-                "exit",
-                "exit");
+                "root");
     }
 }

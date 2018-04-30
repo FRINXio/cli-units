@@ -56,7 +56,7 @@ public class BfdConfigWriter implements CliWriter<Config> {
                 dataAfter.getMultiplier() != null ? f("bfd address-family ipv4 multiplier %s", dataAfter.getMultiplier()) : "no bfd address-family ipv4 multiplier",
                 dataAfter.getMinInterval() != null ? f("bfd address-family ipv4 minimum-interval %s", dataAfter.getMinInterval()) : "no bfd address-family ipv4 minimum-interval",
                 destinationIpv4 != null ? f("bfd address-family ipv4 destination %s", destinationIpv4.getValue()) : "no bfd address-family ipv4 destination",
-                "exit");
+                "root");
     }
 
     private static void validateConfig(Config dataAfter) {
@@ -94,6 +94,6 @@ public class BfdConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 f("interface %s", ifcName),
                 "no bfd",
-                "exit");
+                "root");
     }
 }

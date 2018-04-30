@@ -54,11 +54,11 @@ public class Ipv6ConfigWriterTest {
     private static final String WRITE_INPUT = "interface GigabitEthernet 0/0/0/0\n"
         + "ipv6 address " +
         TestData.IPV6_ADDRESS_CONFIG.getIp().getValue() + "/" + TestData.IPV6_ADDRESS_CONFIG.getPrefixLength() + "\n"
-        + "exit\n";
+        + "root\n";
 
     private static final String DELETE_INPUT = "interface GigabitEthernet 0/0/0/0\n"
         + "no ipv6 address\n"
-        + "exit\n";
+        + "root\n";
 
     private Cli cliMock;
     private WriteContext context;

@@ -40,7 +40,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
     private static final String WRITE_TEMPLATE =
             "interface %s\n" +
             "encapsulation dot1Q %s\n" +
-            "exit";
+            "root";
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
@@ -70,7 +70,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
     private static final String DELETE_TEMPLATE =
             "interface %s\n" +
             "no encapsulation dot1Q %s\n" +
-            "exit";
+            "root";
 
 
     @Override

@@ -41,7 +41,7 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     private static final String WRITE_TEMPLATE =
             "interface %s\n" +
             "ipv4 address %s %s\n" +
-            "exit";
+            "root";
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
@@ -93,7 +93,7 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     private static final String DELETE_TEMPLATE =
             "interface %s\n" +
             "no ipv4 address %s %s\n" +
-            "exit";
+            "root";
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,

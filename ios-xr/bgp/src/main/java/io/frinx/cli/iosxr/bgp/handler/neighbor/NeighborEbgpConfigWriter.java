@@ -49,8 +49,7 @@ public class NeighborEbgpConfigWriter implements BgpWriter<Config> {
             "{% else %}" +
                 "no ebgp-multihop\n" +
             "{% endif %}" +
-            "exit\n" +
-            "exit\n";
+            "root\n";
 
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,

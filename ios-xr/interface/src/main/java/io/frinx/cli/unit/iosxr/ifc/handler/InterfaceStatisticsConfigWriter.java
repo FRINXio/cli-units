@@ -42,7 +42,7 @@ public class InterfaceStatisticsConfigWriter implements CliWriter<Config> {
             blockingWriteAndRead(cli, id, dataAfter,
                     f("interface %s", ifcName),
                     f("load-interval %s", dataAfter.getLoadInterval()),
-                    "exit");
+                    "root");
         }
     }
 
@@ -82,6 +82,6 @@ public class InterfaceStatisticsConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 f("interface %s", ifcName),
                 "no load-interval",
-                "exit");
+                "root");
     }
 }

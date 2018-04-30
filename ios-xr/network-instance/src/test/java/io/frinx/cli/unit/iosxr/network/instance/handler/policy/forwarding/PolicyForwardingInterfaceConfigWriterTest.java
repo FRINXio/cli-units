@@ -50,17 +50,17 @@ public class PolicyForwardingInterfaceConfigWriterTest {
     private static final String WRITE_INPUT = "interface Loopback0\n" +
         "service-policy input input-pol\n" +
         "service-policy output output-pol\n" +
-        "exit\n";
+        "root\n";
 
     private static final String UPDATE_INPUT = "interface Loopback0\n" +
         "service-policy input input-pol1\n" +
         "no service-policy output\n" +
-        "exit\n";
+        "root\n";
 
     private static final String DELETE_INPUT = "interface Loopback0\n" +
         "no service-policy output\n" +
         "no service-policy input\n" +
-        "exit\n";
+        "root\n";
 
     @Mock
     private Cli cli;

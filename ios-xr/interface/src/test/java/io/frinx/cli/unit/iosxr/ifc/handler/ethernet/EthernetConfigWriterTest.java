@@ -47,25 +47,25 @@ public class EthernetConfigWriterTest {
             "interface GigabitEthernet0/0/0/1\n" +
             "bundle id 30 mode active\n" +
             "lacp period short\n" +
-            "exit\n";
+            "root\n";
 
     private static final String UPDATE_INPUT =
             "interface GigabitEthernet0/0/0/1\n" +
             "bundle id 50 mode passive\n" +
             "no lacp period short\n" +
-            "exit\n";
+            "root\n";
 
     private static final String UPDATE_CLEAN_INPUT =
             "interface GigabitEthernet0/0/0/1\n" +
             "bundle id 30 mode on\n" +
             "\n" +
-            "exit\n";
+            "root\n";
 
     private static final String DELETE_INPUT =
             "interface GigabitEthernet0/0/0/1\n" +
             "no bundle id\n" +
             "no lacp period short\n" +
-            "exit\n";
+            "root\n";
 
     @Mock
     private Cli cli;
