@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
+import static io.frinx.cli.handlers.NetUtils.prefixFromNetmask;
 import static io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4AddressReader.INTERFACE_IP_LINE;
 import static io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4AddressReader.SH_INTERFACE_IP;
 import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
@@ -67,7 +68,7 @@ public class Ipv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
 
         parseField(output,
                 INTERFACE_IP_LINE::matcher,
-                m -> Short.parseShort(m.group("prefix")),
+                m -> prefixFromNetmask(m.group("prefix")),
                 configBuilder::setPrefixLength);
     }
 

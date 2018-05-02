@@ -29,7 +29,7 @@ public class Ipv4AddressReaderTest {
 
     @Test
     public void testParse() throws Exception {
-        List<AddressKey> addressKeys = Ipv4AddressReader.parseAddressIds("  Internet address is 192.168.1.44/54");
+        List<AddressKey> addressKeys = Ipv4AddressReader.parseAddressIds(" ip address 192.168.1.44 255.255.255.0\n");
         ArrayList<AddressKey> expected = Lists.newArrayList(new AddressKey(new Ipv4AddressNoZone("192.168.1.44")));
         assertEquals(expected, addressKeys);
     }

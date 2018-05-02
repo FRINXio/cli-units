@@ -27,7 +27,6 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import java.util.Arrays;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressBuilder;
@@ -68,8 +67,12 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         Ipv6AddressNoZone address = id.firstKeyOf(Address.class).getIp();
         configBuilder.setIp(address);
         configBuilder.setPrefixLength(DEFAULT_PREFIX_LENGHT);
-        output = String.valueOf(
-                Arrays.stream(output.split(NEWLINE.pattern())).filter(line -> line.contains(address.getValue())).findAny());
+
+        output = NEWLINE.splitAsStream(output)
+                .filter(line -> line.contains(address.getValue()))
+                .findAny()
+                .orElse("");
+
         parseField(output,
                 IPV6_UNICAST_ADDRESS::matcher,
                 m -> Short.parseShort(m.group("prefix")),

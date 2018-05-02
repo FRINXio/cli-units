@@ -56,6 +56,7 @@
 
     <feature name='cli-southbound-unit-ios-interfaces' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-interface-unit/{{VERSION}}</bundle>
     </feature>
@@ -166,6 +167,7 @@
 
     <feature name='cli-southbound-unit-ios-xr-interface' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-interface-unit/{{VERSION}}</bundle>

@@ -47,9 +47,9 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
         this.cli = cli;
     }
 
-    static final String SH_INTERFACE_IP = "sh ip inter %s | include Internet address";
+    static final String SH_INTERFACE_IP = "show running-config interface %s | include ^ ip address";
     static final Pattern INTERFACE_IP_LINE =
-            Pattern.compile("Internet address is (?<ip>[^/]+)/(?<prefix>[0-9]+)");
+            Pattern.compile("ip address (?<ip>\\S+) (?<prefix>\\S+)");
 
     @Nonnull
     @Override
