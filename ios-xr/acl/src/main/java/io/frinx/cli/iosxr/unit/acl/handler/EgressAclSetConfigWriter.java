@@ -33,7 +33,6 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSets;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSets;
@@ -74,25 +73,24 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
                                                final Class<? extends ACLTYPE> aclType,
                                                final WriteContext writeContext,
                                                final String interfaceName) {
-        // find egress acl set already set for type (ipv4/ipv6)
-        final Optional<EgressAclSets> ingressAclSetsOptional =
-            writeContext.readBefore(RWUtils.cutId(instanceIdentifier, EgressAclSets.class));
+        // find multiple egress acl sets already set for type (ipv4/ipv6)
+        final Optional<EgressAclSets> egressAclSetsOptional =
+            writeContext.readAfter(RWUtils.cutId(instanceIdentifier, EgressAclSets.class));
 
-        final java.util.Optional<EgressAclSet> aclSetName = Stream
-            .of(ingressAclSetsOptional)
+        final long storedAclSetsCount = Stream
+            .of(egressAclSetsOptional)
             .filter(Optional::isPresent)
             .map(item -> item.get().getEgressAclSet())
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
             .filter(aclSet -> aclSet.getType().equals(aclType))
-            .findFirst();
+            .count();
 
-        aclSetName.ifPresent(name -> {
+        if (storedAclSetsCount > 1) {
             throw new IllegalArgumentException(f(
-                "Could not add egress-acl-set config for interface %s, already exists for type %s. "
-                    + "Please delete egress-acl-set config with name %s for interface %s",
-                interfaceName, aclType, aclSetName.get(), interfaceName));
-        });
+                "Could not add more than one egress-acl-set config for type %s for interface %s.",
+                aclType, interfaceName));
+        }
     }
 
     @Override
@@ -100,6 +98,7 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
                                         @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
+        // should not happen until model changes (augment or name moved out from composite key)
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 

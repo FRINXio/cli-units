@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.openconfig.acl.IIDs;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -31,8 +32,12 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSets;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSets;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSet;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.ConfigBuilder;
@@ -60,7 +65,7 @@ public class IngressAclSetConfigWriterTest {
 
     @Test
     public void writeAclSet_LAGInterface_goldenPath() throws WriteFailedException {
-        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE);
+        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE, TestData.EGRESS_ACL_SETS_INIT_EMPTY, TestData.INGRESS_ACL_SETS_INIT);
 
         final IngressAclSetConfigWriter writer = new IngressAclSetConfigWriter(cliMock);
 
@@ -72,7 +77,7 @@ public class IngressAclSetConfigWriterTest {
 
     @Test
     public void writeAclSet_noLAGInterface() throws WriteFailedException {
-        presetWriteContext(context, TestData.INTERFACE_WRONG_TYPE);
+        presetWriteContext(context, TestData.INTERFACE_WRONG_TYPE, TestData.EGRESS_ACL_SETS_INIT_EMPTY, TestData.INGRESS_ACL_SETS_INIT);
 
         final IngressAclSetConfigWriter writer = new IngressAclSetConfigWriter(cliMock);
 
@@ -87,10 +92,26 @@ public class IngressAclSetConfigWriterTest {
             TestData.ACL_CONFIG_IID, TestData.ACL_CONFIG, context);
     }
 
+    @Test
+    public void writeAclSet_multipleForOneType() throws WriteFailedException {
+        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE, TestData.EGRESS_ACL_SETS_INIT_EMPTY, TestData.INGRESS_ACL_SETS_MULTIPLE_FOR_TYPE);
+
+        final IngressAclSetConfigWriter writer = new IngressAclSetConfigWriter(cliMock);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(
+            CoreMatchers.containsString("Could not add more than one")
+        );
+
+        writer.writeCurrentAttributes(
+            TestData.ACL_CONFIG_IID, TestData.ACL_CONFIG, context);
+    }
+
     private static class TestData {
 
         private static final String INTERFACE_NAME = "GigabitInterface 0/0/0/0";
         private static final String ACL_SET_NAME = "test_acl_group";
+        private static final String ACL_SET_NAME_OTHER = "bub_group";
         private static final Class<? extends ACLTYPE> ACL_TYPE = ACLIPV6.class;
 
         static final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface
@@ -120,6 +141,29 @@ public class IngressAclSetConfigWriterTest {
         static final Config ACL_CONFIG = new ConfigBuilder()
             .setSetName(ACL_SET_NAME)
             .setType(ACL_TYPE)
+            .build();
+
+        static final IngressAclSets INGRESS_ACL_SETS_INIT = new IngressAclSetsBuilder()
+            .setIngressAclSet(Arrays.asList(new IngressAclSetBuilder()
+                .setConfig(ACL_CONFIG)
+                .setSetName(ACL_CONFIG.getSetName())
+                .setType(ACL_CONFIG.getType())
+                .build()))
+            .build();
+        static final IngressAclSets INGRESS_ACL_SETS_MULTIPLE_FOR_TYPE = new IngressAclSetsBuilder()
+            .setIngressAclSet(Arrays.asList(
+                new IngressAclSetBuilder()
+                    .setConfig(ACL_CONFIG)
+                    .setSetName(ACL_CONFIG.getSetName())
+                    .setType(ACL_CONFIG.getType())
+                    .build(),
+                new IngressAclSetBuilder()
+                    .setConfig(ACL_CONFIG)
+                    .setSetName(ACL_SET_NAME_OTHER)
+                    .setType(ACL_CONFIG.getType())
+                    .build()))
+            .build();
+        static final EgressAclSets EGRESS_ACL_SETS_INIT_EMPTY = new EgressAclSetsBuilder()
             .build();
     }
 }

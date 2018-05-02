@@ -32,10 +32,14 @@ import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSets;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSet;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSets;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSets;
@@ -59,13 +63,20 @@ public class EgressAclSetConfigWriterTest {
 
     static void presetWriteContext(
         final WriteContext context,
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface anInterface) {
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface anInterface,
+        final EgressAclSets initEgressAclSets,
+        final IngressAclSets initIngressAclSets) {
         Mockito.when(context.readAfter(Mockito.any()))
             .then(invocation -> {
                 final Object iidParam = invocation.getArguments()[0];
                 if (iidParam.getClass().equals(KeyedInstanceIdentifier.class)) {
                     return Optional.of(anInterface);
                 } else if (iidParam.getClass().equals(InstanceIdentifier.class)) {
+                    if (((InstanceIdentifier) iidParam).getTargetType().equals(EgressAclSets.class)) {
+                        return Optional.of(initEgressAclSets);
+                    } else if (((InstanceIdentifier) iidParam).getTargetType().equals(IngressAclSets.class)) {
+                        return Optional.of(initIngressAclSets);
+                    }
                     return Optional.of(TestData.ACL_SETS);
                 }
 
@@ -84,7 +95,7 @@ public class EgressAclSetConfigWriterTest {
 
     @Test
     public void writeAclSet_LAGInterface_goldenPath() throws WriteFailedException {
-        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE);
+        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE, TestData.EGRESS_ACL_SETS_INIT, TestData.INGRESS_ACL_SETS_INIT_EMPTY);
 
         final EgressAclSetConfigWriter writer = new EgressAclSetConfigWriter(cliMock);
 
@@ -95,7 +106,7 @@ public class EgressAclSetConfigWriterTest {
 
     @Test
     public void writeAclSet_noLAGInterface() throws WriteFailedException {
-        presetWriteContext(context, TestData.INTERFACE_WRONG_TYPE);
+        presetWriteContext(context, TestData.INTERFACE_WRONG_TYPE, TestData.EGRESS_ACL_SETS_INIT, TestData.INGRESS_ACL_SETS_INIT_EMPTY);
 
         final EgressAclSetConfigWriter writer = new EgressAclSetConfigWriter(cliMock);
 
@@ -105,6 +116,20 @@ public class EgressAclSetConfigWriterTest {
             CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
             CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
         ));
+
+        writer.writeCurrentAttributes(TestData.ACL_CONFIG_IID, TestData.ACL_CONFIG, context);
+    }
+
+    @Test
+    public void writeAclSet_multipleForOneType() throws WriteFailedException {
+        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE, TestData.EGRESS_ACL_SETS_MULTIPLE_FOR_TYPE, TestData.INGRESS_ACL_SETS_INIT_EMPTY);
+
+        final EgressAclSetConfigWriter writer = new EgressAclSetConfigWriter(cliMock);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(
+            CoreMatchers.containsString("Could not add more than one")
+        );
 
         writer.writeCurrentAttributes(TestData.ACL_CONFIG_IID, TestData.ACL_CONFIG, context);
     }
@@ -149,6 +174,28 @@ public class EgressAclSetConfigWriterTest {
         static final Config ACL_CONFIG = new ConfigBuilder()
             .setSetName(ACL_SET_NAME)
             .setType(ACL_TYPE)
+            .build();
+        static final IngressAclSets INGRESS_ACL_SETS_INIT_EMPTY = new IngressAclSetsBuilder()
+            .build();
+        static final EgressAclSets EGRESS_ACL_SETS_INIT = new EgressAclSetsBuilder()
+            .setEgressAclSet(Arrays.asList(new EgressAclSetBuilder()
+                .setConfig(ACL_CONFIG)
+                .setSetName(ACL_CONFIG.getSetName())
+                .setType(ACL_CONFIG.getType())
+                .build()))
+            .build();
+        static final EgressAclSets EGRESS_ACL_SETS_MULTIPLE_FOR_TYPE = new EgressAclSetsBuilder()
+            .setEgressAclSet(Arrays.asList(
+                new EgressAclSetBuilder()
+                    .setConfig(ACL_CONFIG)
+                    .setSetName(ACL_CONFIG.getSetName())
+                    .setType(ACL_CONFIG.getType())
+                    .build(),
+                new EgressAclSetBuilder()
+                    .setConfig(ACL_CONFIG)
+                    .setSetName(ACL_SET_NAME_OTHER)
+                    .setType(ACL_CONFIG.getType())
+                    .build()))
             .build();
 
         private static AclSet createAclSet(final String aclSetName,
