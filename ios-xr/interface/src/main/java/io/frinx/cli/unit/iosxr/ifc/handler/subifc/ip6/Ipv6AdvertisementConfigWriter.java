@@ -31,8 +31,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class Ipv6AdvertisementConfigWriter implements CliWriter<Config> {
 
-    private static final String IPV6_ND_SUPPRESS = "ipv6 nd suppress";
-    private static final String NO_IPV6_ND_SUPPRESS = "no ipv6 nd suppress";
+    private static final String IPV6_ND_SUPPRESS = "ipv6 nd suppress-ra";
+    private static final String NO_IPV6_ND_SUPPRESS = "no ipv6 nd suppress-ra";
     private final Cli cli;
 
     public Ipv6AdvertisementConfigWriter(final Cli cli) {
