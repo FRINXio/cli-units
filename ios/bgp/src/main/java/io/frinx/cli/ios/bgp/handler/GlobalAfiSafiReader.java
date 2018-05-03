@@ -47,7 +47,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
-    private static final String SH_AFI = "sh run | include ^router bgp|^ address-family";
+    private static final String SH_AFI = "show running-config | include ^router bgp|^ address-family";
     private static final Pattern FAMILY_LINE = Pattern.compile("\\s*address-family (?<family>\\S+).*");
     private static final Pattern FAMILY_VRF_LINE = Pattern.compile("\\s*address-family (?<family>.+) vrf (?<vrf>\\S+).*");
     private Cli cli;

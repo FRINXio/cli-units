@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
-    private static final String SHOW_OSPF_IFC = "sh run | include ^interface |^ ip ospf";
+    private static final String SHOW_OSPF_IFC = "show running-config | include ^interface |^ ip ospf";
 
     private static final Pattern ROUTER_ID = Pattern.compile(".*?interface (?<ifcId>[^\\s]+).*");
 

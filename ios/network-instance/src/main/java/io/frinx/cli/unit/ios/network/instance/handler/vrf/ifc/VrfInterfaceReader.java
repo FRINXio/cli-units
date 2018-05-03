@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
-    private static final String SH_IP_VRF_INTERFACES_ALL = "sh run | include ^interface|^ ip vrf forwarding";
+    private static final String SH_IP_VRF_INTERFACES_ALL = "show running-config | include ^interface|^ ip vrf forwarding";
     private static final Pattern VRF_INTERFACE_ID_LINE = Pattern.compile("interface (?<id>\\S+)\\s+ip vrf forwarding (?<vrfId>\\S+)");
     private static final Pattern INTERFACE_ID_LINE = Pattern.compile("interface (?<id>\\S+)");
 

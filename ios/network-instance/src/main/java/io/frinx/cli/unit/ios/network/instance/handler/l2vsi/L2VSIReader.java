@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class L2VSIReader implements CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>,
         CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
-    public static final String SH_L2_VFI = "sh run | include ^l2 vfi|^ vpn id|^ bridge-domain";
+    public static final String SH_L2_VFI = "show running-config | include ^l2 vfi|^ vpn id|^ bridge-domain";
     public static final Pattern L2_VFI_LINE = Pattern.compile("l2 vfi (?<vfi>\\S+) autodiscovery\\s+vpn id (?<vccid>\\S+)\\s+bridge-domain (?<bd>\\S+).*");
 
     private Cli cli;

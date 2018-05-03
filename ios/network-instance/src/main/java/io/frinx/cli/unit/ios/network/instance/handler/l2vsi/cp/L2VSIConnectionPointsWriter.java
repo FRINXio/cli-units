@@ -46,7 +46,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints> {
 
-    public static final String SH_RUN_INCLUDE_BRIDGE_DOMAIN = "sh run | include bridge-domain";
+    public static final String SH_RUN_INCLUDE_BRIDGE_DOMAIN = "show running-config | include bridge-domain";
     private Cli cli;
     public static final Pattern BD_PATTERN = Pattern.compile("\\s*bridge-domain\\s+(?<bdIndex>[0-9]+)\\s*");
 
