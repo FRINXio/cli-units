@@ -26,22 +26,23 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 
 public class SubniterfaceReaderTest {
 
-    private static final String SH_INTERFACE = "Interface                  IP-Address      OK? Method Status                Protocol\n" +
-            "GigabitEthernet0/0         192.168.1.225   YES NVRAM  up                    up      \n" +
-            "GigabitEthernet0/1         unassigned      YES NVRAM  administratively down down    \n" +
-            "GigabitEthernet0/2         unassigned      YES NVRAM  administratively down down    \n" +
-            "GigabitEthernet0/3         unassigned      YES NVRAM  administratively down down    \n" +
-            "GigabitEthernet0/3.152     unassigned      YES unset  administratively down down    \n" +
-            "GigabitEthernet0/3.153     unassigned      YES unset  deleted               down    \n";
+    private static final String SH_INTERFACE = "interface Loopback0\n" +
+            "interface FastEthernet0/0\n" +
+            "interface GigabitEthernet1/0\n" +
+            "interface GigabitEthernet2/0\n" +
+            "interface GigabitEthernet3/0\n" +
+            "interface FastEthernet4/0\n" +
+            "interface FastEthernet4/0.56\n" +
+            "interface FastEthernet4/0.57\n";
 
     private static final List<SubinterfaceKey> IDS_EXPECTED =
-            Lists.newArrayList(152L)
+            Lists.newArrayList(56L, 57L)
                     .stream()
                     .map(SubinterfaceKey::new)
                     .collect(Collectors.toList());
 
     @Test
     public void testParseInterfaceIds() throws Exception {
-        assertEquals(IDS_EXPECTED, SubinterfaceReader.parseInterfaceIds(SH_INTERFACE, "GigabitEthernet0/3"));
+        assertEquals(IDS_EXPECTED, SubinterfaceReader.parseInterfaceIds(SH_INTERFACE, "FastEthernet4/0"));
     }
 }
