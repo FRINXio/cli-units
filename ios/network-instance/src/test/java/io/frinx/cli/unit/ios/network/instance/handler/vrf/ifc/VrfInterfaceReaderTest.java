@@ -19,6 +19,8 @@ package io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.Lists;
+import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Test;
@@ -30,19 +32,31 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 public class VrfInterfaceReaderTest {
 
     private static  final String SH_IP_VRF_INTERFACES =
-            "Interface              IP-Address      VRF                              Protocol\n" +
-                    "GigabitEthernet1/0                  172.16.11.112      DEP_1                            up\n" +
-                    "GigabitEthernet2/0                  172.16.11.113      DEP_1                            up";
+            "interface Loopback0\n" +
+                    "interface Loopback1\n" +
+                    " ip vrf forwarding a\n" +
+                    "interface Loopback44\n" +
+                    "interface GigabitEthernet1\n" +
+                    "interface GigabitEthernet2\n" +
+                    "interface GigabitEthernet3\n";
 
     private static final List<InterfaceKey> IDS_EXPECTED =
-            Lists.newArrayList("GigabitEthernet1/0", "GigabitEthernet2/0")
+            Lists.newArrayList("Loopback0", "Loopback44", "GigabitEthernet1", "GigabitEthernet2", "GigabitEthernet3")
+                    .stream()
+                    .map(InterfaceKey::new)
+                    .collect(Collectors.toList());
+
+    private static final List<InterfaceKey> IDS_EXPECTED_VRF =
+            Lists.newArrayList("Loopback1")
                     .stream()
                     .map(InterfaceKey::new)
                     .collect(Collectors.toList());
 
     @Test
     public void testReader() {
-        assertEquals(IDS_EXPECTED, VrfInterfaceReader.parseInterfaceIds(SH_IP_VRF_INTERFACES));
+        assertEquals(IDS_EXPECTED, VrfInterfaceReader.parseIds(NetworInstance.DEFAULT_NETWORK_NAME, SH_IP_VRF_INTERFACES));
+        assertEquals(IDS_EXPECTED_VRF, VrfInterfaceReader.parseIds("a", SH_IP_VRF_INTERFACES));
+        assertEquals(Collections.emptyList(), VrfInterfaceReader.parseIds("b", SH_IP_VRF_INTERFACES));
     }
 
 }
