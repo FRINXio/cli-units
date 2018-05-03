@@ -26,22 +26,23 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 
 public class InterfaceReaderTest {
 
-    private static final String SH_INTERFACE = "Interface                  IP-Address      OK? Method Status                Protocol\n" +
-            "GigabitEthernet0/0         192.168.1.225   YES NVRAM  up                    up      \n" +
-            "GigabitEthernet0/1         unassigned      YES NVRAM  administratively down down    \n" +
-            "GigabitEthernet0/2         unassigned      YES NVRAM  administratively down down    \n" +
-            "GigabitEthernet0/3         unassigned      YES NVRAM  administratively down down    \n" +
-            "GigabitEthernet0/3.152     unassigned      YES unset  administratively down down    \n" +
-            "GigabitEthernet0/3.153     unassigned      YES unset  deleted               down    \n";
+    private static final String SH_INTERFACE = "interface Loopback0\n" +
+                    "interface FastEthernet0/0\n" +
+                    "interface GigabitEthernet1/0\n" +
+                    "interface GigabitEthernet2/0\n" +
+                    "interface GigabitEthernet3/0\n" +
+                    "interface FastEthernet4/0\n" +
+                    "interface FastEthernet4/0.56\n" +
+                    "interface FastEthernet4/0.57\n";
 
     private static final List<InterfaceKey> IDS_EXPECTED =
-            Lists.newArrayList("GigabitEthernet0/0", "GigabitEthernet0/1", "GigabitEthernet0/2", "GigabitEthernet0/3")
+            Lists.newArrayList("Loopback0", "FastEthernet0/0", "GigabitEthernet1/0", "GigabitEthernet2/0", "GigabitEthernet3/0", "FastEthernet4/0")
                     .stream()
                     .map(InterfaceKey::new)
                     .collect(Collectors.toList());
 
     private static final List<InterfaceKey> IDS_ALL_EXPECTED =
-            Lists.newArrayList("GigabitEthernet0/0", "GigabitEthernet0/1", "GigabitEthernet0/2", "GigabitEthernet0/3", "GigabitEthernet0/3.152")
+            Lists.newArrayList("Loopback0", "FastEthernet0/0", "GigabitEthernet1/0", "GigabitEthernet2/0", "GigabitEthernet3/0", "FastEthernet4/0", "FastEthernet4/0.56", "FastEthernet4/0.57")
                     .stream()
                     .map(InterfaceKey::new)
                     .collect(Collectors.toList());

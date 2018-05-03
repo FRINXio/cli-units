@@ -16,7 +16,7 @@
 
 package io.frinx.cli.unit.ios.ifc.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
+import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -24,7 +24,6 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -44,7 +43,7 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
         this.cli = cli;
     }
 
-    public static final String SH_INTERFACE = "sh ip inter brie";
+    public static final String SH_INTERFACE = "sh run | include ^interface";
 
     @Nonnull
     @Override
@@ -54,7 +53,7 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
     }
 
     private static final Pattern INTERFACE_ID_LINE =
-            Pattern.compile("(?<id>[^\\s]+)\\s+(?<ip>[^\\s]+)\\s+(?<ok>[^\\s]+)\\s+(?<method>[^\\s]+)\\s+(?<status>[^\\s]+)\\s+(?<protocol>[^\\s]+).*");
+            Pattern.compile("interface (?<id>\\S+)");
 
     public static final Pattern SUBINTERFACE_NAME =
             Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
@@ -69,16 +68,10 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
     }
 
     public static List<InterfaceKey> parseAllInterfaceIds(String output) {
-        return NEWLINE.splitAsStream(output)
-                .map(String::trim)
-                // Remove interfaces marked as deleted ! (deleted subinterface is still reported in the output as deleted)
-                .filter(line -> !line.contains("deleted"))
-                .map(INTERFACE_ID_LINE::matcher)
-                .filter(Matcher::matches)
-                .skip(1)
-                .map(m -> m.group("id"))
-                .map(InterfaceKey::new)
-                .collect(Collectors.toList());
+        return parseFields(output, 0,
+                INTERFACE_ID_LINE::matcher,
+                m -> m.group("id"),
+                InterfaceKey::new);
     }
 
     public static boolean isSubinterface(InterfaceKey ifcName) {
