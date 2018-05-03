@@ -37,7 +37,6 @@ import io.frinx.cli.iosxr.ospf.handler.AreaInterfaceMplsSyncConfigWriter;
 import io.frinx.cli.iosxr.ospf.handler.AreaInterfaceReader;
 import io.frinx.cli.iosxr.ospf.handler.GlobalConfigReader;
 import io.frinx.cli.iosxr.ospf.handler.GlobalConfigWriter;
-import io.frinx.cli.iosxr.ospf.handler.InterfaceRefReader;
 import io.frinx.cli.iosxr.ospf.handler.MaxMetricTimerConfigReader;
 import io.frinx.cli.iosxr.ospf.handler.MaxMetricTimerConfigWriter;
 import io.frinx.cli.iosxr.ospf.handler.MaxMetricTimerReader;
@@ -169,7 +168,6 @@ public class OspfUnit implements TranslateUnit {
                 .child(EnableBfd.class)
                 .child(Config.class), new AreaInterfaceEnableBfdConfigReader(cli)));
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, InterfaceRefBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_IN_CONFIG, new InterfaceRefReader()));
     }
 
     @Override
