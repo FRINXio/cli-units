@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.ios.lldp.handler;
 
+import static io.frinx.cli.unit.ios.lldp.handler.NeighborReader.SHOW_LLDP_NEIGHBOR;
 import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -37,7 +38,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
 
-    private static final String SHOW_LLDP_NEIGHBOR_DETAIL = "sh lldp neighbor %s detail | include Port id|System Name";
     private static final Pattern NEIGHBOR_LINE = Pattern.compile(".*Port id: (?<portId>.+) System Name:.*");
 
     private Cli cli;
@@ -52,7 +52,7 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
             throws ReadFailedException {
         String interfaceId = instanceIdentifier.firstKeyOf(Interface.class).getName();
         String neighborId = instanceIdentifier.firstKeyOf(Neighbor.class).getId();
-        String showLldpEntryCommand = String.format(SHOW_LLDP_NEIGHBOR_DETAIL, interfaceId);
+        String showLldpEntryCommand = String.format(SHOW_LLDP_NEIGHBOR, interfaceId);
 
         parseNeighborStateFields(
                 blockingRead(showLldpEntryCommand, cli, instanceIdentifier, readContext), neighborId, stateBuilder);

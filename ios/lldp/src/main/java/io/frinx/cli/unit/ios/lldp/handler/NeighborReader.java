@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborReader implements CliOperListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
-    private static final String SHOW_LLDP_NEIGHBOR = "sh lldp neighbor %s detail | include System Name";
+    static final String SHOW_LLDP_NEIGHBOR = "sh lldp neighbor %s detail | include Port id|System Name";
     private static final Pattern NEIGHBOR_NAME =
             Pattern.compile("System Name: (?<neighborName>\\S+)");
 
