@@ -18,8 +18,6 @@ package io.frinx.cli.unit.ios.cdp;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
@@ -29,7 +27,6 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.ios.cdp.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.ios.cdp.handler.InterfaceReader;
-import io.frinx.cli.unit.ios.cdp.handler.InterfaceStateReader;
 import io.frinx.cli.unit.ios.cdp.handler.NeighborReader;
 import io.frinx.cli.unit.ios.cdp.handler.NeighborStateReader;
 import io.frinx.openconfig.openconfig.cdp.IIDs;
@@ -91,9 +88,14 @@ public final class IosCdpUnit implements TranslateUnit {
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         rRegistry.addStructuralReader(IIDs.CDP, CdpBuilder.class);
         rRegistry.addStructuralReader(IIDs.CD_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.CD_IN_INTERFACE, new InterfaceReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.CD_IN_IN_CONFIG, new InterfaceConfigReader()));
-        rRegistry.add(new GenericOperReader<>(IIDs.CD_IN_IN_STATE, new InterfaceStateReader()));
+        // TODO keeping InterfaceReader and InterfaceConfigReader just as Operational readers
+        // because we do not yet support writes
+        // and also because finding out whether an interface is cdp enabled or not is not possible
+        // just from running-config (IOS has default off, XE has default on) the only way to get the
+        // info from running config is to use "show run all". But that would not do well with CliReader right now and would
+        // slow down reads by a lot
+        rRegistry.add(new GenericOperListReader<>(IIDs.CD_IN_INTERFACE, new InterfaceReader(cli)));
+        rRegistry.add(new GenericOperReader<>(IIDs.CD_IN_IN_CONFIG, new InterfaceConfigReader()));
         rRegistry.addStructuralReader(IIDs.CD_IN_IN_NEIGHBORS, NeighborsBuilder.class);
         rRegistry.add(new GenericOperListReader<>(IIDs.CD_IN_IN_NE_NEIGHBOR, new NeighborReader(cli)));
         rRegistry.add(new GenericOperReader<>(IIDs.CD_IN_IN_NE_NE_STATE, new NeighborStateReader(cli)));

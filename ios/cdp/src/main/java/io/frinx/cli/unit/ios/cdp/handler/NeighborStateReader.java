@@ -43,9 +43,6 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
         this.cli = cli;
     }
 
-    // Cannot use "sh cdp neighbors" here, The output table lacs any form to rely on and thus cannot be parsed
-    private static final String SH_CDP_INTER_NEIGHBOR = "sh cdp neighbors %s detail | include Device ID|Interface";
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                       @Nonnull StateBuilder stateBuilder,
@@ -53,7 +50,7 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
         String interfaceId = instanceIdentifier.firstKeyOf(Interface.class).getName();
         String neighborId = instanceIdentifier.firstKeyOf(Neighbor.class).getId();
 
-        String output = blockingRead(String.format(SH_CDP_INTER_NEIGHBOR, interfaceId), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(NeighborReader.SH_CDP_NEIGH, interfaceId), cli, instanceIdentifier, readContext);
         parseNeighborStateFields(stateBuilder, output, neighborId);
     }
 

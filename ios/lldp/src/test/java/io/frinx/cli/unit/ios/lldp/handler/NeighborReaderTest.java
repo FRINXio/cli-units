@@ -27,13 +27,17 @@ import java.util.stream.Collectors;
 
 public class NeighborReaderTest {
 
-    private static final String SH_LLDP_NEIGHBOR = "System Name: PE3.demo.frinx.io\n" +
+    private static final String SH_LLDP_NEIGHBOR = "Port id: Gi0/0/0/1\n" +
+            "System Name: PE3.demo.frinx.io\n" +
+            "Port id: Fa0/1\n" +
             "System Name: XE2.FRINX\n" +
-            "System Name: PE1.demo.frinx.io\n" +
-            "System Name: Router2";
+            "Port id: Fa0/0\n" +
+            "System Name: XE1.FRINX\n" +
+            "Port id: Gi0/0/0/3\n" +
+            "System Name: PE1.demo.frinx.io";
 
     private static final List<NeighborKey> EXPECTED_IDS =
-            Lists.newArrayList("Router2", "PE3.demo.frinx.io", "XE2.FRINX", "PE1.demo.frinx.io")
+            Lists.newArrayList("XE1.FRINX", "PE3.demo.frinx.io", "XE2.FRINX", "PE1.demo.frinx.io")
             .stream()
             .map(NeighborKey::new)
             .collect(Collectors.toList());
