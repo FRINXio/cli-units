@@ -46,6 +46,7 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
     private static final Pattern QOS_LINE = Pattern.compile("match qos-group (?<qos>.+)");
     private static final Pattern MPLS_LINE = Pattern.compile("match mpls experimental topmost (?<mpls>.+)");
     private static final Pattern PREC_LINE = Pattern.compile("match precedence(?! ipv4| ipv6) (?<prec>.+)");
+    private static final String MATCH = "match";
 
     private Cli cli;
 
@@ -79,13 +80,11 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
             parseConditions(output, conditionsBuilder);
         } else {
             // if we have a number as term id, just the condition on the specific line will be parsed
-            // skip timestamp + class-map def
-            int skip = Integer.valueOf(line) + 1;
-            if (ParsingUtils.NEWLINE.splitAsStream(output).skip(skip).findFirst().isPresent()) {
-                parseConditions(ParsingUtils.NEWLINE.splitAsStream(output).skip(skip).findFirst().get(), conditionsBuilder);
-            } else {
-                throw new IllegalArgumentException("Term with ID " + line + " does not exist.");
-            }
+            // skip class-map def
+            int skip = Integer.valueOf(line);
+            final String optLine = ParsingUtils.NEWLINE.splitAsStream(output).filter(p -> p.contains(MATCH)).skip(skip)
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("Term with ID " + line + " does not exist."));
+            parseConditions(optLine, conditionsBuilder);
         }
     }
 

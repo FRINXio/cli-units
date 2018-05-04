@@ -17,7 +17,6 @@
 package io.frinx.cli.iosxr.qos.handler.classifier;
 
 import com.google.common.collect.Lists;
-import io.frinx.cli.iosxr.qos.handler.classifier.ConditionsReader;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Precedence;
