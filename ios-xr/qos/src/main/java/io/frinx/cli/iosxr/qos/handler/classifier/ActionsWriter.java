@@ -42,6 +42,8 @@ public class ActionsWriter implements CliWriter<Actions> {
         "no set precedence\n{% endif %}" +
         "{% endif %}root";
 
+    private static final String DEFAULT_CLASS = "class-default";
+
     private Cli cli;
 
     public ActionsWriter(Cli cli) {
@@ -50,7 +52,10 @@ public class ActionsWriter implements CliWriter<Actions> {
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Actions> instanceIdentifier, @Nonnull Actions actions, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
+        String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
+        if (className.endsWith(ClassifierReader.DEFAULT_CLASS_SUFFIX)) {
+            className = DEFAULT_CLASS;
+        }
         final String policyName = actions.getConfig().getTargetGroup();
         if (policyName != null) {
             QosRemarkQosGroupAug aug = actions.getRemark() != null ? actions.getRemark().getConfig().getAugmentation(QosRemarkQosGroupAug.class) : null;

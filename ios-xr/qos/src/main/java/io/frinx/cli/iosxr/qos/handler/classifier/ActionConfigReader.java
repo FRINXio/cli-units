@@ -46,6 +46,11 @@ public class ActionConfigReader implements CliConfigReader<Config, ConfigBuilder
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
+        // class-default has the policy-map name in it's name
+        if (className.endsWith(ClassifierReader.DEFAULT_CLASS_SUFFIX)) {
+            configBuilder.setTargetGroup(className.replace(ClassifierReader.DEFAULT_CLASS_SUFFIX, ""));
+            return;
+        }
         String output = blockingRead(f(SH_POLICY_MAPS, className), cli, instanceIdentifier, readContext);
         parsePolicyName(output, configBuilder, className);
 

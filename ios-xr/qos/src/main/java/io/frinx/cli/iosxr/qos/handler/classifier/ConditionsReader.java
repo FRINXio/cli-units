@@ -63,6 +63,10 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Conditions> instanceIdentifier, @Nonnull ConditionsBuilder conditionsBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         String name = instanceIdentifier.firstKeyOf(Classifier.class).getName();
+        if (name.endsWith(ClassifierReader.DEFAULT_CLASS_SUFFIX)) {
+            // we are reading class-default that does not have any matches, skip it
+            return;
+        }
         String line = instanceIdentifier.firstKeyOf(Term.class).getId();
         String output = blockingRead(f(TermReader.SH_TERMS_ALL, name), cli, instanceIdentifier, readContext);
 

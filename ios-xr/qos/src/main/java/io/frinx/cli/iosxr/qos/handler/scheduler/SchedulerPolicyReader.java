@@ -36,8 +36,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SchedulerPolicyReader implements CliConfigListReader<SchedulerPolicy, SchedulerPolicyKey, SchedulerPolicyBuilder> {
 
-    private static final String SH_POLICY_MAPS = "show running-config policy-map | include policy-map";
-    private static final Pattern POLICY_NAME_LINE = Pattern.compile("policy-map (?<name>.+)");
+    public static final String SH_POLICY_MAPS = "show running-config policy-map | include policy-map";
+    public static final Pattern POLICY_NAME_LINE = Pattern.compile("policy-map (?<name>.+)");
     private Cli cli;
 
     public SchedulerPolicyReader(Cli cli) {
