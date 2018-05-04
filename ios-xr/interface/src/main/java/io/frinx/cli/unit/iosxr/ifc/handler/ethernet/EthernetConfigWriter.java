@@ -29,14 +29,30 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ag
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member.rev171109.LacpEthConfigAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.LacpActivityType;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.LacpPeriodType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EthernetConfigWriter implements CliWriter<Config> {
 
-    private static final String BUNDLE_ID_COMMAND_TEMPLATE = "bundle id %s";
+    private static final String LACP_OPERATION_MODE_TEMPLATE = "mode" +
+            "{% if ($lacp_aug.lacp_mode == ACTIVE) %} active" +
+            "{% elseIf ($lacp_aug.lacp_mode == PASSIVE) %} passive" +
+            "{% else %} on" +
+            "{% endif %}" +
+            "\n";
+
+    private static final String LACP_PERIOD_TEMPLATE = "{% if ($lacp_aug.interval == FAST) %}lacp period short" +
+            "{% else %}no lacp period short" +
+            "{% endif %}" +
+            "\n";
+
+    private static final String IFC_ETHERNET_CONFIG_TEMPLATE = "interface {$ifc_name}\n" +
+            "{% if ($bundle_id) %}bundle id {$bundle_id} " +
+            LACP_OPERATION_MODE_TEMPLATE +
+            "{% else %}no bundle id\n" +
+            "{% endif %}" +
+            LACP_PERIOD_TEMPLATE +
+            "root";
 
     private final Cli cli;
 
@@ -60,36 +76,37 @@ public class EthernetConfigWriter implements CliWriter<Config> {
         Config1 aggregationAug = dataAfter.getAugmentation(Config1.class);
         LacpEthConfigAug lacpAug = dataAfter.getAugmentation(LacpEthConfigAug.class);
 
-        // TODO Exctract this to commands templates
-        int bundleId = Integer.parseInt(getBundleId(aggregationAug.getAggregateId()));
-        String bundleIdCommand = String.format(BUNDLE_ID_COMMAND_TEMPLATE, bundleId);
-        String intervalCommand = "";
-        String mode = "mode on";
-        if (lacpAug != null) {
-            mode = lacpAug.getLacpMode() == LacpActivityType.ACTIVE ? "mode active" : "mode passive";
-            intervalCommand = lacpAug.getInterval() != null && lacpAug.getInterval() == LacpPeriodType.FAST
-                    ? "lacp period short" : "no lacp period short";
+        Long bundleId = getBundleId(aggregationAug);
+
+        if (lacpAug != null && lacpAug.getLacpMode() != null) {
+            Preconditions.checkNotNull(bundleId,
+                    "Missing agregate-id, cannot configure LACP mode on non LAG enabled interface %s", ifcName);
         }
 
         // TODO we should probably check if the logical aggregate interface
         // exists
         blockingWriteAndRead(cli, id, dataAfter,
-                f("interface %s" , ifcName),
-                bundleIdCommand + " " + mode,
-                intervalCommand,
-                "root");
+                fT(IFC_ETHERNET_CONFIG_TEMPLATE,
+                        "ifc_name", ifcName,
+                        "lacp_aug", lacpAug,
+                        "bundle_id", bundleId));
     }
 
     private static Pattern AGGREGATE_IFC_NAME = Pattern.compile("Bundle-Ether(?<id>\\d+)");
 
-    // TODO This should return long
-    private static String getBundleId(String aggregateIfcName) {
+    private static Long getBundleId(final Config1 aggregationAug) {
+        if (aggregationAug == null || aggregationAug.getAggregateId() == null) {
+            return null;
+        }
+
+        String aggregateIfcName = aggregationAug.getAggregateId();
+
         Matcher aggregateIfcNameMatcher = AGGREGATE_IFC_NAME.matcher(aggregateIfcName.trim());
 
         Preconditions.checkArgument(aggregateIfcNameMatcher.matches(),
                 "aggregate-id %s should reference LAG interface", aggregateIfcName);
 
-        return aggregateIfcNameMatcher.group("id");
+        return Long.valueOf(aggregateIfcNameMatcher.group("id"));
     }
 
     @Override

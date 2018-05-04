@@ -58,7 +58,19 @@ public class EthernetConfigWriterTest {
     private static final String UPDATE_CLEAN_INPUT =
             "interface GigabitEthernet0/0/0/1\n" +
             "bundle id 30 mode on\n" +
-            "\n" +
+            "no lacp period short\n" +
+            "root\n";
+
+    private static final String UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT =
+            "interface GigabitEthernet0/0/0/1\n" +
+            "no bundle id\n" +
+            "lacp period short\n" +
+            "root\n";
+
+    private static final String UPDATE_LACP_MODE_INPUT =
+            "interface GigabitEthernet0/0/0/1\n" +
+            "bundle id 30 mode active\n" +
+            "no lacp period short\n" +
             "root\n";
 
     private static final String DELETE_INPUT =
@@ -135,6 +147,79 @@ public class EthernetConfigWriterTest {
     }
 
     @Test
+    public void updateLacpPeriodWithoutLacpMode() throws Exception {
+        Config newData = new ConfigBuilder()
+                .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder()
+                        .setInterval(LacpPeriodType.FAST)
+                        .build())
+                .build();
+
+        this.writer.updateCurrentAttributes(iid, data, newData, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT, response.getValue());
+
+        Config newDataWithEmptyAggregateAug = new ConfigBuilder()
+                .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder()
+                        .setInterval(LacpPeriodType.FAST)
+                        .build())
+                .addAugmentation(Config1.class, new Config1Builder()
+                        .build())
+                .build();
+
+        this.writer.updateCurrentAttributes(iid, data, newDataWithEmptyAggregateAug, context);
+        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT, response.getValue());
+    }
+
+    @Test
+    public void updateLacpMode() throws Exception {
+        Config newData = new ConfigBuilder()
+                .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder()
+                        .setLacpMode(LacpActivityType.ACTIVE)
+                        .build())
+                .addAugmentation(Config1.class, new Config1Builder()
+                        .setAggregateId("Bundle-Ether30")
+                        .build())
+                .build();
+
+        this.writer.updateCurrentAttributes(iid, data, newData, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_LACP_MODE_INPUT, response.getValue());
+
+        // no bundle-id defined, we shouldn't update mode
+        Config newDataWithoutBundleId = new ConfigBuilder()
+                .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder()
+                        .setLacpMode(LacpActivityType.ACTIVE)
+                        .build())
+                .addAugmentation(Config1.class, new Config1Builder()
+                        .build())
+                .build();
+
+        try {
+            this.writer.updateCurrentAttributes(iid, data, newDataWithoutBundleId, context);
+            Assert.fail("Updating LACP mode without configured bundle-id is not allowed");
+        } catch (NullPointerException ex) {
+
+        }
+
+        // no aggregate augmentation defined, we shouldn't update mode
+        Config newDataWithoutAggregateAug = new ConfigBuilder()
+                .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder()
+                        .setLacpMode(LacpActivityType.ACTIVE)
+                        .build())
+                .build();
+
+        try {
+            this.writer.updateCurrentAttributes(iid, data, newDataWithoutAggregateAug, context);
+            Assert.fail("Updating LACP mode without configured bundle-id is not allowed");
+        } catch (NullPointerException ex) {
+
+        }
+    }
+
+
+
+        @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
