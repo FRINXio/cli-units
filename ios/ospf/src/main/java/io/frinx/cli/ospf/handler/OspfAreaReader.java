@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area, AreaKey, AreaBuilder> {
 
-    private static final String SH_OSPF_AREAS = "sh run | include ip ospf %s area";
+    private static final String SH_OSPF_AREAS = "show running-config | include ip ospf %s area";
 
     private static final Pattern AREA_ID = Pattern.compile("\\s*ip ospf (?<ospf>\\S+) area (?<area>\\S+).*");
 

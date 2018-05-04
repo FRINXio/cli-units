@@ -49,7 +49,7 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
     @Override
     public List<ProtocolKey> getAllIds(@Nonnull InstanceIdentifier<Protocol> iid,
                                        @Nonnull ReadContext context) throws ReadFailedException {
-        String output = blockingRead("show run | include router bgp", cli, iid, context);
+        String output = blockingRead("show running-config | include router bgp", cli, iid, context);
         if (output.isEmpty()) {
             return Collections.emptyList();
         }

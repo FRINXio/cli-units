@@ -38,6 +38,7 @@ public class InterfaceReaderTest {
             .stream()
             .map(InterfaceKey::new)
             .collect(Collectors.toList());
+
     @Test
     public void testParseInterfaceIds() {
         List<InterfaceKey> actualIds = InterfaceReader.parseInterfaceIds(SH_LLDP_INTERFACE_OUTPUT);

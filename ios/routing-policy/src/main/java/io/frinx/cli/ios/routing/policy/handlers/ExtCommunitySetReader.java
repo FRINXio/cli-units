@@ -51,7 +51,7 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
 
     static final String ROUTE_TARGET_EXPORT_SET = "-route-target-export-set";
     static final String ROUTE_TARGET_IMPORT_SET = "-route-target-import-set";
-    private static final String SH_RUN_VRF_ID = "sh run | include ^ip vrf|^ route-target";
+    private static final String SH_RUN_VRF_ID = "show running-config | include ^ip vrf|^ route-target";
     private static final Pattern VRF_ID_ROUTE_TARGET_EXPORT = Pattern.compile("route-target export (?<rt>[\\S].*)");
     private static final Pattern VRF_ID_ROUTE_TARGET_IMPORT = Pattern.compile("route-target import (?<rt>[\\S].*)");
     static final Pattern VRF_ID_ROUTE_TARGET = Pattern.compile("(?<vrf>\\S*)-route-target-(?<direction>import|export)-set");

@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class StaticReader implements LrListReader.LrConfigListReader<Static, StaticKey, StaticBuilder> {
 
-    private static final String SH_IP_STATIC_ROUTE = "sh run | include ip route|ipv6 route";
+    private static final String SH_IP_STATIC_ROUTE = "show running-config | include ip route|ipv6 route";
 
     static final Pattern ROUTE_LINE_IP =
             Pattern.compile("ip route (vrf \\S+)?\\s*(?<net>[\\d.]+)\\s*(?<mask>[\\d.]+)\\s*(?<ifc>[A-Z][\\w.]+)?\\s*(?<ip>[\\d]+.[\\d.]+)?\\s*(?<metric>[\\d]+)?.*");

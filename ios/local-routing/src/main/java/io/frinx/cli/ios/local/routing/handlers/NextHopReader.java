@@ -42,8 +42,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, NextHopKey, NextHopBuilder> {
 
-    private static final String SH_IP_STATIC_ROUTE = "sh run | include route %s";
-    private static final String SH_IP_STATIC_ROUTE_VRF = "sh run | include route vrf %s %s";
+    private static final String SH_IP_STATIC_ROUTE = "show running-config | include route %s";
+    private static final String SH_IP_STATIC_ROUTE_VRF = "show running-config | include route vrf %s %s";
 
     private Cli cli;
 

@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class VrfReader implements CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>,
         CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
-    private static final String SH_IP_VRF = "sh run | include ^ip vrf";
+    private static final String SH_IP_VRF = "show running-config | include ^ip vrf";
     private static final Pattern VRF_ID_LINE = Pattern.compile("ip vrf (?<id>[\\S]+).*");
 
     private Cli cli;

@@ -47,7 +47,7 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
         this.cli = cli;
     }
 
-    private static final String SH_RUN_INCLUDE_OSPF = "sh run | include ospf";
+    private static final String SH_RUN_INCLUDE_OSPF = "show running-config | include ospf";
     private static final Pattern OSPF_NO_VRF = Pattern.compile("\\s*router ospf (?<id>[^\\s]+)\\s*");
     private static final Pattern OSPF_VRF = Pattern.compile("\\s*router ospf (?<id>[^\\s]+) vrf (?<vrf>[^\\s]+)\\s*");
 

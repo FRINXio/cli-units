@@ -41,7 +41,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_SUMM = "sh run | include ^router bgp|^ *address-family|^ *bgp router-id";
+    private static final String SH_SUMM = "show running-config | include ^router bgp|^ *address-family|^ *bgp router-id";
     private static final Pattern AS_PATTERN = Pattern.compile("router bgp (?<as>\\S*).*");
     private static final Pattern ROUTER_ID_PATTERN_GLOBAL = Pattern.compile("\\s*router bgp (?<as>\\S*)\\s+bgp router-id (?<routerId>\\S*).*");
     private static final Pattern ROUTER_ID_PATTERN = Pattern.compile("\\s*address-family (?<family>\\S*) vrf (?<vrf>\\S*)\\s+bgp router-id (?<routerId>\\S*).*");

@@ -58,7 +58,7 @@ public class BgpTableConnectionReader implements
         CompositeListReader.Child<TableConnection, TableConnectionKey, TableConnectionBuilder> {
 
     static final String SH_BGP_REDIS =
-            "sh run | include ^router bgp|^ address-family|^ *redistribute";
+            "show running-config | include ^router bgp|^ address-family|^ *redistribute";
 
     static final Pattern FAMILY_LINE =
             Pattern.compile("\\s*address-family (?<family>\\S+).*redistribute (?<protocol>\\S+) (?<protocolId>\\S+).*");

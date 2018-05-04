@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_OSPF_IFC_COST = "sh run interface %s | include ^ ip ospf cost";
+    private static final String SHOW_OSPF_IFC_COST = "show running-config interface %s | include ^ ip ospf cost";
 
     private final Cli cli;
 

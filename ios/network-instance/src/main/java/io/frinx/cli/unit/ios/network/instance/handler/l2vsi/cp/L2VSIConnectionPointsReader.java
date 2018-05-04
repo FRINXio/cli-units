@@ -50,7 +50,7 @@ public class L2VSIConnectionPointsReader implements L2vsiReader.L2vsiConfigReade
 
     static final String REMOTE_POINT_ID = "remote";
 
-    private static final String SH_L2_VFI_IFC = "sh run | include ^interface|^ service instance|^  bridge-domain";
+    private static final String SH_L2_VFI_IFC = "show running-config | include ^interface|^ service instance|^  bridge-domain";
     private static final Pattern L2_VFI_IFC_LINE = Pattern.compile("interface (?<interface>\\S+)\\s+service instance (?<sId>\\S+) ethernet\\s+bridge-domain (?<bd>\\S+).*");
 
     private final Cli cli;

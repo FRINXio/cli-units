@@ -56,7 +56,7 @@ public class OspfTableConnectionReader implements
         CompositeListReader.Child<TableConnection, TableConnectionKey, TableConnectionBuilder> {
 
     static final String SH_OSPF_REDIS =
-            "sh run | include ^router ospf|^ redistribute";
+            "show running-config | include ^router ospf|^ redistribute";
 
     static final Pattern REDIS_LINE =
             Pattern.compile(".*redistribute (?<protocol>\\S+) (?<protocolId>\\S+).*");
