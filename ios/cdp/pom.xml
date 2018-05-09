@@ -65,6 +65,11 @@
             <version>${cli.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>ios-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
         </dependency>

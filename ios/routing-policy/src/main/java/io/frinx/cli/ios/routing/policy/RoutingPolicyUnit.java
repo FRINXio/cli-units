@@ -16,6 +16,7 @@
 
 package io.frinx.cli.ios.routing.policy;
 
+import static io.frinx.cli.ios.IosDevices.IOS_ALL;
 import static io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG;
 
 import com.google.common.collect.Sets;
@@ -52,10 +53,6 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class RoutingPolicyUnit implements TranslateUnit {
 
-    private static final Device IOS_ALL = new DeviceIdBuilder()
-            .setDeviceType("ios")
-            .setDeviceVersion("*")
-            .build();
     private static final InstanceIdentifier<DefinedSets2> DEFINED_SETS_1 =
         IIDs.RO_DEFINEDSETS.augmentation(DefinedSets2.class);
     private static final InstanceIdentifier<BgpDefinedSets> BGP_DEFINED_SETS =

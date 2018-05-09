@@ -54,9 +54,15 @@
         <!--<bundle>mvn:io.frinx.cli/ios-essential-unit/{{VERSION}}</bundle>-->
     <!--</feature>-->
 
+    <feature name='cli-southbound-unit-ios-utils' version='${project.version}'>
+        <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <bundle>mvn:io.frinx.cli/ios-utils/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-ios-interfaces' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-interface-unit/{{VERSION}}</bundle>
     </feature>
@@ -64,6 +70,7 @@
     <feature name='cli-southbound-unit-ios-bgp' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-bgp-unit/{{VERSION}}</bundle>
     </feature>
@@ -75,49 +82,58 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-bgp</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-local-routing</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-ospf' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-ospf-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-cdp' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-cdp-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-local-routing' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-local-routing-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-routing-policy' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-routing-policy-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-lldp' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-lldp-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-rib' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-rib-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-platform' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-platform-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-configuration-metadata' version='${project.version}'>
         <feature version='${project.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-configuration-metadata-unit/{{VERSION}}</bundle>
     </feature>
 
