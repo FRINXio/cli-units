@@ -117,6 +117,7 @@ public class OspfUnit implements TranslateUnit {
         wRegistry.add(new GenericWriter<>(TIMERS1, new NoopCliWriter<>()));
         wRegistry.add(new GenericWriter<>(MAX_METRIC_TIMERS, new NoopCliWriter<>()));
         wRegistry.add(new GenericWriter<>(MAX_METRIC_TIMER, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TI_MA_CONFIG, new NoopCliWriter<>()));
         wRegistry.addAfter(new GenericWriter<>(CONFIG_IID, new MaxMetricTimerConfigWriter(cli)), IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
 
         wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new NoopCliListWriter<>()));
