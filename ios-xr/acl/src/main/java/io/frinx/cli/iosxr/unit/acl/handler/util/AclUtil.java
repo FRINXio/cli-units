@@ -16,22 +16,9 @@
 
 package io.frinx.cli.iosxr.unit.acl.handler.util;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import com.google.common.base.Preconditions;
-import io.fd.honeycomb.translate.write.WriteContext;
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSets;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSetsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
-import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public abstract class AclUtil {
 
@@ -57,43 +44,4 @@ public abstract class AclUtil {
         );
     }
 
-    private static final AclSets EMPTY_ACLS = new AclSetsBuilder().setAclSet(Collections.emptyList()).build();
-
-    public static void checkAclExists(
-        final InstanceIdentifier<AclSets> aclSetIID,
-        final @Nonnull Config config,
-        final @Nonnull WriteContext writeContext) {
-
-        checkAcls(aclSetIID, config, writeContext);
-    }
-
-    public static void checkAclExists(
-        final InstanceIdentifier<AclSets> aclSetIID,
-        final @Nonnull org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.Config config,
-        final @Nonnull WriteContext writeContext) {
-
-        checkAcls(aclSetIID, config, writeContext);
-    }
-
-    private static <T extends DataObject> void checkAcls(
-        final InstanceIdentifier<AclSets> aclSetIID,
-        final @Nonnull T config,
-        final @Nonnull WriteContext writeContext) {
-        Preconditions.checkArgument(config instanceof Config ||
-            config instanceof org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.Config);
-        final String setName;
-        if (config instanceof Config) {
-            setName = ((Config) config).getSetName();
-        } else {
-            setName = ((org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.Config) config).getSetName();
-        }
-
-        // Check acl exists
-        final AclSets aclSets = writeContext.readAfter(aclSetIID).or(EMPTY_ACLS);
-        final List<AclSet> sets = aclSets.getAclSet() == null ? Collections.emptyList() : aclSets.getAclSet();
-        boolean aclSetExists = sets.stream()
-            .map(AclSet::getName)
-            .anyMatch(it -> it.equals(setName));
-        checkArgument(aclSetExists, "Acl: %s does not exist, cannot configure ACLs", setName);
-    }
 }

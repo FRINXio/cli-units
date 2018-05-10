@@ -185,10 +185,9 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
             commandVars.acl_icmp_msg_type =
                 entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString();
         }
-        commandVars.acl_src_addr = Preconditions.checkNotNull(entry.getIpv4().getConfig().getSourceAddress()).getValue();
-        commandVars.acl_dst_addr = Preconditions.checkNotNull(entry.getIpv4().getConfig().getDestinationAddress()).getValue();
-        commandVars.acl_protocol = Preconditions.checkNotNull(
-                formatProtocol(entry.getIpv4().getConfig().getProtocol().getIdentityref(), commandVars.type));
+        commandVars.acl_src_addr = entry.getIpv4().getConfig().getSourceAddress().getValue();
+        commandVars.acl_dst_addr = entry.getIpv4().getConfig().getDestinationAddress().getValue();
+        commandVars.acl_protocol = formatProtocol(entry.getIpv4().getConfig().getProtocol().getIdentityref(), commandVars.type);
     }
 
     private void processIpv6(AclEntry entry, MaxMetricCommandDTO commandVars) {
@@ -202,10 +201,9 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
             commandVars.acl_icmp_msg_type =
                 entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString();
         }
-        commandVars.acl_src_addr = Preconditions.checkNotNull(entry.getIpv6().getConfig().getSourceAddress()).getValue();
-        commandVars.acl_dst_addr = Preconditions.checkNotNull(entry.getIpv6().getConfig().getDestinationAddress()).getValue();
-        commandVars.acl_protocol = Preconditions.checkNotNull(
-                formatProtocol(entry.getIpv6().getConfig().getProtocol().getIdentityref(), commandVars.type));
+        commandVars.acl_src_addr = entry.getIpv6().getConfig().getSourceAddress().getValue();
+        commandVars.acl_dst_addr = entry.getIpv6().getConfig().getDestinationAddress().getValue();
+        commandVars.acl_protocol = formatProtocol(entry.getIpv6().getConfig().getProtocol().getIdentityref(), commandVars.type);
     }
 
     private void processTransport(AclEntry entry, MaxMetricCommandDTO commandVars) {

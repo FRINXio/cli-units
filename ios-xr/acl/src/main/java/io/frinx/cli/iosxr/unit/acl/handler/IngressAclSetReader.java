@@ -22,7 +22,6 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
-import io.frinx.cli.iosxr.unit.acl.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.iosxr.unit.acl.handler.util.NameTypeEntry;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -110,8 +109,6 @@ public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, I
                                       @Nonnull IngressAclSetBuilder ingressAclSetBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
-        InterfaceCheckUtil.checkInterface(readContext, interfaceName);
-
         final String setName = instanceIdentifier.firstKeyOf(IngressAclSet.class).getSetName();
 
         final String readCommand = f(IngressAclSetConfigReader.SH_ACL_INTF, interfaceName);

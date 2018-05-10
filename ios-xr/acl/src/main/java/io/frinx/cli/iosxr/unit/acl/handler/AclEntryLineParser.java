@@ -15,8 +15,7 @@
  */
 package io.frinx.cli.iosxr.unit.acl.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.Arrays;
@@ -94,7 +93,7 @@ public class AclEntryLineParser {
 
     static AclEntry parseLine(final AclEntryBuilder builder, String line, Class<? extends ACLTYPE> aclType) {
 
-        checkArgument(ACLIPV4.class.equals(aclType) || ACLIPV6.class.equals(aclType),
+        Preconditions.checkArgument(ACLIPV4.class.equals(aclType) || ACLIPV6.class.equals(aclType),
                 "Unsupported ACL type" + aclType);
         Queue<String> words = Lists.newLinkedList(Arrays.asList(line.split("\\s")));
         long sequenceId = Long.parseLong(words.poll());
@@ -307,7 +306,7 @@ public class AclEntryLineParser {
      */
     private static Entry<Integer, Integer> parseTTLRange(Queue<String> words) {
         String ttl = words.poll();
-        checkArgument("ttl".equals(ttl));
+        Preconditions.checkArgument("ttl".equals(ttl));
         String keyword = words.poll();
         int num = Integer.parseInt(words.poll());
         switch (keyword) {
