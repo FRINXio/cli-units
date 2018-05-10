@@ -41,7 +41,7 @@ public class InterfaceReader implements CliOperListReader<Interface, InterfaceKe
         this.cli = cli;
     }
 
-    private static final String SH_CDP_INTER = "sh cdp inter";
+    private static final String SH_CDP_INTER = "show cdp interface";
 
     @Nonnull
     @Override

@@ -42,10 +42,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NextHopStateReader implements LrReader.LrOperReader<State, StateBuilder> {
 
-    private static final String SHOW_IP_STATIC_ROUTE_NETWORK = "sh ip static route %s | include %s";
-    private static final String SHOW_IP_STATIC_ROUTE_NETWORK_IP6 = "sh ipv6 static %s | include %s";
-    private static final String SHOW_IP_STATIC_ROUTE_VRF_NETWORK = "sh ip static route vrf %s %s | include %s";
-    private static final String SHOW_IP_STATIC_ROUTE_VRF_NETWORK_IP6 = "sh ipv6 static vrf %s %s | include %s";
+    private static final String SHOW_IP_STATIC_ROUTE_NETWORK = "show ip static route %s | include %s";
+    private static final String SHOW_IP_STATIC_ROUTE_NETWORK_IP6 = "show ipv6 static %s | include %s";
+    private static final String SHOW_IP_STATIC_ROUTE_VRF_NETWORK = "show ip static route vrf %s %s | include %s";
+    private static final String SHOW_IP_STATIC_ROUTE_VRF_NETWORK_IP6 = "show ipv6 static vrf %s %s | include %s";
 
     private static final Pattern METRIC_LINE = Pattern.compile(".*\\[(?<metric>\\d+)/\\d+].*");
     private static final Pattern DISTANCE_LINE = Pattern.compile(".*distance (?<metric>\\d+).*");

@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ComponentStateReader implements CliOperReader<State, StateBuilder> {
 
-    private static final String SH_MODULE_SINGLE = "sh module %s";
+    private static final String SH_MODULE_SINGLE = "show module %s";
 
     private final Cli cli;
 

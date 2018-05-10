@@ -112,7 +112,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
         Endpoint remote = getRemote(endpoint1, endpoint2);
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "conf t",
+                "configure terminal",
                 f("pseudowire-class %s", netName),
                 "encapsulation mpls",
                 "exit",
@@ -137,7 +137,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(getLocal(endpoint1, endpoint2));
         blockingDeleteAndRead(cli, id,
-                "conf t",
+                "configure terminal",
                 f("no pseudowire-class %s", netName),
                 f("interface %s", ifc1),
                 "no xconnect",
@@ -152,7 +152,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint1);
         L2P2PConnectionPointsReader.InterfaceId ifc2 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint2);
         String output = blockingWriteAndRead(cli, id, dataAfter,
-                "conf t",
+                "configure terminal",
                 f("connect %s %s %s interworking ethernet", netName, ifc1, ifc2),
                 "end");
 
@@ -162,7 +162,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
     private void deleteLocalConnect(InstanceIdentifier<ConnectionPoints> id) throws WriteFailedException.DeleteFailedException {
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
         blockingDeleteAndRead(cli, id,
-                "conf t",
+                "configure terminal",
                 f("no connect %s", netName),
                 "end");
     }

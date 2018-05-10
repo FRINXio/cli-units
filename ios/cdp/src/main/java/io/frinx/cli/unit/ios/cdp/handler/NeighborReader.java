@@ -42,7 +42,7 @@ public class NeighborReader implements CliOperListReader<Neighbor, NeighborKey, 
         this.cli = cli;
     }
 
-    static final String SH_CDP_NEIGH = "sh cdp neighbors %s detail | include Device ID|Interface";
+    static final String SH_CDP_NEIGH = "show cdp neighbors %s detail | include Device ID|Interface";
 
     @Nonnull
     @Override

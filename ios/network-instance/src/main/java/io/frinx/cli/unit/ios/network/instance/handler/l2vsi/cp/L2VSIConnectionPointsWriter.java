@@ -96,7 +96,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         // FIXME check vfi not in use
 
         blockingWriteAndRead(cli, id, dataAfter,
-                "conf t",
+                "configure terminal",
                 f("l2 vfi %s autodiscovery", netName),
                 f("vpn id %s", remoteEndpoint.getRemote().getConfig().getVirtualCircuitIdentifier()),
                 f("bridge-domain %s", bdIndex),
@@ -129,7 +129,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
 
         blockingWriteAndRead(cli, id, dataBefore,
-                "conf t",
+                "configure terminal",
                 f("no l2 vfi %s autodiscovery", netName),
                 "end");
     }
@@ -140,7 +140,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         if (endpoint.getLocal().getConfig().getSubinterface() == null) {
             // TODO check service instance not in use
             blockingWriteAndRead(cli, id, dataAfter,
-                            "conf t",
+                            "configure terminal",
                             f("interface %s", ifc1.toParentIfcString()),
                             f("service instance %s ethernet", cpId),
                             "encapsulation untagged",
@@ -149,7 +149,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         } else {
             // TODO check service instance not in use
             blockingWriteAndRead(cli, id, dataAfter,
-                            "conf t",
+                            "configure terminal",
                             f("interface %s", ifc1.toParentIfcString()),
                             f("service instance %s ethernet", cpId),
                             f("encapsulation dot1q %s", endpoint.getLocal().getConfig().getSubinterface()),
@@ -161,11 +161,10 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
 
     private void deleteLocal(String cpId, Endpoint endpoint, InstanceIdentifier<ConnectionPoints> id, ConnectionPoints dataBefore) throws WriteFailedException.CreateFailedException {
 
-        String netName = id.firstKeyOf(NetworkInstance.class).getName();
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint);
 
         blockingWriteAndRead(cli, id, dataBefore,
-                        "conf t",
+                        "configure terminal",
                         f("interface %s", ifc1.toParentIfcString()),
                         f("no service instance %s ethernet", cpId),
                         "end");

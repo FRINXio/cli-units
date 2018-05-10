@@ -40,7 +40,7 @@ public class ComponentReader implements CliOperListReader<Component, ComponentKe
         this.cli = cli;
     }
 
-    private static final String SH_MODULE = "sh module";
+    private static final String SH_MODULE = "show module";
     static final Pattern SEPARATOR = Pattern.compile("^\\s+Mod\\s+", Pattern.MULTILINE);
     static final Pattern LINE = Pattern.compile("\\s*(?<index>\\d+)\\s+(?<ports>\\d+)\\s+(?<type>.+)\\s+(?<model>\\S+)\\s+(?<serial>\\S+)\\s*");
     static final Pattern LINE_HW_SW_FW = Pattern.compile("\\s*(?<index>\\d+)\\s+(?<macs>.+)\\s+(?<hw>\\S+)\\s+(?<fw>\\S+)\\s+(?<sw>\\S+)\\s+(?<status>\\S+)\\s*");

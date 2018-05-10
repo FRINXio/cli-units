@@ -39,7 +39,7 @@ import javax.annotation.Nonnull;
 public class GlobalStateReader implements BgpReader.BgpOperReader<State, StateBuilder> {
 
     private Cli cli;
-    static final String SH_BGP= "sh bgp summ";
+    static final String SH_BGP= "show bgp summary";
     static final Pattern CONFIG_LINE = Pattern.compile("BGP router identifier (?<id>.+), local AS number (?<as>.+)");
 
     public GlobalStateReader(Cli cli) {
