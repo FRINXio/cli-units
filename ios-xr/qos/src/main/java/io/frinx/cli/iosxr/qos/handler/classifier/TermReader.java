@@ -69,11 +69,16 @@ public class TermReader implements CliConfigListReader<Term, TermKey, TermBuilde
         String name = instanceIdentifier.firstKeyOf(Classifier.class).getName();
         String output = blockingRead(f(SH_TERMS_ALL, name), cli, instanceIdentifier, readContext);
 
+        // class-default will always have only one term, let it be "all"
+        // do not read anything, not needed
+        if (name.contains(ClassifierReader.DEFAULT_CLASS_SUFFIX)) {
+            return Lists.newArrayList(new TermKey(ClassMapType.MATCH_ALL.getStringValue()));
+        }
+
         if (output.equals("")) {
             output = blockingRead(f(SH_TERMS_ANY, name), cli, instanceIdentifier, readContext);
         }
         return getTermKeys(output);
-
     }
 
     @VisibleForTesting

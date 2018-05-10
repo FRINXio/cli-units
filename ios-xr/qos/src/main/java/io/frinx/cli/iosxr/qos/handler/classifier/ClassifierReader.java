@@ -20,8 +20,10 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.qos.handler.scheduler.SchedulerPolicyReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -37,6 +39,7 @@ public class ClassifierReader implements CliConfigListReader<Classifier, Classif
 
     static final String SH_CLASS_MAPS = "show running-config class-map | include ^class-map";
     private static final Pattern CLASSIFIER_NAME_LINE = Pattern.compile("class-map match-(any|all) (?<name>.+)");
+    static final String DEFAULT_CLASS_SUFFIX = "-default";
 
     private Cli cli;
 
@@ -47,14 +50,26 @@ public class ClassifierReader implements CliConfigListReader<Classifier, Classif
     @Nonnull
     @Override
     public List<ClassifierKey> getAllIds(@Nonnull InstanceIdentifier<Classifier> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+        List<ClassifierKey> allKeys = new ArrayList<>();
+        // read match class-maps
         String output = blockingRead(SH_CLASS_MAPS, cli, instanceIdentifier, readContext);
-        return getClassifierKeys(output);
+        allKeys.addAll(getClassifierMapKeys(output));
+        // read class-default
+        output = blockingRead(SchedulerPolicyReader.SH_POLICY_MAPS, cli, instanceIdentifier, readContext);
+        allKeys.addAll(getClassifierDefaultKeys(output));
+        return allKeys;
     }
 
     @VisibleForTesting
-    static List<ClassifierKey> getClassifierKeys(String output) {
+    static List<ClassifierKey> getClassifierMapKeys(String output) {
         return ParsingUtils.parseFields(output, 0, CLASSIFIER_NAME_LINE::matcher,
                 matcher -> matcher.group("name"), ClassifierKey::new);
+    }
+
+    @VisibleForTesting
+    static List<ClassifierKey> getClassifierDefaultKeys(String output) {
+        return ParsingUtils.parseFields(output, 0, SchedulerPolicyReader.POLICY_NAME_LINE::matcher,
+                matcher -> matcher.group("name"), n -> new ClassifierKey(n + DEFAULT_CLASS_SUFFIX));
     }
 
     @Override

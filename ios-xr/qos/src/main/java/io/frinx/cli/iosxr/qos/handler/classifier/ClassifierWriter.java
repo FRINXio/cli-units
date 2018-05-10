@@ -83,7 +83,7 @@ public class ClassifierWriter implements CliWriter<Classifier> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Classifier> instanceIdentifier, @Nonnull Classifier classifier, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
-        if (classifier.getTerms() == null || classifier.getTerms().getTerm() == null) {
+        if (classifier.getTerms() == null || classifier.getTerms().getTerm() == null || className.endsWith(ClassifierReader.DEFAULT_CLASS_SUFFIX)) {
             return;
         }
         // first determine class-map type by counting terms
