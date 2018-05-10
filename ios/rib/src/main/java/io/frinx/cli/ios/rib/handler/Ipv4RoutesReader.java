@@ -39,8 +39,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class Ipv4RoutesReader implements CliOperListReader<Route, RouteKey, RouteBuilder> {
 
-    private static final String SH_IP_BGP = "sh ip bgp";
-    private static final String SH_IP_BGP_PREFIX = "sh ip bgp | section %s";
+    private static final String SH_IP_BGP = "show ip bgp";
+    private static final String SH_IP_BGP_PREFIX = "show ip bgp | section %s";
     private static final Pattern ROUTE_LINE = Pattern.compile("(?<statusCodes>[sdh\\*>irSmbfxac\\s]+) (?<prefix>[\\S]+) (?<nextHop>.+) (?:.*) (?<origin>[ie\\?])");
     private static final String PATH_ID = "0";
 

@@ -51,7 +51,6 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
 
     private static final String GROUP_MASK = "mask";
     private static final String GROUP_IP = "net";
-    private static final String GROUP_VRF = "vrf";
 
     private Cli cli;
 
