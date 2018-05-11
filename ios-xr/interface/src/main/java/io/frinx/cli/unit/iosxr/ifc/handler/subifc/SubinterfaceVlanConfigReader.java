@@ -62,7 +62,7 @@ public class SubinterfaceVlanConfigReader implements CliConfigReader<Config, Con
         parseVlanTag(output, builder);
     }
 
-    private static final Pattern VLAN_TAG_LINE = Pattern.compile("encapsulation dot1Q (?<tag>[0-9]+)");
+    private static final Pattern VLAN_TAG_LINE = Pattern.compile("encapsulation dot1q (?<tag>[0-9]+)");
 
     @VisibleForTesting
     static void parseVlanTag(String output, ConfigBuilder builder) {
