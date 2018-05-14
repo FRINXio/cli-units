@@ -40,20 +40,11 @@ public class AggregateConfigWriter implements CliWriter<Config> {
         String ifcName = id.firstKeyOf(Interface.class).getName();
 
         checkIfcType(ifcName);
-        validateConfig(dataAfter);
 
         blockingWriteAndRead(cli, id, dataAfter,
                 f("interface %s", ifcName),
                 f("bundle minimum-active links %s", dataAfter.getMinLinks()),
                 "root");
-    }
-
-    private static void validateConfig(Config config)  {
-        Integer minLinks = config.getMinLinks();
-
-        Preconditions.checkArgument(minLinks == null || minLinks >= 1 && minLinks <= 64,
-                "The minimum number of member interfaces %s is not in range of 1 to 64",
-                minLinks);
     }
 
     private static void checkIfcType(String ifcName) {

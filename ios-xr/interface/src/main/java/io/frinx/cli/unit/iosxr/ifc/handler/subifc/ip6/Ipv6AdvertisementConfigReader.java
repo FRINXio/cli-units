@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.TypedReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
@@ -37,6 +38,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.Identifier;
@@ -71,10 +73,11 @@ public class Ipv6AdvertisementConfigReader implements TypedReader<Config, Config
                                    final InstanceIdentifier<Config> instanceIdentifier) {
         final InterfaceKey interfaceKey = instanceIdentifier.firstKeyOf(Interface.class);
         final SubinterfaceKey subinterfaceKey = instanceIdentifier.firstKeyOf(Subinterface.class);
+        final Class<? extends InterfaceType> infType = InterfaceConfigReader.parseType(interfaceKey.getName());
 
         return interfaceKey != null && subinterfaceKey != null &&
-            Ipv6CheckUtil.checkParentInterfaceType(interfaceKey.getName(), EthernetCsmacd.class, Ieee8023adLag.class) &&
-            Ipv6CheckUtil.checkSubInterfaceId(subinterfaceKey.getIndex(), ZERO_SUBINTERFACE_ID);
+                Ipv6CheckUtil.checkTypes(infType, EthernetCsmacd.class, Ieee8023adLag.class) &&
+                subinterfaceKey.getIndex() == ZERO_SUBINTERFACE_ID;
     }
 
     @VisibleForTesting

@@ -44,8 +44,6 @@ public class BfdConfigWriter implements CliWriter<Config> {
 
         checkIfcType(ifcName);
 
-        validateConfig(dataAfter);
-
         IpAddress destinationAddress = dataAfter.getDestinationAddress();
         Ipv4Address destinationIpv4 = destinationAddress != null ? destinationAddress.getIpv4Address() : null;
 
@@ -57,18 +55,6 @@ public class BfdConfigWriter implements CliWriter<Config> {
                 dataAfter.getMinInterval() != null ? f("bfd address-family ipv4 minimum-interval %s", dataAfter.getMinInterval()) : "no bfd address-family ipv4 minimum-interval",
                 destinationIpv4 != null ? f("bfd address-family ipv4 destination %s", destinationIpv4.getValue()) : "no bfd address-family ipv4 destination",
                 "root");
-    }
-
-    private static void validateConfig(Config dataAfter) {
-        Long minInterval = dataAfter.getMinInterval();
-        Preconditions.checkArgument(minInterval == null || minInterval <= 30000L && minInterval >= 3,
-                "Minimum interval value %s for bfd session is not in the range of 3 to 30000",
-                minInterval);
-
-        Long multiplier = dataAfter.getMultiplier();
-        Preconditions.checkArgument(multiplier == null || multiplier <= 50L && multiplier >= 2L,
-                "Multiplier value %s for bfd session is not in the range of 2 to 50", multiplier);
-
     }
 
     private static void checkIfcType(String ifcName) {

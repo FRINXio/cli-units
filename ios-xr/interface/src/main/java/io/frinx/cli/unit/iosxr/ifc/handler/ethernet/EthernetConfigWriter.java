@@ -83,8 +83,6 @@ public class EthernetConfigWriter implements CliWriter<Config> {
                     "Missing agregate-id, cannot configure LACP mode on non LAG enabled interface %s", ifcName);
         }
 
-        // TODO we should probably check if the logical aggregate interface
-        // exists
         blockingWriteAndRead(cli, id, dataAfter,
                 fT(IFC_ETHERNET_CONFIG_TEMPLATE,
                         "ifc_name", ifcName,

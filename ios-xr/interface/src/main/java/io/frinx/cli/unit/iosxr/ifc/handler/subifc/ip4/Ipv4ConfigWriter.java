@@ -16,9 +16,9 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -70,7 +70,7 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     private static String getIfcName(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
         Long subIfcIndex = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
-        checkArgument(subIfcIndex == ZERO_SUBINTERFACE_ID, "Only subinterface " + ZERO_SUBINTERFACE_ID + "  can have IP");
+        Preconditions.checkArgument(subIfcIndex == ZERO_SUBINTERFACE_ID, "Only subinterface " + ZERO_SUBINTERFACE_ID + "  can have IP");
         return ifcName;
     }
 

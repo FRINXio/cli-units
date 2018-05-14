@@ -74,13 +74,6 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
 
         // check if we have valid parameter combination
         checkParamCombination(halfLife, reuseThreshold, suppressThreshold, maxSuppressTime, dataAfter);
-
-        // check parameter ranges
-        checkParamRanges(halfLife, reuseThreshold, suppressThreshold, maxSuppressTime);
-
-        // check if reuse is less than suppress
-        Preconditions.checkArgument(suppressThreshold == null || reuseThreshold < suppressThreshold,
-                "Reuse threshold is not less than suppress threshold");
     }
 
     private static void checkParamCombination(Long halfLife, Long reuseThreshold, Long suppressThreshold,
@@ -97,23 +90,6 @@ public class InterfaceDampingConfigWriter implements CliWriter<Config> {
         Preconditions.checkArgument(validEmptyCombination || validJustHalfLifeSetCombination
                 || validAllSetCombination, "Not valid damping configuration combination %s."
                 + "Valid damping configuration combinations: [ half-life [ reuse suppress max-suppress ] ]", config);
-    }
-
-    private static void checkParamRanges(Long halfLife, Long reuseThreshold, Long suppressThreshold,
-                                         Long maxSuppressTime) {
-        Preconditions.checkArgument(halfLife == null || halfLife >= 1 && halfLife <= 45,
-                "Decay half life value %s is not in the range of 1 to 45", halfLife);
-
-        Preconditions.checkArgument(reuseThreshold == null || reuseThreshold >= 1 && reuseThreshold <= 20000,
-                "Reuse threshold value % is not in the range of 1 to 20000", reuseThreshold);
-
-        Preconditions.checkArgument(
-                suppressThreshold == null || suppressThreshold >= 1 && suppressThreshold <= 20000,
-                "Max-suppress threshold value % is not in the range of 1 to 20000",
-                suppressThreshold);
-
-        Preconditions.checkArgument(maxSuppressTime == null || maxSuppressTime >= 1 && maxSuppressTime <= 255,
-                "Max-suppress-time value %s is not in the range of 1 to 255", maxSuppressTime);
     }
 
     @Override

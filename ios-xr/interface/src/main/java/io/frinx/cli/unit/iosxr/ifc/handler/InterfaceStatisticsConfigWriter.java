@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler;
 
-import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -38,7 +37,7 @@ public class InterfaceStatisticsConfigWriter implements CliWriter<Config> {
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
 
-        if (validateConfig(dataAfter)) {
+        if (dataAfter.getLoadInterval() != null) {
             blockingWriteAndRead(cli, id, dataAfter,
                     f("interface %s", ifcName),
                     f("load-interval %s", dataAfter.getLoadInterval()),
@@ -46,28 +45,11 @@ public class InterfaceStatisticsConfigWriter implements CliWriter<Config> {
         }
     }
 
-    private static boolean validateConfig(Config dataAfter) {
-        Long loadInterval = dataAfter.getLoadInterval();
-        if (loadInterval == null) {
-            return false;
-        }
-
-        // check range
-        Preconditions.checkArgument(loadInterval >= 0 && loadInterval <= 600,
-                "load-interval value %s is not in the range of 0 and 600", loadInterval);
-
-        // check if it is multiple of 30
-        Preconditions.checkArgument(loadInterval % 30 == 0,
-                "load-interval value %s is not multiple of 30", loadInterval);
-
-        return true;
-    }
-
     @Override
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
-        if (validateConfig(dataAfter)) {
+        if (dataAfter.getLoadInterval() != null) {
             writeCurrentAttributes(id, dataAfter, writeContext);
         } else {
             deleteCurrentAttributes(id, dataBefore, writeContext);

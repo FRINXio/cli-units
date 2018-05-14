@@ -29,12 +29,6 @@ abstract class Ipv6CheckUtil {
     static final String CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX = "Parent interface should be ";
     static final String CHECK_SUBINTERFACE_MSG_PREFIX = "Expected subinterface ";
 
-    static boolean checkParentInterfaceType(final String ifcName, final @Nonnull Class... types) {
-        final Class<? extends InterfaceType> infType = InterfaceConfigReader.parseType(ifcName);
-
-        return checkTypes(infType, types);
-    }
-
     static void checkParentInterfaceTypeWithExeption(final String ifcName, final @Nonnull Class... types) {
         final Class<? extends InterfaceType> infType = InterfaceConfigReader.parseType(ifcName);
 
@@ -45,15 +39,11 @@ abstract class Ipv6CheckUtil {
             Arrays.stream(types).map(Class::getCanonicalName).collect(Collectors.toList()));
     }
 
-    private static boolean checkTypes(final Class<? extends InterfaceType> infType, final @Nonnull Class[] types) {
+    static boolean checkTypes(final Class<? extends InterfaceType> infType, final @Nonnull Class... types) {
         return Lists.newArrayList(types).stream().anyMatch(type -> type.equals(infType));
     }
 
-    public static boolean checkSubInterfaceId(final long subIfcIndex, final long expectedSubInterfaceIndex) {
-        return subIfcIndex == expectedSubInterfaceIndex;
-    }
-
-    public static void checkSubInterfaceIdWithExeption(final long subIfcIndex, final long expectedSubInterfaceIndex) {
+    static void checkSubInterfaceIdWithExeption(final long subIfcIndex, final long expectedSubInterfaceIndex) {
         Preconditions.checkArgument(subIfcIndex == expectedSubInterfaceIndex,
             CHECK_SUBINTERFACE_MSG_PREFIX + "is %s", expectedSubInterfaceIndex);
     }
