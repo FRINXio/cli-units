@@ -57,6 +57,7 @@ import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6AdvertisementConfigRea
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6AdvertisementConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6ConfigWriter;
+import io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
@@ -79,6 +80,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoStatsAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.statistics.top.Statistics;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.statistics.top.StatisticsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.verify.unicast.source.reachable.via.top.VerifyUnicastSourceReachableVia;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.Ethernet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.EthernetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.$YangModuleInfoImpl;
@@ -217,6 +219,17 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
     private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config> IFC_ETH_CONFIG_ROOT_ID =
             InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config.class);
 
+    // RPF check IIDs
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.Interface1> RPF_AUG_IID =
+        IIDs.IN_INTERFACE.augmentation(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.Interface1.class);
+    private static final InstanceIdentifier<VerifyUnicastSourceReachableVia> RPF_IID =
+        IIDs.IN_INTERFACE.augmentation(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.Interface1.class)
+        .child(VerifyUnicastSourceReachableVia.class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv4.verify.Ipv4> RPF_IPV4_SUBTREE_IID =
+        InstanceIdentifier.create(VerifyUnicastSourceReachableVia.class).child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv4.verify.Ipv4.class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv6.verify.Ipv6> RPF_IPV6_SUBTREE_IID =
+        InstanceIdentifier.create(VerifyUnicastSourceReachableVia.class).child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv6.verify.Ipv6.class);
+
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
         wRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
@@ -328,6 +341,13 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                 IFC_ETH_CONFIG_ROOT_ID.augmentation(Config1.class),
                 IFC_ETH_CONFIG_ROOT_ID.augmentation(LacpEthConfigAug.class)),
                 new GenericConfigReader<>(IFC_ETHERNET_CONFIG_ID, new EthernetConfigReader(cli)));
+
+        // RPF check
+        rRegistry.addStructuralReader(RPF_AUG_IID, org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.Interface1Builder.class);
+        rRegistry.subtreeAdd(
+            Sets.newHashSet(RPF_IPV4_SUBTREE_IID, RPF_IPV6_SUBTREE_IID),
+            new GenericConfigReader<>(RPF_IID, new RpfCheckReader(cli))
+        );
     }
 
     @Override
