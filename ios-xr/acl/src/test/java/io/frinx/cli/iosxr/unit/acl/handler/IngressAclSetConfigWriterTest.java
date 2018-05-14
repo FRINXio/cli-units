@@ -45,7 +45,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L2vlan;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -73,23 +72,6 @@ public class IngressAclSetConfigWriterTest {
             TestData.ACL_CONFIG_IID, TestData.ACL_CONFIG, context);
 
         Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(Mockito.any());
-    }
-
-    @Test
-    public void writeAclSet_noLAGInterface() throws WriteFailedException {
-        presetWriteContext(context, TestData.INTERFACE_WRONG_TYPE, TestData.EGRESS_ACL_SETS_INIT_EMPTY, TestData.INGRESS_ACL_SETS_INIT);
-
-        final IngressAclSetConfigWriter writer = new IngressAclSetConfigWriter(cliMock);
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage(CoreMatchers.allOf(
-            CoreMatchers.containsString("Parent interface should be"),
-            CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
-            CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
-        ));
-
-        writer.writeCurrentAttributes(
-            TestData.ACL_CONFIG_IID, TestData.ACL_CONFIG, context);
     }
 
     @Test

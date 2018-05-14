@@ -16,15 +16,14 @@
 
 package io.frinx.cli.iosxr.unit.acl.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
-import io.frinx.cli.iosxr.unit.acl.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Collection;
@@ -35,8 +34,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSets;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.top.Acl;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EgressAclSetConfigWriter implements CliWriter<Config> {
@@ -51,12 +48,8 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
-        InterfaceCheckUtil.checkInterface(writeContext, interfaceName);
-        final InstanceIdentifier<AclSets> aclSetIID = RWUtils.cutId(instanceIdentifier, Acl.class).child(AclSets.class);
-        AclUtil.checkAclExists(aclSetIID, config, writeContext);
-
         final Class<? extends ACLTYPE> aclType = config.getType();
-        checkArgument(aclType != null, "Missing acl type");
+        Preconditions.checkArgument(aclType != null, "Missing acl type");
 
         checkEgressAclSetConfigExists(instanceIdentifier, aclType, writeContext, interfaceName);
 
@@ -118,7 +111,7 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
         }
 
         final Class<? extends ACLTYPE> aclType = config.getType();
-        checkArgument(aclType != null, "Missing acl type");
+        Preconditions.checkArgument(aclType != null, "Missing acl type");
 
         final String aclCommand =
             f("no %s access-group %s egress", AclUtil.getStringType(aclType), config.getSetName());

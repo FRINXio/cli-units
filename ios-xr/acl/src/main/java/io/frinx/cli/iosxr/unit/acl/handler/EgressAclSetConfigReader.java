@@ -19,7 +19,6 @@ package io.frinx.cli.iosxr.unit.acl.handler;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.unit.acl.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSet;
@@ -43,8 +42,6 @@ public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigB
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
-        InterfaceCheckUtil.checkInterface(readContext, interfaceName);
-
         final String setName = instanceIdentifier.firstKeyOf(EgressAclSet.class).getSetName();
 
         final String readCommand = f(SH_ACL_INTF, interfaceName);

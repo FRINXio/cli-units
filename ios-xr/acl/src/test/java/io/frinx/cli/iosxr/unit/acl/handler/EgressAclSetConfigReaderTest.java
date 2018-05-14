@@ -26,7 +26,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
 import io.frinx.openconfig.openconfig.acl.IIDs;
 import java.util.concurrent.CompletableFuture;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,7 +42,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L2vlan;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -95,23 +93,6 @@ public class EgressAclSetConfigReaderTest {
 
         assertEquals(TestData.ACL_SET_NAME, aclSetBuilder.getSetName());
         assertEquals(TestData.ACL_TYPE, aclSetBuilder.getType());
-    }
-
-    @Test
-    public void readAclConfig_noLAGInterface() throws ReadFailedException {
-        Mockito.when(context.read(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_WRONG_TYPE));
-
-        final ConfigBuilder aclSetBuilder = new ConfigBuilder();
-        EgressAclSetConfigReader reader = new EgressAclSetConfigReader(cliMock);
-
-        thrown.expectMessage(CoreMatchers.allOf(
-            CoreMatchers.containsString("Parent interface should be"),
-            CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
-            CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
-        ));
-
-        reader.readCurrentAttributes(TestData.ACL_CONFIG_IID, aclSetBuilder, context);
     }
 
     private static class TestData {
