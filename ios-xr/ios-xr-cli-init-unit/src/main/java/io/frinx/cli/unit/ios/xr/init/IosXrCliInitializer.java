@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.ios.xr.init;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.base.Preconditions;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Session;
@@ -165,7 +163,7 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
 
         LOG.debug("{}: Secret not set, using session password as enable password", id);
 
-        checkArgument(context.getCredentials() instanceof LoginPassword,
+        Preconditions.checkArgument(context.getCredentials() instanceof LoginPassword,
                 "%s: Unable to handle credentials type of: %s",
                 id, context.getCredentials());
 

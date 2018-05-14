@@ -29,9 +29,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.logging._interface.config.EnabledLoggingForEvent;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.logging.interfaces.structural.interfaces._interface.Config;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
@@ -49,7 +46,7 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = dataAfter.getInterfaceId().getValue();
 
-        checkLoggingConfig(ifcName, writeContext, true);
+        checkLoggingConfig(ifcName, writeContext);
 
         List<EnabledLoggingForEvent> enabledLoggingForEventList = dataAfter.getEnabledLoggingForEvent();
 
@@ -57,7 +54,7 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
                 ? NO_LOGGING_COMMAND : LOGGING_COMMAND;
 
         if (enabledLoggingForEventList != null && !enabledLoggingForEventList.isEmpty()) {
-            Preconditions.checkArgument(LoggingInterfacesReader.LINK_UP_DOWN_EVENT_LIST.equals(enabledLoggingForEventList),
+            Preconditions.checkArgument(LoggingInterfacesReader.LINK_UP_DOWN_EVENT_LIST.containsAll(enabledLoggingForEventList),
                     "Cannot configure logging events %s for interface %s, only %s event is supported",
                     enabledLoggingForEventList, ifcName, LoggingInterfacesReader.LINK_UP_DOWN_EVENT);
         }
@@ -81,31 +78,16 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = dataBefore.getInterfaceId().getValue();
 
-        // TODO this check is possibly not needed for delete
-        checkLoggingConfig(ifcName, writeContext, false);
-
         blockingDeleteAndRead(cli, id,
                 f("interface %s", ifcName),
                 NO_LOGGING_COMMAND,
                 "root");
     }
 
-    private static void checkLoggingConfig(String ifcName, WriteContext wContext, boolean isWrite) {
+    private static void checkLoggingConfig(String ifcName, WriteContext wContext) {
         InstanceIdentifier<Interface> ifcId = IIDs.INTERFACES.child(Interface.class, new InterfaceKey(ifcName));
-        final Optional<Interface> optionalIfc;
-        if (isWrite) {
-            optionalIfc = wContext.readAfter(ifcId);
-        } else {
-            optionalIfc = wContext.readBefore(ifcId);
-        }
-
+        final Optional<Interface> optionalIfc = wContext.readAfter(ifcId);
         Preconditions.checkArgument(optionalIfc.isPresent(),
                 "Cannot configure logging on non-existent interface %s", ifcName);
-
-        Class<? extends InterfaceType> type = optionalIfc.get().getConfig().getType();
-        
-        Preconditions.checkArgument(Ieee8023adLag.class.equals(type) || SoftwareLoopback.class.equals(type),
-                "Cannot configure logging on ethernet interface %s of type %s, "
-                        + "logging is supported only on Ethernet and LAG interfaces", ifcName, type);
     }
 }
