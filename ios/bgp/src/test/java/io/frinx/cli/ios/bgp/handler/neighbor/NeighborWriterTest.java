@@ -16,9 +16,11 @@
 
 package io.frinx.cli.ios.bgp.handler.neighbor;
 
+import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.NEIGHBOR_VRF_DELETE;
 import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.deleteNeighbor;
 import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.getAfiSafisForNeighbor;
 import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.renderNeighbor;
+import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.renderNeighborAfiRemoval;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliFormatter;
 import io.frinx.cli.unit.utils.CliWriter;
@@ -34,6 +37,7 @@ import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Test;
@@ -102,6 +106,7 @@ public class NeighborWriterTest implements CliFormatter {
                 {"neighbor minimal", N_MINIMAL, null, NMIN_WRITE, null, NMIN_DELETE, EMPTY_BGP_CONFIG, NetworInstance.DEFAULT_NETWORK_NAME},
                 {"neighbor no global policies", N_NO_GLOBAL_POLICIES, null, NGLOBAL_POLICIES_WRITE, null, NGLOBAL_POLICIES_DELETE, EMPTY_BGP_CONFIG, NetworInstance.DEFAULT_NETWORK_NAME},
                 {"neighbor v6 minimal", N6_MINIMAL, null, N6MIN_WRITE, null, N6MIN_DELETE, EMPTY_BGP_CONFIG, NetworInstance.DEFAULT_NETWORK_NAME},
+                {"neighbor afi safi remove", N_ALL, N_ALL_ONEAFI, NALL_WRITE, N_ALL_UPDATE_REMOVE_AFI, NALL_DELETE, EMPTY_BGP_CONFIG, NetworInstance.DEFAULT_NETWORK_NAME},
         });
     }
 
@@ -136,20 +141,29 @@ public class NeighborWriterTest implements CliFormatter {
         doReturn(output).when(cli).executeAndRead(anyString());
         CliWriter writer = spy(new NeighborWriter(cli));
 
+        Map<String, Object> afiSafisForNeighborSource = getAfiSafisForNeighbor(bgpConfig, getAfiSafisForNeighbor(source.getAfiSafis()));
         renderNeighbor(writer, cli, id,
-                source, null, source.getConfig().isEnabled(), null, id.firstKeyOf(NetworkInstance.class), as, getAfiSafisForNeighbor(bgpConfig, getAfiSafisForNeighbor(source.getAfiSafis())),
+                source, null, source.getConfig().isEnabled(), null, id.firstKeyOf(NetworkInstance.class), as, afiSafisForNeighborSource,
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
         String writeRender = getCommands(writer, false, 1);
         Assert.assertEquals(write, writeRender);
 
         if (after != null) {
+            Map<String, Object> afiSafisForNeighborAfter = getAfiSafisForNeighbor(bgpConfig, getAfiSafisForNeighbor(after.getAfiSafis()));
+            Map<String, Object> afiToRemove = Maps.difference(afiSafisForNeighborSource, afiSafisForNeighborAfter).entriesOnlyOnLeft();
+
+            renderNeighborAfiRemoval(writer, cli, id,
+                    after, id.firstKeyOf(NetworkInstance.class), as, afiToRemove, NeighborWriter.getNeighborIp(after.getNeighborAddress()),
+                    NeighborWriter.NEIGHBOR_GLOBAL_DELETE_AFI, NEIGHBOR_VRF_DELETE);
+            String updateAfiSafiRender = getCommands(writer, false, 2);
+
             renderNeighbor(writer, cli, id,
-                    after, source, after.getConfig().isEnabled(), source.getConfig().isEnabled(), id.firstKeyOf(NetworkInstance.class), as, getAfiSafisForNeighbor(bgpConfig, getAfiSafisForNeighbor(after.getAfiSafis())),
+                    after, source, after.getConfig().isEnabled(), source.getConfig().isEnabled(), id.firstKeyOf(NetworkInstance.class), as, afiSafisForNeighborAfter,
                     NeighborWriter.getNeighborIp(after.getNeighborAddress()), NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
-            String updateRender = getCommands(writer, false, 2);
-            Assert.assertEquals(update, updateRender);
+            String updateRender = updateAfiSafiRender + "\n" + getCommands(writer, false, 3);
+            Assert.assertEquals(update, updateRender.trim());
         }
 
         deleteNeighbor(writer, cli, id,
@@ -230,6 +244,15 @@ public class NeighborWriterTest implements CliFormatter {
                     .build())
             .build();
 
+    private static final Neighbor N_ALL_ONEAFI = new NeighborBuilder(N_ALL)
+            .setAfiSafis(new AfiSafisBuilder()
+                    .setAfiSafi(Lists.newArrayList(
+                            new AfiSafiBuilder()
+                                    .setAfiSafiName(IPV6UNICAST.class)
+                                    .build()))
+                    .build())
+            .build();
+
     private static AfiSafis getAfiSafi() {
         return new AfiSafisBuilder()
                 .setAfiSafi(Lists.newArrayList(new AfiSafiBuilder()
@@ -288,6 +311,34 @@ public class NeighborWriterTest implements CliFormatter {
             "exit\n" +
             "end";
 
+    public static final String N_ALL_UPDATE_REMOVE_AFI = "configure terminal\n" +
+            "router bgp 484\n" +
+            "address-family ipv4\n" +
+            "no neighbor 1.2.3.4 activate\n" +
+            "exit\n" +
+            "address-family vpnv4\n" +
+            "no neighbor 1.2.3.4 activate\n" +
+            "exit\n" +
+            "end\n" +
+            "configure terminal\n" +
+            "router bgp 484\n" +
+            "neighbor 1.2.3.4 remote-as 45\n" +
+            "neighbor 1.2.3.4 peer-group group12\n" +
+            "neighbor 1.2.3.4 description descr 1\n" +
+            "neighbor 1.2.3.4 password passwd\n" +
+            "neighbor 1.2.3.4 update-source Loopback0\n" +
+            "neighbor 1.2.3.4 transport connection-mode passive\n" +
+            "neighbor 1.2.3.4 route-map import1 in\n" +
+            "neighbor 1.2.3.4 route-map import2 in\n" +
+            "neighbor 1.2.3.4 route-map export1 out\n" +
+            "neighbor 1.2.3.4 route-map export2 out\n" +
+            "address-family ipv6\n" +
+            "neighbor 1.2.3.4 send-community both\n" +
+            "neighbor 1.2.3.4 route-reflector-client\n" +
+            "neighbor 1.2.3.4 activate\n" +
+            "exit\n" +
+            "end";
+
     public static final String NALL_DELETE = "configure terminal\n" +
             "router bgp 484\n" +
             "no neighbor 1.2.3.4 peer-group group12\n" +
@@ -295,6 +346,18 @@ public class NeighborWriterTest implements CliFormatter {
             "end";
 
     public static final String NALL_UPDATE = "configure terminal\n" +
+            "router bgp 484\n" +
+            "address-family ipv4\n" +
+            "no neighbor 1.2.3.4 activate\n" +
+            "exit\n" +
+            "address-family ipv6\n" +
+            "no neighbor 1.2.3.4 activate\n" +
+            "exit\n" +
+            "address-family vpnv4\n" +
+            "no neighbor 1.2.3.4 activate\n" +
+            "exit\n" +
+            "end\n" +
+            "configure terminal\n" +
             "router bgp 484\n" +
             "neighbor 1.2.3.4 remote-as 45\n" +
             "no neighbor 1.2.3.4 peer-group\n" +
@@ -377,6 +440,15 @@ public class NeighborWriterTest implements CliFormatter {
             "end";
 
     public static final String NALL_VRF_UPDATE = "configure terminal\n" +
+            "router bgp 484\n" +
+            "address-family ipv6 vrf vrf1\n" +
+            "no neighbor 1.2.3.4 remote-as 45\n" +
+            "exit\n" +
+            "address-family vpnv4 vrf vrf1\n" +
+            "no neighbor 1.2.3.4 remote-as 45\n" +
+            "exit\n" +
+            "end\n" +
+            "configure terminal\n" +
             "router bgp 484\n" +
             "address-family ipv4 vrf vrf1\n" +
             "neighbor 1.2.3.4 remote-as 45\n" +
