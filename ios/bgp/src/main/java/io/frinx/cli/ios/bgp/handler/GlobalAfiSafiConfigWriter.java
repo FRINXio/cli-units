@@ -16,8 +16,7 @@
 
 package io.frinx.cli.ios.bgp.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -84,7 +83,7 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
                     as, toDeviceAddressFamily(config.getAfiSafiName())),
                     cli, id, config);
         } else {
-            checkArgument(writeContext.readAfter(RWUtils.cutId(id, NetworkInstance.class)).get().getConfig().getRouteDistinguisher() != null,
+            Preconditions.checkArgument(writeContext.readAfter(RWUtils.cutId(id, NetworkInstance.class)).get().getConfig().getRouteDistinguisher() != null,
                     "Route distinguisher missing for VRF: %s. Cannot configure BGP afi/safi", vrfName);
 
             DottedQuad routerId = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get().getGlobal().getConfig().getRouterId();
@@ -111,7 +110,7 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         } else if (afiSafiName.equals(L3VPNIPV6UNICAST.class)) {
             return "vpnv6";
         } else {
-            throw new IllegalArgumentException("Unsupported afi safi type: " + afiSafiName);
+            return afiSafiName.getSimpleName();
         }
     }
 

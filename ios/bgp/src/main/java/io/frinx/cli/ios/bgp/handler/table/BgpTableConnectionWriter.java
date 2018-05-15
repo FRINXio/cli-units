@@ -91,9 +91,6 @@ public class BgpTableConnectionWriter implements
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         TableConnectionKey tableConnectionKey = id.firstKeyOf(TableConnection.class);
 
-        Preconditions.checkArgument(config.getSrcProtocol().equals(OSPF.class),
-                "Unable to redistribute from: %s protocol, not supported", config.getSrcProtocol());
-
         List<Protocol> srcProtocols = protocols.stream()
                 .filter(p -> p.getIdentifier().equals(config.getSrcProtocol()))
                 .collect(Collectors.toList());
@@ -125,7 +122,7 @@ public class BgpTableConnectionWriter implements
         } else if (afiSafiName.equals(IPV6.class)) {
             return "ipv6";
         } else {
-            throw new IllegalArgumentException("Unsupported address family type: " + afiSafiName);
+            return afiSafiName.getSimpleName();
         }
     }
 
@@ -136,8 +133,7 @@ public class BgpTableConnectionWriter implements
         if (identifier.equals(BGP.class)) {
             return "bgp";
         }
-
-        throw new IllegalArgumentException("Protocol of type: " + identifier + " is not supported");
+        return identifier.getSimpleName();
     }
 
     @Override

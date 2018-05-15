@@ -16,11 +16,10 @@
 
 package io.frinx.cli.ios.bgp.handler.neighbor;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toMap;
 
 import com.google.common.collect.Maps;
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -230,8 +229,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
                     "before_enabled", beforeEnabled);
         } else {
             String vrfName = vrfKey.getName();
-            checkArgument(!neighAfiSafi.isEmpty(), "No afi safi defined for neighbor: %s in VRF: %s", neighborId, vrfName);
-
+            Preconditions.checkArgument(!neighAfiSafi.isEmpty(), "No afi safi defined for neighbor: %s in VRF: %s", neighborId, vrfName);
             renderNeighbor(writer, cli, vrfTemplate, instanceIdentifier, neighbor,
                     "as", bgpAs,
                     "vrf", vrfName,
@@ -296,7 +294,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     }
 
     public static Long getAsValue(Global global) {
-        return checkNotNull(checkNotNull(global.getConfig()).getAs()).getValue();
+        return Preconditions.checkNotNull(Preconditions.checkNotNull(global.getConfig()).getAs()).getValue();
     }
 
     static Map<String, Object> getAfiSafisForNeighbor(AfiSafis afiSafis) {

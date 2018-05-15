@@ -16,10 +16,10 @@
 
 package io.frinx.cli.ios.bgp.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter.VRF_BGP_AFI_SAFI_ROUTER_ID;
 import static io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter.toDeviceAddressFamily;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -67,7 +67,7 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
 
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         ProtocolKey protoKey = id.firstKeyOf(Protocol.class);
-        checkArgument(protoKey.getName().equals(BgpProtocolReader.DEFAULT_BGP_INSTANCE),
+        Preconditions.checkArgument(protoKey.getName().equals(BgpProtocolReader.DEFAULT_BGP_INSTANCE),
                 "BGP protocol instance has to be named: %s. Not: %s", BgpProtocolReader.DEFAULT_BGP_INSTANCE, protoKey);
 
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
@@ -85,7 +85,7 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
                     .filter(protocol -> protocol.getConfig().getIdentifier().equals(BGP.class))
                     .findFirst()
                     .map(bgp -> bgp.getBgp().getGlobal().getConfig().getAs())
-                    .ifPresent(globalAs -> checkArgument(globalAs.equals(config.getAs()),
+                    .ifPresent(globalAs -> Preconditions.checkArgument(globalAs.equals(config.getAs()),
                             "BGP for VRF contains different AS: %s than global BGP: %s", config.getAs(), globalAs));
 
             blockingWriteAndRead(cli, id, config,
