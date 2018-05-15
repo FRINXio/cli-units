@@ -52,6 +52,7 @@ public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Co
         final InterfaceKey key = instanceIdentifier.firstKeyOf(Interface.class);
         final String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         final String areaId = AreaInterfaceReader.areaIdToString(instanceIdentifier.firstKeyOf(Area.class).getIdentifier());
+        configBuilder.setId(key.getId());
         String output = blockingRead(String.format(SHOW_OSPF_INT, ospfId, areaId ,key.getId()), cli, instanceIdentifier, readContext);
         parseCost(output, configBuilder);
     }
