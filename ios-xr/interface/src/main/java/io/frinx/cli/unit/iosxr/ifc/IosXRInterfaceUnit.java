@@ -57,6 +57,8 @@ import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6AdvertisementConfigRea
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6AdvertisementConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6ConfigWriter;
+import io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckIpv4Writer;
+import io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckIpv6Writer;
 import io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
@@ -225,6 +227,10 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
     private static final InstanceIdentifier<VerifyUnicastSourceReachableVia> RPF_IID =
         IIDs.IN_INTERFACE.augmentation(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.Interface1.class)
         .child(VerifyUnicastSourceReachableVia.class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv4.verify.Ipv4> RPF_IPV4_IID =
+        RPF_IID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv4.verify.Ipv4.class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv6.verify.Ipv6> RPF_IPV6_IID =
+        RPF_IID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv6.verify.Ipv6.class);
     private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv4.verify.Ipv4> RPF_IPV4_SUBTREE_IID =
         InstanceIdentifier.create(VerifyUnicastSourceReachableVia.class).child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv4.verify.Ipv4.class);
     private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ipv6.verify.Ipv6> RPF_IPV6_SUBTREE_IID =
@@ -279,6 +285,12 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                 IFC_ETH_CONFIG_ROOT_ID.augmentation(LacpEthConfigAug.class)),
                 new GenericWriter<>(IFC_ETHERNET_CONFIG_ID, new EthernetConfigWriter(cli)),
                 IIDs.IN_IN_CONFIG);
+
+        // RPF check
+        wRegistry.add(new GenericWriter<>(RPF_IID, new NoopCliWriter<>()));
+        wRegistry.add(new GenericWriter<>(RPF_IPV4_IID, new RpfCheckIpv4Writer(cli)));
+        wRegistry.add(new GenericWriter<>(RPF_IPV6_IID, new RpfCheckIpv6Writer(cli)));
+
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
