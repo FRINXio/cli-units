@@ -115,8 +115,7 @@ public class OspfTableConnectionWriter implements
         if (identifier.equals(BGP.class)) {
             return "bgp";
         }
-
-        throw new IllegalArgumentException("Protocol of type: " + identifier + " is not supported");
+        return identifier.getSimpleName();
     }
 
     @Override

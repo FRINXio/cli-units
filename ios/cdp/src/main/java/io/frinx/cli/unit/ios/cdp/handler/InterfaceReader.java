@@ -70,8 +70,7 @@ public class InterfaceReader implements CliOperListReader<Interface, InterfaceKe
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                       @Nonnull InterfaceBuilder interfaceBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        // TODO check reading existing interface
+                                      @Nonnull ReadContext readContext) {
         interfaceBuilder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
     }
 }

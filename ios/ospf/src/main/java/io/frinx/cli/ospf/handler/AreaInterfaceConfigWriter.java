@@ -16,8 +16,7 @@
 
 package io.frinx.cli.ospf.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -66,10 +65,7 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                 .stream()
                 .anyMatch(i -> i.getId().equals(data.getId()));
 
-        checkArgument(ifcInVrf, "Interface: %s cannot be in OSPF router: %s, not in the same VRF", data.getId(), protocolName);
-
-        // TODO ifc has to have IP configured
-        // TODO check if ifc not present under different OSPF
+        Preconditions.checkArgument(ifcInVrf, "Interface: %s cannot be in OSPF router: %s, not in the same VRF", data.getId(), protocolName);
 
         blockingWriteAndRead(cli, instanceIdentifier, data,
                 fT(WRITE_TEMPLATE,

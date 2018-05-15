@@ -148,7 +148,7 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
         List<ExtCommunitySetKey> extCommunitySetKeys = new ArrayList<>();
         for (String vrf : vrfs) {
             List<ExtCommunitySetKey> keys =
-                    parseExtCommunityIds(blockingRead(String.format(SH_RUN_VRF_ID, vrf), cli, id, context), vrf);
+                    parseExtCommunityIds(blockingRead(SH_RUN_VRF_ID, cli, id, context), vrf);
             extCommunitySetKeys.addAll(keys);
         }
 
@@ -173,10 +173,7 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<ExtCommunitySet> id,
                                       @Nonnull ExtCommunitySetBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
-        Optional<String> vrfName = getVrfName(id.firstKeyOf(ExtCommunitySet.class));
-        if (vrfName.isPresent()) {
-            builder.setKey(id.firstKeyOf(ExtCommunitySet.class));
-            builder.setConfig(parseConfig(blockingRead(String.format(SH_RUN_VRF_ID, vrfName.get()), cli, id, ctx), id));
-        }
+        builder.setKey(id.firstKeyOf(ExtCommunitySet.class));
+        builder.setConfig(parseConfig(blockingRead(SH_RUN_VRF_ID, cli, id, ctx), id));
     }
 }

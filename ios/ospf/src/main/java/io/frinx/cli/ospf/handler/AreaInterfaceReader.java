@@ -67,8 +67,6 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     static List<InterfaceKey> parseInterfaceIds(String ospfId, String output, OspfAreaIdentifier areaId) {
         String realignedOutput = realignOSPFInterfaces(output);
 
-        // No need to check VRFs, it is impossible to configure ip ospf for an interface that does not match ospf's vrf
-
         return NEWLINE.splitAsStream(realignedOutput)
                 .map(String::trim)
                 .filter(ifcLine -> ifcLine.contains(String.format("ip ospf %s area %s", ospfId, areaIdToString(areaId))))

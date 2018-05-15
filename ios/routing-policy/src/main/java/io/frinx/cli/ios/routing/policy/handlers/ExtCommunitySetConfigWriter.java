@@ -16,11 +16,7 @@
 
 package io.frinx.cli.ios.routing.policy.handlers;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.ios.routing.policy.handlers.ExtCommunitySetReader.VRF_ID_ROUTE_TARGET;
-import static io.frinx.cli.ios.routing.policy.handlers.ExtCommunitySetReader.getExistingVrfs;
-import static io.frinx.cli.ios.routing.policy.handlers.ExtCommunitySetReader.getVrfDirection;
-
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -65,12 +61,12 @@ public class ExtCommunitySetConfigWriter implements CliWriter<Config> {
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         ExtCommunitySetKey extCommunitySetKey = id.firstKeyOf(ExtCommunitySet.class);
         Optional<String> vrfName = ExtCommunitySetReader.getVrfName(extCommunitySetKey);
-        checkArgument(vrfName.isPresent(),
+        Preconditions.checkArgument(vrfName.isPresent(),
                 "Invalid ext community: %s. Expected communities are in format: %s",
-                extCommunitySetKey.getExtCommunitySetName(), VRF_ID_ROUTE_TARGET.pattern());
+                extCommunitySetKey.getExtCommunitySetName(), ExtCommunitySetReader.VRF_ID_ROUTE_TARGET.pattern());
 
-        List<String> vrfs = getExistingVrfs(writeContext.readAfter(IIDs.NETWORKINSTANCES));
-        checkArgument(vrfs.contains(vrfName.get()), "Vrf: %s does not exist, cannot configure ext communities", vrfName);
+        List<String> vrfs = ExtCommunitySetReader.getExistingVrfs(writeContext.readAfter(IIDs.NETWORKINSTANCES));
+        Preconditions.checkArgument(vrfs.contains(vrfName.get()), "Vrf: %s does not exist, cannot configure ext communities", vrfName);
 
         String routeTargets = serializeRouteTargets(dataAfter, extCommunitySetKey, true, vrfName.get());
         blockingWriteAndRead(cli, id, dataAfter, routeTargets);
@@ -104,7 +100,7 @@ public class ExtCommunitySetConfigWriter implements CliWriter<Config> {
     }
 
     private String serializeRouteTargets(@Nonnull Config data, ExtCommunitySetKey extCommunitySetKey, boolean add, String vrfName) {
-        Optional<String> direction = getVrfDirection(extCommunitySetKey);
+        Optional<String> direction = ExtCommunitySetReader.getVrfDirection(extCommunitySetKey);
         return getRouteTargets(data, direction.get(), add, vrfName);
     }
 }

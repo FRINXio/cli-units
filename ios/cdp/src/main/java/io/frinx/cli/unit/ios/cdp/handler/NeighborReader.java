@@ -72,8 +72,7 @@ public class NeighborReader implements CliOperListReader<Neighbor, NeighborKey, 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
                                       @Nonnull NeighborBuilder neighborBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        // TODO check reading existing interface
+                                      @Nonnull ReadContext readContext) {
         neighborBuilder.setId(instanceIdentifier.firstKeyOf(Neighbor.class).getId());
     }
 }
