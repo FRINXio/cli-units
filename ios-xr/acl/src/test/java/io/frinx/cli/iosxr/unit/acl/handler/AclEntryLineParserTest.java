@@ -25,6 +25,10 @@ import java.util.Optional;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
@@ -32,6 +36,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.HopRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.IcmpMsgType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.IcmpBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.DestinationAddressWildcardedBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcardedBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
@@ -52,7 +58,9 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IpProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange.Enumeration;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Address;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Address;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.PortNumber;
 
@@ -121,20 +129,24 @@ public class AclEntryLineParserTest {
         return builder.build();
     }
 
-
     @Test
     public void testIpv4() {
-        String lines = "ipv4 access-list foo\n" +
+        String lines = "Mon May 14 14:36:55.408 UTC\n" +
+                "ipv4 access-list foo\n" +
                 " 2 deny ipv4 host 1.2.3.4 any\n" +
                 " 3 permit udp 192.168.1.1/24 10.10.10.10/24\n" +
                 " 4 permit tcp host 1.2.3.4 eq www any\n" +
                 " 5 deny icmp host 1.1.1.1 host 2.2.2.2 ttl range 0 10\n" +
+                " 6 permit udp 0.0.0.0 0.255.255.255 eq 10 0.0.0.0 0.255.255.255 gt 10\n" +
+                " 7 permit udp host 1.1.1.1 gt 10 0.0.0.0 0.255.128.255 lt 10\n" +
+                " 8 permit udp 0.0.0.0 0.255.0.255 lt 10 any range 10 10\n" +
                 " 13 permit tcp host 1.1.1.1 range 1024 65535 host 2.2.2.2 range 0 1023\n" +
                 " 14 permit ipv4 any any ttl gt 12\n" +
                 " 15 permit udp any neq 80 any ttl neq 10\n" +
                 " 26 permit icmp any any echo\n" +
                 "!\n";
         LinkedHashMap<Long, AclEntry> expectedResults = new LinkedHashMap<>();
+
         {
             // 2 deny ipv4 host 1.2.3.4 any
             long sequenceId = 2;
@@ -186,6 +198,72 @@ public class AclEntryLineParserTest {
             configBuilder.addAugmentation(Config1.class, new Config1Builder().setHopRange(new HopRange("0..10")).build());
 
             expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(), null));
+        }
+        {
+            // 6 permit udp 0.0.0.0 0.255.255.255 eq 10 0.0.0.0 0.255.255.255 gt 10
+            long sequenceId = 6;
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
+            configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
+            configBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class, new AclSetAclEntryIpv4WildcardedAugBuilder()
+                    .setSourceAddressWildcarded(new SourceAddressWildcardedBuilder()
+                            .setAddress(new Ipv4Address("0.0.0.0"))
+                            .setWildcardMask(new Ipv4Address("0.255.255.255"))
+                            .build())
+                    .setDestinationAddressWildcarded((new DestinationAddressWildcardedBuilder()
+                            .setAddress(new Ipv4Address("0.0.0.0"))
+                            .setWildcardMask(new Ipv4Address("0.255.255.255"))
+                            .build()))
+                    .build());
+            TransportBuilder transportBuilder = new TransportBuilder();
+            transportBuilder.setConfig(
+                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder()
+                            .setSourcePort(new PortNumRange(new PortNumber(10)))
+                            .setDestinationPort(new PortNumRange("10..65535"))
+                            .build());
+
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), transportBuilder.build()));
+        }
+        {
+            // 7 permit udp host 1.1.1.1 gt 10 0.0.0.0 0.255.128.255 lt 10
+            long sequenceId = 7;
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
+            configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
+            configBuilder.setSourceAddress(new Ipv4Prefix("1.1.1.1/32"));
+            configBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class, new AclSetAclEntryIpv4WildcardedAugBuilder()
+                    .setDestinationAddressWildcarded((new DestinationAddressWildcardedBuilder()
+                            .setAddress(new Ipv4Address("0.0.0.0"))
+                            .setWildcardMask(new Ipv4Address("0.255.128.255"))
+                            .build()))
+                    .build());
+            TransportBuilder transportBuilder = new TransportBuilder();
+            transportBuilder.setConfig(
+                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder()
+                            .setSourcePort(new PortNumRange("10..65535"))
+                            .setDestinationPort(new PortNumRange("0..10"))
+                            .build());
+
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), transportBuilder.build()));
+        }
+        {
+            // 8 permit udp 0.0.0.0 0.255.0.255 lt 10 any range 10 10
+            long sequenceId = 8;
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
+            configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
+            configBuilder.setDestinationAddress((new Ipv4Prefix("0.0.0.0/0")));
+            configBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class, new AclSetAclEntryIpv4WildcardedAugBuilder()
+                    .setSourceAddressWildcarded((new SourceAddressWildcardedBuilder()
+                            .setAddress(new Ipv4Address("0.0.0.0"))
+                            .setWildcardMask(new Ipv4Address("0.255.0.255"))
+                            .build()))
+                    .build());
+            TransportBuilder transportBuilder = new TransportBuilder();
+            transportBuilder.setConfig(
+                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder()
+                            .setSourcePort(new PortNumRange("0..10"))
+                            .setDestinationPort(new PortNumRange("10..10"))
+                            .build());
+
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), transportBuilder.build()));
         }
         {
             // 13 permit tcp host 1.1.1.1 range 1024 65535 host 2.2.2.2 range 0 1023
@@ -243,8 +321,9 @@ public class AclEntryLineParserTest {
         for (Entry<Long, AclEntry> entry : expectedResults.entrySet()) {
             long sequenceId = entry.getKey();
             String line = AclEntryLineParser.findLineWithSequenceId(sequenceId, lines).get();
-            AclEntry parsed = AclEntryLineParser.parseLine(new AclEntryBuilder(), line, ACLIPV4.class);
-            assertEquals(entry.getValue(), parsed);
+            AclEntryBuilder resultBuilder = new AclEntryBuilder();
+            AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4.class);
+            assertEquals(entry.getValue(), resultBuilder.build());
         }
     }
 
@@ -268,6 +347,9 @@ public class AclEntryLineParserTest {
                 " 5 permit tcp host ::1 host ::1\n" +
                 " 6 permit tcp host ::1 host ::1 lt www ttl eq 10\n" +
                 " 7 permit icmpv6 any host ::1 8 ttl neq 10\n" +
+                " 8 permit udp f::a a::b eq 10 fe80:0000:0000:0000:0202:b3ff:fe1e:8329 fe80:0000:0000:0000:0202:b3ff:fe1e:8329 gt 10\n" +
+                " 9 permit udp host fe80:0000:0000:0000:0202:b3ff:fe1e:8329 gt 10 f::a a::b lt 10\n" +
+                " 10 permit udp f::a a::b lt 10 any range 10 10\n" +
                 " 11 remark foo\n" +
                 " 21 remark bar\n" +
                 " 31 remark baz2\n" +
@@ -348,15 +430,78 @@ public class AclEntryLineParserTest {
                             .build());
             expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null, (short) 8));
         }
+        {
+            // 8 permit udp f::a a::b eq 10 FE80:0000:0000:0000:0202:B3FF:FE1E:8329 FE80:0000:0000:0000:0202:B3FF:FE1E:8329 gt 10
+            long sequenceId = 8;
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
+            configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
+            configBuilder.addAugmentation(AclSetAclEntryIpv6WildcardedAug.class, new AclSetAclEntryIpv6WildcardedAugBuilder()
+                    .setSourceAddressWildcarded(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.SourceAddressWildcardedBuilder()
+                            .setAddress(new Ipv6Address("f::a"))
+                            .setWildcardMask(new Ipv6Address("a::b"))
+                            .build())
+                    .setDestinationAddressWildcarded((new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.DestinationAddressWildcardedBuilder()
+                            .setAddress(new Ipv6Address("fe80:0000:0000:0000:0202:b3ff:fe1e:8329"))
+                            .setWildcardMask(new Ipv6Address("fe80:0000:0000:0000:0202:b3ff:fe1e:8329"))
+                            .build()))
+                    .build());
+            TransportBuilder transportBuilder = new TransportBuilder()
+                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder()
+                            .setSourcePort(new PortNumRange(new PortNumber(10)))
+                            .setDestinationPort(new PortNumRange("10..65535"))
+                            .build());
+
+            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), transportBuilder.build()));
+        }
+        {
+            // 9 permit udp host fe80:0000:0000:0000:0202:b3ff:fe1e:8329 gt 10 f::a a::b lt 10
+            long sequenceId = 9;
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
+            configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
+            configBuilder.setSourceAddress(new Ipv6Prefix("fe80:0000:0000:0000:0202:b3ff:fe1e:8329/128"));
+            configBuilder.addAugmentation(AclSetAclEntryIpv6WildcardedAug.class, new AclSetAclEntryIpv6WildcardedAugBuilder()
+                    .setDestinationAddressWildcarded((new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.DestinationAddressWildcardedBuilder()
+                            .setAddress(new Ipv6Address("f::a"))
+                            .setWildcardMask(new Ipv6Address("a::b"))
+                            .build()))
+                    .build());
+            TransportBuilder transportBuilder = new TransportBuilder()
+                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder()
+                            .setSourcePort(new PortNumRange("10..65535"))
+                            .setDestinationPort(new PortNumRange("0..10"))
+                            .build());
+
+            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), transportBuilder.build()));
+        }
+        {
+            // 10 permit udp f::a a::b lt 10 any range 10 10
+            long sequenceId = 10;
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
+            configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
+            configBuilder.addAugmentation(AclSetAclEntryIpv6WildcardedAug.class, new AclSetAclEntryIpv6WildcardedAugBuilder()
+                    .setSourceAddressWildcarded((new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.SourceAddressWildcardedBuilder()
+                            .setAddress(new Ipv6Address("f::a"))
+                            .setWildcardMask(new Ipv6Address("a::b"))
+                            .build()))
+                    .build());
+            configBuilder.setDestinationAddress(new Ipv6Prefix("::/0"));
+            TransportBuilder transportBuilder = new TransportBuilder()
+                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder()
+                            .setSourcePort(new PortNumRange("0..10"))
+                            .setDestinationPort(new PortNumRange("10..10"))
+                            .build());
+
+            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), transportBuilder.build()));
+        }
 
         // verify expected results
         for (Entry<Long, AclEntry> entry : expectedResults.entrySet()) {
             long sequenceId = entry.getKey();
             String line = AclEntryLineParser.findLineWithSequenceId(sequenceId, lines).get();
-            AclEntry parsed = AclEntryLineParser.parseLine(new AclEntryBuilder(), line, ACLIPV6.class);
-            assertEquals(entry.getValue(), parsed);
+            AclEntryBuilder resultBuilder = new AclEntryBuilder();
+            AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV6.class);
+            assertEquals(entry.getValue(), resultBuilder.build());
         }
-
     }
 
 }

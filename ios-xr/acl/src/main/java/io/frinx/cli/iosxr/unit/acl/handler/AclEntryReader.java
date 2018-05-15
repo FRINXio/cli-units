@@ -105,7 +105,7 @@ public class AclEntryReader implements TypedListReader<AclEntry, AclEntryKey, Ac
                                              @Nonnull final ReadContext readContext)
         throws ReadFailedException {
 
-        String command = AclEntryReader.getAclCommand(instanceIdentifier);
+        String command = getAclCommand(instanceIdentifier);
         String output = blockingRead(command, cli, instanceIdentifier, readContext);
 
         parseACL(instanceIdentifier, aclEntryBuilder, output);
