@@ -25,6 +25,7 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
@@ -83,8 +84,11 @@ public class AclEntryLineParser {
     private static final int MAX_PORT_NUMBER = 65535;
     private static final int MAX_TTL = 255;
     private static final IpProtocolType IP_PROTOCOL_ICMP = new IpProtocolType(IPICMP.class);
+    private static final IpProtocolType IP_PROTOCOL_ICMP_NUMBER = new IpProtocolType((short) 1);
     private static final IpProtocolType IP_PROTOCOL_TCP = new IpProtocolType(IPTCP.class);
+    private static final IpProtocolType IP_PROTOCOL_TCP_NUMBER = new IpProtocolType((short) 6);
     private static final IpProtocolType IP_PROTOCOL_UDP = new IpProtocolType(IPUDP.class);
+    private static final IpProtocolType IP_PROTOCOL_UDP_NUMBER = new IpProtocolType((short) 17);
     public static final Pattern ZERO_TO_255_PATTERN = Pattern.compile("^2[0-5][0-5]|2[0-4][0-9]|1?[0-9]?[0-9]$");
 
     static Optional<String> findAclEntryWithSequenceId(InstanceIdentifier<?> id, String lines) {
@@ -209,7 +213,8 @@ public class AclEntryLineParser {
 
         // transport
         Transport transport = null;
-        if (IP_PROTOCOL_TCP.equals(ipProtocolType) || IP_PROTOCOL_UDP.equals(ipProtocolType)) {
+        if (IP_PROTOCOL_TCP.equals(ipProtocolType) || IP_PROTOCOL_TCP_NUMBER.equals(ipProtocolType)
+                || IP_PROTOCOL_UDP.equals(ipProtocolType) || IP_PROTOCOL_UDP_NUMBER.equals(ipProtocolType)) {
             transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
         }
 
@@ -234,7 +239,7 @@ public class AclEntryLineParser {
 
     private static AclEntry1 parseIcmpMsgType(final IpProtocolType ipProtocolType, final Queue<String> words) {
         final AclEntry1Builder icmpMsgTypeAugment = new AclEntry1Builder();
-        if (IP_PROTOCOL_ICMP.equals(ipProtocolType)) {
+        if (IP_PROTOCOL_ICMP.equals(ipProtocolType) || IP_PROTOCOL_ICMP_NUMBER.equals(ipProtocolType)) {
             Optional<Short> maybeMsgType = tryToParseIcmpType(words.peek());
             if (maybeMsgType.isPresent()) {
                 words.poll();
@@ -305,7 +310,8 @@ public class AclEntryLineParser {
 
         // transport
         Transport transport = null;
-        if (IP_PROTOCOL_TCP.equals(ipProtocolType) || IP_PROTOCOL_UDP.equals(ipProtocolType)) {
+        if (IP_PROTOCOL_TCP.equals(ipProtocolType) || IP_PROTOCOL_TCP_NUMBER.equals(ipProtocolType)
+                || IP_PROTOCOL_UDP.equals(ipProtocolType) || IP_PROTOCOL_UDP_NUMBER.equals(ipProtocolType)) {
             transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
         }
 
@@ -476,6 +482,9 @@ public class AclEntryLineParser {
             case "icmpv6":
                 return IP_PROTOCOL_ICMP;
             default:
+                if (NumberUtils.isParsable(protocol)) {
+                    return new IpProtocolType(Integer.valueOf(protocol).shortValue());
+                }
                 LOG.warn("Unknown protocol {}", protocol);
                 return null;
         }
