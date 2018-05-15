@@ -52,7 +52,7 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
         this.cli = cli;
     }
 
-    static final String SH_INTERFACE_IP = "sh ipv6 inter %s %s";
+    public static final String SH_INTERFACE_IP = "sh ipv6 inter %s %s";
     static final Pattern IPV6_LOCAL_ADDRESS = Pattern.compile(".*?link-local address is (?<ipv6local>[^\\s]+).*");
     static final Pattern IPV6_UNICAST_ADDRESS = Pattern.compile(".*?(?<ipv6unicast>[a-fA-F0-9:]+), subnet is [^/]+.*/(?<prefix>[^\\s]+).*");
 
@@ -75,7 +75,7 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
     }
 
     @VisibleForTesting
-    static List<AddressKey> parseAddressIds(String output) {
+    public static List<AddressKey> parseAddressIds(String output) {
         List<AddressKey> addressKeys = new ArrayList<>();
         addressKeys.addAll(parseFields(output, 0,
                 IPV6_LOCAL_ADDRESS::matcher,

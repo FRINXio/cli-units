@@ -47,7 +47,7 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
         this.cli = cli;
     }
 
-    static final String SH_INTERFACE_IP = "show running-config interface %s | include ^ ip address";
+    public static final String SH_INTERFACE_IP = "show running-config interface %s | include ^ ip address";
     static final Pattern INTERFACE_IP_LINE =
             Pattern.compile("ip address (?<ip>\\S+) (?<prefix>\\S+)");
 
@@ -67,7 +67,7 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
     }
 
     @VisibleForTesting
-    static List<AddressKey> parseAddressIds(String output) {
+    public static List<AddressKey> parseAddressIds(String output) {
         return parseFields(output, 0,
                 INTERFACE_IP_LINE::matcher,
                 m -> m.group("ip"),
