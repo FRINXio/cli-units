@@ -49,19 +49,14 @@ public class TunnelConfigWriter implements CliWriter<Config> {
         checkTunnelConfig(data);
 
         blockingWriteAndRead(cli, id, data,
-fT(INPUT_T, "name", name, "autoroute", data.isShortcutEligible() ? true : null,
+        fT(INPUT_T, "name", name, "autoroute", data.isShortcutEligible() ? true : null,
             "metric", LSPMETRICABSOLUTE.class.equals(data.getMetricType()) ? data.getMetric() : null));
     }
 
     private static void checkTunnelConfig(Config data) {
-
-        // TODO What if metric-type is set but metric is not
-        if (data.getMetric() != null) {
+        if (data.getMetricType() != null) {
             Preconditions.checkArgument(LSPMETRICABSOLUTE.class.equals(data.getMetricType()),
                     "Only LSP_METRIC_ABSOLUTE metric type is supported");
-
-            Preconditions.checkArgument(data.isShortcutEligible(),
-                    "Cannot configure metric on non shortcut-eligible tunnel");
         }
     }
 
