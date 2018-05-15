@@ -50,6 +50,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPPROTOCOL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPTCP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPUDP;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IpProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
@@ -227,7 +228,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
             commandVars.acl_dst_addr = ipv4WildcardedOpt.get().getAddress().getValue() + " " + ipv4WildcardedOpt.get().getWildcardMask().getValue();
         }
 
-        commandVars.acl_protocol = formatProtocol(entry.getIpv4().getConfig().getProtocol().getIdentityref(), commandVars.type);
+        IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv4().getConfig())
+                .map(config -> config.getProtocol())
+                .orElse(null);
+        commandVars.acl_protocol = formatProtocol(ipProtocolType, commandVars.type);
     }
 
     private Optional<String> getIpv4Prefix(AclEntry entry, Function<Ipv4ProtocolFieldsConfig, Ipv4Prefix> mapper) {
@@ -282,7 +286,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
             commandVars.acl_dst_addr = ipv6WildcardedOpt.get().getAddress().getValue() + " " + ipv6WildcardedOpt.get().getWildcardMask().getValue();
         }
 
-        commandVars.acl_protocol = formatProtocol(entry.getIpv6().getConfig().getProtocol().getIdentityref(), commandVars.type);
+        IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv6().getConfig())
+                .map(config -> config.getProtocol())
+                .orElse(null);
+        commandVars.acl_protocol = formatProtocol(ipProtocolType, commandVars.type);
     }
 
     private Optional<String> getIpv6Prefix(AclEntry entry, Function<Ipv6ProtocolFieldsConfig, Ipv6Prefix> mapper) {
@@ -326,8 +333,16 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
         }
     }
 
-    @Nullable
-    private static String formatProtocol(Class<? extends IPPROTOCOL> protocol, String type) {
+    private static String formatProtocol(@Nullable IpProtocolType ipProtocolType, String type) {
+        if (ipProtocolType == null) {
+            return type;
+        }
+
+        Class<? extends IPPROTOCOL> protocol = ipProtocolType.getIdentityref();
+        if (protocol == null) {
+            return String.valueOf(ipProtocolType.getUint8());
+        }
+
         if (protocol.equals(IPPROTOCOL.class)) {
             return type;
         } else if (protocol.equals(IPUDP.class)) {
@@ -342,12 +357,11 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
                     return "icmpv6";
                 default:
                     LOG.warn("Unknown protocol {}", protocol);
-                    return null;
+                    throw new IllegalArgumentException("ACL contains unsupported protocol: " + protocol.getSimpleName());
             }
-        } else {
-            LOG.warn("Unknown protocol {}", protocol);
-            return null;
         }
+        LOG.warn("Unknown protocol {}", protocol);
+        throw new IllegalArgumentException("ACL contains unsupported protocol: " + protocol.getSimpleName());
     }
 
     private String formatPort(PortNumRange port) {
