@@ -27,13 +27,23 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.HopRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.IcmpMsgType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv4AddressWildcarded;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv6AddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.IcmpBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.DestinationAddressWildcarded;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.DestinationAddressWildcardedBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcarded;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcardedBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
@@ -57,7 +67,9 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IpProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange.Enumeration;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Address;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Address;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.PortNumber;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -91,7 +103,7 @@ public class AclEntryLineParser {
         return Optional.empty();
     }
 
-    static AclEntry parseLine(final AclEntryBuilder builder, String line, Class<? extends ACLTYPE> aclType) {
+    static void parseLine(final AclEntryBuilder builder, String line, Class<? extends ACLTYPE> aclType) {
 
         Preconditions.checkArgument(ACLIPV4.class.equals(aclType) || ACLIPV6.class.equals(aclType),
                 "Unsupported ACL type" + aclType);
@@ -125,7 +137,6 @@ public class AclEntryLineParser {
         } else {
             throw new IllegalArgumentException("Not supported:" + aclType);
         }
-        return builder.build();
     }
 
     static Actions createActions(Class<? extends FORWARDINGACTION> fwdAction) {
@@ -164,12 +175,37 @@ public class AclEntryLineParser {
         ipv4ProtocolFieldsConfigBuilder.setProtocol(ipProtocolType);
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
 
-        // src
-        ipv4ProtocolFieldsConfigBuilder.setSourceAddress(parseIpv4Prefix(words));
+        AclSetAclEntryIpv4WildcardedAugBuilder ipv4WildcardedAugBuilder = new AclSetAclEntryIpv4WildcardedAugBuilder();
+        // src address
+        Optional<Ipv4Prefix> srcIpv4PrefixOpt = parseIpv4Prefix(words);
+        if (srcIpv4PrefixOpt.isPresent()) {
+            ipv4ProtocolFieldsConfigBuilder.setSourceAddress(srcIpv4PrefixOpt.get());
+        } else {
+            SourceAddressWildcarded srcIpv4Wildcarded = new SourceAddressWildcardedBuilder(parseIpv4Wildcarded(words)).build();
+            ipv4WildcardedAugBuilder.setSourceAddressWildcarded(srcIpv4Wildcarded);
+        }
+
+        // src port
         parseTransportSourcePort(transportConfigBuilder, words);
-        // dst
-        ipv4ProtocolFieldsConfigBuilder.setDestinationAddress(parseIpv4Prefix(words));
+
+        // dst address
+        Optional<Ipv4Prefix> dstIpv4PrefixOpt = parseIpv4Prefix(words);
+        if (dstIpv4PrefixOpt.isPresent()) {
+            ipv4ProtocolFieldsConfigBuilder.setDestinationAddress(dstIpv4PrefixOpt.get());
+        } else {
+            DestinationAddressWildcarded dstIpv4Wildcarded = new DestinationAddressWildcardedBuilder(parseIpv4Wildcarded(words)).build();
+            ipv4WildcardedAugBuilder.setDestinationAddressWildcarded(dstIpv4Wildcarded);
+        }
+
+        // dst port
         parseTransportDestinationPort(transportConfigBuilder, words);
+
+        // src dst wildcarded address
+        if (ipv4WildcardedAugBuilder.getSourceAddressWildcarded() != null
+                || ipv4WildcardedAugBuilder.getDestinationAddressWildcarded() != null) {
+            ipv4ProtocolFieldsConfigBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class,
+                    ipv4WildcardedAugBuilder.build());
+        }
 
         // transport
         Transport transport = null;
@@ -235,13 +271,39 @@ public class AclEntryLineParser {
         ipv6ProtocolFieldsConfigBuilder.setProtocol(ipProtocolType);
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
 
-        // src
-        ipv6ProtocolFieldsConfigBuilder.setSourceAddress(parseIpv6Prefix(words));
+        AclSetAclEntryIpv6WildcardedAugBuilder ipv6WildcardedAugBuilder = new AclSetAclEntryIpv6WildcardedAugBuilder();
+        // src address
+        Optional<Ipv6Prefix> srcIpv6PrefixOpt = parseIpv6Prefix(words);
+        if (srcIpv6PrefixOpt.isPresent()) {
+            ipv6ProtocolFieldsConfigBuilder.setSourceAddress(srcIpv6PrefixOpt.get());
+        } else {
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.SourceAddressWildcarded srcIpv6Wildcarded = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.SourceAddressWildcardedBuilder(parseIpv6Wildcarded(words)).build();
+            ipv6WildcardedAugBuilder.setSourceAddressWildcarded(srcIpv6Wildcarded);
+        }
+
+        // src port
         parseTransportSourcePort(transportConfigBuilder, words);
-        // dst
-        ipv6ProtocolFieldsConfigBuilder.setDestinationAddress(parseIpv6Prefix(words));
+
+        // dst address
+        Optional<Ipv6Prefix> dstIpv6PrefixOpt = parseIpv6Prefix(words);
+        if (dstIpv6PrefixOpt.isPresent()) {
+            ipv6ProtocolFieldsConfigBuilder.setDestinationAddress(dstIpv6PrefixOpt.get());
+        } else {
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.DestinationAddressWildcarded dstIpv6Wildcarded = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.DestinationAddressWildcardedBuilder(parseIpv6Wildcarded(words)).build();
+            ipv6WildcardedAugBuilder.setDestinationAddressWildcarded(dstIpv6Wildcarded);
+        }
+
+        // dst port
         parseTransportDestinationPort(transportConfigBuilder, words);
 
+        // src dst wildcarded address
+        if (ipv6WildcardedAugBuilder.getSourceAddressWildcarded() != null
+                || ipv6WildcardedAugBuilder.getDestinationAddressWildcarded() != null) {
+            ipv6ProtocolFieldsConfigBuilder.addAugmentation(AclSetAclEntryIpv6WildcardedAug.class,
+                    ipv6WildcardedAugBuilder.build());
+        }
+
+        // transport
         Transport transport = null;
         if (IP_PROTOCOL_TCP.equals(ipProtocolType) || IP_PROTOCOL_UDP.equals(ipProtocolType)) {
             transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
@@ -419,37 +481,63 @@ public class AclEntryLineParser {
         }
     }
 
-    private static Ipv4Prefix parseIpv4Prefix(Queue<String> words) {
-        String first = words.poll();
+    private static Optional<Ipv4Prefix> parseIpv4Prefix(Queue<String> words) {
+        String first = words.peek();
         if ("any".equals(first)) {
-            return IPV4_HOST_ANY;
+            // remove "any" from queue
+            words.remove();
+            return Optional.of(IPV4_HOST_ANY);
         } else if ("host".equals(first)) {
+            // remove "host" from queue
+            words.remove();
             int mask = 32;
             String ip = words.poll();
-            return new Ipv4Prefix(ip + "/" + mask);
-        } else {
-            if (!first.contains("/")) {
-                first = first + "/32";
-            }
-            return new Ipv4Prefix(first);
+            return Optional.of(new Ipv4Prefix(ip + "/" + mask));
+        } else if (first.contains("/")) {
+            // remove "x.x.x.x/x" from queue
+            words.remove();
+            return Optional.of(new Ipv4Prefix(first));
         }
+        return Optional.empty();
     }
 
+    private static Ipv4AddressWildcarded parseIpv4Wildcarded(Queue<String> words) {
+        String address = words.poll();
+        Preconditions.checkState(!address.contains("/"), "Expected address and wildcard");
+        String wildcard = words.poll();
+        return new SourceAddressWildcardedBuilder().setAddress(new Ipv4Address(address))
+                .setWildcardMask(new Ipv4Address(wildcard))
+                .build();
+    }
 
-    private static Ipv6Prefix parseIpv6Prefix(Queue<String> words) {
-        String first = words.poll();
+    private static Optional<Ipv6Prefix> parseIpv6Prefix(Queue<String> words) {
+        String first = words.peek();
         if ("any".equals(first)) {
-            return IPV6_HOST_ANY;
+            // remove "any" from queue
+            words.remove();
+            return Optional.of(IPV6_HOST_ANY);
         } else if ("host".equals(first)) {
+            // remove "host" from queue
+            words.remove();
             int mask = 128;
             String ip = words.poll();
-            return new Ipv6Prefix(ip + "/" + mask);
-        } else {
-            if (!first.contains("/")) {
-                first = first + "/128";
-            }
-            return new Ipv6Prefix(first);
+            return Optional.of(new Ipv6Prefix(ip + "/" + mask));
+        } else if (first.contains("/")) {
+            // remove "x:x:x:x:x:x:x:x/x" from queue
+            words.remove();
+            return Optional.of(new Ipv6Prefix(first));
         }
+        return Optional.empty();
+    }
+
+    private static Ipv6AddressWildcarded parseIpv6Wildcarded(Queue<String> words) {
+        String address = words.poll();
+        Preconditions.checkState(!address.contains("/"), "Expected address and wildcard");
+        String wildcard = words.poll();
+        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.SourceAddressWildcardedBuilder()
+                .setAddress(new Ipv6Address(address))
+                .setWildcardMask(new Ipv6Address(wildcard))
+                .build();
     }
 
 }

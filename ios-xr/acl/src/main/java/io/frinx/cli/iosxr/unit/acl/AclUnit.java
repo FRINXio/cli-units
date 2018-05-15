@@ -47,8 +47,12 @@ import io.frinx.openconfig.openconfig.acl.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.DestinationAddressWildcarded;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.AclEntriesBuilder;
@@ -135,6 +139,20 @@ public class AclUnit implements TranslateUnit {
                     .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class)
                     .augmentation(Config1.class),
                 InstanceIdentifier.create(AclEntry.class)
+                    .child(Ipv4.class)
+                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class)
+                    .augmentation(AclSetAclEntryIpv4WildcardedAug.class),
+                InstanceIdentifier.create(AclEntry.class)
+                    .child(Ipv4.class)
+                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class)
+                    .augmentation(AclSetAclEntryIpv4WildcardedAug.class)
+                    .child(SourceAddressWildcarded.class),
+                InstanceIdentifier.create(AclEntry.class)
+                    .child(Ipv4.class)
+                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class)
+                    .augmentation(AclSetAclEntryIpv4WildcardedAug.class)
+                    .child(DestinationAddressWildcarded.class),
+                InstanceIdentifier.create(AclEntry.class)
                     .child(Ipv6.class),
                 InstanceIdentifier.create(AclEntry.class)
                     .child(Ipv6.class)
@@ -143,6 +161,20 @@ public class AclUnit implements TranslateUnit {
                     .child(Ipv6.class)
                     .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class)
                     .augmentation(Config2.class),
+                InstanceIdentifier.create(AclEntry.class)
+                    .child(Ipv6.class)
+                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class)
+                    .augmentation(AclSetAclEntryIpv6WildcardedAug.class),
+                InstanceIdentifier.create(AclEntry.class)
+                    .child(Ipv6.class)
+                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class)
+                    .augmentation(AclSetAclEntryIpv6WildcardedAug.class)
+                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.SourceAddressWildcarded.class),
+                InstanceIdentifier.create(AclEntry.class)
+                    .child(Ipv6.class)
+                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class)
+                    .augmentation(AclSetAclEntryIpv6WildcardedAug.class)
+                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.DestinationAddressWildcarded.class),
                 InstanceIdentifier.create(AclEntry.class)
                     .child(Transport.class),
                 InstanceIdentifier.create(AclEntry.class)
