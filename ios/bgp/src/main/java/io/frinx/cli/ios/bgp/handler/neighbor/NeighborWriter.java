@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toMap;
 
+import com.google.common.collect.Maps;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -149,6 +150,18 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
             NEIGHBOR_DELETE +
             "end";
 
+    static final String NEIGHBOR_GLOBAL_DELETE_AFI = "configure terminal\n" +
+            "router bgp {$as}\n" +
+
+            "{% loop in $afis as $af_name:af %}\n" +
+            "address-family {$af_name}\n" +
+            "no neighbor {$neighbor_id} activate\n" +
+            "exit\n" +
+            "{% onEmpty %}" +
+            "{% endloop %}" +
+
+            "end";
+
     static final String NEIGHBOR_VRF_DELETE = "configure terminal\n" +
             "router bgp {$as}\n" +
 
@@ -233,6 +246,32 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
         }
     }
 
+    public static <T extends BgpCommonStructureNeighborGroupRouteReflector> void renderNeighborAfiRemoval(CliWriter<T> writer, Cli cli,
+                                                                                                InstanceIdentifier<T> instanceIdentifier,
+                                                                                                T neighbor,
+                                                                                                NetworkInstanceKey vrfKey,
+                                                                                                Long bgpAs,
+                                                                                                Map<String, Object> neighAfiSafi,
+                                                                                                String neighborId,
+                                                                                                String globalTemplate,
+                                                                                                String vrfTemplate) throws WriteFailedException.CreateFailedException {
+
+        if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
+            renderNeighbor(writer, cli, globalTemplate, instanceIdentifier, neighbor,
+                    "as", bgpAs,
+                    "neighbor_id", neighborId,
+                    "afis", neighAfiSafi);
+        } else {
+            String vrfName = vrfKey.getName();
+            renderNeighbor(writer, cli, vrfTemplate, instanceIdentifier, neighbor,
+                    "as", bgpAs,
+                    "vrf", vrfName,
+                    "neighbor_id", neighborId,
+                    "neighbor", neighbor,
+                    "afis", neighAfiSafi);
+        }
+    }
+
     public static Boolean isRouteReflectClient(BgpCommonStructureNeighborGroupRouteReflector neighbor) {
         return Optional.ofNullable(neighbor)
                 .map(n -> n.getRouteReflector())
@@ -291,10 +330,23 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
         final Global bgpGlobal = getGlobalBgp(instanceIdentifier, writeContext);
         Long bgpAs = getAsValue(bgpGlobal);
         Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor.getAfiSafis()));
+
+        final Global bgpGlobalBefore = getGlobalBgpForDelete(instanceIdentifier, writeContext);
+        Map<String, Object> neighAfiSafiBefore = getAfiSafisForNeighbor(bgpGlobalBefore, getAfiSafisForNeighbor(before.getAfiSafis()));
+        Map<String, Object> afisToRemove = Maps.difference(neighAfiSafiBefore, neighAfiSafi).entriesOnlyOnLeft();
+
         String neighborIp = getNeighborIp(instanceIdentifier);
         Boolean enabled = neighbor.getConfig().isEnabled();
         Boolean beforeEnabled = before.getConfig().isEnabled();
 
+        // This is a subtree writer which handles entire neighbor config. This means that if during update an AFI was
+        // removed, it has to be detected and deleted here
+        if (!afisToRemove.isEmpty()) {
+            renderNeighborAfiRemoval(this, cli, instanceIdentifier,
+                    neighbor, vrfKey, bgpAs, afisToRemove, neighborIp, NEIGHBOR_GLOBAL_DELETE_AFI, NEIGHBOR_VRF_DELETE);
+        }
+
+        // Then update existing attributes
         renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, before, enabled, beforeEnabled, vrfKey, bgpAs, neighAfiSafi, neighborIp,
                 NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
