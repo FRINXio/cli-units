@@ -50,8 +50,9 @@ public class OneRateTwoColorConfigReader implements CliConfigReader<Config, Conf
     private static final Pattern BW_REM_LINE = Pattern.compile("bandwidth remaining percent (?<rem>.+)");
     private static final Pattern BW_LINE = Pattern.compile("bandwidth percent (?<bw>.+)");
 
-    private static final String CLASS_DEFAULT = "class-default";
-    private static final Pattern CLASS_LINE = Pattern.compile("(.*)class(.*)");
+    public static final String CLASS_DEFAULT = "class-default";
+    private static final String CLASS_LINE = "class %s";
+    private static final Pattern NEXT_CLASS_LINE = Pattern.compile("(.*)class(.*)");
     private Cli cli;
 
     public OneRateTwoColorConfigReader(Cli cli) {
@@ -74,17 +75,25 @@ public class OneRateTwoColorConfigReader implements CliConfigReader<Config, Conf
         String[] full = output.split(ParsingUtils.NEWLINE.pattern());
         // class-default is always the last class in the list
         if (!CLASS_DEFAULT.equals(classname)) {
+            Pattern classDef = Pattern.compile(String.format(CLASS_LINE, classname));
             // however if we do have a class other than class-default, we need to make
             // sure we parse only fields belonging to that class, so limit the output
             // to the line where the next class declaration begins
-            // Skip timestamp and first class definition
-            for (int i = 2; i < full.length; i ++) {
-                // we only have to find the first occurrence
-                Matcher m = CLASS_LINE.matcher(full[i]);
-                if (m.matches()) {
-                    return String.join("\n", Arrays.asList(full).subList(2, i));
+            int first = 0;
+            int until = 0;
+            for (int i = 0; i < full.length; i ++) {
+                // first occurence should be the class definition
+                Matcher matchDef = classDef.matcher(full[i]);
+                if (matchDef.matches()) {
+                    first = i;
+                }
+                // last is any other class definition, including class-default
+                Matcher last = NEXT_CLASS_LINE.matcher(full[i]);
+                if (last.matches()) {
+                    until = i;
                 }
             }
+            return String.join("\n", Arrays.asList(full).subList(first, until));
         }
         return String.join("\n", full);
     }

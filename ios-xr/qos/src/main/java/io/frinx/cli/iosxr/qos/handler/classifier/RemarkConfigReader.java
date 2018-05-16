@@ -21,6 +21,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.qos.handler.scheduler.OneRateTwoColorConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
@@ -29,6 +30,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosRemarkQosGroupAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.RemarkBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.common.remark.actions.ConfigBuilder;
 import org.opendaylight.yangtools.concepts.Builder;
@@ -36,8 +38,6 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class RemarkConfigReader implements CliConfigReader<Config, ConfigBuilder> {
-
-    private static final String SH_POLICY_MAPS = "show running-config policy-map %s | include set";
 
     private static final Pattern MPLS_LINE = Pattern.compile("set mpls experimental topmost (?<mpls>.+)");
     private static final Pattern QOS_LINE = Pattern.compile("set qos-group (?<qos>.+)");
@@ -51,6 +51,10 @@ public class RemarkConfigReader implements CliConfigReader<Config, ConfigBuilder
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
+        if (className.endsWith(ClassifierReader.DEFAULT_CLASS_SUFFIX)) {
+            className = OneRateTwoColorConfigReader.CLASS_DEFAULT;
+        }
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.Config targetGroup =
                 readContext.read(RWUtils.cutId(instanceIdentifier, Actions.class)
                         .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.Config.class)).orNull();
@@ -59,8 +63,9 @@ public class RemarkConfigReader implements CliConfigReader<Config, ConfigBuilder
             return;
         }
         String policyName = targetGroup.getTargetGroup();
-        String output = blockingRead(f(SH_POLICY_MAPS, policyName), cli, instanceIdentifier, readContext);
-        parseRemarks(output, configBuilder);
+        String output = blockingRead(f(OneRateTwoColorConfigReader.SH_POLICY_MAP, policyName, className), cli, instanceIdentifier, readContext);
+        String finalOutput = OneRateTwoColorConfigReader.limitOutput(output, className);
+        parseRemarks(finalOutput, configBuilder);
     }
 
     @VisibleForTesting

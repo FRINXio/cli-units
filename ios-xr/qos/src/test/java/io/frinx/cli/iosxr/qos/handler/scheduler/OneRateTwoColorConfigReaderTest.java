@@ -16,7 +16,6 @@
 
 package io.frinx.cli.iosxr.qos.handler.scheduler;
 
-import io.frinx.cli.iosxr.qos.handler.scheduler.OneRateTwoColorConfigReader;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosMaxQueueDepthMsAug;
@@ -34,6 +33,12 @@ public class OneRateTwoColorConfigReaderTest {
         "  bandwidth percent 15 \r\n" +
         " ! \r\n" +
         " class class-default\r\n" +
+        " end-policy-map\r\n" +
+        "! \r\n";
+
+    private static final String OUTPUT_DEFAULT =
+        " class class-default\r\n" +
+        "  set mpls experimental topmost 10\r\n" +
         "  priority level 2 \r\n" +
         "  queue-limit 3 ms \r\n" +
         "  bandwidth remaining percent 9 \r\n" +
@@ -46,10 +51,16 @@ public class OneRateTwoColorConfigReaderTest {
     public void testOneRateTwoColorConfig() {
         ConfigBuilder builder = new ConfigBuilder();
         String finalOutput = OneRateTwoColorConfigReader.limitOutput(OUTPUT, "map1");
-        System.out.println(finalOutput);
         OneRateTwoColorConfigReader.fillInConfig(finalOutput, builder);
         Assert.assertEquals(4, builder.getAugmentation(QosMaxQueueDepthMsAug.class).getMaxQueueDepthMs().intValue());
         Assert.assertEquals(10, builder.getCirPctRemaining().getValue().intValue());
         Assert.assertEquals(15, builder.getCirPct().getValue().intValue());
+
+        ConfigBuilder builder1 = new ConfigBuilder();
+        finalOutput = OneRateTwoColorConfigReader.limitOutput(OUTPUT_DEFAULT, "class-default");
+        OneRateTwoColorConfigReader.fillInConfig(finalOutput, builder1);
+        Assert.assertEquals(3, builder1.getAugmentation(QosMaxQueueDepthMsAug.class).getMaxQueueDepthMs().intValue());
+        Assert.assertEquals(9, builder1.getCirPctRemaining().getValue().intValue());
+        Assert.assertEquals(14, builder1.getCirPct().getValue().intValue());
     }
 }
