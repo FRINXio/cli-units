@@ -40,14 +40,20 @@ public class VrfConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE = "configure terminal\n" +
             "ip vrf {$config.name}\n" +
-            "{.if ($config.description) }description {$config.description}\n{.else}no description\n{/if}" +
-            "{.if ($config.route_distinguisher.string) }rd {$config.route_distinguisher.string}\n{.else}no rd\n{/if}" +
+            "{.if ($config.description) }description {$config.description}\n{.else}{.if ($before.description) }no description\n{/if}{/if}" +
+            "{.if ($config.route_distinguisher.string) }rd {$config.route_distinguisher.string}\n{.else}{.if ($before.route_distinguisher.string) }no rd\n{/if}{/if}" +
             "end";
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
 
+        renderCurrentAttributes(instanceIdentifier, config, null, writeContext);
+    }
+
+    public void renderCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                        @Nonnull Config config, @Nonnull Config before,
+                                        @Nonnull WriteContext writeContext) throws WriteFailedException.CreateFailedException {
         if (config.getType().equals(L3VRF.class)) {
 
             checkUniqueRd(writeContext, config.getName(), config.getRouteDistinguisher());
@@ -55,6 +61,7 @@ public class VrfConfigWriter implements CliWriter<Config> {
             blockingWriteAndRead(cli, instanceIdentifier, config,
                     fT(WRITE_TEMPLATE,
                             "vrf", config.getName(),
+                            "before", before,
                             "config", config));
         }
     }
@@ -83,7 +90,7 @@ public class VrfConfigWriter implements CliWriter<Config> {
         // The problem with updating VRF by delete+write is that on IOS, VRF deletion happens in background after
         // delete command has been issued. While this is happening a VRF cannot be created. So to avoid that, do not
         // delete VRF during update
-        writeCurrentAttributes(id, dataAfter, writeContext);
+        renderCurrentAttributes(id, dataAfter, dataBefore, writeContext);
     }
 
     private static final String DELETE_TEMPLATE = "configure terminal\n" +
