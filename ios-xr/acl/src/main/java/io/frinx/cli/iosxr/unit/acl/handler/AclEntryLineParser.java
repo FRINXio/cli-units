@@ -25,6 +25,7 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1Builder;
@@ -36,6 +37,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.HopRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.IcmpMsgType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv4AddressWildcarded;
@@ -338,7 +341,7 @@ public class AclEntryLineParser {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder,
         final Queue<String> words) {
         if (!words.isEmpty() && isPortNumRange(words.peek())) {
-            transportConfigBuilder.setSourcePort(parsePortNumRange(words));
+            parsePortNumRange(words, transportConfigBuilder, true);
         } else {
             transportConfigBuilder.setSourcePort(new PortNumRange(Enumeration.ANY));
         }
@@ -348,7 +351,7 @@ public class AclEntryLineParser {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder,
         final Queue<String> words) {
         if (!words.isEmpty() && isPortNumRange(words.peek())) {
-            transportConfigBuilder.setDestinationPort(parsePortNumRange(words));
+            parsePortNumRange(words, transportConfigBuilder, false);
         } else {
             transportConfigBuilder.setDestinationPort(new PortNumRange(Enumeration.ANY));
         }
@@ -410,18 +413,46 @@ public class AclEntryLineParser {
         try {
             return Integer.parseInt(portNumberOrServiceName);
         } catch (NumberFormatException e) {
-            Integer result = ServiceToPortMapping.TCP_MAPPING.get(portNumberOrServiceName);
-            if (result != null) {
-                return result;
-            }
             throw new IllegalArgumentException("Cannot parse port:" + portNumberOrServiceName);
         }
     }
 
-    private static PortNumRange parsePortNumRange(Queue<String> words) {
+    private static void parsePortNumRange(Queue<String> words,
+                                          org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder,
+                                          boolean source) {
         String possiblePortRangeKeyword = words.poll();
-        int port1 = serviceToPortNumber(words.poll());
 
+        String port1String = words.poll();
+        String port2String = possiblePortRangeKeyword.equals("range") ? words.peek() : null;
+
+        boolean arePortsNumeric = port2String == null ?
+                StringUtils.isNumeric(port1String) :
+                StringUtils.isNumeric(port1String) && StringUtils.isNumeric(port2String);
+
+        if (arePortsNumeric) {
+            Integer port1 = serviceToPortNumber(port1String);
+
+            if (source) {
+                transportConfigBuilder.setSourcePort(parsePortNumRangeNumbers(possiblePortRangeKeyword, port1, words));
+            } else {
+                transportConfigBuilder.setDestinationPort(parsePortNumRangeNumbers(possiblePortRangeKeyword, port1, words));
+            }
+        } else {
+            AclSetAclEntryTransportPortNamedAug existingAug = transportConfigBuilder.getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
+            AclSetAclEntryTransportPortNamedAugBuilder AclSetAclEntryTransportPortNamedAugBuilder = existingAug != null ? new AclSetAclEntryTransportPortNamedAugBuilder(existingAug) : new AclSetAclEntryTransportPortNamedAugBuilder();
+
+            if (source) {
+                AclSetAclEntryTransportPortNamedAugBuilder.setSourcePortNamed(parsePortNumRangeNamed(possiblePortRangeKeyword, port1String, words));
+            } else {
+                AclSetAclEntryTransportPortNamedAugBuilder.setDestinationPortNamed(parsePortNumRangeNamed(possiblePortRangeKeyword, port1String, words));
+            }
+
+            transportConfigBuilder.addAugmentation(AclSetAclEntryTransportPortNamedAug.class, AclSetAclEntryTransportPortNamedAugBuilder
+                    .build());
+        }
+    }
+
+    private static PortNumRange parsePortNumRangeNumbers(String possiblePortRangeKeyword, int port1, Queue<String> words) {
         switch (possiblePortRangeKeyword) {
             case "eq":
                 return new PortNumRange(new PortNumber(port1));
@@ -439,8 +470,34 @@ public class AclEntryLineParser {
             case "gt":
                 return createPortNumRange(String.valueOf(port1), String.valueOf(MAX_PORT_NUMBER));
             case "range":
-                int port2 =  serviceToPortNumber(words.poll());
+                int port2 = serviceToPortNumber(words.poll());
                 return createPortNumRange(String.valueOf(port1), String.valueOf(port2));
+            default:
+                throw new IllegalArgumentException("Not a port range keyword:" + possiblePortRangeKeyword);
+        }
+    }
+
+    private static String parsePortNumRangeNamed(String possiblePortRangeKeyword, String port1, Queue<String> words) {
+        switch (possiblePortRangeKeyword) {
+            case "eq":
+                return port1;
+            case "neq":
+                Integer result = ServiceToPortMapping.TCP_MAPPING.get(port1);
+                if (result == null) {
+                    // This is best effort case. We can only transform not SSH, if we know the number behind SSH, otherwise
+                    // we fail
+                    throw new IllegalArgumentException("Unknown named port, unable to translate to from 'neq' to range:" + port1);
+                }
+
+                // not 22 = 23-21
+                return createPortNumRangeFromInt(result + 1, result - 1).getString();
+            case "lt":
+                return createPortRangeString(String.valueOf(0), port1);
+            case "gt":
+                return createPortRangeString(port1, String.valueOf(MAX_PORT_NUMBER));
+            case "range":
+                String port2 = words.poll();
+                return createPortRangeString(port1, port2);
             default:
                 throw new IllegalArgumentException("Not a port range keyword:" + possiblePortRangeKeyword);
         }
@@ -451,7 +508,11 @@ public class AclEntryLineParser {
     }
 
     private static PortNumRange createPortNumRange(String lower, String upper) {
-        return new PortNumRange(lower + ".." + upper);
+        return new PortNumRange(createPortRangeString(lower, upper));
+    }
+
+    private static String createPortRangeString(String lower, String upper) {
+        return lower + ".." + upper;
     }
 
     private static boolean isPortNumRange(String word) {

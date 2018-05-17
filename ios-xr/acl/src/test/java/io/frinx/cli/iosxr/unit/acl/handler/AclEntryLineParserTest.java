@@ -33,6 +33,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.HopRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.IcmpMsgType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.IcmpBuilder;
@@ -182,7 +184,9 @@ public class AclEntryLineParserTest {
             TransportBuilder transportBuilder = new TransportBuilder();
             transportBuilder.setConfig(
                     new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder()
-                            .setSourcePort(new PortNumRange(new PortNumber(80)))
+                            .addAugmentation(AclSetAclEntryTransportPortNamedAug.class, new AclSetAclEntryTransportPortNamedAugBuilder()
+                                    .setSourcePortNamed("www")
+                                    .build())
                             .setDestinationPort(new PortNumRange(Enumeration.ANY))
                             .build());
 
@@ -413,7 +417,9 @@ public class AclEntryLineParserTest {
             transportBuilder.setConfig(
                     new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder()
                             .setSourcePort(new PortNumRange(Enumeration.ANY))
-                            .setDestinationPort(new PortNumRange("0..80"))
+                            .addAugmentation(AclSetAclEntryTransportPortNamedAug.class, new AclSetAclEntryTransportPortNamedAugBuilder()
+                                    .setDestinationPortNamed("0..www")
+                                    .build())
                             .build());
 
             expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), transportBuilder.build()));

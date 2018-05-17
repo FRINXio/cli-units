@@ -27,11 +27,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv4AddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv6AddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
@@ -85,6 +87,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
             "no {$acl_seq_id}\n" +
             "root\n";
     private final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
+    private final Pattern PORT_RANGE_NAMED_PATTERN = Pattern.compile("(?<from>\\S*)\\.\\.(?<to>\\S*)");
 
     private final Cli cli;
 
@@ -310,11 +313,18 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
 
     private void processTransport(AclEntry entry, MaxMetricCommandDTO commandVars) {
         if (entry.getTransport() != null && entry.getTransport().getConfig() != null) {
+            AclSetAclEntryTransportPortNamedAug aug = entry.getTransport().getConfig().getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
+
             if (entry.getTransport().getConfig().getSourcePort() != null) {
                 commandVars.acl_src_port = formatPort(entry.getTransport().getConfig().getSourcePort());
+            } else if (aug != null && aug.getSourcePortNamed() != null) {
+                commandVars.acl_src_port = formatNamedPort(aug.getSourcePortNamed());
             }
+
             if (entry.getTransport().getConfig().getDestinationPort() != null) {
                 commandVars.acl_dst_port = formatPort(entry.getTransport().getConfig().getDestinationPort());
+            } else if (aug != null && aug.getDestinationPortNamed() != null) {
+                commandVars.acl_dst_port = formatNamedPort(aug.getDestinationPortNamed());
             }
         }
     }
@@ -396,6 +406,36 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
         }
 
         return "";
+    }
+
+    private String formatNamedPort(String port) {
+        Matcher matcher = PORT_RANGE_NAMED_PATTERN.matcher(port);
+        if (matcher.find()) {
+            String from = matcher.group("from");
+            String to = matcher.group("to");
+            if (from.equals("0")) {
+                return f("lt %s", to);
+            }
+            if (to.equals(Integer.toString(MAX_PORT))) {
+                return f("gt %s", from);
+            }
+            if (StringUtils.isNumeric(from) && StringUtils.isNumeric(to)) {
+                Integer f = Integer.valueOf(from);
+                Integer t = Integer.valueOf(to);
+
+                if (f > t && f - 1 == t + 1) {
+                    return f("neq %s", from);
+                }
+            }
+
+            return f("range %s %s", from, to);
+        } else {
+            if (ANY.equalsIgnoreCase(port)) {
+                return "";
+            } else {
+                return f("eq %s", port);
+            }
+        }
     }
 
     private String formatTTL(final String rangeString) {

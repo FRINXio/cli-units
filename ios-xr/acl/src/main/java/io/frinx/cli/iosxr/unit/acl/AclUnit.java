@@ -51,6 +51,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.DestinationAddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSetsBuilder;
@@ -181,6 +182,10 @@ public class AclUnit implements TranslateUnit {
                     .child(Transport.class)
                     .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.Config.class),
                 InstanceIdentifier.create(AclEntry.class)
+                    .child(Transport.class)
+                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.Config.class)
+                    .augmentation(AclSetAclEntryTransportPortNamedAug.class),
+                InstanceIdentifier.create(AclEntry.class)
                     .child(Actions.class),
                 InstanceIdentifier.create(AclEntry.class)
                     .child(Actions.class)
@@ -252,6 +257,10 @@ public class AclUnit implements TranslateUnit {
             ACL_ENTRY_TREE_BASE
                 .child(Transport.class)
                 .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.Config.class),
+            ACL_ENTRY_TREE_BASE
+                .child(Transport.class)
+                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.Config.class)
+                .augmentation(AclSetAclEntryTransportPortNamedAug.class),
             ACL_ENTRY_TREE_BASE.augmentation(AclEntry1.class),
             ACL_ENTRY_TREE_BASE
                 .augmentation(AclEntry1.class)
