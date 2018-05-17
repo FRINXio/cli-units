@@ -34,7 +34,7 @@ public class ConditionsReaderTest {
             " match access-group ipv6 ahojgroup \n" +
             " match precedence ipv4 1 5 \n" +
             " match precedence ipv6 1 \n" +
-            " match precedence priority immediate network \n" +
+            " match precedence priority 4 network \n" +
             " match mpls experimental topmost 6 \n" +
             " match qos-group 10 \n" +
             " end-class-map\n";
@@ -90,7 +90,7 @@ public class ConditionsReaderTest {
 
         Assert.assertEquals(
             Lists.newArrayList(
-                Precedence.Priority, Precedence.Critical),
+                new Precedence((short) 1), new Precedence((short) 5)),
                 builder.getIpv4().getConfig().getAugmentation(QosIpv4ConditionAug.class).getPrecedences());
     }
 
@@ -103,7 +103,7 @@ public class ConditionsReaderTest {
         Assert.assertNull(builder.getIpv4());
 
         Assert.assertEquals(
-            Lists.newArrayList(Precedence.Priority),
+            Lists.newArrayList(new Precedence((short) 1)),
             builder.getIpv6().getConfig().getAugmentation(QosIpv6ConditionAug.class).getPrecedences());
     }
 
@@ -117,7 +117,7 @@ public class ConditionsReaderTest {
         Assert.assertNull(builder.getIpv6());
 
         Assert.assertEquals(
-            Lists.newArrayList(Precedence.Priority, Precedence.Immediate, Precedence.Network),
+            Lists.newArrayList(new Precedence("priority"), new Precedence((short) 4), new Precedence("network")),
             builder.getAugmentation(QosConditionAug.class).getPrecedences());
     }
 

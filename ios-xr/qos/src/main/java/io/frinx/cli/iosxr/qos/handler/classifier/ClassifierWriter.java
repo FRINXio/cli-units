@@ -43,7 +43,8 @@ public class ClassifierWriter implements CliWriter<Classifier> {
     }
 
     public static final String LIST_PREC =
-        "{$prec.int_value}" +
+        "{% if ($prec.uint8) %}{$prec.uint8}{% endif %}" +
+        "{% if ($prec.string) %}{$prec.string}{% endif %}" +
         "{% divider %}" +
         " " +
         "{% endloop %}\n";

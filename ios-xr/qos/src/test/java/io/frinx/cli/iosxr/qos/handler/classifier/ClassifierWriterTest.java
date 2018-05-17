@@ -54,19 +54,19 @@ public class ClassifierWriterTest {
 
     private static final String WRITE_INPUT_ALL = "class-map match-all map1\n" +
             "match qos-group 10\n" +
-            "match precedence 2 3 7\n" +
+            "match precedence 2 3 network\n" +
             "match mpls experimental topmost 1\n" +
             "match access-group ipv4 acl4\n" +
             "match access-group ipv6 acl6\n" +
-            "match precedence ipv4 2 3 7\n" +
-            "match precedence ipv6 7\n" +
+            "match precedence ipv4 0 7 network\n" +
+            "match precedence ipv6 critical\n" +
             "root\n";
 
     private static final String WRITE_QOS_ANY = "class-map match-any map1\nmatch qos-group 10\nroot\n";
-    private static final String WRITE_PREC_ANY = "class-map match-any map1\nmatch precedence 2 3 7\nroot\n";
+    private static final String WRITE_PREC_ANY = "class-map match-any map1\nmatch precedence 2 3 network\nroot\n";
     private static final String WRITE_MPLS_ANY = "class-map match-any map1\nmatch mpls experimental topmost 1\nroot\n";
     private static final String WRITE_ACG_IPV4_ANY = "class-map match-any map1\nmatch access-group ipv4 acl4\nroot\n";
-    private static final String WRITE_PREC_IPV4_ANY = "class-map match-any map1\nmatch precedence ipv4 2 3 7\nroot\n";
+    private static final String WRITE_PREC_IPV4_ANY = "class-map match-any map1\nmatch precedence ipv4 0 7 network\nroot\n";
 
     private static final String DELETE_INPUT = "no class-map map1\n";
 
@@ -104,18 +104,18 @@ public class ClassifierWriterTest {
         termAll.setConditions(new ConditionsBuilder()
             .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
                 .setQosGroup(10)
-                .setPrecedences(Lists.newArrayList(Precedence.Immediate, Precedence.Flash, Precedence.Network)).build())
+                .setPrecedences(Lists.newArrayList(new Precedence((short) 2), new Precedence((short) 3), new Precedence("network"))).build())
             .setIpv4(new Ipv4Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder()
                 .addAugmentation(QosIpv4ConditionAug.class, new QosIpv4ConditionAugBuilder()
                     .setAclRef("acl4")
-                    .setPrecedences(Lists.newArrayList(Precedence.Immediate, Precedence.Flash, Precedence.Network))
+                    .setPrecedences(Lists.newArrayList(new Precedence((short) 0), new Precedence((short) 7), new Precedence("network")))
                     .build())
                 .build())
             .build())
                 .setIpv6(new Ipv6Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder()
                     .addAugmentation(QosIpv6ConditionAug.class, new QosIpv6ConditionAugBuilder()
                         .setAclRef("acl6")
-                        .setPrecedences(Lists.newArrayList(Precedence.Network))
+                        .setPrecedences(Lists.newArrayList(new Precedence("critical")))
                         .build())
                     .build())
                 .build())
@@ -142,7 +142,7 @@ public class ClassifierWriterTest {
         Term term2 = new TermBuilder().setId("2")
             .setConditions(new ConditionsBuilder()
                 .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
-                    .setPrecedences(Lists.newArrayList(Precedence.Immediate, Precedence.Flash, Precedence.Network)).build())
+                    .setPrecedences(Lists.newArrayList(new Precedence((short) 2), new Precedence((short) 3), new Precedence("network"))).build())
                 .build())
         .build();
 
@@ -159,7 +159,7 @@ public class ClassifierWriterTest {
             .setConditions(new ConditionsBuilder()
                 .setIpv4(new Ipv4Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder()
                     .addAugmentation(QosIpv4ConditionAug.class, new QosIpv4ConditionAugBuilder()
-                        .setPrecedences(Lists.newArrayList(Precedence.Immediate, Precedence.Flash, Precedence.Network)).build())
+                        .setPrecedences(Lists.newArrayList(new Precedence((short) 0), new Precedence((short) 7), new Precedence("network"))).build())
                     .build()).build())
                 .build())
         .build();

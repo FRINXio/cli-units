@@ -23,13 +23,14 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.mpls.header.top.MplsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.mpls.header.top.mpls.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Precedence;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.PrecedenceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.Term;
@@ -130,41 +131,12 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
     public static List<Precedence> parsePrecedence(String fullPrecs) {
         String[] precs = fullPrecs.split(" ");
         List<Precedence> parsedPrecs = new ArrayList<>();
-        for (String prec : precs) {
-            if (StringUtils.isNumeric(prec)) {
-                parsedPrecs.add(Precedence.forValue(Integer.valueOf(prec.trim())));
-            } else {
-                parsedPrecs.add(precedenceForValue(prec.trim()));
-            }
-        }
+        Arrays.stream(precs).forEach(p -> parsedPrecs.add(PrecedenceBuilder.getDefaultInstance(p)));
         return parsedPrecs;
     }
 
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Conditions conditions) {
         ((TermBuilder) builder).setConditions(conditions);
-    }
-
-    private static Precedence precedenceForValue(String name) {
-        switch(name) {
-            case "routine":
-                return Precedence.Routine;
-            case "priority":
-                return Precedence.Priority;
-            case "immediate":
-                return Precedence.Immediate;
-            case "flash":
-                return Precedence.Flash;
-            case "flash-override":
-                return Precedence.FlashOverride;
-            case "critical":
-                return Precedence.Critical;
-            case "internet":
-                return Precedence.Internet;
-            case "network":
-                return Precedence.Network;
-            default:
-                throw new IllegalArgumentException("Unknown precedence " + name);
-        }
     }
 }

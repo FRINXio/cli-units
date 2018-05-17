@@ -57,7 +57,7 @@ public class ActionsWriterTest {
         "class map1\n" +
         "set mpls experimental topmost 2\n" +
         "set qos-group 40\n" +
-        "set precedence 2\n" +
+        "set precedence something\n" +
         "root\n";
 
     private static final String DELETE_INPUT = "policy-map plmap\n" +
@@ -109,7 +109,7 @@ public class ActionsWriterTest {
                     .addAugmentation(QosRemarkQosGroupAug.class,
                     new QosRemarkQosGroupAugBuilder()
                         .setSetQosGroup(30)
-                        .setSetPrecedences(Lists.newArrayList(Precedence.FlashOverride))
+                        .setSetPrecedences(Lists.newArrayList(new Precedence((short) 4)))
                     .build())
                 .build())
             .build())
@@ -134,7 +134,7 @@ public class ActionsWriterTest {
                     .setSetMplsTc((short) 2).addAugmentation(QosRemarkQosGroupAug.class,
                     new QosRemarkQosGroupAugBuilder()
                         .setSetQosGroup(40)
-                        .setSetPrecedences(Lists.newArrayList(Precedence.Immediate))
+                        .setSetPrecedences(Lists.newArrayList(new Precedence("something")))
                     .build())
                 .build())
             .build())
