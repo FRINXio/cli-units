@@ -149,8 +149,11 @@ public class XRQoSUnit implements TranslateUnit {
         wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_IN_INPUT, new NoopCliListWriter<>()));
         wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_IN_IN_CONFIG, new InputConfigWriter(cli)));
         wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_ONERATETWOCOLOR, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_ON_CONFIG, new OneRateTwoColorConfigWriter(cli)));
-        wRegistry.add(new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_ON_CONFIG.augmentation(QosMaxQueueDepthMsAug.class), new NoopCliWriter<>()));
+
+        wRegistry.subtreeAdd(Sets.newHashSet(
+            RWUtils.cutIdFromStart(IIDs.QO_SC_SC_SC_SC_ON_CONFIG.augmentation(QosMaxQueueDepthMsAug.class),
+                InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.Config.class))),
+            new GenericWriter<>(IIDs.QO_SC_SC_SC_SC_ON_CONFIG, new OneRateTwoColorConfigWriter(cli)));
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
