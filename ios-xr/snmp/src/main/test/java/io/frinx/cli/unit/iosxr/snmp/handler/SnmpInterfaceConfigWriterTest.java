@@ -37,9 +37,7 @@ public class SnmpInterfaceConfigWriterTest {
             "no notification linkupdown disable\n" +
             "root\n";
 
-    private static final String DELETE_INPUT = "snmp-server interface Loopback0\n" +
-            "notification linkupdown disable\n" +
-            "root\n";
+    private static final String DELETE_INPUT = "no snmp-server interface Loopback0\n";
 
     @Mock
     private Cli cli;
@@ -51,8 +49,9 @@ public class SnmpInterfaceConfigWriterTest {
 
     private ArgumentCaptor<String> response = ArgumentCaptor.forClass(String.class);
 
-    private InstanceIdentifier iid = KeyedInstanceIdentifier.create(Interfaces.class)
-            .child(Interface.class, new InterfaceKey(new InterfaceId("Loopback0")));
+    private InstanceIdentifier<Config> iid = KeyedInstanceIdentifier.create(Interfaces.class)
+            .child(Interface.class, new InterfaceKey(new InterfaceId("Loopback0")))
+            .child(Config.class);
 
     // test data
     private Config data;
@@ -68,8 +67,13 @@ public class SnmpInterfaceConfigWriterTest {
     }
 
     private void initializeData() {
-        data = new ConfigBuilder().setEnabledTrapForEvent(
-                Lists.newArrayList(new EnabledTrapForEventBuilder().setEventName(LINKUPDOWN.class).build()))
+        data = new ConfigBuilder()
+                .setInterfaceId(iid.firstKeyOf(Interface.class).getInterfaceId())
+                .setEnabledTrapForEvent(
+                        Lists.newArrayList(new EnabledTrapForEventBuilder()
+                                .setEventName(LINKUPDOWN.class)
+                                .setEnabled(true)
+                                .build()))
                 .build();
     }
 

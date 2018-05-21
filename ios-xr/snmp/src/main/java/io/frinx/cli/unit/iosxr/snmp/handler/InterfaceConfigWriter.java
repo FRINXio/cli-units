@@ -20,14 +20,19 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.event.types.rev171024.LINKUPDOWN;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.interfaces._interface.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
 public class InterfaceConfigWriter implements CliWriter<Config> {
+
+    static final String SNMP_IFC_TEMPLATE =
+            "snmp-server interface {$config.interface_id.value}\n" +
+            "{% if ($enable_linkup) %}no {% endif %}notification linkupdown disable\n" +
+            "root";
+
+    static final String SNMP_IFC_TEMPLATE_DELETE = "no snmp-server interface {$config.interface_id.value}";
 
     private Cli cli;
 
@@ -37,31 +42,26 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = instanceIdentifier.firstKeyOf(Interface.class).getInterfaceId().getValue();
         if (config.getEnabledTrapForEvent() == null ||
                 config.getEnabledTrapForEvent().isEmpty() ||
                 !LINKUPDOWN.class.equals(config.getEnabledTrapForEvent().get(0).getEventName())) {
             return;
         }
-        blockingWriteAndRead(cli, instanceIdentifier, config,
-            f("snmp-server interface %s", name),
-            "no notification linkupdown disable",
-            "root");
+
+        blockingWriteAndRead(cli, instanceIdentifier, config, fT(SNMP_IFC_TEMPLATE,
+                "config", config,
+                "enable_linkup", config.getEnabledTrapForEvent().get(0).isEnabled() ? true : null));
     }
 
     @Override
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = instanceIdentifier.firstKeyOf(Interface.class).getInterfaceId().getValue();
-        blockingWriteAndRead(cli, instanceIdentifier, config,
-            f("snmp-server interface %s", name),
-            "notification linkupdown disable",
-            "root");
+        blockingWriteAndRead(cli, instanceIdentifier, config, fT(SNMP_IFC_TEMPLATE_DELETE,
+                "config", config));
     }
 }
