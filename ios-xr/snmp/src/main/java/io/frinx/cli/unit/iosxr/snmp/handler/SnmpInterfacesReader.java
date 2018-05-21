@@ -23,8 +23,10 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -51,14 +53,20 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
             "show running-config snmp-server | utility egrep \"^snmp-server interface|^ notification linkupdown disable\"";
 
     // TODO try to reuse pattern from interface translate unit's interface reader
-    private static final Pattern INTERFACE_ID = Pattern.compile(".*interface (?<id>\\S+).*");
+    private static final Pattern INTERFACE_ID = Pattern.compile(".*interface (?<id>\\S+)\\s*.*?(?<linkupDisable>notification linkupdown disable)?");
 
     private static final EnabledTrapForEvent LINK_UP_DOWN_EVENT = new EnabledTrapForEventBuilder()
             .setEventName(LINKUPDOWN.class)
+            .setEnabled(true)
             .build();
 
-    static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST =
-            Collections.singletonList(LINK_UP_DOWN_EVENT);
+    private static final EnabledTrapForEvent LINK_UP_DOWN_EVENT_DISABLED = new EnabledTrapForEventBuilder()
+            .setEventName(LINKUPDOWN.class)
+            .setEnabled(false)
+            .build();
+
+    static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST = Collections.singletonList(LINK_UP_DOWN_EVENT);
+    static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST_DISABLED = Collections.singletonList(LINK_UP_DOWN_EVENT_DISABLED);
 
     private Cli cli;
 
@@ -78,17 +86,16 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
     static void parseInterfaces(String snmpInterfaceOutput, InterfacesBuilder interfacesBuilder) {
         String realignedOutput = realignSnmpDisabledInterfacesOutput(snmpInterfaceOutput);
 
-        List<InterfaceKey> ifcKeyes = NEWLINE.splitAsStream(realignedOutput)
+        List<Map.Entry<InterfaceKey, Boolean>> ifcKeyes = NEWLINE.splitAsStream(realignedOutput)
                 .map(String::trim)
-                .filter(ifcLine -> !ifcLine.contains("notification linkupdown disable"))
                 .map(INTERFACE_ID::matcher)
                 .filter(Matcher::matches)
-                .map(matcher -> matcher.group("id"))
-                .map(InterfaceId::new)
-                .map(InterfaceKey::new)
+                .map(matcher -> new AbstractMap.SimpleEntry<>(matcher.group("id"), matcher.group("linkupDisable") == null))
+                .map(e -> new AbstractMap.SimpleEntry<>(new InterfaceId(e.getKey()), e.getValue()))
+                .map(e -> new AbstractMap.SimpleEntry<>(new InterfaceKey(e.getKey()), e.getValue()))
                 .collect(Collectors.toList());
 
-        List<Interface> interfaceList = ifcKeyes.stream().map(InterfaceKey::getInterfaceId)
+        List<Interface> interfaceList = ifcKeyes.stream()
                 .map(SnmpInterfacesReader::getIfcConfig)
                 .map(SnmpInterfacesReader::getInterface)
                 .collect(Collectors.toList());
@@ -96,10 +103,10 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
         interfacesBuilder.setInterface(interfaceList);
     }
 
-    private static Config getIfcConfig(InterfaceId ifcId) {
+    private static Config getIfcConfig(Map.Entry<InterfaceKey, Boolean> ifcEntry) {
         return new ConfigBuilder()
-                .setInterfaceId(ifcId)
-                .setEnabledTrapForEvent(LINK_UP_DOWN_EVENT_LIST)
+                .setInterfaceId(ifcEntry.getKey().getInterfaceId())
+                .setEnabledTrapForEvent(ifcEntry.getValue() ? LINK_UP_DOWN_EVENT_LIST : LINK_UP_DOWN_EVENT_LIST_DISABLED)
                 .build();
     }
 

@@ -9,8 +9,11 @@
 package io.frinx.cli.unit.iosxr.snmp.handler;
 
 import static io.frinx.cli.unit.iosxr.snmp.handler.SnmpInterfacesReader.LINK_UP_DOWN_EVENT_LIST;
+import static io.frinx.cli.unit.iosxr.snmp.handler.SnmpInterfacesReader.LINK_UP_DOWN_EVENT_LIST_DISABLED;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
@@ -35,14 +38,15 @@ public class SnmpInterfacesReaderTest {
             "snmp-server interface GigabitEthernet0/0/0/4\n" +
             " notification linkupdown disable";
 
+    private static final HashSet<String> DISABLED = Sets.newHashSet("tunnel-te55", "tunnel-te56", "GigabitEthernet0/0/0/4");
+
     private static final List<Interface> INTERFACE_LIST =
-            Lists.newArrayList("Bundle-Ether1", "Bundle-Ether7000",
-                    "GigabitEthernet0/0/0/1.100")
+            Lists.newArrayList("Bundle-Ether1", "Bundle-Ether7000", "tunnel-te55", "tunnel-te56", "GigabitEthernet0/0/0/1.100", "GigabitEthernet0/0/0/4")
                     .stream()
                     .map(InterfaceId::new)
                     .map(ifcId -> new ConfigBuilder()
                             .setInterfaceId(ifcId)
-                            .setEnabledTrapForEvent(LINK_UP_DOWN_EVENT_LIST)
+                            .setEnabledTrapForEvent(DISABLED.contains(ifcId.getValue()) ? LINK_UP_DOWN_EVENT_LIST_DISABLED : LINK_UP_DOWN_EVENT_LIST)
                             .build())
                     .map(config -> new InterfaceBuilder()
                             .setInterfaceId(config.getInterfaceId())
