@@ -222,7 +222,7 @@ public class AclEntryLineParser {
         }
 
         //icmp
-        final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words);
+        final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words, true);
 
         // ttl
         Config1Builder hopRangeAugment = new Config1Builder();
@@ -240,10 +240,10 @@ public class AclEntryLineParser {
         return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);
     }
 
-    private static AclEntry1 parseIcmpMsgType(final IpProtocolType ipProtocolType, final Queue<String> words) {
+    private static AclEntry1 parseIcmpMsgType(final IpProtocolType ipProtocolType, final Queue<String> words, boolean isIpv4Acl) {
         final AclEntry1Builder icmpMsgTypeAugment = new AclEntry1Builder();
         if (IP_PROTOCOL_ICMP.equals(ipProtocolType) || IP_PROTOCOL_ICMP_NUMBER.equals(ipProtocolType)) {
-            Optional<Short> maybeMsgType = tryToParseIcmpType(words.peek());
+            Optional<Short> maybeMsgType = tryToParseIcmpType(words.peek(), isIpv4Acl);
             if (maybeMsgType.isPresent()) {
                 words.poll();
                 icmpMsgTypeAugment.setIcmp(new IcmpBuilder()
@@ -319,7 +319,7 @@ public class AclEntryLineParser {
         }
 
         //icmp
-        final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words);
+        final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words, false);
 
         // ttl
         Config2Builder hopRangeAugment = new Config2Builder();
@@ -357,16 +357,17 @@ public class AclEntryLineParser {
         }
     }
 
-    private static Optional<Short> tryToParseIcmpType(String word) {
+    private static Optional<Short> tryToParseIcmpType(String word, boolean isIpv4Acl) {
         if (word == null) {
             return Optional.empty();
         }
         if (ZERO_TO_255_PATTERN.matcher(word).matches()) {
             return Optional.of(Short.parseShort(word));
-        } else {
-            Short result = ServiceToPortMapping.ICMP_MAPPING.get(word);
-            return Optional.ofNullable(result);
         }
+        if (isIpv4Acl) {
+            return Optional.ofNullable(ServiceToPortMapping.ICMP_MAPPING.get(word));
+        }
+        return Optional.ofNullable(ServiceToPortMapping.ICMPV6_MAPPING.get(word));
     }
 
 

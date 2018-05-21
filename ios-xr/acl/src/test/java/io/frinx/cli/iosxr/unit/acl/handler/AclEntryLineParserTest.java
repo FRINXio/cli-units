@@ -122,7 +122,7 @@ public class AclEntryLineParserTest {
                 .setIcmp(new IcmpBuilder()
                     .setConfig(
                         new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.icmp.ConfigBuilder()
-                            .setMsgType(new IcmpMsgType((short) 8))
+                            .setMsgType(new IcmpMsgType(icmpMessageType))
                             .build()
                     ).build()
                 ).build()
@@ -145,7 +145,7 @@ public class AclEntryLineParserTest {
                 " 13 permit tcp host 1.1.1.1 range 1024 65535 host 2.2.2.2 range 0 1023\n" +
                 " 14 permit ipv4 any any ttl gt 12\n" +
                 " 15 permit udp any neq 80 any ttl neq 10\n" +
-                " 26 permit icmp any any echo\n" +
+                " 26 permit icmp any any router-solicitation\n" +
                 "!\n";
         LinkedHashMap<Long, AclEntry> expectedResults = new LinkedHashMap<>();
 
@@ -311,14 +311,14 @@ public class AclEntryLineParserTest {
             expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), transportBuilder.build()));
         }
         {
-            // 26 permit icmp any any echo
+            // 26 permit icmp any any router-solicitation
             long sequenceId = 26;
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
             configBuilder.setProtocol(new IpProtocolType(IPICMP.class));
             configBuilder.setSourceAddress(IPV4_HOST_ANY);
             configBuilder.setDestinationAddress(IPV4_HOST_ANY);
 
-            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null, (short) 8));
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null, (short) 10));
         }
 
         // verify expected results
@@ -346,7 +346,7 @@ public class AclEntryLineParserTest {
     public void testIpv6() {
         String lines = "ipv6 access-list foo\n" +
                 " 1 permit ipv6 any any\n" +
-                " 3 permit icmpv6 any any\n" +
+                " 3 permit icmpv6 any any router-solicitation\n" +
                 " 4 deny ipv6 2001:db8:a0b:12f0::1/55 any\n" +
                 " 5 permit tcp host ::1 host ::1\n" +
                 " 6 permit tcp host ::1 host ::1 lt www ttl eq 10\n" +
@@ -370,14 +370,14 @@ public class AclEntryLineParserTest {
             expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null));
         }
         {
-            // 3 permit icmpv6 any any
+            // 3 permit icmpv6 any any router-solicitation
             long sequenceId = 3;
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
             configBuilder.setProtocol(new IpProtocolType(IPICMP.class));
             configBuilder.setSourceAddress(IPV6_HOST_ANY);
             configBuilder.setDestinationAddress(IPV6_HOST_ANY);
 
-            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null));
+            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null, (short) 133));
         }
         {
             // 4 deny ipv6 2001:db8:a0b:12f0::1/55 any

@@ -22,8 +22,8 @@ import java.util.Map;
 public class ServiceToPortMapping {
 
     public static final Map<String, Integer> TCP_MAPPING;
-
     public static final Map<String, Short> ICMP_MAPPING;
+    public static final Map<String, Short> ICMPV6_MAPPING;
 
 
     static {
@@ -86,5 +86,25 @@ public class ServiceToPortMapping {
         icmpMap.put("conversion-error", (short) 31);
         icmpMap.put("mobile-redirect", (short) 32);
         ICMP_MAPPING = Collections.unmodifiableMap(icmpMap);
+
+        Map<String, Short> icmpv6Map = new HashMap<>();
+        icmpv6Map.put("destination-unreachable", (short) 1);
+        icmpv6Map.put("packet-too-big", (short) 2);
+        icmpv6Map.put("time-exceeded", (short) 3);
+        icmpv6Map.put("parameter-problem", (short) 4);
+        icmpv6Map.put("echo", (short) 128);
+        icmpv6Map.put("echo-reply", (short) 129);
+        icmpv6Map.put("group-membership-query", (short) 130);
+        icmpv6Map.put("group-membership-report", (short) 131);
+        icmpv6Map.put("group-membership-termination", (short) 132);
+        icmpv6Map.put("router-solicitation", (short) 133);
+        icmpv6Map.put("router-advertisement", (short) 134);
+        icmpv6Map.put("nd-ns", (short) 135);
+        icmpv6Map.put("nd-na", (short) 136);
+        icmpv6Map.put("neighbor-redirect", (short) 137);
+        icmpv6Map.put("router-renumbering", (short) 138);
+        icmpv6Map.put("whoareyou-request", (short) 139);
+        icmpv6Map.put("whoareyou-reply", (short) 140);
+        ICMPV6_MAPPING = Collections.unmodifiableMap(icmpv6Map);
     }
 }
