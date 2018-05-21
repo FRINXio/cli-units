@@ -16,6 +16,7 @@
 
 package io.frinx.cli.iosxr.mpls.handler;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -53,10 +54,21 @@ public class TunnelConfigWriter implements CliWriter<Config> {
             "metric", LSPMETRICABSOLUTE.class.equals(data.getMetricType()) ? data.getMetric() : null));
     }
 
-    private static void checkTunnelConfig(Config data) {
-        if (data.getMetricType() != null) {
-            Preconditions.checkArgument(LSPMETRICABSOLUTE.class.equals(data.getMetricType()),
-                    "Only LSP_METRIC_ABSOLUTE metric type is supported");
+    @VisibleForTesting
+    static void checkTunnelConfig(Config data) {
+        if (data.isShortcutEligible() == null || !data.isShortcutEligible()) {
+            Preconditions.checkArgument(data.getMetric() == null, "metric cannot be defined in MPLS " +
+                    "tunnel " + data.getName() + " because 'shortcut-eligible' is not defined or is 'false'");
+            Preconditions.checkArgument(data.getMetricType() == null, "metric-type cannot be defined in MPLS " +
+                    "tunnel " + data.getName() + " because 'shortcut-eligible' is not defined or is 'false'");
+        } else {
+            if (data.getMetricType() == null || data.getMetric() == null) {
+                Preconditions.checkArgument(data.getMetric() == null, "metric is defined but metric-type is not in MPLS tunnel " + data.getName());
+                Preconditions.checkArgument(data.getMetricType() == null, "metric-type is defined but metric is not in MPLS tunnel " + data.getName());
+            } else {
+                Preconditions.checkArgument(LSPMETRICABSOLUTE.class.equals(data.getMetricType()),
+                        "Only LSP_METRIC_ABSOLUTE metric type is supported");
+            }
         }
     }
 

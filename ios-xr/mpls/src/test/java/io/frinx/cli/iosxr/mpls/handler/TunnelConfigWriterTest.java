@@ -22,7 +22,9 @@ import io.frinx.cli.io.Cli;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -33,6 +35,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev17082
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.rev170824.LSPMETRICABSOLUTE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.rev170824.LSPMETRICRELATIVE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
@@ -53,6 +56,9 @@ public class TunnelConfigWriterTest {
         "root\n";
 
     private static final String DELETE_INPUT = "no interface tunnel-te 55\n\n";
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @Mock
     private Cli cli;
@@ -124,5 +130,119 @@ public class TunnelConfigWriterTest {
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue());
+    }
+
+    @Test
+    public void checkTunnelConfig_valid_onlyShortcutEligible() {
+        data = new ConfigBuilder().setShortcutEligible(true).build();
+        TunnelConfigWriter.checkTunnelConfig(data);
+        data = new ConfigBuilder().setShortcutEligible(false).build();
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_valid_noShortcutEligible() {
+        data = new ConfigBuilder().build();
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_valid_allParams() {
+        data = new ConfigBuilder().setShortcutEligible(true)
+                .setMetricType(LSPMETRICABSOLUTE.class)
+                .setMetric(5)
+                .build();
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_throwsIAE_noMetric() {
+        data = new ConfigBuilder().setShortcutEligible(true)
+                .setMetricType(LSPMETRICABSOLUTE.class)
+                .build();
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("metric-type is defined but metric is not in MPLS tunnel");
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_throwsIAE_noMetricType() {
+        data = new ConfigBuilder().setShortcutEligible(true)
+                .setMetric(5)
+                .build();
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("metric is defined but metric-type is not in MPLS tunnel");
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_throwsIAE_relativeMetricType() {
+        data = new ConfigBuilder().setShortcutEligible(true)
+                .setMetricType(LSPMETRICRELATIVE.class)
+                .setMetric(5)
+                .build();
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Only LSP_METRIC_ABSOLUTE metric type is supported");
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_throwsIAE_noShortcutEligible() {
+        data = new ConfigBuilder()
+                .setMetricType(LSPMETRICABSOLUTE.class)
+                .setMetric(5)
+                .build();
+        exception.expect(IllegalArgumentException.class);
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_throwsIAE_noShortcutEligible_setMetric() {
+        data = new ConfigBuilder()
+                .setMetric(5)
+                .build();
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("metric cannot be defined in MPLS tunnel");
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_throwsIAE_noShortcutEligible_setMetricType() {
+        data = new ConfigBuilder()
+                .setMetricType(LSPMETRICRELATIVE.class)
+                .build();
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("metric-type cannot be defined in MPLS tunnel");
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_throwsIAE_falseShortcutEligible() {
+        data = new ConfigBuilder().setShortcutEligible(false)
+                .setMetricType(LSPMETRICABSOLUTE.class)
+                .setMetric(5)
+                .build();
+        exception.expect(IllegalArgumentException.class);
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_throwsIAE_falseShortcutEligible_setMetric() {
+        data = new ConfigBuilder().setShortcutEligible(false)
+                .setMetric(5)
+                .build();
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("metric cannot be defined in MPLS tunnel");
+        TunnelConfigWriter.checkTunnelConfig(data);
+    }
+
+    @Test
+    public void checkTunnelConfig_throwsIAE_falseShortcutEligible_setMetricType() {
+        data = new ConfigBuilder().setShortcutEligible(false)
+                .setMetricType(LSPMETRICRELATIVE.class)
+                .build();
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("metric-type cannot be defined in MPLS tunnel");
+        TunnelConfigWriter.checkTunnelConfig(data);
     }
 }
