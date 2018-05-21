@@ -35,7 +35,7 @@ public class ActionsWriter implements CliWriter<Actions> {
         "set mpls experimental topmost {$mpls}\n{% else %}" +
         "no set mpls experimental topmost\n{% endif %}" +
         "{% if ($aug.set_qos_group) %}" +
-        "set qos-group {$aug.set_qos_group}\n{% else %}" +
+        "set qos-group {% loop in $aug.set_qos_group as $qos %}" + ClassifierWriter.LIST_QOS + "{% else %}" +
         "no set qos-group\n{% endif %}" +
         "{% if ($aug.set_precedences) %}" +
         "set precedence {% loop in $aug.set_precedences as $prec %}" + ClassifierWriter.LIST_PREC + "{% else %}" +

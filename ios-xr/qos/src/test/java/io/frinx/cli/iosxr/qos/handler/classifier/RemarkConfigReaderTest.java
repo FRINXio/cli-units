@@ -16,7 +16,6 @@
 
 package io.frinx.cli.iosxr.qos.handler.classifier;
 
-import io.frinx.cli.iosxr.qos.handler.classifier.RemarkConfigReader;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosRemarkQosGroupAug;
@@ -27,7 +26,7 @@ public class RemarkConfigReaderTest {
     private static String OUTPUT = "Wed Mar 14 12:43:30.768 UTC\n" +
             "  set precedence 4\n" +
             "  set mpls experimental topmost 1\n" +
-            "  set qos-group 30\n";
+            "  set qos-group 30 5-10\n";
 
     @Test
     public void testParseRemarks() {
@@ -35,6 +34,8 @@ public class RemarkConfigReaderTest {
         RemarkConfigReader.parseRemarks(OUTPUT, builder);
 
         Assert.assertEquals(1, builder.getSetMplsTc().shortValue());
-        Assert.assertEquals(30, builder.getAugmentation(QosRemarkQosGroupAug.class).getSetQosGroup().shortValue());
+        Assert.assertEquals(2, builder.getAugmentation(QosRemarkQosGroupAug.class).getSetQosGroup().size());
+        Assert.assertEquals(Long.valueOf(30), builder.getAugmentation(QosRemarkQosGroupAug.class).getSetQosGroup().get(0).getUint32());
+        Assert.assertEquals("5..10", builder.getAugmentation(QosRemarkQosGroupAug.class).getSetQosGroup().get(1).getQosGroupRange().getValue());
     }
 }

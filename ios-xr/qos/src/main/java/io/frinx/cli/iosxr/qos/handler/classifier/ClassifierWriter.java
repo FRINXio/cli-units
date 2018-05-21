@@ -49,8 +49,15 @@ public class ClassifierWriter implements CliWriter<Classifier> {
         " " +
         "{% endloop %}\n";
 
+    public static final String LIST_QOS =
+        "{% if ($qos.uint32) %}{$qos.uint32}{% endif %}" +
+        "{% if ($qos.qos_group_range) %}{$qos.qos_group_range.value|s/\\.\\./-/g}{% endif %}" +
+        "{% divider %}" +
+        " " +
+        "{% endloop %}\n";
+
     private static final String MATCH_QOS_T ="{% if ($aug.qos_group) %}" +
-        "match qos-group {$aug.qos_group}\n{% endif %}";
+        "match qos-group {% loop in $aug.qos_group as $qos %}" + LIST_QOS + "{% endif %}";
 
     private static final String MATCH_PREC_T ="{% if ($aug.precedences) %}" +
         "match precedence {% loop in $aug.precedences as $prec %}" + LIST_PREC + "{% endif %}";

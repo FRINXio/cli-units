@@ -80,7 +80,7 @@ public class RemarkConfigReader implements CliConfigReader<Config, ConfigBuilder
         QosRemarkQosGroupAugBuilder augBuilder = new QosRemarkQosGroupAugBuilder();
         ParsingUtils.parseField(output, QOS_LINE::matcher,
             matcher -> matcher.group("qos"),
-            v -> augBuilder.setSetQosGroup(Integer.valueOf(v)));
+            v -> augBuilder.setSetQosGroup(ConditionsReader.parseQosGroups(v)));
 
         ParsingUtils.parseField(output, PREC_LINE::matcher,
             matcher -> matcher.group("prec"),

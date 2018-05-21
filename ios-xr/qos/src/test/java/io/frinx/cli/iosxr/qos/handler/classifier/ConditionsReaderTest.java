@@ -21,6 +21,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Precedence;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroup;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroupRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv6ConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.ConditionsBuilder;
@@ -36,7 +38,7 @@ public class ConditionsReaderTest {
             " match precedence ipv6 1 \n" +
             " match precedence priority 4 network \n" +
             " match mpls experimental topmost 6 \n" +
-            " match qos-group 10 \n" +
+            " match qos-group 10 1-2\n" +
             " end-class-map\n";
 
     @Test
@@ -45,7 +47,8 @@ public class ConditionsReaderTest {
         ConditionsReader.filterParsing(OUTPUT, "all", builder);
 
         QosConditionAug qos = builder.getAugmentation(QosConditionAug.class);
-        Assert.assertEquals(10, qos.getQosGroup().intValue());
+        Assert.assertEquals(new QosGroup(10L), qos.getQosGroup().get(0));
+        Assert.assertEquals(new QosGroup(new QosGroupRange("1..2")), qos.getQosGroup().get(1));
 
         QosIpv6ConditionAug aug4 = builder.getIpv6().getConfig().getAugmentation(QosIpv6ConditionAug.class);
         Assert.assertEquals("ahojgroup", aug4.getAclRef());
@@ -141,6 +144,7 @@ public class ConditionsReaderTest {
         Assert.assertNull(builder.getIpv4());
         Assert.assertNull(builder.getIpv6());
 
-        Assert.assertEquals(10, builder.getAugmentation(QosConditionAug.class).getQosGroup().intValue());
+        Assert.assertEquals(Long.valueOf(10), builder.getAugmentation(QosConditionAug.class).getQosGroup().get(0).getUint32());
+        Assert.assertEquals("1..2", builder.getAugmentation(QosConditionAug.class).getQosGroup().get(1).getQosGroupRange().getValue());
     }
 }

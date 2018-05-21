@@ -41,6 +41,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroupBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroup;
 
 public class ConditionsReader implements CliConfigReader<Conditions, ConditionsBuilder> {
 
@@ -107,7 +109,14 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
     private static void parseQos(String output, QosConditionAugBuilder augBuilder) {
         ParsingUtils.parseField(output, QOS_LINE::matcher,
             matcher -> matcher.group("qos"),
-            v -> augBuilder.setQosGroup(Integer.valueOf(v)));
+            v -> augBuilder.setQosGroup(parseQosGroups(v)));
+    }
+
+    public static List<QosGroup> parseQosGroups(String fullGroups) {
+        String[] groups = fullGroups.split(" ");
+        List<QosGroup> parsedGroups = new ArrayList<>();
+        Arrays.stream(groups).forEach(p -> parsedGroups.add(QosGroupBuilder.getDefaultInstance(p.replace("-", ".."))));
+        return parsedGroups;
     }
 
     private static void parseMpls(String output, ConditionsBuilder conditionsBuilder) {

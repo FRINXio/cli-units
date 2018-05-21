@@ -34,6 +34,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Precedence;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroup;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroupRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv6ConditionAug;
@@ -53,7 +55,7 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 public class ClassifierWriterTest {
 
     private static final String WRITE_INPUT_ALL = "class-map match-all map1\n" +
-            "match qos-group 10\n" +
+            "match qos-group 10 1-5\n" +
             "match precedence 2 3 network\n" +
             "match mpls experimental topmost 1\n" +
             "match access-group ipv4 acl4\n" +
@@ -62,7 +64,7 @@ public class ClassifierWriterTest {
             "match precedence ipv6 critical\n" +
             "root\n";
 
-    private static final String WRITE_QOS_ANY = "class-map match-any map1\nmatch qos-group 10\nroot\n";
+    private static final String WRITE_QOS_ANY = "class-map match-any map1\nmatch qos-group 10 1-5\nroot\n";
     private static final String WRITE_PREC_ANY = "class-map match-any map1\nmatch precedence 2 3 network\nroot\n";
     private static final String WRITE_MPLS_ANY = "class-map match-any map1\nmatch mpls experimental topmost 1\nroot\n";
     private static final String WRITE_ACG_IPV4_ANY = "class-map match-any map1\nmatch access-group ipv4 acl4\nroot\n";
@@ -103,7 +105,7 @@ public class ClassifierWriterTest {
         termAll.setId("all");
         termAll.setConditions(new ConditionsBuilder()
             .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
-                .setQosGroup(10)
+                .setQosGroup(Lists.newArrayList(new QosGroup(10L), new QosGroup(new QosGroupRange("1..5"))))
                 .setPrecedences(Lists.newArrayList(new Precedence((short) 2), new Precedence((short) 3), new Precedence("network"))).build())
             .setIpv4(new Ipv4Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder()
                 .addAugmentation(QosIpv4ConditionAug.class, new QosIpv4ConditionAugBuilder()
@@ -135,7 +137,7 @@ public class ClassifierWriterTest {
         Term term1 = new TermBuilder().setId("1")
             .setConditions(new ConditionsBuilder()
                 .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
-                        .setQosGroup(10).build())
+                        .setQosGroup(Lists.newArrayList(new QosGroup(10L), new QosGroup(new QosGroupRange("1..5")))).build())
                 .build())
         .build();
 

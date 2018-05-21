@@ -29,6 +29,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Precedence;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroup;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroupRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosRemarkQosGroupAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosRemarkQosGroupAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.Terms;
@@ -56,7 +58,7 @@ public class ActionsWriterTest {
     private static final String UPDATE_INPUT = "policy-map plmap\n" +
         "class map1\n" +
         "set mpls experimental topmost 2\n" +
-        "set qos-group 40\n" +
+        "set qos-group 5-8\n" +
         "set precedence something\n" +
         "root\n";
 
@@ -108,7 +110,7 @@ public class ActionsWriterTest {
                     .setSetMplsTc((short) 1)
                     .addAugmentation(QosRemarkQosGroupAug.class,
                     new QosRemarkQosGroupAugBuilder()
-                        .setSetQosGroup(30)
+                        .setSetQosGroup(Lists.newArrayList(new QosGroup(30L)))
                         .setSetPrecedences(Lists.newArrayList(new Precedence((short) 4)))
                     .build())
                 .build())
@@ -133,7 +135,7 @@ public class ActionsWriterTest {
                 .setConfig(new ConfigBuilder()
                     .setSetMplsTc((short) 2).addAugmentation(QosRemarkQosGroupAug.class,
                     new QosRemarkQosGroupAugBuilder()
-                        .setSetQosGroup(40)
+                        .setSetQosGroup(Lists.newArrayList(new QosGroup(new QosGroupRange("5..8"))))
                         .setSetPrecedences(Lists.newArrayList(new Precedence("something")))
                     .build())
                 .build())
