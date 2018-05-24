@@ -123,7 +123,7 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
         String groupId = getPeerGroupId(instanceIdentifier);
 
         renderNeighbor(this, cli, instanceIdentifier,
-                neighbor, null, null, null, vrfKey, bgpAs, groupAfiSafi, groupId,
+                neighbor, null, null, null, vrfKey, bgpAs, groupAfiSafi, Collections.emptyMap(), groupId,
                 PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
     }
 
@@ -141,12 +141,15 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 
         final Global bgpGlobal = getGlobalBgp(instanceIdentifier, writeContext);
+        final Global bgpGlobalBefore = getGlobalBgpForDelete(instanceIdentifier, writeContext);
         Long bgpAs = getAsValue(bgpGlobal);
+
         Map<String, Object> groupAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForPeerGroup(neighbor.getAfiSafis()));
+        Map<String, Object> groupAfiSafiBefore = getAfiSafisForNeighbor(bgpGlobalBefore, getAfiSafisForPeerGroup(before.getAfiSafis()));
         String groupId = getPeerGroupId(instanceIdentifier);
 
         renderNeighbor(this, cli, instanceIdentifier,
-                neighbor, before, null, null, vrfKey, bgpAs, groupAfiSafi, groupId,
+                neighbor, before, null, null, vrfKey, bgpAs, groupAfiSafi, groupAfiSafiBefore, groupId,
                 PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
     }
 

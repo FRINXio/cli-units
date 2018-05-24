@@ -34,6 +34,8 @@ import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Test;
@@ -128,8 +130,10 @@ public class PeerGroupWriterTest implements CliFormatter {
         doReturn(output).when(cli).executeAndRead(anyString());
         CliWriter writer = spy(new NeighborWriter(cli));
 
+        Map<String, Object> afiSafisForGroupSource = getAfiSafisForNeighbor(bgpConfig, getAfiSafisForPeerGroup(source.getAfiSafis()));
+
         renderNeighbor(writer, cli, id,
-                source, null, null, null, id.firstKeyOf(NetworkInstance.class), as, getAfiSafisForNeighbor(bgpConfig, getAfiSafisForPeerGroup(source.getAfiSafis())),
+                source, null, null, null, id.firstKeyOf(NetworkInstance.class), as, afiSafisForGroupSource, Collections.emptyMap(),
                 PeerGroupWriter.getPeerGroupId(id), PeerGroupWriter.PEER_GROUP_GLOBAL, PeerGroupWriter.PEER_GROUP_VRF);
 
         String writeRender = getCommands(writer, false, 1);
@@ -137,7 +141,7 @@ public class PeerGroupWriterTest implements CliFormatter {
 
         if (after != null) {
             renderNeighbor(writer, cli, id,
-                    after, source, null, null, id.firstKeyOf(NetworkInstance.class), as, getAfiSafisForNeighbor(bgpConfig, getAfiSafisForPeerGroup(after.getAfiSafis())),
+                    after, source, null, null, id.firstKeyOf(NetworkInstance.class), as, getAfiSafisForNeighbor(bgpConfig, getAfiSafisForPeerGroup(after.getAfiSafis())), afiSafisForGroupSource,
                     PeerGroupWriter.getPeerGroupId(id), PeerGroupWriter.PEER_GROUP_GLOBAL, PeerGroupWriter.PEER_GROUP_VRF);
 
             String updateRender = getCommands(writer, false, 2);
@@ -271,7 +275,11 @@ public class PeerGroupWriterTest implements CliFormatter {
             "no neighbor group1 password\n" +
             "no neighbor group1 update-source Loopback0\n" +
             "no neighbor group1 transport connection-mode passive\n" +
-            "no neighbor group1 send-community\n" +
+            "no neighbor group1 route-map import1 in\n" +
+            "no neighbor group1 route-map import2 in\n" +
+            "no neighbor group1 route-map export1 out\n" +
+            "no neighbor group1 route-map export2 out\n" +
+            "no neighbor group1 send-community extended\n" +
             "no neighbor group1 route-reflector-client\n" +
             "end";
 
@@ -346,8 +354,13 @@ public class PeerGroupWriterTest implements CliFormatter {
             "no neighbor group1 password\n" +
             "no neighbor group1 update-source Loopback0\n" +
             "no neighbor group1 transport connection-mode passive\n" +
-            "no neighbor group1 send-community\n" +
+            "no neighbor group1 send-community extended\n" +
             "no neighbor group1 route-reflector-client\n" +
+            "no neighbor group1 route-map import1 in\n" +
+            "no neighbor group1 route-map import2 in\n" +
+            "no neighbor group1 route-map export1 out\n" +
+            "no neighbor group1 route-map export2 out\n" +
+            "no neighbor group1 route-map a in\n" +
             "exit\n" +
             "end";
 

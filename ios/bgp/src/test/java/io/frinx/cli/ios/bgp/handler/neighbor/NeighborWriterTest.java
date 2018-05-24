@@ -37,6 +37,7 @@ import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
@@ -99,6 +100,7 @@ public class NeighborWriterTest implements CliFormatter {
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"neighbor all", N_ALL, N_EMPTY, NALL_WRITE, NALL_UPDATE, NALL_DELETE, EMPTY_BGP_CONFIG, NetworInstance.DEFAULT_NETWORK_NAME},
+                {"neighbor all remove afi policies", N_ALL, N_ALL_REMOVE_AFI_POLICY, NALL_WRITE, NALL_REMOVE_AFI_POLICIES, NALL_DELETE, EMPTY_BGP_CONFIG, NetworInstance.DEFAULT_NETWORK_NAME},
                 {"neighbor all vrf1", N_ALL, N_EMPTY_AFI, NALL_VRF_WRITE, NALL_VRF_UPDATE, NALL_VRF_DELETE, EMPTY_BGP_CONFIG, "vrf1"},
                 {"neighbor all no afi", N_ALL_NOAFI, null, NALL_NOAFI_WRITE, null, NALL_NOAFI_DELETE, EMPTY_BGP_CONFIG, NetworInstance.DEFAULT_NETWORK_NAME},
                 {"neighbor all afi from BGP", N_ALL_NOAFI, null, NALL_AFI_FROM_BGP_WRITE, null, NALL_AFI_FROM_BGP_DELETE, BGP_AFIS, NetworInstance.DEFAULT_NETWORK_NAME},
@@ -143,7 +145,7 @@ public class NeighborWriterTest implements CliFormatter {
 
         Map<String, Object> afiSafisForNeighborSource = getAfiSafisForNeighbor(bgpConfig, getAfiSafisForNeighbor(source.getAfiSafis()));
         renderNeighbor(writer, cli, id,
-                source, null, source.getConfig().isEnabled(), null, id.firstKeyOf(NetworkInstance.class), as, afiSafisForNeighborSource,
+                source, null, source.getConfig().isEnabled(), null, id.firstKeyOf(NetworkInstance.class), as, afiSafisForNeighborSource, Collections.emptyMap(),
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
         String writeRender = getCommands(writer, false, 1);
@@ -159,7 +161,7 @@ public class NeighborWriterTest implements CliFormatter {
             String updateAfiSafiRender = getCommands(writer, false, 2);
 
             renderNeighbor(writer, cli, id,
-                    after, source, after.getConfig().isEnabled(), source.getConfig().isEnabled(), id.firstKeyOf(NetworkInstance.class), as, afiSafisForNeighborAfter,
+                    after, source, after.getConfig().isEnabled(), source.getConfig().isEnabled(), id.firstKeyOf(NetworkInstance.class), as, afiSafisForNeighborAfter, afiSafisForNeighborSource,
                     NeighborWriter.getNeighborIp(after.getNeighborAddress()), NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
             String updateRender = updateAfiSafiRender + "\n" + getCommands(writer, false, 3);
@@ -253,6 +255,10 @@ public class NeighborWriterTest implements CliFormatter {
                     .build())
             .build();
 
+    private static final Neighbor N_ALL_REMOVE_AFI_POLICY = new NeighborBuilder(N_ALL)
+            .setAfiSafis(getAfiSafiNoPolicy())
+            .build();
+
     private static AfiSafis getAfiSafi() {
         return new AfiSafisBuilder()
                 .setAfiSafi(Lists.newArrayList(new AfiSafiBuilder()
@@ -269,6 +275,28 @@ public class NeighborWriterTest implements CliFormatter {
                                 .setApplyPolicy(new ApplyPolicyBuilder()
                                         .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.apply.policy.ConfigBuilder()
                                                 .setImportPolicy(Lists.newArrayList("a"))
+                                                .build())
+                                        .build())
+                                .build(),
+                        new AfiSafiBuilder()
+                                .setAfiSafiName(IPV6UNICAST.class)
+                                .build()))
+                .build();
+    }
+
+    private static AfiSafis getAfiSafiNoPolicy() {
+        return new AfiSafisBuilder()
+                .setAfiSafi(Lists.newArrayList(new AfiSafiBuilder()
+                                .setAfiSafiName(L3VPNIPV4UNICAST.class)
+                                .setApplyPolicy(new ApplyPolicyBuilder()
+                                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.apply.policy.ConfigBuilder()
+                                                .build())
+                                        .build())
+                                .build(),
+                        new AfiSafiBuilder()
+                                .setAfiSafiName(IPV4UNICAST.class)
+                                .setApplyPolicy(new ApplyPolicyBuilder()
+                                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.apply.policy.ConfigBuilder()
                                                 .build())
                                         .build())
                                 .build(),
@@ -365,9 +393,49 @@ public class NeighborWriterTest implements CliFormatter {
             "no neighbor 1.2.3.4 password\n" +
             "no neighbor 1.2.3.4 update-source Loopback0\n" +
             "no neighbor 1.2.3.4 transport connection-mode passive\n" +
-            "no neighbor 1.2.3.4 send-community\n" +
+            "no neighbor 1.2.3.4 route-map import1 in\n" +
+            "no neighbor 1.2.3.4 route-map import2 in\n" +
+            "no neighbor 1.2.3.4 route-map export1 out\n" +
+            "no neighbor 1.2.3.4 route-map export2 out\n" +
+            "no neighbor 1.2.3.4 send-community both\n" +
             "no neighbor 1.2.3.4 route-reflector-client\n" +
             "no neighbor 1.2.3.4 activate\n" +
+            "end";
+
+    public static final String NALL_REMOVE_AFI_POLICIES = "configure terminal\n" +
+            "router bgp 484\n" +
+            "end\n" +
+            "configure terminal\n" +
+            "router bgp 484\n" +
+            "neighbor 1.2.3.4 remote-as 45\n" +
+            "neighbor 1.2.3.4 peer-group group12\n" +
+            "neighbor 1.2.3.4 description descr 1\n" +
+            "neighbor 1.2.3.4 password passwd\n" +
+            "neighbor 1.2.3.4 update-source Loopback0\n" +
+            "neighbor 1.2.3.4 transport connection-mode passive\n" +
+            "neighbor 1.2.3.4 route-map import1 in\n" +
+            "neighbor 1.2.3.4 route-map import2 in\n" +
+            "neighbor 1.2.3.4 route-map export1 out\n" +
+            "neighbor 1.2.3.4 route-map export2 out\n" +
+            "address-family ipv4\n" +
+            "neighbor 1.2.3.4 send-community both\n" +
+            "neighbor 1.2.3.4 route-reflector-client\n" +
+            "no neighbor 1.2.3.4 route-map a in\n" +
+            "neighbor 1.2.3.4 activate\n" +
+            "exit\n" +
+            "address-family ipv6\n" +
+            "neighbor 1.2.3.4 send-community both\n" +
+            "neighbor 1.2.3.4 route-reflector-client\n" +
+            "neighbor 1.2.3.4 activate\n" +
+            "exit\n" +
+            "address-family vpnv4\n" +
+            "neighbor 1.2.3.4 send-community both\n" +
+            "neighbor 1.2.3.4 route-reflector-client\n" +
+            "no neighbor 1.2.3.4 route-map a in\n" +
+            "no neighbor 1.2.3.4 route-map b in\n" +
+            "no neighbor 1.2.3.4 route-map c out\n" +
+            "neighbor 1.2.3.4 activate\n" +
+            "exit\n" +
             "end";
 
     public static final String NALL_VRF_WRITE = "configure terminal\n" +
@@ -457,8 +525,13 @@ public class NeighborWriterTest implements CliFormatter {
             "no neighbor 1.2.3.4 password\n" +
             "no neighbor 1.2.3.4 update-source Loopback0\n" +
             "no neighbor 1.2.3.4 transport connection-mode passive\n" +
-            "no neighbor 1.2.3.4 send-community\n" +
+            "no neighbor 1.2.3.4 send-community both\n" +
             "no neighbor 1.2.3.4 route-reflector-client\n" +
+            "no neighbor 1.2.3.4 route-map import1 in\n" +
+            "no neighbor 1.2.3.4 route-map import2 in\n" +
+            "no neighbor 1.2.3.4 route-map export1 out\n" +
+            "no neighbor 1.2.3.4 route-map export2 out\n" +
+            "no neighbor 1.2.3.4 route-map a in\n" +
             "no neighbor 1.2.3.4 activate\n" +
             "exit\n" +
             "end";

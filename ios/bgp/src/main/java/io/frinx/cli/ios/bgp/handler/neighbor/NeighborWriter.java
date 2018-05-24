@@ -64,7 +64,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
     public static final String NEIGHBOR_SEND_COMMUNITY_CONFIG =
             "{%if ($neighbor.config.send_community.name) %}neighbor {$neighbor_id} send-community {$neighbor.config.send_community.name|lc}\n" +
-                    "{% elseIf ($before.config.send_community.name) %}no neighbor {$neighbor_id} send-community\n{% endif %}";
+                    "{% elseIf ($before.config.send_community.name) %}no neighbor {$neighbor_id} send-community {$before.config.send_community.name|lc}\n{% endif %}";
 
     private static final String NEIGHBOR_ESSENTIAL_CONFIG =
             "{%if ($neighbor.config.peer_as.value) %}neighbor {$neighbor_id} remote-as {$neighbor.config.peer_as.value}\n" +
@@ -84,26 +84,54 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
                     "{% elseIf ($before.transport.config|lc =~ /passivemode=true/) %}no neighbor {$neighbor_id} transport connection-mode passive\n{% endif %}";
 
     public static final String NEIGHBOR_POLICIES =
-            // Set import/export policies
             "{% loop in $neighbor.apply_policy.config.import_policy as $im_p %}\n" +
-                    "neighbor {$neighbor_id} route-map {$im_p} in\n" +
-                    "{% onEmpty %}" +
-                    "{% endloop %}" +
-                    "{% loop in $neighbor.apply_policy.config.export_policy as $ex_p %}\n" +
-                    "neighbor {$neighbor_id} route-map {$ex_p} out\n" +
-                    "{% onEmpty %}" +
-                    "{% endloop %}";
+            "neighbor {$neighbor_id} route-map {$im_p} in\n" +
+            "{% onEmpty %}" +
+                // Remove before policies if there were any set
+                "{% loop in $before.apply_policy.config.import_policy as $im_p_before %}\n" +
+                "no neighbor {$neighbor_id} route-map {$im_p_before} in\n" +
+                "{% onEmpty %}" +
+                "{% endloop %}" +
+            "{% endloop %}" +
+            "{% loop in $neighbor.apply_policy.config.export_policy as $ex_p %}\n" +
+            "neighbor {$neighbor_id} route-map {$ex_p} out\n" +
+            "{% onEmpty %}" +
+                // Remove before policies if there were any set
+                "{% loop in $before.apply_policy.config.export_policy as $ex_p_before %}\n" +
+                "no neighbor {$neighbor_id} route-map {$ex_p_before} out\n" +
+                "{% onEmpty %}" +
+                "{% endloop %}" +
+            "{% endloop %}";
 
     public static final String NEIGHBOR_AFI_POLICIES =
-            // Set import/export policies
             "{% loop in $af.apply_policy.config.import_policy as $im_p %}\n" +
-                    "neighbor {$neighbor_id} route-map {$im_p} in\n" +
+            "neighbor {$neighbor_id} route-map {$im_p} in\n" +
+            "{% onEmpty %}" +
+                    // Find the afi from before and remove its policies
+                    "{% loop in $before_afis as $af_name_before:af_before %}\n" +
+                    "{% if ($af_name == $af_name_before)}" +
+                        "{% loop in $af_before.apply_policy.config.import_policy as $im_p_before %}\n" +
+                        "no neighbor {$neighbor_id} route-map {$im_p_before} in\n" +
+                        "{% onEmpty %}" +
+                        "{% endloop %}" +
+                    "{% endif %}" +
                     "{% onEmpty %}" +
                     "{% endloop %}" +
-                    "{% loop in $af.apply_policy.config.export_policy as $ex_p %}\n" +
-                    "neighbor {$neighbor_id} route-map {$ex_p} out\n" +
+            "{% endloop %}" +
+            "{% loop in $af.apply_policy.config.export_policy as $ex_p %}\n" +
+            "neighbor {$neighbor_id} route-map {$ex_p} out\n" +
+            "{% onEmpty %}" +
+                    // Find the afi from before and remove its policies
+                    "{% loop in $before_afis as $af_name_before:af_before %}\n" +
+                    "{% if ($af_name == $af_name_before)}" +
+                        "{% loop in $af_before.apply_policy.config.export_policy as $ex_p_before %}\n" +
+                        "no neighbor {$neighbor_id} route-map {$ex_p_before} out\n" +
+                        "{% onEmpty %}" +
+                        "{% endloop %}" +
+                    "{% endif %}" +
                     "{% onEmpty %}" +
-                    "{% endloop %}";
+                    "{% endloop %}" +
+            "{% endloop %}";
 
     static final String NEIGHBOR_GLOBAL = "configure terminal\n" +
             "router bgp {$as}\n" +
@@ -191,7 +219,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
         Boolean enabled = neighbor.getConfig().isEnabled();
 
         renderNeighbor(this, cli, instanceIdentifier,
-                neighbor, null, enabled, null, vrfKey, bgpAs, neighAfiSafi, neighborIp,
+                neighbor, null, enabled, null, vrfKey, bgpAs, neighAfiSafi, Collections.emptyMap(), neighborIp,
                 NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
     }
 
@@ -212,6 +240,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
                                                                                                 NetworkInstanceKey vrfKey,
                                                                                                 Long bgpAs,
                                                                                                 Map<String, Object> neighAfiSafi,
+                                                                                                Map<String, Object> beforeAfiSafi,
                                                                                                 String neighborId,
                                                                                                 String globalTemplate,
                                                                                                 String vrfTemplate) throws WriteFailedException.CreateFailedException {
@@ -223,6 +252,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
                     "neighbor", neighbor,
                     "before", before,
                     "afis", neighAfiSafi,
+                    "before_afis", beforeAfiSafi,
                     "route_reflect_client", isRouteReflectClient(neighbor),
                     "before_route_reflect_client", isRouteReflectClient(before),
                     "enabled", enabled,
@@ -237,6 +267,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
                     "neighbor", neighbor,
                     "before", before,
                     "afis", neighAfiSafi,
+                    "before_afis", beforeAfiSafi,
                     "route_reflect_client", isRouteReflectClient(neighbor),
                     "before_route_reflect_client", isRouteReflectClient(before),
                     "enabled", enabled,
@@ -346,7 +377,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
         // Then update existing attributes
         renderNeighbor(this, cli, instanceIdentifier,
-                neighbor, before, enabled, beforeEnabled, vrfKey, bgpAs, neighAfiSafi, neighborIp,
+                neighbor, before, enabled, beforeEnabled, vrfKey, bgpAs, neighAfiSafi, neighAfiSafiBefore, neighborIp,
                 NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
     }
 
