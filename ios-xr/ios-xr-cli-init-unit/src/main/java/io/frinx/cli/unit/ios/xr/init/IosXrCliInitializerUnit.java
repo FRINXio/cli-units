@@ -186,7 +186,7 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
     @Override
     public Set<Pattern> getErrorPatterns() {
         return Sets.newLinkedHashSet(Arrays.asList(
-                Pattern.compile("\\s*\\^.*", Pattern.DOTALL),
+                Pattern.compile("^\\s+\\^.*", Pattern.DOTALL),
                 Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL),
                 Pattern.compile("\\% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
         ));
