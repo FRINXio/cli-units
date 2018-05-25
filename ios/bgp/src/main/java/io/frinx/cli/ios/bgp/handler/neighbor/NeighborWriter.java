@@ -48,6 +48,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
+    // TODO split this into regular smaller writers if possible. Especially the AFI SAFI handling (update and removal) is
+    // difficult this way, since diff has to be performed in this writer
+    // Applies for PeerGroupWriter as well
+
     public static final String NEIGHBOR_COMMON_CONFIG =
             "{%if ($neighbor.config.description) %}neighbor {$neighbor_id} description {$neighbor.config.description}\n" +
                     "{% elseIf ($before.config.description) %}no neighbor {$neighbor_id} description\n{% endif %}" +
