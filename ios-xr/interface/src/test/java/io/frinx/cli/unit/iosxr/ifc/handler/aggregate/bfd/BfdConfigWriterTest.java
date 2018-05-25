@@ -68,7 +68,11 @@ public class BfdConfigWriterTest {
 
     private static final String DELETE_INPUT =
             "interface Bundle-Ether55\n" +
-            "no bfd\n" +
+            "no bfd mode ietf\n" +
+            "no bfd address-family ipv4 fast-detect\n" +
+            "no bfd address-family ipv4 multiplier\n" +
+            "no bfd address-family ipv4 minimum-interval\n" +
+            "no bfd address-family ipv4 destination\n" +
             "root\n";
 
     @Mock

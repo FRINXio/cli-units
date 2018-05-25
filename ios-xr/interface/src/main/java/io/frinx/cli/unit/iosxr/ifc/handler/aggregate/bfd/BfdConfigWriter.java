@@ -79,7 +79,11 @@ public class BfdConfigWriter implements CliWriter<Config> {
 
         blockingDeleteAndRead(cli, id,
                 f("interface %s", ifcName),
-                "no bfd",
+                "no bfd mode ietf",
+                "no bfd address-family ipv4 fast-detect",
+                "no bfd address-family ipv4 multiplier",
+                "no bfd address-family ipv4 minimum-interval",
+                "no bfd address-family ipv4 destination",
                 "root");
     }
 }
