@@ -69,8 +69,11 @@ public class ActionsWriter implements CliWriter<Actions> {
 
     @Override
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Actions> id, @Nonnull Actions dataBefore, @Nonnull Actions dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        // policy reference changed
-        if (!dataBefore.getConfig().getTargetGroup().equals(dataAfter.getConfig().getTargetGroup())) {
+        // policy name was removed
+        if (dataAfter.getConfig() == null) {
+            deleteCurrentAttributes(id, dataBefore, writeContext);
+        } else if (dataBefore.getConfig() != null  && !dataBefore.getConfig().getTargetGroup().equals(dataAfter.getConfig().getTargetGroup())) {
+            // policy reference changed or was added
             deleteCurrentAttributes(id, dataBefore,writeContext);
             writeCurrentAttributes(id, dataAfter, writeContext);
         } else {

@@ -73,6 +73,7 @@ public class ActionsWriterTest {
         "no set precedence\n" +
         "root\n";
 
+
     @Mock
     private Cli cli;
 
@@ -165,6 +166,77 @@ public class ActionsWriterTest {
         Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0));
         Assert.assertEquals(UPDATE_POLICY_INPUT, response.getAllValues().get(1));
+    }
+
+    @Test
+    public void addClassToPolicy() throws WriteFailedException {
+        data = new ActionsBuilder()
+            .setRemark(new RemarkBuilder()
+                    .setConfig(new ConfigBuilder()
+                            .setSetMplsTc((short) 1)
+                            .addAugmentation(QosRemarkQosGroupAug.class,
+                                    new QosRemarkQosGroupAugBuilder()
+                                            .setSetQosGroup(Lists.newArrayList(new QosGroup(30L)))
+                                            .setSetPrecedences(Lists.newArrayList(new Precedence((short) 4)))
+                                            .build())
+                            .build())
+                    .build())
+            .build();
+
+        Actions newData = new ActionsBuilder()
+                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.ConfigBuilder()
+                        .setTargetGroup("plmap").build())
+                .setRemark(new RemarkBuilder()
+                        .setConfig(new ConfigBuilder()
+                                .setSetMplsTc((short) 1)
+                                .addAugmentation(QosRemarkQosGroupAug.class,
+                                        new QosRemarkQosGroupAugBuilder()
+                                                .setSetQosGroup(Lists.newArrayList(new QosGroup(30L)))
+                                                .setSetPrecedences(Lists.newArrayList(new Precedence((short) 4)))
+                                                .build())
+                                .build())
+                        .build())
+                .build();
+
+        this.writer.updateCurrentAttributes(piid, data, newData, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue());
+    }
+
+    @Test
+    public void removeClassFromPolicy() throws WriteFailedException {
+        data = new ActionsBuilder()
+                .setRemark(new RemarkBuilder()
+                        .setConfig(new ConfigBuilder()
+                                .setSetMplsTc((short) 1)
+                                .addAugmentation(QosRemarkQosGroupAug.class,
+                                        new QosRemarkQosGroupAugBuilder()
+                                                .setSetQosGroup(Lists.newArrayList(new QosGroup(30L)))
+                                                .setSetPrecedences(Lists.newArrayList(new Precedence((short) 4)))
+                                                .build())
+                                .build())
+                        .build())
+                .build();
+
+        Actions newData = new ActionsBuilder()
+                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.ConfigBuilder()
+                        .setTargetGroup("plmap").build())
+                .setRemark(new RemarkBuilder()
+                        .setConfig(new ConfigBuilder()
+                                .setSetMplsTc((short) 1)
+                                .addAugmentation(QosRemarkQosGroupAug.class,
+                                        new QosRemarkQosGroupAugBuilder()
+                                                .setSetQosGroup(Lists.newArrayList(new QosGroup(30L)))
+                                                .setSetPrecedences(Lists.newArrayList(new Precedence((short) 4)))
+                                                .build())
+                                .build())
+                        .build())
+                .build();
+        this.writer.updateCurrentAttributes(piid, newData, data, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue());
     }
 
     @Test
