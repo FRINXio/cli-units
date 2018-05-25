@@ -57,7 +57,9 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import java.util.Collections;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflectorBuilder;
@@ -112,6 +114,11 @@ public class BgpUnit implements TranslateUnit {
         Cli cli = context.getTransport();
         provideReaders(rRegistry, cli);
         provideWriters(wRegistry, cli);
+    }
+
+    @Override
+    public Set<Pattern> getErrorPatterns() {
+        return Collections.singleton(Pattern.compile("% Configure the peer-group .+ first", Pattern.DOTALL));
     }
 
     private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
