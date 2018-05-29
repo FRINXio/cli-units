@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent-lite</artifactId>
-        <version>1.8.1-Carbon-SR1.3_1_4_rc2-frinxodl</version>
+        <version>1.8.1-Carbon-SR1.3_1_4_rc3-frinxodl-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
