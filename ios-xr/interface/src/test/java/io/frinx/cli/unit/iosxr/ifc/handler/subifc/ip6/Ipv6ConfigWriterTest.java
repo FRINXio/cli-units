@@ -20,6 +20,7 @@ import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.concurrent.CompletableFuture;
 import org.hamcrest.CoreMatchers;
@@ -62,7 +63,7 @@ public class Ipv6ConfigWriterTest {
 
     private Cli cliMock;
     private WriteContext context;
-    private ArgumentCaptor<String> response = ArgumentCaptor.forClass(String.class);
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -86,7 +87,7 @@ public class Ipv6ConfigWriterTest {
         writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG, context);
 
         Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -142,7 +143,7 @@ public class Ipv6ConfigWriterTest {
         writer.deleteCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG, context);
 
         Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 
     private static class TestData {

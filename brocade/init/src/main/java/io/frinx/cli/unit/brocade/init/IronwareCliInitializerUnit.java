@@ -21,6 +21,7 @@ import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.spi.write.PostTransactionHook;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.frinx.cli.io.Command;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
@@ -44,6 +45,8 @@ public class IronwareCliInitializerUnit implements TranslateUnit {
             .setDeviceType("ironware")
             .setDeviceVersion("*")
             .build();
+
+    private static final Command WRITE_MEMORY = Command.createUncheckedCommand("write memory");
 
     private TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -79,7 +82,7 @@ public class IronwareCliInitializerUnit implements TranslateUnit {
         return () -> {
             try {
                 LOG.trace("Running Post transaction hook");
-                String output = ctx.getTransport().executeAndRead("write memory").toCompletableFuture().get();
+                String output = ctx.getTransport().executeAndRead(WRITE_MEMORY).toCompletableFuture().get();
                 LOG.debug("Post transaction hook invoked successfully with output: {}", output);
             } catch (Exception e) {
                 LOG.warn("Unable to execute post transaction hook", e);

@@ -18,22 +18,23 @@ package io.frinx.cli.unit.ios.xr.init;
 
 import com.google.common.base.Preconditions;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.io.impl.cli.PromptResolutionStrategy;
 import io.frinx.cli.topology.RemoteDeviceId;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.PrivilegedModeCredentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.credentials.LoginPassword;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.privileged.mode.credentials.IosEnablePassword;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.annotation.Nonnull;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Predicate;
 
 /**
  * Initialize IOS-XR CLI session to be usable by various CRUD and RPC handlers
@@ -45,8 +46,8 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
     private static final String PRIVILEGED_PROMPT_SUFFIX = "#";
     private static final String ENABLE_COMMAND = "enable";
     private static final String CONFIG_PROMPT_SUFFIX = "(config)#";
-    private static final String CONFIG_COMMAND = "configure terminal";
-    private static final String END_COMMAND = "end";
+    private static final Command CONFIG_COMMAND = Command.create("configure terminal");
+    private static final Command END_COMMAND = Command.create("end");
     private static final String SET_TERMINAL_LENGTH_COMMAND = "terminal length 0";
     private static final String SET_TERMINAL_WIDTH_COMMAND = "terminal width 0";
     private static final int WRITE_TIMEOUT_SECONDS = 10;

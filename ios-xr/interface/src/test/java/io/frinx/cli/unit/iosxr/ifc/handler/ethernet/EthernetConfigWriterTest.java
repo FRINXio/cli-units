@@ -19,6 +19,7 @@ package io.frinx.cli.unit.iosxr.ifc.handler.ethernet;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -87,7 +88,7 @@ public class EthernetConfigWriterTest {
 
     private EthernetConfigWriter writer;
 
-    private ArgumentCaptor<String> response = ArgumentCaptor.forClass(String.class);
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier iid = KeyedInstanceIdentifier.create(Interfaces.class)
            .child(Interface.class, new InterfaceKey("GigabitEthernet0/0/0/1"));
@@ -117,7 +118,7 @@ public class EthernetConfigWriterTest {
         this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -131,7 +132,7 @@ public class EthernetConfigWriterTest {
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -143,7 +144,7 @@ public class EthernetConfigWriterTest {
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue());
+        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -156,7 +157,7 @@ public class EthernetConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT, response.getValue());
+        Assert.assertEquals(UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT, response.getValue().getContent());
 
         Config newDataWithEmptyAggregateAug = new ConfigBuilder()
                 .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder()
@@ -168,7 +169,7 @@ public class EthernetConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newDataWithEmptyAggregateAug, context);
         Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT, response.getValue());
+        Assert.assertEquals(UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -184,7 +185,7 @@ public class EthernetConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_LACP_MODE_INPUT, response.getValue());
+        Assert.assertEquals(UPDATE_LACP_MODE_INPUT, response.getValue().getContent());
 
         // no bundle-id defined, we shouldn't update mode
         Config newDataWithoutBundleId = new ConfigBuilder()
@@ -224,7 +225,7 @@ public class EthernetConfigWriterTest {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -235,6 +236,6 @@ public class EthernetConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }

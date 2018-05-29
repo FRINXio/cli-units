@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -82,7 +83,7 @@ public class ActionsWriterTest {
 
     private ActionsWriter writer;
 
-    private ArgumentCaptor<String> response = ArgumentCaptor.forClass(String.class);
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier piid = KeyedInstanceIdentifier.create(Classifiers.class)
         .child(Classifier.class, new ClassifierKey("map1"))
@@ -124,7 +125,7 @@ public class ActionsWriterTest {
         this.writer.writeCurrentAttributes(piid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -146,7 +147,7 @@ public class ActionsWriterTest {
         this.writer.updateCurrentAttributes(piid, data, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -164,8 +165,8 @@ public class ActionsWriterTest {
         this.writer.updateCurrentAttributes(piid, data, newData, context);
 
         Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0));
-        Assert.assertEquals(UPDATE_POLICY_INPUT, response.getAllValues().get(1));
+        Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0).getContent());
+        Assert.assertEquals(UPDATE_POLICY_INPUT, response.getAllValues().get(1).getContent());
     }
 
     @Test
@@ -201,7 +202,7 @@ public class ActionsWriterTest {
         this.writer.updateCurrentAttributes(piid, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -236,7 +237,7 @@ public class ActionsWriterTest {
         this.writer.updateCurrentAttributes(piid, newData, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -244,6 +245,6 @@ public class ActionsWriterTest {
         this.writer.deleteCurrentAttributes(piid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }

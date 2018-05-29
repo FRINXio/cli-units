@@ -22,7 +22,6 @@ import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.getAfiSafisFo
 import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.renderNeighbor;
 import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.renderNeighborAfiRemoval;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -31,6 +30,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import io.frinx.cli.unit.utils.CliFormatter;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
@@ -140,7 +140,7 @@ public class NeighborWriterTest implements CliFormatter {
 
         CompletableFuture<String> output = new CompletableFuture<>();
         output.complete("");
-        doReturn(output).when(cli).executeAndRead(anyString());
+        doReturn(output).when(cli).executeAndRead(any(Command.class));
         CliWriter writer = spy(new NeighborWriter(cli));
 
         Map<String, Object> afiSafisForNeighborSource = getAfiSafisForNeighbor(bgpConfig, getAfiSafisForNeighbor(source.getAfiSafis()));

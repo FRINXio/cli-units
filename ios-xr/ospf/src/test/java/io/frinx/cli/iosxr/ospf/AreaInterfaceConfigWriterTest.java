@@ -20,6 +20,7 @@ import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import io.frinx.cli.iosxr.ospf.handler.AreaInterfaceConfigWriter;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
@@ -81,7 +82,7 @@ public class AreaInterfaceConfigWriterTest {
 
     private AreaInterfaceConfigWriter writer;
 
-    private ArgumentCaptor<String> response = ArgumentCaptor.forClass(String.class);
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier piid = KeyedInstanceIdentifier.create(Protocols.class)
             .child(Protocol.class, new ProtocolKey(OSPF.class,"default"))
@@ -118,7 +119,7 @@ public class AreaInterfaceConfigWriterTest {
         this.writer.writeCurrentAttributesForType(piid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -129,7 +130,7 @@ public class AreaInterfaceConfigWriterTest {
         this.writer.updateCurrentAttributesForType(piid, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_COST_INPUT, response.getValue());
+        Assert.assertEquals(UPDATE_COST_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -140,7 +141,7 @@ public class AreaInterfaceConfigWriterTest {
         this.writer.updateCurrentAttributesForType(piid, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(REMOVE_COST_INPUT, response.getValue());
+        Assert.assertEquals(REMOVE_COST_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -148,6 +149,6 @@ public class AreaInterfaceConfigWriterTest {
         this.writer.deleteCurrentAttributesForType(piid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }

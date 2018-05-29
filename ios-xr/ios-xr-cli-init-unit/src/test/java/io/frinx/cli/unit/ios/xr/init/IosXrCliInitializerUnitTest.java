@@ -18,11 +18,16 @@ package io.frinx.cli.unit.ios.xr.init;
 
 import io.fd.honeycomb.translate.spi.write.CommitFailedException;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
-import io.fd.honeycomb.translate.write.registry.WriterRegistry.BulkUpdateException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Predicate;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,11 +39,6 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Predicate;
 
 public class IosXrCliInitializerUnitTest {
 
@@ -73,8 +73,8 @@ public class IosXrCliInitializerUnitTest {
         CompletionStage future = Mockito.mock(CompletionStage.class);
         CompletableFuture cFuture = Mockito.mock(CompletableFuture.class);
         Mockito.when(future.toCompletableFuture()).thenReturn(cFuture);
-        Mockito.when(cli.executeAndRead(Mockito.anyString())).thenReturn(future);
-        Mockito.when(cli.executeAndSwitchPrompt(Mockito.anyString(), Mockito.any(Predicate.class))).thenReturn(future);
+        Mockito.when(cli.executeAndRead(Mockito.any(Command.class))).thenReturn(future);
+        Mockito.when(cli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class))).thenReturn(future);
         RemoteDeviceId device = new RemoteDeviceId(new TopologyKey(new TopologyId("cli")),
                 "deviceId",
                 new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 1234));

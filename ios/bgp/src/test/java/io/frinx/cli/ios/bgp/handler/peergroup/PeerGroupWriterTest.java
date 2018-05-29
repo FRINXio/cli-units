@@ -21,12 +21,13 @@ import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.getAfiSafisFo
 import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.renderNeighbor;
 import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriterTest.getCommands;
 import static io.frinx.cli.ios.bgp.handler.peergroup.PeerGroupWriter.getAfiSafisForPeerGroup;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter;
 import io.frinx.cli.unit.utils.CliFormatter;
 import io.frinx.cli.unit.utils.CliWriter;
@@ -127,7 +128,7 @@ public class PeerGroupWriterTest implements CliFormatter {
 
         CompletableFuture<String> output = new CompletableFuture<>();
         output.complete("");
-        doReturn(output).when(cli).executeAndRead(anyString());
+        doReturn(output).when(cli).executeAndRead(any(Command.class));
         CliWriter writer = spy(new NeighborWriter(cli));
 
         Map<String, Object> afiSafisForGroupSource = getAfiSafisForNeighbor(bgpConfig, getAfiSafisForPeerGroup(source.getAfiSafis()));

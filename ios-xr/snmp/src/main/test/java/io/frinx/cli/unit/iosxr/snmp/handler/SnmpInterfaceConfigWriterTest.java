@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,7 +48,7 @@ public class SnmpInterfaceConfigWriterTest {
 
     private InterfaceConfigWriter writer;
 
-    private ArgumentCaptor<String> response = ArgumentCaptor.forClass(String.class);
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier<Config> iid = KeyedInstanceIdentifier.create(Interfaces.class)
             .child(Interface.class, new InterfaceKey(new InterfaceId("Loopback0")))
@@ -82,7 +83,7 @@ public class SnmpInterfaceConfigWriterTest {
         this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -91,8 +92,8 @@ public class SnmpInterfaceConfigWriterTest {
 
         Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
 
-        Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0));
-        Assert.assertEquals(WRITE_INPUT, response.getAllValues().get(1));
+        Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0).getContent());
+        Assert.assertEquals(WRITE_INPUT, response.getAllValues().get(1).getContent());
     }
 
     @Test
@@ -111,6 +112,6 @@ public class SnmpInterfaceConfigWriterTest {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }

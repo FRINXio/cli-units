@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -80,7 +81,7 @@ public class ClassifierWriterTest {
 
     private ClassifierWriter writer;
 
-    private ArgumentCaptor<String> response = ArgumentCaptor.forClass(String.class);
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier piid = KeyedInstanceIdentifier.create(Classifiers.class)
             .child(Classifier.class, new ClassifierKey("map1"))
@@ -183,11 +184,11 @@ public class ClassifierWriterTest {
         this.writer.writeCurrentAttributes(piid, data, context);
 
         Mockito.verify(cli, Mockito.times(5)).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_QOS_ANY, response.getAllValues().get(0));
-        Assert.assertEquals(WRITE_PREC_ANY, response.getAllValues().get(1));
-        Assert.assertEquals(WRITE_ACG_IPV4_ANY, response.getAllValues().get(2));
-        Assert.assertEquals(WRITE_PREC_IPV4_ANY, response.getAllValues().get(3));
-        Assert.assertEquals(WRITE_MPLS_ANY, response.getAllValues().get(4));
+        Assert.assertEquals(WRITE_QOS_ANY, response.getAllValues().get(0).getContent());
+        Assert.assertEquals(WRITE_PREC_ANY, response.getAllValues().get(1).getContent());
+        Assert.assertEquals(WRITE_ACG_IPV4_ANY, response.getAllValues().get(2).getContent());
+        Assert.assertEquals(WRITE_PREC_IPV4_ANY, response.getAllValues().get(3).getContent());
+        Assert.assertEquals(WRITE_MPLS_ANY, response.getAllValues().get(4).getContent());
     }
 
     @Test
@@ -195,7 +196,7 @@ public class ClassifierWriterTest {
         this.writer.writeCurrentAttributes(piid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT_ALL, response.getValue());
+        Assert.assertEquals(WRITE_INPUT_ALL, response.getValue().getContent());
     }
 
     @Test
@@ -203,6 +204,6 @@ public class ClassifierWriterTest {
         this.writer.deleteCurrentAttributes(piid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }

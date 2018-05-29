@@ -22,6 +22,7 @@ import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,7 +71,7 @@ public class PolicyForwardingInterfaceConfigWriterTest {
 
     private PolicyForwardingInterfaceConfigWriter writer;
 
-    private ArgumentCaptor<String> response = ArgumentCaptor.forClass(String.class);
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier iid = KeyedInstanceIdentifier.create(NetworkInstances.class)
             .child(NetworkInstance.class, new NetworkInstanceKey(DEFAULT_NETWORK)).child(PolicyForwarding.class)
@@ -105,7 +106,7 @@ public class PolicyForwardingInterfaceConfigWriterTest {
         this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -121,8 +122,8 @@ public class PolicyForwardingInterfaceConfigWriterTest {
 
         Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
 
-        Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0));
-        Assert.assertEquals(UPDATE_INPUT, response.getAllValues().get(1));
+        Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0).getContent());
+        Assert.assertEquals(UPDATE_INPUT, response.getAllValues().get(1).getContent());
     }
 
     @Test
@@ -130,6 +131,6 @@ public class PolicyForwardingInterfaceConfigWriterTest {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }

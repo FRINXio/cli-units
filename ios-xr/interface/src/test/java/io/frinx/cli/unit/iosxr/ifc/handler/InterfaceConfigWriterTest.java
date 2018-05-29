@@ -19,6 +19,7 @@ package io.frinx.cli.unit.iosxr.ifc.handler;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
@@ -67,7 +68,7 @@ public class InterfaceConfigWriterTest {
 
     private InterfaceConfigWriter writer;
 
-    private ArgumentCaptor<String> response = ArgumentCaptor.forClass(String.class);
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier iid = IIDs.IN_IN_CONFIG;
 
@@ -95,7 +96,7 @@ public class InterfaceConfigWriterTest {
         this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -108,7 +109,7 @@ public class InterfaceConfigWriterTest {
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -120,7 +121,7 @@ public class InterfaceConfigWriterTest {
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue());
+        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -128,6 +129,6 @@ public class InterfaceConfigWriterTest {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }
