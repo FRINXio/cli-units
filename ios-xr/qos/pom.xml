@@ -35,7 +35,7 @@
     <properties>
         <cli.version>3.1.4.rc3-frinx</cli.version>
         <openconfig.version>3.1.4.rc3-frinx</openconfig.version>
-        <honeycomb.version>1.17.10-Carbon-SR1.3_1_4_rc3-frinxodl</honeycomb.version>
+        <honeycomb.version>1.17.10-Carbon-SR1.3_1_4_rc4-frinxodl-SNAPSHOT</honeycomb.version>
     </properties>
 
     <dependencies>
