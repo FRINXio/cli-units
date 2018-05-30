@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.opendaylight.mdsal</groupId>
         <artifactId>binding-parent</artifactId>
-        <version>0.10.1-Carbon-SR1.3_1_4_rc3-frinxodl-SNAPSHOT</version>
+        <version>0.10.1-Carbon-SR1.3_1_4_rc3-frinxodl</version>
         <relativePath/>
     </parent>
 
