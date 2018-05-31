@@ -30,6 +30,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
+import io.frinx.cli.registry.spi.MountPointContext;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import java.util.Arrays;
@@ -189,7 +190,7 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    public Set<Pattern> getErrorPatterns() {
+    public Set<Pattern> getErrorPatterns(MountPointContext mpCtx) {
         return Sets.newLinkedHashSet(Arrays.asList(
                 Pattern.compile("^\\s+\\^.*", Pattern.DOTALL),
                 Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL),
