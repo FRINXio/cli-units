@@ -40,7 +40,10 @@ public class NeighborReaderTest {
             "Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd\n" +
             "10.255.255.3    4        65000   23713   23711        1    0    0 2w0d            0\n";
 
-    public static final String SUMM_OUTPUT_NEIGHBORS = "router bgp 65000\n" +
+    public static final String SUMM_OUTPUT_NEIGHBORS = " address-family ipv4\n" +
+            " address-family ipv6\n" +
+            "" +
+            "router bgp 65000\n" +
             " neighbor 3.3.3.3 remote-as 65000\n" +
             " neighbor 3.3.3.4 peer-group abcd\n" +
             " neighbor abcd peer-group\n" +

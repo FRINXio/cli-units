@@ -29,7 +29,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 
 public class NeighborAfiSafiReaderTest {
 
-    private static final String OUTPUT = "router bgp 65002\n" +
+    private static final String OUTPUT = " address-family ipv4\n" +
+            " address-family ipv6\n" +
+            " address-family vpnv4\n" +
+            " address-family vpnv6\n" +
+            "router bgp 65002\n" +
             " neighbor 1.2.3.4 remote-as 65000\n" +
             " address-family ipv4\n" +
             "  neighbor 1.2.3.4 activate\n" +
@@ -39,7 +43,11 @@ public class NeighborAfiSafiReaderTest {
             "  neighbor 1.2.3.4 remote-as 65000\n" +
             "  neighbor 1.2.3.4 activate\n";
 
-    private static final String OUTPUT2 = "router bgp 65002\r\n" +
+    private static final String OUTPUT2 = " address-family ipv4\n" +
+            " address-family ipv6\n" +
+            " address-family vpnv4\n" +
+            " address-family vpnv6\n" +
+            "router bgp 65002\r\n" +
             " neighbor 1.2.3.4 remote-as 65000\r\n" +
             " neighbor 1.2.3.4 update-source GigabitEthernet1\r\n" +
             " address-family ipv4\r\n" +
@@ -47,7 +55,11 @@ public class NeighborAfiSafiReaderTest {
             "  neighbor 1.2.3.4 route-map policy1 in\r\n" +
             " address-family ipv6";
 
-    private static final String OUTPUT3 = "router bgp 65002\r\n" +
+    private static final String OUTPUT3 = " address-family ipv4\n" +
+            " address-family ipv6\n" +
+            " address-family vpnv4\n" +
+            " address-family vpnv6\n" +
+            "router bgp 65002\r\n" +
             " neighbor 1.2.3.4 remote-as 65000\r\n" +
             " neighbor 1.2.3.4 update-source GigabitEthernet1\r\n" +
             " address-family ipv4 vrf abcd\r\n" +

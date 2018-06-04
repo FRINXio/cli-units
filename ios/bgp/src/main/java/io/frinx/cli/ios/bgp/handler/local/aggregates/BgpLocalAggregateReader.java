@@ -48,7 +48,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
 
     private static final String GROUP_IP = "ip";
     private static final String GROUP_MASK = "mask";
-    static final String SH_SUMM = "show running-config | include ^router bgp|^ *address-family|^ *network";
+    static final String SH_SUMM = "show running-config | include ^router bgp|^ address-family|^ *network";
     private static final Pattern NEIGHBOR_LINE = Pattern.compile("network (?<ip>\\S*) mask (?<mask>\\S*).*");
     private final Cli cli;
 

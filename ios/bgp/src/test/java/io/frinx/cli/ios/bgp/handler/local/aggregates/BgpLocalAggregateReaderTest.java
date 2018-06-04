@@ -25,9 +25,17 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
 
 public class BgpLocalAggregateReaderTest {
-    private String summOutputNeighbors = "router bgp 65000\n" + "  network 10.10.30.0 mask 255.255.255.0\n"
-        + " address-family ipv4 vrf vrf1\n" + "  network 10.10.10.0 mask 255.255.255.0\n"
-        + " address-family ipv4 vrf vrf3\n" + "  network 10.10.20.0 mask 255.255.255.0\n";
+
+    private String summOutputNeighbors =
+            " address-family ipv4\n" +
+            " address-family ipv6\n" +
+            " address-family vpnv6\n" +
+            "router bgp 65000\n" +
+            "  network 10.10.30.0 mask 255.255.255.0\n" +
+            " address-family ipv4 vrf vrf1\n" +
+            "  network 10.10.10.0 mask 255.255.255.0\n" +
+            " address-family ipv4 vrf vrf3\n" +
+            "  network 10.10.20.0 mask 255.255.255.0\n";
 
     @Test
     public void testNeighborIds() {

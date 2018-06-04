@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
-    public static final String SH_SUMM = "show running-config | include ^router bgp|^ *address-family|^ *neighbor";
+    public static final String SH_SUMM = "show running-config | include ^router bgp|^ address-family|^ *neighbor";
     private static final Pattern NEIGHBOR_LINE = Pattern.compile("neighbor (?<id>[0-9A-F.:]*) (remote-as|peer-group) \\S+");
     private static final Function<String, NeighborKey> TO_NEIGH_KEY = (String value) -> new NeighborKey(new IpAddress(value.toCharArray()));
 
@@ -105,7 +105,10 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
     }
 
     public static String[] splitOutput(String output) {
-        return output.replaceAll(NEWLINE, "").replaceAll("\r", "")
+        // Skip any output before "router bgp" such as address-family definitions for VRFs or OSPF
+        output = output.substring(output.indexOf("router bgp"));
+        return output.replaceAll(NEWLINE, "")
+                .replaceAll("\r", "")
                 .replaceAll(" address-family", "\n address-family")
                 .split("\\n");
     }

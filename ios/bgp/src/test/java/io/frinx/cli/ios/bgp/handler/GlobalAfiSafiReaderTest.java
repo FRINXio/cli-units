@@ -17,6 +17,7 @@
 package io.frinx.cli.ios.bgp.handler;
 
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -27,7 +28,9 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev
 
 public class GlobalAfiSafiReaderTest {
 
-    private static final String BGP_OUTPUT = "router bgp 65000\r\n" +
+    private static final String BGP_OUTPUT = " address-family vpnv4\r\n" +
+            " address-family vpnv6\r\n" +
+            "router bgp 65000\r\n" +
             " address-family ipv4\r\n" +
             " address-family ipv4 vrf a\n";
 
@@ -39,6 +42,7 @@ public class GlobalAfiSafiReaderTest {
 
         AfiSafiKey ipv4Key = new AfiSafiKey(IPV4UNICAST.class);
 
+        assertEquals(1, defaultFamilies.size());
         assertThat(defaultFamilies, hasItems(ipv4Key));
         assertThat(aFamilies, hasItems(ipv4Key));
         assertTrue(bFamilies.isEmpty());
