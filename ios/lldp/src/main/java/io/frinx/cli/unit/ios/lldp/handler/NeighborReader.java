@@ -16,14 +16,19 @@
 
 package io.frinx.cli.unit.ios.lldp.handler;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp._interface.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp.neighbor.top.NeighborsBuilder;
@@ -36,16 +41,16 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborReader implements CliOperListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
-    static final String SHOW_LLDP_NEIGHBOR = "show lldp neighbors %s detail | include Port id|System Name";
-    private static final Pattern NEIGHBOR_NAME =
-            Pattern.compile("System Name: (?<neighborName>\\S+)");
+    static final String SHOW_LLDP_NEIGHBOR = "show lldp neighbors %s detail";
+    private static final Pattern CHASSIS = Pattern.compile("Chassis id: (?<chassis>.+)");
+    private static final Pattern PORT = Pattern.compile("Port id: (?<portId>.+)");
+    static final String KEY_FORMAT = "%s Port:%s";
 
     private Cli cli;
 
     public NeighborReader(Cli cli) {
         this.cli = cli;
     }
-
 
     @Nonnull
     @Override
@@ -58,10 +63,27 @@ public class NeighborReader implements CliOperListReader<Neighbor, NeighborKey, 
 
     @VisibleForTesting
     static List<NeighborKey> parseNeighborIds(String showLlldpNeighborOutput) {
-        return ParsingUtils.parseFields(showLlldpNeighborOutput, 0,
-                NEIGHBOR_NAME::matcher,
-                m -> m.group("neighborName"),
-                NeighborKey::new);
+        List<String> collect = ParsingUtils.NEWLINE.splitAsStream(showLlldpNeighborOutput)
+                .map(String::trim)
+                .filter(l -> CHASSIS.matcher(l).matches() || PORT.matcher(l).matches())
+                .collect(Collectors.toList());
+
+        List<NeighborKey> keys = Lists.newArrayList();
+        for (int i = 0; i < collect.size(); i = i + 2) {
+            String chassisString = collect.get(i);
+            String portString = collect.get(i + 1);
+
+            Matcher chMatcher = CHASSIS.matcher(chassisString);
+            checkState(chMatcher.matches());
+            String chassis = chMatcher.group("chassis");
+            Matcher pMatcher = PORT.matcher(portString);
+            checkState(pMatcher.matches());
+            String port = pMatcher.group("portId");
+
+            keys.add(new NeighborKey(String.format(KEY_FORMAT, chassis, port)));
+        }
+
+        return keys;
     }
 
     @Override

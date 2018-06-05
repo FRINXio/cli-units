@@ -16,14 +16,17 @@
 
 package io.frinx.cli.unit.ios.lldp.handler;
 
+import static io.frinx.cli.unit.ios.lldp.handler.NeighborReader.KEY_FORMAT;
 import static io.frinx.cli.unit.ios.lldp.handler.NeighborReader.SHOW_LLDP_NEIGHBOR;
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
+import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -38,7 +41,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
 
-    private static final Pattern NEIGHBOR_LINE = Pattern.compile(".*Port id: (?<portId>.+) System Name:.*");
+    private static final Pattern PORT_DESC = Pattern.compile("Port Description: (?<portDescr>.+)");
+    private static final Pattern NAME = Pattern.compile("System Name: (?<name>\\S+)");
+    private static final Pattern DESCR = Pattern.compile("System Description:\\s*\\r?\\n(?<descr>.+?)\\r?\\n\\r?\\n", Pattern.DOTALL);
+    private static final Pattern IP = Pattern.compile("(IP|IPv4 address): (?<ip>\\S+)");
+    private static final Pattern IPV6 = Pattern.compile("(IPV6|IPv6 address): (?<ip>\\S+)");
+    private static final Pattern SEPARATOR = Pattern.compile("----------");
 
     private Cli cli;
 
@@ -52,31 +60,52 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
             throws ReadFailedException {
         String interfaceId = instanceIdentifier.firstKeyOf(Interface.class).getName();
         String neighborId = instanceIdentifier.firstKeyOf(Neighbor.class).getId();
-        String showLldpEntryCommand = String.format(SHOW_LLDP_NEIGHBOR, interfaceId);
+        String cmd = String.format(SHOW_LLDP_NEIGHBOR, interfaceId);
+        String output = blockingRead(cmd, cli, instanceIdentifier, readContext);
 
-        parseNeighborStateFields(
-                blockingRead(showLldpEntryCommand, cli, instanceIdentifier, readContext), neighborId, stateBuilder);
-
+        parseNeighborStateFields(extractSingleNeighbor(output, neighborId), neighborId, stateBuilder);
     }
 
-    // TODO document this method
+    @VisibleForTesting
+    static String extractSingleNeighbor(String output, String neighborId) {
+        String[] split = splitId(neighborId);
+        return SEPARATOR.splitAsStream(output)
+                .filter(chunk -> chunk.contains(split[0]) && chunk.contains(split[1]))
+                .findFirst()
+                .orElse("");
+    }
+
     @VisibleForTesting
     static void parseNeighborStateFields(String output, String neighborId, StateBuilder builder) {
-        String withoutNewLines = output.replaceAll(NEWLINE.pattern(), " ");
-
-        String linePerNeighborOutput = withoutNewLines.replaceAll("Port id:", "\nPort id:");
-
-        NEWLINE.splitAsStream(linePerNeighborOutput)
-                .map(String::trim)
-                .filter(s -> s.endsWith(neighborId))
-                .map(NEIGHBOR_LINE::matcher)
-                .filter(Matcher::matches)
-                .map(matcher -> matcher.group("portId"))
-                .findFirst()
-                .ifPresent(builder::setPortId);
+        String[] split = splitId(neighborId);
 
         builder.setId(neighborId);
-        // TODO set also other fields
+        builder.setChassisId(split[0]);
+        builder.setPortId(split[1]);
+
+        // Optional TLVs
+        parseField(output, PORT_DESC::matcher, m -> m.group("portDescr"), builder::setPortDescription);
+        parseField(output, NAME::matcher, m -> m.group("name"), builder::setSystemName);
+
+        Matcher descrMatcher = DESCR.matcher(output);
+        if (descrMatcher.find()) {
+            String descr = descrMatcher.group(1);
+            builder.setSystemDescription(descr.length() >= 255 ? descr.substring(0, 254): descr);
+        }
+
+        Optional<String> mgmtIp4 = parseField(output, 0, IP::matcher, m -> m.group("ip"));
+        String mgmtIp = mgmtIp4
+                .orElse(parseField(output, 0, IPV6::matcher, m -> m.group("ip")).orElse(null));
+        if (mgmtIp != null) {
+            builder.setManagementAddress(mgmtIp);
+        }
+    }
+
+    private static String[] splitId(String neighborId) {
+        String[] split = neighborId.split(" Port:");
+        Preconditions.checkArgument(split.length == 2,
+                "Invalid neighbor id format, expected: %s", KEY_FORMAT);
+        return split;
     }
 
     @Override

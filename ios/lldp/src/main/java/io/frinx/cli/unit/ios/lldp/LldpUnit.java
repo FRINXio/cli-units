@@ -29,6 +29,7 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.ios.lldp.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.ios.lldp.handler.InterfaceReader;
+import io.frinx.cli.unit.ios.lldp.handler.LldpConfigReader;
 import io.frinx.cli.unit.ios.lldp.handler.NeighborReader;
 import io.frinx.cli.unit.ios.lldp.handler.NeighborStateReader;
 import io.frinx.openconfig.openconfig.lldp.IIDs;
@@ -80,6 +81,7 @@ public class LldpUnit implements TranslateUnit {
     private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         // TODO CDP and LLDP are almost identical, reuse code, DRY
         rRegistry.addStructuralReader(IIDs.LLDP, LldpBuilder.class);
+        rRegistry.add(new GenericOperReader<>(IIDs.LL_CONFIG, new LldpConfigReader(cli, getShowHostnameCommand())));
         rRegistry.addStructuralReader(IIDs.LL_INTERFACES, InterfacesBuilder.class);
         // TODO see IosCdpUnit why interface and config readers are registered as operational
         rRegistry.add(new GenericOperListReader<>(IIDs.LL_IN_INTERFACE, new InterfaceReader(cli)));
@@ -87,6 +89,10 @@ public class LldpUnit implements TranslateUnit {
         rRegistry.addStructuralReader(IIDs.LL_IN_IN_NEIGHBORS, NeighborsBuilder.class);
         rRegistry.add(new GenericOperListReader<>(IIDs.LL_IN_IN_NE_NEIGHBOR, new NeighborReader(cli)));
         rRegistry.add(new GenericOperReader<>(IIDs.LL_IN_IN_NE_NE_STATE, new NeighborStateReader(cli)));
+    }
+
+    protected String getShowHostnameCommand() {
+        return LldpConfigReader.SHOW_HOSTNAME;
     }
 
     @Override

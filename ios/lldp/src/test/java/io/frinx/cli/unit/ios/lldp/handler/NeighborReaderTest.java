@@ -27,17 +27,266 @@ import java.util.stream.Collectors;
 
 public class NeighborReaderTest {
 
-    private static final String SH_LLDP_NEIGHBOR = "Port id: Gi0/0/0/1\n" +
-            "System Name: PE3.demo.frinx.io\n" +
-            "Port id: Fa0/1\n" +
+    static final String SH_LLDP_NEIGHBOR = "------------------------------------------------\n" +
+            "Chassis id: 001e.bd3a.4500\n" +
+            "Port id: Gi1\n" +
+            "Port Description: GigabitEthernet1\n" +
+            "System Name: XE3.FRINX.LOCAL\n" +
+            "\n" +
+            "System Description: \n" +
+            "Cisco IOS Software, CSR1000V Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.4(3)S1, RELEASE SOFTWARE (fc3)\n" +
+            "Technical Support: http://www.cisco.com/techsupport\n" +
+            "Copyright (c) 1986-2014 by Cisco Systems, Inc.\n" +
+            "Compiled Fri 31-Oct-14 17:32 by mcpre\n" +
+            "\n" +
+            "Time remaining: 116 seconds\n" +
+            "System Capabilities: B,R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IP: 192.168.1.253\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "------------------------------------------------\n" +
+            "Chassis id: 001e.bd3a.4500\n" +
+            "Port id: Gi3\n" +
+            "Port Description: GigabitEthernet3\n" +
+            "System Name: XE3.FRINX.LOCAL\n" +
+            "\n" +
+            "System Description: \n" +
+            "Cisco IOS Software, CSR1000V Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.4(3)S1, RELEASE SOFTWARE (fc3)\n" +
+            "Technical Support: http://www.cisco.com/techsupport\n" +
+            "Copyright (c) 1986-2014 by Cisco Systems, Inc.\n" +
+            "Compiled Fri 31-Oct-14 17:32 by mcpre\n" +
+            "\n" +
+            "Time remaining: 109 seconds\n" +
+            "System Capabilities: B,R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IP: 192.168.1.253\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "------------------------------------------------\n" +
+            "Chassis id: 001e.bd3a.4500\n" +
+            "Port id: Gi2\n" +
+            "Port Description: GigabitEthernet2\n" +
+            "System Name: XE3.FRINX.LOCAL\n" +
+            "\n" +
+            "System Description: \n" +
+            "Cisco IOS Software, CSR1000V Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.4(3)S1, RELEASE SOFTWARE (fc3)\n" +
+            "Technical Support: http://www.cisco.com/techsupport\n" +
+            "Copyright (c) 1986-2014 by Cisco Systems, Inc.\n" +
+            "Compiled Fri 31-Oct-14 17:32 by mcpre\n" +
+            "\n" +
+            "Time remaining: 102 seconds\n" +
+            "System Capabilities: B,R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IP: 192.168.1.253\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "------------------------------------------------\n" +
+            "Chassis id: 001e.e6a5.f300\n" +
+            "Port id: Gi1\n" +
+            "Port Description: GigabitEthernet1\n" +
             "System Name: XE2.FRINX\n" +
-            "Port id: Fa0/0\n" +
+            "\n" +
+            "System Description: \n" +
+            "Cisco IOS Software, CSR1000V Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.4(2)S, RELEASE SOFTWARE (fc2)\n" +
+            "Technical Support: http://www.cisco.com/techsupport\n" +
+            "Copyright (c) 1986-2014 by Cisco Systems, Inc.\n" +
+            "Compiled Wed 26-Mar-14 21:09 by mcpre\n" +
+            "\n" +
+            "Time remaining: 96 seconds\n" +
+            "System Capabilities: B,R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IP: 192.168.1.251\n" +
+            "    IPV6: 2001:DB8:0:1::\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "------------------------------------------------\n" +
+            "Chassis id: 001e.bdb2.5200\n" +
+            "Port id: Gi2\n" +
+            "Port Description: GigabitEthernet2\n" +
+            "System Name: XE4.FRINX.LOCAL\n" +
+            "\n" +
+            "System Description: \n" +
+            "Cisco IOS Software, CSR1000V Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.4(3)S1, RELEASE SOFTWARE (fc3)\n" +
+            "Technical Support: http://www.cisco.com/techsupport\n" +
+            "Copyright (c) 1986-2014 by Cisco Systems, Inc.\n" +
+            "Compiled Fri 31-Oct-14 17:32 by mcpre\n" +
+            "\n" +
+            "Time remaining: 90 seconds\n" +
+            "System Capabilities: B,R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IP: 192.168.1.254\n" +
+            "    IPV6: 2::2\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "------------------------------------------------\n" +
+            "Chassis id: 001e.bdb2.5200\n" +
+            "Port id: Gi3\n" +
+            "Port Description: GigabitEthernet3\n" +
+            "System Name: XE4.FRINX.LOCAL\n" +
+            "\n" +
+            "System Description: \r\n" +
+            "Cisco IOS Software, CSR1000V Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.4(3)S1, RELEASE SOFTWARE (fc3)\n" +
+            "Technical Support: http://www.cisco.com/techsupport\n" +
+            "Copyright (c) 1986-2014 by Cisco Systems, Inc.\n" +
+            "Compiled Fri 31-Oct-14 17:32 by mcpre\r\n" +
+            "\r\n" +
+            "Time remaining: 101 seconds\n" +
+            "System Capabilities: B,R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IP: 192.168.1.254\n" +
+            "    IPV6: 2::2\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "------------------------------------------------\n" +
+            "Chassis id: 001e.bdb2.5200\n" +
+            "Port id: Gi1\n" +
+            "Port Description: GigabitEthernet1\n" +
+            "System Name: XE4.FRINX.LOCAL\n" +
+            "\n" +
+            "System Description: \n" +
+            "Cisco IOS Software, CSR1000V Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.4(3)S1, RELEASE SOFTWARE (fc3)\n" +
+            "Technical Support: http://www.cisco.com/techsupport\n" +
+            "Copyright (c) 1986-2014 by Cisco Systems, Inc.\n" +
+            "Compiled Fri 31-Oct-14 17:32 by mcpre\n" +
+            "\n" +
+            "Time remaining: 114 seconds\n" +
+            "System Capabilities: B,R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IP: 192.168.1.254\n" +
+            "    IPV6: 2::2\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "------------------------------------------------\n" +
+            "Chassis id: 027f.e579.a406\n" +
+            "Port id: Gi0/0/0/4\n" +
+            "Port Description - not advertised\n" +
+            "System Name: PE1.demo.frinx.io\n" +
+            "\n" +
+            "System Description: \n" +
+            "Cisco IOS XR Software, Version 6.1.2[Default]\n" +
+            "Copyright (c) 2016 by Cisco Systems, Inc., IOS XRv Series\n" +
+            "\n" +
+            "Time remaining: 111 seconds\n" +
+            "System Capabilities: R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IPV6: 2::2\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "------------------------------------------------\n" +
+            "Chassis id: 0261.826a.a405\n" +
+            "Port id: Gi0/0/0/4\n" +
+            "Port Description - not advertised\n" +
+            "System Name: ios\n" +
+            "\n" +
+            "System Description: \n" +
+            "Cisco IOS XR Software, Version 5.3.4[Default]\n" +
+            "Copyright (c) 2016 by Cisco Systems, Inc., IOS XRv Series\n" +
+            "\n" +
+            "Time remaining: 117 seconds\n" +
+            "System Capabilities: R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IPV6: 2::2\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "------------------------------------------------\n" +
+            "Chassis id: 001e.49a4.ef00\n" +
+            "Port id: Gi1\n" +
+            "Port Description: GigabitEthernet1\n" +
             "System Name: XE1.FRINX\n" +
-            "Port id: Gi0/0/0/3\n" +
-            "System Name: PE1.demo.frinx.io";
+            "\n" +
+            "System Description: \n" +
+            "Cisco IOS Software, CSR1000V Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.4(2)S, RELEASE SOFTWARE (fc2)\n" +
+            "Technical Support: http://www.cisco.com/techsupport\n" +
+            "Copyright (c) 1986-2014 by Cisco Systems, Inc.\n" +
+            "Compiled Wed 26-Mar-14 21:09 by mcpre\n" +
+            "\n" +
+            "Time remaining: 102 seconds\n" +
+            "System Capabilities: B,R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IP: 192.168.1.252\n" +
+            "    IPV6: 2001:DB8:0:1::\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "------------------------------------------------\n" +
+            "Chassis id: 001e.49a4.ef00\n" +
+            "Port id: Gi2\n" +
+            "Port Description: GigabitEthernet2\n" +
+            "System Name: XE1.FRINX\n" +
+            "\n" +
+            "System Description: \n" +
+            "Cisco IOS Software, CSR1000V Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.4(2)S, RELEASE SOFTWARE (fc2)\n" +
+            "Technical Support: http://www.cisco.com/techsupport\n" +
+            "Copyright (c) 1986-2014 by Cisco Systems, Inc.\n" +
+            "Compiled Wed 26-Mar-14 21:09 by mcpre\n" +
+            "\n" +
+            "Time remaining: 101 seconds\n" +
+            "System Capabilities: B,R\n" +
+            "Enabled Capabilities: R\n" +
+            "Management Addresses:\n" +
+            "    IP: 192.168.1.252\n" +
+            "    IPV6: 2001:DB8:0:1::\n" +
+            "Auto Negotiation - not supported\n" +
+            "Physical media capabilities - not advertised\n" +
+            "Media Attachment Unit type - not advertised\n" +
+            "Vlan ID: - not advertised\n" +
+            "\n" +
+            "\n" +
+            "Total entries displayed: 11\n" +
+            "\n";
 
     private static final List<NeighborKey> EXPECTED_IDS =
-            Lists.newArrayList("XE1.FRINX", "PE3.demo.frinx.io", "XE2.FRINX", "PE1.demo.frinx.io")
+            Lists.newArrayList("001e.bd3a.4500 Port:Gi1",
+                    "001e.bd3a.4500 Port:Gi3",
+                    "001e.bd3a.4500 Port:Gi2",
+                    "001e.e6a5.f300 Port:Gi1",
+                    "001e.bdb2.5200 Port:Gi2",
+                    "001e.bdb2.5200 Port:Gi3",
+                    "001e.bdb2.5200 Port:Gi1",
+                    "027f.e579.a406 Port:Gi0/0/0/4",
+                    "0261.826a.a405 Port:Gi0/0/0/4",
+                    "001e.49a4.ef00 Port:Gi1",
+                    "001e.49a4.ef00 Port:Gi2")
             .stream()
             .map(NeighborKey::new)
             .collect(Collectors.toList());
