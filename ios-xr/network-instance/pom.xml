@@ -28,51 +28,41 @@
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
-    <groupId>io.frinx.cli</groupId>
     <artifactId>ios-xr-network-instance-unit</artifactId>
     <version>3.1.5.rc4-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <properties>
-        <cli.version>3.1.5.rc4-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.5.rc4-frinx-SNAPSHOT</openconfig.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-spi</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>io-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>utils-unit</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>common-handlers</artifactId>
-            <version>${cli.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>ios-xr-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>ios-xr-bgp-unit</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>ios-xr-ospf-unit</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>translation-registry-common</artifactId>
             <version>${cli.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>translate-spi</artifactId>
+            <version>${hc.version}</version>
         </dependency>
 
         <!-- Openconfig models -->
@@ -87,27 +77,22 @@
             <version>${openconfig.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-bgp-unit</artifactId>
-            <version>${cli.version}</version>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-local-routing</artifactId>
+            <version>${openconfig.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-mpls-unit</artifactId>
-            <version>${cli.version}</version>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-policy</artifactId>
+            <version>${openconfig.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-ospf-unit</artifactId>
-            <version>${cli.version}</version>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-interfaces</artifactId>
+            <version>${openconfig.version}</version>
         </dependency>
 
         <!-- Testing Dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>

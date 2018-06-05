@@ -33,6 +33,81 @@
     <version>3.1.5.rc4-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <properties>
+        <cli.version>3.1.5.rc4-frinx-SNAPSHOT</cli.version>
+        <openconfig.version>3.1.5.rc4-frinx-SNAPSHOT</openconfig.version>
+        <hc.version>1.17.10-Carbon-SR1.3_1_5_rc4-frinxodl-SNAPSHOT</hc.version>
+        <controller.version>1.5.1-Carbon-SR1.3_1_5_rc4-frinxodl-SNAPSHOT</controller.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>utils-unit</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+
+        <!-- Cli -->
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>translation-registry-api</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>translation-registry-spi</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>io-api</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+
+        <!-- Honeycomb -->
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>rpc-api</artifactId>
+            <version>${hc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>translate-api</artifactId>
+            <version>${hc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>translate-impl</artifactId>
+            <version>${hc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>translate-utils</artifactId>
+            <version>${hc.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>concepts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>yang-binding</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <!-- Testing Dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

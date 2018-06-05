@@ -18,42 +18,41 @@
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
-    <groupId>io.frinx.cli</groupId>
     <artifactId>ios-xr-netflow-unit</artifactId>
     <version>3.1.5.rc4-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <properties>
-        <cli.version>3.1.5.rc4-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.5.rc4-frinx-SNAPSHOT</openconfig.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-spi</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
             <artifactId>ios-xr-utils</artifactId>
-            <version>${cli.version}</version>
+            <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>utils-unit</artifactId>
+            <artifactId>translation-registry-common</artifactId>
             <version>${cli.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>iana-if-type-2014-05-08</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>ietf-interfaces</artifactId>
         </dependency>
 
         <!-- Openconfig models -->
         <dependency>
             <groupId>io.frinx.openconfig</groupId>
             <artifactId>openconfig-netflow</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-interfaces</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
     </dependencies>

@@ -24,69 +24,45 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.frinx.cli</groupId>
     <artifactId>ios-xr-mpls-unit</artifactId>
     <version>3.1.5.rc4-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <properties>
-        <cli.version>3.1.5.rc4-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.5.rc4-frinx-SNAPSHOT</openconfig.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-spi</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>io-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>utils-unit</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-interface-unit</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>ios-xr-utils</artifactId>
-            <version>${cli.version}</version>
+            <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>common-handlers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Openconfig models -->
         <dependency>
             <groupId>io.frinx.openconfig</groupId>
             <artifactId>openconfig-network-instance</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-api</artifactId>
-            <version>${cli.version}</version>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-mpls</artifactId>
+            <version>${openconfig.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>common-handlers</artifactId>
-            <version>${cli.version}</version>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-types</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-interfaces</artifactId>
+            <version>${openconfig.version}</version>
         </dependency>
 
         <!-- Testing Dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>

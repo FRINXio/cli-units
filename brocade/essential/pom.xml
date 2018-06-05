@@ -28,58 +28,21 @@
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
-    <groupId>io.frinx.cli</groupId>
     <artifactId>brocade-essential-unit</artifactId>
     <version>3.1.5.rc4-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <properties>
-        <cli.version>3.1.5.rc4-frinx-SNAPSHOT</cli.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-spi</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>io-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>utils-unit</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-
-        <!-- ios-essential model -->
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>ios-essential-model</artifactId>
-            <version>${cli.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
-        <!-- Testing Dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>translation-registry-model</artifactId>
+            <version>${cli.version}</version>
         </dependency>
     </dependencies>
 </project>

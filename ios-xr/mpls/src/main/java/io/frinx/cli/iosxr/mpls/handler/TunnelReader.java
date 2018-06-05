@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.mpls.handler;
 
-import static io.frinx.cli.unit.iosxr.ifc.handler.InterfaceReader.SH_RUN_INTERFACE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -40,6 +38,7 @@ public class TunnelReader implements MplsListReader.MplsConfigListReader<Tunnel,
 
     private Cli cli;
 
+    private static final String SH_RUN_INTERFACE = "show running-config interface | include ^interface";
     private static final Pattern TUNNEL_TE_IFACE_LINE = Pattern.compile("interface tunnel-te(?<name>[0-9]+)");
 
     public TunnelReader(Cli cli) {

@@ -25,41 +25,23 @@
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
-    <groupId>io.frinx.cli</groupId>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-platform-unit</artifactId>
     <version>3.1.5.rc4-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <properties>
-        <cli.version>3.1.5.rc4-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.5.rc4-frinx-SNAPSHOT</openconfig.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>utils-unit</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.openconfig</groupId>
-            <artifactId>openconfig-platform</artifactId>
-            <version>${openconfig.version}</version>
-        </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>ios-utils</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <!-- Openconfig models -->
+        <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-platform</artifactId>
+            <version>${openconfig.version}</version>
         </dependency>
     </dependencies>
 </project>

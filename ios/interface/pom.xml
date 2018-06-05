@@ -28,55 +28,20 @@
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
-    <groupId>io.frinx.cli</groupId>
     <artifactId>ios-interface-unit</artifactId>
     <version>3.1.5.rc4-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <properties>
-        <cli.version>3.1.5.rc4-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.5.rc4-frinx-SNAPSHOT</openconfig.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-spi</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>io-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>utils-unit</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>common-handlers</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>ios-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>common-handlers</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Openconfig models -->
@@ -85,17 +50,33 @@
             <artifactId>openconfig-if-ip</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
-
-        <!-- Testing Dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-vlan</artifactId>
+            <version>${openconfig.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-interfaces</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>iana-if-type-2014-05-08</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>ietf-inet-types-2013-07-15</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>ietf-interfaces</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
         </dependency>
     </dependencies>
 </project>

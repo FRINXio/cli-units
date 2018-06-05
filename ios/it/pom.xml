@@ -24,20 +24,10 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.frinx.cli</groupId>
     <artifactId>ios-it</artifactId>
     <version>3.1.5.rc4-frinx-SNAPSHOT</version>
 
-    <properties>
-        <cli.version>3.1.5.rc4-frinx-SNAPSHOT</cli.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>io-impl</artifactId>
@@ -45,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>topology-impl</artifactId>
+            <artifactId>topology-api</artifactId>
             <version>${cli.version}</version>
         </dependency>
         <dependency>
@@ -53,6 +43,99 @@
             <artifactId>translation-registry</artifactId>
             <version>${cli.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>translation-registry-model</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>utils</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+
+        <!-- Honeycomb -->
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>data-api</artifactId>
+            <version>${hc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>data-impl</artifactId>
+            <version>${hc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>translate-impl</artifactId>
+            <version>${hc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>translate-utils</artifactId>
+            <version>${hc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>rpc-impl</artifactId>
+            <version>${hc.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-data-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-data-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-data-codec-gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>yang-model-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>ietf-topology</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>ietf-inet-types-2013-07-15</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>sal-binding-api</artifactId>
+            <version>${controller.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>sal-binding-broker-impl</artifactId>
+            <version>${controller.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>sal-common-api</artifactId>
+            <version>${controller.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>sal-core-api</artifactId>
+            <version>${controller.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-binding-dom-codec</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
+        <!-- Testing Dependencies -->
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>generic-unit</artifactId>
@@ -112,17 +195,15 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Openconfig models -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.7</version>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-interfaces</artifactId>
+            <version>${openconfig.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -131,6 +212,12 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.7</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

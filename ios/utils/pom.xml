@@ -28,33 +28,14 @@
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
-    <groupId>io.frinx.cli</groupId>
     <artifactId>ios-utils</artifactId>
     <packaging>bundle</packaging>
-
-    <properties>
-        <cli.version>3.1.5.rc4-frinx-SNAPSHOT</cli.version>
-    </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-spi</artifactId>
+            <artifactId>translation-registry-model</artifactId>
             <version>${cli.version}</version>
         </dependency>
-
-        <!-- Testing Dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
-
 </project>
