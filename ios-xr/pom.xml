@@ -47,6 +47,7 @@
     <module>netflow</module>
     <module>qos</module>
     <module>configuration-metadata</module>
+    <module>lldp</module>
   </modules>
 
   <build>
