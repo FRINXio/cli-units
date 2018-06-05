@@ -48,6 +48,7 @@
     <module>qos</module>
     <module>configuration-metadata</module>
     <module>lldp</module>
+    <module>it</module>
   </modules>
 
   <build>

@@ -114,12 +114,13 @@ public class IosAll {
 
     private static final Device IOS_ALL = new DeviceIdBuilder()
             .setDeviceType("ios")
-            .setDeviceVersion("*")
+            .setDeviceVersion("15.1")
             .build();
 
-    private static final String IOS_ID = "ios-it";
+    private static final String MOUNT_ID = "ios-it";
     private static final int PORT = 22;
-    private static final String HOST = "192.168.1.230";
+
+    private static final String HOST = "192.168.1.254";
     private static final InetSocketAddress IOS_ADDR = new InetSocketAddress(HOST, PORT);
     private static final CliNode CLI_CFG = new CliNodeBuilder()
             .setPort(new PortNumber(PORT))
@@ -173,10 +174,10 @@ public class IosAll {
 
         TranslateRegistryImpl reg = getTranslateRegistry(mockBroker);
 
-        TranslateContext translateContext = reg.getTranslateContext(IOS_ALL);
+        TranslateContext translateContext = reg.getTranslateContext(getDeviceId());
 
-        RemoteDeviceId remoteId = new RemoteDeviceId(CLI_TOPO_KEY, IOS_ID, IOS_ADDR);
-        cli = IOFactory.getIO(remoteId, CLI_CFG, translateContext.getInitializer(remoteId, CLI_CFG), EXECUTOR, RECONNECT_LISTENER, Collections.emptySet())
+        RemoteDeviceId remoteId = new RemoteDeviceId(CLI_TOPO_KEY, MOUNT_ID, getAddress());
+        cli = IOFactory.getIO(remoteId, getCliNode(), translateContext.getInitializer(remoteId, getCliNode()), EXECUTOR, RECONNECT_LISTENER, Collections.emptySet())
                 .toCompletableFuture()
                 .get();
 
@@ -207,6 +208,14 @@ public class IosAll {
         }.load(DataBroker.class).get());
     }
 
+    protected InetSocketAddress getAddress() {
+        return IOS_ADDR;
+    }
+
+    protected Device getDeviceId() {
+        return IOS_ALL;
+    }
+
     private void setRootLogLevel() {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.INFO);
@@ -227,7 +236,7 @@ public class IosAll {
         doReturn(mockTx).when(mockTxChain).newWriteOnlyTransaction();
     }
 
-    private static TranslateRegistryImpl getTranslateRegistry(DataBroker mockBroker) {
+    protected TranslateRegistryImpl getTranslateRegistry(DataBroker mockBroker) {
         TranslateRegistryImpl reg = new TranslateRegistryImpl(mockBroker);
 
         new GenericTranslateUnit(reg).init();
@@ -269,18 +278,22 @@ public class IosAll {
         cli.close();
 
         TranslateRegistryImpl reg = getTranslateRegistry(mockBroker);
-        TranslateContext translateContext = reg.getTranslateContext(IOS_ALL);
+        TranslateContext translateContext = reg.getTranslateContext(getDeviceId());
 
-        RemoteDeviceId remoteId = new RemoteDeviceId(CLI_TOPO_KEY, IOS_ID, IOS_ADDR);
+        RemoteDeviceId remoteId = new RemoteDeviceId(CLI_TOPO_KEY, MOUNT_ID, getAddress());
 
         for (int i = 0; i < 20; i++) {
 
-            Cli io = IOFactory.getIO(remoteId, CLI_CFG, translateContext.getInitializer(remoteId, CLI_CFG), EXECUTOR, RECONNECT_LISTENER, Collections.emptySet())
+            Cli io = IOFactory.getIO(remoteId, getCliNode(), translateContext.getInitializer(remoteId, getCliNode()), EXECUTOR, RECONNECT_LISTENER, Collections.emptySet())
                     .toCompletableFuture()
                     .get();
 
             io.close();
         }
+    }
+
+    protected CliNode getCliNode() {
+        return CLI_CFG;
     }
 
     @Ignore
