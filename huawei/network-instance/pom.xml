@@ -22,18 +22,18 @@
   <parent>
     <groupId>io.frinx.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>3.1.5.rc2-frinx</version>
+    <version>3.1.5.rc3-frinx-SNAPSHOT</version>
     <relativePath>../../unit-parent</relativePath>
   </parent>
 
 <groupId>io.frinx.cli</groupId>
 <artifactId>huawei-network-instance-unit</artifactId>
-<version>3.1.5.rc2-frinx</version>
+<version>3.1.5.rc3-frinx-SNAPSHOT</version>
 <packaging>bundle</packaging>
 
 <properties>
-  <cli.version>3.1.5.rc2-frinx</cli.version>
-  <openconfig.version>3.1.5.rc2-frinx</openconfig.version>
+  <cli.version>3.1.5.rc3-frinx-SNAPSHOT</cli.version>
+  <openconfig.version>3.1.5.rc3-frinx-SNAPSHOT</openconfig.version>
 </properties>
 
 <dependencies>
