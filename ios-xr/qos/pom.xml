@@ -24,17 +24,17 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.5.rc2-frinx-SNAPSHOT</version>
+        <version>3.1.5.rc2-frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>ios-xr-qos-unit</artifactId>
-    <version>3.1.5.rc2-frinx-SNAPSHOT</version>
+    <version>3.1.5.rc2-frinx</version>
     <packaging>bundle</packaging>
 
     <properties>
-        <cli.version>3.1.5.rc2-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.5.rc2-frinx-SNAPSHOT</openconfig.version>
+        <cli.version>3.1.5.rc2-frinx</cli.version>
+        <openconfig.version>3.1.5.rc2-frinx</openconfig.version>
         <honeycomb.version>1.17.10-Carbon-SR1.3_1_5_rc2-frinxodl</honeycomb.version>
     </properties>
 
