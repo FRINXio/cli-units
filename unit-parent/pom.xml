@@ -30,7 +30,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>3.1.5.rc3-frinx-SNAPSHOT</version>
+    <version>3.1.5.rc3-frinx</version>
     <packaging>pom</packaging>
 
     <build>
