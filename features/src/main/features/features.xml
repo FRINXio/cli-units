@@ -31,11 +31,6 @@
         <feature version='${cli.version}'>cli-southbound-io</feature>
         <bundle>mvn:io.frinx.cli/ios-cli-init-unit/{{VERSION}}</bundle>
     </feature>
-    <feature name='cli-southbound-unit-ios-xr-common-cli-initializer' version='${project.version}'>
-        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
-        <feature version='${cli.version}'>cli-southbound-io</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-cli-init-unit/{{VERSION}}</bundle>
-    </feature>
 
     <feature name='cli-southbound-ios-common-models' version='${project.version}'>
         <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
@@ -44,285 +39,119 @@
 
     <feature name='cli-southbound-ios-common-handlers' version='${project.version}'>
         <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${openconfig.version}'>openconfig-models</feature>
+        <bundle>wrap:mvn:org.tinyjee.jgraphx/jgraphx/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-core/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-ext/{{VERSION}}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-utils/${hc.version}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-impl/${hc.version}</bundle>
         <bundle>mvn:io.frinx.cli/common-handlers/{{VERSION}}</bundle>
     </feature>
-
-    <!--<feature name='cli-southbound-unit-ios-essential' version='${project.version}'>-->
-        <!--<feature version='${project.version}'>cli-southbound-unit-generic</feature>-->
-        <!--<feature version='${project.version}'>cli-southbound-ios-common-models</feature>-->
-        <!--<feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>-->
-        <!--<bundle>mvn:io.frinx.cli/ios-essential-unit/{{VERSION}}</bundle>-->
-    <!--</feature>-->
 
     <feature name='cli-southbound-unit-ios-utils' version='${project.version}'>
         <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
         <bundle>mvn:io.frinx.cli/ios-utils/{{VERSION}}</bundle>
     </feature>
 
-    <feature name='cli-southbound-unit-ios-interfaces' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+    <feature name='cli-southbound-unit-ios' version='${project.version}'>
+        <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-interface-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-ospf' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-ospf-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-bgp' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
-        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-bgp-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-local-routing' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
-        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
-        <bundle>mvn:io.frinx.cli/ios-local-routing-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-network-instance' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-interfaces</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-ospf</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-bgp</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-local-routing</feature>
-        <bundle>mvn:io.frinx.cli/ios-network-instance-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-cdp' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-cdp-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-routing-policy' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-routing-policy-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-lldp' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-lldp-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-rib' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-rib-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-platform' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
+        <bundle>mvn:io.frinx.cli/ios-network-instance-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-local-routing-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-routing-policy-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-ospf-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-cdp-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-lldp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-platform-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-configuration-metadata' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-configuration-metadata-unit/{{VERSION}}</bundle>
     </feature>
 
-    <feature name='cli-southbound-unit-ios' version='${project.version}'>
-        <feature version='${cli.version}'>cli-topology</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
-        <!--<feature version='${project.version}'>cli-southbound-unit-ios-essential</feature>-->
-        <feature version='${project.version}'>cli-southbound-unit-ios-interfaces</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-bgp</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-rib</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-network-instance</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-local-routing</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-routing-policy</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-ospf</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-cdp</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-lldp</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-platform</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-configuration-metadata</feature>
+    <feature name='cli-southbound-unit-ios-xr-common-cli-initializer' version='${project.version}'>
+        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${cli.version}'>cli-southbound-io</feature>
+        <bundle>mvn:io.frinx.cli/ios-xr-cli-init-unit/{{VERSION}}</bundle>
     </feature>
-
-    <!--<feature name='cli-southbound-unit-ios-xr-essential' version='${project.version}'>-->
-        <!--<feature version='${project.version}'>cli-southbound-unit-generic</feature>-->
-        <!--<feature version='${project.version}'>cli-southbound-ios-common-models</feature>-->
-        <!--<feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>-->
-        <!--<bundle>mvn:io.frinx.cli/ios-xr-essential-unit/{{VERSION}}</bundle>-->
-    <!--</feature>-->
 
     <feature name='cli-southbound-unit-ios-xr-utils' version='${project.version}'>
         <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${openconfig.version}'>openconfig-models</feature>
+        <bundle>wrap:mvn:org.tinyjee.jgraphx/jgraphx/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-core/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-ext/{{VERSION}}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-utils/${hc.version}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-impl/${hc.version}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-utils/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-bgp' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-bgp-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-ospf' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-ospf-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-network-instance' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-bgp</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-ospf</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-network-instance-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-interface' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
-        <bundle>mvn:io.frinx.cli/ios-xr-interface-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-mpls' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-mpls-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-snmp' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-snmp-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-logging' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-logging-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-acl' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-acl-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-routing-policy' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-routing-policy-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-netflow' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-netflow-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-qos' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-qos-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-ios-xr-configuration-metadata' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
-        <bundle>mvn:io.frinx.cli/ios-xr-configuration-metadata-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-common-cli-initializer</feature>
-        <!--<feature version='${project.version}'>cli-southbound-unit-ios-xr-essential</feature>-->
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-network-instance</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-bgp</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-interface</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-mpls</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-ospf</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-snmp</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-logging</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-acl</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-routing-policy</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-netflow</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-qos</feature>
-        <feature version='${project.version}'>cli-southbound-unit-ios-xr-configuration-metadata</feature>
-    </feature>
-
-    <feature name='cli-southbound-unit-brocade-common-cli-initializer' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
-        <bundle>mvn:io.frinx.cli/brocade-cli-init-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-brocade-essential' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-models</feature>
-        <bundle>mvn:io.frinx.cli/brocade-essential-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-brocade-interface' version='${project.version}'>
-        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
-        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
-        <bundle>mvn:io.frinx.cli/brocade-interface-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-brocade-network-instance' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-unit-brocade-interface</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-utils</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <bundle>mvn:io.frinx.cli/brocade-network-instance-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-brocade-cdp' version='${project.version}'>
-        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
-        <bundle>mvn:io.frinx.cli/brocade-cdp-unit/{{VERSION}}</bundle>
+        <feature version='${project.version}'>cli-southbound-unit-ios-xr-common-cli-initializer</feature>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-cli-init-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-network-instance-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-bgp-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-interface-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-mpls-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-ospf-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-snmp-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-logging-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-acl-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-routing-policy-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-netflow-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-qos-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-configuration-metadata-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-brocade' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
+        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <feature version='${project.version}'>cli-southbound-unit-brocade-common-cli-initializer</feature>
-        <feature version='${project.version}'>cli-southbound-unit-brocade-essential</feature>
-        <feature version='${project.version}'>cli-southbound-unit-brocade-interface</feature>
-        <feature version='${project.version}'>cli-southbound-unit-brocade-cdp</feature>
-        <feature version='${project.version}'>cli-southbound-unit-brocade-network-instance</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-models</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
+        <bundle>wrap:mvn:org.tinyjee.jgraphx/jgraphx/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-core/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-ext/{{VERSION}}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-utils/${hc.version}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-impl/${hc.version}</bundle>
+        <bundle>mvn:io.frinx.cli/brocade-cli-init-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/brocade-essential-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/brocade-interface-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/brocade-cdp-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/brocade-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
-    <feature name='cli-southbound-unit-junos-common-cli-initializer' version='${project.version}'>
+    <feature name='cli-southbound-unit-junos' version='${project.version}'>
+        <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
         <feature version='${cli.version}'>cli-southbound-io</feature>
         <bundle>mvn:io.frinx.cli/junos-cli-init-unit/{{VERSION}}</bundle>
     </feature>
 
-    <feature name='cli-southbound-unit-junos' version='${project.version}'>
-        <feature version='${cli.version}'>cli-topology</feature>
-        <feature version='${project.version}'>cli-southbound-unit-junos-common-cli-initializer</feature>
-    </feature>
-
-    <feature name='cli-southbound-unit-huawei-cli-initializer' version='${project.version}'>
-        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
-        <bundle>mvn:io.frinx.cli/huawei-cli-init-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-huawei-interface' version='${project.version}'>
-        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
-        <bundle>mvn:io.frinx.cli/huawei-interface-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-huawei-bgp' version='${project.version}'>
-        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
-        <bundle>mvn:io.frinx.cli/huawei-bgp-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-huawei-network-instance' version='${project.version}'>
-        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
-        <feature version='${project.version}'>cli-southbound-unit-huawei-bgp</feature>
-        <bundle>mvn:io.frinx.cli/huawei-network-instance-unit/{{VERSION}}</bundle>
-    </feature>
-
-    <feature name='cli-southbound-unit-huawei-routing-policy' version='${project.version}'>
-        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
-        <bundle>mvn:io.frinx.cli/huawei-routing-policy-unit/{{VERSION}}</bundle>
-    </feature>
-
     <feature name='cli-southbound-unit-huawei' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
-        <feature version='${project.version}'>cli-southbound-unit-huawei-cli-initializer</feature>
-        <feature version='${project.version}'>cli-southbound-unit-huawei-interface</feature>
-        <feature version='${project.version}'>cli-southbound-unit-huawei-network-instance</feature>
-        <feature version='${project.version}'>cli-southbound-unit-huawei-bgp</feature>
-        <feature version='${project.version}'>cli-southbound-unit-huawei-routing-policy</feature>
+        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${openconfig.version}'>openconfig-models</feature>
+        <bundle>wrap:mvn:org.tinyjee.jgraphx/jgraphx/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-core/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-ext/{{VERSION}}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-utils/${hc.version}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-impl/${hc.version}</bundle>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/huawei-cli-init-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/huawei-interface-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/huawei-network-instance-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/huawei-bgp-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/huawei-routing-policy-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-all-units' version='${project.version}'>
