@@ -59,9 +59,11 @@ import java.io.StringWriter;
 import java.net.InetSocketAddress;
 import java.security.Security;
 import java.util.Collections;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nonnull;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -136,9 +138,18 @@ public class IosAll {
 
     private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(4);
 
-    private static final KeepaliveCli.ReconnectListener RECONNECT_LISTENER = init -> {
-        throw new RuntimeException("Disconnected !");
+    private static final KeepaliveCli.ReconnectListener RECONNECT_LISTENER = new KeepaliveCli.ReconnectListener() {
+        @Override
+        public void onDisconnected(@Nonnull CompletionStage<? extends Cli> init, Throwable throwable) {
+            throw new RuntimeException("Disconnected !");
+        }
+
+        @Override
+        public void onReconnecting(Throwable throwable) {
+            throw new RuntimeException("Disconnected !");
+        }
     };
+
     public static final TopologyKey CLI_TOPO_KEY = new TopologyKey(new TopologyId("cli"));
 
     @Mock
