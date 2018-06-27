@@ -32,10 +32,11 @@ import javax.annotation.Nonnull;
 public class TunnelConfigWriter implements CliWriter<Config> {
 
     private final static String INPUT_T = "{% if ($delete) %}no {% endif %}interface tunnel-te {$name}\n" +
-        "{% if (!$delete) %}" +
-        "{% if (!$autoroute) %}no {% endif %}autoroute announce\n" +
-        "{% if ($autoroute) %}{% if (!$metric) %}no metric absolute\n{% else %}metric absolute {$metric}\n{% endif %}{% endif %}" +
-        "root{% endif %}";
+            "{% if (!$delete) %}" +
+            "{% if (!$autoroute) %}no {% endif %}autoroute announce\n" +
+            "{% if ($autoroute) %}{% if ($metric == nondefined) %}" +
+            "no metric absolute\n{% else if ( $metric != $null) %}metric absolute {$metric}\n{% endif %}{% endif %}" +
+            "root{% endif %}";
 
     private Cli cli;
 
@@ -50,8 +51,8 @@ public class TunnelConfigWriter implements CliWriter<Config> {
         checkTunnelConfig(data);
 
         blockingWriteAndRead(cli, id, data,
-        fT(INPUT_T, "name", name, "autoroute", data.isShortcutEligible() ? true : null,
-            "metric", LSPMETRICABSOLUTE.class.equals(data.getMetricType()) ? data.getMetric() : null));
+                fT(INPUT_T, "name", name, "autoroute", data.isShortcutEligible() ? true : null,
+                        "metric", LSPMETRICABSOLUTE.class.equals(data.getMetricType()) ? data.getMetric() : null));
     }
 
     @VisibleForTesting
@@ -77,14 +78,28 @@ public class TunnelConfigWriter implements CliWriter<Config> {
                                         @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        this.writeCurrentAttributes(id, dataAfter, writeContext);
-    }
+        if (wasMetricDefined(dataBefore, dataAfter)) {
+            final String name = id.firstKeyOf(Tunnel.class).getName();
 
+            checkTunnelConfig(dataAfter);
+
+            blockingWriteAndRead(cli, id, dataAfter,
+                    fT(INPUT_T, "name", name, "autoroute", dataAfter.isShortcutEligible() ? true : null,
+                            "metric", "nondefined"));
+        } else
+            this.writeCurrentAttributes(id, dataAfter, writeContext);
+    }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class).getName();
         blockingWriteAndRead(cli, id, data,
-            fT(INPUT_T, "name", name, "delete", true));
+                fT(INPUT_T, "name", name, "delete", true));
     }
+
+    private boolean wasMetricDefined(@Nonnull final Config dataBefore, @Nonnull final Config dataAfter) {
+        return dataBefore.getMetric() != null && dataBefore.getMetricType() != null
+                && dataAfter.getMetric() == null && dataAfter.getMetricType() == null;
+    }
+
 }

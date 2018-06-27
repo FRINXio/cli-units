@@ -52,6 +52,10 @@ public class TunnelConfigWriterTest {
         "no metric absolute\n" +
         "root\n";
 
+    private static final String UPDATE_INPUT2 = "interface tunnel-te 55\n" +
+        "autoroute announce\n" +
+        "root\n";
+
     private static final String UPDATE_CLEAN_INPUT = "interface tunnel-te 55\n" +
         "no autoroute announce\n" +
         "root\n";
@@ -112,6 +116,32 @@ public class TunnelConfigWriterTest {
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+    }
+
+    @Test
+    public void update2() throws WriteFailedException {
+        // update no metric with no metric data
+        Config noMetricData = new ConfigBuilder().setShortcutEligible(true)
+                .build();
+
+        this.writer.updateCurrentAttributes(iid, noMetricData, noMetricData, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT2, response.getValue().getContent());
+    }
+
+    @Test
+    public void combinedSequence() throws WriteFailedException {
+        Config noMetricData = new ConfigBuilder().setShortcutEligible(true)
+                .build();
+
+        this.writer.writeCurrentAttributes(iid, data, context);
+        this.writer.updateCurrentAttributes(iid, data, noMetricData, context);
+        this.writer.deleteCurrentAttributes(iid, data, context);
+        this.writer.writeCurrentAttributes(iid, data, context);
+
+        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -246,4 +276,5 @@ public class TunnelConfigWriterTest {
         exception.expectMessage("metric-type cannot be defined in MPLS tunnel");
         TunnelConfigWriter.checkTunnelConfig(data);
     }
+
 }
