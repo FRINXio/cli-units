@@ -24,6 +24,8 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import javax.annotation.Nonnull;
+
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.OsComponent;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.PlatformComponentState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.Component;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.ComponentBuilder;
@@ -34,9 +36,13 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class ComponentStateReader implements CliOperReader<State, StateBuilder> {
 
     private static final String SH_MODULE_SINGLE = "show module %s";
+    private static final String SH_MODULE_VERSION = "show version";
 
     private final Cli cli;
 
@@ -49,8 +55,11 @@ public class ComponentStateReader implements CliOperReader<State, StateBuilder> 
                                       @Nonnull StateBuilder stateBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         String name = instanceIdentifier.firstKeyOf(Component.class).getName();
-        String output = blockingRead(f(SH_MODULE_SINGLE, name), cli, instanceIdentifier, readContext);
-        parseFields(stateBuilder, name, output);
+        if (name.equals(OsComponent.OS_KEY)) {
+            parseOSVersions(stateBuilder, blockingRead(f(SH_MODULE_VERSION), cli, instanceIdentifier, readContext));
+        } else {
+            parseFields(stateBuilder, name, blockingRead(f(SH_MODULE_SINGLE, name), cli, instanceIdentifier, readContext));
+        }
     }
 
     static void parseFields(@Nonnull StateBuilder stateBuilder, String name, String output) {
@@ -91,6 +100,21 @@ public class ComponentStateReader implements CliOperReader<State, StateBuilder> 
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State state) {
         ((ComponentBuilder) builder).setState(state);
     }
+    private static final Pattern ID_COMP = Pattern.compile("Cisco\\s(?<id>.+)\\sSoftware,.*");
+    private static final Pattern LINE_SW = Pattern.compile("^(?<name>.+), Version (?<version>.+),\\s.*", Pattern.MULTILINE);
 
+    static void parseOSVersions(@Nonnull StateBuilder stateBuilder, String output) {
 
+        stateBuilder.setName(OsComponent.OS_NAME);
+
+        ParsingUtils.parseField(output, 0,
+                ID_COMP::matcher,
+                m -> m.group("id"),
+                stateBuilder::setId);
+
+        ParsingUtils.parseField(output, 0,
+                LINE_SW::matcher,
+                m -> m.group("version"),
+                stateBuilder::setSoftwareVersion);
+    }
 }
