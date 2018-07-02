@@ -30,12 +30,12 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>3.1.5.rc11-frinx-SNAPSHOT</version>
+    <version>3.1.5.rc11-frinx</version>
     <packaging>pom</packaging>
 
     <properties>
-        <cli.version>3.1.5.rc11-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.5.rc11-frinx-SNAPSHOT</openconfig.version>
+        <cli.version>3.1.5.rc11-frinx</cli.version>
+        <openconfig.version>3.1.5.rc11-frinx</openconfig.version>
         <hc.version>1.17.10-Carbon-SR1.3_1_5_rc11-frinxodl</hc.version>
         <controller.version>1.5.1-Carbon-SR1.3_1_5_rc11-frinxodl</controller.version>
     </properties>
