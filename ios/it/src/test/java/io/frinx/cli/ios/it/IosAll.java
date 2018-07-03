@@ -61,6 +61,7 @@ import java.security.Security;
 import java.util.Collections;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
@@ -177,7 +178,8 @@ public class IosAll {
         TranslateContext translateContext = reg.getTranslateContext(getDeviceId());
 
         RemoteDeviceId remoteId = new RemoteDeviceId(CLI_TOPO_KEY, MOUNT_ID, getAddress());
-        cli = IOFactory.getIO(remoteId, getCliNode(), translateContext.getInitializer(remoteId, getCliNode()), EXECUTOR, RECONNECT_LISTENER, Collections.emptySet())
+        cli = IOFactory.getIO(remoteId, getCliNode(), translateContext.getInitializer(remoteId, getCliNode()),
+                EXECUTOR, ForkJoinPool.commonPool(), RECONNECT_LISTENER, Collections.emptySet())
                 .toCompletableFuture()
                 .get();
 
@@ -284,7 +286,8 @@ public class IosAll {
 
         for (int i = 0; i < 20; i++) {
 
-            Cli io = IOFactory.getIO(remoteId, getCliNode(), translateContext.getInitializer(remoteId, getCliNode()), EXECUTOR, RECONNECT_LISTENER, Collections.emptySet())
+            Cli io = IOFactory.getIO(remoteId, getCliNode(), translateContext.getInitializer(remoteId, getCliNode()),
+                    EXECUTOR, ForkJoinPool.commonPool(), RECONNECT_LISTENER, Collections.emptySet())
                     .toCompletableFuture()
                     .get();
 
