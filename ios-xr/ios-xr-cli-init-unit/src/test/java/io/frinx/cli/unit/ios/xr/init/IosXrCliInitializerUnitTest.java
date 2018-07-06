@@ -16,18 +16,24 @@
 
 package io.frinx.cli.unit.ios.xr.init;
 
+import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.write.CommitFailedException;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
+import io.frinx.cli.io.impl.cli.ErrorAwareCli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,39 +59,45 @@ public class IosXrCliInitializerUnitTest {
     private IosXrCliInitializerUnit unit;
 
     @Mock
+    private Cli delegateCli;
+
+    @Mock
     private TranslationUnitCollector registry;
 
     @Mock
     private TranslateUnit.Context context;
 
-
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         this.unit = new IosXrCliInitializerUnit(this.registry);
-    }
 
-    private CompletableFuture prepareCommit() throws Exception {
-        Cli cli = Mockito.mock(Cli.class);
-        Mockito.when(this.context.getTransport()).thenReturn(cli);
+        final String idName = "test";
+        delegateCli = Mockito.mock(Cli.class);
+        final Cli.Configuration delegateCliConfig = Mockito.mock(Cli.Configuration.class);
+        Mockito.when(delegateCliConfig.init())
+                .thenAnswer(invocation -> CompletableFuture.completedFuture(delegateCli));
 
+        final Set<Pattern> errorPatterns = Sets.newLinkedHashSet(Collections.singletonList(
+                Pattern.compile("\\% (?i)Failed(?-i).*", Pattern.DOTALL)
+        ));
+        final CompletionStage<? extends Cli> cliStage =
+                new ErrorAwareCli.Configuration(idName, delegateCliConfig, errorPatterns, ForkJoinPool.commonPool()).init();
+        Cli globalCli = cliStage.toCompletableFuture().get();
+        Mockito.when(globalCli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class))).thenReturn(cliStage.toCompletableFuture());
 
-        CompletionStage future = Mockito.mock(CompletionStage.class);
-        CompletableFuture cFuture = Mockito.mock(CompletableFuture.class);
-        Mockito.when(future.toCompletableFuture()).thenReturn(cFuture);
-        Mockito.when(cli.executeAndRead(Mockito.any(Command.class))).thenReturn(future);
-        Mockito.when(cli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class))).thenReturn(future);
+        Mockito.when(this.context.getTransport()).thenReturn(globalCli);
         RemoteDeviceId device = new RemoteDeviceId(new TopologyKey(new TopologyId("cli")),
                 "deviceId",
                 new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 1234));
         unit.getInitializer(device, new CliNodeBuilder().build());
-        return cFuture;
     }
 
     @Test
     public void testSuccessCommit() throws Exception {
-        CompletableFuture cFuture = prepareCommit();
-        Mockito.when(cFuture.get()).thenReturn(SUCCESS_COMMIT);
+
+        Mockito.when(delegateCli.executeAndRead(Mockito.any(Command.class)))
+                .thenReturn(CompletableFuture.completedFuture(SUCCESS_COMMIT));
         try {
             this.unit.getCommitHook(this.context).run();
             Assert.assertTrue(true);
@@ -99,25 +111,27 @@ public class IosXrCliInitializerUnitTest {
 
     @Test
     public void testFailedCommit() throws Exception {
-        CompletableFuture cFuture = prepareCommit();
-        Mockito.when(cFuture.get()).thenReturn(FAILED_COMMIT);
+        Mockito.when(delegateCli.executeAndRead(Mockito.any(Command.class)))
+                .thenReturn(CompletableFuture.completedFuture(FAILED_COMMIT));
+        Mockito.when(delegateCli.executeAndRead(IosXrCliInitializerUnit.SH_CONF_FAILED))
+                .thenReturn(CompletableFuture.completedFuture(""));
         thrown.expect(CommitFailedException.class);
         this.unit.getCommitHook(this.context).run();
     }
 
     @Test
     public void testRevertSuccessCommitFailed() throws Exception {
-        CompletableFuture cFuture = prepareCommit();
         // doesn't matter what we return
-        Mockito.when(cFuture.get()).thenReturn("");
+        Mockito.when(delegateCli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class)))
+                .thenReturn(CompletableFuture.completedFuture(""));
         thrown.expect(WriterRegistry.Reverter.RevertSuccessException.class);
         this.unit.getPostFailedHook(this.context).run(null);
     }
 
     @Test
     public void testRevertFailedCommitFailed() throws Exception {
-        CompletableFuture cFuture = prepareCommit();
-        Mockito.when(cFuture.get()).thenThrow(InterruptedException.class);
+        Mockito.when(delegateCli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class)))
+                .thenThrow(InterruptedException.class);
         thrown.expect(WriterRegistry.Reverter.RevertFailedException.class);
         this.unit.getPostFailedHook(this.context).run(null);
     }

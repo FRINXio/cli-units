@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.ios.xr.init;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
@@ -68,13 +69,16 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
             .build();
 
     private static final Command COMMIT = Command.create("commit");
-    private static final Command SH_CONF_FAILED = Command.create("show configuration failed inheritance");
     private static final Command ABORT = Command.create("abort");
+
+    @VisibleForTesting
+    static final Command SH_CONF_FAILED = Command.create("show configuration failed inheritance");
 
     private TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration iosXrReg;
     private IosXrCliInitializer initializer;
     private RemoteDeviceId deviceId;
+
 
     public IosXrCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
         this.registry = registry;
@@ -131,18 +135,10 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
     @Override
     public PostCommitHook getCommitHook(Context context) {
         return () -> {
-            String CONFIG_FAILED_PREFIX = "% Failed";
             try {
                 Cli cli = context.getTransport();
-                String s = cli.executeAndRead(COMMIT).toCompletableFuture().get();
-                if (s.contains(CONFIG_FAILED_PREFIX)) {
-                    LOG.warn("{}: Commit failed - {}", deviceId, s);
-                    String reason = cli.executeAndRead(SH_CONF_FAILED)
-                            .toCompletableFuture()
-                            .get();
-                    LOG.warn("{}: Reason of commit failure - {}", deviceId, reason);
-                    throw new CommitFailedException(reason);
-                } else {
+                try {
+                    cli.executeAndRead(COMMIT).toCompletableFuture().get();
                     LOG.debug("{}: Commit successful", deviceId);
                     try {
                         initializer.tryToExitConfigurationMode(cli);
@@ -150,6 +146,13 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
                         LOG.warn("{}: Unable to exit configuration mode", deviceId, e);
                         throw new IllegalStateException(deviceId + ": Unable to exit configuration mode", e);
                     }
+                } catch (Exception e) {
+                    LOG.warn("{}: Commit failed", deviceId);
+                    String reason = cli.executeAndRead(SH_CONF_FAILED)
+                            .toCompletableFuture()
+                            .get();
+                    LOG.warn("{}: Reason of commit failure - {}", deviceId, reason);
+                    throw new CommitFailedException(reason);
                 }
             } catch (InterruptedException | ExecutionException e) {
                 LOG.warn("{}: Sending commit failed. Reason: {}", deviceId, e.getMessage(), e);
@@ -194,7 +197,8 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
         return Sets.newLinkedHashSet(Arrays.asList(
                 Pattern.compile("^\\s+\\^.*", Pattern.DOTALL),
                 Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL),
-                Pattern.compile("\\% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
+                Pattern.compile("\\% (?i)Incomplete command(?-i).*", Pattern.DOTALL),
+                Pattern.compile("\\% (?i)Failed(?-i).*")
         ));
     }
 
