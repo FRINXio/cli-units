@@ -40,6 +40,7 @@
     <module>huawei</module>
     <module>features</module>
     <module>unit-parent</module>
+    <module>nexus</module>
   </modules>
 
   <build>
