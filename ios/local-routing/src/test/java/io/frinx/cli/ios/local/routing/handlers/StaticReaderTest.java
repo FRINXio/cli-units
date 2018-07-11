@@ -51,8 +51,8 @@ public class StaticReaderTest {
             "ip route 0.0.0.0 0.0.0.0 147.175.204.1\n" +
                     "ip route 10.40.6.0 255.255.255.0 9.8.8.8 40\n" +
                     "ip route 10.255.1.0 255.255.255.0 Null0\n" +
-                    "ipv6 route 4001::/64 GigabitEthernet1 55\n" +
-                    "ipv6 route 4004::/64 GigabitEthernet1 4005::1 33 1\n" +
+                    "ipv6 route 400A::/64 GigabitEthernet1 55\n" +
+                    "ipv6 route 4004::/64 GigabitEthernet1 4005:A:1 33 1\n" +
                     "ipv6 route vrf TMP 4009::/64 GigabitEthernet3 4005::2 33 1\n" +
                     "ip route 1.2.39.0 255.255.255.0 GigabitEthernet1 44.4.4.4 55 tag 33 name ab.ca track 33\n" +
                     "ip route 1.2.39.0 255.255.255.0 GigabitEthernet2 5.5.5.5 tag 33 permanent name ab.ca\n" +
@@ -67,7 +67,7 @@ public class StaticReaderTest {
                     .collect(Collectors.toList());
 
     private static final List<StaticKey> EXPECTED_IDS2 =
-            Lists.newArrayList("0.0.0.0/0", "10.40.6.0/24", "10.255.1.0/24", "4001::/64", "4004::/64", "1.2.39.0/24", "4007::/64")
+            Lists.newArrayList("0.0.0.0/0", "10.40.6.0/24", "10.255.1.0/24", "400A::/64", "4004::/64", "1.2.39.0/24", "4007::/64")
                     .stream()
                     .map(value -> new StaticKey(new IpPrefix(value.toCharArray())))
                     .collect(Collectors.toList());
