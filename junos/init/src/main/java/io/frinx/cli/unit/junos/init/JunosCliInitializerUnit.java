@@ -28,17 +28,17 @@ import io.frinx.cli.io.impl.cli.PromptResolutionStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 public class JunosCliInitializerUnit implements TranslateUnit {
 
@@ -56,8 +56,7 @@ public class JunosCliInitializerUnit implements TranslateUnit {
         this.registry = registry;
     }
 
-    public void init()
-    {
+    public void init() {
         reg = registry.registerTranslateUnit(JUNOS, this);
     }
 
@@ -91,10 +90,12 @@ public class JunosCliInitializerUnit implements TranslateUnit {
                     tryToEnterCliMode(session, newline);
 
                     // Check if we are actually in cli mode
-                    String prompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
+                    String prompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline)
+                            .trim();
                     // If not, fail
                     Preconditions.checkState(prompt.endsWith(PRIVILEGED_PROMPT_SUFFIX),
-                            "%s: Junos cli session initialization failed to enter cli mode. Current prompt: %s", id, prompt);
+                            "%s: Junos cli session initialization failed to enter cli mode. Current prompt: %s", id,
+                            prompt);
 
                     LOG.debug("{}: Setting terminal complete command on space to off", id);
                     write(session, newline, DISABLE_COMPLETE_ON_SPACE);
@@ -110,7 +111,8 @@ public class JunosCliInitializerUnit implements TranslateUnit {
 
                     LOG.info("{}: Junos cli session initialized successfully", id);
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                    Thread.currentThread()
+                            .interrupt();
                     throw new RuntimeException(e);
                 } catch (SessionException | ExecutionException | TimeoutException e) {
                     LOG.warn("{}: Unable to initialize device", id, e);
@@ -123,7 +125,8 @@ public class JunosCliInitializerUnit implements TranslateUnit {
                     throws InterruptedException, ExecutionException, TimeoutException {
 
                 write(session, newline, CLI_COMMAND);
-                String cliCommandOutput = session.readUntilTimeout(READ_TIMEOUT_SECONDS).trim();
+                String cliCommandOutput = session.readUntilTimeout(READ_TIMEOUT_SECONDS)
+                        .trim();
                 LOG.debug("{}: Entering cli mode resulted in output: {}", id, cliCommandOutput);
             }
         };
@@ -135,8 +138,8 @@ public class JunosCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         // NO-OP
     }
