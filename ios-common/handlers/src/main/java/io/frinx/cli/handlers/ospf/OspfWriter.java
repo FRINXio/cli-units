@@ -22,7 +22,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 
-public interface OspfWriter <O extends DataObject> extends TypedWriter<O>, CliWriter<O> {
+public interface OspfWriter<O extends DataObject> extends TypedWriter<O>, CliWriter<O> {
 
     @Override
     default Identifier<? extends DataObject> getKey() {

@@ -32,16 +32,22 @@ import org.opendaylight.yangtools.yang.binding.Identifiable;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public interface L2vsiListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends Builder<O>> extends TypedListReader<O, K, B> {
+public interface L2vsiListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends
+        Builder<O>> extends TypedListReader<O, K, B> {
 
     @Nullable
     @Override
-    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>> getParentCheck(InstanceIdentifier<O> id) {
-        return new AbstractMap.SimpleEntry<>(
-                RWUtils.cutId(id, NetworkInstance.class).child(Config.class),
-                L2vsiReader.L2VSI_CHECK);
+    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>>
+        getParentCheck(InstanceIdentifier<O> id) {
+        return new AbstractMap.SimpleEntry<>(RWUtils.cutId(id, NetworkInstance.class)
+                .child(Config.class), L2vsiReader.L2VSI_CHECK);
     }
 
-    interface L2vsiConfigListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends Builder<O>> extends L2vsiListReader<O, K, B>, CliConfigListReader<O, K, B> {}
-    interface L2vsiOperListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends Builder<O>> extends L2vsiListReader<O, K, B>, CliOperListReader<O, K, B> {}
+    interface L2vsiConfigListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends
+            Builder<O>> extends L2vsiListReader<O, K, B>, CliConfigListReader<O, K, B> {
+    }
+
+    interface L2vsiOperListReader<O extends DataObject & Identifiable<K>, K extends Identifier<O>, B extends
+            Builder<O>> extends L2vsiListReader<O, K, B>, CliOperListReader<O, K, B> {
+    }
 }

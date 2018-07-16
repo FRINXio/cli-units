@@ -38,7 +38,10 @@ public interface OspfReader<O extends DataObject, B extends Builder<O>> extends 
     /**
      * Union mixin of Ospf reader and Config reader.
      */
-    interface OspfConfigReader<O extends DataObject, B extends Builder<O>> extends OspfReader<O, B>, CliConfigReader<O, B> {}
+    interface OspfConfigReader<O extends DataObject, B extends Builder<O>> extends OspfReader<O, B>,
+            CliConfigReader<O, B> {
+    }
 
-    interface OspfOperReader<O extends DataObject, B extends Builder<O>> extends OspfReader<O, B>, CliOperReader<O, B> {}
+    interface OspfOperReader<O extends DataObject, B extends Builder<O>> extends OspfReader<O, B>, CliOperReader<O, B> {
+    }
 }

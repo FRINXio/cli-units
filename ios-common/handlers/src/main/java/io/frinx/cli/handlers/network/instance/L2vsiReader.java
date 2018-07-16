@@ -33,16 +33,22 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public interface L2vsiReader<O extends DataObject, B extends Builder<O>> extends TypedReader<O, B> {
 
-    Function<DataObject, Boolean> L2VSI_CHECK = config -> ((Config) config).getType() == L2VSI.class;
+    Function<DataObject, Boolean> L2VSI_CHECK = config -> ((Config) config).getType()
+            == L2VSI.class;
 
     @Nullable
     @Override
-    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>> getParentCheck(InstanceIdentifier<O> id) {
-        return new AbstractMap.SimpleEntry<>(
-                RWUtils.cutId(id, NetworkInstance.class).child(Config.class),
-                L2VSI_CHECK);
+    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>>
+        getParentCheck(InstanceIdentifier<O> id) {
+        return new AbstractMap.SimpleEntry<>(RWUtils.cutId(id, NetworkInstance.class)
+                .child(Config.class), L2VSI_CHECK);
     }
 
-    interface L2vsiConfigReader<O extends DataObject, B extends Builder<O>> extends L2vsiReader<O, B>, CliConfigReader<O, B> {}
-    interface L2vsiVrfOperReader<O extends DataObject, B extends Builder<O>> extends L2vsiReader<O, B>, CliOperReader<O, B> {}
+    interface L2vsiConfigReader<O extends DataObject, B extends Builder<O>> extends L2vsiReader<O, B>,
+            CliConfigReader<O, B> {
+    }
+
+    interface L2vsiVrfOperReader<O extends DataObject, B extends Builder<O>> extends L2vsiReader<O, B>,
+            CliOperReader<O, B> {
+    }
 }

@@ -33,16 +33,22 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public interface L2p2pReader<O extends DataObject, B extends Builder<O>> extends TypedReader<O, B> {
 
-    Function<DataObject, Boolean> L2P2P_CHECK = config -> ((Config) config).getType() == L2P2P.class;
+    Function<DataObject, Boolean> L2P2P_CHECK = config -> ((Config) config).getType()
+            == L2P2P.class;
 
     @Nullable
     @Override
-    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>> getParentCheck(InstanceIdentifier<O> id) {
-        return new AbstractMap.SimpleEntry<>(
-                RWUtils.cutId(id, NetworkInstance.class).child(Config.class),
-                L2P2P_CHECK);
+    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>>
+        getParentCheck(InstanceIdentifier<O> id) {
+        return new AbstractMap.SimpleEntry<>(RWUtils.cutId(id, NetworkInstance.class)
+                .child(Config.class), L2P2P_CHECK);
     }
 
-    interface L2p2pConfigReader<O extends DataObject, B extends Builder<O>> extends L2p2pReader<O, B>, CliConfigReader<O, B> {}
-    interface L2p2pVrfOperReader<O extends DataObject, B extends Builder<O>> extends L2p2pReader<O, B>, CliOperReader<O, B> {}
+    interface L2p2pConfigReader<O extends DataObject, B extends Builder<O>> extends L2p2pReader<O, B>,
+            CliConfigReader<O, B> {
+    }
+
+    interface L2p2pVrfOperReader<O extends DataObject, B extends Builder<O>> extends L2p2pReader<O, B>,
+            CliOperReader<O, B> {
+    }
 }
