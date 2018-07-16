@@ -66,8 +66,10 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class IosNetworkInstanceUnit implements TranslateUnit {
 
-    public static final InstanceIdentifier<ConnectionPoints> CONN_PTS_ID = InstanceIdentifier.create(ConnectionPoints.class);
-    private static final InstanceIdentifier<TableConnection> TABLE_CONN_ID = InstanceIdentifier.create(TableConnection.class);
+    public static final InstanceIdentifier<ConnectionPoints> CONN_PTS_ID = InstanceIdentifier.create(ConnectionPoints
+            .class);
+    private static final InstanceIdentifier<TableConnection> TABLE_CONN_ID = InstanceIdentifier.create(TableConnection
+            .class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -92,24 +94,24 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         // No handling required on the network instance level
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
 
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli)),
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli)),
                 Sets.newHashSet(
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG,
                         IosInterfaceUnit.SUBIFC_VLAN_CFG_ID));
 
-        wRegistry.subtreeAddAfter(Sets.newHashSet(
+        writeRegistry.subtreeAddAfter(Sets.newHashSet(
                 RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CONNECTIONPOINT, CONN_PTS_ID),
                 RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_CONFIG, CONN_PTS_ID),
                 RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_ENDPOINTS, CONN_PTS_ID),
@@ -123,61 +125,61 @@ public class IosNetworkInstanceUnit implements TranslateUnit {
                 /*handle after network instance configuration*/ IIDs.NE_NE_CONFIG);
 
         //todo create proper writers once we support routing policies
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_INTERINSTANCEPOLICIES, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_APPLYPOLICY, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_AP_CONFIG, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_INTERINSTANCEPOLICIES, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_APPLYPOLICY, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_AP_CONFIG, new NoopCliWriter<>()));
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)),
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)),
                 IIDs.NE_NE_IN_INTERFACE);
 
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigWriter(cli)),
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigWriter(cli)),
                 Sets.newHashSet(IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG));
 
         // Interfaces for VRF
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_INTERFACES, new NoopCliWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_IN_INTERFACE, new VrfInterfaceWriter(cli)),
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_INTERFACES, new NoopCliWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_IN_INTERFACE, new VrfInterfaceWriter(cli)),
                 IIDs.NE_NE_CONFIG);
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_IN_CONFIG, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_IN_CONFIG, new NoopCliWriter<>()));
 
         // Table connections for VRF
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_TABLECONNECTIONS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_TA_TABLECONNECTION, new NoopCliListWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_TA_TA_CONFIG, new TableConnectionConfigWriter(cli)),
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_TABLECONNECTIONS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_TA_TABLECONNECTION, new NoopCliListWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_TA_TA_CONFIG, new TableConnectionConfigWriter(cli)),
                 /*add after protocol writers*/
                 Sets.newHashSet(IIDs.NE_NE_PR_PR_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG));
 
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
         // VRFs, L2P2P
-        rRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_STATE, new NetworkInstanceStateReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli)));
+        readRegistry.add(new GenericOperReader<>(IIDs.NE_NE_STATE, new NetworkInstanceStateReader(cli)));
 
         // Interfaces for VRF
-        rRegistry.addStructuralReader(IIDs.NE_NE_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_IN_INTERFACE, new VrfInterfaceReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_INTERFACES, InterfacesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_IN_INTERFACE, new VrfInterfaceReader(cli)));
 
         // Protocols for VRF
-        rRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
-        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader()));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
+        readRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader()));
 
         // Local aggregates
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, LocalAggregatesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new LocalAggregateReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, LocalAggregatesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new LocalAggregateReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigReader(cli)));
 
         // Table connections for VRF
-        rRegistry.addStructuralReader(IIDs.NE_NE_TABLECONNECTIONS, TableConnectionsBuilder.class);
-        rRegistry.subtreeAdd(Sets.newHashSet(RWUtils.cutIdFromStart(IIDs.NE_NE_TA_TA_CONFIG, TABLE_CONN_ID)),
+        readRegistry.addStructuralReader(IIDs.NE_NE_TABLECONNECTIONS, TableConnectionsBuilder.class);
+        readRegistry.subtreeAdd(Sets.newHashSet(RWUtils.cutIdFromStart(IIDs.NE_NE_TA_TA_CONFIG, TABLE_CONN_ID)),
                 new GenericConfigListReader<>(IIDs.NE_NE_TA_TABLECONNECTION, new TableConnectionReader(cli)));
 
         // Connection points for L2P2p
-        rRegistry.subtreeAdd(Sets.newHashSet(
+        readRegistry.subtreeAdd(Sets.newHashSet(
                 RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CONNECTIONPOINT, CONN_PTS_ID),
                 RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_CONFIG, CONN_PTS_ID),
                 RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_STATE, CONN_PTS_ID),

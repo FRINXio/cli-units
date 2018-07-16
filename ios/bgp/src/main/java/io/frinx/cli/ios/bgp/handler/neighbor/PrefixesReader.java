@@ -35,8 +35,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixesReader implements BgpReader.BgpOperReader<Prefixes, PrefixesBuilder> {
 
-    private final String SH_IPV4 = "show bgp ipv4 unicast summary | section %s";
-    private final String SH_VPNV4 = "show bgp vpnv4 unicast all summary | section %s";
+    private static final String SH_IPV4 = "show bgp ipv4 unicast summary | section %s";
+    private static final String SH_VPNV4 = "show bgp vpnv4 unicast all summary | section %s";
 
     private final Cli cli;
 
@@ -50,7 +50,8 @@ public class PrefixesReader implements BgpReader.BgpOperReader<Prefixes, Prefixe
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         Class<? extends AFISAFITYPE> afiKey = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();
         String neighborIp = NeighborWriter.getNeighborIp(instanceIdentifier);
-        String command = afiKey.equals(IPV4UNICAST.class) ? String.format(SH_IPV4, neighborIp) : String.format(SH_VPNV4, neighborIp);
+        String command = afiKey.equals(IPV4UNICAST.class) ? String.format(SH_IPV4, neighborIp) : String.format(
+                SH_VPNV4, neighborIp);
         parsePrefixes(blockingRead(command, cli, instanceIdentifier, readContext), prefixesBuilder, neighborIp);
     }
 

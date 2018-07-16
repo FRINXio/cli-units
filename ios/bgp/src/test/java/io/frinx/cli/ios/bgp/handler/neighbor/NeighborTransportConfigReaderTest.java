@@ -25,15 +25,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 
 public class NeighborTransportConfigReaderTest {
 
-    private static final String OUTPUT = "router bgp 65000\n" +
-            " neighbor 1.2.3.4 remote-as 45\n" +
-            " neighbor 1.2.3.4 update-source Loopback0\n" +
-            " neighbor 1.2.3.4 transport connection-mode passive\n" +
-            " neighbor 1.2.3.4 activate\n";
+    private static final String OUTPUT = "router bgp 65000\n"
+            + " neighbor 1.2.3.4 remote-as 45\n"
+            + " neighbor 1.2.3.4 update-source Loopback0\n"
+            + " neighbor 1.2.3.4 transport connection-mode passive\n"
+            + " neighbor 1.2.3.4 activate\n";
 
-    private static final String OUTPUT2 = "router bgp 65000\n" +
-            " neighbor 1.2.3.4 remote-as 45\n" +
-            " neighbor 1.2.3.4 activate\n";
+    private static final String OUTPUT2 = "router bgp 65000\n"
+            + " neighbor 1.2.3.4 remote-as 45\n"
+            + " neighbor 1.2.3.4 activate\n";
 
     @Test
     public void testParse() throws Exception {
@@ -46,7 +46,8 @@ public class NeighborTransportConfigReaderTest {
                 configBuilder.build());
 
         configBuilder = new ConfigBuilder();
-        NeighborTransportConfigReader.parseConfigAttributes(OUTPUT2, configBuilder, NetworInstance.DEFAULT_NETWORK_NAME);
+        NeighborTransportConfigReader.parseConfigAttributes(OUTPUT2, configBuilder, NetworInstance
+                .DEFAULT_NETWORK_NAME);
         assertEquals(new ConfigBuilder()
                         .setPassiveMode(false)
                         .build(),

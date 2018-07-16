@@ -32,15 +32,15 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceKey> {
 
     private final Cli cli;
-    private static final String WRITE_TEMPLATE = "configure terminal\n" +
-            "interface %s\n" +
-            "ip vrf forwarding %s\n" +
-            "end";
+    private static final String WRITE_TEMPLATE = "configure terminal\n"
+            + "interface %s\n"
+            + "ip vrf forwarding %s\n"
+            + "end";
 
-    private static final String DELETE_TEMPLATE = "configure terminal\n" +
-            "interface %s\n" +
-            "no ip vrf forwarding %s\n" +
-            "end";
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
+            + "interface %s\n"
+            + "no ip vrf forwarding %s\n"
+            + "end";
 
     public VrfInterfaceWriter(Cli cli) {
         this.cli = cli;
@@ -50,23 +50,29 @@ public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceK
     public void writeCurrentAttributesForType(InstanceIdentifier<Interface> instanceIdentifier, Interface anInterface,
                                               WriteContext writeContext) throws WriteFailedException {
 
-        boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey(anInterface.getId())))
+        boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx
+                        .openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
+                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+                        .interfaces.InterfaceKey(anInterface.getId())))
                 .isPresent();
-        Preconditions.checkArgument(ifcExists, "Interface: %s does not exist, cannot add it to VRF", anInterface.getId());
+        Preconditions.checkArgument(ifcExists, "Interface: %s does not exist, cannot add it to VRF", anInterface
+                .getId());
 
         final NetworkInstance networkInstance =
-                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance.class)).get();
+                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance.class))
+                        .get();
 
         blockingWriteAndRead(cli, instanceIdentifier, anInterface,
                 f(WRITE_TEMPLATE,
                         anInterface.getId(),
-                        networkInstance.getConfig().getName()));
+                        networkInstance.getConfig()
+                                .getName()));
     }
 
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Interface> id, Interface dataBefore,
-                                               Interface dataAfter, WriteContext writeContext) throws WriteFailedException {
+                                               Interface dataAfter, WriteContext writeContext) throws
+            WriteFailedException {
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
@@ -76,8 +82,10 @@ public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceK
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey networkInstanceKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 
-        boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey(anInterface.getId())))
+        boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx
+                        .openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
+                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+                        .interfaces.InterfaceKey(anInterface.getId())))
                 .isPresent();
         if (!ifcExists) {
             // No point of removing vrf from nonexisting ifc

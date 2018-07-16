@@ -35,9 +35,10 @@ public class ConnectionPointsReader extends CompositeReader<ConnectionPoints, Co
 
     public ConnectionPointsReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<ConnectionPoints, ConnectionPointsBuilder>>() {{
-            add(new L2P2PConnectionPointsReader(cli));
-            add(new L2VSIConnectionPointsReader(cli));
-        }});
+                add(new L2P2PConnectionPointsReader(cli));
+                add(new L2VSIConnectionPointsReader(cli));
+            }
+        });
     }
 
     @Override

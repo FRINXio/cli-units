@@ -60,7 +60,8 @@ public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, N
         StaticKey staticRouteKey = instanceIdentifier.firstKeyOf(Static.class);
         String ipPrefix = getDevicePrefix(staticRouteKey);
 
-        String cmd = vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ?
+        String cmd = vrfKey.equals(NetworInstance.DEFAULT_NETWORK)
+                ?
                 String.format(SH_IP_STATIC_ROUTE, ipPrefix) :
                 String.format(SH_IP_STATIC_ROUTE_VRF, vrfKey.getName(), ipPrefix);
 
@@ -69,11 +70,16 @@ public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, N
     }
 
     static String getDevicePrefix(StaticKey staticRouteKey) {
-        if (staticRouteKey.getPrefix().getIpv4Prefix() != null) {
-            SubnetUtils.SubnetInfo info = new SubnetUtils(staticRouteKey.getPrefix().getIpv4Prefix().getValue()).getInfo();
+        if (staticRouteKey.getPrefix()
+                .getIpv4Prefix() != null) {
+            SubnetUtils.SubnetInfo info = new SubnetUtils(staticRouteKey.getPrefix()
+                    .getIpv4Prefix()
+                    .getValue()).getInfo();
             return String.format("%s %s", info.getNetworkAddress(), info.getNetmask());
         } else {
-            return staticRouteKey.getPrefix().getIpv6Prefix().getValue();
+            return staticRouteKey.getPrefix()
+                    .getIpv6Prefix()
+                    .getValue();
         }
     }
 
@@ -96,9 +102,9 @@ public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, N
         return nextHopKeyes;
     }
 
-    private static String extractNextHopId(Matcher m) {
-        String ip = m.group("ip");
-        String ifc = m.group("ifc");
+    private static String extractNextHopId(Matcher matcher) {
+        String ip = matcher.group("ip");
+        String ifc = matcher.group("ifc");
 
         if (ip != null) {
             return ifc == null ? ip : String.format("%s %s", ip, ifc);
@@ -107,12 +113,12 @@ public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, N
         }
     }
 
-    private static Matcher ipv4Matcher(String s) {
-        return StaticReader.ROUTE_LINE_IP.matcher(s);
+    private static Matcher ipv4Matcher(String string) {
+        return StaticReader.ROUTE_LINE_IP.matcher(string);
     }
 
-    private static Matcher ipv6Matcher(String s) {
-        return StaticReader.ROUTE_LINE_IP6.matcher(s);
+    private static Matcher ipv6Matcher(String string) {
+        return StaticReader.ROUTE_LINE_IP6.matcher(string);
     }
 
     @Override
@@ -124,6 +130,7 @@ public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, N
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
                                              @Nonnull NextHopBuilder nextHopBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        nextHopBuilder.setIndex(instanceIdentifier.firstKeyOf(NextHop.class).getIndex());
+        nextHopBuilder.setIndex(instanceIdentifier.firstKeyOf(NextHop.class)
+                .getIndex());
     }
 }

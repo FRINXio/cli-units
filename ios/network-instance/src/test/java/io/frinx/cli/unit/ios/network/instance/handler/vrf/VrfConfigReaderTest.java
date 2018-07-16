@@ -26,12 +26,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 
 public class VrfConfigReaderTest {
 
-    private static final String OUTPUT = "ip vrf TMP\n" +
-            "ip vrf TEST\n" +
-            " rd 65002:1\n" +
-            "ip vrf ANOTHER_TEST\n" +
-            " rd 2.2.2.2:44\n" +
-            "ip vrf WITHOUT_RD";
+    private static final String OUTPUT = "ip vrf TMP\n"
+            + "ip vrf TEST\n"
+            + " rd 65002:1\n"
+            + "ip vrf ANOTHER_TEST\n"
+            + " rd 2.2.2.2:44\n"
+            + "ip vrf WITHOUT_RD";
 
     private static final Config EXPECTED_VRF_TEST = new ConfigBuilder()
             .setRouteDistinguisher(new RouteDistinguisher("65002:1"))

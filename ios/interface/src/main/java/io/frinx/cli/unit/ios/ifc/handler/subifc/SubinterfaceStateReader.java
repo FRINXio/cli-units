@@ -48,7 +48,8 @@ public class SubinterfaceStateReader implements CliOperReader<State, StateBuilde
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> id, @Nonnull StateBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> id, @Nonnull StateBuilder builder, @Nonnull
+            ReadContext ctx) throws ReadFailedException {
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
 
         // Only parse configuration for non 0 subifc
@@ -69,20 +70,20 @@ public class SubinterfaceStateReader implements CliOperReader<State, StateBuilde
 
         parseField(output,
                 STATUS_LINE::matcher,
-                matcher -> InterfaceCommonState.AdminStatus.valueOf(matcher.group("admin").toUpperCase()),
-                adminStatus -> {
-                    builder.setAdminStatus(adminStatus);
-                    builder.setEnabled(adminStatus == InterfaceCommonState.AdminStatus.UP);
-                });
+            matcher -> InterfaceCommonState.AdminStatus.valueOf(matcher.group("admin").toUpperCase()),
+            adminStatus -> {
+                builder.setAdminStatus(adminStatus);
+                builder.setEnabled(adminStatus == InterfaceCommonState.AdminStatus.UP);
+            });
 
         parseField(output,
                 STATUS_LINE::matcher,
-                matcher -> InterfaceCommonState.OperStatus.valueOf(matcher.group("line").toUpperCase()),
+            matcher -> InterfaceCommonState.OperStatus.valueOf(matcher.group("line").toUpperCase()),
                 builder::setOperStatus);
 
         parseField(output,
                 DESCR_LINE::matcher,
-                matcher -> matcher.group("desc"),
+            matcher -> matcher.group("desc"),
                 builder::setDescription);
     }
 

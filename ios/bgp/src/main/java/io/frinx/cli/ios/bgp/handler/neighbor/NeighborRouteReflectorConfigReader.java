@@ -58,7 +58,8 @@ public class NeighborRouteReflectorConfigReader implements BgpReader.BgpConfigRe
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String ipAddress = NeighborWriter.getNeighborIp(instanceIdentifier);
 
-        parseConfigAttributes(blockingRead(String.format(NeighborConfigReader.SH_SUMM, ipAddress), cli, instanceIdentifier, readContext),
+        parseConfigAttributes(blockingRead(String.format(NeighborConfigReader.SH_SUMM, ipAddress), cli,
+                instanceIdentifier, readContext),
                 configBuilder, vrfName);
     }
 
@@ -77,7 +78,7 @@ public class NeighborRouteReflectorConfigReader implements BgpReader.BgpConfigRe
     private static void parseDefault(ConfigBuilder configBuilder, String[] output) {
         Optional<String> defaultNetworkNeighbors = Arrays.stream(output)
                 .filter(value -> !value.contains("vrf"))
-                .reduce((s, s2) -> s + s2);
+                .reduce((s1, s2) -> s1 + s2);
 
         setAttributes(configBuilder, defaultNetworkNeighbors.orElse(""));
     }
@@ -90,8 +91,8 @@ public class NeighborRouteReflectorConfigReader implements BgpReader.BgpConfigRe
         String processed = defaultInstance.replaceAll(" neighbor", "\n neighbor");
 
         ParsingUtils.parseField(processed, 0, NEIGHBOR_RR_CLIENT_PATTERN::matcher,
-                m -> m.group("client"),
-                client -> configBuilder.setRouteReflectorClient(true));
+            m -> m.group("client"),
+            client -> configBuilder.setRouteReflectorClient(true));
     }
 
     private static void parseVrf(ConfigBuilder configBuilder, String vrfName, String[] output) {

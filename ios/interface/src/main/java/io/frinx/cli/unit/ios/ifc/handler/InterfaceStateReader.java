@@ -70,11 +70,11 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
 
         parseField(output,
                 STATUS_LINE::matcher,
-                matcher -> InterfaceCommonState.AdminStatus.valueOf(matcher.group("admin").toUpperCase()),
-                adminStatus -> {
-                    builder.setAdminStatus(adminStatus);
-                    builder.setEnabled(adminStatus == InterfaceCommonState.AdminStatus.UP);
-                });
+            matcher -> InterfaceCommonState.AdminStatus.valueOf(matcher.group("admin").toUpperCase()),
+            adminStatus -> {
+                builder.setAdminStatus(adminStatus);
+                builder.setEnabled(adminStatus == InterfaceCommonState.AdminStatus.UP);
+            });
 
         if (builder.getAdminStatus() == null) {
             // We cannot parse AdminSatus from output, fallback to AdminStatus.DOWN
@@ -84,7 +84,7 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
 
         parseField(output,
                 STATUS_LINE::matcher,
-                matcher -> InterfaceCommonState.OperStatus.valueOf(matcher.group("line").toUpperCase()),
+            matcher -> InterfaceCommonState.OperStatus.valueOf(matcher.group("line").toUpperCase()),
                 builder::setOperStatus);
 
         if (builder.getOperStatus() == null) {
@@ -94,12 +94,12 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
 
         parseField(output,
                 MTU_LINE::matcher,
-                matcher -> Integer.valueOf(matcher.group("mtu")),
+            matcher -> Integer.valueOf(matcher.group("mtu")),
                 builder::setMtu);
 
         parseField(output,
                 DESCR_LINE::matcher,
-                matcher -> matcher.group("desc"),
+            matcher -> matcher.group("desc"),
                 builder::setDescription);
     }
 

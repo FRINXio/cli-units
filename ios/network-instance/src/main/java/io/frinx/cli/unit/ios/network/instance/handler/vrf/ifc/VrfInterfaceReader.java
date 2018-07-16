@@ -38,10 +38,13 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
+public class VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader<Interface, InterfaceKey,
+        InterfaceBuilder> {
 
-    private static final String SH_IP_VRF_INTERFACES_ALL = "show running-config | include ^interface|^ ip vrf forwarding";
-    private static final Pattern VRF_INTERFACE_ID_LINE = Pattern.compile("interface (?<id>\\S+)\\s+ip vrf forwarding (?<vrfId>\\S+)");
+    private static final String SH_IP_VRF_INTERFACES_ALL = "show running-config | include ^interface|^ ip vrf "
+            + "forwarding";
+    private static final Pattern VRF_INTERFACE_ID_LINE = Pattern.compile("interface (?<id>\\S+)\\s+ip vrf forwarding "
+            + "(?<vrfId>\\S+)");
     private static final Pattern INTERFACE_ID_LINE = Pattern.compile("interface (?<id>\\S+)");
 
     private final Cli cli;
@@ -54,14 +57,16 @@ public class VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader
     @Override
     public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                                @Nonnull ReadContext ctx) throws ReadFailedException {
-        final String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
+        final String name = instanceIdentifier.firstKeyOf(NetworkInstance.class)
+                .getName();
         String output = blockingRead(SH_IP_VRF_INTERFACES_ALL, cli, instanceIdentifier, ctx);
         return parseIds(name, output);
     }
 
     @VisibleForTesting
     static List<InterfaceKey> parseIds(String vrfName, String output) {
-        String noNewlines = NEWLINE.matcher(output).replaceAll("");
+        String noNewlines = NEWLINE.matcher(output)
+                .replaceAll("");
         String ifcPerLine = noNewlines.replaceAll("interface", "\ninterface");
 
         if (vrfName.equals(NetworInstance.DEFAULT_NETWORK_NAME)) {
@@ -69,9 +74,10 @@ public class VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader
         } else {
             return parseFields(ifcPerLine, 0,
                     VRF_INTERFACE_ID_LINE::matcher,
-                    m -> new AbstractMap.SimpleEntry<>(m.group("id"), m.group("vrfId")),
-                    e -> new InterfaceKey(e.getKey()),
-                    e -> e.getValue().equals(vrfName));
+                m -> new AbstractMap.SimpleEntry<>(m.group("id"), m.group("vrfId")),
+                e -> new InterfaceKey(e.getKey()),
+                e -> e.getValue()
+                            .equals(vrfName));
         }
     }
 
@@ -84,6 +90,7 @@ public class VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                              @Nonnull InterfaceBuilder interfaceBuilder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
-        interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class).getId());
+        interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class)
+                .getId());
     }
 }

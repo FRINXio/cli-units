@@ -70,30 +70,32 @@ public final class IosCdpUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {}
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+    }
 
-    private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.CDP, CdpBuilder.class);
-        rRegistry.addStructuralReader(IIDs.CD_INTERFACES, InterfacesBuilder.class);
+    private void provideReaders(ModifiableReaderRegistryBuilder readeRegistry, Cli cli) {
+        readeRegistry.addStructuralReader(IIDs.CDP, CdpBuilder.class);
+        readeRegistry.addStructuralReader(IIDs.CD_INTERFACES, InterfacesBuilder.class);
         // TODO keeping InterfaceReader and InterfaceConfigReader just as Operational readers
         // because we do not yet support writes
         // and also because finding out whether an interface is cdp enabled or not is not possible
         // just from running-config (IOS has default off, XE has default on) the only way to get the
-        // info from running config is to use "show run all". But that would not do well with CliReader right now and would
+        // info from running config is to use "show run all". But that would not do well with CliReader right now and
+        // would
         // slow down reads by a lot
-        rRegistry.add(new GenericOperListReader<>(IIDs.CD_IN_INTERFACE, new InterfaceReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.CD_IN_IN_CONFIG, new InterfaceConfigReader()));
-        rRegistry.addStructuralReader(IIDs.CD_IN_IN_NEIGHBORS, NeighborsBuilder.class);
-        rRegistry.add(new GenericOperListReader<>(IIDs.CD_IN_IN_NE_NEIGHBOR, new NeighborReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.CD_IN_IN_NE_NE_STATE, new NeighborStateReader(cli)));
+        readeRegistry.add(new GenericOperListReader<>(IIDs.CD_IN_INTERFACE, new InterfaceReader(cli)));
+        readeRegistry.add(new GenericOperReader<>(IIDs.CD_IN_IN_CONFIG, new InterfaceConfigReader()));
+        readeRegistry.addStructuralReader(IIDs.CD_IN_IN_NEIGHBORS, NeighborsBuilder.class);
+        readeRegistry.add(new GenericOperListReader<>(IIDs.CD_IN_IN_NE_NEIGHBOR, new NeighborReader(cli)));
+        readeRegistry.add(new GenericOperReader<>(IIDs.CD_IN_IN_NE_NE_STATE, new NeighborStateReader(cli)));
     }
 
     @Override

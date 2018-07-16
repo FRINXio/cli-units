@@ -27,13 +27,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 
 public class GlobalReadersTest {
 
-    private String summOutput = "BGP router identifier 99.0.0.99, local AS number 65000\n" +
-            "BGP table version is 1, main routing table version 1\n";
+    private String summOutput = "BGP router identifier 99.0.0.99, local AS number 65000\n"
+            + "BGP table version is 1, main routing table version 1\n";
 
-    private String shRunOutput = "router bgp 65000\n" +
-            " bgp router-id 10.10.10.20\n" +
-            " address-family ipv4 vrf vrf3\n" +
-            "  bgp router-id 10.10.10.30\n";
+    private String shRunOutput = "router bgp 65000\n"
+            + " bgp router-id 10.10.10.20\n"
+            + " address-family ipv4 vrf vrf3\n"
+            + "  bgp router-id 10.10.10.30\n";
 
     @Test
     public void testGlobal() {

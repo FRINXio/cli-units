@@ -70,7 +70,7 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
     public static List<InterfaceKey> parseAllInterfaceIds(String output) {
         return parseFields(output, 0,
                 INTERFACE_ID_LINE::matcher,
-                m -> m.group("id"),
+            m -> m.group("id"),
                 InterfaceKey::new);
     }
 

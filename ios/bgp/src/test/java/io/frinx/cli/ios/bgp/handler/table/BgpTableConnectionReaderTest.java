@@ -31,16 +31,16 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 
 public class BgpTableConnectionReaderTest {
 
-    private static final String OUTPUT =" redistribute ospf 888 subnets\n" +
-            "router bgp 65002\n" +
-            " address-family ipv4\n" +
-            "  redistribute ospf 88 subnets route-map alala\n" +
-            " address-family vpnv4\n" +
-            " address-family ipv6\n" +
-            "  redistribute ospf 888\n" +
-            "  redistribute ospf 88\n" +
-            " address-family ipv4 vrf aaa\n" +
-            "  redistribute ospf 1 route-map pass\n";
+    private static final String OUTPUT = " redistribute ospf 888 subnets\n"
+            + "router bgp 65002\n"
+            + " address-family ipv4\n"
+            + "  redistribute ospf 88 subnets route-map alala\n"
+            + " address-family vpnv4\n"
+            + " address-family ipv6\n"
+            + "  redistribute ospf 888\n"
+            + "  redistribute ospf 88\n"
+            + " address-family ipv4 vrf aaa\n"
+            + "  redistribute ospf 1 route-map pass\n";
 
     @Test
     public void getAllIds() throws Exception {

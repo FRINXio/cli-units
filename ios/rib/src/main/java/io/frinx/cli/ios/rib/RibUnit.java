@@ -73,29 +73,31 @@ public class RibUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         // no writers
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
         // FIXME: add ipv6 support?
-        rRegistry.addStructuralReader(IIDs.BGPRIB, BgpRibBuilder.class);
-        rRegistry.addStructuralReader(IIDs.BG_AFISAFIS, AfiSafisBuilder.class);
-        rRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(AfiSafi.class).child(State.class)),
+        readRegistry.addStructuralReader(IIDs.BGPRIB, BgpRibBuilder.class);
+        readRegistry.addStructuralReader(IIDs.BG_AFISAFIS, AfiSafisBuilder.class);
+        readRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(AfiSafi.class)
+                        .child(State.class)),
                 new GenericOperListReader<>(IIDs.BG_AF_AFISAFI, new AfiSafiReader()));
-        rRegistry.addStructuralReader(IIDs.BG_AF_AF_IPV4UNICAST, Ipv4UnicastBuilder.class);
-        rRegistry.addStructuralReader(IIDs.BG_AF_AF_IP_LOCRIB, LocRibBuilder.class);
-        rRegistry.addStructuralReader(IIDs.BG_AF_AF_IP_LO_ROUTES, RoutesBuilder.class);
-        rRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(Route.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rib.bgp.rev161017.ipv4.loc.rib.top.loc.rib.routes.route.State.class)),
+        readRegistry.addStructuralReader(IIDs.BG_AF_AF_IPV4UNICAST, Ipv4UnicastBuilder.class);
+        readRegistry.addStructuralReader(IIDs.BG_AF_AF_IP_LOCRIB, LocRibBuilder.class);
+        readRegistry.addStructuralReader(IIDs.BG_AF_AF_IP_LO_ROUTES, RoutesBuilder.class);
+        readRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(Route.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rib.bgp.rev161017.ipv4.loc
+                                .rib.top.loc.rib.routes.route.State.class)),
                 new GenericOperListReader<>(IIDs.BG_AF_AF_IP_LO_RO_ROUTE, new Ipv4RoutesReader(cli)));
     }
 

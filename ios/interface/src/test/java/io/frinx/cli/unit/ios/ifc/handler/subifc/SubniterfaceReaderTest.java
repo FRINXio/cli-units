@@ -26,14 +26,14 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 
 public class SubniterfaceReaderTest {
 
-    private static final String SH_INTERFACE = "interface Loopback0\n" +
-            "interface FastEthernet0/0\n" +
-            "interface GigabitEthernet1/0\n" +
-            "interface GigabitEthernet2/0\n" +
-            "interface GigabitEthernet3/0\n" +
-            "interface FastEthernet4/0\n" +
-            "interface FastEthernet4/0.56\n" +
-            "interface FastEthernet4/0.57\n";
+    private static final String SH_INTERFACE = "interface Loopback0\n"
+            + "interface FastEthernet0/0\n"
+            + "interface GigabitEthernet1/0\n"
+            + "interface GigabitEthernet2/0\n"
+            + "interface GigabitEthernet3/0\n"
+            + "interface FastEthernet4/0\n"
+            + "interface FastEthernet4/0.56\n"
+            + "interface FastEthernet4/0.57\n";
 
     private static final List<SubinterfaceKey> IDS_EXPECTED =
             Lists.newArrayList(56L, 57L)

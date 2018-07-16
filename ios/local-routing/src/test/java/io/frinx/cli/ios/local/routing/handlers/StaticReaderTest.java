@@ -32,20 +32,19 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 public class StaticReaderTest {
 
     private static final String VRF_NAME = "TMP";
-    static String STATIC_OUTPUT =
-            "ip route 10.255.1.0 255.255.255.0 Null0\n" +
-                    "ip route 10.255.1.0 255.255.255.0 192.168.1.5\n" +
-                    "ip route 10.255.2.0 255.255.255.0 192.168.1.5\n" +
-                    "ip route 12.255.1.0 255.255.255.240 192.168.1.24\n" +
-                    "ip route 192.0.2.0 255.255.255.0 15.3.0.1\n" +
-                    "ip route 192.0.2.0 255.255.255.0 15.3.0.3\n" +
-                    "ip route 192.0.2.0 255.255.255.0 6.3.0.3\n" +
-                    "ip route 192.0.2.0 255.255.255.0 192.0.2.12\n" +
-                    "ip route 192.0.2.0 255.255.255.0 192.0.2.10\n" +
-                    "ip route 192.0.2.0 255.255.255.0 192.0.2.10\n" +
-                    "ip route vrf TMP 192.0.3.0 255.255.255.0 10.10.10.10\n" +
-                    "ip route vrf TMP 192.0.2.0 255.255.255.0 10.10.10.20\n" +
-                    "ip route vrf AAA 192.0.4.0 255.255.255.0 10.10.10.30\n";
+    static String STATIC_OUTPUT = "ip route 10.255.1.0 255.255.255.0 Null0\n"
+            + "ip route 10.255.1.0 255.255.255.0 192.168.1.5\n"
+            + "ip route 10.255.2.0 255.255.255.0 192.168.1.5\n"
+            + "ip route 12.255.1.0 255.255.255.240 192.168.1.24\n"
+            + "ip route 192.0.2.0 255.255.255.0 15.3.0.1\n"
+            + "ip route 192.0.2.0 255.255.255.0 15.3.0.3\n"
+            + "ip route 192.0.2.0 255.255.255.0 6.3.0.3\n"
+            + "ip route 192.0.2.0 255.255.255.0 192.0.2.12\n"
+            + "ip route 192.0.2.0 255.255.255.0 192.0.2.10\n"
+            + "ip route 192.0.2.0 255.255.255.0 192.0.2.10\n"
+            + "ip route vrf TMP 192.0.3.0 255.255.255.0 10.10.10.10\n"
+            + "ip route vrf TMP 192.0.2.0 255.255.255.0 10.10.10.20\n"
+            + "ip route vrf AAA 192.0.4.0 255.255.255.0 10.10.10.30\n";
 
     static String STATIC_OUTPUT2 =
             "ip route 0.0.0.0 0.0.0.0 147.175.204.1\n" +

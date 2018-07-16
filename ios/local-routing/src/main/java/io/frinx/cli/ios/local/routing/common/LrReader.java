@@ -30,7 +30,8 @@ import org.opendaylight.yangtools.yang.binding.Identifier;
 /**
  * Lr version of reader. A mixin that checks if LR type is set in the protocol in the background.
  */
-public interface LrReader<O extends DataObject, B extends Builder<O>> extends TypedReader<O, B>, CliReader<O, B>, L3VrfReader<O, B> {
+public interface LrReader<O extends DataObject, B extends Builder<O>> extends TypedReader<O, B>, CliReader<O, B>,
+        L3VrfReader<O, B> {
 
     Class<STATIC> TYPE = STATIC.class;
 
@@ -42,7 +43,9 @@ public interface LrReader<O extends DataObject, B extends Builder<O>> extends Ty
     /**
      * Union mixin of Lr reader and Config reader.
      */
-    interface LrConfigReader<O extends DataObject, B extends Builder<O>> extends LrReader<O, B>, CliConfigReader<O, B> {}
+    interface LrConfigReader<O extends DataObject, B extends Builder<O>> extends LrReader<O, B>, CliConfigReader<O, B> {
+    }
 
-    interface LrOperReader<O extends DataObject, B extends Builder<O>> extends LrReader<O, B>, CliOperReader<O, B> {}
+    interface LrOperReader<O extends DataObject, B extends Builder<O>> extends LrReader<O, B>, CliOperReader<O, B> {
+    }
 }

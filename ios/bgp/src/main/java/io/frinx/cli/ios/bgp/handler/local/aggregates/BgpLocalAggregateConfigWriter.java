@@ -46,32 +46,36 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
 
     private final Cli cli;
 
-    private static final String ENTER_AFI_SAFI = "{% if ($afi_safi) %}" +
-            "address-family {$afi_safi}" +
-            "{% if ($vrf) %}" +
-            " vrf {$vrf}" +
-            "{% else %}" +
-            "{% endif %}" +
-            "\n" +
-            "{% endif %}";
+    private static final String ENTER_AFI_SAFI = "{% if ($afi_safi) %}"
+            + "address-family {$afi_safi}"
+            + "{% if ($vrf) %}"
+            + " vrf {$vrf}"
+            + "{% else %}"
+            + "{% endif %}"
+            + "\n"
+            + "{% endif %}";
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n" +
-            "router bgp {$as}\n" +
-
-            // Enter afi + VRF
-            ENTER_AFI_SAFI +
-
-            "network {$network} {.if ($mask) }mask {$mask}{/if}\n" +
-            "end";
-
-    private static final String DELETE_TEMPLATE = "configure terminal\n" +
-            "router bgp {$as}\n" +
+    private static final String WRITE_TEMPLATE = "configure terminal\n"
+            + "router bgp {$as}\n"
+            +
 
             // Enter afi + VRF
-            ENTER_AFI_SAFI +
+            ENTER_AFI_SAFI
+            +
 
-            "no network {$network} {.if ($mask) }mask {$mask}{/if}\n" +
-            "end";
+            "network {$network} {.if ($mask) }mask {$mask}{/if}\n"
+            + "end";
+
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
+            + "router bgp {$as}\n"
+            +
+
+            // Enter afi + VRF
+            ENTER_AFI_SAFI
+            +
+
+            "no network {$network} {.if ($mask) }mask {$mask}{/if}\n"
+            + "end";
 
     public BgpLocalAggregateConfigWriter(Cli cli) {
         this.cli = cli;
@@ -81,7 +85,8 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,
                                               WriteContext writeContext) throws WriteFailedException {
         final Protocols networkInstance =
-                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance.class).child(Protocols.class)).get();
+                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance.class).child(Protocols
+                        .class)).get();
         Optional<Bgp> bgp = getBgpGlobal(networkInstance);
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
         Preconditions.checkArgument(bgp.isPresent(),
@@ -139,7 +144,8 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,
                                                WriteContext writeContext) throws WriteFailedException {
         final Protocols networkInstance =
-                writeContext.readBefore(RWUtils.cutId(instanceIdentifier, NetworkInstance.class).child(Protocols.class)).get();
+                writeContext.readBefore(RWUtils.cutId(instanceIdentifier, NetworkInstance.class).child(Protocols
+                        .class)).get();
         Optional<Bgp> bgp = getBgpGlobal(networkInstance);
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 

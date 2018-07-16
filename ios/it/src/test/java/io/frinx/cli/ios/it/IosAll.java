@@ -187,17 +187,17 @@ public class IosAll {
         BindingToNormalizedNodeCodec codec = translateContext.getCodec();
 
         // Get & register CRUD handlers
-        CompositeReaderRegistryBuilder rRegistryBuilder = new CompositeReaderRegistryBuilder(new YangDAG());
-        FlatWriterRegistryBuilder wRegistryBuilder = new FlatWriterRegistryBuilder(new YangDAG());
+        CompositeReaderRegistryBuilder readerRegistryBuilder = new CompositeReaderRegistryBuilder(new YangDAG());
+        FlatWriterRegistryBuilder writerRegistryBuilder = new FlatWriterRegistryBuilder(new YangDAG());
         TranslateUnit.Context transportContext = () -> cli;
 
-        translateContext.provideHandlers(rRegistryBuilder, wRegistryBuilder, transportContext);
-        ReaderRegistry rRegistry = rRegistryBuilder.build();
-        WriterRegistry wRegistry = wRegistryBuilder.build();
+        translateContext.provideHandlers(readerRegistryBuilder, writerRegistryBuilder, transportContext);
+        ReaderRegistry readerRegistry = readerRegistryBuilder.build();
+        WriterRegistry writerRegistry = writerRegistryBuilder.build();
 
         // Get DOM brokers
         TipProducingDataTree dataTree = getDataTree(schemaCtx, TreeType.CONFIGURATION);
-        domBroker = getDomBroker(schemaCtx, NOOP_DATA_BROKER, codec, rRegistry, wRegistry, dataTree);
+        domBroker = getDomBroker(schemaCtx, NOOP_DATA_BROKER, codec, readerRegistry, writerRegistry, dataTree);
 
         // Get & register RPC handlers
         RpcRegistryBuilder rpcRegBuilder = new RpcRegistryBuilder();
@@ -307,7 +307,6 @@ public class IosAll {
                 readOnlyTransaction.read(LogicalDatastoreType.OPERATIONAL, IIDs.INTERFACES);
         Interfaces interfaces = read.checkedGet().get();
 
-        System.err.println(interfaces);
     }
 
     /**
@@ -321,7 +320,6 @@ public class IosAll {
                 readOnlyTransaction.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.EMPTY);
         NormalizedNode<?, ?> root = read.checkedGet().get();
 
-        System.err.println(toJson(root));
     }
 
     @Ignore
@@ -352,7 +350,6 @@ public class IosAll {
             averageTime += stopwatch.elapsed(TimeUnit.MILLISECONDS);
         }
 
-        System.err.println("Average execution time: " + averageTime / (rounds * 1.0) + " seconds");
     }
 
     private String toJson(NormalizedNode<?, ?> root) throws Exception {

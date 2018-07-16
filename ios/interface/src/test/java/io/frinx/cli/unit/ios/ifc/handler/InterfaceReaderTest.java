@@ -26,26 +26,27 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 
 public class InterfaceReaderTest {
 
-    private static final String SH_INTERFACE = "interface Loopback0\n" +
-                    "interface FastEthernet0/0\n" +
-                    "interface GigabitEthernet1/0\n" +
-                    "interface GigabitEthernet2/0\n" +
-                    "interface GigabitEthernet3/0\n" +
-                    "interface FastEthernet4/0\n" +
-                    "interface FastEthernet4/0.56\n" +
-                    "interface FastEthernet4/0.57\n";
+    private static final String SH_INTERFACE = "interface Loopback0\n"
+            + "interface FastEthernet0/0\n"
+            + "interface GigabitEthernet1/0\n"
+            + "interface GigabitEthernet2/0\n"
+            + "interface GigabitEthernet3/0\n"
+            + "interface FastEthernet4/0\n"
+            + "interface FastEthernet4/0.56\n"
+            + "interface FastEthernet4/0.57\n";
 
-    private static final List<InterfaceKey> IDS_EXPECTED =
-            Lists.newArrayList("Loopback0", "FastEthernet0/0", "GigabitEthernet1/0", "GigabitEthernet2/0", "GigabitEthernet3/0", "FastEthernet4/0")
-                    .stream()
-                    .map(InterfaceKey::new)
-                    .collect(Collectors.toList());
+    private static final List<InterfaceKey> IDS_EXPECTED = Lists.newArrayList("Loopback0", "FastEthernet0/0",
+            "GigabitEthernet1/0", "GigabitEthernet2/0", "GigabitEthernet3/0", "FastEthernet4/0")
+            .stream()
+            .map(InterfaceKey::new)
+            .collect(Collectors.toList());
 
-    private static final List<InterfaceKey> IDS_ALL_EXPECTED =
-            Lists.newArrayList("Loopback0", "FastEthernet0/0", "GigabitEthernet1/0", "GigabitEthernet2/0", "GigabitEthernet3/0", "FastEthernet4/0", "FastEthernet4/0.56", "FastEthernet4/0.57")
-                    .stream()
-                    .map(InterfaceKey::new)
-                    .collect(Collectors.toList());
+    private static final List<InterfaceKey> IDS_ALL_EXPECTED = Lists.newArrayList("Loopback0", "FastEthernet0/0",
+            "GigabitEthernet1/0", "GigabitEthernet2/0", "GigabitEthernet3/0", "FastEthernet4/0",
+            "FastEthernet4/0.56", "FastEthernet4/0.57")
+            .stream()
+            .map(InterfaceKey::new)
+            .collect(Collectors.toList());
 
     @Test
     public void testParseInterfaceIds() throws Exception {

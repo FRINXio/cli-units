@@ -28,10 +28,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 
 public class Ipv6AddressReaderTest {
 
-    public static final String OUTPUT =
-            " ipv6 address FE80::C801:7FF:FEBC:1C link-local\n" +
-            " ipv6 address 2002::1/65\n" +
-            " ipv6 address 2003::1/124\n";
+    public static final String OUTPUT = " ipv6 address FE80::C801:7FF:FEBC:1C link-local\n"
+            + " ipv6 address 2002::1/65\n"
+            + " ipv6 address 2003::1/124\n";
 
     @Test
     public void testParse() throws Exception {

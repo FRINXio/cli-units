@@ -51,9 +51,11 @@ public class PeerGroupRouteReflectorConfigReader implements BgpReader.BgpConfigR
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        String pG = instanceIdentifier.firstKeyOf(PeerGroup.class).getPeerGroupName();
+        String peerGroupName = instanceIdentifier.firstKeyOf(PeerGroup.class).getPeerGroupName();
 
-        parseConfigAttributes(blockingRead(String.format(NeighborConfigReader.SH_SUMM, pG), cli, instanceIdentifier, readContext),
+        parseConfigAttributes(blockingRead(String.format(NeighborConfigReader.SH_SUMM, peerGroupName), cli,
+                instanceIdentifier,
+                readContext),
                 configBuilder, vrfName);
     }
 }

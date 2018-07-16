@@ -37,13 +37,12 @@ public class StaticNextHopReaderTest {
                     .map(NextHopKey::new)
                     .collect(Collectors.toList());
 
-    static String STATIC_OUTPUT1 =
-                    "ip route 192.0.2.0 255.255.255.0 15.3.0.1\n" +
-                    "ip route 192.0.2.0 255.255.255.0 15.3.0.3\n" +
-                    "ip route 192.0.2.0 255.255.255.0 6.3.0.3\n" +
-                    "ip route 192.0.2.0 255.255.255.0 192.0.2.12\n" +
-                    "ip route 192.0.2.0 255.255.255.0 192.0.2.10\n" +
-                    "ip route 192.0.2.0 255.255.255.0 192.0.2.10\n";
+    static String STATIC_OUTPUT1 = "ip route 192.0.2.0 255.255.255.0 15.3.0.1\n"
+            + "ip route 192.0.2.0 255.255.255.0 15.3.0.3\n"
+            + "ip route 192.0.2.0 255.255.255.0 6.3.0.3\n"
+            + "ip route 192.0.2.0 255.255.255.0 192.0.2.12\n"
+            + "ip route 192.0.2.0 255.255.255.0 192.0.2.10\n"
+            + "ip route 192.0.2.0 255.255.255.0 192.0.2.10\n";
 
     static String STATIC_OUTPUT2 =
                     "ip route vrf TMP 192.0.3.0 255.255.255.0 10.10.10.10\n";

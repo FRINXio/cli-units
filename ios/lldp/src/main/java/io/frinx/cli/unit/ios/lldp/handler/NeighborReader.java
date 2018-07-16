@@ -76,9 +76,9 @@ public class NeighborReader implements CliOperListReader<Neighbor, NeighborKey, 
             Matcher chMatcher = CHASSIS.matcher(chassisString);
             checkState(chMatcher.matches());
             String chassis = chMatcher.group("chassis");
-            Matcher pMatcher = PORT.matcher(portString);
-            checkState(pMatcher.matches());
-            String port = pMatcher.group("portId");
+            Matcher ppMatcher = PORT.matcher(portString);
+            checkState(ppMatcher.matches());
+            String port = ppMatcher.group("portId");
 
             keys.add(new NeighborKey(String.format(KEY_FORMAT, chassis, port)));
         }

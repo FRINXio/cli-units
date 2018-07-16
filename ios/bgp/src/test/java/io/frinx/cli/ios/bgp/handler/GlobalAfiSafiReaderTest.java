@@ -28,24 +28,22 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev
 
 public class GlobalAfiSafiReaderTest {
 
-    private static final String BGP_OUTPUT = " address-family vpnv4\r\n" +
-            " address-family vpnv6\r\n" +
-            "router bgp 65000\r\n" +
-            " address-family ipv4\r\n" +
-            " address-family ipv4 vrf a\n";
+    private static final String BGP_OUTPUT = " address-family vpnv4\r\n"
+            + " address-family vpnv6\r\n"
+            + "router bgp 65000\r\n"
+            + " address-family ipv4\r\n"
+            + " address-family ipv4 vrf a\n";
 
     @Test
     public void testParse() throws Exception {
-        List<AfiSafiKey> aFamilies = GlobalAfiSafiReader.getAfiKeys(BGP_OUTPUT, "a");
-        List<AfiSafiKey> bFamilies = GlobalAfiSafiReader.getAfiKeys(BGP_OUTPUT, "b");
+        List<AfiSafiKey> afamilies = GlobalAfiSafiReader.getAfiKeys(BGP_OUTPUT, "a");
+        List<AfiSafiKey> bfamilies = GlobalAfiSafiReader.getAfiKeys(BGP_OUTPUT, "b");
         List<AfiSafiKey> defaultFamilies = GlobalAfiSafiReader.getDefaultAfiKeys(BGP_OUTPUT);
-
         AfiSafiKey ipv4Key = new AfiSafiKey(IPV4UNICAST.class);
-
+        assertThat(afamilies, hasItems(ipv4Key));
+        assertTrue(bfamilies.isEmpty());
         assertEquals(1, defaultFamilies.size());
         assertThat(defaultFamilies, hasItems(ipv4Key));
-        assertThat(aFamilies, hasItems(ipv4Key));
-        assertTrue(bFamilies.isEmpty());
 
     }
 }

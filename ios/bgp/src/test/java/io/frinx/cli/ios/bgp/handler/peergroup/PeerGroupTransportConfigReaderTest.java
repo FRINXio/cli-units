@@ -25,23 +25,24 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 
 public class PeerGroupTransportConfigReaderTest {
 
-    private static final String OUTPUT = "router bgp 65000\n" +
-            " neighbor group-for-some-neighbors peer-group\n" +
-            " neighbor group-for-some-neighbors remote-as 45\n" +
-            " neighbor group-for-some-neighbors update-source Loopback0\n" +
-            " neighbor group-for-some-neighbors transport connection-mode passive\n" +
-            " neighbor group-for-some-neighbors activate\n";
+    private static final String OUTPUT = "router bgp 65000\n"
+            + " neighbor group-for-some-neighbors peer-group\n"
+            + " neighbor group-for-some-neighbors remote-as 45\n"
+            + " neighbor group-for-some-neighbors update-source Loopback0\n"
+            + " neighbor group-for-some-neighbors transport connection-mode passive\n"
+            + " neighbor group-for-some-neighbors activate\n";
 
-    private static final String OUTPUT2 = "router bgp 65000\n" +
-            " neighbor group-for-some-neighbors peer-group\n" +
-            " neighbor group-for-some-neighbors remote-as 45\n" +
-            " neighbor group-for-some-neighbors activate\n";
+    private static final String OUTPUT2 = "router bgp 65000\n"
+            + " neighbor group-for-some-neighbors peer-group\n"
+            + " neighbor group-for-some-neighbors remote-as 45\n"
+            + " neighbor group-for-some-neighbors activate\n";
 
 
     @Test
     public void testParse() throws Exception {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        PeerGroupTransportConfigReader.parseConfigAttributes(OUTPUT, configBuilder, NetworInstance.DEFAULT_NETWORK_NAME);
+        PeerGroupTransportConfigReader.parseConfigAttributes(OUTPUT, configBuilder, NetworInstance
+                .DEFAULT_NETWORK_NAME);
         assertEquals(new ConfigBuilder()
                         .setPassiveMode(true)
                         .setLocalAddress(new BgpCommonNeighborGroupTransportConfig.LocalAddress("Loopback0"))
@@ -49,7 +50,8 @@ public class PeerGroupTransportConfigReaderTest {
                 configBuilder.build());
 
         configBuilder = new ConfigBuilder();
-        PeerGroupTransportConfigReader.parseConfigAttributes(OUTPUT2, configBuilder, NetworInstance.DEFAULT_NETWORK_NAME);
+        PeerGroupTransportConfigReader.parseConfigAttributes(OUTPUT2, configBuilder, NetworInstance
+                .DEFAULT_NETWORK_NAME);
         assertEquals(new ConfigBuilder()
                         .setPassiveMode(false)
                         .build(),

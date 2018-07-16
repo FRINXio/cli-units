@@ -89,6 +89,7 @@ public class NextHopStateReader implements LrReader.LrOperReader<State, StateBui
             return SHOW_IP_STATIC_ROUTE_NETWORK_IP6;
         }
     }
+
     private String getVrfCommand(StaticKey staticRouteKey) {
         if (staticRouteKey.getPrefix().getIpv4Prefix() != null) {
             return SHOW_IP_STATIC_ROUTE_VRF_NETWORK;
@@ -101,13 +102,13 @@ public class NextHopStateReader implements LrReader.LrOperReader<State, StateBui
     static void parseMetric(String output, StateBuilder stateBuilder) {
         ParsingUtils.parseField(output, 0,
                 NextHopStateReader::getMatcher,
-                matcher -> Long.valueOf(matcher.group("metric")),
+            matcher -> Long.valueOf(matcher.group("metric")),
                 stateBuilder::setMetric);
     }
 
-    private static Matcher getMatcher(String s) {
-        Matcher matcher = METRIC_LINE.matcher(s);
-        return matcher.matches() ? matcher : DISTANCE_LINE.matcher(s);
+    private static Matcher getMatcher(String string) {
+        Matcher matcher = METRIC_LINE.matcher(string);
+        return matcher.matches() ? matcher : DISTANCE_LINE.matcher(string);
     }
 
     @Override

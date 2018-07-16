@@ -49,7 +49,8 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
 
     private static final String SH_AFI = "show running-config | include ^router bgp|^ address-family";
     private static final Pattern FAMILY_LINE = Pattern.compile("\\s*address-family (?<family>\\S+).*");
-    private static final Pattern FAMILY_VRF_LINE = Pattern.compile("\\s*address-family (?<family>.+) vrf (?<vrf>\\S+).*");
+    private static final Pattern FAMILY_VRF_LINE = Pattern.compile("\\s*address-family (?<family>.+) vrf (?<vrf>\\S+)"
+            + ".*");
     private Cli cli;
 
     public GlobalAfiSafiReader(final Cli cli) {
@@ -143,6 +144,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
                 return Optional.of(L3VPNIPV6UNICAST.class);
             case "ipv6":
                 return Optional.of(IPV6UNICAST.class);
+            default: break;
         }
 
         return Optional.empty();

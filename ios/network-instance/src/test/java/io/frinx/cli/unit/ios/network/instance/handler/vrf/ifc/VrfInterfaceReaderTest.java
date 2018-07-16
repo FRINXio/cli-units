@@ -31,14 +31,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 @RunWith(MockitoJUnitRunner.class)
 public class VrfInterfaceReaderTest {
 
-    private static  final String SH_IP_VRF_INTERFACES =
-            "interface Loopback0\n" +
-                    "interface Loopback1\n" +
-                    " ip vrf forwarding a\n" +
-                    "interface Loopback44\n" +
-                    "interface GigabitEthernet1\n" +
-                    "interface GigabitEthernet2\n" +
-                    "interface GigabitEthernet3\n";
+    private static final String SH_IP_VRF_INTERFACES = "interface Loopback0\n"
+            + "interface Loopback1\n"
+            + " ip vrf forwarding a\n"
+            + "interface Loopback44\n"
+            + "interface GigabitEthernet1\n"
+            + "interface GigabitEthernet2\n"
+            + "interface GigabitEthernet3\n";
 
     private static final List<InterfaceKey> IDS_EXPECTED =
             Lists.newArrayList("Loopback0", "Loopback44", "GigabitEthernet1", "GigabitEthernet2", "GigabitEthernet3")
@@ -54,7 +53,8 @@ public class VrfInterfaceReaderTest {
 
     @Test
     public void testReader() {
-        assertEquals(IDS_EXPECTED, VrfInterfaceReader.parseIds(NetworInstance.DEFAULT_NETWORK_NAME, SH_IP_VRF_INTERFACES));
+        assertEquals(IDS_EXPECTED, VrfInterfaceReader.parseIds(NetworInstance.DEFAULT_NETWORK_NAME,
+                SH_IP_VRF_INTERFACES));
         assertEquals(IDS_EXPECTED_VRF, VrfInterfaceReader.parseIds("a", SH_IP_VRF_INTERFACES));
         assertEquals(Collections.emptyList(), VrfInterfaceReader.parseIds("b", SH_IP_VRF_INTERFACES));
     }

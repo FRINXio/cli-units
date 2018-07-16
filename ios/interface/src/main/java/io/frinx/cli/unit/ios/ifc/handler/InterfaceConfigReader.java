@@ -54,7 +54,8 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
     public void readCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id,
                                       @Nonnull final ConfigBuilder builder,
                                       @Nonnull final ReadContext ctx) throws ReadFailedException {
-        String name = id.firstKeyOf(Interface.class).getName();
+        String name = id.firstKeyOf(Interface.class)
+                .getName();
         parseInterface(blockingRead(String.format(SH_SINGLE_INTERFACE_CFG, name), cli, id, ctx), builder, name);
     }
 
@@ -74,26 +75,26 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
         // Actually check if disabled
         parseField(output, 0,
                 SHUTDOWN_LINE::matcher,
-                matcher -> false,
+            matcher -> false,
                 builder::setEnabled);
 
         parseField(output,
                 MTU_LINE::matcher,
-                matcher -> Integer.valueOf(matcher.group("mtu")),
+            matcher -> Integer.valueOf(matcher.group("mtu")),
                 builder::setMtu);
 
         parseField(output,
                 DESCR_LINE::matcher,
-                matcher -> matcher.group("desc"),
+            matcher -> matcher.group("desc"),
                 builder::setDescription);
     }
 
     static Class<? extends InterfaceType> parseType(String name) {
-        if(name.startsWith("FastEther")) {
+        if (name.startsWith("FastEther")) {
             return EthernetCsmacd.class;
         } else if (name.startsWith("GigabitEthernet")) {
             return EthernetCsmacd.class;
-        }  else if (name.startsWith("Loopback")) {
+        } else if (name.startsWith("Loopback")) {
             return SoftwareLoopback.class;
         } else {
             return Other.class;

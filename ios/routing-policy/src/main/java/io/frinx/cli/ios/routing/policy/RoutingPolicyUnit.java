@@ -46,8 +46,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.defined.sets.top.DefinedSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.routing.policy.top.RoutingPolicyBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
@@ -86,33 +84,34 @@ public class RoutingPolicyUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readerRegistryBuilder,
+                                @Nonnull ModifiableWriterRegistryBuilder writerRegistryBuilder,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readerRegistryBuilder, cli);
+        provideWriters(writerRegistryBuilder, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
+    private void provideWriters(ModifiableWriterRegistryBuilder writerRegistryBuilder, Cli cli) {
         // provide writers
-        wRegistry.add(new GenericWriter<>(IIDs.ROUTINGPOLICY, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.RO_DEFINEDSETS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(DEFINED_SETS_1, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(BGP_DEFINED_SETS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(EXT_COMMUNITY_SETS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(EXT_COMMUNITY_SET, new NoopCliWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(EXT_CS_CONFIG,new ExtCommunitySetConfigWriter(cli)), NE_NE_CONFIG);
+        writerRegistryBuilder.add(new GenericWriter<>(IIDs.ROUTINGPOLICY, new NoopCliWriter<>()));
+        writerRegistryBuilder.add(new GenericWriter<>(IIDs.RO_DEFINEDSETS, new NoopCliWriter<>()));
+        writerRegistryBuilder.add(new GenericWriter<>(DEFINED_SETS_1, new NoopCliWriter<>()));
+        writerRegistryBuilder.add(new GenericWriter<>(BGP_DEFINED_SETS, new NoopCliWriter<>()));
+        writerRegistryBuilder.add(new GenericWriter<>(EXT_COMMUNITY_SETS, new NoopCliWriter<>()));
+        writerRegistryBuilder.add(new GenericWriter<>(EXT_COMMUNITY_SET, new NoopCliWriter<>()));
+        writerRegistryBuilder.addAfter(new GenericWriter<>(EXT_CS_CONFIG, new ExtCommunitySetConfigWriter(cli)),
+                NE_NE_CONFIG);
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readerRegistryBuilder, Cli cli) {
         // provide readers
-        rRegistry.addStructuralReader(IIDs.ROUTINGPOLICY, RoutingPolicyBuilder.class);
-        rRegistry.addStructuralReader(IIDs.RO_DEFINEDSETS, DefinedSetsBuilder.class);
-        rRegistry.addStructuralReader(DEFINED_SETS_1, DefinedSets2Builder.class);
-        rRegistry.addStructuralReader(BGP_DEFINED_SETS, BgpDefinedSetsBuilder.class);
-        rRegistry.addStructuralReader(EXT_COMMUNITY_SETS, ExtCommunitySetsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(EXT_COMMUNITY_SET, new ExtCommunitySetReader(cli)));
+        readerRegistryBuilder.addStructuralReader(IIDs.ROUTINGPOLICY, RoutingPolicyBuilder.class);
+        readerRegistryBuilder.addStructuralReader(IIDs.RO_DEFINEDSETS, DefinedSetsBuilder.class);
+        readerRegistryBuilder.addStructuralReader(DEFINED_SETS_1, DefinedSets2Builder.class);
+        readerRegistryBuilder.addStructuralReader(BGP_DEFINED_SETS, BgpDefinedSetsBuilder.class);
+        readerRegistryBuilder.addStructuralReader(EXT_COMMUNITY_SETS, ExtCommunitySetsBuilder.class);
+        readerRegistryBuilder.add(new GenericConfigListReader<>(EXT_COMMUNITY_SET, new ExtCommunitySetReader(cli)));
     }
 
     @Override

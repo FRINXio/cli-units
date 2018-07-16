@@ -64,15 +64,15 @@ public class ConfigurationUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
+        provideReaders(readRegistry, cli);
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.add(new GenericOperReader<>(IIDs.CONFIGURATIONMETADATA, new ConfigMetadataReader(cli)));
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.add(new GenericOperReader<>(IIDs.CONFIGURATIONMETADATA, new ConfigMetadataReader(cli)));
     }
 
     @Override

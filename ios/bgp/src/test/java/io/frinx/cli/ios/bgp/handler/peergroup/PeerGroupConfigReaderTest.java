@@ -26,14 +26,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 
 public class PeerGroupConfigReaderTest {
 
-    private static final String OUTPUT = "router bgp 65000\n" +
-            " neighbor G-1 peer-group\n" +
-            " neighbor G-1 remote-as 45\n" +
-            " neighbor G-1 password passwd\n" +
-            " neighbor G-1 description description\n" +
+    private static final String OUTPUT = "router bgp 65000\n"
+            + " neighbor G-1 peer-group\n"
+            + " neighbor G-1 remote-as 45\n"
+            + " neighbor G-1 password passwd\n"
+            + " neighbor G-1 description description\n"
+            +
             // These 2 are neighbor specific and should be ignored by group parser
-            " neighbor G-1 peer-group abcd\n" +
-            " neighbor G-1 activate\n";
+            " neighbor G-1 peer-group abcd\n"
+            + " neighbor G-1 activate\n";
 
     @Test
     public void testParse() throws Exception {

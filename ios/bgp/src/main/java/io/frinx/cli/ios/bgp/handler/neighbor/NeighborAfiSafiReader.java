@@ -47,7 +47,8 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
 
 
     private static final Pattern FAMILY_LINE = Pattern.compile("\\s*address-family (?<family>\\S+).*");
-    private static final Pattern FAMILY_LINE_VRF = Pattern.compile("\\s*address-family (?<family>\\S+) vrf (?<vrf>\\S+).*");
+    private static final Pattern FAMILY_LINE_VRF = Pattern.compile("\\s*address-family (?<family>\\S+) vrf "
+            + "(?<vrf>\\S+).*");
     private Cli cli;
 
     public NeighborAfiSafiReader(final Cli cli) {
@@ -61,12 +62,14 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
 
         String neighborIp = NeighborWriter.getNeighborIp(id);
-        return getAfiKeys(blockingRead(String.format(NeighborConfigReader.SH_SUMM, neighborIp), cli, id, readContext), vrfKey,
-                line -> line.contains("activate"));
+        return getAfiKeys(blockingRead(String.format(NeighborConfigReader.SH_SUMM, neighborIp), cli, id, readContext),
+                vrfKey,
+            line -> line.contains("activate"));
     }
 
     @VisibleForTesting
-    public static List<AfiSafiKey> getAfiKeys(String output, NetworkInstanceKey vrfKey, Predicate<String> filterActiveFamilies) {
+    public static List<AfiSafiKey> getAfiKeys(String output, NetworkInstanceKey vrfKey, Predicate<String>
+            filterActiveFamilies) {
         output = output.replaceAll("\\n|\\r", "");
         output = output.replaceAll("address-family", "\naddress-family");
 

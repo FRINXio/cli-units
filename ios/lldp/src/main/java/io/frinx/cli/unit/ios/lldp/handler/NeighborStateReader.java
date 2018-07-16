@@ -43,7 +43,8 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
 
     private static final Pattern PORT_DESC = Pattern.compile("Port Description: (?<portDescr>.+)");
     private static final Pattern NAME = Pattern.compile("System Name: (?<name>\\S+)");
-    private static final Pattern DESCR = Pattern.compile("System Description:\\s*\\r?\\n(?<descr>.+?)\\r?\\n\\r?\\n", Pattern.DOTALL);
+    private static final Pattern DESCR = Pattern.compile("System Description:\\s*\\r?\\n(?<descr>.+?)\\r?\\n\\r?\\n",
+            Pattern.DOTALL);
     private static final Pattern IP = Pattern.compile("(IP|IPv4 address): (?<ip>\\S+)");
     private static final Pattern IPV6 = Pattern.compile("(IPV6|IPv6 address): (?<ip>\\S+)");
     private static final Pattern SEPARATOR = Pattern.compile("----------");
@@ -90,7 +91,7 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
         Matcher descrMatcher = DESCR.matcher(output);
         if (descrMatcher.find()) {
             String descr = descrMatcher.group(1);
-            builder.setSystemDescription(descr.length() >= 255 ? descr.substring(0, 254): descr);
+            builder.setSystemDescription(descr.length() >= 255 ? descr.substring(0, 254) : descr);
         }
 
         Optional<String> mgmtIp4 = parseField(output, 0, IP::matcher, m -> m.group("ip"));

@@ -38,31 +38,31 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
 
-    private static final String GLOBAL_BGP_AFI_SAFI = "configure terminal\n" +
-            "router bgp %s\n" +
-            "address-family %s\n" +
-            "end";
+    private static final String GLOBAL_BGP_AFI_SAFI = "configure terminal\n"
+            + "router bgp %s\n"
+            + "address-family %s\n"
+            + "end";
 
-    private static final String GLOBAL_BGP_AFI_SAFI_DELETE = "configure terminal\n" +
-            "router bgp %s\n" +
-            "no address-family %s\n" +
-            "end";
+    private static final String GLOBAL_BGP_AFI_SAFI_DELETE = "configure terminal\n"
+            + "router bgp %s\n"
+            + "no address-family %s\n"
+            + "end";
 
-    private static final String VRF_BGP_AFI_SAFI = "configure terminal\n" +
-            "router bgp %s\n" +
-            "address-family %s vrf %s\n" +
-            "end";
+    private static final String VRF_BGP_AFI_SAFI = "configure terminal\n"
+            + "router bgp %s\n"
+            + "address-family %s vrf %s\n"
+            + "end";
 
-    private static final String VRF_BGP_AFI_SAFI_DELETE = "configure terminal\n" +
-            "router bgp %s\n" +
-            "no address-family %s vrf %s\n" +
-            "end";
+    private static final String VRF_BGP_AFI_SAFI_DELETE = "configure terminal\n"
+            + "router bgp %s\n"
+            + "no address-family %s vrf %s\n"
+            + "end";
 
-    static final String VRF_BGP_AFI_SAFI_ROUTER_ID = "configure terminal\n" +
-            "router bgp %s\n" +
-            "address-family %s vrf %s\n" +
-            "bgp router-id %s\n" +
-            "end";
+    static final String VRF_BGP_AFI_SAFI_ROUTER_ID = "configure terminal\n"
+            + "router bgp %s\n"
+            + "address-family %s vrf %s\n"
+            + "bgp router-id %s\n"
+            + "end";
 
     private Cli cli;
 
@@ -78,17 +78,19 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         String vrfName = vrfKey.getName();
         Long as = writeContext.readAfter(RWUtils.cutId(id, Global.class)).get().getConfig().getAs().getValue();
 
-        if(vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
+        if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             blockingWriteAndRead(f(GLOBAL_BGP_AFI_SAFI,
                     as, toDeviceAddressFamily(config.getAfiSafiName())),
                     cli, id, config);
         } else {
-            Preconditions.checkArgument(writeContext.readAfter(RWUtils.cutId(id, NetworkInstance.class)).get().getConfig().getRouteDistinguisher() != null,
+            Preconditions.checkArgument(writeContext.readAfter(RWUtils.cutId(id, NetworkInstance.class)).get()
+                            .getConfig().getRouteDistinguisher() != null,
                     "Route distinguisher missing for VRF: %s. Cannot configure BGP afi/safi", vrfName);
 
-            DottedQuad routerId = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get().getGlobal().getConfig().getRouterId();
+            DottedQuad routerId = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get().getGlobal().getConfig()
+                    .getRouterId();
 
-            if(routerId == null) {
+            if (routerId == null) {
                 blockingWriteAndRead(f(VRF_BGP_AFI_SAFI,
                         as, toDeviceAddressFamily(config.getAfiSafiName()), vrfName),
                         cli, id, config);
@@ -135,7 +137,7 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         String vrfName = vrfKey.getName();
         Long as = writeContext.readBefore(RWUtils.cutId(id, Global.class)).get().getConfig().getAs().getValue();
 
-        if(vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
+        if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             blockingWriteAndRead(f(GLOBAL_BGP_AFI_SAFI_DELETE,
                     as, toDeviceAddressFamily(config.getAfiSafiName())),
                     cli, id, config);

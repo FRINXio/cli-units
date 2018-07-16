@@ -45,7 +45,8 @@ public class GlobalStateReader implements OspfReader.OspfOperReader<State, State
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
         // FIXME Set config attributes from operational state e.g. use sh ip vrf here instead of sh run vrf
-        Optional<Config> cfg = ctx.read(RWUtils.cutId(instanceIdentifier, IIDs.NE_NE_PR_PR_OS_GLOBAL).child(Config.class));
+        Optional<Config> cfg = ctx.read(RWUtils.cutId(instanceIdentifier, IIDs.NE_NE_PR_PR_OS_GLOBAL)
+                .child(Config.class));
         if (cfg.isPresent()) {
             stateBuilder.fieldsFrom(cfg.get());
         }

@@ -56,9 +56,11 @@ public class PeerGroupAfiSafiPolicyConfigReader implements BgpReader.BgpConfigRe
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String peerGroupId = PeerGroupWriter.getPeerGroupId(instanceIdentifier);
-        String afiSafi = GlobalAfiSafiConfigWriter.toDeviceAddressFamily(instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName());
+        String afiSafi = GlobalAfiSafiConfigWriter.toDeviceAddressFamily(instanceIdentifier.firstKeyOf(AfiSafi.class)
+                .getAfiSafiName());
 
-        String output = blockingRead(String.format(NeighborConfigReader.SH_SUMM, peerGroupId), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(NeighborConfigReader.SH_SUMM, peerGroupId), cli,
+                instanceIdentifier, readContext);
         String[] outputLines = NeighborReader.splitOutput(output);
         Stream<String> outputStream = Arrays.stream(outputLines)
                 .filter(line -> line.contains("address-family " + afiSafi));

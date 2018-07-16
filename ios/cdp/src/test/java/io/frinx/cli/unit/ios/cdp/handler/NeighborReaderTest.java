@@ -26,18 +26,19 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev16051
 
 public class NeighborReaderTest {
 
-    private static final String IOS_OUTPUT = "Device ID: TELNET\n" +
-            "Interface: FastEthernet0/0,  Port ID (outgoing port): FastEthernet0/0\n" +
-            "Device ID: XE2.FRINX\n" +
-            "Interface: FastEthernet0/0,  Port ID (outgoing port): GigabitEthernet1\n" +
-            "Device ID: PE1.demo.frinx.io\n" +
-            "Interface: FastEthernet0/0,  Port ID (outgoing port): MgmtEth0/0/CPU0/0\n" +
-            "Device ID: R2.FRINX.LOCAL\n" +
-            "Interface: FastEthernet0/0,  Port ID (outgoing port): FastEthernet0/0\n" +
-            "Device ID: PE2.demo.frinx.io\n" +
-            "Interface: FastEthernet0/0,  Port ID (outgoing port): MgmtEth0/0/CPU0/0\n";
+    private static final String IOS_OUTPUT = "Device ID: TELNET\n"
+            + "Interface: FastEthernet0/0,  Port ID (outgoing port): FastEthernet0/0\n"
+            + "Device ID: XE2.FRINX\n"
+            + "Interface: FastEthernet0/0,  Port ID (outgoing port): GigabitEthernet1\n"
+            + "Device ID: PE1.demo.frinx.io\n"
+            + "Interface: FastEthernet0/0,  Port ID (outgoing port): MgmtEth0/0/CPU0/0\n"
+            + "Device ID: R2.FRINX.LOCAL\n"
+            + "Interface: FastEthernet0/0,  Port ID (outgoing port): FastEthernet0/0\n"
+            + "Device ID: PE2.demo.frinx.io\n"
+            + "Interface: FastEthernet0/0,  Port ID (outgoing port): MgmtEth0/0/CPU0/0\n";
 
-    private static final List<NeighborKey> IOS_EXPECTED = Lists.newArrayList("TELNET", "XE2.FRINX", "PE1.demo.frinx.io", "R2.FRINX.LOCAL", "PE2.demo.frinx.io")
+    private static final List<NeighborKey> IOS_EXPECTED = Lists.newArrayList("TELNET", "XE2.FRINX", "PE1.demo.frinx"
+            + ".io", "R2.FRINX.LOCAL", "PE2.demo.frinx.io")
             .stream()
             .map(NeighborKey::new)
             .collect(Collectors.toList());

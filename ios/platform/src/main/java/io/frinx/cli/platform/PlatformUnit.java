@@ -63,23 +63,23 @@ public class PlatformUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         //noop
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.COMPONENTS, ComponentsBuilder.class);
-        rRegistry.add(new GenericOperListReader<>(IIDs.CO_COMPONENT, new ComponentReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.CO_CO_CONFIG, new ComponentConfigReader()));
-        rRegistry.add(new GenericOperReader<>(IIDs.CO_CO_STATE, new ComponentStateReader(cli)));
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.addStructuralReader(IIDs.COMPONENTS, ComponentsBuilder.class);
+        readRegistry.add(new GenericOperListReader<>(IIDs.CO_COMPONENT, new ComponentReader(cli)));
+        readRegistry.add(new GenericOperReader<>(IIDs.CO_CO_CONFIG, new ComponentConfigReader()));
+        readRegistry.add(new GenericOperReader<>(IIDs.CO_CO_STATE, new ComponentStateReader(cli)));
     }
 
     @Override

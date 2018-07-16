@@ -47,35 +47,39 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         this.cli = cli;
     }
 
-    public static final short DEFAULT_PREFIX_LENGHT = (short)64;
+    public static final short DEFAULT_PREFIX_LENGHT = (short) 64;
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String name = id.firstKeyOf(Interface.class).getName();
-        Long subId = id.firstKeyOf(Subinterface.class).getIndex();
+        String name = id.firstKeyOf(Interface.class)
+                .getName();
+        Long subId = id.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name), cli, id, readContext), id);
+            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name), cli, id,
+                    readContext), id);
         }
     }
 
     @VisibleForTesting
     static void parseAddressConfig(ConfigBuilder configBuilder, String output, InstanceIdentifier<Config> id) {
-        Ipv6AddressNoZone address = id.firstKeyOf(Address.class).getIp();
+        Ipv6AddressNoZone address = id.firstKeyOf(Address.class)
+                .getIp();
         configBuilder.setIp(address);
         configBuilder.setPrefixLength(DEFAULT_PREFIX_LENGHT);
 
         output = NEWLINE.splitAsStream(output)
-                .filter(line -> line.contains(address.getValue()))
+            .filter(line -> line.contains(address.getValue()))
                 .findAny()
                 .orElse("");
 
         parseField(output,
                 IPV6_UNICAST_ADDRESS::matcher,
-                m -> Short.parseShort(m.group("prefix")),
+            m -> Short.parseShort(m.group("prefix")),
                 configBuilder::setPrefixLength);
     }
 

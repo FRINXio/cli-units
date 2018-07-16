@@ -38,10 +38,10 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n" +
-            "interface %s\n" +
-            "ip address %s %s\n" +
-            "end";
+    private static final String WRITE_TEMPLATE = "configure terminal\n"
+            + "interface %s\n"
+            + "ip address %s %s\n"
+            + "end";
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
@@ -70,7 +70,10 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     private static String getIfcName(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
         Long subIfcIndex = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
-        checkArgument(subIfcIndex == ZERO_SUBINTERFACE_ID, "Only subinterface " + ZERO_SUBINTERFACE_ID + "  can have IP");
+        checkArgument(subIfcIndex
+                == ZERO_SUBINTERFACE_ID, "Only subinterface "
+                + ZERO_SUBINTERFACE_ID
+                + "  can have IP");
         return ifcName;
     }
 
@@ -87,10 +90,10 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         }
     }
 
-    private static final String DELETE_TEMPLATE = "configure terminal\n" +
-            "interface %s\n" +
-            "no ip address %s %s\n" +
-            "end";
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
+            + "interface %s\n"
+            + "no ip address %s %s\n"
+            + "end";
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,

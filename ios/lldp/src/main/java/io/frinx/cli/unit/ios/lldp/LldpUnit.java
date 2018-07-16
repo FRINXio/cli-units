@@ -72,23 +72,23 @@ public class LldpUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry, @Nonnull Context context) {
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry, @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
+        provideReaders(readRegistry, cli);
     }
 
-    private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
+    private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
         // TODO CDP and LLDP are almost identical, reuse code, DRY
-        rRegistry.addStructuralReader(IIDs.LLDP, LldpBuilder.class);
-        rRegistry.add(new GenericOperReader<>(IIDs.LL_CONFIG, new LldpConfigReader(cli, getShowHostnameCommand())));
-        rRegistry.addStructuralReader(IIDs.LL_INTERFACES, InterfacesBuilder.class);
+        readRegistry.addStructuralReader(IIDs.LLDP, LldpBuilder.class);
+        readRegistry.add(new GenericOperReader<>(IIDs.LL_CONFIG, new LldpConfigReader(cli, getShowHostnameCommand())));
+        readRegistry.addStructuralReader(IIDs.LL_INTERFACES, InterfacesBuilder.class);
         // TODO see IosCdpUnit why interface and config readers are registered as operational
-        rRegistry.add(new GenericOperListReader<>(IIDs.LL_IN_INTERFACE, new InterfaceReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.LL_IN_IN_CONFIG, new InterfaceConfigReader()));
-        rRegistry.addStructuralReader(IIDs.LL_IN_IN_NEIGHBORS, NeighborsBuilder.class);
-        rRegistry.add(new GenericOperListReader<>(IIDs.LL_IN_IN_NE_NEIGHBOR, new NeighborReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.LL_IN_IN_NE_NE_STATE, new NeighborStateReader(cli)));
+        readRegistry.add(new GenericOperListReader<>(IIDs.LL_IN_INTERFACE, new InterfaceReader(cli)));
+        readRegistry.add(new GenericOperReader<>(IIDs.LL_IN_IN_CONFIG, new InterfaceConfigReader()));
+        readRegistry.addStructuralReader(IIDs.LL_IN_IN_NEIGHBORS, NeighborsBuilder.class);
+        readRegistry.add(new GenericOperListReader<>(IIDs.LL_IN_IN_NE_NEIGHBOR, new NeighborReader(cli)));
+        readRegistry.add(new GenericOperReader<>(IIDs.LL_IN_IN_NE_NE_STATE, new NeighborStateReader(cli)));
     }
 
     protected String getShowHostnameCommand() {

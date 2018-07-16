@@ -35,15 +35,17 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n" +
-            "router ospf {$ospf}" + "{.if ($vrf) } vrf {$vrf}{/if}" +
-            "\n" +
-            "end";
+    private static final String WRITE_TEMPLATE = "configure terminal\n"
+            + "router ospf {$ospf}"
+            + "{.if ($vrf) } vrf {$vrf}{/if}"
+            + "\n"
+            + "end";
 
-    private static final String DELETE_TEMPLATE = "configure terminal\n" +
-            "no router ospf {$ospf}" + "{.if ($vrf) } vrf {$vrf}{/if}" +
-            "\n" +
-            "end";
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
+            + "no router ospf {$ospf}"
+            + "{.if ($vrf) } vrf {$vrf}{/if}"
+            + "\n"
+            + "end";
 
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,

@@ -74,7 +74,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 "end");
     }
 
-    public static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES = Collections.singleton(EthernetCsmacd.class);
+    public static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES = Collections.singleton(EthernetCsmacd
+            .class);
 
     public static boolean isPhysicalInterface(Config data) {
         return PHYS_IFC_TYPES.contains(data.getType());
@@ -86,7 +87,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         try {
-            checkArgument(dataBefore.getType().equals(dataAfter.getType()),
+            checkArgument(dataBefore.getType()
+                            .equals(dataAfter.getType()),
                     "Changing interface type is not permitted. Before: %s, After: %s",
                     dataBefore.getType(), dataAfter.getType());
         } catch (RuntimeException e) {

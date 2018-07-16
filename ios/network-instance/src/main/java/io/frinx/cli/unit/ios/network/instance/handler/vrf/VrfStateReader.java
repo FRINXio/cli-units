@@ -44,7 +44,8 @@ public class VrfStateReader implements CliOperReader<State, StateBuilder>,
                                       @Nonnull StateBuilder stateBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         // FIXME Set config attributes from operational state e.g. use sh ip vrf here instead of sh run vrf
-        Optional<Config> cfg = readContext.read(RWUtils.cutId(instanceIdentifier, IIDs.NE_NETWORKINSTANCE).child(Config.class));
+        Optional<Config> cfg = readContext.read(RWUtils.cutId(instanceIdentifier, IIDs.NE_NETWORKINSTANCE)
+                .child(Config.class));
         if (cfg.isPresent()) {
             stateBuilder.fieldsFrom(cfg.get());
         }

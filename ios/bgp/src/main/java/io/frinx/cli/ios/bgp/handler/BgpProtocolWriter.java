@@ -16,12 +16,11 @@
 
 package io.frinx.cli.ios.bgp.handler;
 
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.bgp.BgpWriter;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpProtocolWriter implements BgpWriter<Config> {
 

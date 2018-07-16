@@ -40,7 +40,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
+public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey,
+        InterfaceBuilder> {
 
     private static final String SHOW_OSPF_IFC = "show running-config | include ^interface |^ ip ospf";
 
@@ -69,7 +70,8 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
 
         return NEWLINE.splitAsStream(realignedOutput)
                 .map(String::trim)
-                .filter(ifcLine -> ifcLine.contains(String.format("ip ospf %s area %s", ospfId, areaIdToString(areaId))))
+                .filter(ifcLine -> ifcLine.contains(String.format("ip ospf %s area %s", ospfId,
+                        areaIdToString(areaId))))
                 .map(ROUTER_ID::matcher)
                 .filter(Matcher::matches)
                 .map(m -> m.group("ifcId"))
@@ -86,11 +88,14 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                              @Nonnull InterfaceBuilder interfaceBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class).getId());
+        interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class)
+                .getId());
     }
 
     public static String areaIdToString(OspfAreaIdentifier areaId) {
-        return areaId.getUint32() != null ? areaId.getUint32().toString() : areaId.getDottedQuad().getValue();
+        return areaId.getUint32() != null ? areaId.getUint32()
+                .toString() : areaId.getDottedQuad()
+                .getValue();
     }
 
     private static String realignOSPFInterfaces(String output) {

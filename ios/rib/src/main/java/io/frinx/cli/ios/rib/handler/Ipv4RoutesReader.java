@@ -41,7 +41,8 @@ public class Ipv4RoutesReader implements CliOperListReader<Route, RouteKey, Rout
 
     private static final String SH_IP_BGP = "show ip bgp";
     private static final String SH_IP_BGP_PREFIX = "show ip bgp | section %s";
-    private static final Pattern ROUTE_LINE = Pattern.compile("(?<statusCodes>[sdh\\*>irSmbfxac\\s]+) (?<prefix>[\\S]+) (?<nextHop>.+) (?:.*) (?<origin>[ie\\?])");
+    private static final Pattern ROUTE_LINE = Pattern.compile("(?<statusCodes>[sdh\\*>irSmbfxac\\s]+) "
+            + "(?<prefix>[\\S]+) (?<nextHop>.+) (?:.*) (?<origin>[ie\\?])");
     private static final String PATH_ID = "0";
 
     private Cli cli;
@@ -57,39 +58,42 @@ public class Ipv4RoutesReader implements CliOperListReader<Route, RouteKey, Rout
 
         // * valid
         ParsingUtils.parseField(output, 0,
-            ROUTE_LINE::matcher,
+                ROUTE_LINE::matcher,
             matcher -> matcher.group("statusCodes"))
                 .ifPresent(s -> sBuilder.setValidRoute(s.contains(Character.toString('*'))));
 
         builder.setOrigin(key.getOrigin())
-            .setPathId(PATH_ID)
-            .setPrefix(key.getPrefix())
-            .setState(sBuilder.build()).build();
+                .setPathId(PATH_ID)
+                .setPrefix(key.getPrefix())
+                .setState(sBuilder.build())
+                .build();
     }
 
     @VisibleForTesting
     public List<RouteKey> getRouteKeys(String output) {
         List<Ipv4Prefix> prefixes = ParsingUtils.parseFields(output, 0,
-            ROUTE_LINE::matcher,
+                ROUTE_LINE::matcher,
             matcher -> matcher.group("prefix"),
-            Ipv4Prefix::new);
+                Ipv4Prefix::new);
 
         List<String> origins = ParsingUtils.parseNonDistinctFields(output, 0,
-            ROUTE_LINE::matcher,
+                ROUTE_LINE::matcher,
             matcher -> matcher.group("origin"),
-            String::trim);
+                String::trim);
 
         List<RouteKey> routeKeys = new ArrayList<>();
-        for(int i = 0; i < prefixes.size(); i++) {
-            RouteKey r = new RouteKey(origins.get(i), PATH_ID, prefixes.get(i).getValue());
-            routeKeys.add(r);
+        for (int i = 0; i < prefixes.size(); i++) {
+            RouteKey routeKey = new RouteKey(origins.get(i), PATH_ID, prefixes.get(i)
+                    .getValue());
+            routeKeys.add(routeKey);
         }
         return routeKeys;
     }
 
     @Nonnull
     @Override
-    public List<RouteKey> getAllIds(@Nonnull InstanceIdentifier<Route> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<RouteKey> getAllIds(@Nonnull InstanceIdentifier<Route> instanceIdentifier, @Nonnull ReadContext
+            readContext) throws ReadFailedException {
         return getRouteKeys(blockingRead(SH_IP_BGP, cli, instanceIdentifier, readContext));
     }
 
@@ -99,8 +103,10 @@ public class Ipv4RoutesReader implements CliOperListReader<Route, RouteKey, Rout
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Route> instanceIdentifier, @Nonnull RouteBuilder routeBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Route> instanceIdentifier, @Nonnull RouteBuilder
+            routeBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         RouteKey key = instanceIdentifier.firstKeyOf(Route.class);
-        parseRoute(blockingRead(String.format(SH_IP_BGP_PREFIX, key.getPrefix()), cli, instanceIdentifier, readContext), routeBuilder, key);
+        parseRoute(blockingRead(String.format(SH_IP_BGP_PREFIX, key.getPrefix()), cli, instanceIdentifier,
+                readContext), routeBuilder, key);
     }
 }

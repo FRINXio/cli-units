@@ -61,7 +61,8 @@ public class NeighborTransportConfigReader implements BgpReader.BgpConfigReader<
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String ipAddress = NeighborWriter.getNeighborIp(instanceIdentifier);
 
-        parseConfigAttributes(blockingRead(String.format(NeighborConfigReader.SH_SUMM, ipAddress), cli, instanceIdentifier, readContext),
+        parseConfigAttributes(blockingRead(String.format(NeighborConfigReader.SH_SUMM, ipAddress), cli,
+                instanceIdentifier, readContext),
                 configBuilder, vrfName);
     }
 
@@ -80,7 +81,7 @@ public class NeighborTransportConfigReader implements BgpReader.BgpConfigReader<
     private static void parseDefault(ConfigBuilder configBuilder, String[] output) {
         Optional<String> defaultNetworkNeighbors = Arrays.stream(output)
                 .filter(value -> !value.contains("vrf"))
-                .reduce((s, s2) -> s + s2);
+                .reduce((s1, s2) -> s1 + s2);
 
         setAttributes(configBuilder, defaultNetworkNeighbors.orElse(""));
     }
@@ -94,8 +95,8 @@ public class NeighborTransportConfigReader implements BgpReader.BgpConfigReader<
         String processed = defaultInstance.replaceAll(" neighbor", "\n neighbor");
 
         ParsingUtils.parseField(processed, 0, NEIGHBOR_UPDATE_SOURCE_PATTERN::matcher,
-                m -> m.group("updateSource"),
-                updateSource -> configBuilder.setLocalAddress(parseLocalAddress(updateSource)));
+            m -> m.group("updateSource"),
+            updateSource -> configBuilder.setLocalAddress(parseLocalAddress(updateSource)));
     }
 
     private static void setPassive(ConfigBuilder configBuilder, String defaultInstance) {
@@ -104,8 +105,8 @@ public class NeighborTransportConfigReader implements BgpReader.BgpConfigReader<
 
         String processed = defaultInstance.replaceAll(" neighbor", "\n neighbor");
         ParsingUtils.parseField(processed, 0, NEIGHBOR_PASSIVE::matcher,
-                m -> true,
-                configBuilder::setPassiveMode);
+            m -> true,
+            configBuilder::setPassiveMode);
     }
 
     private static BgpCommonNeighborGroupTransportConfig.LocalAddress parseLocalAddress(String updateSource) {

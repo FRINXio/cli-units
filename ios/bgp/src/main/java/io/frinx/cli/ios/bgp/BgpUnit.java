@@ -109,12 +109,12 @@ public class BgpUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
     @Override
@@ -122,113 +122,153 @@ public class BgpUnit implements TranslateUnit {
         return Collections.singleton(Pattern.compile("% Configure the peer-group .+ first", Pattern.DOTALL));
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigWriter(cli)),
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigWriter(cli)),
                 IIDs.NE_NE_CONFIG);
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI, new NoopCliWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, new GlobalAfiSafiConfigWriter(cli)),
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI, new NoopCliWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG,
+                        new GlobalAfiSafiConfigWriter(cli)),
                 IIDs.NE_NE_PR_PR_BG_GL_CONFIG);
 
         // Peer group writer, handle also subtrees
-        wRegistry.subtreeAddAfter(
+        writeRegistry.subtreeAddAfter(
                 Sets.newHashSet(
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_CONFIG, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_TRANSPORT, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_TR_CONFIG, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_ROUTEREFLECTOR, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_RO_CONFIG, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_APPLYPOLICY, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AP_CONFIG, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AFISAFIS, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AFISAFI, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_CONFIG, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_APPLYPOLICY, InstanceIdentifier.create(PeerGroup.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_AP_CONFIG, InstanceIdentifier.create(PeerGroup.class))),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_CONFIG, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_TRANSPORT, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_TR_CONFIG, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_ROUTEREFLECTOR, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_RO_CONFIG, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_APPLYPOLICY, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AP_CONFIG, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AFISAFIS, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AFISAFI, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_CONFIG, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_APPLYPOLICY, InstanceIdentifier
+                                .create(PeerGroup.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_AP_CONFIG, InstanceIdentifier
+                                .create(PeerGroup.class))),
                 new GenericListWriter<>(IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP, new PeerGroupWriter(cli)),
                 Sets.newHashSet(IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG));
 
         // Neighbor writer, handle also subtrees
-        wRegistry.subtreeAddAfter(
+        writeRegistry.subtreeAddAfter(
                 Sets.newHashSet(
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_TRANSPORT, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_TR_CONFIG, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_ROUTEREFLECTOR, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_RO_CONFIG, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_APPLYPOLICY, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AP_CONFIG, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY, InstanceIdentifier.create(Neighbor.class)),
-                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, InstanceIdentifier.create(Neighbor.class))),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, InstanceIdentifier.create(Neighbor
+                                .class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_TRANSPORT, InstanceIdentifier
+                                .create(Neighbor.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_TR_CONFIG, InstanceIdentifier
+                                .create(Neighbor.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_ROUTEREFLECTOR, InstanceIdentifier
+                                .create(Neighbor.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_RO_CONFIG, InstanceIdentifier
+                                .create(Neighbor.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_APPLYPOLICY, InstanceIdentifier
+                                .create(Neighbor.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AP_CONFIG, InstanceIdentifier
+                                .create(Neighbor.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS, InstanceIdentifier
+                                .create(Neighbor.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, InstanceIdentifier
+                                .create(Neighbor.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG, InstanceIdentifier
+                                .create(Neighbor.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY, InstanceIdentifier
+                                .create(Neighbor.class)),
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, InstanceIdentifier
+                                .create(Neighbor.class))),
                 new GenericListWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborWriter(cli)),
                 Sets.newHashSet(IIDs.NE_NE_PR_PR_BG_PE_PE_CONFIG));
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BGP, BgpBuilder.class);
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BGP, BgpBuilder.class);
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_GLOBAL, GlobalBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_BG_GL_STATE, new GlobalStateReader(cli)));
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_GL_AFISAFIS, org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.AfiSafisBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI, new GlobalAfiSafiReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, new GlobalAfiSafiConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_GLOBAL, GlobalBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigReader(cli)));
+        readRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_BG_GL_STATE, new GlobalStateReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_GL_AFISAFIS, org.opendaylight.yang.gen.v1.http.frinx
+                .openconfig.net.yang.bgp.rev170202.bgp.global.base.AfiSafisBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI,
+                new GlobalAfiSafiReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, new GlobalAfiSafiConfigReader(
+                cli)));
 
-        provideNeighborReaders(rRegistry, cli);
-        providePeerGroupReaders(rRegistry, cli);
+        provideNeighborReaders(readRegistry, cli);
+        providePeerGroupReaders(readRegistry, cli);
     }
 
-    private void provideNeighborReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NEIGHBORS, NeighborsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborReader(cli)));
+    private void provideNeighborReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NEIGHBORS, NeighborsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborReader(cli)));
 
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_STATE, new NeighborStateReader(cli)));
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS, AfiSafisBuilder.class);
-        rRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(AfiSafi.class).child(Config.class)),
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader(cli)));
+        readRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_STATE, new NeighborStateReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS, AfiSafisBuilder.class);
+        readRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(AfiSafi.class).child(Config.class)),
                 new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, new NeighborAfiSafiReader(cli)));
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY, ApplyPolicyBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, new NeighborAfiSafiPolicyConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY, ApplyPolicyBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, new
+                NeighborAfiSafiPolicyConfigReader(cli)));
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_TRANSPORT, TransportBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_TR_CONFIG, new NeighborTransportConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_TRANSPORT, TransportBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_TR_CONFIG, new
+                NeighborTransportConfigReader(cli)));
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_APPLYPOLICY, ApplyPolicyBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AP_CONFIG, new NeighborPolicyConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_APPLYPOLICY, ApplyPolicyBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AP_CONFIG,
+                new NeighborPolicyConfigReader(cli)));
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_STATE, StateBuilder.class);
-        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_ST_PREFIXES, new PrefixesReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_STATE, StateBuilder.class);
+        readRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_ST_PREFIXES, new PrefixesReader(cli)));
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_ROUTEREFLECTOR, RouteReflectorBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_RO_CONFIG, new NeighborRouteReflectorConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_ROUTEREFLECTOR, RouteReflectorBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_RO_CONFIG, new
+                NeighborRouteReflectorConfigReader(cli)));
     }
 
-    private void providePeerGroupReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PEERGROUPS, PeerGroupsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP, new PeerGroupReader(cli)));
+    private void providePeerGroupReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PEERGROUPS, PeerGroupsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP, new PeerGroupReader(cli)));
 
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_CONFIG, new PeerGroupConfigReader(cli)));
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PE_PE_AFISAFIS, org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.AfiSafisBuilder.class);
-        rRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.afi.safi.list.AfiSafi.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.afi.safi.list.afi.safi.Config.class)),
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_CONFIG, new PeerGroupConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PE_PE_AFISAFIS, org.opendaylight.yang.gen.v1.http.frinx
+                .openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.AfiSafisBuilder.class);
+        readRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx
+                        .openconfig.net.yang.bgp.rev170202.bgp.peer.group.afi.safi.list.AfiSafi.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer
+                                .group.afi.safi.list.afi.safi.Config.class)),
                 new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AFISAFI, new PeerGroupAfiSafiReader(cli)));
 
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_APPLYPOLICY, ApplyPolicyBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_AP_CONFIG, new PeerGroupAfiSafiPolicyConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_APPLYPOLICY, ApplyPolicyBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_AP_CONFIG, new
+                PeerGroupAfiSafiPolicyConfigReader(cli)));
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PE_PE_TRANSPORT, org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.TransportBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_TR_CONFIG, new PeerGroupTransportConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PE_PE_TRANSPORT, org.opendaylight.yang.gen.v1.http.frinx
+                .openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.TransportBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_TR_CONFIG, new
+                PeerGroupTransportConfigReader(cli)));
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PE_PE_APPLYPOLICY, ApplyPolicyBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_AP_CONFIG, new PeerGroupPolicyConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PE_PE_APPLYPOLICY, ApplyPolicyBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_AP_CONFIG,
+                new PeerGroupPolicyConfigReader(cli)));
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PE_PE_ROUTEREFLECTOR, RouteReflectorBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_RO_CONFIG, new PeerGroupRouteReflectorConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PE_PE_ROUTEREFLECTOR, RouteReflectorBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_PE_PE_RO_CONFIG, new
+                PeerGroupRouteReflectorConfigReader(cli)));
     }
 
     @Override

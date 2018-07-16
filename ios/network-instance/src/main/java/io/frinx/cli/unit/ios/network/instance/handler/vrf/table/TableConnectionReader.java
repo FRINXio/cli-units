@@ -39,9 +39,10 @@ public class TableConnectionReader
 
     public TableConnectionReader(Cli cli) {
         super(new ArrayList<ListReaderCustomizer<TableConnection, TableConnectionKey, TableConnectionBuilder>>() {{
-            add(new BgpTableConnectionReader(cli));
-            add(new OspfTableConnectionReader(cli));
-        }});
+                add(new BgpTableConnectionReader(cli));
+                add(new OspfTableConnectionReader(cli));
+            }
+        });
     }
 
     @Override

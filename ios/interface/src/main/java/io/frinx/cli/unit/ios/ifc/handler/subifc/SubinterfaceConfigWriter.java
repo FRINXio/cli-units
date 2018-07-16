@@ -43,9 +43,12 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                                        @Nonnull Config data,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
-        Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId).get().getConfig().getType();
+        Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId)
+                .get()
+                .getConfig()
+                .getType();
 
-        if(PHYS_IFC_TYPES.contains(parentIfcType)) {
+        if (PHYS_IFC_TYPES.contains(parentIfcType)) {
             blockingWriteAndRead(cli, id, data,
                     "configure terminal",
                     f("interface %s", getSubinterfaceName(id)),
@@ -54,7 +57,8 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                     "end");
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));
+                    new IllegalArgumentException("Unable to create subinterface for interface of type: "
+                            + parentIfcType));
         }
     }
 
@@ -72,16 +76,20 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config data,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
-        Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId).get().getConfig().getType();
+        Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId)
+                .get()
+                .getConfig()
+                .getType();
 
-        if(PHYS_IFC_TYPES.contains(parentIfcType)) {
+        if (PHYS_IFC_TYPES.contains(parentIfcType)) {
             blockingDeleteAndRead(cli, id,
                     "configure terminal",
                     f("no interface %s", getSubinterfaceName(id)),
                     "end");
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));
+                    new IllegalArgumentException("Unable to create subinterface for interface of type: "
+                            + parentIfcType));
         }
     }
 }

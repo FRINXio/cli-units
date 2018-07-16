@@ -46,17 +46,17 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class BgpTableConnectionWriter implements
         L3VrfWriter<Config> {
 
-    private static final String UPDATE_REDIS = "configure terminal\n" +
-            "router bgp {$bgp}\n" +
-            "address-family {$family}" +
-            "{.if ($vrf) } vrf {$vrf}{/if}" +
-            "\n" +
-            "{.if ($add) }{.else}no {/if}" +
-            "redistribute {$protocol} {$protocol_id}" +
-            "{.if ($vrf) } vrf {$vrf}{/if}" +
-            "{.if ($add) }{.if ($policy) } route-map {$policy}{/if}{/if}" +
-            "\n" +
-            "end";
+    private static final String UPDATE_REDIS = "configure terminal\n"
+            + "router bgp {$bgp}\n"
+            + "address-family {$family}"
+            + "{.if ($vrf) } vrf {$vrf}{/if}"
+            + "\n"
+            + "{.if ($add) }{.else}no {/if}"
+            + "redistribute {$protocol} {$protocol_id}"
+            + "{.if ($vrf) } vrf {$vrf}{/if}"
+            + "{.if ($add) }{.if ($policy) } route-map {$policy}{/if}{/if}"
+            + "\n"
+            + "end";
 
     private Cli cli;
 
@@ -69,7 +69,8 @@ public class BgpTableConnectionWriter implements
                                               Config config,
                                               WriteContext writeContext) throws WriteFailedException {
         if (config.getDstProtocol().equals(BGP.class)) {
-            List<Protocol> allProtocols = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, IIDs.NE_NETWORKINSTANCE).child(Protocols.class))
+            List<Protocol> allProtocols = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, IIDs
+                    .NE_NETWORKINSTANCE).child(Protocols.class))
                     .or(new ProtocolsBuilder().setProtocol(Collections.emptyList()).build())
                     .getProtocol();
 
@@ -98,9 +99,10 @@ public class BgpTableConnectionWriter implements
         Preconditions.checkArgument(!srcProtocols.isEmpty(),
                 "No protocols: %s configured in current network", config.getSrcProtocol());
 
-        List<String> importPolicy = config.getImportPolicy() == null ? Collections.emptyList() : config.getImportPolicy();
+        List<String> importPolicy = config.getImportPolicy() == null ? Collections.emptyList() : config
+                .getImportPolicy();
 
-        Preconditions.checkArgument(importPolicy.isEmpty() || importPolicy.size() ==1,
+        Preconditions.checkArgument(importPolicy.isEmpty() || importPolicy.size() == 1,
                 "Only a single import policy is supported: %s", importPolicy);
 
         for (Protocol srcProto : srcProtocols) {
@@ -150,7 +152,8 @@ public class BgpTableConnectionWriter implements
                                                Config config,
                                                WriteContext writeContext) throws WriteFailedException {
         if (config.getDstProtocol().equals(BGP.class)) {
-            List<Protocol> allProtocols = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, IIDs.NE_NETWORKINSTANCE).child(Protocols.class))
+            List<Protocol> allProtocols = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, IIDs
+                    .NE_NETWORKINSTANCE).child(Protocols.class))
                     .or(new ProtocolsBuilder().setProtocol(Collections.emptyList()).build())
                     .getProtocol();
 

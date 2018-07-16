@@ -31,7 +31,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.StateBuilder;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NetworkInstanceStateReader extends CompositeReader<State, StateBuilder>
     implements CliOperReader<State, StateBuilder> {
@@ -40,11 +39,12 @@ public class NetworkInstanceStateReader extends CompositeReader<State, StateBuil
 
     public NetworkInstanceStateReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<State, StateBuilder>>() {{
-            add(new VrfStateReader(cli));
-            add(new DefaultStateReader());
-            add(new L2P2PStateReader(cli));
-            add(new L2VSIStateReader(cli));
-        }});
+                add(new VrfStateReader(cli));
+                add(new DefaultStateReader());
+                add(new L2P2PStateReader(cli));
+                add(new L2VSIStateReader(cli));
+            }
+        });
     }
 
     @Override

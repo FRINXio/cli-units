@@ -62,8 +62,8 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
         if (vrfId.equals(DEFAULT_NETWORK_NAME)) {
             return ParsingUtils.parseFields(output, 0,
                     OSPF_NO_VRF::matcher,
-                    matcher -> matcher.group("id"),
-                    s -> new ProtocolKey(TYPE, s));
+                matcher -> matcher.group("id"),
+                s -> new ProtocolKey(TYPE, s));
         } else {
             return NEWLINE.splitAsStream(output)
                     .map(String::trim)

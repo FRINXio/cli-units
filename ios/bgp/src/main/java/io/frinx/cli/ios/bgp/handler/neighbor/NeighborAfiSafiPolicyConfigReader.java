@@ -54,9 +54,11 @@ public class NeighborAfiSafiPolicyConfigReader implements BgpReader.BgpConfigRea
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String ipAddress = NeighborWriter.getNeighborIp(instanceIdentifier);
-        String afiSafi = GlobalAfiSafiConfigWriter.toDeviceAddressFamily(instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName());
+        String afiSafi = GlobalAfiSafiConfigWriter.toDeviceAddressFamily(instanceIdentifier.firstKeyOf(AfiSafi.class)
+                .getAfiSafiName());
 
-        String output = blockingRead(String.format(NeighborConfigReader.SH_SUMM, ipAddress), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(NeighborConfigReader.SH_SUMM, ipAddress), cli, instanceIdentifier,
+                readContext);
         String[] outputLines = NeighborReader.splitOutput(output);
         Stream<String> outputStream = Arrays.stream(outputLines)
                 .filter(line -> line.contains("address-family " + afiSafi));

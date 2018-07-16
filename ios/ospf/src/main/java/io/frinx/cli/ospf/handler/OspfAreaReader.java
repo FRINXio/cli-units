@@ -60,8 +60,8 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
     public static List<AreaKey> parseAreasIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 AREA_ID::matcher,
-                m -> m.group("area"),
-                area -> new AreaKey(getAreaIdentifier(area)));
+            m -> m.group("area"),
+            area -> new AreaKey(getAreaIdentifier(area)));
     }
 
     @VisibleForTesting

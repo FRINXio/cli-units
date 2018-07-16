@@ -45,8 +45,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
     public static final String SH_SUMM = "show running-config | include ^router bgp|^ address-family|^ *neighbor";
-    private static final Pattern NEIGHBOR_LINE = Pattern.compile("neighbor (?<id>[0-9A-F.:]*) (remote-as|peer-group) \\S+");
-    private static final Function<String, NeighborKey> TO_NEIGH_KEY = (String value) -> new NeighborKey(new IpAddress(value.toCharArray()));
+    private static final Pattern NEIGHBOR_LINE = Pattern.compile("neighbor (?<id>[0-9A-F.:]*) (remote-as|peer-group) "
+            + "\\S+");
+    private static final Function<String, NeighborKey> TO_NEIGH_KEY = (String value) -> new NeighborKey(new IpAddress(
+            value.toCharArray()));
 
     private Cli cli;
 
@@ -82,7 +84,8 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
 
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
-                                             @Nonnull NeighborBuilder neighborBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+                                             @Nonnull NeighborBuilder neighborBuilder, @Nonnull ReadContext
+                                                         readContext) throws ReadFailedException {
         neighborBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
     }
 
@@ -94,12 +97,13 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
                 TO_NEIGH_KEY, NEIGHBOR_LINE);
     }
 
-    public static <T> List<T> parseKeys(Optional<String> optionalVrfOutput, Function<String, T> transform, Pattern neighborLine) {
+    public static <T> List<T> parseKeys(Optional<String> optionalVrfOutput, Function<String, T> transform, Pattern
+            neighborLine) {
         if (optionalVrfOutput.isPresent()) {
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll(" neighbor", "\n neighbor"), 0,
-                    neighborLine::matcher,
-                    matcher -> matcher.group("id"),
-                    transform);
+                neighborLine::matcher,
+                matcher -> matcher.group("id"),
+                transform);
         }
         return new ArrayList<>();
     }
