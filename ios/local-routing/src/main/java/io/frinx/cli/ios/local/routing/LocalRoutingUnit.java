@@ -85,7 +85,7 @@ public class LocalRoutingUnit implements TranslateUnit {
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_STATICROUTES, StaticRoutesBuilder.class);
         rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_ST_STATIC, new StaticReader(cli)));
-        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_ST_ST_STATE, new StaticStateReader()));
+        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_ST_ST_STATE, new StaticStateReader(cli)));
         rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_ST_ST_CONFIG, new StaticConfigReader()));
         rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_ST_ST_NEXTHOPS, NextHopsBuilder.class);
         rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_ST_ST_NE_NEXTHOP, new NextHopReader(cli)));
