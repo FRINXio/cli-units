@@ -69,12 +69,14 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
         String name = id.firstKeyOf(Interface.class).getName();
         Class<? extends InterfaceType> ifcType = parseType(name);
         String ifcNumber = getIfcNumber(name);
-        parseInterface(blockingRead(String.format(SH_SINGLE_INTERFACE_CFG, getTypeOnDevice(ifcType), ifcNumber), cli, id, ctx), builder, name, ifcType);
+        parseInterface(blockingRead(String.format(SH_SINGLE_INTERFACE_CFG, getTypeOnDevice(ifcType), ifcNumber), cli,
+                id, ctx), builder, name, ifcType);
     }
 
     public static String getIfcNumber(String name) {
         Matcher matcher = IFC_NAME.matcher(name);
-        checkArgument(matcher.matches(), "Interface name %s in unexpected format. Expected format: GigabitEthernet1/0", name);
+        checkArgument(matcher.matches(), "Interface name %s in unexpected format. Expected format: "
+                + "GigabitEthernet1/0", name);
         return matcher.group("number");
     }
 
@@ -87,7 +89,8 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
     public static final Pattern DESCR_LINE = Pattern.compile("\\s*port-name (?<desc>.+)");
 
     @VisibleForTesting
-    public static void parseInterface(final String output, final ConfigBuilder builder, String name, Class<? extends InterfaceType> ifcType) {
+    public static void parseInterface(final String output, final ConfigBuilder builder, String name, Class<? extends
+            InterfaceType> ifcType) {
         // Set disabled unless proven otherwise
         builder.setEnabled(false);
         builder.setName(name);
@@ -95,19 +98,19 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
 
         // Actually check if disabled
         parseField(output, 0,
-                SHUTDOWN_LINE::matcher,
-                matcher -> true,
-                builder::setEnabled);
+            SHUTDOWN_LINE::matcher,
+            matcher -> true,
+            builder::setEnabled);
 
         parseField(output,
-                MTU_LINE::matcher,
-                matcher -> Integer.valueOf(matcher.group("mtu")),
-                builder::setMtu);
+            MTU_LINE::matcher,
+            matcher -> Integer.valueOf(matcher.group("mtu")),
+            builder::setMtu);
 
         parseField(output,
-                DESCR_LINE::matcher,
-                matcher -> matcher.group("desc"),
-                builder::setDescription);
+            DESCR_LINE::matcher,
+            matcher -> matcher.group("desc"),
+            builder::setDescription);
     }
 
     public static final Set<String> ETHERNET_NAME_PREFIX = Sets.newHashSet(
@@ -128,6 +131,7 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
     }
 
     public static final Map<Class<? extends InterfaceType>, String> IFC_TYPE_MAP = new HashMap<>();
+
     static {
         IFC_TYPE_MAP.put(EthernetCsmacd.class, "ethernet");
         IFC_TYPE_MAP.put(SoftwareLoopback.class, "loopback");

@@ -62,7 +62,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<ConnectionPoints, ConnectionPointsBuilder> {
+public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<ConnectionPoints,
+        ConnectionPointsBuilder> {
 
     public static final String POINT_1 = "1";
     public static final String ENDPOINT_1_LINE = "End-point " + POINT_1;
@@ -110,45 +111,45 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
     public static final String SH_VLL = "sh mpls vll %s";
     public static final Pattern VLL_PEER_LINE = Pattern.compile("Vll-Peer\\s+:\\s+(?<remoteIp>\\S+).*");
     public static final Pattern VLL_LOCAL_IFC_LINE = Pattern.compile("End-point[^:]+:\\s+untagged\\s+(?<ifc>.+)");
-    public static final Pattern VLL_LOCAL_SUBIFC_LINE = Pattern.compile("End-point[^:]+:\\s+tagged\\s+vlan (?<vlan>[0-9]+)\\s+(?<ifc>.+)");
+    public static final Pattern VLL_LOCAL_SUBIFC_LINE = Pattern.compile("End-point[^:]+:\\s+tagged\\s+vlan "
+            + "(?<vlan>[0-9]+)\\s+(?<ifc>.+)");
     public static final Pattern VLL_VCCID_LINE = Pattern.compile(".*VC-ID (?<vccid>\\S+),.*");
 
     public static final String SH_VLL_LOCAL = "sh mpls vll-local %s";
 
-    private List<ConnectionPoint> getVllPoints(InstanceIdentifier<ConnectionPoints> id, ReadContext ctx, String netName, boolean isOper)
-            throws ReadFailedException {
+    private List<ConnectionPoint> getVllPoints(InstanceIdentifier<ConnectionPoints> id, ReadContext ctx, String
+            netName, boolean isOper) throws ReadFailedException {
         String output = blockingRead(String.format(SH_VLL, netName), this.cli, id, ctx);
         return parseVllPoints(output, isOper, id, ctx);
     }
 
-    private List<ConnectionPoint> getVllLocalPoints(InstanceIdentifier<ConnectionPoints> id, ReadContext ctx, String netName, boolean isOper)
-            throws ReadFailedException {
+    private List<ConnectionPoint> getVllLocalPoints(InstanceIdentifier<ConnectionPoints> id, ReadContext ctx, String
+            netName, boolean isOper) throws ReadFailedException {
         String output = blockingRead(String.format(SH_VLL_LOCAL, netName), this.cli, id, ctx);
         return parseVllLocalPoints(output, isOper, id, ctx);
     }
 
-    private List<ConnectionPoint> parseVllPoints(String output, boolean isOper, InstanceIdentifier<ConnectionPoints> id, ReadContext ctx) throws ReadFailedException {
-        Optional<String> remoteIp = parseField(output, 0,
-                VLL_PEER_LINE::matcher,
-                m -> m.group("remoteIp"));
+    private List<ConnectionPoint> parseVllPoints(String output, boolean isOper, InstanceIdentifier<ConnectionPoints>
+            id, ReadContext ctx) throws ReadFailedException {
+        Optional<String> remoteIp = parseField(output, 0, VLL_PEER_LINE::matcher, m -> m.group("remoteIp"));
         if (!remoteIp.isPresent()) {
             return Collections.emptyList();
         }
 
         Optional<String> vccId = parseField(output, 0,
-                VLL_VCCID_LINE::matcher,
-                m -> m.group("vccid"));
+            VLL_VCCID_LINE::matcher,
+            m -> m.group("vccid"));
         if (!vccId.isPresent()) {
             return Collections.emptyList();
         }
 
         Optional<String> localIfc = parseField(output, 0,
-                VLL_LOCAL_IFC_LINE::matcher,
-                m -> m.group("ifc"));
+            VLL_LOCAL_IFC_LINE::matcher,
+            m -> m.group("ifc"));
 
         Optional<String> localSubifc = parseField(output, 0,
-                VLL_LOCAL_SUBIFC_LINE::matcher,
-                m -> String.format("%s.%s", m.group("ifc"), m.group("vlan")));
+            VLL_LOCAL_SUBIFC_LINE::matcher,
+            m -> String.format("%s.%s", m.group("ifc"), m.group("vlan")));
         if (!localIfc.isPresent() && !localSubifc.isPresent()) {
             return Collections.emptyList();
         }
@@ -162,20 +163,22 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
                 isOper);
     }
 
-    private List<ConnectionPoint> parseVllLocalPoints(String output, boolean isOper, InstanceIdentifier<ConnectionPoints> id, ReadContext ctx) throws ReadFailedException {
-        Optional<String> ifc1 = extractVllLocalIfc(output, ENDPOINT_1_LINE, VLL_LOCAL_IFC_LINE,
-                m -> m.group("ifc"));
-        Optional<String> subifc1 = extractVllLocalIfc(output, ENDPOINT_1_LINE, VLL_LOCAL_SUBIFC_LINE,
-                m -> String.format("%s.%s", m.group("ifc"), m.group("vlan")));
-        if (!ifc1.isPresent() && !subifc1.isPresent()) {
+    private List<ConnectionPoint> parseVllLocalPoints(String output, boolean isOper,
+                                                      InstanceIdentifier<ConnectionPoints> id, ReadContext ctx)
+            throws ReadFailedException {
+        Optional<String> ifc1 = extractVllLocalIfc(output, ENDPOINT_1_LINE, VLL_LOCAL_IFC_LINE, m -> m.group("ifc"));
+        Optional<String> subifc1 = extractVllLocalIfc(output, ENDPOINT_1_LINE, VLL_LOCAL_SUBIFC_LINE, m -> String
+            .format("%s.%s", m.group("ifc"), m.group("vlan")));
+        if (!ifc1.isPresent()
+                && !subifc1.isPresent()) {
             return Collections.emptyList();
         }
 
-        Optional<String> ifc2 = extractVllLocalIfc(output, ENDPOINT_2_LINE, VLL_LOCAL_IFC_LINE,
-                m -> m.group("ifc"));
-        Optional<String> subifc2 = extractVllLocalIfc(output, ENDPOINT_2_LINE, VLL_LOCAL_SUBIFC_LINE,
-                m -> String.format("%s.%s", m.group("ifc"), m.group("vlan")));
-        if (!ifc2.isPresent() && !subifc2.isPresent()) {
+        Optional<String> ifc2 = extractVllLocalIfc(output, ENDPOINT_2_LINE, VLL_LOCAL_IFC_LINE, m -> m.group("ifc"));
+        Optional<String> subifc2 = extractVllLocalIfc(output, ENDPOINT_2_LINE, VLL_LOCAL_SUBIFC_LINE, m -> String
+            .format("%s.%s", m.group("ifc"), m.group("vlan")));
+        if (!ifc2.isPresent()
+                && !subifc2.isPresent()) {
             return Collections.emptyList();
         }
 
@@ -187,11 +190,10 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
         return extractVllLocalPoints(ifcId1, ifcId2, isOper);
     }
 
-    private InterfaceId expandIfcName(InterfaceId ifc, InstanceIdentifier<ConnectionPoints> id, ReadContext ctx) throws ReadFailedException {
+    private InterfaceId expandIfcName(InterfaceId ifc, InstanceIdentifier<ConnectionPoints> id, ReadContext ctx)
+            throws ReadFailedException {
         String output = blockingRead(String.format(SH_SINGLE_INTERFACE, ifc.toParentIfcString(), ""), cli, id, ctx);
-        Optional<String> fullIfcName = ParsingUtils.parseField(output, 0,
-                STATUS_LINE::matcher,
-                m -> m.group("id"));
+        Optional<String> fullIfcName = ParsingUtils.parseField(output, 0, STATUS_LINE::matcher, m -> m.group("id"));
 
         checkArgument(fullIfcName.isPresent(), "Unknown interface %s", ifc);
         return new InterfaceId(fullIfcName.get(), ifc.subifc);
@@ -254,51 +256,44 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
 
     private ConnectionPointBuilder getConnectionPointBuilder(boolean isOper, Endpoint localEndpoint, String pointId) {
         ConnectionPointBuilder point1Builder = new ConnectionPointBuilder();
-        point1Builder.setConnectionPointId(pointId)
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.ConfigBuilder()
-                        .setConnectionPointId(pointId)
-                        .build())
-                .setEndpoints(new EndpointsBuilder()
-                        .setEndpoint(Collections.singletonList(localEndpoint))
-                        .build());
+        point1Builder.setConnectionPointId(pointId).setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig
+                .net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance
+                .connection.points.connection.point.ConfigBuilder().setConnectionPointId(pointId).build())
+                .setEndpoints(new EndpointsBuilder().setEndpoint(Collections.singletonList(localEndpoint)).build());
         if (isOper) {
-            point1Builder.setState(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.StateBuilder()
-                    .setConnectionPointId(pointId)
-                    .build());
+            point1Builder.setState(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance
+                    .rev170228.network.instance.top.network.instances.network.instance.connection.points.connection
+                    .point.StateBuilder().setConnectionPointId(pointId).build());
         }
         return point1Builder;
     }
 
     private static EndpointBuilder getEndpoint(boolean isOper, Class<? extends ENDPOINTTYPE> type) {
         EndpointBuilder localEndpointBuilder = new EndpointBuilder();
-        localEndpointBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.endpoints.endpoint.ConfigBuilder()
-                .setEndpointId(ENDPOINT_ID)
-                .setPrecedence(0)
-                .setType(type)
-                .build());
+        localEndpointBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network
+                .instance.rev170228.network.instance.top.network.instances.network.instance.connection.points
+                .connection.point.endpoints.endpoint.ConfigBuilder().setEndpointId(ENDPOINT_ID).setPrecedence(0)
+                .setType(type).build());
         if (isOper) {
-            localEndpointBuilder.setState(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.endpoints.endpoint.StateBuilder()
-                    .setEndpointId(ENDPOINT_ID)
-                    .setActive(true)
-                    .setPrecedence(0)
-                    .setType(type)
-                    .build());
+            localEndpointBuilder.setState(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network
+                    .instance.rev170228.network.instance.top.network.instances.network.instance.connection.points
+                    .connection.point.endpoints.endpoint.StateBuilder().setEndpointId(ENDPOINT_ID).setActive(true)
+                    .setPrecedence(0).setType(type).build());
         }
-        return localEndpointBuilder
-                .setEndpointId(ENDPOINT_ID);
+        return localEndpointBuilder.setEndpointId(ENDPOINT_ID);
     }
 
     private static Remote getXconnectRemote(boolean isOper, IpAddress remoteIp, Long vccid) {
         RemoteBuilder remoteBuilder = new RemoteBuilder();
-        remoteBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.endpoints.endpoint.remote.ConfigBuilder()
-                .setRemoteSystem(remoteIp)
-                .setVirtualCircuitIdentifier(vccid)
+        remoteBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance
+                .rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point
+                .endpoints.endpoint.remote.ConfigBuilder().setRemoteSystem(remoteIp).setVirtualCircuitIdentifier(vccid)
                 .build());
         if (isOper) {
-            remoteBuilder.setState(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.endpoints.endpoint.remote.StateBuilder()
-                    .setRemoteSystem(remoteIp)
-                    .setVirtualCircuitIdentifier(vccid)
-                    .build());
+            remoteBuilder.setState(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance
+                    .rev170228.network.instance.top.network.instances.network.instance.connection.points.connection
+                    .point.endpoints.endpoint.remote.StateBuilder().setRemoteSystem(remoteIp)
+                    .setVirtualCircuitIdentifier(vccid).build());
         }
         return remoteBuilder.build();
     }

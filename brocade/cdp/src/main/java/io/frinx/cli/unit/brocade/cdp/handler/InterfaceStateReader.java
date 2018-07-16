@@ -47,7 +47,7 @@ public class InterfaceStateReader implements CliOperReader<State, StateBuilder> 
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State State) {
-        ((InterfaceBuilder) builder).setState(State);
+    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State state) {
+        ((InterfaceBuilder) builder).setState(state);
     }
 }

@@ -50,28 +50,31 @@ public class VersionReader implements CliOperReader<Version, VersionBuilder> {
 
     private static final Pattern DESCRIPTION_LINE = Pattern.compile("Compiled on .* labeled as (?<image>\\S+)");
     private static final Pattern VERSION_LINE = Pattern.compile("IronWare\\s+: Version (?<version>\\S+) Copyright.*");
-    private static final Pattern PLATFORM_LINE = Pattern.compile("(Chassis|System): (?<platform>[^(]+) \\(Serial #:\\s+(?<serial>[^,]+),\\s+Part #:\\s+(?<part>[^)]+)\\)");
+    private static final Pattern PLATFORM_LINE = Pattern.compile("(Chassis|System): (?<platform>[^(]+) \\(Serial "
+            + "#:\\s+(?<serial>[^,]+),\\s+Part #:\\s+(?<part>[^)]+)\\)");
 
     @VisibleForTesting
     static void parseShowVersion(String output, VersionBuilder builder) {
         parseField(output, 0,
                 DESCRIPTION_LINE::matcher,
-                matcher -> matcher.group("image"),
-                builder::setSysImage);
+            matcher -> {
+                return matcher.group("image");
+            },
+            builder::setSysImage);
 
         builder.setOsFamily("IronWare");
         parseField(output, 0,
-                VERSION_LINE::matcher,
-                matcher -> matcher.group("version"),
-                builder::setOsVersion);
+            VERSION_LINE::matcher,
+            matcher -> matcher.group("version"),
+            builder::setOsVersion);
         parseField(output, 0,
-                PLATFORM_LINE::matcher,
-                matcher -> matcher.group("platform"),
-                builder::setPlatform);
+            PLATFORM_LINE::matcher,
+            matcher -> matcher.group("platform"),
+            builder::setPlatform);
         parseField(output, 0,
-                PLATFORM_LINE::matcher,
-                matcher -> matcher.group("serial"),
-                builder::setSerialId);
+            PLATFORM_LINE::matcher,
+            matcher -> matcher.group("serial"),
+            builder::setSerialId);
     }
 
     @Nonnull

@@ -54,7 +54,8 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
 
     public static final String SH_INTERFACE_IP = "sh ipv6 inter %s %s";
     static final Pattern IPV6_LOCAL_ADDRESS = Pattern.compile(".*?link-local address is (?<ipv6local>[^\\s]+).*");
-    static final Pattern IPV6_UNICAST_ADDRESS = Pattern.compile(".*?(?<ipv6unicast>[a-fA-F0-9:]+), subnet is [^/]+.*/(?<prefix>[^\\s]+).*");
+    static final Pattern IPV6_UNICAST_ADDRESS = Pattern.compile(".*?(?<ipv6unicast>[a-fA-F0-9:]+), subnet is [^/]+.*/"
+            + "(?<prefix>[^\\s]+).*");
 
     @Nonnull
     @Override
@@ -64,10 +65,12 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (subId
+                == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             Class<? extends InterfaceType> ifcType = parseType(id);
             String ifcNumber = getIfcNumber(id);
-            final String input = blockingRead(String.format(SH_INTERFACE_IP, getTypeOnDevice(ifcType), ifcNumber), cli, instanceIdentifier, readContext);
+            final String input = blockingRead(String.format(SH_INTERFACE_IP, getTypeOnDevice(ifcType), ifcNumber),
+                    cli, instanceIdentifier, readContext);
             return parseAddressIds(input);
         } else {
             return Collections.emptyList();
@@ -78,13 +81,13 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
     public static List<AddressKey> parseAddressIds(String output) {
         List<AddressKey> addressKeys = new ArrayList<>();
         addressKeys.addAll(parseFields(output, 0,
-                IPV6_LOCAL_ADDRESS::matcher,
-                m -> m.group("ipv6local"),
-                addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
+            IPV6_LOCAL_ADDRESS::matcher,
+            m -> m.group("ipv6local"),
+            addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
         addressKeys.addAll(parseFields(output, 0,
-                IPV6_UNICAST_ADDRESS::matcher,
-                m -> m.group("ipv6unicast"),
-                addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
+            IPV6_UNICAST_ADDRESS::matcher,
+            m -> m.group("ipv6unicast"),
+            addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
         return addressKeys;
     }
 
@@ -107,7 +110,8 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (subId
+                == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class).getIp());
         }
     }

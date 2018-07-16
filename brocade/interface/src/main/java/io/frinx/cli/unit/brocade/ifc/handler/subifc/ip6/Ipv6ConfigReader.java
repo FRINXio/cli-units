@@ -69,7 +69,8 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             Class<? extends InterfaceType> ifcType = parseType(name);
             String ifcNumber = getIfcNumber(name);
-            parseAddressConfig(configBuilder, blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP, getTypeOnDevice(ifcType), ifcNumber), cli, id, readContext), id);
+            parseAddressConfig(configBuilder, blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP,
+                    getTypeOnDevice(ifcType), ifcNumber), cli, id, readContext), id);
         }
     }
 
@@ -78,12 +79,12 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         Ipv6AddressNoZone address = id.firstKeyOf(Address.class).getIp();
         configBuilder.setIp(address);
         configBuilder.setPrefixLength(DEFAULT_PREFIX_LENGHT);
-        output = String.valueOf(
-                Arrays.stream(output.split(NEWLINE.pattern())).filter(line -> line.contains(address.getValue())).findAny());
+        output = String.valueOf(Arrays.stream(output.split(NEWLINE.pattern())).filter(line -> line.contains(address
+                .getValue())).findAny());
         parseField(output,
-                Ipv6AddressReader.IPV6_UNICAST_ADDRESS::matcher,
-                m -> Short.parseShort(m.group("prefix")),
-                configBuilder::setPrefixLength);
+            Ipv6AddressReader.IPV6_UNICAST_ADDRESS::matcher,
+            m -> Short.parseShort(m.group("prefix")),
+            configBuilder::setPrefixLength);
     }
 
     @Override

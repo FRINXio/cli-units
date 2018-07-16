@@ -54,7 +54,8 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
         return parseCdpInterfaces(output);
     }
 
-    private static final Pattern CDP_INTER_LINE = Pattern.compile("interface (?<ifcType>\\S+)\\s+(?<ifcNumber>\\S+)\\s*(?<isCdp>no cdp enable)?.*");
+    private static final Pattern CDP_INTER_LINE = Pattern.compile("interface (?<ifcType>\\S+)\\s+(?<ifcNumber>\\S+)"
+            + "\\s*(?<isCdp>no cdp enable)?.*");
 
     @VisibleForTesting
     static List<InterfaceKey> parseCdpInterfaces(String output) {

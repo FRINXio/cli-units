@@ -75,17 +75,17 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
     @VisibleForTesting
     static List<NetworkInstanceKey> parseVllIds(String output) {
         return parseFields(output, 0,
-                VLL_ID_LINE::matcher,
-                matcher -> matcher.group("network"),
-                NetworkInstanceKey::new);
+            VLL_ID_LINE::matcher,
+            matcher -> matcher.group("network"),
+            NetworkInstanceKey::new);
     }
 
     @VisibleForTesting
     static List<NetworkInstanceKey> parseLocalConnectIds(String output) {
         return parseFields(output, 0,
-                VLL_LOCAL_ID_LINE::matcher,
-                matcher -> matcher.group("network"),
-                NetworkInstanceKey::new);
+            VLL_LOCAL_ID_LINE::matcher,
+            matcher -> matcher.group("network"),
+            NetworkInstanceKey::new);
     }
 
     @Override

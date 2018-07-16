@@ -47,7 +47,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class TpIdInterfaceReader implements CliConfigReader<Config1, Config1Builder> {
 
     private static final String SH_IFC_TAG_TYPE = "sh run | include tag-type";
-    private static final Pattern TAG_TYPE = Pattern.compile(".*tag-type (?<tpid>\\S+) (?<ifcType>\\S+) (?<ifcNumber>\\S+).*");
+    private static final Pattern TAG_TYPE = Pattern.compile(".*tag-type (?<tpid>\\S+) (?<ifcType>\\S+) "
+            + "(?<ifcNumber>\\S+).*");
 
     private Cli cli;
 
@@ -78,7 +79,8 @@ public class TpIdInterfaceReader implements CliConfigReader<Config1, Config1Buil
                 .map(String::trim)
                 .map(TAG_TYPE::matcher)
                 .filter(Matcher::matches)
-                .filter(m -> ifcType.startsWith(m.group("ifcType")) && ifcNumber.equals(m.group("ifcNumber")))
+                .filter(m -> ifcType.startsWith(m.group("ifcType"))
+                        && ifcNumber.equals(m.group("ifcNumber")))
                 .findFirst()
                 .map(m -> m.group("tpid"))
                 .ifPresent(s -> builder.setTpid(parseTpId(s)));
@@ -88,13 +90,13 @@ public class TpIdInterfaceReader implements CliConfigReader<Config1, Config1Buil
             TPID0X8100.class, TPID0X8A88.class, TPID0X9100.class, TPID0X9200.class
     );
 
-    private Class<? extends TPIDTYPES> parseTpId(String s) {
+    private Class<? extends TPIDTYPES> parseTpId(String string) {
         return SUPPORTED_IDS.stream()
-                .filter(cls -> cls.getSimpleName().toLowerCase().contains(s.toLowerCase()))
+                .filter(cls -> cls.getSimpleName().toLowerCase().contains(string.toLowerCase()))
                 .findFirst()
                 .orElseGet(() -> {
                     // 88a8 on device == 8A88
-                    if (s.toLowerCase().equals("88a8")) {
+                    if (string.toLowerCase().equals("88a8")) {
                         return TPID0X8A88.class;
                     } else {
                         // Other tags are unsupported
