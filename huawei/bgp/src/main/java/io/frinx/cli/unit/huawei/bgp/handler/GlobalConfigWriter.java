@@ -17,9 +17,8 @@
 package io.frinx.cli.unit.huawei.bgp.handler;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiConfigWriter.VRF_BGP_AFI_SAFI_ROUTER_ID;
 
-import io.fd.honeycomb.translate.util.RWUtils;
+
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.bgp.BgpWriter;
@@ -81,7 +80,8 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
                     "return");
         } else {
             // Compare AS for global and current VRF. Must match for IOS
-            writeContext.readAfter(IIDs.NETWORKINSTANCES.child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK).child(Protocols.class))
+            writeContext.readAfter(IIDs.NETWORKINSTANCES.child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
+                    .child(Protocols.class))
                     .get()
                     .getProtocol().stream()
                     .filter(protocol -> protocol.getConfig().getIdentifier().equals(BGP.class))
@@ -124,7 +124,7 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
     }
 
     /**
-     * Collect all afi safi referenced in this instance
+     * Collect all afi safi referenced in this instance.
      */
     public static Set<AfiSafi> getAfiSafis(@Nullable Bgp bgp) {
         List<AfiSafi> globalAfiSafi = Optional.ofNullable(bgp)
@@ -151,7 +151,8 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
                 .map(BgpNeighborBase::getAfiSafis)
                 .filter(Objects::nonNull)
                 .map(BgpNeighborAfiSafiList::getAfiSafi)
-                .flatMap(a -> (a == null ? Collections.<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi>emptyList() : a).stream())
+                .flatMap(a -> (a == null ? Collections.<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                        .bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi>emptyList() : a).stream())
                 .map(a -> new AfiSafiBuilder().setAfiSafiName(a.getAfiSafiName()).build())
                 .collect(Collectors.toSet());
     }

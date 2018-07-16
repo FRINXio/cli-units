@@ -26,7 +26,6 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -76,13 +75,13 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
 
 
         Optional<String> optionalVrfOutput =
-                Arrays.stream(getSplitedOutput(output)).filter(value -> value.contains(vrfName)).findFirst();
+            Arrays.stream(getSplitedOutput(output)).filter(value -> value.contains(vrfName)).findFirst();
 
-        if(optionalVrfOutput.isPresent()) {
+        if (optionalVrfOutput.isPresent()) {
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll(" peer", "\n peer"), 0,
-                    PEER_LINE::matcher,
-                    matcher -> matcher.group("neighborIp"),
-                    value -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
+                PEER_LINE::matcher,
+                matcher -> matcher.group("neighborIp"),
+                value -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
         }
 
         return Lists.newArrayList();
@@ -97,13 +96,13 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
     @VisibleForTesting
     public static List<NeighborKey> getDefaultNeighborKeys(String output) {
         Optional<String> optionalVrfOutput =
-                Arrays.stream(getSplitedOutput(output)).filter(value -> !value.contains("vpn-instance")).findFirst();
+            Arrays.stream(getSplitedOutput(output)).filter(value -> !value.contains("vpn-instance")).findFirst();
 
-        if(optionalVrfOutput.isPresent()) {
+        if (optionalVrfOutput.isPresent()) {
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll(" peer", "\n peer"), 0,
-                    PEER_LINE::matcher,
-                    matcher -> matcher.group("neighborIp"),
-                    value -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
+                PEER_LINE::matcher,
+                matcher -> matcher.group("neighborIp"),
+                value -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
         }
 
         return Lists.newArrayList();

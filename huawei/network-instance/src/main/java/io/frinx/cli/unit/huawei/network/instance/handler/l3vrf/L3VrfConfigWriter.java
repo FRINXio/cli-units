@@ -40,7 +40,7 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
                                        @Nonnull WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
-        if(config.getType().equals(L3VRF.class)) {
+        if (config.getType().equals(L3VRF.class)) {
             blockingWriteAndRead(cli, instanceIdentifier, config,
                     "system-view",
                     f("ip vpn-instance %s", config.getName()),
@@ -64,11 +64,12 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
         Preconditions.checkArgument(Objects.equals(rdBefore, rdAfter),
                 "Cannot update route distinguisher once l3vrf already created");
 
-        if(dataAfter.getType().equals(L3VRF.class)) {
+        if (dataAfter.getType().equals(L3VRF.class)) {
             blockingWriteAndRead(cli, id, dataAfter,
                     "system-view",
                     f("ip vpn-instance %s", dataAfter.getName()),
-                    dataAfter.getDescription() == null ? "undo description" : f("description %s", dataAfter.getDescription()),
+                    dataAfter.getDescription() == null ? "undo description" : f("description %s", dataAfter
+                            .getDescription()),
                     "commit",
                     "return");
         }
@@ -80,7 +81,7 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.DeleteFailedException {
 
-        if(config.getType().equals(L3VRF.class)) {
+        if (config.getType().equals(L3VRF.class)) {
 
             blockingDeleteAndRead(cli, instanceIdentifier,
                     "system-view",

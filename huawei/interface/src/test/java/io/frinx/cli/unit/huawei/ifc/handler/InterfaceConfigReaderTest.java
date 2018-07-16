@@ -25,35 +25,27 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 
 public class InterfaceConfigReaderTest {
 
-    private static final String DISPLAY_CURRENT_INT = "#\n" +
-            "interface GigabitEthernet0/0/0\n" +
-            " speed auto\n" +
-            " duplex auto\n" +
-            " undo shutdown\n" +
-            " mtu 1200\n" +
-            " ip address 192.168.2.241 255.255.255.0\n" +
-            "#\n" +
-            "return";
+    private static final String DISPLAY_CURRENT_INT = "#\n"
+            + "interface GigabitEthernet0/0/0\n"
+            + " speed auto\n"
+            + " duplex auto\n"
+            + " undo shutdown\n"
+            + " mtu 1200\n"
+            + " ip address 192.168.2.241 255.255.255.0\n"
+            + "#\n"
+            + "return";
 
-    private static final Config EXPECTED_CONFIG = new ConfigBuilder()
-            .setName("GigabitEthernet0/0/0")
-            .setEnabled(true)
-            .setMtu(1200)
-            .setType(EthernetCsmacd.class)
-            .build();
+    private static final Config EXPECTED_CONFIG = new ConfigBuilder().setName("GigabitEthernet0/0/0")
+            .setEnabled(true).setMtu(1200).setType(EthernetCsmacd.class).build();
 
-    private static final String DISPLAY_CURRENT_INT2 = "#\n" +
-            "interface LoopBack100\n" +
-            " description Example loopback interface\n" +
-            "#\n" +
-            "return\n";
+    private static final String DISPLAY_CURRENT_INT2 = "#\n"
+            + "interface LoopBack100\n"
+            + " description Example loopback interface\n"
+            + "#\n"
+            + "return\n";
 
-    private static final Config EXPECTED_CONFIG2 = new ConfigBuilder()
-            .setName("LoopBack100")
-            .setEnabled(false)
-            .setDescription("Example loopback interface")
-            .setType(SoftwareLoopback.class)
-            .build();
+    private static final Config EXPECTED_CONFIG2 = new ConfigBuilder().setName("LoopBack100").setEnabled(false)
+            .setDescription("Example loopback interface").setType(SoftwareLoopback.class).build();
 
     @Test
     public void testParseInterface() {

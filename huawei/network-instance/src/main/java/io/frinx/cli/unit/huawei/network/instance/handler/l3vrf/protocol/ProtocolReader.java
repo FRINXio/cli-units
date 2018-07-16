@@ -45,7 +45,8 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
     }
 
     @Override
-    public List<ProtocolKey> getAllIdsForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<ProtocolKey> getAllIdsForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
         return delegate.getAllIds(instanceIdentifier, readContext);
     }
 
@@ -55,7 +56,8 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull ProtocolBuilder protocolBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull
+            ProtocolBuilder protocolBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         delegate.readCurrentAttributes(instanceIdentifier, protocolBuilder, readContext);
     }
 
@@ -63,9 +65,10 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
             implements CliConfigListReader<Protocol, ProtocolKey, ProtocolBuilder> {
 
         ProtocolReaderComposite(Cli cli) {
-            super(new ArrayList<ListReaderCustomizer<Protocol, ProtocolKey, ProtocolBuilder>>() {{
-                add(new BgpProtocolReader(cli));
-            }});
+                    super(new ArrayList<ListReaderCustomizer<Protocol, ProtocolKey, ProtocolBuilder>>() {{
+                            add(new BgpProtocolReader(cli));
+                        }
+                    });
         }
 
         @Override

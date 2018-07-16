@@ -46,15 +46,16 @@ public class ExtCommunitySetConfigWriter implements CliWriter<Config> {
     // See https://github.com/FRINXio/translation-units-docs/blob/master/Configuration%20datasets/network-instances/l3vpn/network_instance_l3vpn_bgp.md
     // for example.
 
-    private static final String WRITE_TEMPLATE_2 = "system-view\n" +
-            "ip vpn-instance {$vrf}\n" +
-            "ipv4-family\n" +
-            "{% loop in $config.ext_community_member as $community %}\n" +
-            "{.if ($add) }{.else}undo {/if}" + "vpn-target {$community.bgp_ext_community_type.string} {$direction}\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "commit\n" +
-            "return";
+    private static final String WRITE_TEMPLATE_2 = "system-view\n"
+            + "ip vpn-instance {$vrf}\n"
+            + "ipv4-family\n"
+            + "{% loop in $config.ext_community_member as $community %}\n"
+            + "{.if ($add) }{.else}undo {/if}"
+            + "vpn-target {$community.bgp_ext_community_type.string} {$direction}\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "commit\n"
+            + "return";
 
     private Cli cli;
 
@@ -72,7 +73,8 @@ public class ExtCommunitySetConfigWriter implements CliWriter<Config> {
                 extCommunitySetKey.getExtCommunitySetName(), VRF_ID_ROUTE_TARGET.pattern());
 
         List<String> vrfs = getExistingVrfs(writeContext.readAfter(IIDs.NETWORKINSTANCES));
-        checkArgument(vrfs.contains(vrfName.get()), "Vrf: %s does not exist, cannot configure ext communities", vrfName);
+        checkArgument(vrfs.contains(vrfName.get()), "Vrf: %s does not exist, cannot configure ext communities",
+                vrfName);
 
         String routeTargets = serializeRouteTargets(dataAfter, extCommunitySetKey, true, vrfName.get());
         blockingWriteAndRead(cli, id, dataAfter, routeTargets);
@@ -88,7 +90,8 @@ public class ExtCommunitySetConfigWriter implements CliWriter<Config> {
 
     @Override
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
-                                        @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+                                        @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws
+            WriteFailedException {
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
@@ -105,7 +108,8 @@ public class ExtCommunitySetConfigWriter implements CliWriter<Config> {
         }
     }
 
-    private String serializeRouteTargets(@Nonnull Config data, ExtCommunitySetKey extCommunitySetKey, boolean add, String vrfName) {
+    private String serializeRouteTargets(@Nonnull Config data, ExtCommunitySetKey extCommunitySetKey, boolean add,
+                                         String vrfName) {
         Optional<String> direction = getVrfDirection(extCommunitySetKey);
         return getRouteTargets(data, direction.get(), add, vrfName);
     }

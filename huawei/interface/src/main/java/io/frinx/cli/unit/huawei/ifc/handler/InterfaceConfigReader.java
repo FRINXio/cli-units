@@ -30,7 +30,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
@@ -74,19 +73,19 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
 
         // Actually check if disabled
         parseField(output, 0,
-                SHUTDOWN_LINE::matcher,
-                matcher -> true,
-                builder::setEnabled);
+            SHUTDOWN_LINE::matcher,
+            matcher -> true,
+            builder::setEnabled);
 
         parseField(output,
-                MTU_LINE::matcher,
-                matcher -> Integer.valueOf(matcher.group("mtu")),
-                builder::setMtu);
+            MTU_LINE::matcher,
+            matcher -> Integer.valueOf(matcher.group("mtu")),
+            builder::setMtu);
 
         parseField(output,
-                DESCR_LINE::matcher,
-                matcher -> matcher.group("desc"),
-                builder::setDescription);
+            DESCR_LINE::matcher,
+            matcher -> matcher.group("desc"),
+            builder::setDescription);
     }
 
     static Class<? extends InterfaceType> parseType(String name) {

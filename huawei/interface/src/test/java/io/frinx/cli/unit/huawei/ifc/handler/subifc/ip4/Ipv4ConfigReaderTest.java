@@ -24,26 +24,23 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 
 public class Ipv4ConfigReaderTest {
 
-    private static final String DISPLAY_IP_INT_BR_OUTPUT = "*down: administratively down\n" +
-            "!down: FIB overload down\n" +
-            "^down: standby\n" +
-            "(l): loopback\n" +
-            "(s): spoofing\n" +
-            "(d): Dampening Suppressed\n" +
-            "(E): E-Trunk down\n" +
-            "Interface                         IP Address/Mask      Physical   Protocol VPN \n" +
-            "GigabitEthernet1/0/1              10.230.10.1/30       down       down     --  \n" +
-            "\n";
+    private static final String DISPLAY_IP_INT_BR_OUTPUT = "*down: administratively down\n"
+            + "!down: FIB overload down\n"
+            + "^down: standby\n"
+            + "(l): loopback\n"
+            + "(s): spoofing\n"
+            + "(d): Dampening Suppressed\n"
+            + "(E): E-Trunk down\n"
+            + "Interface                         IP Address/Mask      Physical   Protocol VPN \n"
+            + "GigabitEthernet1/0/1              10.230.10.1/30       down       down     --  \n"
+            + "\n";
 
     @Test
     public void testParse() throws Exception {
         ConfigBuilder actual = new ConfigBuilder();
         Ipv4ConfigReader.parseAddressConfig(actual, DISPLAY_IP_INT_BR_OUTPUT);
-        assertEquals(new ConfigBuilder()
-                        .setIp(new Ipv4AddressNoZone("10.230.10.1"))
-                        .setPrefixLength((short) 30)
-                        .build(),
-                actual.build());
+        assertEquals(new ConfigBuilder().setIp(new Ipv4AddressNoZone("10.230.10.1")).setPrefixLength((short) 30)
+                .build(), actual.build());
     }
 
 }

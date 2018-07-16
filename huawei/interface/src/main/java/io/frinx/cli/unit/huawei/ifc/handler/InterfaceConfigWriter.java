@@ -39,6 +39,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     private Cli cli;
 
     private static final Set<Class<? extends InterfaceType>> SUPPORTED_INTERFACE_TYPES = Sets.newHashSet();
+
     static {
         SUPPORTED_INTERFACE_TYPES.add(SoftwareLoopback.class);
     }

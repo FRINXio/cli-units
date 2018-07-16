@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4;
 
-import static io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4.Ipv4AddressReader.INTERFACE_IP_LINE;
 import static io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4.Ipv4AddressReader.DISPLAY_IP_INT_BRIEF;
+import static io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4.Ipv4AddressReader.INTERFACE_IP_LINE;
 import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -53,22 +53,24 @@ public class Ipv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         Long subId = id.firstKeyOf(Subinterface.class).getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            parseAddressConfig(configBuilder, blockingRead(String.format(DISPLAY_IP_INT_BRIEF, name), cli, id, readContext));
+        if (subId
+                == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+            parseAddressConfig(configBuilder, blockingRead(String.format(DISPLAY_IP_INT_BRIEF, name), cli, id,
+                    readContext));
         }
     }
 
     @VisibleForTesting
     static void parseAddressConfig(ConfigBuilder configBuilder, String output) {
         parseField(output,
-                INTERFACE_IP_LINE::matcher,
-                m -> new Ipv4AddressNoZone(m.group("ip")),
-                configBuilder::setIp);
+            INTERFACE_IP_LINE::matcher,
+            m -> new Ipv4AddressNoZone(m.group("ip")),
+            configBuilder::setIp);
 
         parseField(output,
-                INTERFACE_IP_LINE::matcher,
-                m -> Short.parseShort(m.group("prefix")),
-                configBuilder::setPrefixLength);
+            INTERFACE_IP_LINE::matcher,
+            m -> Short.parseShort(m.group("prefix")),
+            configBuilder::setPrefixLength);
     }
 
     @Override

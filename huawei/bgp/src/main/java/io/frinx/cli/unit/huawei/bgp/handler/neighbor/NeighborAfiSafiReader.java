@@ -63,7 +63,8 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
 
         String neighborIp = getNeighborIp(id);
-        return getAfiKeys(blockingRead(String.format(NeighborConfigReader.DISPLAY_PEER_CONFIG, neighborIp), cli, id, readContext), vrfKey);
+        return getAfiKeys(blockingRead(String.format(NeighborConfigReader.DISPLAY_PEER_CONFIG, neighborIp), cli, id,
+                readContext), vrfKey);
     }
 
     static String getNeighborIp(InstanceIdentifier<?> neigh) {
@@ -72,9 +73,8 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
     }
 
     static String getNeighborIp(IpAddress addr) {
-        return addr.getIpv4Address() != null ?
-                addr.getIpv4Address().getValue() :
-                addr.getIpv6Address().getValue();
+        return addr.getIpv4Address() != null
+                ? addr.getIpv4Address().getValue() : addr.getIpv6Address().getValue();
     }
 
     @VisibleForTesting

@@ -44,70 +44,84 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
     private static final String NEIGHBOR_POLICIES =
             // Set import/export policies
-            "{% loop in $neighbor.apply_policy.config.import_policy as $im_p %}\n" +
-                    "peer {$neighbor_ip} route-policy {$im_p} import\n" +
-                    "{% onEmpty %}" +
-                    "{% endloop %}" +
-                    "{% loop in $neighbor.apply_policy.config.export_policy as $ex_p %}\n" +
-                    "peer {$neighbor_ip} route-policy {$ex_p} export\n" +
-                    "{% onEmpty %}" +
-                    "{% endloop %}";
+            "{% loop in $neighbor.apply_policy.config.import_policy as $im_p %}\n"
+                    + "peer {$neighbor_ip} route-policy {$im_p} import\n"
+                    + "{% onEmpty %}"
+                    + "{% endloop %}"
+                    + "{% loop in $neighbor.apply_policy.config.export_policy as $ex_p %}\n"
+                    + "peer {$neighbor_ip} route-policy {$ex_p} export\n"
+                    + "{% onEmpty %}"
+                    + "{% endloop %}";
 
-    static final String NEIGHBOR_GLOBAL = "system-view\n" +
-            "bgp {$as}\n" +
-            "peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n" +
-
-            // //Active the neighbor. Either under address family, or globally if no family present
-            "{.if ($afi_safi) }ipv4-family {$afi_safi}\n{/if}" +
-
-            //Set policies
-            NEIGHBOR_POLICIES +
-
-            "peer {$neighbor_ip} enable\n" +
-
-            "{.if ($afi_safi) }quit\n{/if}" +
-
-            "commit\n" +
-            "return";
-
-    static final String NEIGHBOR_GLOBAL_DELETE = "system-view\n" +
-            "bgp {$as}\n" +
-
-            "{.if ($afi_safi) }ipv4-family {$afi_safi}\n{/if}" +
-            "undo peer {$neighbor_ip} enable\n" +
-            "{.if ($afi_safi) }quit\n{/if}" +
-
-            "undo peer {$neighbor_ip}\n" +
-            "Y\n" +
-
-            "commit\n" +
-            "return";
-
-    static final String NEIGHBOR_VRF = "system-view\n" +
-            "bgp {$as}\n" +
+    static final String NEIGHBOR_GLOBAL = "system-view\n"
+            + "bgp {$as}\n"
+            + "peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n"
+            +
 
             // //Active the neighbor. Either under address family, or globally if no family present
-            "ipv4-family vpn-instance {$vrf}\n" +
-
-            "peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n" +
+            "{.if ($afi_safi) }ipv4-family {$afi_safi}\n{/if}"
+            +
 
             //Set policies
-            NEIGHBOR_POLICIES +
+            NEIGHBOR_POLICIES
+            +
 
-            "peer {$neighbor_ip} enable\n" +
+            "peer {$neighbor_ip} enable\n"
+            +
 
-            "commit\n" +
-            "return";
+            "{.if ($afi_safi) }quit\n{/if}"
+            +
 
-    static final String NEIGHBOR_VRF_DELETE = "system-view\n" +
-            "bgp {$as}\n" +
+            "commit\n"
+            + "return";
 
-            "ipv4-family vpn-instance {$vrf}\n" +
-            "undo peer {$neighbor_ip} enable\n" +
-            "undo peer {$neighbor_ip} \n" +
-            "Y\n" +
-            "commit\n" +
-            "return";
+    static final String NEIGHBOR_GLOBAL_DELETE = "system-view\n"
+            + "bgp {$as}\n"
+            +
+
+            "{.if ($afi_safi) }ipv4-family {$afi_safi}\n{/if}"
+            + "undo peer {$neighbor_ip} enable\n"
+            + "{.if ($afi_safi) }quit\n{/if}"
+            +
+
+            "undo peer {$neighbor_ip}\n"
+            + "Y\n"
+            +
+
+            "commit\n"
+            + "return";
+
+    static final String NEIGHBOR_VRF = "system-view\n"
+            + "bgp {$as}\n"
+            +
+
+            // //Active the neighbor. Either under address family, or globally if no family present
+            "ipv4-family vpn-instance {$vrf}\n"
+            +
+
+            "peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n"
+            +
+
+            //Set policies
+            NEIGHBOR_POLICIES
+            +
+
+            "peer {$neighbor_ip} enable\n"
+            +
+
+            "commit\n"
+            + "return";
+
+    static final String NEIGHBOR_VRF_DELETE = "system-view\n"
+            + "bgp {$as}\n"
+            +
+
+            "ipv4-family vpn-instance {$vrf}\n"
+            + "undo peer {$neighbor_ip} enable\n"
+            + "undo peer {$neighbor_ip} \n"
+            + "Y\n"
+            + "commit\n"
+            + "return";
 
     private Cli cli;
 
@@ -143,7 +157,8 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
             }
         } else {
             String vrfName = vrfKey.getName();
-            checkArgument(!neighAfiSafi.isEmpty(), "No afi safi defined for neighbor: %s in VRF: %s", neighborIp, vrfName);
+            checkArgument(!neighAfiSafi.isEmpty(), "No afi safi defined for neighbor: %s in VRF: %s", neighborIp,
+                    vrfName);
 
             for (Class<? extends AFISAFITYPE> afiClass : neighAfiSafi) {
                 renderNeighbor(NEIGHBOR_VRF, instanceIdentifier, neighbor,
@@ -156,11 +171,13 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
         }
     }
 
-    private void renderNeighbor(String template, InstanceIdentifier<Neighbor> id, Neighbor data, Object... params) throws WriteFailedException.CreateFailedException {
+    private void renderNeighbor(String template, InstanceIdentifier<Neighbor> id, Neighbor data, Object... params)
+            throws WriteFailedException.CreateFailedException {
         blockingWriteAndRead(fT(template, params), cli, id, data);
     }
 
-    private void deleteNeighbor(String template, InstanceIdentifier<Neighbor> id, Object... params) throws WriteFailedException.DeleteFailedException {
+    private void deleteNeighbor(String template, InstanceIdentifier<Neighbor> id, Object... params) throws
+            WriteFailedException.DeleteFailedException {
         blockingDeleteAndRead(fT(template, params), cli, id);
     }
 
@@ -169,7 +186,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     }
 
     /**
-     * Get neighbor specific afiSafi list or if empty, use BGP instance specific afi safi list
+     * Get neighbor specific afiSafi list or if empty, use BGP instance specific afi safi list.
      */
     private List<Class<? extends AFISAFITYPE>> getAfiSafisForNeighbor(Global bgpGlobal, Neighbor neighbor) {
         List<Class<? extends AFISAFITYPE>> neighAfiSafi = Collections.emptyList();
@@ -185,7 +202,8 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
             if (bgpGlobal.getAfiSafis() != null && bgpGlobal.getAfiSafis().getAfiSafi() != null) {
                 neighAfiSafi = bgpGlobal.getAfiSafis().getAfiSafi()
                         .stream()
-                        .map(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafi::getAfiSafiName)
+                        .map(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi
+                                .safi.list.AfiSafi::getAfiSafiName)
                         .collect(Collectors.toList());
             }
         }
@@ -204,7 +222,8 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 
-        final Global bgpGlobal = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class)).get().getGlobal();
+        final Global bgpGlobal = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class)).get()
+                .getGlobal();
         Long bgpAs = getAsValue(bgpGlobal);
 
         List<Class<? extends AFISAFITYPE>> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, neighbor);
@@ -245,7 +264,8 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     }
 
     static String getNeighborIp(IpAddress addr) {
-        return addr.getIpv4Address() != null ?
+        return addr.getIpv4Address() != null
+                ?
                 addr.getIpv4Address().getValue() :
                 addr.getIpv6Address().getValue();
     }

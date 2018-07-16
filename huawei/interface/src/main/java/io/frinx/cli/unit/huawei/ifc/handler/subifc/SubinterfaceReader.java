@@ -30,7 +30,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey, SubinterfaceBuilder> {
+public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey,
+        SubinterfaceBuilder> {
 
     public static final long ZERO_SUBINTERFACE_ID = 0L;
 

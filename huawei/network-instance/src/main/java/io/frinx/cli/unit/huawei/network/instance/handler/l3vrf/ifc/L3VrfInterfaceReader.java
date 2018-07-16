@@ -24,9 +24,9 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
@@ -38,7 +38,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L3VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
+public class L3VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader<Interface, InterfaceKey,
+        InterfaceBuilder> {
 
     private static final String DISPLAY_IFC_VRF_CONFIG =
             "display current-configuration interface | include ^interface|^ ip binding vpn-instance";
@@ -71,24 +72,24 @@ public class L3VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListRead
         }
 
         return NEWLINE.splitAsStream(realignedOutput)
-                .map(String::trim)
-                .filter(line -> line.contains(String.format("ip binding vpn-instance %s", vrfName)))
-                .map(INTERFACE_ID_PATTERN::matcher)
-                .filter(Matcher::matches)
-                .map(matcher -> matcher.group("id"))
-                .map(InterfaceKey::new)
-                .collect(Collectors.toList());
+            .map(String::trim)
+            .filter(line -> line.contains(String.format("ip binding vpn-instance %s", vrfName)))
+            .map(INTERFACE_ID_PATTERN::matcher)
+            .filter(Matcher::matches)
+            .map(matcher -> matcher.group("id"))
+            .map(InterfaceKey::new)
+            .collect(Collectors.toList());
     }
 
     private static List<InterfaceKey> parseDefaultVrfInterfacesIds(String realignedOutput) {
         return NEWLINE.splitAsStream(realignedOutput)
-                .map(String::trim)
-                .filter(line -> !line.contains("ip binding vpn-instance"))
-                .map(INTERFACE_ID_PATTERN::matcher)
-                .filter(Matcher::matches)
-                .map(matcher -> matcher.group("id"))
-                .map(InterfaceKey::new)
-                .collect(Collectors.toList());
+            .map(String::trim)
+            .filter(line -> !line.contains("ip binding vpn-instance"))
+            .map(INTERFACE_ID_PATTERN::matcher)
+            .filter(Matcher::matches)
+            .map(matcher -> matcher.group("id"))
+            .map(InterfaceKey::new)
+            .collect(Collectors.toList());
     }
 
     @Override

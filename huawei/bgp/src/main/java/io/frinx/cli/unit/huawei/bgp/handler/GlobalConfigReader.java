@@ -79,13 +79,13 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
         }
     }
 
-    private static void setGlobalRouterId(ConfigBuilder cBuilder, String output) {
+    private static void setGlobalRouterId(ConfigBuilder configBuilder, String output) {
         output = realignOutput(output);
 
         ParsingUtils.parseField(output, 0,
-                ROUTER_ID_PATTERN_GLOBAL::matcher,
-                matcher -> matcher.group("routerId"),
-                (String value) -> cBuilder.setRouterId(new DottedQuad(value)));
+            ROUTER_ID_PATTERN_GLOBAL::matcher,
+            matcher -> matcher.group("routerId"),
+            (String value) -> configBuilder.setRouterId(new DottedQuad(value)));
     }
 
     private static String realignOutput(String output) {
@@ -94,7 +94,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
         return output;
     }
 
-    private static void setVrfRouterId(ConfigBuilder cBuilder, String output, String vrf) {
+    private static void setVrfRouterId(ConfigBuilder configBuilder, String output, String vrf) {
         output = realignOutput(output);
 
         NEWLINE.splitAsStream(output)
@@ -105,15 +105,15 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
                 .map(m -> m.group("routerId"))
                 .findFirst()
                 .map(DottedQuad::new)
-                .ifPresent(cBuilder::setRouterId);
+                .ifPresent(configBuilder::setRouterId);
     }
 
     @VisibleForTesting
-    public static void parseGlobalAs(String output, ConfigBuilder cBuilder) {
+    public static void parseGlobalAs(String output, ConfigBuilder configBuilder) {
         ParsingUtils.parseField(output, 0,
-                AS_PATTERN::matcher,
-                matcher -> matcher.group("as"),
-                (String value) -> cBuilder.setAs(new AsNumber(Long.valueOf(value))));
+            AS_PATTERN::matcher,
+            matcher -> matcher.group("as"),
+            (String value) -> configBuilder.setAs(new AsNumber(Long.valueOf(value))));
     }
 
 }

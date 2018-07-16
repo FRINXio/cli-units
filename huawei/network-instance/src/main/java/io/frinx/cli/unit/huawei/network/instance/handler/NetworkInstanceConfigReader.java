@@ -38,9 +38,10 @@ public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigB
 
     public NetworkInstanceConfigReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {{
-            add(new DefaultConfigReader());
-            add(new L3VrfConfigReader(cli));
-        }});
+                add(new DefaultConfigReader());
+                add(new L3VrfConfigReader(cli));
+            }
+        });
     }
 
     @Nonnull

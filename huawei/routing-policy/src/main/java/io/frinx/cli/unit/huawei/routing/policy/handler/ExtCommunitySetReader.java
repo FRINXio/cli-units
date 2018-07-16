@@ -47,15 +47,19 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySet, ExtCommunitySetKey, ExtCommunitySetBuilder> {
+public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySet, ExtCommunitySetKey,
+        ExtCommunitySetBuilder> {
 
     static final String ROUTE_TARGET_EXPORT_SET = "-route-target-export-set";
     static final String ROUTE_TARGET_IMPORT_SET = "-route-target-import-set";
     static final String RT = "rt";
     private static final String DISPLAY_VRF_CONFIG = "display current-configuration configuration vpn-instance %s";
-    private static final Pattern VRF_ID_ROUTE_TARGET_EXPORT = Pattern.compile("vpn-target (?<rt>[\\S].*) export-extcommunity");
-    private static final Pattern VRF_ID_ROUTE_TARGET_IMPORT = Pattern.compile("vpn-target (?<rt>[\\S].*) import-extcommunity");
-    static final Pattern VRF_ID_ROUTE_TARGET = Pattern.compile("(?<vrf>\\S*)-route-target-(?<direction>import|export)-set");
+    private static final Pattern VRF_ID_ROUTE_TARGET_EXPORT = Pattern.compile("vpn-target (?<rt>[\\S].*) "
+            + "export-extcommunity");
+    private static final Pattern VRF_ID_ROUTE_TARGET_IMPORT = Pattern.compile("vpn-target (?<rt>[\\S].*) "
+            + "import-extcommunity");
+    static final Pattern VRF_ID_ROUTE_TARGET = Pattern.compile("(?<vrf>\\S*)-route-target-(?<direction>import|export)"
+            + "-set");
 
     private Cli cli;
 
@@ -66,14 +70,14 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
     @VisibleForTesting
     static List<ExtCommunitySetKey> parseExtCommunityIds(String output, String vrfName) {
         List<ExtCommunitySetKey> exportKeys = ParsingUtils.parseFields(output, 0,
-                VRF_ID_ROUTE_TARGET_EXPORT::matcher,
-                Matcher::matches,
-                value -> new ExtCommunitySetKey(vrfName + ROUTE_TARGET_EXPORT_SET));
+            VRF_ID_ROUTE_TARGET_EXPORT::matcher,
+            Matcher::matches,
+            value -> new ExtCommunitySetKey(vrfName + ROUTE_TARGET_EXPORT_SET));
 
         List<ExtCommunitySetKey> importKeys = ParsingUtils.parseFields(output, 0,
-                VRF_ID_ROUTE_TARGET_IMPORT::matcher,
-                Matcher::matches,
-                value -> new ExtCommunitySetKey(vrfName + ROUTE_TARGET_IMPORT_SET));
+            VRF_ID_ROUTE_TARGET_IMPORT::matcher,
+            Matcher::matches,
+            value -> new ExtCommunitySetKey(vrfName + ROUTE_TARGET_IMPORT_SET));
 
         List<ExtCommunitySetKey> extCommunitySetKeys = new ArrayList<>();
         extCommunitySetKeys.addAll(exportKeys);
@@ -100,9 +104,9 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
     private static void setIds(String output, ConfigBuilder configBuilder, Pattern vrfIdRouteTargetImport) {
         List<ExtCommunitySetConfig.ExtCommunityMember> extCommunityMembers;
         extCommunityMembers = ParsingUtils.parseFields(output, 0,
-                vrfIdRouteTargetImport::matcher,
-                matcher -> matcher.group(RT),
-                value -> new ExtCommunitySetConfig.ExtCommunityMember(new BgpExtCommunityType(value)));
+            vrfIdRouteTargetImport::matcher,
+            matcher -> matcher.group(RT),
+            value -> new ExtCommunitySetConfig.ExtCommunityMember(new BgpExtCommunityType(value)));
         configBuilder.setExtCommunityMember(extCommunityMembers);
     }
 
@@ -158,11 +162,13 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<ExtCommunitySet> id,
-                                      @Nonnull ExtCommunitySetBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
+                                      @Nonnull ExtCommunitySetBuilder builder, @Nonnull ReadContext ctx) throws
+            ReadFailedException {
         Optional<String> vrfName = getVrfName(id.firstKeyOf(ExtCommunitySet.class));
         if (vrfName.isPresent()) {
             builder.setKey(id.firstKeyOf(ExtCommunitySet.class));
-            builder.setConfig(parseConfig(blockingRead(String.format(DISPLAY_VRF_CONFIG, vrfName.get()), cli, id, ctx), id));
+            builder.setConfig(parseConfig(blockingRead(String.format(DISPLAY_VRF_CONFIG, vrfName.get()), cli, id,
+                    ctx), id));
         }
     }
 }

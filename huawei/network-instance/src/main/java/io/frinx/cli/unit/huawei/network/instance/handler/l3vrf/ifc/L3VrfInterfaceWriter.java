@@ -49,7 +49,8 @@ public class L3VrfInterfaceWriter implements L3VrfListWriter<Interface, Interfac
 
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Interface> id, Interface dataBefore,
-                                                         Interface dataAfter, WriteContext writeContext) throws WriteFailedException {
+                                               Interface dataAfter, WriteContext writeContext) throws
+            WriteFailedException {
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }

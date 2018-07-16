@@ -33,14 +33,16 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>
+public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, NetworkInstanceKey,
+        NetworkInstanceBuilder>
         implements CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
     public NetworkInstanceReader(Cli cli) {
         super(new ArrayList<ListReaderCustomizer<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {{
-            add(new DefaultReader());
-            add(new L3VrfReader(cli));
-        }});
+                add(new DefaultReader());
+                add(new L3VrfReader(cli));
+            }
+        });
     }
 
     @Override

@@ -54,7 +54,8 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
     }
 
     private static final Pattern INTERFACE_ID_LINE =
-            Pattern.compile("(?<id>[^\\s^\\(]+)(\\(10G\\))*\\s+(?<ipAddr>[^\\s]+)\\s+(?<status>[^\\s]+)\\s+(?<protocol>[^\\s]+)\\s+(?<vpn>[^\\s]+)\\s*");
+            Pattern.compile("(?<id>[^\\s^\\(]+)(\\(10G\\))*\\s+(?<ipAddr>[^\\s]+)\\s+(?<status>[^\\s]+)\\s+"
+                    + "(?<protocol>[^\\s]+)\\s+(?<vpn>[^\\s]+)\\s*");
 
     private static final Pattern SUBINTERFACE_NAME =
             Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");

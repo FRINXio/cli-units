@@ -72,7 +72,8 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
         String ipAddress = getNeighborIp(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
 
         configBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
-        parseConfigAttributes(blockingRead(String.format(DISPLAY_PEER_CONFIG, ipAddress), cli, instanceIdentifier, readContext),
+        parseConfigAttributes(blockingRead(String.format(DISPLAY_PEER_CONFIG, ipAddress), cli, instanceIdentifier,
+                readContext),
                 configBuilder, vrfName);
     }
 
@@ -89,8 +90,8 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
 
     private void parseDefault(ConfigBuilder configBuilder, String[] output) {
         Optional<String> defaultNetworkNeighbors = Arrays.stream(output)
-                .filter(value -> !value.contains("vpn-instance"))
-                .reduce((s, s2) -> s + s2);
+            .filter(value -> !value.contains("vpn-instance"))
+            .reduce((s1, s2) -> s1 + s2);
 
         setAttributes(configBuilder, defaultNetworkNeighbors.orElse(""));
     }
@@ -102,7 +103,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
 
     private void parseVrf(ConfigBuilder configBuilder, String vrfName, String[] output) {
         Optional<String> optionalVrfOutput =
-                Arrays.stream(output).filter(value -> value.contains(vrfName)).findFirst();
+            Arrays.stream(output).filter(value -> value.contains(vrfName)).findFirst();
 
         if (optionalVrfOutput.isPresent()) {
             String defaultInstance = optionalVrfOutput.get();
@@ -112,30 +113,30 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
 
     private void setAs(ConfigBuilder configBuilder, String defaultInstance) {
         ParsingUtils.parseFields(defaultInstance.replaceAll(" peer", "\n peer"), 0, REMOTE_AS_PATTERN::matcher,
-                NeighborConfigReader::resolveGroupsRemoteAs,
-                groupsHashMap -> configBuilder.setPeerAs(new AsNumber(Long.valueOf(groupsHashMap.get(REMOTE_AS)))));
+            NeighborConfigReader::resolveGroupsRemoteAs,
+            groupsHashMap -> configBuilder.setPeerAs(new AsNumber(Long.valueOf(groupsHashMap.get(REMOTE_AS)))));
     }
 
     private void setEnabled(ConfigBuilder configBuilder, String defaultInstance) {
         ParsingUtils.parseFields(defaultInstance.replaceAll(" peer", "\n peer"), 0, NEIGHBOR_ACTIVATE_PATTERN::matcher,
-                NeighborConfigReader::resolveGroupsActivate,
-                groupsHashMap -> configBuilder.setEnabled(ACTIVATE.equals(groupsHashMap.get(ENABLED))));
+            NeighborConfigReader::resolveGroupsActivate,
+            groupsHashMap -> configBuilder.setEnabled(ACTIVATE.equals(groupsHashMap.get(ENABLED))));
     }
 
-    private static HashMap<String, String> resolveGroupsActivate(Matcher m) {
+    private static HashMap<String, String> resolveGroupsActivate(Matcher matcher) {
         HashMap<String, String> hashMap = new HashMap<>();
 
-        hashMap.put(NEIGHBOR_IP, m.group(NEIGHBOR_IP));
+        hashMap.put(NEIGHBOR_IP, matcher.group(NEIGHBOR_IP));
         hashMap.put(ENABLED, ACTIVATE);
 
         return hashMap;
     }
 
-    private static HashMap<String, String> resolveGroupsRemoteAs(Matcher m) {
+    private static HashMap<String, String> resolveGroupsRemoteAs(Matcher matcher) {
         HashMap<String, String> hashMap = new HashMap<>();
 
-        hashMap.put(NEIGHBOR_IP, m.group(NEIGHBOR_IP));
-        hashMap.put(REMOTE_AS, m.group(REMOTE_AS));
+        hashMap.put(NEIGHBOR_IP, matcher.group(NEIGHBOR_IP));
+        hashMap.put(REMOTE_AS, matcher.group(REMOTE_AS));
 
         return hashMap;
     }

@@ -49,7 +49,9 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
 
     static final String DISPLAY_IP_INT_BRIEF = "display ip int brief %s";
     static final Pattern INTERFACE_IP_LINE =
-            Pattern.compile("(?<id>[^\\s]+)\\s+(?<ip>[^/]+)/(?<prefix>[0-9]+)\\s+(?<status>[^\\s]+)\\s+(?<protocol>[^\\s]+)\\s+(?<vpn>[^\\s]+)\\s*");
+            Pattern.compile("(?<id>[^\\s]+)\\s+(?<ip>[^/]+)/(?<prefix>[0-9]+)\\s+(?<status>[^\\s]+)\\s+"
+                    + "(?<protocol>[^\\s]+)\\s+(?<vpn>[^\\s]+)\\s*");
+
     @Nonnull
     @Override
     public List<AddressKey> getAllIds(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
@@ -58,7 +60,8 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (subId
+                == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             return parseAddressIds(
                     blockingRead(String.format(DISPLAY_IP_INT_BRIEF, id), cli, instanceIdentifier, readContext));
         } else {
@@ -69,9 +72,9 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
     @VisibleForTesting
     static List<AddressKey> parseAddressIds(String output) {
         return parseFields(output, 0,
-                INTERFACE_IP_LINE::matcher,
-                m -> m.group("ip"),
-                addr -> new AddressKey(new Ipv4AddressNoZone(addr)));
+            INTERFACE_IP_LINE::matcher,
+            m -> m.group("ip"),
+            addr -> new AddressKey(new Ipv4AddressNoZone(addr)));
     }
 
     @Override
@@ -87,7 +90,8 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (subId
+                == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class).getIp());
         }
     }

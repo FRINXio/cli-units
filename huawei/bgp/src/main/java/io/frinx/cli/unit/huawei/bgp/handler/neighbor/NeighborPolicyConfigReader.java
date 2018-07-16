@@ -81,7 +81,7 @@ public class NeighborPolicyConfigReader implements BgpReader.BgpConfigReader<Con
     private static void parseDefault(ConfigBuilder configBuilder, String[] output) {
         Optional<String> defaultNetworkNeighbors = Arrays.stream(output)
                 .filter(value -> !value.contains("vpn-instance"))
-                .reduce((s, s2) -> s + s2);
+                .reduce((s1, s2) -> s1 + s2);
 
         setAttributes(configBuilder, defaultNetworkNeighbors.orElse(""));
     }
@@ -94,14 +94,14 @@ public class NeighborPolicyConfigReader implements BgpReader.BgpConfigReader<Con
         String processed = defaultInstance.replaceAll(" peer", "\n peer");
 
         List<String> inPolicies = ParsingUtils.parseFields(processed, 0, NEIGHBOR_POLICY_IN_PATTERN::matcher,
-                m -> m.group("updateSource"),
-                Function.identity());
+            m -> m.group("updateSource"),
+            Function.identity());
 
         configBuilder.setImportPolicy(inPolicies);
 
         List<String> outPolicies = ParsingUtils.parseFields(processed, 0, NEIGHBOR_POLICY_OUT_PATTERN::matcher,
-                m -> m.group("updateSource"),
-                Function.identity());
+            m -> m.group("updateSource"),
+            Function.identity());
 
         configBuilder.setExportPolicy(outPolicies);
     }
