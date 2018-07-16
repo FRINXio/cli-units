@@ -28,9 +28,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class InterfaceConfigWriter implements CliWriter<Config> {
 
     static final String SNMP_IFC_TEMPLATE =
-            "snmp-server interface {$config.interface_id.value}\n" +
-            "{% if ($enable_linkup) %}no {% endif %}notification linkupdown disable\n" +
-            "root";
+            "snmp-server interface {$config.interface_id.value}\n"
+                    + "{% if ($enable_linkup) %}no {% endif %}notification linkupdown disable\n"
+                    + "root";
 
     static final String SNMP_IFC_TEMPLATE_DELETE = "no snmp-server interface {$config.interface_id.value}";
 
@@ -41,26 +41,36 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (config.getEnabledTrapForEvent() == null ||
-                config.getEnabledTrapForEvent().isEmpty() ||
-                !LINKUPDOWN.class.equals(config.getEnabledTrapForEvent().get(0).getEventName())) {
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (config.getEnabledTrapForEvent() == null
+                ||
+                config.getEnabledTrapForEvent()
+                        .isEmpty()
+                ||
+                !LINKUPDOWN.class.equals(config.getEnabledTrapForEvent()
+                        .get(0)
+                        .getEventName())) {
             return;
         }
 
         blockingWriteAndRead(cli, instanceIdentifier, config, fT(SNMP_IFC_TEMPLATE,
                 "config", config,
-                "enable_linkup", config.getEnabledTrapForEvent().get(0).isEnabled() ? true : null));
+                "enable_linkup", config.getEnabledTrapForEvent()
+                        .get(0)
+                        .isEnabled() ? true : null));
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter,
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull
+            Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         blockingWriteAndRead(cli, instanceIdentifier, config, fT(SNMP_IFC_TEMPLATE_DELETE,
                 "config", config));
     }

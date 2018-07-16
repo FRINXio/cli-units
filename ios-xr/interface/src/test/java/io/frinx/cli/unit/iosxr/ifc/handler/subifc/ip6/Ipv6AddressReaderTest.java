@@ -26,9 +26,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 
 public class Ipv6AddressReaderTest {
 
-    private static final String SH_RUN_INT_IPV6 = "Mon Feb 12 13:25:08.172 UTC\n" +
-            " ipv6 address fe80::260:3eff:fe11:6770 link-local\n" +
-            " ipv6 address 2001:db8:a0b:12f0::1/64";
+    private static final String SH_RUN_INT_IPV6 = "Mon Feb 12 13:25:08.172 UTC\n"
+            + " ipv6 address fe80::260:3eff:fe11:6770 link-local\n"
+            + " ipv6 address 2001:db8:a0b:12f0::1/64";
 
     private static final List<AddressKey> EXPECTED_ADRESS_IDS =
             Lists.newArrayList("fe80::260:3eff:fe11:6770", "2001:db8:a0b:12f0::1")

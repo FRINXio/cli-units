@@ -26,8 +26,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class CommunitySetConfigWriter implements CliWriter<Config> {
 
-    private static final String TEMPLATE = "{.if ($delete) }no {/if}community-set {$config.community_set_name}\n" +
-            "{.if ($delete) }{.else}end-set{/if}";
+    private static final String TEMPLATE = "{.if ($delete) }no {/if}community-set {$config.community_set_name}\n"
+            + "{.if ($delete) }{.else}end-set{/if}";
 
     private final Cli cli;
 

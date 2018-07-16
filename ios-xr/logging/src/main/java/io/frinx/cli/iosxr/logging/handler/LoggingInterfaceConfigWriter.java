@@ -54,7 +54,8 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
                 ? NO_LOGGING_COMMAND : LOGGING_COMMAND;
 
         if (enabledLoggingForEventList != null && !enabledLoggingForEventList.isEmpty()) {
-            Preconditions.checkArgument(LoggingInterfacesReader.LINK_UP_DOWN_EVENT_LIST.containsAll(enabledLoggingForEventList),
+            Preconditions.checkArgument(LoggingInterfacesReader.LINK_UP_DOWN_EVENT_LIST
+                            .containsAll(enabledLoggingForEventList),
                     "Cannot configure logging events %s for interface %s, only %s event is supported",
                     enabledLoggingForEventList, ifcName, LoggingInterfacesReader.LINK_UP_DOWN_EVENT);
         }
@@ -84,9 +85,9 @@ public class LoggingInterfaceConfigWriter implements CliWriter<Config> {
                 "root");
     }
 
-    private static void checkLoggingConfig(String ifcName, WriteContext wContext) {
+    private static void checkLoggingConfig(String ifcName, WriteContext writeContext) {
         InstanceIdentifier<Interface> ifcId = IIDs.INTERFACES.child(Interface.class, new InterfaceKey(ifcName));
-        final Optional<Interface> optionalIfc = wContext.readAfter(ifcId);
+        final Optional<Interface> optionalIfc = writeContext.readAfter(ifcId);
         Preconditions.checkArgument(optionalIfc.isPresent(),
                 "Cannot configure logging on non-existent interface %s", ifcName);
     }

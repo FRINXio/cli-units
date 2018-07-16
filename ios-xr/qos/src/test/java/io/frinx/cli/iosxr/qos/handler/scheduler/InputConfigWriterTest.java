@@ -40,19 +40,19 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 public class InputConfigWriterTest {
 
 
-    private static final String WRITE_INPUT = "policy-map plmap\n" +
-            "class map1\n" +
-            "priority level 10\n" +
-            "root\n";
+    private static final String WRITE_INPUT = "policy-map plmap\n"
+            + "class map1\n"
+            + "priority level 10\n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT = "policy-map plmap\n" +
-            "class map1\n" +
-            "no priority\n" +
-            "root\n";
+    private static final String UPDATE_INPUT = "policy-map plmap\n"
+            + "class map1\n"
+            + "no priority\n"
+            + "root\n";
 
-    private static final String DELETE_INPUT = "policy-map plmap\n" +
-            "no class map1\n" +
-            "root\n";
+    private static final String DELETE_INPUT = "policy-map plmap\n"
+            + "no class map1\n"
+            + "root\n";
 
     @Mock
     private Cli cli;
@@ -74,7 +74,8 @@ public class InputConfigWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        Mockito.when(cli.executeAndRead(Mockito.any()))
+                .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new InputConfigWriter(this.cli);
 
@@ -82,32 +83,41 @@ public class InputConfigWriterTest {
     }
 
     private void initializeData() {
-        data = new ConfigBuilder().setId("map1").setWeight(BigInteger.TEN).build();
+        data = new ConfigBuilder().setId("map1")
+                .setWeight(BigInteger.TEN)
+                .build();
     }
 
     @Test
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributes(piid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void update() throws WriteFailedException {
-        data = new ConfigBuilder().setId("map1").build();
+        data = new ConfigBuilder().setId("map1")
+                .build();
 
         this.writer.updateCurrentAttributes(piid, data, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributes(piid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 }

@@ -30,16 +30,16 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 
 public class ConditionsReaderTest {
 
-    private static final String OUTPUT = "Mon Mar 19 12:26:57.492 UTC\n" +
-            "class-map match-any map1\n" +
-            " match access-group ipv4 inacl222 \n" +
-            " match access-group ipv6 ahojgroup \n" +
-            " match precedence ipv4 1 5 \n" +
-            " match precedence ipv6 1 \n" +
-            " match precedence priority 4 network \n" +
-            " match mpls experimental topmost 6 \n" +
-            " match qos-group 10 1-2\n" +
-            " end-class-map\n";
+    private static final String OUTPUT = "Mon Mar 19 12:26:57.492 UTC\n"
+            + "class-map match-any map1\n"
+            + " match access-group ipv4 inacl222 \n"
+            + " match access-group ipv6 ahojgroup \n"
+            + " match precedence ipv4 1 5 \n"
+            + " match precedence ipv6 1 \n"
+            + " match precedence priority 4 network \n"
+            + " match mpls experimental topmost 6 \n"
+            + " match qos-group 10 1-2\n"
+            + " end-class-map\n";
 
     @Test
     public void testConditionsReaderAll() {
@@ -47,16 +47,25 @@ public class ConditionsReaderTest {
         ConditionsReader.filterParsing(OUTPUT, "all", builder);
 
         QosConditionAug qos = builder.getAugmentation(QosConditionAug.class);
-        Assert.assertEquals(new QosGroup(10L), qos.getQosGroup().get(0));
-        Assert.assertEquals(new QosGroup(new QosGroupRange("1..2")), qos.getQosGroup().get(1));
+        Assert.assertEquals(new QosGroup(10L), qos.getQosGroup()
+                .get(0));
+        Assert.assertEquals(new QosGroup(new QosGroupRange("1..2")), qos.getQosGroup()
+                .get(1));
 
-        QosIpv6ConditionAug aug4 = builder.getIpv6().getConfig().getAugmentation(QosIpv6ConditionAug.class);
+        QosIpv6ConditionAug aug4 = builder.getIpv6()
+                .getConfig()
+                .getAugmentation(QosIpv6ConditionAug.class);
         Assert.assertEquals("ahojgroup", aug4.getAclRef());
 
-        QosIpv4ConditionAug aug6 = builder.getIpv4().getConfig().getAugmentation(QosIpv4ConditionAug.class);
+        QosIpv4ConditionAug aug6 = builder.getIpv4()
+                .getConfig()
+                .getAugmentation(QosIpv4ConditionAug.class);
         Assert.assertEquals("inacl222", aug6.getAclRef());
 
-        Assert.assertEquals(6, builder.getMpls().getConfig().getTrafficClass().shortValue());
+        Assert.assertEquals(6, builder.getMpls()
+                .getConfig()
+                .getTrafficClass()
+                .shortValue());
     }
 
     @Test
@@ -67,7 +76,9 @@ public class ConditionsReaderTest {
         Assert.assertNull(builder.getMpls());
         Assert.assertNull(builder.getIpv6());
 
-        QosIpv4ConditionAug aug = builder.getIpv4().getConfig().getAugmentation(QosIpv4ConditionAug.class);
+        QosIpv4ConditionAug aug = builder.getIpv4()
+                .getConfig()
+                .getAugmentation(QosIpv4ConditionAug.class);
         Assert.assertEquals("inacl222", aug.getAclRef());
     }
 
@@ -79,7 +90,9 @@ public class ConditionsReaderTest {
         Assert.assertNull(builder.getMpls());
         Assert.assertNull(builder.getIpv4());
 
-        QosIpv6ConditionAug aug = builder.getIpv6().getConfig().getAugmentation(QosIpv6ConditionAug.class);
+        QosIpv6ConditionAug aug = builder.getIpv6()
+                .getConfig()
+                .getAugmentation(QosIpv6ConditionAug.class);
         Assert.assertEquals("ahojgroup", aug.getAclRef());
     }
 
@@ -92,9 +105,12 @@ public class ConditionsReaderTest {
         Assert.assertNull(builder.getIpv6());
 
         Assert.assertEquals(
-            Lists.newArrayList(
-                new Precedence((short) 1), new Precedence((short) 5)),
-                builder.getIpv4().getConfig().getAugmentation(QosIpv4ConditionAug.class).getPrecedences());
+                Lists.newArrayList(
+                        new Precedence((short) 1), new Precedence((short) 5)),
+                builder.getIpv4()
+                        .getConfig()
+                        .getAugmentation(QosIpv4ConditionAug.class)
+                        .getPrecedences());
     }
 
     @Test
@@ -106,8 +122,11 @@ public class ConditionsReaderTest {
         Assert.assertNull(builder.getIpv4());
 
         Assert.assertEquals(
-            Lists.newArrayList(new Precedence((short) 1)),
-            builder.getIpv6().getConfig().getAugmentation(QosIpv6ConditionAug.class).getPrecedences());
+                Lists.newArrayList(new Precedence((short) 1)),
+                builder.getIpv6()
+                        .getConfig()
+                        .getAugmentation(QosIpv6ConditionAug.class)
+                        .getPrecedences());
     }
 
     @Test
@@ -120,8 +139,9 @@ public class ConditionsReaderTest {
         Assert.assertNull(builder.getIpv6());
 
         Assert.assertEquals(
-            Lists.newArrayList(new Precedence("priority"), new Precedence((short) 4), new Precedence("network")),
-            builder.getAugmentation(QosConditionAug.class).getPrecedences());
+                Lists.newArrayList(new Precedence("priority"), new Precedence((short) 4), new Precedence("network")),
+                builder.getAugmentation(QosConditionAug.class)
+                        .getPrecedences());
     }
 
     @Test
@@ -132,7 +152,10 @@ public class ConditionsReaderTest {
         Assert.assertNull(builder.getIpv4());
         Assert.assertNull(builder.getIpv6());
 
-        Assert.assertEquals(6, builder.getMpls().getConfig().getTrafficClass().shortValue());
+        Assert.assertEquals(6, builder.getMpls()
+                .getConfig()
+                .getTrafficClass()
+                .shortValue());
     }
 
     @Test
@@ -144,7 +167,14 @@ public class ConditionsReaderTest {
         Assert.assertNull(builder.getIpv4());
         Assert.assertNull(builder.getIpv6());
 
-        Assert.assertEquals(Long.valueOf(10), builder.getAugmentation(QosConditionAug.class).getQosGroup().get(0).getUint32());
-        Assert.assertEquals("1..2", builder.getAugmentation(QosConditionAug.class).getQosGroup().get(1).getQosGroupRange().getValue());
+        Assert.assertEquals(Long.valueOf(10), builder.getAugmentation(QosConditionAug.class)
+                .getQosGroup()
+                .get(0)
+                .getUint32());
+        Assert.assertEquals("1..2", builder.getAugmentation(QosConditionAug.class)
+                .getQosGroup()
+                .get(1)
+                .getQosGroupRange()
+                .getValue());
     }
 }

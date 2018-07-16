@@ -19,7 +19,9 @@ package io.frinx.cli.iosxr.unit.acl.handler;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.unit.utils.CliConfigReader;
+
 import javax.annotation.Nonnull;
+
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetBuilder;
@@ -33,15 +35,16 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class AclSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder
+            configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final AclSetKey aclSetKey = instanceIdentifier.firstKeyOf(AclSet.class);
         final String aclName = aclSetKey.getName();
         final Class<? extends ACLTYPE> aclType = aclSetKey.getType();
 
         configBuilder
-            .setName(aclName)
-            .setType(aclType)
-            .build();
+                .setName(aclName)
+                .setType(aclType)
+                .build();
     }
 
     @Override

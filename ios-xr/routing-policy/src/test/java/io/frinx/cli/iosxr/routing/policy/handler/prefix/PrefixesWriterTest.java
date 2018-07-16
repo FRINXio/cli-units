@@ -59,25 +59,21 @@ public class PrefixesWriterTest implements CliFormatter {
                 "name", "testing",
                 "prefixes", configDtos);
 
-        assertEquals("prefix-set testing\n" +
-                        "1.1.1.1/32 ge 32 le 32,\n" +
-                        "1.1.1.1/4 ge 32 le 32,\n" +
-                        "1.1.1.1/4 ge 11 le 11,\n" +
-                        "dead:beef::/4 ge 128 le 128,\n" +
-                        "dead:beef::1/128 ge 128 le 128,\n" +
-                        "dead:beef::1/128 ge 1 le 1,\n" +
-                        "dead:beef::1/45 ge 45 le 45,\n" +
-                        "dead:beef::1/46\n" +
-                        "end-set",
-                output);
+        assertEquals("prefix-set testing\n"
+                + "1.1.1.1/32 ge 32 le 32,\n"
+                + "1.1.1.1/4 ge 32 le 32,\n"
+                + "1.1.1.1/4 ge 11 le 11,\n"
+                + "dead:beef::/4 ge 128 le 128,\n"
+                + "dead:beef::1/128 ge 128 le 128,\n"
+                + "dead:beef::1/128 ge 1 le 1,\n"
+                + "dead:beef::1/45 ge 45 le 45,\n"
+                + "dead:beef::1/46\n"
+                + "end-set", output);
 
-        output = fT(PrefixesWriter.TEMPLATE,
-                "name", "testing",
-                "prefixes", Collections.emptyList());
+        output = fT(PrefixesWriter.TEMPLATE, "name", "testing", "prefixes", Collections.emptyList());
 
-        assertEquals("prefix-set testing\n" +
-                        "\n" +
-                        "end-set",
-                output);
+        assertEquals("prefix-set testing\n"
+                + "\n"
+                + "end-set", output);
     }
 }

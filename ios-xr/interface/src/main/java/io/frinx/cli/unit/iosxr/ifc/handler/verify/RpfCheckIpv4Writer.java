@@ -38,22 +38,26 @@ public class RpfCheckIpv4Writer implements CliWriter<Ipv4> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull final InstanceIdentifier<Ipv4> instanceIdentifier, @Nonnull final Ipv4 dataAfter,
+    public void writeCurrentAttributes(@Nonnull final InstanceIdentifier<Ipv4> instanceIdentifier, @Nonnull final
+        Ipv4 dataAfter,
                                        @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class)
+                .getName();
 
         final StringBuilder verifyCmd = prepareCmd(dataAfter);
 
         blockingWriteAndRead(cli, instanceIdentifier, dataAfter,
-            f("interface %s", interfaceName),
-            verifyCmd.toString(),
-            "root");
+                f("interface %s", interfaceName),
+                verifyCmd.toString(),
+                "root");
     }
 
     @VisibleForTesting
     StringBuilder prepareCmd(final @Nonnull Ipv4 dataAfter) {
         final StringBuilder verifyCmd = new StringBuilder(
-            f(IPV4_VERIFY_CMD_BASE, dataAfter.getRpfCheck().getName().toLowerCase())
+                f(IPV4_VERIFY_CMD_BASE, dataAfter.getRpfCheck()
+                        .getName()
+                        .toLowerCase())
         );
         RpfCheckUtils.appendAllowConfigCmdParams(dataAfter, verifyCmd);
         return verifyCmd;
@@ -62,19 +66,23 @@ public class RpfCheckIpv4Writer implements CliWriter<Ipv4> {
     @Override
     public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Ipv4> id, @Nonnull final Ipv4 dataBefore,
                                         @Nonnull final Ipv4 dataAfter, @Nonnull final WriteContext writeContext)
-        throws WriteFailedException {
+            throws WriteFailedException {
 
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull final InstanceIdentifier<Ipv4> instanceIdentifier, @Nonnull final Ipv4 dataBefore,
+    public void deleteCurrentAttributes(@Nonnull final InstanceIdentifier<Ipv4> instanceIdentifier, @Nonnull final
+        Ipv4 dataBefore,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class)
+                .getName();
 
         blockingDeleteAndRead(cli, instanceIdentifier,
-            f("interface %s", interfaceName),
-            f("no " + IPV4_VERIFY_CMD_BASE, dataBefore.getRpfCheck().getName().toLowerCase()),
-            "root");
+                f("interface %s", interfaceName),
+                f("no " + IPV4_VERIFY_CMD_BASE, dataBefore.getRpfCheck()
+                        .getName()
+                        .toLowerCase()),
+                "root");
     }
 }

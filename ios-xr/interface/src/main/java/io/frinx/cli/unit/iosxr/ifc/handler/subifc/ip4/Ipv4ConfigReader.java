@@ -50,8 +50,10 @@ public class Ipv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String name = id.firstKeyOf(Interface.class).getName();
-        Long subId = id.firstKeyOf(Subinterface.class).getIndex();
+        String name = id.firstKeyOf(Interface.class)
+                .getName();
+        Long subId = id.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
@@ -63,12 +65,12 @@ public class Ipv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
     static void parseAddressConfig(ConfigBuilder configBuilder, String output) {
         parseField(output,
                 INTERFACE_IP_LINE::matcher,
-                m -> new Ipv4AddressNoZone(m.group("address")),
+            m -> new Ipv4AddressNoZone(m.group("address")),
                 configBuilder::setIp);
 
         parseField(output,
                 INTERFACE_IP_LINE::matcher,
-                m -> prefixFromNetmask(m.group("prefix")),
+            m -> prefixFromNetmask(m.group("prefix")),
                 configBuilder::setPrefixLength);
     }
 

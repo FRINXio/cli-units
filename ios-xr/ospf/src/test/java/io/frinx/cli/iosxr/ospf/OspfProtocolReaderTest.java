@@ -26,12 +26,14 @@ import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 
 public class OspfProtocolReaderTest {
-    private static final String SH_RUN_OSPF = "Mon Feb 12 14:57:11.223 UTC\n" +
-            "router ospf 97\n" +
-            "router ospf EXAMPLE_OSPF\n";
+    private static final String SH_RUN_OSPF = "Mon Feb 12 14:57:11.223 UTC\n"
+            + "router ospf 97\n"
+            + "router ospf EXAMPLE_OSPF\n";
 
     private static final List<ProtocolKey> EXPECTED_KEYES = Lists.newArrayList("97", "EXAMPLE_OSPF")
-            .stream().map(ospfId -> new ProtocolKey(OspfReader.TYPE, ospfId)).collect(Collectors.toList());
+            .stream()
+            .map(ospfId -> new ProtocolKey(OspfReader.TYPE, ospfId))
+            .collect(Collectors.toList());
 
     @Test
     public void testParseOspfIds() {

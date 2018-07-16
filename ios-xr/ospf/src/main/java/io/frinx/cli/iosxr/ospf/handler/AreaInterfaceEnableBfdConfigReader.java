@@ -51,11 +51,16 @@ public class AreaInterfaceEnableBfdConfigReader implements OspfReader.OspfConfig
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String interfaceId = instanceIdentifier.firstKeyOf(Interface.class).getId();
-        final String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        final String areaId = AreaInterfaceReader.areaIdToString(instanceIdentifier.firstKeyOf(Area.class).getIdentifier());
-        String output = blockingRead(String.format(SHOW_OSPF_INT, ospfId, areaId, interfaceId), cli, instanceIdentifier, readContext);
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+            ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        final String interfaceId = instanceIdentifier.firstKeyOf(Interface.class)
+                .getId();
+        final String ospfId = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
+        final String areaId = AreaInterfaceReader.areaIdToString(instanceIdentifier.firstKeyOf(Area.class)
+                .getIdentifier());
+        String output = blockingRead(String.format(SHOW_OSPF_INT, ospfId, areaId, interfaceId), cli,
+                instanceIdentifier, readContext);
         parseBfd(output, configBuilder);
     }
 

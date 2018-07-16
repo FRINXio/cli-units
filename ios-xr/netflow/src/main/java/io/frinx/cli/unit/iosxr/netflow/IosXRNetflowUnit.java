@@ -46,8 +46,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.IngressFlowsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.top.NetflowBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public final class IosXRNetflowUnit implements TranslateUnit {
@@ -72,7 +70,8 @@ public final class IosXRNetflowUnit implements TranslateUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.$YangModuleInfoImpl.getInstance()
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.$YangModuleInfoImpl
+                        .getInstance()
         );
     }
 
@@ -82,42 +81,42 @@ public final class IosXRNetflowUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
         Cli cli = context.getTransport();
 
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(final ModifiableWriterRegistryBuilder wRegistry, final Cli cli) {
-        wRegistry.add(new GenericWriter<>(IIDs.NE_INTERFACES, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_INTERFACE, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_CONFIG, new NoopCliWriter<>()));
+    private void provideWriters(final ModifiableWriterRegistryBuilder writeRegistry, final Cli cli) {
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_INTERFACES, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_INTERFACE, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_CONFIG, new NoopCliWriter<>()));
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_INGRESSFLOWS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_IN_INGRESSFLOW, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_IN_IN_CONFIG, new IngressFlowConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_INGRESSFLOWS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_IN_INGRESSFLOW, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_IN_IN_CONFIG, new IngressFlowConfigWriter(cli)));
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_EGRESSFLOWS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_EG_EGRESSFLOW, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_EG_EG_CONFIG, new EgressFlowConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_EGRESSFLOWS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_EG_EGRESSFLOW, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_EG_EG_CONFIG, new EgressFlowConfigWriter(cli)));
     }
 
-    private void provideReaders(final ModifiableReaderRegistryBuilder rRegistry, final Cli cli) {
-        rRegistry.addStructuralReader(IIDs.NETFLOW, NetflowBuilder.class);
-        rRegistry.addStructuralReader(IIDs.NE_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_IN_INTERFACE, new NetflowInterfaceReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_IN_IN_CONFIG, new NetflowInterfaceConfigReader()));
+    private void provideReaders(final ModifiableReaderRegistryBuilder readRegistry, final Cli cli) {
+        readRegistry.addStructuralReader(IIDs.NETFLOW, NetflowBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_INTERFACES, InterfacesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_IN_INTERFACE, new NetflowInterfaceReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_IN_IN_CONFIG, new NetflowInterfaceConfigReader()));
 
-        rRegistry.addStructuralReader(IIDs.NE_IN_IN_INGRESSFLOWS, IngressFlowsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_IN_IN_IN_INGRESSFLOW, new IngressFlowReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_IN_IN_IN_IN_CONFIG, new IngressFlowConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_IN_IN_INGRESSFLOWS, IngressFlowsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_IN_IN_IN_INGRESSFLOW, new IngressFlowReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_IN_IN_IN_IN_CONFIG, new IngressFlowConfigReader(cli)));
 
-        rRegistry.addStructuralReader(IIDs.NE_IN_IN_EGRESSFLOWS, EgressFlowsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_IN_IN_EG_EGRESSFLOW, new EgressFlowReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_IN_IN_EG_EG_CONFIG, new EgressFlowConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_IN_IN_EGRESSFLOWS, EgressFlowsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_IN_IN_EG_EGRESSFLOW, new EgressFlowReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_IN_IN_EG_EG_CONFIG, new EgressFlowConfigReader(cli)));
     }
 
     @Override

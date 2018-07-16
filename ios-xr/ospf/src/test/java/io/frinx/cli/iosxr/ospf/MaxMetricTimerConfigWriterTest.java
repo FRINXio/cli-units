@@ -46,25 +46,25 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class MaxMetricTimerConfigWriterTest {
 
-    private static final String WRITE_INPUT = "router ospf default\n" +
-            "max-metric router-lsa summary-lsa include-stub external-lsa \n" +
-            "root\n";
+    private static final String WRITE_INPUT = "router ospf default\n"
+            + "max-metric router-lsa summary-lsa include-stub external-lsa \n"
+            + "root\n";
 
-    private static final String WRITE_NO_INCLUDE_INPUT = "router ospf default\n" +
-            "max-metric router-lsa \n" +
-            "root\n";
+    private static final String WRITE_NO_INCLUDE_INPUT = "router ospf default\n"
+            + "max-metric router-lsa \n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT = "router ospf default\n" +
-            "max-metric router-lsa summary-lsa include-stub \n" +
-            "root\n";
+    private static final String UPDATE_INPUT = "router ospf default\n"
+            + "max-metric router-lsa summary-lsa include-stub \n"
+            + "root\n";
 
-    private static final String REMOVE_TIMEOUT_INPUT = "router ospf default\n" +
-            "max-metric router-lsa summary-lsa include-stub external-lsa \n" +
-            "root\n";
+    private static final String REMOVE_TIMEOUT_INPUT = "router ospf default\n"
+            + "max-metric router-lsa summary-lsa include-stub external-lsa \n"
+            + "root\n";
 
-    private static final String DELETE_INPUT = "router ospf default\n" +
-            "no max-metric router-lsa summary-lsa include-stub external-lsa \n" +
-            "root\n";
+    private static final String DELETE_INPUT = "router ospf default\n"
+            + "no max-metric router-lsa summary-lsa include-stub external-lsa \n"
+            + "root\n";
 
     @Mock
     private Cli cli;
@@ -77,7 +77,7 @@ public class MaxMetricTimerConfigWriterTest {
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier piid = KeyedInstanceIdentifier.create(Protocols.class)
-            .child(Protocol.class, new ProtocolKey(OSPF.class,"default"));
+            .child(Protocol.class, new ProtocolKey(OSPF.class, "default"));
 
     // test data
     private Config data;
@@ -86,7 +86,8 @@ public class MaxMetricTimerConfigWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        Mockito.when(cli.executeAndRead(Mockito.any()))
+                .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new MaxMetricTimerConfigWriter(this.cli);
         initializeData();
@@ -94,7 +95,8 @@ public class MaxMetricTimerConfigWriterTest {
 
     private void initializeData() {
         data = new ConfigBuilder()
-                .setInclude(Lists.newArrayList(MAXMETRICSUMMARYLSA.class, MAXMETRICINCLUDESTUB.class, MAXMETRICINCLUDETYPE2EXTERNAL.class))
+                .setInclude(Lists.newArrayList(MAXMETRICSUMMARYLSA.class, MAXMETRICINCLUDESTUB.class,
+                        MAXMETRICINCLUDETYPE2EXTERNAL.class))
                 .setTimeout(BigInteger.valueOf(1000L))
                 .setTrigger(MAXMETRICALWAYS.class)
                 .build();
@@ -104,28 +106,32 @@ public class MaxMetricTimerConfigWriterTest {
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributesForType(piid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void writeNoInclude() throws WriteFailedException {
         // timeout to 500, removed external-lsa
-        Config newData =  new ConfigBuilder()
+        Config newData = new ConfigBuilder()
                 .setTimeout(BigInteger.valueOf(1000L))
                 .setTrigger(MAXMETRICALWAYS.class)
                 .build();
 
         this.writer.writeCurrentAttributesForType(piid, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_NO_INCLUDE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_NO_INCLUDE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void update() throws WriteFailedException {
         // timeout to 500, removed external-lsa
-        Config newData =  new ConfigBuilder()
+        Config newData = new ConfigBuilder()
                 .setInclude(Lists.newArrayList(MAXMETRICSUMMARYLSA.class, MAXMETRICINCLUDESTUB.class))
                 .setTimeout(BigInteger.valueOf(500L))
                 .setTrigger(MAXMETRICALWAYS.class)
@@ -133,29 +139,36 @@ public class MaxMetricTimerConfigWriterTest {
 
         this.writer.updateCurrentAttributesForType(piid, data, newData, context);
 
-        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli, Mockito.times(2))
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void updateNoTimeout() throws WriteFailedException {
         // removing timeout
         Config newData = new ConfigBuilder()
-                .setInclude(Lists.newArrayList(MAXMETRICSUMMARYLSA.class, MAXMETRICINCLUDESTUB.class, MAXMETRICINCLUDETYPE2EXTERNAL.class))
+                .setInclude(Lists.newArrayList(MAXMETRICSUMMARYLSA.class, MAXMETRICINCLUDESTUB.class,
+                        MAXMETRICINCLUDETYPE2EXTERNAL.class))
                 .setTrigger(MAXMETRICALWAYS.class)
                 .build();
 
         this.writer.updateCurrentAttributesForType(piid, data, newData, context);
 
-        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
-        Assert.assertEquals(REMOVE_TIMEOUT_INPUT, response.getValue().getContent());
+        Mockito.verify(cli, Mockito.times(2))
+                .executeAndRead(response.capture());
+        Assert.assertEquals(REMOVE_TIMEOUT_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributesForType(piid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 }

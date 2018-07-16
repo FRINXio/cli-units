@@ -53,13 +53,15 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class Ipv6ConfigWriterTest {
 
     private static final String WRITE_INPUT = "interface GigabitEthernet 0/0/0/0\n"
-        + "ipv6 address " +
-        TestData.IPV6_ADDRESS_CONFIG.getIp().getValue() + "/" + TestData.IPV6_ADDRESS_CONFIG.getPrefixLength() + "\n"
-        + "root\n";
+            + "ipv6 address "
+            +
+            TestData.IPV6_ADDRESS_CONFIG.getIp()
+                    .getValue() + "/" + TestData.IPV6_ADDRESS_CONFIG.getPrefixLength() + "\n"
+            + "root\n";
 
     private static final String DELETE_INPUT = "interface GigabitEthernet 0/0/0/0\n"
-        + "no ipv6 address\n"
-        + "root\n";
+            + "no ipv6 address\n"
+            + "root\n";
 
     private Cli cliMock;
     private WriteContext context;
@@ -74,34 +76,36 @@ public class Ipv6ConfigWriterTest {
         context = Mockito.mock(WriteContext.class);
 
         Mockito.when(cliMock.executeAndRead(Mockito.any()))
-            .then(invocation -> CompletableFuture.completedFuture(""));
+                .then(invocation -> CompletableFuture.completedFuture(""));
     }
 
     @Test
     public void settingIpv6Address_LAGInterface_goldenPathTest() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
 
         final Ipv6ConfigWriter writer = new Ipv6ConfigWriter(cliMock);
 
         writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG, context);
 
-        Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cliMock, Mockito.times(1))
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void settingIpv6Address_noLAGInterface() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_WRONG_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_WRONG_TYPE));
 
         final Ipv6ConfigWriter writer = new Ipv6ConfigWriter(cliMock);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(CoreMatchers.allOf(
-            CoreMatchers.containsString(Ipv6CheckUtil.CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX),
-            CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
-            CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
+                CoreMatchers.containsString(Ipv6CheckUtil.CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX),
+                CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
+                CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
         ));
 
         writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_VLAN, TestData.IPV6_ADDRESS_CONFIG, context);
@@ -110,40 +114,44 @@ public class Ipv6ConfigWriterTest {
     @Test
     public void settingIpv6Address_LAGInterface_missingIPAddress() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
 
         final Ipv6ConfigWriter writer = new Ipv6ConfigWriter(cliMock);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(CoreMatchers.containsString(Ipv6ConfigWriter.MISSING_IP_ADDRESS_MSG));
 
-        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG_NO_ADDRESS, context);
+        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG_NO_ADDRESS,
+                context);
     }
 
     @Test
     public void settingIpv6Address_LAGInterface_missingPrefix() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
 
         final Ipv6ConfigWriter writer = new Ipv6ConfigWriter(cliMock);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(CoreMatchers.containsString(Ipv6ConfigWriter.MISSING_PREFIX_LENGTH_MSG));
 
-        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG_NO_PREFIX, context);
+        writer.writeCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG_NO_PREFIX,
+                context);
     }
 
     @Test
     public void deleteIpv6Address_LAGInterface() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
 
         final Ipv6ConfigWriter writer = new Ipv6ConfigWriter(cliMock);
 
         writer.deleteCurrentAttributes(TestData.ADDRESS_CONFIG_IID_CORRECT, TestData.IPV6_ADDRESS_CONFIG, context);
 
-        Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cliMock, Mockito.times(1))
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 
     private static class TestData {
@@ -153,51 +161,53 @@ public class Ipv6ConfigWriterTest {
         static final long SUBINTERFACE_INDEX = 0L;
         private static final Ipv6AddressNoZone IPV6_ADDRESS = new Ipv6AddressNoZone("1::");
 
-        static InstanceIdentifier<Interface> INTERFACE_IID(final String interfaceName) {
+        static InstanceIdentifier<Interface> interfaceIid(final String interfaceName) {
             return IIDs.INTERFACES.child(Interface.class, new InterfaceKey(interfaceName));
         }
 
         static final InstanceIdentifier<Config> ADDRESS_CONFIG_IID_CORRECT =
-            INTERFACE_IID(INTERFACE_NAME).child(Subinterfaces.class)
-                .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX))
-                .augmentation(Subinterface2.class)
-                .child(Ipv6.class)
-                .child(Addresses.class)
-                .child(Address.class, new AddressKey(IPV6_ADDRESS))
-                .child(Config.class);
+                interfaceIid(INTERFACE_NAME).child(Subinterfaces.class)
+                        .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX))
+                        .augmentation(Subinterface2.class)
+                        .child(Ipv6.class)
+                        .child(Addresses.class)
+                        .child(Address.class, new AddressKey(IPV6_ADDRESS))
+                        .child(Config.class);
 
         static final InstanceIdentifier<Config> ADDRESS_CONFIG_IID_VLAN =
-            INTERFACE_IID(INTERFACE_NAME_WRONG).child(Subinterfaces.class)
-                .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX))
-                .augmentation(Subinterface2.class)
-                .child(Ipv6.class)
-                .child(Addresses.class)
-                .child(Address.class, new AddressKey(IPV6_ADDRESS))
-                .child(Config.class);
+                interfaceIid(INTERFACE_NAME_WRONG).child(Subinterfaces.class)
+                        .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX))
+                        .augmentation(Subinterface2.class)
+                        .child(Ipv6.class)
+                        .child(Addresses.class)
+                        .child(Address.class, new AddressKey(IPV6_ADDRESS))
+                        .child(Config.class);
 
         static final Interface INTERFACE_CORRECT_TYPE = new InterfaceBuilder()
-            .setName(INTERFACE_NAME)
-            .setConfig(
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
-                    .setType(Ieee8023adLag.class)
-                    .build())
-            .build();
+                .setName(INTERFACE_NAME)
+                .setConfig(
+                        new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                .rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                                .setType(Ieee8023adLag.class)
+                                .build())
+                .build();
         static final Interface INTERFACE_WRONG_TYPE = new InterfaceBuilder()
-            .setName(INTERFACE_NAME_WRONG)
-            .setConfig(
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
-                    .setType(L2vlan.class)
-                    .build())
-            .build();
+                .setName(INTERFACE_NAME_WRONG)
+                .setConfig(
+                        new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                .rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                                .setType(L2vlan.class)
+                                .build())
+                .build();
         static final Config IPV6_ADDRESS_CONFIG = new ConfigBuilder()
-            .setIp(IPV6_ADDRESS)
-            .setPrefixLength((short) 128)
-            .build();
+                .setIp(IPV6_ADDRESS)
+                .setPrefixLength((short) 128)
+                .build();
         public static final Config IPV6_ADDRESS_CONFIG_NO_ADDRESS = new ConfigBuilder()
-            .setPrefixLength((short) 128)
-            .build();
+                .setPrefixLength((short) 128)
+                .build();
         static final Config IPV6_ADDRESS_CONFIG_NO_PREFIX = new ConfigBuilder()
-            .setIp(IPV6_ADDRESS)
-            .build();
+                .setIp(IPV6_ADDRESS)
+                .build();
     }
 }

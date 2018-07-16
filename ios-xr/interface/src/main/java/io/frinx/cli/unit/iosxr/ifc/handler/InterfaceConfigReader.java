@@ -75,17 +75,17 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
         // Actually check if disabled
         parseField(output, 0,
                 SHUTDOWN_LINE::matcher,
-                matcher -> false,
+            matcher -> false,
                 builder::setEnabled);
 
         parseField(output,
                 MTU_LINE::matcher,
-                matcher -> Integer.valueOf(matcher.group("mtu")),
+            matcher -> Integer.valueOf(matcher.group("mtu")),
                 builder::setMtu);
 
         parseField(output,
                 DESCR_LINE::matcher,
-                matcher -> matcher.group("desc"),
+            matcher -> matcher.group("desc"),
                 builder::setDescription);
     }
 

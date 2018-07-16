@@ -31,12 +31,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.ApplyPolicyBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.apply.policy.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.apply.policy.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.ApplyPolicyBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.apply.policy.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.apply.policy.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
@@ -65,21 +65,27 @@ public class NeighborAfiSafiApplyPolicyConfigReader implements BgpReader.BgpConf
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
+                globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
                 .child(Global.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config.class))
+                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
+                        .Config.class))
                 .orNull();
 
         if (globalConfig == null) {
             return;
         }
 
-        IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress();
+        IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class)
+                .getNeighborAddress();
         String address = new String(neighborIp.getValue());
         final String instName = GlobalConfigWriter.getProtoInstanceName(instanceIdentifier);
-        String afiName = GlobalAfiSafiReader.transformAfiToString(instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName());
+        String afiName = GlobalAfiSafiReader.transformAfiToString(instanceIdentifier.firstKeyOf(AfiSafi.class)
+                .getAfiSafiName());
 
-        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs().getValue().intValue(), instName, address, afiName), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs()
+                .getValue()
+                .intValue(), instName, address, afiName), cli, instanceIdentifier, readContext);
 
         List<String> importPolicy = NEWLINE.splitAsStream(output.trim())
                 .map(ROUTE_POLICY_IN_LINE::matcher)
@@ -104,7 +110,7 @@ public class NeighborAfiSafiApplyPolicyConfigReader implements BgpReader.BgpConf
             exportPolicy.add(NEXTHOPSELF_POLICY_NAME);
         }
 
-        if(exportPolicy.size() > 0) {
+        if (exportPolicy.size() > 0) {
             configBuilder.setExportPolicy(exportPolicy);
         }
     }

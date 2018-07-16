@@ -36,7 +36,7 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
 
     private static final String SHOW_LAST_COMMIT_TIME = "show configuration commit list | utility egrep \"^1 \"";
     private static final String DATE_REGEX = "\\s*.+\\s{2,}.+\\s{2,}.+\\s{2,}.+\\s{2,}.+\\s{3,}(?<time>.+)\\s*";
-    private static final Pattern pattern = Pattern.compile(DATE_REGEX);
+    private static final Pattern PATTERN = Pattern.compile(DATE_REGEX);
     private final Cli cli;
 
     public ConfigMetadataReader(final Cli cli) {
@@ -44,13 +44,15 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
     }
 
     @VisibleForTesting
-    static Optional<String> getLastConfigurationFingerprint(String TimeFormat) throws ParseException {
+    static Optional<String> getLastConfigurationFingerprint(String timeFormat) throws ParseException {
 
-        return ParsingUtils.parseField(TimeFormat, 0, pattern::matcher, m -> m.group("time"));
+        return ParsingUtils.parseField(timeFormat, 0, PATTERN::matcher, m -> m.group("time"));
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<ConfigurationMetadata> instanceIdentifier, @Nonnull ConfigurationMetadataBuilder configurationMetadataBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<ConfigurationMetadata> instanceIdentifier, @Nonnull
+            ConfigurationMetadataBuilder configurationMetadataBuilder, @Nonnull ReadContext readContext) throws
+            ReadFailedException {
         String output = blockingRead(SHOW_LAST_COMMIT_TIME, cli, instanceIdentifier, readContext);
 
         try {
@@ -62,7 +64,8 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull ConfigurationMetadata configurationMetadata) {
+    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull ConfigurationMetadata
+            configurationMetadata) {
         // NOOP, root reader
     }
 }

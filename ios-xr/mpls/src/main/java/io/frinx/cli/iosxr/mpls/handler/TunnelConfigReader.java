@@ -22,6 +22,8 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.mpls.MplsReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.Tunnel;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.TunnelBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.Config;
@@ -30,9 +32,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.re
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-import java.util.regex.Pattern;
 
 public class TunnelConfigReader implements MplsReader.MplsConfigReader<Config, ConfigBuilder> {
 
@@ -46,10 +45,13 @@ public class TunnelConfigReader implements MplsReader.MplsConfigReader<Config, C
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String name = instanceIdentifier.firstKeyOf(Tunnel.class).getName();
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+            ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        final String name = instanceIdentifier.firstKeyOf(Tunnel.class)
+                .getName();
         configBuilder.setName(name);
-        parseConfig(blockingRead(String.format(SH_RUN_TUNNEL, name), cli, instanceIdentifier, readContext), configBuilder);
+        parseConfig(blockingRead(String.format(SH_RUN_TUNNEL, name), cli, instanceIdentifier, readContext),
+                configBuilder);
     }
 
     @VisibleForTesting

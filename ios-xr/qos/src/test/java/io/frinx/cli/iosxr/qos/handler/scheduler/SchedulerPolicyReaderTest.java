@@ -17,7 +17,6 @@
 package io.frinx.cli.iosxr.qos.handler.scheduler;
 
 import com.google.common.collect.Lists;
-import io.frinx.cli.iosxr.qos.handler.scheduler.SchedulerPolicyReader;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
@@ -26,16 +25,18 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 
 public class SchedulerPolicyReaderTest {
 
-    private static String OUTPUT = "Thu Mar 22 13:33:38.062 UTC\n" +
-        "policy-map plmap\n" +
-        "policy-map plmap1\n" +
-        "policy-map plmap2\n";
+    private static String OUTPUT = "Thu Mar 22 13:33:38.062 UTC\n"
+            + "policy-map plmap\n"
+            + "policy-map plmap1\n"
+            + "policy-map plmap2\n";
 
     @Test
     public void testGetIds() {
         List<SchedulerPolicyKey> keys = SchedulerPolicyReader.getSchedulerKeys(OUTPUT);
         Assert.assertFalse(keys.isEmpty());
         Assert.assertEquals(Lists.newArrayList("plmap", "plmap1", "plmap2"),
-            keys.stream().map(SchedulerPolicyKey::getName).collect(Collectors.toList()));
+                keys.stream()
+                        .map(SchedulerPolicyKey::getName)
+                        .collect(Collectors.toList()));
     }
 }

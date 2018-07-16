@@ -25,8 +25,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
 
 public class Ipv4AddressReaderTest {
-    private static final String SH_RUN_INT_IP = "Mon Feb 12 12:47:42.025 UTC\n"+
-            " ipv4 address 10.0.0.5 255.255.255.0\n";
+    private static final String SH_RUN_INT_IP = "Mon Feb 12 12:47:42.025 UTC\n"
+            + " ipv4 address 10.0.0.5 255.255.255.0\n";
 
     private static final String SH_RUN_INT_NO_IP = "Mon Feb 12 12:53:52.860 UTC";
 

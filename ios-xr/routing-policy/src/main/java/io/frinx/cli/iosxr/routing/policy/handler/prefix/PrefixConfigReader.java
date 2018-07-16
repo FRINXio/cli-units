@@ -32,7 +32,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class PrefixConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
+                                      @Nonnull ReadContext ctx) throws ReadFailedException {
         PrefixKey prefixKey = id.firstKeyOf(Prefix.class);
         builder.setIpPrefix(prefixKey.getIpPrefix());
         builder.setMasklengthRange(prefixKey.getMasklengthRange());

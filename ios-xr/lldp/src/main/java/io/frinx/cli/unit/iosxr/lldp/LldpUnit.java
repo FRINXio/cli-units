@@ -64,10 +64,10 @@ public class LldpUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder writeRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder readRegistry,
                                 @Nonnull Context context) {
-        delegate.provideHandlers(rRegistry, wRegistry, context);
+        delegate.provideHandlers(writeRegistry, readRegistry, context);
     }
 
     @Override

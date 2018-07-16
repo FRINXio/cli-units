@@ -56,30 +56,30 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class NeighborConfigWriterTest {
 
-    private static final String WRITE_INPUT = "router bgp 65505 instance test\n" +
-            "neighbor 192.168.1.1\n" +
-            "remote-as 65500\n" +
-            "use neighbor-group ibgp\n" +
-            "no shutdown\n" +
-            "root\n";
+    private static final String WRITE_INPUT = "router bgp 65505 instance test\n"
+            + "neighbor 192.168.1.1\n"
+            + "remote-as 65500\n"
+            + "use neighbor-group ibgp\n"
+            + "no shutdown\n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT = "router bgp 65505 instance test\n" +
-            "neighbor 192.168.1.1\n" +
-            "remote-as 65501\n" +
-            "use neighbor-group ebgp\n" +
-            "shutdown\n" +
-            "root\n";
+    private static final String UPDATE_INPUT = "router bgp 65505 instance test\n"
+            + "neighbor 192.168.1.1\n"
+            + "remote-as 65501\n"
+            + "use neighbor-group ebgp\n"
+            + "shutdown\n"
+            + "root\n";
 
-    private static final String UPDATE_CLEAN_INPUT = "router bgp 65505 instance test\n" +
-            "neighbor 192.168.1.1\n" +
-            "no remote-as\n" +
-            "no use neighbor-group\n" +
-            "shutdown\n" +
-            "root\n";
+    private static final String UPDATE_CLEAN_INPUT = "router bgp 65505 instance test\n"
+            + "neighbor 192.168.1.1\n"
+            + "no remote-as\n"
+            + "no use neighbor-group\n"
+            + "shutdown\n"
+            + "root\n";
 
-    private static final String DELETE_INPUT = "router bgp 65505 instance test\n" +
-            "no neighbor 192.168.1.1\n" +
-            "root\n";
+    private static final String DELETE_INPUT = "router bgp 65505 instance test\n"
+            + "no neighbor 192.168.1.1\n"
+            + "root\n";
 
     @Mock
     private Cli cli;
@@ -92,9 +92,11 @@ public class NeighborConfigWriterTest {
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier iid = KeyedInstanceIdentifier.create(NetworkInstances.class)
-            .child(NetworkInstance.class, new NetworkInstanceKey(DEFAULT_NETWORK)).child(Protocols.class)
-            .child(Protocol.class, new ProtocolKey(BGP.class,"test"))
-            .child(Bgp.class).child(Neighbors.class)
+            .child(NetworkInstance.class, new NetworkInstanceKey(DEFAULT_NETWORK))
+            .child(Protocols.class)
+            .child(Protocol.class, new ProtocolKey(BGP.class, "test"))
+            .child(Bgp.class)
+            .child(Neighbors.class)
             .child(Neighbor.class, new NeighborKey(new IpAddress(new Ipv4Address("192.168.1.1"))));
 
     // test data
@@ -104,7 +106,8 @@ public class NeighborConfigWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        Mockito.when(cli.executeAndRead(Mockito.any()))
+                .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new NeighborConfigWriter(this.cli);
         initializeData();
@@ -115,26 +118,40 @@ public class NeighborConfigWriterTest {
                 .setNeighborAddress(new IpAddress(new Ipv4Address("192.168.1.1")))
                 .setEnabled(true)
                 .setPeerGroup("ibgp")
-            .build();
+                .build();
 
-        Bgp b = new BgpBuilder().setGlobal(new GlobalBuilder()
-            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder()
-                .setAs(new AsNumber(65505L)).build()).build()).build();
+        Bgp build = new BgpBuilder().setGlobal(new GlobalBuilder()
+                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global
+                        .base.ConfigBuilder()
+                        .setAs(new AsNumber(65505L))
+                        .build())
+                .build())
+                .build();
 
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config c =
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder()
-                        .setType(L3VRF.class).build();
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top
+                .network.instances.network.instance.Config config =
+                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network
+                        .instance.top.network.instances.network.instance.ConfigBuilder()
+                        .setType(L3VRF.class)
+                        .build();
 
-        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(c)).thenReturn(Optional.of(b)).thenReturn(Optional.absent());
-        Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(c)).thenReturn(Optional.of(b));
+        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class)))
+                .thenReturn(Optional.of(config))
+                .thenReturn(Optional.of(build))
+                .thenReturn(Optional.absent());
+        Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class)))
+                .thenReturn(Optional.of(config))
+                .thenReturn(Optional.of(build));
     }
 
     @Test
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -148,8 +165,10 @@ public class NeighborConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -162,19 +181,28 @@ public class NeighborConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
-        Bgp b = new BgpBuilder().setGlobal(new GlobalBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder()
-                        .setAs(new AsNumber(65505L)).build()).build()).build();
-        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(b));
+        Bgp build = new BgpBuilder().setGlobal(new GlobalBuilder()
+                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global
+                        .base.ConfigBuilder()
+                        .setAs(new AsNumber(65505L))
+                        .build())
+                .build())
+                .build();
+        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class)))
+                .thenReturn(Optional.of(build));
         this.writer.deleteCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 }

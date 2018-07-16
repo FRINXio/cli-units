@@ -44,7 +44,8 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class Ipv6AdvertisementConfigReader implements TypedReader<Config, ConfigBuilder>, CliConfigReader<Config, ConfigBuilder> {
+public class Ipv6AdvertisementConfigReader implements TypedReader<Config, ConfigBuilder>, CliConfigReader<Config,
+        ConfigBuilder> {
 
     private static final String SH_SINGLE_SUB_INTERFACE_CFG = "show running-config interface %s";
     private static final Pattern IPV6_ADVERTISEMENT_ENABLED = Pattern.compile("\\s*ipv6 nd suppress-ra.*");
@@ -59,13 +60,14 @@ public class Ipv6AdvertisementConfigReader implements TypedReader<Config, Config
     public void readCurrentAttributesForType(@Nonnull final InstanceIdentifier<Config> id,
                                              @Nonnull final ConfigBuilder configBuilder,
                                              @Nonnull final ReadContext readContext)
-        throws ReadFailedException {
+            throws ReadFailedException {
 
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         // using show running-config interface <GigabitEthernet 0/0/0/0>
         parseAdvertisementConfig(
-            blockingRead(String.format(SH_SINGLE_SUB_INTERFACE_CFG, ifcName), cli, id, readContext), configBuilder);
+                blockingRead(String.format(SH_SINGLE_SUB_INTERFACE_CFG, ifcName), cli, id, readContext), configBuilder);
     }
 
     @Override
@@ -75,18 +77,18 @@ public class Ipv6AdvertisementConfigReader implements TypedReader<Config, Config
         final SubinterfaceKey subinterfaceKey = instanceIdentifier.firstKeyOf(Subinterface.class);
         final Class<? extends InterfaceType> infType = InterfaceConfigReader.parseType(interfaceKey.getName());
 
-        return interfaceKey != null && subinterfaceKey != null &&
-                Ipv6CheckUtil.checkTypes(infType, EthernetCsmacd.class, Ieee8023adLag.class) &&
-                subinterfaceKey.getIndex() == ZERO_SUBINTERFACE_ID;
+        return interfaceKey != null && subinterfaceKey != null
+                && Ipv6CheckUtil.checkTypes(infType, EthernetCsmacd.class, Ieee8023adLag.class)
+                && subinterfaceKey.getIndex() == ZERO_SUBINTERFACE_ID;
     }
 
     @VisibleForTesting
     void parseAdvertisementConfig(final String output, final ConfigBuilder builder) {
         // ipv6 nd suppress-ra
         ParsingUtils.parseField(output, 0,
-            IPV6_ADVERTISEMENT_ENABLED::matcher,
+                IPV6_ADVERTISEMENT_ENABLED::matcher,
             matcher -> true,
-            builder::setSuppress);
+                builder::setSuppress);
     }
 
     @Override

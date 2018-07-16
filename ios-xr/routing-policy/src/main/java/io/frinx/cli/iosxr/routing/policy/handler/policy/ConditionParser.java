@@ -42,16 +42,16 @@ class ConditionParser {
     static final Conditions EMPTY_CONDITIONS = new ConditionsBuilder().build();
 
     static Conditions parseConditions(String line) {
-        ConditionsBuilder b = new ConditionsBuilder();
-        parseBgpConditions(line, b);
-        parsePrefixSets(line, b);
+        ConditionsBuilder conditionsBuilder = new ConditionsBuilder();
+        parseBgpConditions(line, conditionsBuilder);
+        parsePrefixSets(line, conditionsBuilder);
 
-        return b.build();
+        return conditionsBuilder.build();
     }
 
     private static final BgpConditions EMPTY_BGP_CONDS = new BgpConditionsBuilder().build();
 
-    private static void parseBgpConditions(String line, ConditionsBuilder b) {
+    private static void parseBgpConditions(String line, ConditionsBuilder conditionsBuilder) {
         BgpConditionsBuilder bgpCondsBuilder = new BgpConditionsBuilder();
         parseAsPathLength(line, bgpCondsBuilder);
         parseAsPathIn(line, bgpCondsBuilder);
@@ -66,12 +66,12 @@ class ConditionParser {
         }
 
         bgpCondsAugmentBuilder.setBgpConditions(build);
-        b.addAugmentation(Conditions2.class, bgpCondsAugmentBuilder.build());
+        conditionsBuilder.addAugmentation(Conditions2.class, bgpCondsAugmentBuilder.build());
     }
 
     private static final MatchPrefixSet EMPTY_PREFIX_SET = new MatchPrefixSetBuilder().build();
 
-    private static void parsePrefixSets(String line, ConditionsBuilder b) {
+    private static void parsePrefixSets(String line, ConditionsBuilder conditionsBuilder) {
         MatchPrefixSetBuilder prefixSetBuilder = new MatchPrefixSetBuilder();
         parseDestination(line, prefixSetBuilder);
         MatchPrefixSet build = prefixSetBuilder.build();
@@ -81,10 +81,11 @@ class ConditionParser {
             return;
         }
 
-        b.setMatchPrefixSet(build);
+        conditionsBuilder.setMatchPrefixSet(build);
     }
 
-    private static final Pattern AS_PATH_LENGTH = Pattern.compile("as-path length (?<operator>is|eq|ge|le) (?<value>[0-9]+)");
+    private static final Pattern AS_PATH_LENGTH = Pattern.compile("as-path length (?<operator>is|eq|ge|le) "
+            + "(?<value>[0-9]+)");
 
     private static void parseAsPathLength(String line, BgpConditionsBuilder bgpCondsBuilder) {
         Matcher matcher = AS_PATH_LENGTH.matcher(line);
@@ -104,6 +105,7 @@ class ConditionParser {
                 case "le":
                     opClass = ATTRIBUTELE.class;
                     break;
+                default: break;
             }
 
             bgpCondsBuilder.setAsPathLength(new AsPathLengthBuilder()
@@ -123,7 +125,8 @@ class ConditionParser {
             String val = matcher.group("value");
 
             builder.setMatchAsPathSet(new MatchAsPathSetBuilder()
-                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.match.as.path.top.match.as.path.set.ConfigBuilder()
+                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
+                            .rev170730.match.as.path.top.match.as.path.set.ConfigBuilder()
                             .setAsPathSet(val)
                             .setMatchSetOptions(MatchSetOptionsType.ANY)
                             .build())
@@ -131,7 +134,8 @@ class ConditionParser {
         }
     }
 
-    private static final Pattern COMMUNITY_IN = Pattern.compile("community (?<operator>matches-any|matches-every) (?<value>\\S+)");
+    private static final Pattern COMMUNITY_IN = Pattern.compile("community (?<operator>matches-any|matches-every) "
+            + "(?<value>\\S+)");
 
     private static void parseCommunity(String line, BgpConditionsBuilder builder) {
         Matcher matcher = COMMUNITY_IN.matcher(line);
@@ -147,10 +151,12 @@ class ConditionParser {
                 case "matches-every":
                     opClass = MatchSetOptionsType.ALL;
                     break;
+                default: break;
             }
 
             builder.setMatchCommunitySet(new MatchCommunitySetBuilder()
-                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.match.community.top.match.community.set.ConfigBuilder()
+                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
+                            .rev170730.match.community.top.match.community.set.ConfigBuilder()
                             .setMatchSetOptions(opClass)
                             .setCommunitySet(val)
                             .build())
@@ -165,7 +171,8 @@ class ConditionParser {
         if (matcher.find()) {
             String val = matcher.group("value");
 
-            builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.condition.top.match.prefix.set.ConfigBuilder()
+            builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy
+                    .rev170714.prefix.set.condition.top.match.prefix.set.ConfigBuilder()
                     .setPrefixSet(val)
                     .setMatchSetOptions(MatchSetOptionsRestrictedType.ANY)
                     .build());

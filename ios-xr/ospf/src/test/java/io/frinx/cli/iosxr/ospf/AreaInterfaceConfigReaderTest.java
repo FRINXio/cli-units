@@ -23,19 +23,20 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 
 public class AreaInterfaceConfigReaderTest {
 
-    private final String output = "Thu Dec 21 15:40:02.857 UTC\n" +
-            "router ospf 100\n" +
-            " area 0\n" +
-            "  interface Loopback97\n" +
-            "   cost 1\n" +
-            "  !\n" +
-            " !\n" +
-            "!\n";
+    private final String output = "Thu Dec 21 15:40:02.857 UTC\n"
+            + "router ospf 100\n"
+            + " area 0\n"
+            + "  interface Loopback97\n"
+            + "   cost 1\n"
+            + "  !\n"
+            + " !\n"
+            + "!\n";
 
     @Test
     public void test() {
         ConfigBuilder builder = new ConfigBuilder();
         AreaInterfaceConfigReader.parseCost(output, builder);
-        Assert.assertEquals(Integer.valueOf(1), builder.getMetric().getValue());
+        Assert.assertEquals(Integer.valueOf(1), builder.getMetric()
+                .getValue());
     }
 }

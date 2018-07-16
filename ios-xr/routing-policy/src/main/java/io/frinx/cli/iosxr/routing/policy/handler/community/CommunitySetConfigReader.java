@@ -78,7 +78,7 @@ public class CommunitySetConfigReader implements CliConfigReader<Config, ConfigB
     private static final Pattern NO_EXPORT = Pattern.compile("no-export");
     private static final Pattern NO_ADVERTISE = Pattern.compile("no-advertise");
 
-    private static CommunitySetConfig.CommunityMember parseMember(String s) {
+    private static CommunitySetConfig.CommunityMember parseMember(String string) {
         // TODO finish parse members
         return null;
     }

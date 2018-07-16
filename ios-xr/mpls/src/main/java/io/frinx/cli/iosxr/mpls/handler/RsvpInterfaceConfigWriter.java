@@ -20,11 +20,10 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes._interface.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes._interface.Config;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
 
@@ -35,12 +34,15 @@ public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+            WriteContext writeContext) throws WriteFailedException {
+        final String name = id.firstKeyOf(Interface.class)
+                .getInterfaceId()
+                .getValue();
         blockingWriteAndRead(cli, id, data,
-            "rsvp",
-            f("interface %s", name),
-            "root");
+                "rsvp",
+                f("interface %s", name),
+                "root");
     }
 
     @Override
@@ -52,11 +54,14 @@ public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+            WriteContext writeContext) throws WriteFailedException {
+        final String name = id.firstKeyOf(Interface.class)
+                .getInterfaceId()
+                .getValue();
         blockingWriteAndRead(cli, id, data,
-            "rsvp",
-            f("no interface %s", name),
-            "root");
+                "rsvp",
+                f("no interface %s", name),
+                "root");
     }
 }

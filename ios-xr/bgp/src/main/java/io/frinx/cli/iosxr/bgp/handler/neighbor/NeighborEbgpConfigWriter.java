@@ -38,33 +38,32 @@ public class NeighborEbgpConfigWriter implements BgpWriter<Config> {
         this.cli = cli;
     }
 
-    static final String NEIGHBOR_EBGP ="router bgp {$as} {$instance}\n" +
-            "neighbor {$address}\n" +
-            "{% if ($enabled == TRUE) %}" +
-                "{% if ($config.multihop_ttl) %}" +
-                    "ebgp-multihop {$config.multihop_ttl}\n" +
-                "{% else %}" +
-                    "no ebgp-multihop\n" +
-                "{% endif %}" +
-            "{% else %}" +
-                "no ebgp-multihop\n" +
-            "{% endif %}" +
-            "root\n";
+    static final String NEIGHBOR_EBGP = "router bgp {$as} {$instance}\n"
+            + "neighbor {$address}\n"
+            + "{% if ($enabled == TRUE) %}"
+            + "{% if ($config.multihop_ttl) %}"
+            + "ebgp-multihop {$config.multihop_ttl}\n"
+            + "{% else %}"
+            + "no ebgp-multihop\n"
+            + "{% endif %}"
+            + "{% else %}"
+            + "no ebgp-multihop\n"
+            + "{% endif %}"
+            + "root\n";
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
-                                              WriteContext writeContext) throws WriteFailedException {
+    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config, WriteContext
+            writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingWriteAndRead(fT(NEIGHBOR_EBGP,
-                "as", g.getConfig().getAs().getValue(),
-                "instance", instName,
-                "address", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "enabled", config.isEnabled(),
-                "config", config),
-                cli, id, config);
+        blockingWriteAndRead(fT(NEIGHBOR_EBGP, "as", g.getConfig()
+                .getAs()
+                .getValue(), "instance", instName, "address", new String(id.firstKeyOf(Neighbor.class)
+                .getNeighborAddress()
+                .getValue()), "enabled", config.isEnabled(), "config", config), cli, id, config);
     }
 
     @Override
@@ -74,18 +73,19 @@ public class NeighborEbgpConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config config, WriteContext writeContext) throws WriteFailedException {
+    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config config, WriteContext
+            writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         if (!bgpOptional.isPresent()) {
             return;
         }
-        final Global g = bgpOptional.get().getGlobal();
+        final Global g = bgpOptional.get()
+                .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingDeleteAndRead(fT(NEIGHBOR_EBGP,
-                "as", g.getConfig().getAs().getValue(),
-                "instance", instName,
-                "address", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "enabled", false),
-                cli, id);
+        blockingDeleteAndRead(fT(NEIGHBOR_EBGP, "as", g.getConfig()
+                .getAs()
+                .getValue(), "instance", instName, "address", new String(id.firstKeyOf(Neighbor.class)
+                .getNeighborAddress()
+                .getValue()), "enabled", false), cli, id);
     }
 }

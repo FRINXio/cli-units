@@ -42,7 +42,8 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class EgressFlowReader implements TypedListReader<EgressFlow, EgressFlowKey, EgressFlowBuilder>, CliConfigListReader<EgressFlow, EgressFlowKey, EgressFlowBuilder> {
+public class EgressFlowReader implements TypedListReader<EgressFlow, EgressFlowKey, EgressFlowBuilder>,
+        CliConfigListReader<EgressFlow, EgressFlowKey, EgressFlowBuilder> {
 
     private static final String SH_NETFLOW_INTF = "show running-config interface %s | include egress";
     private static final Pattern FLOW_LINE = Pattern.compile("flow (?<type>.+) monitor \\S+( sampler .+)? egress");
@@ -61,17 +62,20 @@ public class EgressFlowReader implements TypedListReader<EgressFlow, EgressFlowK
 
     @Nonnull
     @Override
-    public List<EgressFlowKey> getAllIdsForType(@Nonnull InstanceIdentifier<EgressFlow> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
-        InterfaceId interfaceId = instanceIdentifier.firstKeyOf(Interface.class).getId();
-        return parseFlowKeys(blockingRead(String.format(SH_NETFLOW_INTF, interfaceId.getValue()), cli, instanceIdentifier, readContext));
+    public List<EgressFlowKey> getAllIdsForType(@Nonnull InstanceIdentifier<EgressFlow> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
+        InterfaceId interfaceId = instanceIdentifier.firstKeyOf(Interface.class)
+                .getId();
+        return parseFlowKeys(blockingRead(String.format(SH_NETFLOW_INTF, interfaceId.getValue()), cli,
+                instanceIdentifier, readContext));
     }
 
     @VisibleForTesting
     public static List<EgressFlowKey> parseFlowKeys(String output) {
         return ParsingUtils.parseFields(output, 0,
-            FLOW_LINE::matcher,
+                FLOW_LINE::matcher,
             matcher -> NetflowUtils.getType(matcher.group("type")),
-            EgressFlowKey::new
+                EgressFlowKey::new
         );
     }
 
@@ -81,7 +85,8 @@ public class EgressFlowReader implements TypedListReader<EgressFlow, EgressFlowK
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<EgressFlow> instanceIdentifier, @Nonnull EgressFlowBuilder ingressFlowBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<EgressFlow> instanceIdentifier, @Nonnull
+            EgressFlowBuilder ingressFlowBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final EgressFlowKey key = instanceIdentifier.firstKeyOf(EgressFlow.class);
         ingressFlowBuilder.setNetflowType(key.getNetflowType());
     }

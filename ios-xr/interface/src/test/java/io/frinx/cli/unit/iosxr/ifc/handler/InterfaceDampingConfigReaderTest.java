@@ -23,58 +23,55 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.damping.rev17
 
 public class InterfaceDampingConfigReaderTest {
 
-    private static final String SH_RUN_INT_NO_DAMPING = "Fri Nov 24 14:59:39.354 UTC\n" +
-            "interface GigabitEthernet0/0/0/4\n" +
-            " carrier-delay up 500 down 100\n" +
-            " shutdown\n" +
-            " load-interval 0\n" +
-            "!\n" +
-            "\n";
+    private static final String SH_RUN_INT_NO_DAMPING = "Fri Nov 24 14:59:39.354 UTC\n"
+            + "interface GigabitEthernet0/0/0/4\n"
+            + " carrier-delay up 500 down 100\n"
+            + " shutdown\n"
+            + " load-interval 0\n"
+            + "!\n"
+            + "\n";
 
-    private static final Config EXPECTED_NO_DAMPING_CONFIG = new ConfigBuilder()
-            .build();
+    private static final Config EXPECTED_NO_DAMPING_CONFIG = new ConfigBuilder().build();
 
-    private static final String SH_RUN_INT_DEFAULT_DAMPING = "Fri Nov 24 15:20:05.070 UTC\n" +
-            "interface GigabitEthernet0/0/0/4\n" +
-            " carrier-delay up 500 down 100\n" +
-            " shutdown\n" +
-            " dampening\n" +
-            "!\n" +
-            "\n";
+    private static final String SH_RUN_INT_DEFAULT_DAMPING = "Fri Nov 24 15:20:05.070 UTC\n"
+            + "interface GigabitEthernet0/0/0/4\n"
+            + " carrier-delay up 500 down 100\n"
+            + " shutdown\n"
+            + " dampening\n"
+            + "!\n"
+            + "\n";
 
-    private static final Config EXPECTED_DEFAULT_DAMPING_CONFIG = new ConfigBuilder()
-            .setEnabled(true)
+    private static final Config EXPECTED_DEFAULT_DAMPING_CONFIG = new ConfigBuilder().setEnabled(true)
             .setHalfLife(InterfaceDampingConfigReader.DEFAULT_HALF_LIFE)
             .setSuppress(InterfaceDampingConfigReader.DEFAULT_SUPRESS)
             .setMaxSuppress(InterfaceDampingConfigReader.DEFAULT_MAX_SUPRESS_TIME)
             .setReuse(InterfaceDampingConfigReader.DEFAULT_REUSE)
             .build();
 
-    private static final String SH_RUN_INT_HALF_LIFE_DAMPING = "Fri Nov 24 15:22:07.082 UTC\n" +
-            "interface GigabitEthernet0/0/0/4\n" +
-            " carrier-delay up 500 down 100\n" +
-            " shutdown\n" +
-            " load-interval 0\n" +
-            " dampening 35\n" +
-            "!\n" +
-            "\n";
+    private static final String SH_RUN_INT_HALF_LIFE_DAMPING = "Fri Nov 24 15:22:07.082 UTC\n"
+            + "interface GigabitEthernet0/0/0/4\n"
+            + " carrier-delay up 500 down 100\n"
+            + " shutdown\n"
+            + " load-interval 0\n"
+            + " dampening 35\n"
+            + "!\n"
+            + "\n";
 
-    private static final Config EXPECTED_HALF_LIFE_DAMPING_CONFIG = new ConfigBuilder()
-            .setEnabled(true)
+    private static final Config EXPECTED_HALF_LIFE_DAMPING_CONFIG = new ConfigBuilder().setEnabled(true)
             .setHalfLife(35L)
             .setSuppress(InterfaceDampingConfigReader.DEFAULT_SUPRESS)
             .setMaxSuppress(InterfaceDampingConfigReader.DEFAULT_MAX_SUPRESS_TIME)
             .setReuse(InterfaceDampingConfigReader.DEFAULT_REUSE)
             .build();
 
-    private static final String SH_RUN_INT_DAMPING = "Fri Nov 24 15:28:50.544 UTC\n" +
-            "interface GigabitEthernet0/0/0/4\n" +
-            " carrier-delay up 500 down 100\n" +
-            " shutdown\n" +
-            " load-interval 0\n" +
-            " dampening 35 500 600 3\n" +
-            "!\n" +
-            "\n";
+    private static final String SH_RUN_INT_DAMPING = "Fri Nov 24 15:28:50.544 UTC\n"
+            + "interface GigabitEthernet0/0/0/4\n"
+            + " carrier-delay up 500 down 100\n"
+            + " shutdown\n"
+            + " load-interval 0\n"
+            + " dampening 35 500 600 3\n"
+            + "!\n"
+            + "\n";
 
     private static final Config EXPECTED_DAMPING_CONFIG = new ConfigBuilder()
             .setEnabled(true)

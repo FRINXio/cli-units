@@ -50,29 +50,29 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 public class OneRateTwoColorConfigWriterTest {
 
 
-    private static final String WRITE_INPUT = "policy-map plmap\n" +
-            "class map1\n" +
-            "bandwidth percent 30\n" +
-            "bandwidth remaining percent 50\n" +
-            "police rate percent 40\n" +
-            "queue-limit 1000 ms\n" +
-            "root\n";
+    private static final String WRITE_INPUT = "policy-map plmap\n"
+            + "class map1\n"
+            + "bandwidth percent 30\n"
+            + "bandwidth remaining percent 50\n"
+            + "police rate percent 40\n"
+            + "queue-limit 1000 ms\n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT = "policy-map plmap\n" +
-            "class map1\n" +
-            "bandwidth percent 35\n" +
-            "bandwidth remaining percent 55\n" +
-            "police rate percent 45\n" +
-            "queue-limit 100 ms\n" +
-            "root\n";
+    private static final String UPDATE_INPUT = "policy-map plmap\n"
+            + "class map1\n"
+            + "bandwidth percent 35\n"
+            + "bandwidth remaining percent 55\n"
+            + "police rate percent 45\n"
+            + "queue-limit 100 ms\n"
+            + "root\n";
 
-    private static final String DELETE_INPUT = "policy-map plmap\n" +
-            "class map1\n" +
-            "no bandwidth\n" +
-            "no bandwidth remaining\n" +
-            "no police\n" +
-            "no queue-limit\n" +
-            "root\n";
+    private static final String DELETE_INPUT = "policy-map plmap\n"
+            + "class map1\n"
+            + "no bandwidth\n"
+            + "no bandwidth remaining\n"
+            + "no police\n"
+            + "no queue-limit\n"
+            + "root\n";
 
     @Mock
     private Cli cli;
@@ -85,8 +85,10 @@ public class OneRateTwoColorConfigWriterTest {
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier piid = KeyedInstanceIdentifier.create(SchedulerPolicies.class)
-            .child(SchedulerPolicy.class, new SchedulerPolicyKey("plmap")).child(Schedulers.class)
-            .child(Scheduler.class, new SchedulerKey(0L)).child(Inputs.class);
+            .child(SchedulerPolicy.class, new SchedulerPolicyKey("plmap"))
+            .child(Schedulers.class)
+            .child(Scheduler.class, new SchedulerKey(0L))
+            .child(Inputs.class);
 
     // test data
     private Inputs inputs;
@@ -96,7 +98,8 @@ public class OneRateTwoColorConfigWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        Mockito.when(cli.executeAndRead(Mockito.any()))
+                .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new OneRateTwoColorConfigWriter(this.cli);
 
@@ -105,42 +108,52 @@ public class OneRateTwoColorConfigWriterTest {
 
     private void initializeData() {
         data = new ConfigBuilder()
-            .setCirPct(new Percentage((short)30))
-            .setMaxQueueDepthPercent(new Percentage((short) 40))
-            .setCirPctRemaining(new Percentage((short) 50))
-            .addAugmentation(QosMaxQueueDepthMsAug.class,
-                new QosMaxQueueDepthMsAugBuilder().setMaxQueueDepthMs(1000L).build())
-        .build();
+                .setCirPct(new Percentage((short) 30))
+                .setMaxQueueDepthPercent(new Percentage((short) 40))
+                .setCirPctRemaining(new Percentage((short) 50))
+                .addAugmentation(QosMaxQueueDepthMsAug.class,
+                        new QosMaxQueueDepthMsAugBuilder().setMaxQueueDepthMs(1000L)
+                                .build())
+                .build();
 
         inputs = new InputsBuilder().setInput(Lists.newArrayList(new InputBuilder()
-                .setId("map1").build())).build();
+                .setId("map1")
+                .build()))
+                .build();
 
-        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(inputs));
-        Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(inputs));
+        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class)))
+                .thenReturn(Optional.of(inputs));
+        Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class)))
+                .thenReturn(Optional.of(inputs));
     }
 
     @Test
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributes(piid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void update() throws WriteFailedException {
         data = new ConfigBuilder()
-            .setCirPct(new Percentage((short)35))
-            .setMaxQueueDepthPercent(new Percentage((short) 45))
-            .setCirPctRemaining(new Percentage((short) 55))
-            .addAugmentation(QosMaxQueueDepthMsAug.class,
-                new QosMaxQueueDepthMsAugBuilder().setMaxQueueDepthMs(100L).build())
-        .build();
+                .setCirPct(new Percentage((short) 35))
+                .setMaxQueueDepthPercent(new Percentage((short) 45))
+                .setCirPctRemaining(new Percentage((short) 55))
+                .addAugmentation(QosMaxQueueDepthMsAug.class,
+                        new QosMaxQueueDepthMsAugBuilder().setMaxQueueDepthMs(100L)
+                                .build())
+                .build();
 
         this.writer.updateCurrentAttributes(piid, data, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -149,15 +162,19 @@ public class OneRateTwoColorConfigWriterTest {
 
         this.writer.updateCurrentAttributes(piid, data, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributes(piid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 }

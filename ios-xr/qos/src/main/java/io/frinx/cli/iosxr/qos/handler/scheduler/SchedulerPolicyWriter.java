@@ -27,9 +27,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SchedulerPolicyWriter implements CliWriter<Config> {
 
-    private final static String POLICY_T = "{% if (delete) %} no {% endif %} " +
-        "policy-map {$name}\n" +
-        "root";
+    private static final String POLICY_T = "{% if (delete) %} no {% endif %} "
+            + "policy-map {$name}\n"
+            + "root";
 
     private Cli cli;
 
@@ -38,21 +38,26 @@ public class SchedulerPolicyWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            fT(POLICY_T, "name", policyName));
+                fT(POLICY_T, "name", policyName));
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull
+            Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
         // noop
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            fT(POLICY_T, "name", policyName, "delete", true));
+                fT(POLICY_T, "name", policyName, "delete", true));
     }
 }

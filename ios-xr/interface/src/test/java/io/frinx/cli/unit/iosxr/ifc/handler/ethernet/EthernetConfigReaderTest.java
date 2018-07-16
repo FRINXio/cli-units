@@ -27,22 +27,23 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.et
 @Ignore
 public class EthernetConfigReaderTest {
 
-    private static final String SH_INT_CONFIG = "Mon Nov 27 10:22:55.365 UTC\n" +
-            "interface GigabitEthernet0/0/0/3\n" +
-            " bundle id 200 mode on\n" +
-            " shutdown\n" +
-            "!\n" +
-            "\n";
+    private static final String SH_INT_CONFIG = "Mon Nov 27 10:22:55.365 UTC\n"
+            + "interface GigabitEthernet0/0/0/3\n"
+            + " bundle id 200 mode on\n"
+            + " shutdown\n"
+            + "!\n"
+            + "\n";
 
-    private static Config EXPECTED_CONFIG = new ConfigBuilder()
-            .addAugmentation(Config1.class, new Config1Builder().setAggregateId("Bundle-Ether200").build())
+    private static Config EXPECTED_CONFIG = new ConfigBuilder().addAugmentation(Config1.class, new Config1Builder()
+            .setAggregateId("Bundle-Ether200")
+            .build())
             .build();
 
-    private static final String SH_INT_CONFIG_NOT_CONFIGURED_BUNDLE_ID = "Mon Nov 27 10:30:39.554 UTC\n" +
-            "interface GigabitEthernet0/0/0/2\n" +
-            " shutdown\n" +
-            "!\n" +
-            "\n";
+    private static final String SH_INT_CONFIG_NOT_CONFIGURED_BUNDLE_ID = "Mon Nov 27 10:30:39.554 UTC\n"
+            + "interface GigabitEthernet0/0/0/2\n"
+            + " shutdown\n"
+            + "!\n"
+            + "\n";
 
     private static Config EXPECTED_CONFIG_NOT_CONFIGURED_BUNDLE_ID = new ConfigBuilder()
             .build();

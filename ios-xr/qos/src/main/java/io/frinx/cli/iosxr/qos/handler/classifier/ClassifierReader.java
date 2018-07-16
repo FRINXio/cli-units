@@ -49,7 +49,8 @@ public class ClassifierReader implements CliConfigListReader<Classifier, Classif
 
     @Nonnull
     @Override
-    public List<ClassifierKey> getAllIds(@Nonnull InstanceIdentifier<Classifier> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<ClassifierKey> getAllIds(@Nonnull InstanceIdentifier<Classifier> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
         List<ClassifierKey> allKeys = new ArrayList<>();
         // read match class-maps
         String output = blockingRead(SH_CLASS_MAPS, cli, instanceIdentifier, readContext);
@@ -63,13 +64,13 @@ public class ClassifierReader implements CliConfigListReader<Classifier, Classif
     @VisibleForTesting
     static List<ClassifierKey> getClassifierMapKeys(String output) {
         return ParsingUtils.parseFields(output, 0, CLASSIFIER_NAME_LINE::matcher,
-                matcher -> matcher.group("name"), ClassifierKey::new);
+            matcher -> matcher.group("name"), ClassifierKey::new);
     }
 
     @VisibleForTesting
     static List<ClassifierKey> getClassifierDefaultKeys(String output) {
         return ParsingUtils.parseFields(output, 0, SchedulerPolicyReader.POLICY_NAME_LINE::matcher,
-                matcher -> matcher.group("name"), n -> new ClassifierKey(n + DEFAULT_CLASS_SUFFIX));
+            matcher -> matcher.group("name"), n -> new ClassifierKey(n + DEFAULT_CLASS_SUFFIX));
     }
 
     @Override
@@ -78,7 +79,8 @@ public class ClassifierReader implements CliConfigListReader<Classifier, Classif
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Classifier> instanceIdentifier, @Nonnull ClassifierBuilder builder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Classifier> instanceIdentifier, @Nonnull
+            ClassifierBuilder builder, @Nonnull ReadContext readContext) throws ReadFailedException {
         ClassifierKey key = instanceIdentifier.firstKeyOf(Classifier.class);
         builder.setName(key.getName());
     }

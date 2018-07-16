@@ -46,7 +46,8 @@ public class AsPathSetReader implements CliConfigListReader<AsPathSet, AsPathSet
 
     @Nonnull
     @Override
-    public List<AsPathSetKey> getAllIds(@Nonnull InstanceIdentifier<AsPathSet> id, @Nonnull ReadContext context) throws ReadFailedException {
+    public List<AsPathSetKey> getAllIds(@Nonnull InstanceIdentifier<AsPathSet> id, @Nonnull ReadContext context)
+            throws ReadFailedException {
         String output = blockingRead(SH_ALL_PREFIX_SETS, cli, id, context);
         return parseAllIds(output);
     }
@@ -55,7 +56,7 @@ public class AsPathSetReader implements CliConfigListReader<AsPathSet, AsPathSet
     static List<AsPathSetKey> parseAllIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 ID_PATTERN::matcher,
-                m -> m.group("id"),
+            m -> m.group("id"),
                 AsPathSetKey::new);
     }
 
@@ -65,7 +66,8 @@ public class AsPathSetReader implements CliConfigListReader<AsPathSet, AsPathSet
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<AsPathSet> id, @Nonnull AsPathSetBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<AsPathSet> id, @Nonnull AsPathSetBuilder builder,
+                                      @Nonnull ReadContext ctx) throws ReadFailedException {
         AsPathSetKey communitySetKey = id.firstKeyOf(AsPathSet.class);
         builder.setAsPathSetName(communitySetKey.getAsPathSetName());
     }

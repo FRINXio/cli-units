@@ -28,15 +28,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 
 public class NeighborReaderTest {
 
-    private static final String OUTPUT = "Fri Feb 23 06:19:58.022 UTC\n" +
-            " neighbor-group nbrgroup1\n" +
-            " neighbor 5.5.5.5\n" +
-            " neighbor 6.6.6.6\n" +
-            " neighbor 8.8.8.8";
+    private static final String OUTPUT = "Fri Feb 23 06:19:58.022 UTC\n"
+            + " neighbor-group nbrgroup1\n"
+            + " neighbor 5.5.5.5\n"
+            + " neighbor 6.6.6.6\n"
+            + " neighbor 8.8.8.8";
 
-    private static final String IPV6_NEIGHBORS_OUTPUT = "Tue Feb 27 08:53:41.685 UTC\n" +
-            " neighbor 6.6.6.6\n" +
-            " neighbor dead:beef::1";
+    private static final String IPV6_NEIGHBORS_OUTPUT = "Tue Feb 27 08:53:41.685 UTC\n"
+            + " neighbor 6.6.6.6\n"
+            + " neighbor dead:beef::1";
 
     private static final List<NeighborKey> EXPECTED_KEYS = Lists.newArrayList("5.5.5.5", "6.6.6.6", "8.8.8.8")
             .stream()

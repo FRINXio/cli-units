@@ -25,7 +25,9 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
 import io.frinx.openconfig.openconfig.acl.IIDs;
+
 import java.util.concurrent.CompletableFuture;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,13 +58,13 @@ public class EgressAclSetConfigReaderTest {
     @Before
     public void setUp() throws Exception {
         Mockito.when(cliMock.executeAndRead(Mockito.any()))
-            .then(invocation -> CompletableFuture.completedFuture(TestData.READ_OUTPUT));
+                .then(invocation -> CompletableFuture.completedFuture(TestData.READ_OUTPUT));
 
         final ModificationCache modificationCacheMock = Mockito.mock(ModificationCache.class);
         Mockito.when(context.getModificationCache())
-            .then(invocation -> modificationCacheMock);
+                .then(invocation -> modificationCacheMock);
         Mockito.when(context.getModificationCache().containsKey(Mockito.any()))
-            .then(invocation -> true);
+                .then(invocation -> true);
     }
 
     @Test
@@ -70,9 +72,13 @@ public class EgressAclSetConfigReaderTest {
         final String setName = "IPV4_ACL_EXAMPLE2";
         final String type = "ipv4";
         String readOutput = "Tue Apr  3 01:10:12.042 UTC\n"
-            + "interface Bundle-Ether666\n"
-            + " " + type + " access-group " + setName + " egress\n"
-            + "!";
+                + "interface Bundle-Ether666\n"
+                + " "
+                + type
+                + " access-group "
+                + setName
+                + " egress\n"
+                + "!";
 
         final ConfigBuilder builder = new ConfigBuilder();
         EgressAclSetReader.parseAcl(readOutput, builder, setName);
@@ -85,7 +91,7 @@ public class EgressAclSetConfigReaderTest {
     @Test
     public void readAclConfig_LAGInterface() throws ReadFailedException {
         Mockito.when(context.read(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
 
         final ConfigBuilder aclSetBuilder = new ConfigBuilder();
         EgressAclSetConfigReader reader = new EgressAclSetConfigReader(cliMock);
@@ -102,34 +108,38 @@ public class EgressAclSetConfigReaderTest {
         private static final String ACL_SET_NAME_OTHER = "bubu_group";
         private static final Class<? extends ACLTYPE> ACL_TYPE = ACLIPV6.class;
         private static final String READ_OUTPUT = String.format("interface GigabitEthernet0/0/0/0\n"
-                + " ipv6 access-group %s egress\n"
-                + " ipv6 access-group %s egress\n"
-                + "!",
-            ACL_SET_NAME, ACL_SET_NAME_OTHER);
+                        + " ipv6 access-group %s egress\n"
+                        + " ipv6 access-group %s egress\n"
+                        + "!",
+                ACL_SET_NAME, ACL_SET_NAME_OTHER);
 
         static final InstanceIdentifier<Config> ACL_CONFIG_IID = IIDs.AC_INTERFACES
-            .child(Interface.class, new InterfaceKey(new InterfaceId(INTERFACE_NAME)))
-            .child(EgressAclSets.class)
-            .child(EgressAclSet.class, new EgressAclSetKey(ACL_SET_NAME, ACL_TYPE))
-            .child(Config.class);
+                .child(Interface.class, new InterfaceKey(new InterfaceId(INTERFACE_NAME)))
+                .child(EgressAclSets.class)
+                .child(EgressAclSet.class, new EgressAclSetKey(ACL_SET_NAME, ACL_TYPE))
+                .child(Config.class);
 
-        static final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface
-            INTERFACE_CORRECT_TYPE =
-            new InterfaceBuilder()
-                .setName(INTERFACE_NAME)
-                .setConfig(
-                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
-                        .setType(Ieee8023adLag.class)
-                        .build())
-                .build();
-        static final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface
-            INTERFACE_WRONG_TYPE =
-            new InterfaceBuilder()
-                .setName(INTERFACE_NAME)
-                .setConfig(
-                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
-                        .setType(L2vlan.class)
-                        .build())
-                .build();
+        static final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+                .interfaces.Interface
+                INTERFACE_CORRECT_TYPE =
+                new InterfaceBuilder()
+                        .setName(INTERFACE_NAME)
+                        .setConfig(
+                                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                        .rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                                        .setType(Ieee8023adLag.class)
+                                        .build())
+                        .build();
+        static final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+                .interfaces.Interface
+                INTERFACE_WRONG_TYPE =
+                new InterfaceBuilder()
+                        .setName(INTERFACE_NAME)
+                        .setConfig(
+                                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                        .rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                                        .setType(L2vlan.class)
+                                        .build())
+                        .build();
     }
 }

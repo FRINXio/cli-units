@@ -26,6 +26,8 @@ import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
@@ -41,9 +43,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-import java.util.regex.Pattern;
 
 public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
@@ -72,66 +71,78 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
-            .child(Global.class)
-            .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config.class))
-            .orNull();
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
+                globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
+                .child(Global.class)
+                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
+                        .Config.class))
+                .orNull();
 
         if (globalConfig == null) {
             return;
         }
 
-        IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress();
+        IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class)
+                .getNeighborAddress();
         configBuilder.setNeighborAddress(neighborIp);
 
         String address = new String(neighborIp.getValue());
-        String insName = instanceIdentifier.firstKeyOf(Protocol.class).getName().equals(NetworInstance.DEFAULT_NETWORK_NAME) ?
-                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class).getName();
+        String insName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName()
+                .equals(NetworInstance.DEFAULT_NETWORK_NAME)
+                ?
+                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
 
-        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs().getValue().intValue(), insName, address), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs()
+                .getValue()
+                .intValue(), insName, address), cli, instanceIdentifier, readContext);
 
         readNeighbor(output, configBuilder, address);
     }
 
     @VisibleForTesting
-    public static void readNeighbor(final String output, final ConfigBuilder configBuilder, final String neighborAddress) {
+    public static void readNeighbor(final String output, final ConfigBuilder configBuilder, final String
+            neighborAddress) {
 
         String neighbor = NEWLINE.splitAsStream(realignOutput(output))
                 .filter(neighborLine -> neighborLine.contains(neighborAddress))
-                .findFirst().orElse("");
+                .findFirst()
+                .orElse("");
 
         // remote-as 65000
         ParsingUtils.parseField(neighbor.trim(), 0,
                 REMOTE_AS_LINE::matcher,
-                matcher -> matcher.group("remoteAs"),
-                value -> configBuilder.setPeerAs(new AsNumber(Long.parseLong(value.trim()))));
+            matcher -> matcher.group("remoteAs"),
+            value -> configBuilder.setPeerAs(new AsNumber(Long.parseLong(value.trim()))));
 
         // shutdown (reverse the result, if we DO find the match, set to FALSE)
         ParsingUtils.findMatch(neighbor, SHUTDOWN_LINE, configBuilder::setEnabled);
         configBuilder.setEnabled(!configBuilder.isEnabled());
 
         // use neighbor-group iBGP
-        ParsingUtils.parseField(neighbor, NEIGHBOR_LINE::matcher, matcher -> matcher.group("group"), configBuilder::setPeerGroup);
+        ParsingUtils.parseField(neighbor, NEIGHBOR_LINE::matcher, matcher -> matcher.group("group"),
+                configBuilder::setPeerGroup);
 
         // password
         ParsingUtils.parseField(output, PASSWORD_LINE::matcher,
-                matcher -> matcher.group("password"),
-                password -> configBuilder.setAuthPassword(new RoutingPassword(password)));
+            matcher -> matcher.group("password"),
+            password -> configBuilder.setAuthPassword(new RoutingPassword(password)));
 
         // description
         ParsingUtils.parseField(output, DESCRIPTION_LINE::matcher,
-                matcher -> matcher.group("description"),
-                password -> configBuilder.setDescription(password));
+            matcher -> matcher.group("description"),
+            password -> configBuilder.setDescription(password));
 
         // send-community-ebgp
         ParsingUtils.parseField(output, SEND_COMMUNITY_LINE::matcher,
-                matcher -> matcher.matches(),
-                matches -> configBuilder.setSendCommunity(matches ? CommunityType.BOTH : null));
+            matcher -> matcher.matches(),
+            matches -> configBuilder.setSendCommunity(matches ? CommunityType.BOTH : null));
 
         // remove-private-AS
         ParsingUtils.parseField(output, REMOVE_AS_LINE::matcher,
-                matcher -> matcher.matches(),
-                matches -> configBuilder.setRemovePrivateAs(matches ? PRIVATEASREMOVEALL.class : null));
+            matcher -> matcher.matches(),
+            matches -> configBuilder.setRemovePrivateAs(matches ? PRIVATEASREMOVEALL.class : null));
     }
 
     private static String realignOutput(String output) {

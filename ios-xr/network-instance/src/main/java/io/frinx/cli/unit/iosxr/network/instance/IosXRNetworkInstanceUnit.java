@@ -89,73 +89,82 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
         // VRFs
-        rRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader()));
-        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_STATE, new NetworkInstanceStateReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader()));
+        readRegistry.add(new GenericOperReader<>(IIDs.NE_NE_STATE, new NetworkInstanceStateReader(cli)));
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
-        rRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader()));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
+        readRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader()));
 
         // PF
-        rRegistry.addStructuralReader(IIDs.NE_NE_POLICYFORWARDING, PolicyForwardingBuilder.class);
-        rRegistry.addStructuralReader(IIDs.NE_NE_PO_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(
+        readRegistry.addStructuralReader(IIDs.NE_NE_POLICYFORWARDING, PolicyForwardingBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_PO_INTERFACES, InterfacesBuilder.class);
+        readRegistry.add(
                 new GenericConfigListReader<>(IIDs.NE_NE_PO_IN_INTERFACE, new PolicyForwardingInterfaceReader(cli)));
-        rRegistry.add(
+        readRegistry.add(
                 new GenericConfigReader<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli)));
 
 
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, LocalAggregatesBuilder.class);
-        rRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(Aggregate.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class),
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, LocalAggregatesBuilder.class);
+        readRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(Aggregate.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing
+                                .rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class),
                 InstanceIdentifier.create(Aggregate.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing
+                                .rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class)
                         .augmentation(NiProtAggAug.class)),
                 new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new ProtocolLocalAggregateReader(cli)));
     }
 
-    private void provideWriters(@Nonnull ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
+    private void provideWriters(@Nonnull ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         // No handling required on the network instance level
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
 
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG,
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG,
                         new CompositeWriter<>(Lists.newArrayList(
                                 new DefaultConfigWriter()))),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new NoopCliListWriter<>()));
-        wRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class)
-                .augmentation(NiProtAggAug.class)),new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new ProtocolLocalAggregateConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new NoopCliListWriter<>()));
+        writeRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx
+                .openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config
+                .class)
+                .augmentation(NiProtAggAug.class)), new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new
+                ProtocolLocalAggregateConfigWriter(cli)));
         // PF
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PO_IN_INTERFACE, new NoopCliListWriter<>()));
-        wRegistry.subtreeAddAfter(Sets.newHashSet(PF_IFC_CFG_ROOT_ID.augmentation(NiPfIfCiscoAug.class)),
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PO_IN_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.subtreeAddAfter(Sets.newHashSet(PF_IFC_CFG_ROOT_ID.augmentation(NiPfIfCiscoAug.class)),
                 new GenericWriter<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigWriter(cli)),
-                        /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
+                /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension.cisco.rev171109.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.$YangModuleInfoImpl.getInstance());
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance
+                        .rev170228.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding
+                        .rev170621.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension
+                        .cisco.rev171109.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.$YangModuleInfoImpl
+                        .getInstance());
     }
 
     @Override

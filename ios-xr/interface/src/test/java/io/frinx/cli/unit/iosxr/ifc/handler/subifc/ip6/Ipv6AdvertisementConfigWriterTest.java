@@ -58,69 +58,75 @@ public class Ipv6AdvertisementConfigWriterTest {
         context = Mockito.mock(WriteContext.class);
 
         Mockito.when(cliMock.executeAndRead(Mockito.any()))
-            .then(invocation -> CompletableFuture.completedFuture(""));
+                .then(invocation -> CompletableFuture.completedFuture(""));
     }
 
     @Test
     public void settingAdvertisement_LAGInterface_goldenPathTest() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
 
         final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
 
         final String interfaceName = TestData.INTERFACE_CORRECT_TYPE.getName();
-        writer.writeCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID(interfaceName), TestData.SUPPRESS_TRUE_DATA, context);
+        writer.writeCurrentAttributes(TestData.advertisementConfigIid(interfaceName), TestData.SUPPRESS_TRUE_DATA,
+                context);
 
-        Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(Mockito.any());
+        Mockito.verify(cliMock, Mockito.times(1))
+                .executeAndRead(Mockito.any());
     }
 
     @Test
     public void settingAdvertisement_nonLAGInterface() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_VLAN_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_VLAN_TYPE));
 
         final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(CoreMatchers.allOf(
-            CoreMatchers.containsString(Ipv6CheckUtil.CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX),
-            CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
-            CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
+                CoreMatchers.containsString(Ipv6CheckUtil.CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX),
+                CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
+                CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
         ));
 
         final String interfaceName = TestData.INTERFACE_VLAN_TYPE.getName();
-        writer.writeCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID(interfaceName), TestData.SUPPRESS_TRUE_DATA, context);
+        writer.writeCurrentAttributes(TestData.advertisementConfigIid(interfaceName), TestData.SUPPRESS_TRUE_DATA,
+                context);
     }
 
     @Test
     public void deleteAdvertisement_LAGInterface() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_CORRECT_TYPE));
 
         final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
 
         final String interfaceName = TestData.INTERFACE_CORRECT_TYPE.getName();
-        writer.deleteCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID(interfaceName), TestData.SUPPRESS_TRUE_DATA, context);
+        writer.deleteCurrentAttributes(TestData.advertisementConfigIid(interfaceName), TestData.SUPPRESS_TRUE_DATA,
+                context);
 
-        Mockito.verify(cliMock, Mockito.times(1)).executeAndRead(Mockito.any());
+        Mockito.verify(cliMock, Mockito.times(1))
+                .executeAndRead(Mockito.any());
     }
 
     @Test
     public void deleteAdvertisement_nonLAGInterface() throws WriteFailedException {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_VLAN_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_VLAN_TYPE));
 
         final Ipv6AdvertisementConfigWriter writer = new Ipv6AdvertisementConfigWriter(cliMock);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(CoreMatchers.allOf(
-            CoreMatchers.containsString(Ipv6CheckUtil.CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX),
-            CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
-            CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
+                CoreMatchers.containsString(Ipv6CheckUtil.CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX),
+                CoreMatchers.containsString(EthernetCsmacd.class.getSimpleName()),
+                CoreMatchers.containsString(Ieee8023adLag.class.getSimpleName())
         ));
 
         final String interfaceName = TestData.INTERFACE_VLAN_TYPE.getName();
-        writer.deleteCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID(interfaceName), TestData.SUPPRESS_TRUE_DATA, context);
+        writer.deleteCurrentAttributes(TestData.advertisementConfigIid(interfaceName), TestData.SUPPRESS_TRUE_DATA,
+                context);
     }
 
     static class TestData {
@@ -130,33 +136,38 @@ public class Ipv6AdvertisementConfigWriterTest {
         static final long SUBINTERFACE_INDEX = 0L;
 
         static final Config SUPPRESS_TRUE_DATA = new ConfigBuilder()
-            .setSuppress(true)
-            .build();
+                .setSuppress(true)
+                .build();
         static final Interface INTERFACE_CORRECT_TYPE = new InterfaceBuilder()
-            .setName(INTERFACE_NAME)
-            .setConfig(
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
-                    .setType(Ieee8023adLag.class)
-                    .build())
-            .build();
+                .setName(INTERFACE_NAME)
+                .setConfig(
+                        new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                .rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                                .setType(Ieee8023adLag.class)
+                                .build())
+                .build();
         static final Interface INTERFACE_VLAN_TYPE = new InterfaceBuilder()
-            .setName(INTERFACE_NAME_VLAN)
-            .setConfig(
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
-                    .setType(L2vlan.class)
-                    .build())
-            .build();
+                .setName(INTERFACE_NAME_VLAN)
+                .setConfig(
+                        new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                .rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                                .setType(L2vlan.class)
+                                .build())
+                .build();
 
-        static final InstanceIdentifier<Interface> INTERFACE_IID(final String interfaceName) {
+        static final InstanceIdentifier<Interface> interfaceIid(final String interfaceName) {
             return IIDs.INTERFACES.child(Interface.class, new InterfaceKey(interfaceName));
         }
 
 
-        static final InstanceIdentifier<Config> ADVERTISEMENT_CONFIG_IID(final String interfaceName) {
-            return INTERFACE_IID(interfaceName)
-                .child(Subinterfaces.class)
-                .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX)).augmentation(Subinterface2.class)
-                .child(Ipv6.class).child(RouterAdvertisement.class).child(Config.class);
+        static final InstanceIdentifier<Config> advertisementConfigIid(final String interfaceName) {
+            return interfaceIid(interfaceName)
+                    .child(Subinterfaces.class)
+                    .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX))
+                    .augmentation(Subinterface2.class)
+                    .child(Ipv6.class)
+                    .child(RouterAdvertisement.class)
+                    .child(Config.class);
         }
     }
 }

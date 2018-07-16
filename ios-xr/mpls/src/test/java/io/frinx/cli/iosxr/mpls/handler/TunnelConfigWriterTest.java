@@ -42,23 +42,23 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class TunnelConfigWriterTest {
 
-    private static final String WRITE_INPUT = "interface tunnel-te 55\n" +
-        "autoroute announce\n" +
-        "metric absolute 5\n" +
-        "root\n";
+    private static final String WRITE_INPUT = "interface tunnel-te 55\n"
+            + "autoroute announce\n"
+            + "metric absolute 5\n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT = "interface tunnel-te 55\n" +
-        "autoroute announce\n" +
-        "no metric absolute\n" +
-        "root\n";
+    private static final String UPDATE_INPUT = "interface tunnel-te 55\n"
+            + "autoroute announce\n"
+            + "no metric absolute\n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT2 = "interface tunnel-te 55\n" +
-        "autoroute announce\n" +
-        "root\n";
+    private static final String UPDATE_INPUT2 = "interface tunnel-te 55\n"
+            + "autoroute announce\n"
+            + "root\n";
 
-    private static final String UPDATE_CLEAN_INPUT = "interface tunnel-te 55\n" +
-        "no autoroute announce\n" +
-        "root\n";
+    private static final String UPDATE_CLEAN_INPUT = "interface tunnel-te 55\n"
+            + "no autoroute announce\n"
+            + "root\n";
 
     private static final String DELETE_INPUT = "no interface tunnel-te 55\n\n";
 
@@ -85,7 +85,8 @@ public class TunnelConfigWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        Mockito.when(cli.executeAndRead(Mockito.any()))
+                .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new TunnelConfigWriter(this.cli);
         initializeData();
@@ -93,17 +94,19 @@ public class TunnelConfigWriterTest {
 
     private void initializeData() {
         data = new ConfigBuilder().setShortcutEligible(true)
-            .setMetricType(LSPMETRICABSOLUTE.class)
-            .setMetric(5)
-            .build();
+                .setMetricType(LSPMETRICABSOLUTE.class)
+                .setMetric(5)
+                .build();
     }
 
     @Test
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -114,8 +117,10 @@ public class TunnelConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -126,8 +131,10 @@ public class TunnelConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iid, noMetricData, noMetricData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT2, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT2, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -140,34 +147,43 @@ public class TunnelConfigWriterTest {
         this.writer.deleteCurrentAttributes(iid, data, context);
         this.writer.writeCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli, Mockito.atLeastOnce())
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void updateClean() throws WriteFailedException {
         // remove autoroute
-        Config newData = new ConfigBuilder().setShortcutEligible(false).build();
+        Config newData = new ConfigBuilder().setShortcutEligible(false)
+                .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void checkTunnelConfig_valid_onlyShortcutEligible() {
-        data = new ConfigBuilder().setShortcutEligible(true).build();
+        data = new ConfigBuilder().setShortcutEligible(true)
+                .build();
         TunnelConfigWriter.checkTunnelConfig(data);
-        data = new ConfigBuilder().setShortcutEligible(false).build();
+        data = new ConfigBuilder().setShortcutEligible(false)
+                .build();
         TunnelConfigWriter.checkTunnelConfig(data);
     }
 

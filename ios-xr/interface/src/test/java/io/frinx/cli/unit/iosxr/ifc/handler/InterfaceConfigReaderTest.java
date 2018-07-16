@@ -25,26 +25,25 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 
 public class InterfaceConfigReaderTest {
 
-    private static final String SH_RUN_INT = "Fri Nov 24 11:50:02.834 UTC\n" +
-            "interface Loopback0\n" +
-            " ipv4 address 99.0.0.3 255.255.255.255\n" +
-            " ipv6 address fe80::260:3eff:fe11:6770 link-local\n" +
-            " shutdown\n" +
-            "!\n" +
-            "\n";
+    private static final String SH_RUN_INT = "Fri Nov 24 11:50:02.834 UTC\n"
+            + "interface Loopback0\n"
+            + " ipv4 address 99.0.0.3 255.255.255.255\n"
+            + " ipv6 address fe80::260:3eff:fe11:6770 link-local\n"
+            + " shutdown\n"
+            + "!\n"
+            + "\n";
 
-    private static final Config EXPECTED_CONFIG = new ConfigBuilder()
-            .setName("Loopback0")
+    private static final Config EXPECTED_CONFIG = new ConfigBuilder().setName("Loopback0")
             .setEnabled(false)
             .setType(SoftwareLoopback.class)
             .build();
 
-    private static final String SH_RUN_INT2 = "Fri Nov 24 11:56:59.795 UTC\n" +
-            "interface GigabitEthernet0/0/0/0\n" +
-            " description example\n" +
-            " mtu 1500\n" +
-            "!\n" +
-            "\n";
+    private static final String SH_RUN_INT2 = "Fri Nov 24 11:56:59.795 UTC\n"
+            + "interface GigabitEthernet0/0/0/0\n"
+            + " description example\n"
+            + " mtu 1500\n"
+            + "!\n"
+            + "\n";
 
     private static final Config EXPECTED_CONFIG2 = new ConfigBuilder()
             .setName("GigabitEthernet0/0/0/0")

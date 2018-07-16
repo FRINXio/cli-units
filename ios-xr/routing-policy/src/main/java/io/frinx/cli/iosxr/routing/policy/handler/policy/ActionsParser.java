@@ -58,8 +58,8 @@ class ActionsParser {
     private static final BgpActions EMPTY_BGP_ACTIONS = new BgpActionsBuilder().build();
 
     @VisibleForTesting
-    static void parseBgpActions(String line, ActionsBuilder b) {
-        Actions2 augmentation = b.getAugmentation(Actions2.class);
+    static void parseBgpActions(String line, ActionsBuilder actionsBuilder) {
+        Actions2 augmentation = actionsBuilder.getAugmentation(Actions2.class);
 
         BgpActionsBuilder bgpActsBuilder;
         if (augmentation != null && augmentation.getBgpActions() != null) {
@@ -82,7 +82,7 @@ class ActionsParser {
             return;
         }
         bgpCondsAugmentBuilder.setBgpActions(build);
-        b.addAugmentation(Actions2.class, bgpCondsAugmentBuilder.build());
+        actionsBuilder.addAugmentation(Actions2.class, bgpCondsAugmentBuilder.build());
     }
 
     private static final Pattern LOCAL_PREF = Pattern.compile("set local-preference (?<value>\\S+)");
@@ -95,17 +95,20 @@ class ActionsParser {
         if (matcher.matches()) {
             String val = matcher.group("value");
             Long value;
-            if (LP_TYPE1.matcher(val).matches()) {
+            if (LP_TYPE1.matcher(val)
+                    .matches()) {
                 // not supported by model
                 return;
-            } else if (LP_TYPE2.matcher(val).matches()) {
+            } else if (LP_TYPE2.matcher(val)
+                    .matches()) {
                 value = Long.valueOf(val);
             } else {
                 // not supported by model
                 return;
             }
 
-            ConfigBuilder cfgBuilder = builder.getConfig() == null ? new ConfigBuilder() : new ConfigBuilder(builder.getConfig());
+            ConfigBuilder cfgBuilder = builder.getConfig() == null ? new ConfigBuilder() : new ConfigBuilder(builder
+                    .getConfig());
             builder.setConfig(cfgBuilder
                     .setSetLocalPref(value)
                     .build());
@@ -122,16 +125,19 @@ class ActionsParser {
         if (matcher.matches()) {
             String val = matcher.group("value");
             BgpNextHopType value;
-            if (NP_TYPE_SELF.matcher(val).matches()) {
+            if (NP_TYPE_SELF.matcher(val)
+                    .matches()) {
                 value = new BgpNextHopType(BgpNextHopType.Enumeration.SELF);
-            } else if (NP_TYPE_IP.matcher(val).matches()) {
+            } else if (NP_TYPE_IP.matcher(val)
+                    .matches()) {
                 value = new BgpNextHopType(IpAddressBuilder.getDefaultInstance(val));
             } else {
                 // not supported by model
                 return;
             }
 
-            ConfigBuilder cfgBuilder = builder.getConfig() == null ? new ConfigBuilder() : new ConfigBuilder(builder.getConfig());
+            ConfigBuilder cfgBuilder = builder.getConfig() == null ? new ConfigBuilder() : new ConfigBuilder(builder
+                    .getConfig());
             builder.setConfig(cfgBuilder
                     .setSetNextHop(value)
                     .build());
@@ -139,7 +145,8 @@ class ActionsParser {
     }
 
     private static final Pattern SET_COMM = Pattern.compile("set community (?<value>[^\\s()]+)(?<additive> additive)?");
-    private static final Pattern SET_COMM_INLINE = Pattern.compile("set community \\((?<value>.+)\\)(?<additive> additive)?");
+    private static final Pattern SET_COMM_INLINE = Pattern.compile("set community \\((?<value>.+)\\)(?<additive> "
+            + "additive)?");
     private static final Pattern INLINE_COM_SEPARATOR = Pattern.compile(",\\s");
     private static final Pattern INLINE_COM = Pattern.compile("[0-9:]+");
 
@@ -151,12 +158,14 @@ class ActionsParser {
             String additive = matcher.group("additive");
 
             builder.setSetCommunity(new SetCommunityBuilder()
-                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.set.community.ConfigBuilder()
+                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
+                            .rev170730.set.community.action.top.set.community.ConfigBuilder()
                             .setMethod(SetCommunityActionCommon.Method.REFERENCE)
                             .setOptions(Strings.isNullOrEmpty(additive) ? null : BgpSetCommunityOptionType.ADD)
                             .build())
                     .setReference(new ReferenceBuilder()
-                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.reference.top.reference.ConfigBuilder()
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
+                                    .rev170730.set.community.reference.top.reference.ConfigBuilder()
                                     .setCommunitySetRef(val)
                                     .build())
                             .build())
@@ -169,18 +178,21 @@ class ActionsParser {
         if (matcher.matches()) {
             String val = matcher.group("value");
             List<SetCommunityInlineConfig.Communities> parsedCommunities = INLINE_COM_SEPARATOR.splitAsStream(val)
-                    .filter(c -> INLINE_COM.matcher(c).matches())
+                    .filter(c -> INLINE_COM.matcher(c)
+                            .matches())
                     .map(ActionsParser::parseSingleInlineCommunity)
                     .collect(toList());
             String additive = matcher.group("additive");
 
             builder.setSetCommunity(new SetCommunityBuilder()
-                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.set.community.ConfigBuilder()
+                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
+                            .rev170730.set.community.action.top.set.community.ConfigBuilder()
                             .setMethod(SetCommunityActionCommon.Method.INLINE)
                             .setOptions(Strings.isNullOrEmpty(additive) ? null : BgpSetCommunityOptionType.ADD)
                             .build())
                     .setInline(new InlineBuilder()
-                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.inline.ConfigBuilder()
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
+                                    .rev170730.set.community.inline.top.inline.ConfigBuilder()
                                     .setCommunities(parsedCommunities)
                                     .build())
                             .build())
@@ -188,9 +200,11 @@ class ActionsParser {
         }
     }
 
-    private static SetCommunityInlineConfig.Communities parseSingleInlineCommunity(String s) {
-        SetCommunityInlineConfig.Communities communities = new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(s));
-        // This is a workaround, if we don't call getValue, the _value field will not be set and then equals method does not work as expected
+    private static SetCommunityInlineConfig.Communities parseSingleInlineCommunity(String string) {
+        SetCommunityInlineConfig.Communities communities = new SetCommunityInlineConfig.Communities(new
+                BgpStdCommunityType(string));
+        // This is a workaround, if we don't call getValue, the _value field will not be set and then equals method
+        // does not work as expected
         communities.getValue();
         return communities;
     }
@@ -211,10 +225,12 @@ class ActionsParser {
                 repeat = Short.valueOf(rep);
             }
 
-            if (PA_TYPE1.matcher(val).matches()) {
+            if (PA_TYPE1.matcher(val)
+                    .matches()) {
                 // FIXME reuse utilities from unitopo-units/**/As class (to transform between 54545 and 43.53)
                 return;
-            } else if (PA_TYPE2.matcher(val).matches()) {
+            } else if (PA_TYPE2.matcher(val)
+                    .matches()) {
                 value = Long.valueOf(val);
             } else {
                 // not supported
@@ -222,7 +238,8 @@ class ActionsParser {
             }
 
             builder.setSetAsPathPrepend(new SetAsPathPrependBuilder()
-                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.ConfigBuilder()
+                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
+                            .rev170730.as.path.prepend.top.set.as.path.prepend.ConfigBuilder()
                             .setAsn(new AsNumber(value))
                             .setRepeatN(repeat)
                             .build())
@@ -243,19 +260,24 @@ class ActionsParser {
         if (matcher.matches()) {
             String val = matcher.group("value");
             BgpSetMedType value;
-            if (MED_TYPE1.matcher(val).matches()) {
+            if (MED_TYPE1.matcher(val)
+                    .matches()) {
                 value = new BgpSetMedType(val);
-            } else if (MED_TYPE2.matcher(val).matches()) {
+            } else if (MED_TYPE2.matcher(val)
+                    .matches()) {
                 value = new BgpSetMedType(Long.valueOf(val));
-            } else if (MED_TYPE3.matcher(val).matches()) {
+            } else if (MED_TYPE3.matcher(val)
+                    .matches()) {
                 value = new BgpSetMedType(BgpSetMedType.Enumeration.IGP);
-            } else if (MED_TYPE4.matcher(val).matches()) {
+            } else if (MED_TYPE4.matcher(val)
+                    .matches()) {
                 value = new BgpSetMedType(MED_TYPE4_VALUE);
             } else {
                 value = new BgpSetMedType(val);
             }
 
-            ConfigBuilder cfgBuilder = builder.getConfig() == null ? new ConfigBuilder() : new ConfigBuilder(builder.getConfig());
+            ConfigBuilder cfgBuilder = builder.getConfig() == null ? new ConfigBuilder() : new ConfigBuilder(builder
+                    .getConfig());
             builder.setConfig(cfgBuilder
                     .setSetMed(value)
                     .build());
@@ -266,18 +288,23 @@ class ActionsParser {
     static final Pattern DONE = Pattern.compile("done");
 
     @VisibleForTesting
-    static void parseGlobalAction(ActionsBuilder b, String line) {
-        if (b.getConfig() != null && b.getConfig().getPolicyResult() != null) {
+    static void parseGlobalAction(ActionsBuilder actionsBuilder, String line) {
+        if (actionsBuilder.getConfig() != null && actionsBuilder.getConfig()
+                .getPolicyResult() != null) {
             // Global action already parsed
             return;
         }
 
-        if (DROP.matcher(line).find()) {
-            b.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.actions.ConfigBuilder()
+        if (DROP.matcher(line)
+                .find()) {
+            actionsBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy
+                    .rev170714.policy.actions.top.actions.ConfigBuilder()
                     .setPolicyResult(PolicyResultType.REJECTROUTE)
                     .build());
-        } else if (DONE.matcher(line).find()) {
-            b.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.actions.ConfigBuilder()
+        } else if (DONE.matcher(line)
+                .find()) {
+            actionsBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy
+                    .rev170714.policy.actions.top.actions.ConfigBuilder()
                     .setPolicyResult(PolicyResultType.ACCEPTROUTE)
                     .build());
         }
@@ -286,8 +313,9 @@ class ActionsParser {
     private static final Pattern APPLY_POLICY = Pattern.compile("apply (?<value>\\S+).*");
 
     @VisibleForTesting
-    static void parseApplyPolicyCondition(String line, ConditionsBuilder b) {
-        if (b.getConfig() != null && b.getConfig().getCallPolicy() != null) {
+    static void parseApplyPolicyCondition(String line, ConditionsBuilder conditionsBuilder) {
+        if (conditionsBuilder.getConfig() != null && conditionsBuilder.getConfig()
+                .getCallPolicy() != null) {
             // Policy already parsed for statement
             return;
         }
@@ -295,11 +323,15 @@ class ActionsParser {
         Matcher matcher = APPLY_POLICY.matcher(line);
         if (matcher.matches()) {
 
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.conditions.ConfigBuilder builder = b.getConfig() == null ?
-                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.conditions.ConfigBuilder() :
-                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.conditions.ConfigBuilder(b.getConfig());
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions
+                    .top.conditions.ConfigBuilder builder = conditionsBuilder.getConfig() == null
+                    ?
+                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy
+                            .conditions.top.conditions.ConfigBuilder() :
+                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy
+                            .conditions.top.conditions.ConfigBuilder(conditionsBuilder.getConfig());
 
-            b.setConfig(builder
+            conditionsBuilder.setConfig(builder
                     .setCallPolicy(matcher.group("value"))
                     .build());
         }

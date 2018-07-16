@@ -42,7 +42,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class PrefixReader implements CliConfigListReader<Prefix, PrefixKey, PrefixBuilder> {
 
     private static final String SH_PREFIX_SET = "show running-config prefix-set %s";
-    private static final Pattern PREFIX_PATTERN = Pattern.compile("\\s+(?<network>[0-9a-f.:]+)/?(?<mask>[0-9]*)?\\s*(?<modifiers>.*)\\s*");
+    private static final Pattern PREFIX_PATTERN = Pattern.compile("\\s+(?<network>[0-9a-f.:]+)/?(?<mask>[0-9]*)?\\s*"
+            + "(?<modifiers>.*)\\s*");
 
     private static final Pattern GE_PATTERN = Pattern.compile(".*ge (?<value>[0-9]+)\\s*.*");
     private static final Pattern LE_PATTERN = Pattern.compile(".*le (?<value>[0-9]+)\\s*.*");
@@ -76,10 +77,13 @@ public class PrefixReader implements CliConfigListReader<Prefix, PrefixKey, Pref
                 .collect(Collectors.toList());
     }
 
-    private static PrefixKey toKey(Matcher m) {
-        String network = m.group("network").trim();
-        String mask = m.group("mask").trim();
-        String modifiers = m.group("modifiers").trim();
+    private static PrefixKey toKey(Matcher matcher) {
+        String network = matcher.group("network")
+                .trim();
+        String mask = matcher.group("mask")
+                .trim();
+        String modifiers = matcher.group("modifiers")
+                .trim();
 
         int maxLength = network.contains(":") ? 128 : 32;
 

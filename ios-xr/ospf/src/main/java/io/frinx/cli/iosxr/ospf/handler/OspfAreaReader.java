@@ -51,15 +51,16 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
     @Override
     public List<AreaKey> getAllIdsForType(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
                                           @Nonnull ReadContext readContext) throws ReadFailedException {
-        String id = instanceIdentifier.firstKeyOf(Protocol.class).getName();
+        String id = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
         return parseAreasIds(blockingRead(String.format(SH_RUN_OSPF_AREA, id), cli, instanceIdentifier, readContext));
     }
 
     private static List<AreaKey> parseAreasIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 AREA_ID::matcher,
-                m -> m.group("areaId"),
-                area -> new AreaKey(getAreaIdentifier(area)));
+            m -> m.group("areaId"),
+            area -> new AreaKey(getAreaIdentifier(area)));
     }
 
     private static OspfAreaIdentifier getAreaIdentifier(String area) {
@@ -79,6 +80,7 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
                                              @Nonnull AreaBuilder areaBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        areaBuilder.setIdentifier(instanceIdentifier.firstKeyOf(Area.class).getIdentifier());
+        areaBuilder.setIdentifier(instanceIdentifier.firstKeyOf(Area.class)
+                .getIdentifier());
     }
 }

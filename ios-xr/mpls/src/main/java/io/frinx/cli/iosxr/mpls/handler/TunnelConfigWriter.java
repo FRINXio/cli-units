@@ -22,21 +22,20 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.Tunnel;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.rev170824.LSPMETRICABSOLUTE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-
 public class TunnelConfigWriter implements CliWriter<Config> {
 
-    private final static String INPUT_T = "{% if ($delete) %}no {% endif %}interface tunnel-te {$name}\n" +
-            "{% if (!$delete) %}" +
-            "{% if (!$autoroute) %}no {% endif %}autoroute announce\n" +
-            "{% if ($autoroute) %}{% if ($metric == nondefined) %}" +
-            "no metric absolute\n{% else if ( $metric != $null) %}metric absolute {$metric}\n{% endif %}{% endif %}" +
-            "root{% endif %}";
+    private static final String INPUT_T = "{% if ($delete) %}no {% endif %}interface tunnel-te {$name}\n"
+            + "{% if (!$delete) %}"
+            + "{% if (!$autoroute) %}no {% endif %}autoroute announce\n"
+            + "{% if ($autoroute) %}{% if ($metric == nondefined) %}"
+            + "no metric absolute\n{% else if ( $metric != $null) %}metric absolute {$metric}\n{% endif %}{% endif %}"
+            + "root{% endif %}";
 
     private Cli cli;
 
@@ -45,8 +44,10 @@ public class TunnelConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = id.firstKeyOf(Tunnel.class).getName();
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+            WriteContext writeContext) throws WriteFailedException {
+        final String name = id.firstKeyOf(Tunnel.class)
+                .getName();
 
         checkTunnelConfig(data);
 
@@ -58,14 +59,16 @@ public class TunnelConfigWriter implements CliWriter<Config> {
     @VisibleForTesting
     static void checkTunnelConfig(Config data) {
         if (data.isShortcutEligible() == null || !data.isShortcutEligible()) {
-            Preconditions.checkArgument(data.getMetric() == null, "metric cannot be defined in MPLS " +
-                    "tunnel " + data.getName() + " because 'shortcut-eligible' is not defined or is 'false'");
-            Preconditions.checkArgument(data.getMetricType() == null, "metric-type cannot be defined in MPLS " +
-                    "tunnel " + data.getName() + " because 'shortcut-eligible' is not defined or is 'false'");
+            Preconditions.checkArgument(data.getMetric() == null, "metric cannot be defined in MPLS "
+                    + "tunnel " + data.getName() + " because 'shortcut-eligible' is not defined or is 'false'");
+            Preconditions.checkArgument(data.getMetricType() == null, "metric-type cannot be defined in MPLS "
+                    + "tunnel " + data.getName() + " because 'shortcut-eligible' is not defined or is 'false'");
         } else {
             if (data.getMetricType() == null || data.getMetric() == null) {
-                Preconditions.checkArgument(data.getMetric() == null, "metric is defined but metric-type is not in MPLS tunnel " + data.getName());
-                Preconditions.checkArgument(data.getMetricType() == null, "metric-type is defined but metric is not in MPLS tunnel " + data.getName());
+                Preconditions.checkArgument(data.getMetric() == null, "metric is defined but metric-type is not in "
+                        + "MPLS tunnel " + data.getName());
+                Preconditions.checkArgument(data.getMetricType() == null, "metric-type is defined but metric is not "
+                        + "in MPLS tunnel " + data.getName());
             } else {
                 Preconditions.checkArgument(LSPMETRICABSOLUTE.class.equals(data.getMetricType()),
                         "Only LSP_METRIC_ABSOLUTE metric type is supported");
@@ -79,20 +82,24 @@ public class TunnelConfigWriter implements CliWriter<Config> {
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
         if (wasMetricDefined(dataBefore, dataAfter)) {
-            final String name = id.firstKeyOf(Tunnel.class).getName();
+            final String name = id.firstKeyOf(Tunnel.class)
+                    .getName();
 
             checkTunnelConfig(dataAfter);
 
             blockingWriteAndRead(cli, id, dataAfter,
                     fT(INPUT_T, "name", name, "autoroute", dataAfter.isShortcutEligible() ? true : null,
                             "metric", "nondefined"));
-        } else
+        } else {
             this.writeCurrentAttributes(id, dataAfter, writeContext);
+        }
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = id.firstKeyOf(Tunnel.class).getName();
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+            WriteContext writeContext) throws WriteFailedException {
+        final String name = id.firstKeyOf(Tunnel.class)
+                .getName();
         blockingWriteAndRead(cli, id, data,
                 fT(INPUT_T, "name", name, "delete", true));
     }

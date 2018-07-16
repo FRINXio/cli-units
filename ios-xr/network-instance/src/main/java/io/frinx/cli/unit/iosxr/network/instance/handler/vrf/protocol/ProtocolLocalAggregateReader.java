@@ -35,7 +35,7 @@ public class ProtocolLocalAggregateReader extends CompositeListReader<Aggregate,
 
     public ProtocolLocalAggregateReader(final Cli cli) {
         super(Lists.newArrayList(
-            new BgpLocalAggregateReader(cli)
+                new BgpLocalAggregateReader(cli)
         ));
     }
 

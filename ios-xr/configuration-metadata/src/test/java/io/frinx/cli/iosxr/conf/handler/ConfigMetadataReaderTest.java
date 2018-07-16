@@ -27,10 +27,12 @@ public class ConfigMetadataReaderTest {
     @Test
     public void testParse() throws Exception {
 
-        Optional<String> Date1 = ConfigMetadataReader.getLastConfigurationFingerprint("Tue Apr  3 14:03:27.250 UTC\n1    1000007068            cisco     vty1:node0_0_CPU0   CLI         Tue Apr  3 13:03:39 2018\n");
-        Assert.assertEquals(Date1.get().toString(),"Tue Apr  3 13:03:39 2018");
+        Optional<String> date1 = ConfigMetadataReader.getLastConfigurationFingerprint("Tue Apr  3 14:03:27.250 UTC\n1"
+                + "    1000007068            cisco     vty1:node0_0_CPU0   CLI         Tue Apr  3 13:03:39 2018\n");
+        Assert.assertEquals(date1.get()
+                .toString(), "Tue Apr  3 13:03:39 2018");
 
-        Optional<String> Date2 = (ConfigMetadataReader.getLastConfigurationFingerprint(""));
-        assertFalse(Date2.isPresent());
+        Optional<String> date2 = (ConfigMetadataReader.getLastConfigurationFingerprint(""));
+        assertFalse(date2.isPresent());
     }
 }

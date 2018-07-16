@@ -38,9 +38,9 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
     }
 
     private static final String WRITE_TEMPLATE =
-            "interface %s\n" +
-            "encapsulation dot1q %s\n" +
-            "root";
+            "interface %s\n"
+                    + "encapsulation dot1q %s\n"
+                    + "root";
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
@@ -51,7 +51,9 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, dataAfter,
                 f(WRITE_TEMPLATE,
                         getSubinterfaceName(id),
-                        dataAfter.getVlanId().getVlanId().getValue()));
+                        dataAfter.getVlanId()
+                                .getVlanId()
+                                .getValue()));
 
     }
 
@@ -68,9 +70,9 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
     }
 
     private static final String DELETE_TEMPLATE =
-            "interface %s\n" +
-            "no encapsulation dot1q %s\n" +
-            "root";
+            "interface %s\n"
+                    + "no encapsulation dot1q %s\n"
+                    + "root";
 
 
     @Override
@@ -82,11 +84,14 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 f(DELETE_TEMPLATE,
                         getSubinterfaceName(id),
-                        dataBefore.getVlanId().getVlanId().getValue()));
+                        dataBefore.getVlanId()
+                                .getVlanId()
+                                .getValue()));
     }
 
     private static void checkNotZeroSubinterface(@Nonnull InstanceIdentifier<?> id) throws WriteFailedException {
-        Long subifcIndex = id.firstKeyOf(Subinterface.class).getIndex();
+        Long subifcIndex = id.firstKeyOf(Subinterface.class)
+                .getIndex();
         Preconditions.checkArgument(subifcIndex != ZERO_SUBINTERFACE_ID,
                 "Vlan configuration is not allowed for .%s subinterface", subifcIndex);
 

@@ -26,8 +26,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixSetConfigWriter implements CliWriter<Config> {
 
-    private static final String TEMPLATE = "{.if ($delete) }no {/if}prefix-set {$config.name}\n" +
-            "{.if ($delete) }{.else}end-set{/if}";
+    private static final String TEMPLATE = "{.if ($delete) }no {/if}prefix-set {$config.name}\n"
+            + "{.if ($delete) }{.else}end-set{/if}";
 
     private final Cli cli;
 
@@ -44,7 +44,8 @@ public class PrefixSetConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull
+            Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
         // NOOP, one line command with only one parameter does not need update
     }
 

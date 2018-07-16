@@ -17,24 +17,28 @@
 package io.frinx.cli.iosxr.mpls.handler;
 
 import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.InterfaceKey;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class TeInterfaceReaderTest {
 
-    private static final String OUTPUT = "Mon Feb 12 15:25:00.339 UTC\n" +
-            " interface GigabitEthernet0/0/0/3\n" +
-            " interface GigabitEthernet0/0/0/4";
+    private static final String OUTPUT = "Mon Feb 12 15:25:00.339 UTC\n"
+            + " interface GigabitEthernet0/0/0/3\n"
+            + " interface GigabitEthernet0/0/0/4";
+
     @Test
     public void testIds() {
         List<InterfaceKey> keys = TeInterfaceReader.getInterfaceKeys(OUTPUT);
         Assert.assertFalse(keys.isEmpty());
         Assert.assertEquals(Lists.newArrayList("GigabitEthernet0/0/0/3", "GigabitEthernet0/0/0/4"),
-            keys.stream().map(InterfaceKey::getInterfaceId).map(InterfaceId::getValue).collect(Collectors.toList()));
+                keys.stream()
+                        .map(InterfaceKey::getInterfaceId)
+                        .map(InterfaceId::getValue)
+                        .collect(Collectors.toList()));
     }
 }

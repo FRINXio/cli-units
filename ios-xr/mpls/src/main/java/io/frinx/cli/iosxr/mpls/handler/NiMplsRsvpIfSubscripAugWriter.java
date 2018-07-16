@@ -39,27 +39,35 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull NiMplsRsvpIfSubscripAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull
+            NiMplsRsvpIfSubscripAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        final String name = id.firstKeyOf(Interface.class)
+                .getInterfaceId()
+                .getValue();
         blockingWriteAndRead(cli, id, data,
-            "rsvp",
-            f("interface %s", name),
-            resolveBandwidth(data.getBandwidth()),
-            "root");
+                "rsvp",
+                f("interface %s", name),
+                resolveBandwidth(data.getBandwidth()),
+                "root");
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull NiMplsRsvpIfSubscripAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull
+            NiMplsRsvpIfSubscripAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        final String name = id.firstKeyOf(Interface.class)
+                .getInterfaceId()
+                .getValue();
         blockingWriteAndRead(cli, id, data,
-            "rsvp",
-            f("interface %s", name),
-            "no bandwidth",
-            "root");
+                "rsvp",
+                f("interface %s", name),
+                "no bandwidth",
+                "root");
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull NiMplsRsvpIfSubscripAug dataBefore, @Nonnull NiMplsRsvpIfSubscripAug dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull
+            NiMplsRsvpIfSubscripAug dataBefore, @Nonnull NiMplsRsvpIfSubscripAug dataAfter, @Nonnull WriteContext
+            writeContext) throws WriteFailedException {
         if (dataAfter.getBandwidth() == null) {
             deleteCurrentAttributes(id, dataBefore, writeContext);
         } else {
@@ -67,17 +75,17 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
         }
     }
 
-    private String resolveBandwidth(MplsRsvpSubscriptionConfig.Bandwidth b) {
-        if (NiMplsRsvpIfSubscripAugReader.DEFAULT.equals(b.getString())) {
+    private String resolveBandwidth(MplsRsvpSubscriptionConfig.Bandwidth bandwidth) {
+        if (NiMplsRsvpIfSubscripAugReader.DEFAULT.equals(bandwidth.getString())) {
             return "bandwidth";
-        } else if (b.getUint32() != null) {
+        } else if (bandwidth.getUint32() != null) {
             NumberFormat formatter = new DecimalFormat(BW_FORMAT);
-            return f("bandwidth %s", formatter.format(kbps(b.getUint32())));
+            return f("bandwidth %s", formatter.format(kbps(bandwidth.getUint32())));
         }
         return "";
     }
 
     private static double kbps(Long bps) {
-        return bps.doubleValue()/1000;
+        return bps.doubleValue() / 1000;
     }
 }

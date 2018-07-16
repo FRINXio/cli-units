@@ -19,19 +19,18 @@ package io.frinx.cli.iosxr.routing.policy.handler.prefix;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.Lists;
-import io.frinx.cli.iosxr.routing.policy.handler.prefix.PrefixSetReader;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.top.prefix.sets.PrefixSetKey;
 
 public class PrefixSetReaderTest {
 
-    public static final String OUTPUT = "Building configuration...\n" +
-            "prefix-set ab\n" +
-            "prefix-set dd\n" +
-            "prefix-set sd33\n" +
-            "prefix-set asdasd\n" +
-            "prefix-set 23445jasdj123\n";
+    public static final String OUTPUT = "Building configuration...\n"
+            + "prefix-set ab\n"
+            + "prefix-set dd\n"
+            + "prefix-set sd33\n"
+            + "prefix-set asdasd\n"
+            + "prefix-set 23445jasdj123\n";
 
     @Test
     public void testIds() throws Exception {

@@ -39,15 +39,16 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     }
 
     private static final String WRITE_TEMPLATE =
-            "interface %s\n" +
-            "ipv4 address %s %s\n" +
-            "root";
+            "interface %s\n"
+                    + "ipv4 address %s %s\n"
+                    + "root";
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         if (subId != ZERO_SUBINTERFACE_ID) {
             throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
@@ -59,18 +60,23 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, config,
                 f(WRITE_TEMPLATE,
                         getIfcName(instanceIdentifier),
-                        config.getIp().getValue(),
+                        config.getIp()
+                                .getValue(),
                         info.getNetmask()));
     }
 
     private static SubnetUtils.SubnetInfo getSubnetInfo(@Nonnull Config config) {
-        return new SubnetUtils(config.getIp().getValue() + "/" + config.getPrefixLength()).getInfo();
+        return new SubnetUtils(config.getIp()
+                .getValue() + "/" + config.getPrefixLength()).getInfo();
     }
 
     private static String getIfcName(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        Long subIfcIndex = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
-        Preconditions.checkArgument(subIfcIndex == ZERO_SUBINTERFACE_ID, "Only subinterface " + ZERO_SUBINTERFACE_ID + "  can have IP");
+        String ifcName = instanceIdentifier.firstKeyOf(Interface.class)
+                .getName();
+        Long subIfcIndex = instanceIdentifier.firstKeyOf(Subinterface.class)
+                .getIndex();
+        Preconditions.checkArgument(subIfcIndex == ZERO_SUBINTERFACE_ID, "Only subinterface " + ZERO_SUBINTERFACE_ID
+                + "  can have IP");
         return ifcName;
     }
 
@@ -91,15 +97,16 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     }
 
     private static final String DELETE_TEMPLATE =
-            "interface %s\n" +
-            "no ipv4 address %s %s\n" +
-            "root";
+            "interface %s\n"
+                    + "no ipv4 address %s %s\n"
+                    + "root";
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         if (subId == ZERO_SUBINTERFACE_ID) {
             SubnetUtils.SubnetInfo info = getSubnetInfo(config);
@@ -108,7 +115,8 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
                 blockingWriteAndRead(cli, instanceIdentifier, config,
                         f(DELETE_TEMPLATE,
                                 getIfcName(instanceIdentifier),
-                                config.getIp().getValue(),
+                                config.getIp()
+                                        .getValue(),
                                 info.getNetmask()));
             } catch (WriteFailedException.CreateFailedException e) {
                 throw new WriteFailedException.DeleteFailedException(instanceIdentifier, e);

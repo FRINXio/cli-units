@@ -44,7 +44,8 @@ public class AreaConfigWriter implements OspfWriter<Config> {
 
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore,
-                                               Config dataAfter, WriteContext writeContext) throws WriteFailedException {
+                                               Config dataAfter, WriteContext writeContext) throws
+            WriteFailedException {
         // NOOP
     }
 

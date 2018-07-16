@@ -36,29 +36,25 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriterTest {
 
-    private static final String WRITE_INPUT =
-        "interface Bundle-Ether45\n" +
-        "mtu 35\n" +
-        "description test desc\n" +
-        "no shutdown\n" +
-        "root\n";
+    private static final String WRITE_INPUT = "interface Bundle-Ether45\n"
+            + "mtu 35\n"
+            + "description test desc\n"
+            + "no shutdown\n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT =
-        "interface Bundle-Ether45\n" +
-        "mtu 50\n" +
-        "description updated desc\n" +
-        "shutdown\n" +
-        "root\n";
+    private static final String UPDATE_INPUT = "interface Bundle-Ether45\n"
+            + "mtu 50\n"
+            + "description updated desc\n"
+            + "shutdown\n"
+            + "root\n";
 
-    private static final String UPDATE_CLEAN_INPUT =
-        "interface Bundle-Ether45\n" +
-        "no mtu\n" +
-        "no description\n" +
-        "shutdown\n" +
-        "root\n";
+    private static final String UPDATE_CLEAN_INPUT = "interface Bundle-Ether45\n"
+            + "no mtu\n"
+            + "no description\n"
+            + "shutdown\n"
+            + "root\n";
 
-    private static final String DELETE_INPUT =
-        "no interface Bundle-Ether45\n";
+    private static final String DELETE_INPUT = "no interface Bundle-Ether45\n";
 
     @Mock
     private Cli cli;

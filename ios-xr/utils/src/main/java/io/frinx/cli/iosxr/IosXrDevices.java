@@ -38,9 +38,10 @@ public class IosXrDevices {
             .setDeviceVersion("6.*")
             .build();
 
-    public static final Set<Device> IOS_XR_ALL = new HashSet<Device>(){{
-        add(IOS_4);
-        add(IOS_5);
-        add(IOS_6);
-    }};
+    public static final Set<Device> IOS_XR_ALL = new HashSet<Device>() {{
+            add(IOS_4);
+            add(IOS_5);
+            add(IOS_6);
+        }
+    };
 }

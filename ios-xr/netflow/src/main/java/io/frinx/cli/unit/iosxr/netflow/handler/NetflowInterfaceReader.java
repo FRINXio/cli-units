@@ -40,7 +40,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NetflowInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
-    private static final Pattern CONTAINS_NETFLOW = Pattern.compile("flow .+ monitor \\S+( sampler .+)? (ingress|egress)");
+    private static final Pattern CONTAINS_NETFLOW = Pattern.compile("flow .+ monitor \\S+( sampler .+)? "
+            + "(ingress|egress)");
     private final Cli cli;
     private static final String SH_IFACES = "show running-config interface";
     private static final Pattern IFACE_LINE = Pattern.compile("interface (?<name>.+)");
@@ -51,19 +52,23 @@ public class NetflowInterfaceReader implements CliConfigListReader<Interface, In
 
     @Nonnull
     @Override
-    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
         return getInterfaceKeys(blockingRead(SH_IFACES, cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting
     public static List<InterfaceKey> getInterfaceKeys(String output) {
         List<InterfaceKey> keys = new ArrayList<>();
-        List<String> candidates = Pattern.compile("!").splitAsStream(output).collect(Collectors.toList());
+        List<String> candidates = Pattern.compile("!")
+                .splitAsStream(output)
+                .collect(Collectors.toList());
         for (String candidate : candidates) {
-            Optional<Boolean> maybeNetflow = ParsingUtils.parseField(candidate, 0, CONTAINS_NETFLOW::matcher, Matcher::matches);
+            Optional<Boolean> maybeNetflow = ParsingUtils.parseField(candidate, 0, CONTAINS_NETFLOW::matcher,
+                    Matcher::matches);
             if (maybeNetflow.isPresent() && maybeNetflow.get()) {
                 ParsingUtils.parseField(candidate, 0, IFACE_LINE::matcher, matcher -> matcher.group("name"))
-                    .ifPresent(s -> keys.add(new InterfaceKey(new InterfaceId(s))));
+                        .ifPresent(s -> keys.add(new InterfaceKey(new InterfaceId(s))));
             }
         }
         return keys;
@@ -75,7 +80,8 @@ public class NetflowInterfaceReader implements CliConfigListReader<Interface, In
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull InterfaceBuilder interfaceBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull
+            InterfaceBuilder interfaceBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         InterfaceKey key = instanceIdentifier.firstKeyOf(Interface.class);
         interfaceBuilder.setId(key.getId());
     }

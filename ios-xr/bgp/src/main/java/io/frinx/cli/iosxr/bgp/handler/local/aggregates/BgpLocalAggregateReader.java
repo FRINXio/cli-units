@@ -45,10 +45,12 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReader<Aggregate, AggregateKey, AggregateBuilder> {
+public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReader<Aggregate, AggregateKey,
+        AggregateBuilder> {
 
     private static final String SH_BGP = "show running-config router bgp %s %s";
-    private static final Pattern NETWORK_LINE = Pattern.compile("network (?<prefix>\\S+)(?<policy> route-policy (?<policyName>\\S+))*");
+    private static final Pattern NETWORK_LINE = Pattern.compile("network (?<prefix>\\S+)(?<policy> route-policy "
+            + "(?<policyName>\\S+))*");
 
     private Cli cli;
 
@@ -62,21 +64,25 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
     }
 
     @Override
-    public List<AggregateKey> getAllIdsForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier,
-                                               @Nonnull ReadContext readContext) throws ReadFailedException {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config globalConfig =
-                readContext.read(instanceIdentifier.firstIdentifierOf(Protocol.class).child(Bgp.class)
-                        .child(Global.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config.class))
-                        .orNull();
+    public List<AggregateKey> getAllIdsForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
+                globalConfig = readContext.read(instanceIdentifier.firstIdentifierOf(Protocol.class)
+                .child(Bgp.class)
+                .child(Global.class)
+                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
+                        .Config.class))
+                .orNull();
 
-        if (globalConfig == null) {
+        if (globalConfig
+                == null) {
             return Collections.EMPTY_LIST;
         }
 
         final String instName = GlobalConfigWriter.getProtoInstanceName(instanceIdentifier);
-        String output = blockingRead(String.format(SH_BGP, globalConfig.getAs().getValue().intValue(), instName),
-                cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SH_BGP, globalConfig.getAs()
+                .getValue()
+                .intValue(), instName), cli, instanceIdentifier, readContext);
 
         return NEWLINE.splitAsStream(output.trim())
                 .map(NETWORK_LINE::matcher)
@@ -87,31 +93,37 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier,
-                                             @Nonnull AggregateBuilder builder,
-                                             @Nonnull ReadContext readContext) throws ReadFailedException {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config globalConfig =
-                readContext.read(instanceIdentifier.firstIdentifierOf(Protocol.class).child(Bgp.class)
-                        .child(Global.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config.class))
-                        .orNull();
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
+            AggregateBuilder builder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
+                globalConfig = readContext.read(instanceIdentifier.firstIdentifierOf(Protocol.class)
+                .child(Bgp.class)
+                .child(Global.class)
+                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
+                        .Config.class))
+                .orNull();
         final String instName = GlobalConfigWriter.getProtoInstanceName(instanceIdentifier);
         AggregateKey key = instanceIdentifier.firstKeyOf(Aggregate.class);
-        String output = blockingRead(String.format(SH_BGP, globalConfig.getAs().getValue().intValue(), instName),
-                cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SH_BGP, globalConfig.getAs()
+                .getValue()
+                .intValue(), instName), cli, instanceIdentifier, readContext);
 
         Optional<String> policies = NEWLINE.splitAsStream(output.trim())
                 .map(NETWORK_LINE::matcher)
                 .filter(Matcher::find)
-                .filter(matcher -> matcher.group("prefix").equals(new String(key.getPrefix().getValue())) &&
-                        matcher.group("policy") != null)
+                .filter(matcher -> matcher.group("prefix")
+                        .equals(new String(key.getPrefix()
+                                .getValue()))
+                        && matcher.group("policy")
+                        != null)
                 .map(matcher -> matcher.group("policyName"))
                 .findFirst();
 
         builder.setPrefix(key.getPrefix());
         ConfigBuilder configBuilder = new ConfigBuilder().setPrefix(key.getPrefix());
         if (policies.isPresent()) {
-            configBuilder.addAugmentation(NiProtAggAug.class, new NiProtAggAugBuilder().setApplyPolicy(policies.get()).build());
+            configBuilder.addAugmentation(NiProtAggAug.class, new NiProtAggAugBuilder().setApplyPolicy(policies.get())
+                    .build());
         }
         builder.setConfig(configBuilder.build());
     }

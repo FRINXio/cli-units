@@ -91,8 +91,10 @@ public class MplsUnit implements TranslateUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.$YangModuleInfoImpl.getInstance());
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension
+                        .rev171024.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.$YangModuleInfoImpl
+                        .getInstance());
     }
 
     @Override
@@ -101,72 +103,79 @@ public class MplsUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MPLS, new NoopCliWriter<>()));
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MPLS, new NoopCliWriter<>()));
 
         // RSVP
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RSVPTE, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG, new RsvpInterfaceConfigWriter(cli)));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, new NoopCliWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG.augmentation(NiMplsRsvpIfSubscripAug.class), new NiMplsRsvpIfSubscripAugWriter(cli)),
-            IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG);
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RSVPTE, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG, new RsvpInterfaceConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, new NoopCliWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG
+                        .augmentation(NiMplsRsvpIfSubscripAug.class), new NiMplsRsvpIfSubscripAugWriter(cli)),
+                IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG);
 
         // TE
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TE_INTERFACE, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TE_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigWriter(cli)));
 
         // Tunnel
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LSPS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CONSTRAINEDPATH, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TUNNEL, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG, new TunnelConfigWriter(cli)));
-        wRegistry.addAfter(new GenericWriter<>(CONFIG_IID, new LoadShareConfigWriter(cli)), IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG);
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_P2PTUNNELATTRIBUTES, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_P2_CONFIG, new P2pAttributesConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LSPS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CONSTRAINEDPATH, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TUNNEL, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG, new TunnelConfigWriter(cli)));
+        writeRegistry.addAfter(new GenericWriter<>(CONFIG_IID, new LoadShareConfigWriter(cli)), IIDs
+                .NE_NE_MP_LS_CO_TU_TU_CONFIG);
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_P2PTUNNELATTRIBUTES, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_P2_CONFIG, new P2pAttributesConfigWriter(cli)));
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.NE_NE_MPLS, MplsBuilder.class);
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.addStructuralReader(IIDs.NE_NE_MPLS, MplsBuilder.class);
 
         // RSVP
-        rRegistry.addStructuralReader(IIDs.NE_NE_MP_SIGNALINGPROTOCOLS, SignalingProtocolsBuilder.class);
-        rRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RSVPTE, RsvpTeBuilder.class);
-        rRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_INTERFACEATTRIBUTES, InterfaceAttributesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE, new RsvpInterfaceReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG, new RsvpInterfaceConfigReader()));
-        rRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_IN_IN_SUBSCRIPTION, SubscriptionBuilder.class);
-        rRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, ConfigBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG.augmentation(NiMplsRsvpIfSubscripAug.class), new NiMplsRsvpIfSubscripAugReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SIGNALINGPROTOCOLS, SignalingProtocolsBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RSVPTE, RsvpTeBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_INTERFACEATTRIBUTES, InterfaceAttributesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE, new RsvpInterfaceReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG, new RsvpInterfaceConfigReader()));
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_IN_IN_SUBSCRIPTION, SubscriptionBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, ConfigBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG
+                .augmentation(NiMplsRsvpIfSubscripAug.class), new NiMplsRsvpIfSubscripAugReader(cli)));
 
         // TE
-        rRegistry.addStructuralReader(IIDs.NE_NE_MP_TEINTERFACEATTRIBUTES, TeInterfaceAttributesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_TE_INTERFACE, new TeInterfaceReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigReader()));
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_TEINTERFACEATTRIBUTES, TeInterfaceAttributesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_TE_INTERFACE, new TeInterfaceReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigReader()));
 
         // Tunnel
-        rRegistry.addStructuralReader(IIDs.NE_NE_MP_LSPS, LspsBuilder.class);
-        rRegistry.addStructuralReader(IIDs.NE_NE_MP_LS_CONSTRAINEDPATH, ConstrainedPathBuilder.class);
-        rRegistry.addStructuralReader(IIDs.NE_NE_MP_LS_CO_TUNNELS, TunnelsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_LS_CO_TU_TUNNEL, new TunnelReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG, new TunnelConfigReader(cli)));
-        rRegistry.addStructuralReader(TE_EXT_IID, NiMplsTeTunnelCiscoAugBuilder.class);
-        rRegistry.addStructuralReader(MPLS_EXT_IID, CiscoMplsTeExtensionBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(CONFIG_IID, new LoadShareConfigReader(cli)));
-        rRegistry.addStructuralReader(IIDs.NE_NE_MP_LS_CO_TU_TU_P2PTUNNELATTRIBUTES, P2pTunnelAttributesBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_LS_CO_TU_TU_P2_CONFIG, new P2pAttributesConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_LSPS, LspsBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_LS_CONSTRAINEDPATH, ConstrainedPathBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_LS_CO_TUNNELS, TunnelsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_LS_CO_TU_TUNNEL, new TunnelReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG, new TunnelConfigReader(cli)));
+        readRegistry.addStructuralReader(TE_EXT_IID, NiMplsTeTunnelCiscoAugBuilder.class);
+        readRegistry.addStructuralReader(MPLS_EXT_IID, CiscoMplsTeExtensionBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(CONFIG_IID, new LoadShareConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_LS_CO_TU_TU_P2PTUNNELATTRIBUTES, P2pTunnelAttributesBuilder
+                .class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_LS_CO_TU_TU_P2_CONFIG,
+                new P2pAttributesConfigReader(cli)));
     }
 
-    private static final InstanceIdentifier<NiMplsTeTunnelCiscoAug> TE_EXT_IID = IIDs.NE_NE_MP_LS_CO_TU_TUNNEL.augmentation(NiMplsTeTunnelCiscoAug.class);
-    private static final InstanceIdentifier<CiscoMplsTeExtension> MPLS_EXT_IID = TE_EXT_IID.child(CiscoMplsTeExtension.class);
+    private static final InstanceIdentifier<NiMplsTeTunnelCiscoAug> TE_EXT_IID = IIDs.NE_NE_MP_LS_CO_TU_TUNNEL
+            .augmentation(NiMplsTeTunnelCiscoAug.class);
+    private static final InstanceIdentifier<CiscoMplsTeExtension> MPLS_EXT_IID
+            = TE_EXT_IID.child(CiscoMplsTeExtension.class);
     private static final InstanceIdentifier<Config> CONFIG_IID = MPLS_EXT_IID.child(Config.class);
 
     @Override

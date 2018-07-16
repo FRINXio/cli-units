@@ -41,6 +41,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
     private Cli cli;
 
     private static final Set<Class<? extends InterfaceType>> SUPPORTED_INTERFACE_TYPES = Sets.newHashSet();
+
     static {
         SUPPORTED_INTERFACE_TYPES.add(Ieee8023adLag.class);
         SUPPORTED_INTERFACE_TYPES.add(EthernetCsmacd.class);
@@ -57,25 +58,31 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
 
         // If we are creating new interface, allow empty config for .0 subifc
-        if (!writeContext.readBefore(parentIfcId).isPresent()
-                && id.firstKeyOf(Subinterface.class).getIndex() == ZERO_SUBINTERFACE_ID) {
+        if (!writeContext.readBefore(parentIfcId)
+                .isPresent()
+                && id.firstKeyOf(Subinterface.class)
+                .getIndex() == ZERO_SUBINTERFACE_ID) {
             Preconditions.checkArgument(data.getDescription() == null,
-                    "'description' cannot be specified for .0 subinterface. " +
-                            "Use 'description' under interface/config instead.");
+                    "'description' cannot be specified for .0 subinterface. "
+                            + "Use 'description' under interface/config instead.");
             Preconditions.checkArgument(data.isEnabled() == null,
-                    "'enabled' cannot be specified for .0 subinterface. " +
-                            "Use 'enabled' under interface/config instead.");
+                    "'enabled' cannot be specified for .0 subinterface. "
+                            + "Use 'enabled' under interface/config instead.");
             return;
         }
 
         if (isZeroSubinterface(id)) {
-            // do nothing for .0 subinterface because it represents physical interface which config is handled in interface/config
+            // do nothing for .0 subinterface because it represents physical interface which config is handled in
+            // interface/config
             return;
         }
 
-        Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId).get().getConfig().getType();
+        Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId)
+                .get()
+                .getConfig()
+                .getType();
 
-        if(isSupportedType(parentIfcType)) {
+        if (isSupportedType(parentIfcType)) {
             blockingWriteAndRead(cli, id, data,
                     f("interface %s", getSubinterfaceName(id)),
                     data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
@@ -83,12 +90,14 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                     "root");
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));
+                    new IllegalArgumentException("Unable to create subinterface for interface of type: "
+                            + parentIfcType));
         }
     }
 
     private static boolean isZeroSubinterface(@Nonnull InstanceIdentifier<?> id) throws WriteFailedException {
-        Long subifcIndex = id.firstKeyOf(Subinterface.class).getIndex();
+        Long subifcIndex = id.firstKeyOf(Subinterface.class)
+                .getIndex();
         return subifcIndex == ZERO_SUBINTERFACE_ID;
 
     }
@@ -109,24 +118,31 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
 
         // if deleting parent interface allow deleting also .0 subifc
-        if (!writeContext.readAfter(parentIfcId).isPresent()
-                && id.firstKeyOf(Subinterface.class).getIndex() == ZERO_SUBINTERFACE_ID) {
+        if (!writeContext.readAfter(parentIfcId)
+                .isPresent()
+                && id.firstKeyOf(Subinterface.class)
+                .getIndex() == ZERO_SUBINTERFACE_ID) {
             return;
         }
 
         if (isZeroSubinterface(id)) {
-            // do nothing for .0 subinterface because it represents physical interface which config is handled in interface/config
+            // do nothing for .0 subinterface because it represents physical interface which config is handled in
+            // interface/config
             return;
         }
 
-        Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId).get().getConfig().getType();
+        Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId)
+                .get()
+                .getConfig()
+                .getType();
 
-        if(isSupportedType(parentIfcType)) {
+        if (isSupportedType(parentIfcType)) {
             blockingDeleteAndRead(cli, id,
                     f("no interface %s", getSubinterfaceName(id)));
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Unable to create subinterface for interface of type: " + parentIfcType));
+                    new IllegalArgumentException("Unable to create subinterface for interface of type: "
+                            + parentIfcType));
         }
     }
 

@@ -68,23 +68,30 @@ class ConditionRenderer {
         return conditionStrings;
     }
 
-    private static final String AS_PATH_LENGTH_TEMPLATE = "{% if ($config.as_path_length.config.value) %}" +
-            "{.if ($config.as_path_length.config.operator =~ /LE$/)}as-path length le {$config.as_path_length.config.value}{.endif}" +
-            "{.if ($config.as_path_length.config.operator =~ /GE$/)}as-path length ge {$config.as_path_length.config.value}{.endif}" +
-            "{.if ($config.as_path_length.config.operator =~ /EQ$/)}as-path length eq {$config.as_path_length.config.value}{.endif}" +
-            "{% endif %}";
+    private static final String AS_PATH_LENGTH_TEMPLATE = "{% if ($config.as_path_length.config.value) %}"
+            + "{.if ($config.as_path_length.config.operator =~ /LE$/)}as-path length le {$config.as_path_length"
+            + ".config.value}{.endif}"
+            + "{.if ($config.as_path_length.config.operator =~ /GE$/)}as-path length ge {$config.as_path_length"
+            + ".config.value}{.endif}"
+            + "{.if ($config.as_path_length.config.operator =~ /EQ$/)}as-path length eq {$config.as_path_length"
+            + ".config.value}{.endif}"
+            + "{% endif %}";
 
-    private static final String AS_PATH_IN_TEMPLATE = "{% if ($config.match_as_path_set.config.as_path_set) %}" +
-            "{.if ($config.match_as_path_set.config.match_set_options.name == ANY)}as-path in {$config.match_as_path_set.config.as_path_set}{.endif}" +
-            "{% endif %}";
+    private static final String AS_PATH_IN_TEMPLATE = "{% if ($config.match_as_path_set.config.as_path_set) %}"
+            + "{.if ($config.match_as_path_set.config.match_set_options.name == ANY)}as-path in {$config"
+            + ".match_as_path_set.config.as_path_set}{.endif}"
+            + "{% endif %}";
 
-    private static final String COMMUNITY_TEMPLATE = "{% if ($config.match_community_set.config.community_set) %}" +
-            "{.if ($config.match_community_set.config.match_set_options.name == ANY)}community matches-any {$config.match_community_set.config.community_set}{.endif}" +
-            "{.if ($config.match_community_set.config.match_set_options.name == ALL)}community matches-every {$config.match_community_set.config.community_set}{.endif}" +
-            "{% endif %}";
+    private static final String COMMUNITY_TEMPLATE = "{% if ($config.match_community_set.config.community_set) %}"
+            + "{.if ($config.match_community_set.config.match_set_options.name == ANY)}community matches-any {$config"
+            + ".match_community_set.config.community_set}{.endif}"
+            + "{.if ($config.match_community_set.config.match_set_options.name == ALL)}community matches-every "
+            + "{$config.match_community_set.config.community_set}{.endif}"
+            + "{% endif %}";
 
-    private static final String DESTINATION_TEMPLATE = "{% if ($config.match_prefix_set.config.prefix_set) %}" +
-            "{.if ($config.match_prefix_set.config.match_set_options.name == ANY)}destination in {$config.match_prefix_set.config.prefix_set}{.endif}" +
-            "{% endif %}";
+    private static final String DESTINATION_TEMPLATE = "{% if ($config.match_prefix_set.config.prefix_set) %}"
+            + "{.if ($config.match_prefix_set.config.match_set_options.name == ANY)}destination in {$config"
+            + ".match_prefix_set.config.prefix_set}{.endif}"
+            + "{% endif %}";
 
 }

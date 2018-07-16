@@ -23,32 +23,29 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 
 public class AreaInterfaceMplsSyncConfigReaderTest {
 
-    private final String outputDisable =
-            "  interface GigabitEthernet0/0/0/3\n" +
-            "   cost 100\n" +
-            "   mpls ldp sync disable\n";
+    private final String outputDisable = "  interface GigabitEthernet0/0/0/3\n"
+            + "   cost 100\n"
+            + "   mpls ldp sync disable\n";
 
-    private final String outputEnable =
-            "  interface GigabitEthernet0/0/0/3\n" +
-            "   cost 100\n" +
-            "   mpls ldp sync\n";
+    private final String outputEnable = "  interface GigabitEthernet0/0/0/3\n"
+            + "   cost 100\n"
+            + "   mpls ldp sync\n";
 
-    private final String outputNotSet =
-            "  interface GigabitEthernet0/0/0/3\n" +
-            "   cost 100\n";
+    private final String outputNotSet = "  interface GigabitEthernet0/0/0/3\n"
+            + "   cost 100\n";
 
     @Test
     public void test() {
         ConfigBuilder builder = new ConfigBuilder();
-        AreaInterfaceMplsSyncConfigReader.parseMplsSync(outputDisable,  builder);
+        AreaInterfaceMplsSyncConfigReader.parseMplsSync(outputDisable, builder);
         Assert.assertFalse(builder.isEnabled());
 
         builder = new ConfigBuilder();
-        AreaInterfaceMplsSyncConfigReader.parseMplsSync(outputEnable,  builder);
+        AreaInterfaceMplsSyncConfigReader.parseMplsSync(outputEnable, builder);
         Assert.assertTrue(builder.isEnabled());
 
         builder = new ConfigBuilder();
-        AreaInterfaceMplsSyncConfigReader.parseMplsSync(outputNotSet,  builder);
+        AreaInterfaceMplsSyncConfigReader.parseMplsSync(outputNotSet, builder);
         Assert.assertNull(builder.isEnabled());
     }
 }

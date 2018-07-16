@@ -51,11 +51,12 @@ public class IngressFlowConfigWriter implements CliWriter<Config> {
 
         String dampConfCommand = getNetflowCommand(dataAfter);
 
-        String ifcName = interfaceKey.getId().getValue();
+        String ifcName = interfaceKey.getId()
+                .getValue();
         blockingWriteAndRead(cli, id, dataAfter,
-            f("interface %s", ifcName),
-            dampConfCommand,
-            "root");
+                f("interface %s", ifcName),
+                dampConfCommand,
+                "root");
     }
 
     private String getNetflowCommand(final Config dataAfter) {
@@ -78,11 +79,13 @@ public class IngressFlowConfigWriter implements CliWriter<Config> {
 
         String deleteCommand = getNoNetflowCommand(dataBefore);
 
-        String ifcName = id.firstKeyOf(Interface.class).getId().getValue();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getId()
+                .getValue();
         blockingDeleteAndRead(cli, id,
-            f("interface %s", ifcName),
-            deleteCommand,
-            "root");
+                f("interface %s", ifcName),
+                deleteCommand,
+                "root");
     }
 
     private String getNoNetflowCommand(final Config dataAfter) {
@@ -95,7 +98,7 @@ public class IngressFlowConfigWriter implements CliWriter<Config> {
     @Override
     public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id, @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter, @Nonnull final WriteContext writeContext)
-        throws WriteFailedException {
+            throws WriteFailedException {
 
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);

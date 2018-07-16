@@ -44,10 +44,14 @@ public class InputConfigReader implements CliConfigReader<Config, ConfigBuilder>
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
-        String className = instanceIdentifier.firstKeyOf(Input.class).getId();
-        String output = blockingRead(f(OneRateTwoColorConfigReader.SH_POLICY_MAP, policyName, className), cli, instanceIdentifier, readContext);
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder
+            configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
+        String className = instanceIdentifier.firstKeyOf(Input.class)
+                .getId();
+        String output = blockingRead(f(OneRateTwoColorConfigReader.SH_POLICY_MAP, policyName, className), cli,
+                instanceIdentifier, readContext);
         setPriority(output, className, configBuilder);
         configBuilder.setId(className);
         configBuilder.setQueue(className);

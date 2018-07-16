@@ -42,17 +42,17 @@ public class PrefixesWriter implements CliWriter<Prefixes> {
     private static final Pattern MASK_RANGE_PATTERN = Pattern.compile("(?<ge>[0-9]+)\\.\\.(?<le>[0-9]+)|exact");
 
     @VisibleForTesting
-    static final String TEMPLATE = "prefix-set {$name}\n" +
-            "{% loop in $prefixes as $p %}\n" +
-            "{$p.prefix}" +
-            "{.if ($p.ge) } ge {$p.ge}{/if}" +
-            "{.if ($p.le) } le {$p.ge}{/if}" +
-            "{% divider %}" +
-            ",\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "\n\n" +
-            "end-set";
+    static final String TEMPLATE = "prefix-set {$name}\n"
+            + "{% loop in $prefixes as $p %}\n"
+            + "{$p.prefix}"
+            + "{.if ($p.ge) } ge {$p.ge}{/if}"
+            + "{.if ($p.le) } le {$p.ge}{/if}"
+            + "{% divider %}"
+            + ",\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "\n\n"
+            + "end-set";
 
     private final Cli cli;
 
@@ -78,10 +78,10 @@ public class PrefixesWriter implements CliWriter<Prefixes> {
     @VisibleForTesting
     static List<ConfigDto> transformPrefixes(List<Prefix> prefixList) {
         return prefixList.stream()
-                    .filter(p -> p.getConfig() != null)
-                    .map(Prefix::getConfig)
-                    .map(PrefixesWriter::configToDto)
-                    .collect(Collectors.toList());
+                .filter(p -> p.getConfig() != null)
+                .map(Prefix::getConfig)
+                .map(PrefixesWriter::configToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -138,13 +138,14 @@ public class PrefixesWriter implements CliWriter<Prefixes> {
             Matcher matcher = MASK_RANGE_PATTERN.matcher(config.getMasklengthRange());
             checkArgument(matcher.matches(), "Mask length range in unsupported format: %s, should be: %s",
                     config.getMasklengthRange(), MASK_RANGE_PATTERN.pattern());
-            
+
             String geGroup = matcher.group("ge");
             String leGroup = matcher.group("le");
             Integer ge = Strings.isNullOrEmpty(geGroup) ? null : Integer.parseInt(geGroup);
             Integer le = Strings.isNullOrEmpty(leGroup) ? null : Integer.parseInt(leGroup);
 
-            return new ConfigDto(new String(config.getIpPrefix().getValue()).intern(), ge, le);
+            return new ConfigDto(new String(config.getIpPrefix()
+                    .getValue()).intern(), ge, le);
         }
     }
 }

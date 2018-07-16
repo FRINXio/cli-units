@@ -27,7 +27,6 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import java.util.Arrays;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
@@ -49,18 +48,21 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         this.cli = cli;
     }
 
-    private static final short DEFAULT_PREFIX_LENGHT = (short)64;
+    private static final short DEFAULT_PREFIX_LENGHT = (short) 64;
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String name = id.firstKeyOf(Interface.class).getName();
-        Long subId = id.firstKeyOf(Subinterface.class).getIndex();
+        String name = id.firstKeyOf(Interface.class)
+                .getName();
+        Long subId = id.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            Ipv6AddressNoZone address = id.firstKeyOf(Address.class).getIp();
+            Ipv6AddressNoZone address = id.firstKeyOf(Address.class)
+                    .getIp();
             parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name),
                     cli, id, readContext), address);
         }
@@ -81,7 +83,7 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
 
         parseField(optionalAddressLine.get(),
                 IPV6_UNICAST_ADDRESS::matcher,
-                m -> Short.parseShort(m.group("prefix")),
+            m -> Short.parseShort(m.group("prefix")),
                 configBuilder::setPrefixLength);
     }
 

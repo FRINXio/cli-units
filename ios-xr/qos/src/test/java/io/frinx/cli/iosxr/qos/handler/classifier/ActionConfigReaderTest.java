@@ -22,20 +22,20 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 
 public class ActionConfigReaderTest {
 
-    private static final String OUTPUT = "Thu Mar 15 14:50:55.986 UTC\r\n" +
-            "policy-map plmap\r\n" +
-            " class map1\r\n" +
-            "policy-map plmap1\r\n" +
-            " class map1\r\n";
+    private static final String OUTPUT = "Thu Mar 15 14:50:55.986 UTC\r\n"
+            + "policy-map plmap\r\n"
+            + " class map1\r\n"
+            + "policy-map plmap1\r\n"
+            + " class map1\r\n";
 
-    private static final String OUTPUT_ANOTHER = "Thu Mar 15 14:50:55.986 UTC\r\n" +
-            "policy-map plmap\r\n" +
-            "policy-map plmap1\r\n" +
-            " class map2\r\n";
+    private static final String OUTPUT_ANOTHER = "Thu Mar 15 14:50:55.986 UTC\r\n"
+            + "policy-map plmap\r\n"
+            + "policy-map plmap1\r\n"
+            + " class map2\r\n";
 
-    private static final String OUTPUT_WRONG = "Wed Mar 14 08:33:07.627 UTC\r\n" +
-            "policy-map plmap\r\n" +
-            "policy-map plmap2\r\n";
+    private static final String OUTPUT_WRONG = "Wed Mar 14 08:33:07.627 UTC\r\n"
+            + "policy-map plmap\r\n"
+            + "policy-map plmap2\r\n";
 
     @Test
     public void testPolicyName() {

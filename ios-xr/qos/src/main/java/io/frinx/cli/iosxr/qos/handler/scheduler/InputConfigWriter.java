@@ -27,11 +27,11 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InputConfigWriter implements CliWriter<Config> {
 
-    private final static String INPUT_T =
-        "policy-map {$name}\n" +
-        "{% if ($delete) %}no {% endif %}class {$className}\n" +
-        "{% if (!$delete) %} {% if ($priority) %}priority level {$priority}\n{% else %}no priority\n{% endif %}{% endif %}" +
-        "root";
+    private static final String INPUT_T = "policy-map {$name}\n"
+            + "{% if ($delete) %}no {% endif %}class {$className}\n"
+            + "{% if (!$delete) %} {% if ($priority) %}priority level {$priority}\n{% else %}no priority\n{% endif "
+            + "%}{% endif %}"
+            + "root";
 
     private Cli cli;
 
@@ -40,21 +40,26 @@ public class InputConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            fT(INPUT_T, "name", policyName, "className", config.getId(), "priority", config.getWeight()));
+                fT(INPUT_T, "name", policyName, "className", config.getId(), "priority", config.getWeight()));
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull
+            Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            fT(INPUT_T,"name", policyName, "className", config.getId(), "delete", true));
+                fT(INPUT_T, "name", policyName, "className", config.getId(), "delete", true));
     }
 }

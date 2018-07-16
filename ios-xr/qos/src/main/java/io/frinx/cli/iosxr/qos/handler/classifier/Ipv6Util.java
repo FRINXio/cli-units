@@ -31,8 +31,6 @@ class Ipv6Util {
     private static final Pattern PREC_LINE = Pattern.compile("match precedence ipv6 (?<prec>.+)");
 
     static void parseIpv6(String output, ConditionsBuilder builder) {
-        Ipv6Builder v6Builder = new Ipv6Builder();
-        ConfigBuilder cBuilder = new ConfigBuilder();
         QosIpv6ConditionAugBuilder augBuilder = new QosIpv6ConditionAugBuilder();
 
         parseAcl(output, augBuilder);
@@ -42,15 +40,19 @@ class Ipv6Util {
         if (augBuilder.getAclRef() == null && augBuilder.getPrecedences() == null) {
             return;
         }
-        cBuilder.addAugmentation(QosIpv6ConditionAug.class, augBuilder.build());
-        v6Builder.setConfig(cBuilder.build());
+
+        Ipv6Builder v6Builder = new Ipv6Builder();
+        ConfigBuilder configBuilder = new ConfigBuilder();
+
+        configBuilder.addAugmentation(QosIpv6ConditionAug.class, augBuilder.build());
+        v6Builder.setConfig(configBuilder.build());
         builder.setIpv6(v6Builder.build());
     }
 
     private static void parseAcl(String output, QosIpv6ConditionAugBuilder augBuilder) {
         ParsingUtils.parseField(output, ACL_LINE::matcher,
             matcher -> matcher.group("acl"),
-            augBuilder::setAclRef);
+                augBuilder::setAclRef);
     }
 
     private static void parsePrecedence(String output, QosIpv6ConditionAugBuilder augBuilder) {

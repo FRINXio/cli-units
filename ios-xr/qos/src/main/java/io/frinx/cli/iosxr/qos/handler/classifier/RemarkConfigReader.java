@@ -50,20 +50,26 @@ public class RemarkConfigReader implements CliConfigReader<Config, ConfigBuilder
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder
+            configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        String className = instanceIdentifier.firstKeyOf(Classifier.class)
+                .getName();
         if (className.endsWith(ClassifierReader.DEFAULT_CLASS_SUFFIX)) {
             className = OneRateTwoColorConfigReader.CLASS_DEFAULT;
         }
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.Config targetGroup =
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term
+                .actions.Config targetGroup =
                 readContext.read(RWUtils.cutId(instanceIdentifier, Actions.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.actions.Config.class)).orNull();
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos
+                                .classifier.terms.top.terms.term.actions.Config.class))
+                        .orNull();
         if (targetGroup == null) {
             // no policy-map / class-map relationship is specified, no remarks to be filled in
             return;
         }
         String policyName = targetGroup.getTargetGroup();
-        String output = blockingRead(f(OneRateTwoColorConfigReader.SH_POLICY_MAP, policyName, className), cli, instanceIdentifier, readContext);
+        String output = blockingRead(f(OneRateTwoColorConfigReader.SH_POLICY_MAP, policyName, className), cli,
+                instanceIdentifier, readContext);
         String finalOutput = OneRateTwoColorConfigReader.limitOutput(output, className);
         parseRemarks(finalOutput, configBuilder);
     }

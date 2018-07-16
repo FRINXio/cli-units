@@ -57,15 +57,16 @@ public class NetflowUtils {
     }
 
     public static InterfaceKey checkInterfaceExists(final @Nonnull InstanceIdentifier<?> iid,
-                                             final @Nonnull WriteContext writeContext) {
+                                                    final @Nonnull WriteContext writeContext) {
         final InterfaceKey interfaceKey = iid.firstKeyOf(Interface.class);
         if (interfaceKey == null) {
             throw new IllegalArgumentException(
-                "wrong instance identifier entered, expected child of netflow interface, instanceidentifier: " + iid);
+                    "wrong instance identifier entered, expected child of netflow interface, instanceidentifier: "
+                            + iid);
         }
         final Optional<Interface> netflowInterface = writeContext.readAfter(RWUtils.cutId(iid, Interface.class));
-        Preconditions.checkArgument(netflowInterface.isPresent(), "netflow cannot be configured because " +
-            "interface {} does not exist.", interfaceKey);
+        Preconditions.checkArgument(netflowInterface.isPresent(), "netflow cannot be configured because "
+                + "interface {} does not exist.", interfaceKey);
         return interfaceKey;
     }
 }

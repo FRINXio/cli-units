@@ -34,7 +34,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SchedulerPolicyReader implements CliConfigListReader<SchedulerPolicy, SchedulerPolicyKey, SchedulerPolicyBuilder> {
+public class SchedulerPolicyReader implements CliConfigListReader<SchedulerPolicy, SchedulerPolicyKey,
+        SchedulerPolicyBuilder> {
 
     public static final String SH_POLICY_MAPS = "show running-config policy-map | include policy-map";
     public static final Pattern POLICY_NAME_LINE = Pattern.compile("policy-map (?<name>.+)");
@@ -46,7 +47,8 @@ public class SchedulerPolicyReader implements CliConfigListReader<SchedulerPolic
 
     @Nonnull
     @Override
-    public List<SchedulerPolicyKey> getAllIds(@Nonnull InstanceIdentifier<SchedulerPolicy> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<SchedulerPolicyKey> getAllIds(@Nonnull InstanceIdentifier<SchedulerPolicy> instanceIdentifier,
+                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String output = blockingRead(SH_POLICY_MAPS, cli, instanceIdentifier, readContext);
         return getSchedulerKeys(output);
     }
@@ -63,9 +65,13 @@ public class SchedulerPolicyReader implements CliConfigListReader<SchedulerPolic
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<SchedulerPolicy> instanceIdentifier, @Nonnull SchedulerPolicyBuilder schedulerPolicyBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<SchedulerPolicy> instanceIdentifier, @Nonnull
+            SchedulerPolicyBuilder schedulerPolicyBuilder, @Nonnull ReadContext readContext) throws
+            ReadFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
         schedulerPolicyBuilder.setName(policyName);
-        schedulerPolicyBuilder.setConfig(new ConfigBuilder().setName(policyName).build());
+        schedulerPolicyBuilder.setConfig(new ConfigBuilder().setName(policyName)
+                .build());
     }
 }

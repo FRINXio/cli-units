@@ -21,11 +21,10 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-
-import io.frinx.cli.unit.utils.ParsingUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.OspfAreaIdentifier;
@@ -39,7 +38,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
+public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey,
+        InterfaceBuilder> {
 
     private static final String SHOW_OSPF_INT = "show running-config router ospf %s area %s";
     private static final Pattern INTERFACE_NAME_LINE = Pattern.compile("interface (?<name>.*)");
@@ -53,11 +53,12 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     @Nonnull
     @Override
     public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                        @Nonnull ReadContext readContext) throws ReadFailedException {
+                                               @Nonnull ReadContext readContext) throws ReadFailedException {
         ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
         AreaKey areaKey = instanceIdentifier.firstKeyOf(Area.class);
 
-        String output = blockingRead(String.format(SHOW_OSPF_INT, protocolKey.getName(), areaIdToString(areaKey.getIdentifier())), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SHOW_OSPF_INT, protocolKey.getName(), areaIdToString(areaKey
+                .getIdentifier())), cli, instanceIdentifier, readContext);
         return parseInterfaceIds(output);
     }
 
@@ -65,12 +66,14 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     public static List<InterfaceKey> parseInterfaceIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 INTERFACE_NAME_LINE::matcher,
-                matcher -> matcher.group("name"),
+            matcher -> matcher.group("name"),
                 InterfaceKey::new);
     }
 
     public static String areaIdToString(OspfAreaIdentifier id) {
-        return (id.getDottedQuad() != null) ? id.getDottedQuad().getValue() : id.getUint32().toString();
+        return (id.getDottedQuad() != null) ? id.getDottedQuad()
+                .getValue() : id.getUint32()
+                .toString();
     }
 
     @Override
@@ -82,6 +85,7 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                              @Nonnull InterfaceBuilder interfaceBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class).getId());
+        interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class)
+                .getId());
     }
 }

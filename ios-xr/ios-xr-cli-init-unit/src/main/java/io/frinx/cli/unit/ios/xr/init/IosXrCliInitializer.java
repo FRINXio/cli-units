@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Initialize IOS-XR CLI session to be usable by various CRUD and RPC handlers
+ * Initialize IOS-XR CLI session to be usable by various CRUD and RPC handlers.
  */
 public final class IosXrCliInitializer implements SessionInitializationStrategy {
 
@@ -53,7 +53,8 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
     private static final int WRITE_TIMEOUT_SECONDS = 10;
     private static final int READ_TIMEOUT_SECONDS = 1;
     public static final Predicate<String> IS_CONFIGURATION_PROMPT = s -> s.endsWith(CONFIG_PROMPT_SUFFIX);
-    public static final Predicate<String> IS_PRIVELEGE_PROMPT = s -> s.endsWith(PRIVILEGED_PROMPT_SUFFIX) && !s.endsWith(CONFIG_PROMPT_SUFFIX);
+    public static final Predicate<String> IS_PRIVELEGE_PROMPT = s -> s.endsWith(PRIVILEGED_PROMPT_SUFFIX) && !s
+            .endsWith(CONFIG_PROMPT_SUFFIX);
 
     private final CliNode context;
     private final RemoteDeviceId id;
@@ -66,7 +67,6 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
     @Override
     public void accept(@Nonnull Session session, @Nonnull String newline) {
         try {
-            String initialPrompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
 
             // Set terminal length to 0 to prevent "--More--" situation
             LOG.debug("{}: Setting terminal length to 0 to prevent \"--More--\" situation", id);
@@ -75,6 +75,9 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
             // Set terminal width to 0 to prevent command shortening
             LOG.debug("{}: Setting terminal width to 0", id);
             write(session, newline, SET_TERMINAL_WIDTH_COMMAND);
+
+            String initialPrompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline)
+                    .trim();
 
             String initOutput = session.readUntilOutput(initialPrompt)
                     .toCompletableFuture()
@@ -91,15 +94,18 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
             tryToEnterPrivilegedMode(session, newline);
 
             // Check if we are actually in privileged mode
-            String prompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
+            String prompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline)
+                    .trim();
 
             // If not, fail
             Preconditions.checkState(prompt.endsWith(PRIVILEGED_PROMPT_SUFFIX),
-                    "%s: IOS cli session initialization failed to enter privileged mode. Current prompt: %s", id, prompt);
+                    "%s: IOS cli session initialization failed to enter privileged mode. Current prompt: %s", id,
+                    prompt);
 
             LOG.info("{}: IOS-XR cli session initialized successfully", id);
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            Thread.currentThread()
+                    .interrupt();
             throw new RuntimeException(e);
         } catch (SessionException | ExecutionException | TimeoutException e) {
             LOG.warn("{}: Unable to initialize device", id, e);
@@ -111,7 +117,8 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
             throws InterruptedException, ExecutionException, TimeoutException {
 
         write(session, newline, ENABLE_COMMAND);
-        String enableCommandOutput = session.readUntilTimeout(READ_TIMEOUT_SECONDS).trim();
+        String enableCommandOutput = session.readUntilTimeout(READ_TIMEOUT_SECONDS)
+                .trim();
 
         // password is requested
         // TODO When reading from session, we can see all previously
@@ -123,15 +130,19 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
             String password = getEnablePasswordFromCliNode();
             write(session, newline, password);
 
-            String output = session.readUntilTimeout(READ_TIMEOUT_SECONDS).trim();
+            String output = session.readUntilTimeout(READ_TIMEOUT_SECONDS)
+                    .trim();
             if (output.endsWith(PASSWORD_PROMPT)) {
                 LOG.warn("{}: Specified enable password is not correct", id);
 
                 // We have entered incorrect password and we can be asked for
                 // correct one multiple times. Just skip those requests.
                 while (output.endsWith(PASSWORD_PROMPT)) {
-                    session.write(newline).toCompletableFuture().get(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-                    output = session.readUntilTimeout(READ_TIMEOUT_SECONDS).trim();
+                    session.write(newline)
+                            .toCompletableFuture()
+                            .get(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                    output = session.readUntilTimeout(READ_TIMEOUT_SECONDS)
+                            .trim();
                 }
 
             } else {
@@ -147,13 +158,15 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
             throws InterruptedException, ExecutionException, TimeoutException {
         LOG.debug("Entering configuration mode on {}.", id);
         cli.executeAndSwitchPrompt(CONFIG_COMMAND, IS_CONFIGURATION_PROMPT)
-                .toCompletableFuture().get(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                .toCompletableFuture()
+                .get(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     void tryToExitConfigurationMode(Cli cli) throws InterruptedException, ExecutionException, TimeoutException {
         LOG.debug("Exiting configuration mode on {}.", id);
         cli.executeAndSwitchPrompt(END_COMMAND, IS_PRIVELEGE_PROMPT)
-                .toCompletableFuture().get(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                .toCompletableFuture()
+                .get(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     private String getEnablePasswordFromCliNode() {

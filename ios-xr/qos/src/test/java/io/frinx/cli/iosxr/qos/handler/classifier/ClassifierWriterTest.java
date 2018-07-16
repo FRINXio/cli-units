@@ -55,21 +55,22 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class ClassifierWriterTest {
 
-    private static final String WRITE_INPUT_ALL = "class-map match-all map1\n" +
-            "match qos-group 10 1-5\n" +
-            "match precedence 2 3 network\n" +
-            "match mpls experimental topmost 1\n" +
-            "match access-group ipv4 acl4\n" +
-            "match access-group ipv6 acl6\n" +
-            "match precedence ipv4 0 7 network\n" +
-            "match precedence ipv6 critical\n" +
-            "root\n";
+    private static final String WRITE_INPUT_ALL = "class-map match-all map1\n"
+            + "match qos-group 10 1-5\n"
+            + "match precedence 2 3 network\n"
+            + "match mpls experimental topmost 1\n"
+            + "match access-group ipv4 acl4\n"
+            + "match access-group ipv6 acl6\n"
+            + "match precedence ipv4 0 7 network\n"
+            + "match precedence ipv6 critical\n"
+            + "root\n";
 
     private static final String WRITE_QOS_ANY = "class-map match-any map1\nmatch qos-group 10 1-5\nroot\n";
     private static final String WRITE_PREC_ANY = "class-map match-any map1\nmatch precedence 2 3 network\nroot\n";
     private static final String WRITE_MPLS_ANY = "class-map match-any map1\nmatch mpls experimental topmost 1\nroot\n";
     private static final String WRITE_ACG_IPV4_ANY = "class-map match-any map1\nmatch access-group ipv4 acl4\nroot\n";
-    private static final String WRITE_PREC_IPV4_ANY = "class-map match-any map1\nmatch precedence ipv4 0 7 network\nroot\n";
+    private static final String WRITE_PREC_IPV4_ANY = "class-map match-any map1\nmatch precedence ipv4 0 7 "
+            + "network\nroot\n";
 
     private static final String DELETE_INPUT = "no class-map map1\n";
 
@@ -94,7 +95,8 @@ public class ClassifierWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        Mockito.when(cli.executeAndRead(Mockito.any()))
+                .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new ClassifierWriter(this.cli);
 
@@ -105,105 +107,143 @@ public class ClassifierWriterTest {
         TermBuilder termAll = new TermBuilder();
         termAll.setId("all");
         termAll.setConditions(new ConditionsBuilder()
-            .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
-                .setQosGroup(Lists.newArrayList(new QosGroup(10L), new QosGroup(new QosGroupRange("1..5"))))
-                .setPrecedences(Lists.newArrayList(new Precedence((short) 2), new Precedence((short) 3), new Precedence("network"))).build())
-            .setIpv4(new Ipv4Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder()
-                .addAugmentation(QosIpv4ConditionAug.class, new QosIpv4ConditionAugBuilder()
-                    .setAclRef("acl4")
-                    .setPrecedences(Lists.newArrayList(new Precedence((short) 0), new Precedence((short) 7), new Precedence("network")))
-                    .build())
-                .build())
-            .build())
-                .setIpv6(new Ipv6Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder()
-                    .addAugmentation(QosIpv6ConditionAug.class, new QosIpv6ConditionAugBuilder()
-                        .setAclRef("acl6")
-                        .setPrecedences(Lists.newArrayList(new Precedence("critical")))
+                .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
+                        .setQosGroup(Lists.newArrayList(new QosGroup(10L), new QosGroup(new QosGroupRange("1..5"))))
+                        .setPrecedences(Lists.newArrayList(new Precedence((short) 2), new Precedence((short) 3), new
+                                Precedence("network")))
                         .build())
-                    .build())
-                .build())
-            .setMpls(new MplsBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.mpls.header.top.mpls.ConfigBuilder()
-                    .setTrafficClass((short) 1).build()).build())
-        .build());
+                .setIpv4(new Ipv4Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                        .header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder()
+                        .addAugmentation(QosIpv4ConditionAug.class, new QosIpv4ConditionAugBuilder()
+                                .setAclRef("acl4")
+                                .setPrecedences(Lists.newArrayList(new Precedence((short) 0), new Precedence((short)
+                                        7), new Precedence("network")))
+                                .build())
+                        .build())
+                        .build())
+                .setIpv6(new Ipv6Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                        .header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder()
+                        .addAugmentation(QosIpv6ConditionAug.class, new QosIpv6ConditionAugBuilder()
+                                .setAclRef("acl6")
+                                .setPrecedences(Lists.newArrayList(new Precedence("critical")))
+                                .build())
+                        .build())
+                        .build())
+                .setMpls(new MplsBuilder()
+                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields
+                                .rev171215.mpls.header.top.mpls.ConfigBuilder()
+                                .setTrafficClass((short) 1)
+                                .build())
+                        .build())
+                .build());
 
         data = new ClassifierBuilder()
-            .setName("map1")
-            .setTerms(new TermsBuilder().setTerm(Lists.newArrayList(termAll.build())).build())
-            .build();
+                .setName("map1")
+                .setTerms(new TermsBuilder().setTerm(Lists.newArrayList(termAll.build()))
+                        .build())
+                .build();
     }
 
     @Test
     public void writeAny() throws WriteFailedException {
         Term term1 = new TermBuilder().setId("1")
-            .setConditions(new ConditionsBuilder()
-                .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
-                        .setQosGroup(Lists.newArrayList(new QosGroup(10L), new QosGroup(new QosGroupRange("1..5")))).build())
-                .build())
-        .build();
+                .setConditions(new ConditionsBuilder()
+                        .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
+                                .setQosGroup(Lists.newArrayList(new QosGroup(10L), new QosGroup(
+                                        new QosGroupRange("1..5"))))
+                                .build())
+                        .build())
+                .build();
 
         Term term2 = new TermBuilder().setId("2")
-            .setConditions(new ConditionsBuilder()
-                .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
-                    .setPrecedences(Lists.newArrayList(new Precedence((short) 2), new Precedence((short) 3), new Precedence("network"))).build())
-                .build())
-        .build();
+                .setConditions(new ConditionsBuilder()
+                        .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
+                                .setPrecedences(Lists.newArrayList(new Precedence((short) 2), new Precedence((short)
+                                        3), new Precedence("network")))
+                                .build())
+                        .build())
+                .build();
 
         Term term3 = new TermBuilder().setId("3")
-            .setConditions(new ConditionsBuilder()
-                .setIpv4(new Ipv4Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder()
-                        .addAugmentation(QosIpv4ConditionAug.class, new QosIpv4ConditionAugBuilder()
-                                .setAclRef("acl4").build())
-                        .build()).build())
-                .build())
-        .build();
+                .setConditions(new ConditionsBuilder()
+                        .setIpv4(new Ipv4Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig
+                                .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder()
+                                .addAugmentation(QosIpv4ConditionAug.class, new QosIpv4ConditionAugBuilder()
+                                        .setAclRef("acl4")
+                                        .build())
+                                .build())
+                                .build())
+                        .build())
+                .build();
 
         Term term4 = new TermBuilder().setId("4")
-            .setConditions(new ConditionsBuilder()
-                .setIpv4(new Ipv4Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder()
-                    .addAugmentation(QosIpv4ConditionAug.class, new QosIpv4ConditionAugBuilder()
-                        .setPrecedences(Lists.newArrayList(new Precedence((short) 0), new Precedence((short) 7), new Precedence("network"))).build())
-                    .build()).build())
-                .build())
-        .build();
+                .setConditions(new ConditionsBuilder()
+                        .setIpv4(new Ipv4Builder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig
+                                .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder()
+                                .addAugmentation(QosIpv4ConditionAug.class, new QosIpv4ConditionAugBuilder()
+                                        .setPrecedences(Lists.newArrayList(new Precedence((short) 0),
+                                                new Precedence((short) 7), new Precedence("network")))
+                                        .build())
+                                .build())
+                                .build())
+                        .build())
+                .build();
 
         Term term5 = new TermBuilder().setId("5")
-            .setConditions(new ConditionsBuilder()
-                .setMpls(new MplsBuilder()
-                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.mpls.header.top.mpls.ConfigBuilder()
-                        .setTrafficClass((short) 1).build())
-                    .build())
-                .build())
-        .build();
+                .setConditions(new ConditionsBuilder()
+                        .setMpls(new MplsBuilder()
+                                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header
+                                        .fields.rev171215.mpls.header.top.mpls.ConfigBuilder()
+                                        .setTrafficClass((short) 1)
+                                        .build())
+                                .build())
+                        .build())
+                .build();
 
         data = new ClassifierBuilder()
-            .setName("map1")
-            .setTerms(new TermsBuilder().setTerm(Lists.newArrayList(term1, term2, term3, term4, term5)).build())
-            .build();
+                .setName("map1")
+                .setTerms(new TermsBuilder().setTerm(Lists.newArrayList(term1, term2, term3, term4, term5))
+                        .build())
+                .build();
 
         this.writer.writeCurrentAttributes(piid, data, context);
 
-        Mockito.verify(cli, Mockito.times(5)).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_QOS_ANY, response.getAllValues().get(0).getContent());
-        Assert.assertEquals(WRITE_PREC_ANY, response.getAllValues().get(1).getContent());
-        Assert.assertEquals(WRITE_ACG_IPV4_ANY, response.getAllValues().get(2).getContent());
-        Assert.assertEquals(WRITE_PREC_IPV4_ANY, response.getAllValues().get(3).getContent());
-        Assert.assertEquals(WRITE_MPLS_ANY, response.getAllValues().get(4).getContent());
+        Mockito.verify(cli, Mockito.times(5))
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_QOS_ANY, response.getAllValues()
+                .get(0)
+                .getContent());
+        Assert.assertEquals(WRITE_PREC_ANY, response.getAllValues()
+                .get(1)
+                .getContent());
+        Assert.assertEquals(WRITE_ACG_IPV4_ANY, response.getAllValues()
+                .get(2)
+                .getContent());
+        Assert.assertEquals(WRITE_PREC_IPV4_ANY, response.getAllValues()
+                .get(3)
+                .getContent());
+        Assert.assertEquals(WRITE_MPLS_ANY, response.getAllValues()
+                .get(4)
+                .getContent());
     }
 
     @Test
     public void writeAll() throws WriteFailedException {
         this.writer.writeCurrentAttributes(piid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT_ALL, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT_ALL, response.getValue()
+                .getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributes(piid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 }

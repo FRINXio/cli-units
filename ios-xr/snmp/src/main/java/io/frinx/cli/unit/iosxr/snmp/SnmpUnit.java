@@ -68,7 +68,8 @@ public class SnmpUnit implements TranslateUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.event.types.rev171024.$YangModuleInfoImpl.getInstance());
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.event.types.rev171024.$YangModuleInfoImpl
+                        .getInstance());
     }
 
     @Override
@@ -77,22 +78,23 @@ public class SnmpUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry, @Nonnull Context context) {
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry, @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
-        wRegistry.add(new GenericListWriter<>(IIDs.SN_IN_INTERFACE, new NoopCliListWriter<>()));
-        wRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(Config.class).child(EnabledTrapForEvent.class)),
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+        writeRegistry.add(new GenericListWriter<>(IIDs.SN_IN_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(Config.class)
+                        .child(EnabledTrapForEvent.class)),
                 new GenericWriter<>(IIDs.SN_IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
     }
 
-    private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.SNMP, SnmpBuilder.class);
-        rRegistry.subtreeAdd(Sets.newHashSet(
+    private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.addStructuralReader(IIDs.SNMP, SnmpBuilder.class);
+        readRegistry.subtreeAdd(Sets.newHashSet(
                 RWUtils.cutIdFromStart(IIDs.SN_IN_INTERFACE, IFCS_ID),
                 RWUtils.cutIdFromStart(IIDs.SN_IN_IN_CONFIG, IFCS_ID),
                 RWUtils.cutIdFromStart(IIDs.SN_IN_IN_CO_ENABLEDTRAPFOREVENT, IFCS_ID)),

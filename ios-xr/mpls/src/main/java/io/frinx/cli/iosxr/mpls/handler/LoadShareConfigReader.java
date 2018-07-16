@@ -22,6 +22,8 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.mpls.MplsReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.CiscoMplsTeExtensionBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.ConfigBuilder;
@@ -29,9 +31,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev17082
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-import java.util.regex.Pattern;
 
 public class LoadShareConfigReader implements MplsReader.MplsConfigReader<Config, ConfigBuilder> {
 
@@ -43,9 +42,12 @@ public class LoadShareConfigReader implements MplsReader.MplsConfigReader<Config
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String name = instanceIdentifier.firstKeyOf(Tunnel.class).getName();
-        parseConfig(blockingRead(String.format(TunnelConfigReader.SH_RUN_TUNNEL, name), cli, instanceIdentifier, readContext), configBuilder);
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+            ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        final String name = instanceIdentifier.firstKeyOf(Tunnel.class)
+                .getName();
+        parseConfig(blockingRead(String.format(TunnelConfigReader.SH_RUN_TUNNEL, name), cli, instanceIdentifier,
+                readContext), configBuilder);
     }
 
     @VisibleForTesting

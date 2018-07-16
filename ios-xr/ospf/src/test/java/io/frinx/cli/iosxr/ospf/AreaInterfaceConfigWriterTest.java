@@ -51,28 +51,28 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class AreaInterfaceConfigWriterTest {
 
-    private static final String WRITE_INPUT = "router ospf default\n" +
-            "area 1000\n" +
-            "interface Loopback97\n" +
-            "cost 300\n" +
-            "root\n";
+    private static final String WRITE_INPUT = "router ospf default\n"
+            + "area 1000\n"
+            + "interface Loopback97\n"
+            + "cost 300\n"
+            + "root\n";
 
-    private static final String UPDATE_COST_INPUT = "router ospf default\n" +
-            "area 1000\n" +
-            "interface Loopback97\n" +
-            "cost 500\n" +
-            "root\n";
+    private static final String UPDATE_COST_INPUT = "router ospf default\n"
+            + "area 1000\n"
+            + "interface Loopback97\n"
+            + "cost 500\n"
+            + "root\n";
 
-    private static final String REMOVE_COST_INPUT = "router ospf default\n" +
-            "area 1000\n" +
-            "interface Loopback97\n" +
-            "no cost\n" +
-            "root\n";
+    private static final String REMOVE_COST_INPUT = "router ospf default\n"
+            + "area 1000\n"
+            + "interface Loopback97\n"
+            + "no cost\n"
+            + "root\n";
 
-    private static final String DELETE_INPUT = "router ospf default\n" +
-            "area 1000\n" +
-            "no interface Loopback97\n" +
-            "root\n";
+    private static final String DELETE_INPUT = "router ospf default\n"
+            + "area 1000\n"
+            + "no interface Loopback97\n"
+            + "root\n";
 
     @Mock
     private Cli cli;
@@ -85,12 +85,16 @@ public class AreaInterfaceConfigWriterTest {
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier piid = KeyedInstanceIdentifier.create(Protocols.class)
-            .child(Protocol.class, new ProtocolKey(OSPF.class,"default"))
-            .child(Ospfv2.class).child(Areas.class).child(Area.class).child(Interfaces.class).child(Interface.class);
+            .child(Protocol.class, new ProtocolKey(OSPF.class, "default"))
+            .child(Ospfv2.class)
+            .child(Areas.class)
+            .child(Area.class)
+            .child(Interfaces.class)
+            .child(Interface.class);
 
     // test data
-    private Area a;
-    private Interface i;
+    private Area area;
+    private Interface anInterface;
     private Config data;
 
 
@@ -98,7 +102,8 @@ public class AreaInterfaceConfigWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        Mockito.when(cli.executeAndRead(Mockito.any()))
+                .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new AreaInterfaceConfigWriter(this.cli);
 
@@ -106,31 +111,43 @@ public class AreaInterfaceConfigWriterTest {
     }
 
     private void initializeData() {
-        data = new ConfigBuilder().setMetric(new OspfMetric(300)).build();
-        a = new AreaBuilder().setIdentifier(new OspfAreaIdentifier(1000L)).build();
-        i = new InterfaceBuilder().setKey(new InterfaceKey("Loopback97")).build();
+        data = new ConfigBuilder().setMetric(new OspfMetric(300))
+                .build();
+        area = new AreaBuilder().setIdentifier(new OspfAreaIdentifier(1000L))
+                .build();
+        anInterface = new InterfaceBuilder().setKey(new InterfaceKey("Loopback97"))
+                .build();
 
-        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(a)).thenReturn(Optional.of(i));
-        Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(a)).thenReturn(Optional.of(i));
+        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class)))
+                .thenReturn(Optional.of(area))
+                .thenReturn(Optional.of(anInterface));
+        Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class)))
+                .thenReturn(Optional.of(area))
+                .thenReturn(Optional.of(anInterface));
     }
 
     @Test
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributesForType(piid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void update() throws WriteFailedException {
         // cost to 500
-        Config newData = new ConfigBuilder().setMetric(new OspfMetric(500)).build();
+        Config newData = new ConfigBuilder().setMetric(new OspfMetric(500))
+                .build();
 
         this.writer.updateCurrentAttributesForType(piid, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_COST_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_COST_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -140,15 +157,19 @@ public class AreaInterfaceConfigWriterTest {
 
         this.writer.updateCurrentAttributesForType(piid, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(REMOVE_COST_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(REMOVE_COST_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributesForType(piid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 }

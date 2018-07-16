@@ -52,7 +52,8 @@ public class BfdConfigReader implements CliConfigReader<Config, ConfigBuilder> {
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
         if (!AggregateConfigReader.isLAGInterface(ifcName)) {
             // read bfd configuration just for LAG interfaces
             return;
@@ -94,17 +95,17 @@ public class BfdConfigReader implements CliConfigReader<Config, ConfigBuilder> {
     static void parseBfdConfig(String output, ConfigBuilder builder) {
         ParsingUtils.parseField(output,
                 BFD_MINIMUM_INTERVAL::matcher,
-                matcher -> Long.valueOf(matcher.group("minInterval")),
+            matcher -> Long.valueOf(matcher.group("minInterval")),
                 builder::setMinInterval);
 
         ParsingUtils.parseField(output,
                 BFD_MULTIPLIER::matcher,
-                matcher -> Long.valueOf(matcher.group("multiplier")),
+            matcher -> Long.valueOf(matcher.group("multiplier")),
                 builder::setMultiplier);
 
         ParsingUtils.parseField(output,
                 BFD_DESTINATION::matcher,
-                matcher -> new IpAddress(new Ipv4Address(matcher.group("destination"))),
+            matcher -> new IpAddress(new Ipv4Address(matcher.group("destination"))),
                 builder::setDestinationAddress);
     }
 
@@ -112,12 +113,12 @@ public class BfdConfigReader implements CliConfigReader<Config, ConfigBuilder> {
     static boolean isSupportedBfdConfig(String output) {
         List<Boolean> bfdMode = ParsingUtils.parseFields(output, 0,
                 BFD_MODE_ITEF::matcher,
-                matcher -> true,
+            matcher -> true,
                 Function.identity());
 
         List<Boolean> fastDetect = ParsingUtils.parseFields(output, 0,
                 BFD_FAST_DETECT::matcher,
-                matcher -> true,
+            matcher -> true,
                 Function.identity());
 
         return !fastDetect.isEmpty() && !bfdMode.isEmpty();

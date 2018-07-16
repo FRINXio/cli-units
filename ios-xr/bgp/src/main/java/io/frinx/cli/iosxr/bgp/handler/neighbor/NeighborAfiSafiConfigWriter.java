@@ -45,11 +45,16 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
                                               WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         blockingWriteAndRead(cli, id, config,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
+                f("router bgp %s %s", g.getConfig()
+                        .getAs()
+                        .getValue(), instName),
+                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
+                        .getNeighborAddress()
+                        .getValue())),
                 f("address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
                 getReconfigurationCommand(config, false),
                 "root");
@@ -60,20 +65,31 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
                                                WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         Config reconfig = dataAfter;
         boolean delete = false;
-        if ((dataBefore.getAugmentation(BgpNeAfAug.class) !=null &&
-                dataBefore.getAugmentation(BgpNeAfAug.class).getSoftReconfiguration() != null) &&
-                (dataAfter.getAugmentation(BgpNeAfAug.class) ==null ||
-                        dataBefore.getAugmentation(BgpNeAfAug.class).getSoftReconfiguration() == null)) {
+        if ((dataBefore.getAugmentation(BgpNeAfAug.class)
+                != null
+                && dataBefore.getAugmentation(BgpNeAfAug.class)
+                .getSoftReconfiguration()
+                != null)
+                && (dataAfter.getAugmentation(BgpNeAfAug.class)
+                == null
+                || dataBefore.getAugmentation(BgpNeAfAug.class)
+                .getSoftReconfiguration()
+                == null)) {
             delete = true;
             reconfig = dataBefore;
         }
         blockingWriteAndRead(cli, id, dataAfter,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
+                f("router bgp %s %s", g.getConfig()
+                        .getAs()
+                        .getValue(), instName),
+                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
+                        .getNeighborAddress()
+                        .getValue())),
                 f("address-family %s", GlobalAfiSafiReader.transformAfiToString(dataAfter.getAfiSafiName())),
                 getReconfigurationCommand(reconfig, delete),
                 "root");
@@ -86,25 +102,34 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
         if (!bgpOptional.isPresent()) {
             return;
         }
-        final Global g = bgpOptional.get().getGlobal();
+        final Global g = bgpOptional.get()
+                .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         blockingDeleteAndRead(cli, id,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
+                f("router bgp %s %s", g.getConfig()
+                        .getAs()
+                        .getValue(), instName),
+                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
+                        .getNeighborAddress()
+                        .getValue())),
                 f("no address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
                 "root");
     }
 
     private String getReconfigurationCommand(Config config, boolean delete) {
 
-        if (config.getAugmentation(BgpNeAfAug.class) != null &&
-                config.getAugmentation(BgpNeAfAug.class).getSoftReconfiguration() != null) {
+        if (config.getAugmentation(BgpNeAfAug.class) != null
+                &&
+                config.getAugmentation(BgpNeAfAug.class)
+                        .getSoftReconfiguration() != null) {
             StringBuilder command = new StringBuilder();
             if (delete) {
                 command.append("no ");
             }
             command.append("soft-reconfiguration inbound");
-            if (config.getAugmentation(BgpNeAfAug.class).getSoftReconfiguration().isAlways()) {
+            if (config.getAugmentation(BgpNeAfAug.class)
+                    .getSoftReconfiguration()
+                    .isAlways()) {
                 command.append(" always");
             }
             return command.toString();

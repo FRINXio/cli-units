@@ -32,10 +32,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NeighborTransportConfigWriter  implements BgpWriter<Config> {
+public class NeighborTransportConfigWriter implements BgpWriter<Config> {
 
     private Cli cli;
-    private Pattern LOOPBACK_PATTERN = Pattern.compile("[Ll]oopback(?<index>\\d+)");
+    private static final Pattern LOOPBACK_PATTERN = Pattern.compile("[Ll]oopback(?<index>\\d+)");
 
 
     public NeighborTransportConfigWriter(Cli cli) {
@@ -43,24 +43,27 @@ public class NeighborTransportConfigWriter  implements BgpWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
-                                              WriteContext writeContext) throws WriteFailedException {
+    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config, WriteContext
+            writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        if (config.getLocalAddress() == null) {
+        if (config.getLocalAddress()
+                == null) {
             return;
         }
-        Matcher matcher = LOOPBACK_PATTERN.matcher(config.getLocalAddress().getString());
+        Matcher matcher = LOOPBACK_PATTERN.matcher(config.getLocalAddress()
+                .getString());
         if (!matcher.matches()) {
             return;
         }
-        blockingWriteAndRead(cli, id, config,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
-                f("update-source loopback %s", matcher.group("index")),
-                "root");
+        blockingWriteAndRead(cli, id, config, f("router bgp %s %s", g.getConfig()
+                .getAs()
+                .getValue(), instName), f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
+                .getNeighborAddress()
+                .getValue())), f("update-source loopback %s", matcher.group("index")), "root");
     }
 
     @Override
@@ -68,35 +71,41 @@ public class NeighborTransportConfigWriter  implements BgpWriter<Config> {
                                                WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         boolean isLoopback = false;
         Matcher matcher = null;
-        if (dataAfter.getLocalAddress() != null) {
-            matcher = LOOPBACK_PATTERN.matcher(dataAfter.getLocalAddress().getString());
+        if (dataAfter.getLocalAddress()
+                != null) {
+            matcher = LOOPBACK_PATTERN.matcher(dataAfter.getLocalAddress()
+                    .getString());
             if (matcher.matches()) {
                 isLoopback = true;
             }
         }
-        blockingWriteAndRead(cli, id, dataAfter,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
-                isLoopback ? f("update-source loopback %s", matcher.group("index")) : "no update-source",
-                "root");
+        blockingWriteAndRead(cli, id, dataAfter, f("router bgp %s %s", g.getConfig()
+                .getAs()
+                .getValue(), instName), f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
+                .getNeighborAddress()
+                .getValue())), isLoopback ? f("update-source loopback %s", matcher.group("index")) : "no "
+                + "update-source", "root");
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config config, WriteContext writeContext) throws WriteFailedException {
+    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config config, WriteContext
+            writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         if (!bgpOptional.isPresent()) {
             return;
         }
-        final Global g = bgpOptional.get().getGlobal();
+        final Global g = bgpOptional.get()
+                .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingDeleteAndRead(cli, id,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
-                "no update-source",
-                "root");
+        blockingDeleteAndRead(cli, id, f("router bgp %s %s", g.getConfig()
+                .getAs()
+                .getValue(), instName), f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
+                .getNeighborAddress()
+                .getValue())), "no update-source", "root");
     }
 }

@@ -76,24 +76,24 @@ public final class LoggingUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry, @Nonnull Context context) {
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry, @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
-        wRegistry.add(new GenericListWriter<>(IIDs.LO_IN_INTERFACE, new NoopCliListWriter<>()));
-        wRegistry.subtreeAddAfter(Sets.newHashSet(
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+        writeRegistry.add(new GenericListWriter<>(IIDs.LO_IN_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.subtreeAddAfter(Sets.newHashSet(
                 RWUtils.cutIdFromStart(IIDs.LO_IN_IN_CO_ENABLEDLOGGINGFOREVENT, IFC_CFG_ID)),
                 new GenericWriter<>(IIDs.LO_IN_IN_CONFIG, new LoggingInterfaceConfigWriter(cli)),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
     }
 
-    private void provideReaders(ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.LOGGING, LoggingBuilder.class);
-        rRegistry.subtreeAdd(Sets.newHashSet(
+    private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.addStructuralReader(IIDs.LOGGING, LoggingBuilder.class);
+        readRegistry.subtreeAdd(Sets.newHashSet(
                 RWUtils.cutIdFromStart(IIDs.LO_IN_INTERFACE, IFCS_ID),
                 RWUtils.cutIdFromStart(IIDs.LO_IN_IN_CONFIG, IFCS_ID),
                 RWUtils.cutIdFromStart(IIDs.LO_IN_IN_CO_ENABLEDLOGGINGFOREVENT, IFCS_ID)),

@@ -20,7 +20,9 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
+
 import javax.annotation.Nonnull;
+
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.Config;
@@ -40,16 +42,17 @@ public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigB
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder
+            configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
         final String setName = instanceIdentifier.firstKeyOf(EgressAclSet.class).getSetName();
 
         final String readCommand = f(SH_ACL_INTF, interfaceName);
         final String readConfig = blockingRead(
-            readCommand,
-            cli,
-            instanceIdentifier,
-            readContext
+                readCommand,
+                cli,
+                instanceIdentifier,
+                readContext
         );
 
         EgressAclSetReader.parseAcl(readConfig, configBuilder, setName);

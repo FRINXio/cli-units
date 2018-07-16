@@ -31,13 +31,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 
-public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>
+public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, NetworkInstanceKey,
+        NetworkInstanceBuilder>
         implements CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
     public NetworkInstanceReader(Cli cli) {
         super(new ArrayList<ListReaderCustomizer<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {{
-            add(new DefaultReader());
-        }});
+                add(new DefaultReader());
+            }
+        });
     }
 
     @Override

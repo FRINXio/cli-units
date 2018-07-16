@@ -40,41 +40,37 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class BfdConfigWriterTest {
 
-    private static final String WRITE_INPUT =
-            "interface Bundle-Ether55\n" +
-            "bfd mode ietf\n" +
-            "bfd address-family ipv4 fast-detect\n" +
-            "bfd address-family ipv4 multiplier 5\n" +
-            "bfd address-family ipv4 minimum-interval 1000\n" +
-            "bfd address-family ipv4 destination 192.168.1.1\n" +
-            "root\n";
+    private static final String WRITE_INPUT = "interface Bundle-Ether55\n"
+            + "bfd mode ietf\n"
+            + "bfd address-family ipv4 fast-detect\n"
+            + "bfd address-family ipv4 multiplier 5\n"
+            + "bfd address-family ipv4 minimum-interval 1000\n"
+            + "bfd address-family ipv4 destination 192.168.1.1\n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT =
-            "interface Bundle-Ether55\n" +
-            "bfd mode ietf\n" +
-            "bfd address-family ipv4 fast-detect\n" +
-            "bfd address-family ipv4 multiplier 10\n" +
-            "bfd address-family ipv4 minimum-interval 2000\n" +
-            "bfd address-family ipv4 destination 192.168.1.2\n" +
-            "root\n";
+    private static final String UPDATE_INPUT = "interface Bundle-Ether55\n"
+            + "bfd mode ietf\n"
+            + "bfd address-family ipv4 fast-detect\n"
+            + "bfd address-family ipv4 multiplier 10\n"
+            + "bfd address-family ipv4 minimum-interval 2000\n"
+            + "bfd address-family ipv4 destination 192.168.1.2\n"
+            + "root\n";
 
-    private static final String UPDATE_CLEAN_INPUT =
-            "interface Bundle-Ether55\n" +
-            "bfd mode ietf\n" +
-            "bfd address-family ipv4 fast-detect\n" +
-            "no bfd address-family ipv4 multiplier\n" +
-            "no bfd address-family ipv4 minimum-interval\n" +
-            "no bfd address-family ipv4 destination\n" +
-            "root\n";
+    private static final String UPDATE_CLEAN_INPUT = "interface Bundle-Ether55\n"
+            + "bfd mode ietf\n"
+            + "bfd address-family ipv4 fast-detect\n"
+            + "no bfd address-family ipv4 multiplier\n"
+            + "no bfd address-family ipv4 minimum-interval\n"
+            + "no bfd address-family ipv4 destination\n"
+            + "root\n";
 
-    private static final String DELETE_INPUT =
-            "interface Bundle-Ether55\n" +
-            "no bfd mode ietf\n" +
-            "no bfd address-family ipv4 fast-detect\n" +
-            "no bfd address-family ipv4 multiplier\n" +
-            "no bfd address-family ipv4 minimum-interval\n" +
-            "no bfd address-family ipv4 destination\n" +
-            "root\n";
+    private static final String DELETE_INPUT = "interface Bundle-Ether55\n"
+            + "no bfd mode ietf\n"
+            + "no bfd address-family ipv4 fast-detect\n"
+            + "no bfd address-family ipv4 multiplier\n"
+            + "no bfd address-family ipv4 minimum-interval\n"
+            + "no bfd address-family ipv4 destination\n"
+            + "root\n";
 
     @Mock
     private Cli cli;

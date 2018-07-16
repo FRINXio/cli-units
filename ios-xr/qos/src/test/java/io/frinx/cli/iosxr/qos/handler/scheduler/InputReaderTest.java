@@ -21,15 +21,21 @@ import org.junit.Test;
 
 public class InputReaderTest {
 
-    private static final String OUTPUT = "Tue Apr  3 08:55:01.362 UTC\r\n" +
-        " class mapAny\r\n" +
-        " class mapAll\r\n" +
-        " class class-default\r\n";
+    private static final String OUTPUT = "Tue Apr  3 08:55:01.362 UTC\r\n"
+            + " class mapAny\r\n"
+            + " class mapAll\r\n"
+            + " class class-default\r\n";
 
     @Test
     public void testAllIds() {
-        Assert.assertEquals("mapAny", InputReader.getInputKeys(OUTPUT, 1L).get(0).getId());
-        Assert.assertEquals("mapAll", InputReader.getInputKeys(OUTPUT, 2L).get(0).getId());
-        Assert.assertEquals("class-default", InputReader.getInputKeys(OUTPUT, 3L).get(0).getId());
+        Assert.assertEquals("mapAny", InputReader.getInputKeys(OUTPUT, 1L)
+                .get(0)
+                .getId());
+        Assert.assertEquals("mapAll", InputReader.getInputKeys(OUTPUT, 2L)
+                .get(0)
+                .getId());
+        Assert.assertEquals("class-default", InputReader.getInputKeys(OUTPUT, 3L)
+                .get(0)
+                .getId());
     }
 }

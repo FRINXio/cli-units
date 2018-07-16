@@ -23,23 +23,23 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 
 public class NeighborConfigReaderTest {
 
-    private static final String OUTPUT = "Fri Feb 23 06:18:50.457 UTC\n" +
-            " neighbor 5.5.5.5\n" +
-            "  remote-as 5000\n" +
-            "  use neighbor-group nbrgroup1\n" +
-            " neighbor 6.6.6.6\n" +
-            "  remote-as 5000\n" +
-            "  shutdown\n" +
-            " neighbor 8.8.8.8\n" +
-            "  remote-as 65000\n" +
-            "  use neighbor-group nbrgroup1\n" +
-            " neighbor 7.7.7.7\n" +
-            "  remote-as 65000\n" +
-            "  use neighbor-group nbrgroup1\n" +
-            "  description test desc\n" +
-            "  password encrypted GCHKNJDJSADNKLSAND\n" +
-            "  send-community-ebgp\n" +
-            "  remove-private-AS\n";
+    private static final String OUTPUT = "Fri Feb 23 06:18:50.457 UTC\n"
+            + " neighbor 5.5.5.5\n"
+            + "  remote-as 5000\n"
+            + "  use neighbor-group nbrgroup1\n"
+            + " neighbor 6.6.6.6\n"
+            + "  remote-as 5000\n"
+            + "  shutdown\n"
+            + " neighbor 8.8.8.8\n"
+            + "  remote-as 65000\n"
+            + "  use neighbor-group nbrgroup1\n"
+            + " neighbor 7.7.7.7\n"
+            + "  remote-as 65000\n"
+            + "  use neighbor-group nbrgroup1\n"
+            + "  description test desc\n"
+            + "  password encrypted GCHKNJDJSADNKLSAND\n"
+            + "  send-community-ebgp\n"
+            + "  remove-private-AS\n";
 
     @Test
     public void test() {

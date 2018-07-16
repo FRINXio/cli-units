@@ -55,12 +55,12 @@ public class HoldTimeConfigReader implements CliConfigReader<Config, ConfigBuild
     static void parseHoldTime(String output, ConfigBuilder builder) {
         ParsingUtils.parseField(output, 0,
                 CARRIER_DELAY_LINE::matcher,
-                matcher -> Long.valueOf(matcher.group("up")),
+            matcher -> Long.valueOf(matcher.group("up")),
                 builder::setUp);
 
         ParsingUtils.parseField(output, 0,
                 CARRIER_DELAY_LINE::matcher,
-                matcher -> Long.valueOf(matcher.group("down")),
+            matcher -> Long.valueOf(matcher.group("down")),
                 builder::setDown);
     }
 

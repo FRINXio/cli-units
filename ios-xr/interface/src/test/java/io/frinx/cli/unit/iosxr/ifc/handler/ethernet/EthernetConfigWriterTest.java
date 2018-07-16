@@ -44,41 +44,35 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class EthernetConfigWriterTest {
 
-    private static final String WRITE_INPUT =
-            "interface GigabitEthernet0/0/0/1\n" +
-            "bundle id 30 mode active\n" +
-            "lacp period short\n" +
-            "root\n";
+    private static final String WRITE_INPUT = "interface GigabitEthernet0/0/0/1\n"
+            + "bundle id 30 mode active\n"
+            + "lacp period short\n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT =
-            "interface GigabitEthernet0/0/0/1\n" +
-            "bundle id 50 mode passive\n" +
-            "no lacp period short\n" +
-            "root\n";
+    private static final String UPDATE_INPUT = "interface GigabitEthernet0/0/0/1\n"
+            + "bundle id 50 mode passive\n"
+            + "no lacp period short\n"
+            + "root\n";
 
-    private static final String UPDATE_CLEAN_INPUT =
-            "interface GigabitEthernet0/0/0/1\n" +
-            "bundle id 30 mode on\n" +
-            "no lacp period short\n" +
-            "root\n";
+    private static final String UPDATE_CLEAN_INPUT = "interface GigabitEthernet0/0/0/1\n"
+            + "bundle id 30 mode on\n"
+            + "no lacp period short\n"
+            + "root\n";
 
-    private static final String UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT =
-            "interface GigabitEthernet0/0/0/1\n" +
-            "no bundle id\n" +
-            "lacp period short\n" +
-            "root\n";
+    private static final String UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT = "interface GigabitEthernet0/0/0/1\n"
+            + "no bundle id\n"
+            + "lacp period short\n"
+            + "root\n";
 
-    private static final String UPDATE_LACP_MODE_INPUT =
-            "interface GigabitEthernet0/0/0/1\n" +
-            "bundle id 30 mode active\n" +
-            "no lacp period short\n" +
-            "root\n";
+    private static final String UPDATE_LACP_MODE_INPUT = "interface GigabitEthernet0/0/0/1\n"
+            + "bundle id 30 mode active\n"
+            + "no lacp period short\n"
+            + "root\n";
 
-    private static final String DELETE_INPUT =
-            "interface GigabitEthernet0/0/0/1\n" +
-            "no bundle id\n" +
-            "no lacp period short\n" +
-            "root\n";
+    private static final String DELETE_INPUT = "interface GigabitEthernet0/0/0/1\n"
+            + "no bundle id\n"
+            + "no lacp period short\n"
+            + "root\n";
 
     @Mock
     private Cli cli;
@@ -91,7 +85,7 @@ public class EthernetConfigWriterTest {
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier iid = KeyedInstanceIdentifier.create(Interfaces.class)
-           .child(Interface.class, new InterfaceKey("GigabitEthernet0/0/0/1"));
+            .child(Interface.class, new InterfaceKey("GigabitEthernet0/0/0/1"));
 
     // test data
     private Config data;
@@ -100,51 +94,67 @@ public class EthernetConfigWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        Mockito.when(cli.executeAndRead(Mockito.any()))
+                .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new EthernetConfigWriter(this.cli);
         initializeData();
     }
 
     private void initializeData() {
-        data = new ConfigBuilder().addAugmentation(Config1.class, new Config1Builder().setAggregateId("Bundle-Ether30").build())
-            .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder().setLacpMode(LacpActivityType.ACTIVE)
-                    .setInterval(LacpPeriodType.FAST).build())
-            .build();
+        data = new ConfigBuilder().addAugmentation(Config1.class, new Config1Builder().setAggregateId("Bundle-Ether30")
+                .build())
+                .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder().setLacpMode(LacpActivityType
+                        .ACTIVE)
+                        .setInterval(LacpPeriodType.FAST)
+                        .build())
+                .build();
     }
 
     @Test
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void update() throws WriteFailedException {
         // update values
-        Config newData = new ConfigBuilder().addAugmentation(Config1.class, new Config1Builder().setAggregateId("Bundle-Ether50").build())
-            .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder().setLacpMode(LacpActivityType.PASSIVE)
-                    .setInterval(LacpPeriodType.SLOW).build())
-            .build();
+        Config newData = new ConfigBuilder().addAugmentation(Config1.class,
+                new Config1Builder().setAggregateId("Bundle-Ether50")
+                .build())
+                .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder().setLacpMode(LacpActivityType
+                        .PASSIVE)
+                        .setInterval(LacpPeriodType.SLOW)
+                        .build())
+                .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void updateClean() throws WriteFailedException {
         // clean what we can
-        Config newData = new ConfigBuilder().addAugmentation(Config1.class, new Config1Builder().setAggregateId("Bundle-Ether30").build())
-            .build();
+        Config newData = new ConfigBuilder().addAugmentation(Config1.class,
+                new Config1Builder().setAggregateId("Bundle-Ether30")
+                .build())
+                .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -156,8 +166,10 @@ public class EthernetConfigWriterTest {
                 .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT, response.getValue()
+                .getContent());
 
         Config newDataWithEmptyAggregateAug = new ConfigBuilder()
                 .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder()
@@ -168,8 +180,10 @@ public class EthernetConfigWriterTest {
                 .build();
 
         this.writer.updateCurrentAttributes(iid, data, newDataWithEmptyAggregateAug, context);
-        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli, Mockito.times(2))
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_LACP_PERIOD_WITHOUT_LACP_MODE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -184,8 +198,10 @@ public class EthernetConfigWriterTest {
                 .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_LACP_MODE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_LACP_MODE_INPUT, response.getValue()
+                .getContent());
 
         // no bundle-id defined, we shouldn't update mode
         Config newDataWithoutBundleId = new ConfigBuilder()
@@ -200,7 +216,6 @@ public class EthernetConfigWriterTest {
             this.writer.updateCurrentAttributes(iid, data, newDataWithoutBundleId, context);
             Assert.fail("Updating LACP mode without configured bundle-id is not allowed");
         } catch (NullPointerException ex) {
-
         }
 
         // no aggregate augmentation defined, we shouldn't update mode
@@ -214,18 +229,18 @@ public class EthernetConfigWriterTest {
             this.writer.updateCurrentAttributes(iid, data, newDataWithoutAggregateAug, context);
             Assert.fail("Updating LACP mode without configured bundle-id is not allowed");
         } catch (NullPointerException ex) {
-
         }
     }
 
 
-
-        @Test
+    @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -235,7 +250,9 @@ public class EthernetConfigWriterTest {
                 .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 }

@@ -38,23 +38,23 @@ public class AsPathSetConfigWriterTest implements CliFormatter {
                     "ios-regex '*'"))
             .build();
 
-    static final String OUTPUT_1 = "as-path-set test\n" +
-            "neighbor-is '1.1',\n" +
-            "passes-through '54',\n" +
-            "originates-from '3243',\n" +
-            "length eq 444,\n" +
-            "unique-length eq 44,\n" +
-            "ios-regex '*'\n" +
-            "end-set";
+    static final String OUTPUT_1 = "as-path-set test\n"
+            + "neighbor-is '1.1',\n"
+            + "passes-through '54',\n"
+            + "originates-from '3243',\n"
+            + "length eq 444,\n"
+            + "unique-length eq 44,\n"
+            + "ios-regex '*'\n"
+            + "end-set";
 
     static final Config CFG_2 = new ConfigBuilder()
             .setAsPathSetName("test")
             .setAsPathSetMember(Collections.emptyList())
             .build();
 
-    static final String OUTPUT_2 = "as-path-set test\n" +
-            "\n" +
-            "end-set";
+    static final String OUTPUT_2 = "as-path-set test\n"
+            + "\n"
+            + "end-set";
 
     @Test
     public void testWrite() throws Exception {

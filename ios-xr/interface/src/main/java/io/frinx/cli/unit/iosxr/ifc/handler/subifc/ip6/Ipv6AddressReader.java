@@ -50,14 +50,17 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
 
     public static final String SH_INTERFACE_IP = "show running-config interface %s | include ^ ipv6 address";
     static final Pattern IPV6_LOCAL_ADDRESS = Pattern.compile("ipv6 address (?<ipv6local>[^\\s]+) link-local");
-    static final Pattern IPV6_UNICAST_ADDRESS = Pattern.compile("ipv6 address (?<ipv6unicast>[a-fA-F0-9:]+)/(?<prefix>[\\d]+)");
+    static final Pattern IPV6_UNICAST_ADDRESS = Pattern.compile("ipv6 address (?<ipv6unicast>[a-fA-F0-9:]+)/"
+            + "(?<prefix>[\\d]+)");
 
     @Nonnull
     @Override
     public List<AddressKey> getAllIds(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+        String id = instanceIdentifier.firstKeyOf(Interface.class)
+                .getName();
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
@@ -73,12 +76,12 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
         List<AddressKey> addressKeys = new ArrayList<>();
         addressKeys.addAll(parseFields(output, 0,
                 IPV6_LOCAL_ADDRESS::matcher,
-                m -> m.group("ipv6local"),
-                addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
+            m -> m.group("ipv6local"),
+            addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
         addressKeys.addAll(parseFields(output, 0,
                 IPV6_UNICAST_ADDRESS::matcher,
-                m -> m.group("ipv6unicast"),
-                addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
+            m -> m.group("ipv6unicast"),
+            addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
         return addressKeys;
     }
 
@@ -92,11 +95,13 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
                                       @Nonnull AddressBuilder addressBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class).getIp());
+            addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class)
+                    .getIp());
         }
     }
 }

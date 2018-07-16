@@ -43,7 +43,8 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
     public static final String DEFAULT_BGP_INSTANCE = "default";
 
     private static final String SHOW_RUN_ROUTER_BGP = "show running-config router bgp | include ^router bgp";
-    private static final Pattern INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9.]+) instance (?<instance>[\\S]+)");
+    private static final Pattern INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9.]+) instance "
+            + "(?<instance>[\\S]+)");
     private static final Pattern DEFAULT_INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9]+)");
     private final Cli cli;
 
@@ -64,8 +65,8 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
     public static List<ProtocolKey> parseGbpProtocolKeys(String output) {
         List<ProtocolKey> bgpProtocolKeys = ParsingUtils.parseFields(output, 0,
                 INSTANCE_PATTERN::matcher,
-                matcher -> matcher.group("instance"),
-                v -> new ProtocolKey(TYPE, v));
+            matcher -> matcher.group("instance"),
+            v -> new ProtocolKey(TYPE, v));
 
         boolean isDefaultInstanceConfigured = NEWLINE.splitAsStream(output)
                 .map(String::trim)

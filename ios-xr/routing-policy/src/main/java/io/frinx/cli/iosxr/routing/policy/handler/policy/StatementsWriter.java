@@ -80,22 +80,22 @@ public class StatementsWriter implements CliWriter<Statements> {
                 });
     }
 
-    private static final String POLICY_TEMPLATE = "route-policy {$policy}\n" +
-            "{$statements|join(\n)}" +
-            "\n" +
-            "end-policy";
+    private static final String POLICY_TEMPLATE = "route-policy {$policy}\n"
+            + "{$statements|join(\n)}"
+            + "\n"
+            + "end-policy";
 
     // Spaces in the template intentional to produce output comparable to xr
-    private static final String STATEMENT_TEMPLATE = "{% if ($conditions) %}" +
-            "{.if ($wasIf)}  else{.else}  {.endif}" +
-            "if {$conditions|join( and )} then\n" +
-            "    {$actions|join(\n    )}" +
-            "{% elseif ($actions) %}" +
-            "{.if ($wasIf)}  else\n    {$actions|join(\n    )}{.else}  {$actions|join(\n  )}{.endif}" +
-            "\n" +
-            "{% else %}" +
-            "{.if ($wasIf)}  endif\n{.endif}" +
-            "{% endif %}";
+    private static final String STATEMENT_TEMPLATE = "{% if ($conditions) %}"
+            + "{.if ($wasIf)}  else{.else}  {.endif}"
+            + "if {$conditions|join( and )} then\n"
+            + "    {$actions|join(\n    )}"
+            + "{% elseif ($actions) %}"
+            + "{.if ($wasIf)}  else\n    {$actions|join(\n    )}{.else}  {$actions|join(\n  )}{.endif}"
+            + "\n"
+            + "{% else %}"
+            + "{.if ($wasIf)}  endif\n{.endif}"
+            + "{% endif %}";
 
     @VisibleForTesting
     static String processStatements(List<Statement> statements, String rpName, CliFormatter format) {
@@ -107,8 +107,9 @@ public class StatementsWriter implements CliWriter<Statements> {
             List<String> conditions = ConditionRenderer.renderConditions(statement.getConditions());
             List<String> actions = ActionsRenderer.renderActions(statement.getActions(), statement.getConditions());
 
-            if(actions.isEmpty())
+            if (actions.isEmpty()) {
                 continue;
+            }
 
             statementStrings.add(format.fT(STATEMENT_TEMPLATE,
                     "wasIf", wasIf ? true : null,

@@ -45,13 +45,18 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
         Preconditions.checkArgument(DEFAULT_NETWORK.equals(id.firstKeyOf(NetworkInstance.class)),
                 "Policy forwarding should be configured in default network instance");
 
-        String ifcName = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getInterfaceId()
+                .getValue();
 
         // check ifc existence
-        InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface> ifcId =
-                IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
+        InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                .rev161222.interfaces.top.interfaces.Interface> ifcId =
+                IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                .rev161222.interfaces.top.interfaces.Interface.class,
                         new InterfaceKey(ifcName));
-        Preconditions.checkArgument(writeContext.readAfter(ifcId).isPresent(),
+        Preconditions.checkArgument(writeContext.readAfter(ifcId)
+                        .isPresent(),
                 "Cannot configure policy forwarding on non-existent interface %s", ifcName);
 
         NiPfIfCiscoAug pfIfAug = dataAfter.getAugmentation(NiPfIfCiscoAug.class);
@@ -71,9 +76,11 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull
+            Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
         // You cannot 'modify' the policy on router. Router error:
-        // !!% The service policy under consideration can't be modified: A service policy already exists. Modification is not allowed
+        // !!% The service policy under consideration can't be modified: A service policy already exists.
+        // Modification is not allowed
         // therefore issue a delete first anyway
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
@@ -82,7 +89,9 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getInterfaceId()
+                .getValue();
 
         blockingDeleteAndRead(cli, id,
                 f("interface %s", ifcName),

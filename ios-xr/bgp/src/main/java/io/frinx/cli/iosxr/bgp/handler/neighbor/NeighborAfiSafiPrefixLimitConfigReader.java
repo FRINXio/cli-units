@@ -49,7 +49,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class NeighborAfiSafiPrefixLimitConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_NEI = "show running-config router bgp %s %s neighbor %s address-family %s";
-    public static final Pattern MAX_PREFIX_LINE = Pattern.compile("maximum-prefix (?<prefixCount>\\d+) ?(?<maxPrefixThreshold>\\d+)?");
+    public static final Pattern MAX_PREFIX_LINE = Pattern.compile("maximum-prefix (?<prefixCount>\\d+) ?"
+            + "(?<maxPrefixThreshold>\\d+)?");
 
     private Cli cli;
 
@@ -66,15 +67,18 @@ public class NeighborAfiSafiPrefixLimitConfigReader implements BgpReader.BgpConf
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
+                globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
                 .child(Global.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config.class))
+                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
+                        .Config.class))
                 .orNull();
 
         if (globalConfig == null) {
             return;
         }
-        Class<? extends AFISAFITYPE> afiClass = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();
+        Class<? extends AFISAFITYPE> afiClass = instanceIdentifier.firstKeyOf(AfiSafi.class)
+                .getAfiSafiName();
         if (afiClass.equals(IPV4UNICAST.class) && instanceIdentifier.firstIdentifierOf(Ipv4Unicast.class) == null) {
             return;
         }
@@ -82,13 +86,21 @@ public class NeighborAfiSafiPrefixLimitConfigReader implements BgpReader.BgpConf
             return;
         }
 
-        IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress();
+        IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class)
+                .getNeighborAddress();
         String address = new String(neighborIp.getValue());
-        String insName = instanceIdentifier.firstKeyOf(Protocol.class).getName().equals(NetworInstance.DEFAULT_NETWORK_NAME) ?
-                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        String afiName = GlobalAfiSafiReader.transformAfiToString(instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName());
+        String insName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName()
+                .equals(NetworInstance.DEFAULT_NETWORK_NAME)
+                ?
+                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
+        String afiName = GlobalAfiSafiReader.transformAfiToString(instanceIdentifier.firstKeyOf(AfiSafi.class)
+                .getAfiSafiName());
 
-        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs().getValue().intValue(), insName, address, afiName), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs()
+                .getValue()
+                .intValue(), insName, address, afiName), cli, instanceIdentifier, readContext);
         parsePrefixLimit(output, configBuilder);
 
     }
@@ -97,11 +109,11 @@ public class NeighborAfiSafiPrefixLimitConfigReader implements BgpReader.BgpConf
     static void parsePrefixLimit(String output, ConfigBuilder configBuilder) {
         ParsingUtils.parseField(output.trim(), 0,
                 MAX_PREFIX_LINE::matcher,
-                matcher -> matcher.group("prefixCount"),
-                count -> configBuilder.setMaxPrefixes(Long.valueOf(count)));
+            matcher -> matcher.group("prefixCount"),
+            count -> configBuilder.setMaxPrefixes(Long.valueOf(count)));
         ParsingUtils.parseField(output.trim(), 0,
                 MAX_PREFIX_LINE::matcher,
-                matcher -> matcher.group("maxPrefixThreshold"),
-                count -> configBuilder.setShutdownThresholdPct(new Percentage(Short.valueOf(count))));
+            matcher -> matcher.group("maxPrefixThreshold"),
+            count -> configBuilder.setShutdownThresholdPct(new Percentage(Short.valueOf(count))));
     }
 }

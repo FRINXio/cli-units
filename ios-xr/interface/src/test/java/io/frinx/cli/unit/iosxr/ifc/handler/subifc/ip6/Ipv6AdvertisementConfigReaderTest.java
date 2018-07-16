@@ -60,7 +60,7 @@ public class Ipv6AdvertisementConfigReaderTest {
         context = Mockito.mock(ReadContext.class);
 
         Mockito.when(cliMock.executeAndRead(Mockito.any()))
-            .then(invocation -> CompletableFuture.completedFuture(""));
+                .then(invocation -> CompletableFuture.completedFuture(""));
     }
 
     @Test
@@ -68,10 +68,10 @@ public class Ipv6AdvertisementConfigReaderTest {
         final Ipv6AdvertisementConfigReader reader = new Ipv6AdvertisementConfigReader(null);
 
         final String cliOutput = "Wed Feb 14 13:54:21.274 UTC\n"
-            + "interface " + TestData.INTERFACE_NAME + "\n"
-            + " ipv4 address 8.8.8.8 255.255.255.224\n"
-            + " ipv6 nd suppress-ra\n"
-            + "!";
+                + "interface " + TestData.INTERFACE_NAME + "\n"
+                + " ipv4 address 8.8.8.8 255.255.255.224\n"
+                + " ipv6 nd suppress-ra\n"
+                + "!";
         final ConfigBuilder builder = new ConfigBuilder();
 
         reader.parseAdvertisementConfig(cliOutput, builder);
@@ -84,10 +84,10 @@ public class Ipv6AdvertisementConfigReaderTest {
         final Ipv6AdvertisementConfigReader reader = new Ipv6AdvertisementConfigReader(null);
 
         final String cliOutput = "Wed Feb 14 13:54:21.274 UTC\n"
-            + "interface " + TestData.INTERFACE_NAME + "\n"
-            + " ipv4 address 8.8.8.8 255.255.255.224\n"
-            + " ipv6 address \n"
-            + "!";
+                + "interface " + TestData.INTERFACE_NAME + "\n"
+                + " ipv4 address 8.8.8.8 255.255.255.224\n"
+                + " ipv6 address \n"
+                + "!";
         final ConfigBuilder builder = new ConfigBuilder();
 
         reader.parseAdvertisementConfig(cliOutput, builder);
@@ -98,7 +98,7 @@ public class Ipv6AdvertisementConfigReaderTest {
     @Test
     public void readAdvertisement_nonLAGInterface() throws ReadFailedException {
         Mockito.when(context.read(Mockito.any()))
-            .then(invocation -> Optional.of(TestData.INTERFACE_WRONG_TYPE));
+                .then(invocation -> Optional.of(TestData.INTERFACE_WRONG_TYPE));
 
         final Ipv6AdvertisementConfigReader reader = new Ipv6AdvertisementConfigReader(cliMock);
 
@@ -118,19 +118,23 @@ public class Ipv6AdvertisementConfigReaderTest {
         static final long SUBINTERFACE_INDEX = 0L;
 
         static final Interface INTERFACE_WRONG_TYPE = new InterfaceBuilder()
-            .setName(INTERFACE_NAME_VLAN)
-            .setConfig(
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
-                    .setType(L2vlan.class)
-                    .build())
-            .build();
+                .setName(INTERFACE_NAME_VLAN)
+                .setConfig(
+                        new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                .rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                                .setType(L2vlan.class)
+                                .build())
+                .build();
 
         static final InstanceIdentifier<Interface> INTERFACE_IID_VLAN =
-            IIDs.INTERFACES.child(Interface.class, new InterfaceKey(INTERFACE_NAME_VLAN));
+                IIDs.INTERFACES.child(Interface.class, new InterfaceKey(INTERFACE_NAME_VLAN));
 
         static final InstanceIdentifier<Config> ADVERTISEMENT_CONFIG_IID_VLAN_INTERFACE = INTERFACE_IID_VLAN
-            .child(Subinterfaces.class)
-            .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX)).augmentation(Subinterface2.class)
-            .child(Ipv6.class).child(RouterAdvertisement.class).child(Config.class);
+                .child(Subinterfaces.class)
+                .child(Subinterface.class, new SubinterfaceKey(SUBINTERFACE_INDEX))
+                .augmentation(Subinterface2.class)
+                .child(Ipv6.class)
+                .child(RouterAdvertisement.class)
+                .child(Config.class);
     }
 }

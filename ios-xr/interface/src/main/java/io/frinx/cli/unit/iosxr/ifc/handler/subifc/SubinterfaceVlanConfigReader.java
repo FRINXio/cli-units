@@ -68,8 +68,8 @@ public class SubinterfaceVlanConfigReader implements CliConfigReader<Config, Con
     static void parseVlanTag(String output, ConfigBuilder builder) {
         ParsingUtils.parseField(output,
                 VLAN_TAG_LINE::matcher,
-                matcher -> matcher.group("tag"),
-                tag -> builder.setVlanId(new VlanLogicalConfig.VlanId(new VlanId(Integer.valueOf(tag)))));
+            matcher -> matcher.group("tag"),
+            tag -> builder.setVlanId(new VlanLogicalConfig.VlanId(new VlanId(Integer.valueOf(tag)))));
     }
 
     @Override

@@ -26,9 +26,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PolicyConfigWriter implements CliWriter<Config> {
 
-    static final String TEMPLATE = "{.if ($delete) }no {/if}" +
-            "route-policy {$config.name}\n" +
-            "{.if ($delete != TRUE) }end-policy{/if}";
+    static final String TEMPLATE = "{.if ($delete) }no {/if}"
+            + "route-policy {$config.name}\n"
+            + "{.if ($delete != TRUE) }end-policy{/if}";
 
     private final Cli cli;
 

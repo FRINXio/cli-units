@@ -42,12 +42,13 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class IngressFlowConfigReader implements TypedReader<Config, ConfigBuilder>, CliConfigReader<Config, ConfigBuilder> {
+public class IngressFlowConfigReader implements TypedReader<Config, ConfigBuilder>, CliConfigReader<Config,
+        ConfigBuilder> {
 
     private static final String SH_SINGLE_INTERFACE_FLOW_CFG =
-        "show running-config interface %s | include flow %s monitor";
+            "show running-config interface %s | include flow %s monitor";
     private static final Pattern FLOW_MONITOR =
-        Pattern.compile("flow (?<type>.+) monitor (?<monitorName>\\S+)( sampler (?<samplerName>.+))? ingress");
+            Pattern.compile("flow (?<type>.+) monitor (?<monitorName>\\S+)( sampler (?<samplerName>.+))? ingress");
 
     private final Cli cli;
 
@@ -63,24 +64,28 @@ public class IngressFlowConfigReader implements TypedReader<Config, ConfigBuilde
 
     @Override
     public void readCurrentAttributesForType(@Nonnull final InstanceIdentifier<Config> id,
-                                      @Nonnull final ConfigBuilder builder,
-                                      @Nonnull final ReadContext ctx) throws ReadFailedException {
-        final InterfaceId ifcName = id.firstKeyOf(Interface.class).getId();
-        final Class<? extends NETFLOWTYPE> flowType = id.firstKeyOf(IngressFlow.class).getNetflowType();
+                                             @Nonnull final ConfigBuilder builder,
+                                             @Nonnull final ReadContext ctx) throws ReadFailedException {
+        final InterfaceId ifcName = id.firstKeyOf(Interface.class)
+                .getId();
+        final Class<? extends NETFLOWTYPE> flowType = id.firstKeyOf(IngressFlow.class)
+                .getNetflowType();
 
         parseNetflowConfig(id,
-            blockingRead(f(SH_SINGLE_INTERFACE_FLOW_CFG, ifcName.getValue(), NetflowUtils.getNetflowStringType(flowType)), cli, id, ctx),
-            builder
+                blockingRead(f(SH_SINGLE_INTERFACE_FLOW_CFG, ifcName.getValue(), NetflowUtils
+                        .getNetflowStringType(flowType)), cli, id, ctx),
+                builder
         );
     }
 
     private void parseNetflowConfig(final InstanceIdentifier<Config> iid,
                                     final String output, final ConfigBuilder builder) {
-        final Class<? extends NETFLOWTYPE> flowType = iid.firstKeyOf(IngressFlow.class).getNetflowType();
+        final Class<? extends NETFLOWTYPE> flowType = iid.firstKeyOf(IngressFlow.class)
+                .getNetflowType();
 
         ParsingUtils.parseField(output, 0,
-            FLOW_MONITOR::matcher,
-            FlowDetails::fromMatcher,
+                FLOW_MONITOR::matcher,
+                FlowDetails::fromMatcher,
             flowDetails -> {
                 builder.setMonitorName(flowDetails.getMonitorName());
                 builder.setSamplerName(flowDetails.getSamplerName());

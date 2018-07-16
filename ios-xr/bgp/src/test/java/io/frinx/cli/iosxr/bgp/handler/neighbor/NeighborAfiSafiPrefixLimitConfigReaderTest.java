@@ -24,36 +24,36 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.ty
 public class NeighborAfiSafiPrefixLimitConfigReaderTest {
 
 
-    private final static String OUTPUT_COUNT_THRESHOLD = "Mon Apr 16 07:49:07.995 UTC\n" +
-            "router bgp 666 instance TEST\n" +
-            " neighbor 6.6.6.6\n" +
-            "  address-family ipv4 unicast\n" +
-            "   send-community-ebgp\n" +
-            "   route-policy test-policy in\n" +
-            "   maximum-prefix 25 75\n" +
-            "   route-policy test-policy out\n" +
-            "   default-originate\n" +
-            "   next-hop-self\n" +
-            "   remove-private-AS\n" +
-            "   soft-reconfiguration inbound always\n" +
-            "  !\n" +
-            " !\n" +
-            "!";
-    private final static String OUTPUT_COUNT = "Mon Apr 16 07:49:07.995 UTC\n" +
-            "router bgp 666 instance TEST\n" +
-            " neighbor 6.6.6.6\n" +
-            "  address-family ipv4 unicast\n" +
-            "   send-community-ebgp\n" +
-            "   route-policy test-policy in\n" +
-            "   maximum-prefix 25\n" +
-            "   route-policy test-policy out\n" +
-            "   default-originate\n" +
-            "   next-hop-self\n" +
-            "   remove-private-AS\n" +
-            "   soft-reconfiguration inbound always\n" +
-            "  !\n" +
-            " !\n" +
-            "!";
+    private static final String OUTPUT_COUNT_THRESHOLD = "Mon Apr 16 07:49:07.995 UTC\n"
+            + "router bgp 666 instance TEST\n"
+            + " neighbor 6.6.6.6\n"
+            + "  address-family ipv4 unicast\n"
+            + "   send-community-ebgp\n"
+            + "   route-policy test-policy in\n"
+            + "   maximum-prefix 25 75\n"
+            + "   route-policy test-policy out\n"
+            + "   default-originate\n"
+            + "   next-hop-self\n"
+            + "   remove-private-AS\n"
+            + "   soft-reconfiguration inbound always\n"
+            + "  !\n"
+            + " !\n"
+            + "!";
+    private static final String OUTPUT_COUNT = "Mon Apr 16 07:49:07.995 UTC\n"
+            + "router bgp 666 instance TEST\n"
+            + " neighbor 6.6.6.6\n"
+            + "  address-family ipv4 unicast\n"
+            + "   send-community-ebgp\n"
+            + "   route-policy test-policy in\n"
+            + "   maximum-prefix 25\n"
+            + "   route-policy test-policy out\n"
+            + "   default-originate\n"
+            + "   next-hop-self\n"
+            + "   remove-private-AS\n"
+            + "   soft-reconfiguration inbound always\n"
+            + "  !\n"
+            + " !\n"
+            + "!";
 
     @Test
     public void parsePrefixLimit() throws Exception {
