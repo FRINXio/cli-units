@@ -35,16 +35,24 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public interface L3VrfReader<O extends DataObject, B extends Builder<O>> extends TypedReader<O, B> {
 
     // Vrf readers are also available for default network instance
-    Function<DataObject, Boolean> L3VRF_CHECK = config -> ((Config) config).getType() == L3VRF.class || ((Config) config).getType() == DEFAULTINSTANCE.class;
+    Function<DataObject, Boolean> L3VRF_CHECK = config -> ((Config) config).getType() == L3VRF.class || ((Config)
+            config).getType() == DEFAULTINSTANCE.class;
 
     @Nullable
     @Override
-    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>> getParentCheck(InstanceIdentifier<O> id) {
+    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>>
+        getParentCheck(InstanceIdentifier<O> id) {
         return new AbstractMap.SimpleEntry<>(
-                RWUtils.cutId(id, NetworkInstance.class).child(Config.class),
+                RWUtils.cutId(id, NetworkInstance.class)
+                        .child(Config.class),
                 L3VRF_CHECK);
     }
 
-    interface L3VrfConfigReader<O extends DataObject, B extends Builder<O>> extends L3VrfReader<O, B>, CliConfigReader<O, B> {}
-    interface L3VrfOperReader<O extends DataObject, B extends Builder<O>> extends L3VrfReader<O, B>, CliOperReader<O, B> {}
+    interface L3VrfConfigReader<O extends DataObject, B extends Builder<O>> extends L3VrfReader<O, B>,
+            CliConfigReader<O, B> {
+    }
+
+    interface L3VrfOperReader<O extends DataObject, B extends Builder<O>> extends L3VrfReader<O, B>, CliOperReader<O,
+            B> {
+    }
 }

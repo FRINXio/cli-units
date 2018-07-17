@@ -38,7 +38,10 @@ public interface BgpReader<O extends DataObject, B extends Builder<O>> extends T
     /**
      * Union mixin of Bgp reader and Config reader.
      */
-    interface BgpConfigReader<O extends DataObject, B extends Builder<O>> extends BgpReader<O, B>, CliConfigReader<O, B> {}
+    interface BgpConfigReader<O extends DataObject, B extends Builder<O>> extends BgpReader<O, B>, CliConfigReader<O,
+            B> {
+    }
 
-    interface BgpOperReader<O extends DataObject, B extends Builder<O>> extends BgpReader<O, B>, CliOperReader<O, B> {}
+    interface BgpOperReader<O extends DataObject, B extends Builder<O>> extends BgpReader<O, B>, CliOperReader<O, B> {
+    }
 }

@@ -32,9 +32,9 @@ public interface L2vsiWriter<O extends DataObject> extends TypedWriter<O>, CliWr
 
     @Nullable
     @Override
-    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>> getParentCheck(InstanceIdentifier<O> id) {
-        return new AbstractMap.SimpleEntry<>(
-                RWUtils.cutId(id, NetworkInstance.class).child(Config.class),
-                L2vsiReader.L2VSI_CHECK);
+    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>>
+        getParentCheck(InstanceIdentifier<O> id) {
+        return new AbstractMap.SimpleEntry<>(RWUtils.cutId(id, NetworkInstance.class)
+                .child(Config.class), L2vsiReader.L2VSI_CHECK);
     }
 }

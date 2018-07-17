@@ -16,6 +16,9 @@
 
 package io.frinx.cli.handlers.network.instance;
 
+import io.fd.honeycomb.translate.util.RWUtils;
+import io.frinx.cli.registry.common.TypedWriter;
+import io.frinx.cli.unit.utils.CliWriter;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -29,18 +32,14 @@ import org.opendaylight.yangtools.yang.binding.Identifiable;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import io.fd.honeycomb.translate.util.RWUtils;
-import io.frinx.cli.registry.common.TypedWriter;
-import io.frinx.cli.unit.utils.CliListWriter;
-import io.frinx.cli.unit.utils.CliWriter;
-
-public interface L3VrfListWriter<O extends DataObject & Identifiable<K>, K extends Identifier<O>> extends TypedWriter<O>, CliWriter<O> {
+public interface L3VrfListWriter<O extends DataObject & Identifiable<K>, K extends Identifier<O>> extends
+        TypedWriter<O>, CliWriter<O> {
 
     @Nullable
     @Override
-    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>> getParentCheck(InstanceIdentifier<O> id) {
-        return new AbstractMap.SimpleEntry<>(
-            RWUtils.cutId(id, NetworkInstance.class).child(Config.class),
-            L3VrfReader.L3VRF_CHECK);
+    default Map.Entry<InstanceIdentifier<? extends DataObject>, Function<DataObject, Boolean>>
+        getParentCheck(InstanceIdentifier<O> id) {
+        return new AbstractMap.SimpleEntry<>(RWUtils.cutId(id, NetworkInstance.class)
+                .child(Config.class), L3VrfReader.L3VRF_CHECK);
     }
 }

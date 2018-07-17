@@ -21,5 +21,6 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.Identifiable;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 
-public interface BgpListWriter<O extends DataObject & Identifiable<K>, K extends Identifier<O>> extends BgpWriter<O>, CliListWriter<O, K> {
+public interface BgpListWriter<O extends DataObject & Identifiable<K>, K extends Identifier<O>> extends BgpWriter<O>,
+        CliListWriter<O, K> {
 }
