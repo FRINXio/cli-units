@@ -128,6 +128,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
                 return Optional.of(IPV4UNICAST.class);
             case "vpnv4":
                 return Optional.of(L3VPNIPV4UNICAST.class);
+            default: break;
         }
 
         return Optional.empty();

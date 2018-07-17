@@ -64,9 +64,9 @@ public class L3VrfReader implements CliConfigListReader<NetworkInstance, Network
 
     private static List<NetworkInstanceKey> parseVrfIds(String output) {
         return ParsingUtils.parseFields(output, 0,
-                VRF_CONFIGURATION_LINE::matcher,
-                matcher -> matcher.group("vrfName"),
-                NetworkInstanceKey::new);
+            VRF_CONFIGURATION_LINE::matcher,
+            matcher -> matcher.group("vrfName"),
+            NetworkInstanceKey::new);
     }
 
     @Override

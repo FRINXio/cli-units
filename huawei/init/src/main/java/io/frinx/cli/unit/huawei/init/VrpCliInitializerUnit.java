@@ -54,8 +54,7 @@ public class VrpCliInitializerUnit implements TranslateUnit {
         this.registry = registry;
     }
 
-    public void init()
-    {
+    public void init() {
         reg = registry.registerTranslateUnit(HUAWEI, this);
     }
 
@@ -82,8 +81,8 @@ public class VrpCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         // NO-OP
     }
@@ -109,12 +108,12 @@ public class VrpCliInitializerUnit implements TranslateUnit {
 
                 // Set terminal length to 0 to prevent "--More--" situation
                 LOG.debug("{}: Setting terminal length to 0 to prevent \"--More--\" situation", id);
-                String s = session.readUntilTimeout(READ_TIMEOUT_SECONDS);
+                String ss = session.readUntilTimeout(READ_TIMEOUT_SECONDS);
                 write(session, newline, SET_TERMINAL_LENGTH_COMMAND);
-                s += session.readUntilTimeout(READ_TIMEOUT_SECONDS);
+                ss += session.readUntilTimeout(READ_TIMEOUT_SECONDS);
 
                 LOG.info("{}: VRP cli session initialized successfully", id);
-                LOG.debug("{}: VRP cli session initialization output: {}", id, s);
+                LOG.debug("{}: VRP cli session initialization output: {}", id, ss);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException(e);

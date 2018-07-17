@@ -73,38 +73,41 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
         builder.setType(parseType(name));
 
         parseField(output,
-                ADMIN_STATUS_LINE::matcher,
-                matcher -> InterfaceCommonState.AdminStatus.valueOf(matcher.group("admin").toUpperCase()),
-                adminStatus -> {
-                    builder.setAdminStatus(adminStatus);
-                    builder.setEnabled(adminStatus == InterfaceCommonState.AdminStatus.UP);
-                });
+            ADMIN_STATUS_LINE::matcher,
+            matcher -> InterfaceCommonState.AdminStatus.valueOf(matcher.group("admin").toUpperCase()),
+            adminStatus -> {
+                builder.setAdminStatus(adminStatus);
+                builder.setEnabled(adminStatus
+                        == InterfaceCommonState.AdminStatus.UP);
+            });
 
-        if (builder.getAdminStatus() == null) {
+        if (builder.getAdminStatus()
+                == null) {
             // We cannot parse AdminStatus from output, fallback to AdminStatus.DOWN
             builder.setAdminStatus(InterfaceCommonState.AdminStatus.DOWN);
             builder.setEnabled(false);
         }
 
         parseField(output,
-                OPER_STATUS_LINE::matcher,
-                matcher -> InterfaceCommonState.OperStatus.valueOf(matcher.group("oper").toUpperCase()),
-                builder::setOperStatus);
+            OPER_STATUS_LINE::matcher,
+            matcher -> InterfaceCommonState.OperStatus.valueOf(matcher.group("oper").toUpperCase()),
+            builder::setOperStatus);
 
-        if (builder.getOperStatus() == null) {
+        if (builder.getOperStatus()
+                == null) {
             // We cannot parse OperStatus from output, fallback to OperStatus.Unknown
             builder.setOperStatus(InterfaceCommonState.OperStatus.UNKNOWN);
         }
 
         parseField(output,
-                MTU_LINE::matcher,
-                matcher -> Integer.valueOf(matcher.group("mtu")),
-                builder::setMtu);
+            MTU_LINE::matcher,
+            matcher -> Integer.valueOf(matcher.group("mtu")),
+            builder::setMtu);
 
         parseField(output,
-                DESCR_LINE::matcher,
-                matcher -> matcher.group("desc"),
-                builder::setDescription);
+            DESCR_LINE::matcher,
+            matcher -> matcher.group("desc"),
+            builder::setDescription);
     }
 
 }

@@ -61,14 +61,14 @@ public class L3VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>
     private void parseVrfConfig(String output, ConfigBuilder builder, String vrf) {
         builder.setName(vrf);
         parseField(output,
-                RD_CONFIG::matcher,
-                matcher -> matcher.group("rd"),
-                rd -> builder.setRouteDistinguisher(new RouteDistinguisher(rd)));
+            RD_CONFIG::matcher,
+            matcher -> matcher.group("rd"),
+            rd -> builder.setRouteDistinguisher(new RouteDistinguisher(rd)));
 
         parseField(output,
-                DESC_CONFIG::matcher,
-                matcher -> matcher.group("desc"),
-                builder::setDescription);
+            DESC_CONFIG::matcher,
+            matcher -> matcher.group("desc"),
+            builder::setDescription);
     }
 
     private boolean isVrf(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {

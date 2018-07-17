@@ -20,7 +20,6 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
@@ -82,53 +81,53 @@ public class VrpNetworkInstanceUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         // No handling required on the network instance level
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli)),
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli)),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter()));
 
         // Interfaces for VRF
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_INTERFACES, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_INTERFACE, new L3VrfInterfaceWriter(cli)));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_IN_CONFIG, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_INTERFACES, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_INTERFACE, new L3VrfInterfaceWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_IN_CONFIG, new NoopCliWriter<>()));
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new NoopCliWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigWriter(cli)),
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new NoopCliWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigWriter(cli)),
                 Sets.newHashSet(IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG));
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
         // VRFs
-        rRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli)));
 
         // Interfaces for VRF
-        rRegistry.addStructuralReader(IIDs.NE_NE_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_IN_INTERFACE, new L3VrfInterfaceReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_INTERFACES, InterfacesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_IN_INTERFACE, new L3VrfInterfaceReader(cli)));
 
         // Protocols for VRF
-        rRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
 
         // Local aggregates
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, LocalAggregatesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new LocalAggregateReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, LocalAggregatesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new LocalAggregateReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigReader(cli)));
     }
 
     @Override

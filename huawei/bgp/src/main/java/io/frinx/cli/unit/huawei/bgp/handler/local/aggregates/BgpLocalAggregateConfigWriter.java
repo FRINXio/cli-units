@@ -46,31 +46,35 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
 
     private final Cli cli;
 
-    private static final String ENTER_AFI_SAFI = "{% if ($vrf) %}" +
-            "ipv4-family vpn-instance {$vrf}\n" +
-            "{% elseif ($afi_safi) %}" +
-            "ipv4-family {$afi_safi}\n" +
-            "{% endif %}";
+    private static final String ENTER_AFI_SAFI = "{% if ($vrf) %}"
+            + "ipv4-family vpn-instance {$vrf}\n"
+            + "{% elseif ($afi_safi) %}"
+            + "ipv4-family {$afi_safi}\n"
+            + "{% endif %}";
 
-    private static final String WRITE_TEMPLATE = "system-view\n" +
-            "bgp {$as}\n" +
-
-            // Enter afi + VRF
-            ENTER_AFI_SAFI +
-
-            "network {$network} {.if ($mask) }{$mask}{/if}\n" +
-            "commit\n" +
-            "return";
-
-    private static final String DELETE_TEMPLATE = "system-view\n" +
-            "bgp {$as}\n" +
+    private static final String WRITE_TEMPLATE = "system-view\n"
+            + "bgp {$as}\n"
+            +
 
             // Enter afi + VRF
-            ENTER_AFI_SAFI +
+            ENTER_AFI_SAFI
+            +
 
-            "undo network {$network} {.if ($mask) }{$mask}{/if}\n" +
-            "commit\n" +
-            "return";
+            "network {$network} {.if ($mask) }{$mask}{/if}\n"
+            + "commit\n"
+            + "return";
+
+    private static final String DELETE_TEMPLATE = "system-view\n"
+            + "bgp {$as}\n"
+            +
+
+            // Enter afi + VRF
+            ENTER_AFI_SAFI
+            +
+
+            "undo network {$network} {.if ($mask) }{$mask}{/if}\n"
+            + "commit\n"
+            + "return";
 
 
     public BgpLocalAggregateConfigWriter(Cli cli) {
@@ -80,37 +84,34 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,
                                               WriteContext writeContext) throws WriteFailedException {
-        final Protocols networkInstance =
-                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance.class).child(Protocols.class)).get();
+        final Protocols networkInstance = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance
+                .class).child(Protocols.class)).get();
         Optional<Bgp> bgp = getBgpGlobal(networkInstance);
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
-        Preconditions.checkArgument(bgp.isPresent(),
-                "BGP not configured for VRF: %s. Cannot configure networks", vrfKey.getName());
+        Preconditions.checkArgument(bgp.isPresent(), "BGP not configured for VRF: %s. Cannot configure networks",
+                vrfKey.getName());
 
         Set<AfiSafi> afiSafis = GlobalConfigWriter.getAfiSafis(bgp.orElse(null));
 
         if (afiSafis.isEmpty()) {
-            blockingWriteAndRead(cli, instanceIdentifier, config,
-                    fT(WRITE_TEMPLATE,
-                            "as", bgp.get().getGlobal().getConfig().getAs().getValue(),
-                            "network", getNetAddress(config.getPrefix()),
-                            "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(),
-                            "mask", getNetMask(config.getPrefix())));
+            blockingWriteAndRead(cli, instanceIdentifier, config, fT(WRITE_TEMPLATE, "as", bgp.get().getGlobal()
+                    .getConfig().getAs().getValue(), "network", getNetAddress(config.getPrefix()), "vrf", vrfKey
+                    .equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(), "mask", getNetMask(config
+                    .getPrefix())));
         } else {
             for (AfiSafi afiSafi : afiSafis) {
-                blockingWriteAndRead(cli, instanceIdentifier, config,
-                        fT(WRITE_TEMPLATE,
-                                "as", bgp.get().getGlobal().getConfig().getAs().getValue(),
-                                "network", getNetAddress(config.getPrefix()),
-                                "afi_safi", GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afiSafi.getAfiSafiName()),
-                                "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(),
-                                "mask", getNetMask(config.getPrefix())));
+                blockingWriteAndRead(cli, instanceIdentifier, config, fT(WRITE_TEMPLATE, "as", bgp.get().getGlobal()
+                        .getConfig().getAs().getValue(), "network", getNetAddress(config.getPrefix()), "afi_safi",
+                        GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afiSafi.getAfiSafiName()), "vrf", vrfKey
+                                .equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(), "mask", getNetMask(
+                                        config.getPrefix())));
             }
         }
     }
 
     private String getNetAddress(@Nonnull IpPrefix ipPrefix) {
-        if (ipPrefix.getIpv4Prefix() != null) {
+        if (ipPrefix.getIpv4Prefix()
+                != null) {
             SubnetUtils utils = new SubnetUtils(ipPrefix.getIpv4Prefix().getValue());
             return utils.getInfo().getNetworkAddress();
         } else {
@@ -120,7 +121,8 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
 
     @Nullable
     private String getNetMask(@Nonnull IpPrefix ipPrefix) {
-        if (ipPrefix.getIpv4Prefix() != null) {
+        if (ipPrefix.getIpv4Prefix()
+                != null) {
             SubnetUtils utils = new SubnetUtils(ipPrefix.getIpv4Prefix().getValue());
             return utils.getInfo().getNetmask();
         } else {
@@ -138,37 +140,35 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     @Override
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,
                                                WriteContext writeContext) throws WriteFailedException {
-        final Protocols networkInstance =
-                writeContext.readBefore(RWUtils.cutId(instanceIdentifier, NetworkInstance.class).child(Protocols.class)).get();
+        final Protocols networkInstance = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, NetworkInstance
+                .class).child(Protocols.class)).get();
         Optional<Bgp> bgp = getBgpGlobal(networkInstance);
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 
         Set<AfiSafi> afiSafis = GlobalConfigWriter.getAfiSafis(bgp.orElse(null));
 
         if (afiSafis.isEmpty()) {
-            blockingDeleteAndRead(cli, instanceIdentifier,
-                    fT(DELETE_TEMPLATE,
-                            "as", bgp.get().getGlobal().getConfig().getAs().getValue(),
-                            "network", getNetAddress(config.getPrefix()),
-                            "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName()));
+            blockingDeleteAndRead(cli, instanceIdentifier, fT(DELETE_TEMPLATE, "as", bgp.get().getGlobal().getConfig()
+                    .getAs().getValue(), "network", getNetAddress(config.getPrefix()), "vrf", vrfKey.equals(
+                            NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName()));
         } else {
             for (AfiSafi afiSafi : afiSafis) {
-                blockingDeleteAndRead(cli, instanceIdentifier,
-                        fT(DELETE_TEMPLATE,
-                                "as", bgp.get().getGlobal().getConfig().getAs().getValue(),
-                                "network", getNetAddress(config.getPrefix()),
-                                "afi_safi", GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afiSafi.getAfiSafiName()),
-                                "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(),
-                                "mask", getNetMask(config.getPrefix())));
+                blockingDeleteAndRead(cli, instanceIdentifier, fT(DELETE_TEMPLATE, "as", bgp.get().getGlobal()
+                        .getConfig().getAs().getValue(), "network", getNetAddress(config.getPrefix()), "afi_safi",
+                        GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afiSafi.getAfiSafiName()), "vrf", vrfKey
+                                .equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(), "mask", getNetMask(
+                                        config.getPrefix())));
             }
         }
     }
 
     private Optional<Bgp> getBgpGlobal(Protocols protocolsContainer) {
         List<Protocol> protocols = protocolsContainer.getProtocol();
-        if (protocols != null && !protocols.isEmpty()) {
-            Optional<Protocol> bgpProtocol =
-                    protocols.stream().filter(protocol -> protocol.getIdentifier().equals(BGP.class)).findFirst();
+        if (protocols
+                != null
+                && !protocols.isEmpty()) {
+            Optional<Protocol> bgpProtocol = protocols.stream().filter(protocol -> protocol.getIdentifier().equals(
+                    BGP.class)).findFirst();
             if (bgpProtocol.isPresent()) {
                 return Optional.ofNullable(bgpProtocol.get().getBgp());
             }

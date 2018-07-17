@@ -90,33 +90,33 @@ public class RoutingPolicyUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         // provide writers
-        wRegistry.add(new GenericWriter<>(IIDs.ROUTINGPOLICY, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.RO_DEFINEDSETS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(DEFINED_SETS_1, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(BGP_DEFINED_SETS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(EXT_COMMUNITY_SETS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(EXT_COMMUNITY_SET, new NoopCliWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(EXT_CS_CONFIG,new ExtCommunitySetConfigWriter(cli)), NE_NE_CONFIG);
+        writeRegistry.add(new GenericWriter<>(IIDs.ROUTINGPOLICY, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.RO_DEFINEDSETS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(DEFINED_SETS_1, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(BGP_DEFINED_SETS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(EXT_COMMUNITY_SETS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(EXT_COMMUNITY_SET, new NoopCliWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(EXT_CS_CONFIG,new ExtCommunitySetConfigWriter(cli)), NE_NE_CONFIG);
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
         // provide readers
-        rRegistry.addStructuralReader(IIDs.ROUTINGPOLICY, RoutingPolicyBuilder.class);
-        rRegistry.addStructuralReader(IIDs.RO_DEFINEDSETS, DefinedSetsBuilder.class);
-        rRegistry.addStructuralReader(DEFINED_SETS_1, DefinedSets2Builder.class);
-        rRegistry.addStructuralReader(BGP_DEFINED_SETS, BgpDefinedSetsBuilder.class);
-        rRegistry.addStructuralReader(EXT_COMMUNITY_SETS, ExtCommunitySetsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(EXT_COMMUNITY_SET, new ExtCommunitySetReader(cli)));
+        readRegistry.addStructuralReader(IIDs.ROUTINGPOLICY, RoutingPolicyBuilder.class);
+        readRegistry.addStructuralReader(IIDs.RO_DEFINEDSETS, DefinedSetsBuilder.class);
+        readRegistry.addStructuralReader(DEFINED_SETS_1, DefinedSets2Builder.class);
+        readRegistry.addStructuralReader(BGP_DEFINED_SETS, BgpDefinedSetsBuilder.class);
+        readRegistry.addStructuralReader(EXT_COMMUNITY_SETS, ExtCommunitySetsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(EXT_COMMUNITY_SET, new ExtCommunitySetReader(cli)));
     }
 
     @Override

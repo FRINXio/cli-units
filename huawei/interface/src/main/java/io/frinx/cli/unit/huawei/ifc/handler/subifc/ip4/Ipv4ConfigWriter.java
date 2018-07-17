@@ -36,37 +36,33 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE = "system-view\n" +
-            "interface %s\n" +
-            "ip address %s %s\n" +
-            "commit\n" +
-            "return";
+    private static final String WRITE_TEMPLATE = "system-view\n"
+            + "interface %s\n"
+            + "ip address %s %s\n"
+            + "commit\n"
+            + "return";
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                       @Nonnull Config config,
-                                       @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        if (subId != ZERO_SUBINTERFACE_ID) {
-            throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
-                    new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
+        if (subId
+                != ZERO_SUBINTERFACE_ID) {
+            throw new WriteFailedException.CreateFailedException(instanceIdentifier, config, new
+                    IllegalArgumentException("Unable to manage IP for subinterface: "
+                    + subId));
         }
 
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
 
-        blockingWriteAndRead(cli, instanceIdentifier, config,
-                f(WRITE_TEMPLATE,
-                        ifcName,
-                        config.getIp().getValue(),
-                        config.getPrefixLength()));
+        blockingWriteAndRead(cli, instanceIdentifier, config, f(WRITE_TEMPLATE, ifcName, config.getIp().getValue(),
+                config.getPrefixLength()));
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                        @Nonnull Config before,
-                                        @Nonnull Config after,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            before, @Nonnull Config after, @Nonnull WriteContext writeContext) throws WriteFailedException {
         try {
             deleteCurrentAttributes(instanceIdentifier, before, writeContext);
             writeCurrentAttributes(instanceIdentifier, after, writeContext);
@@ -75,27 +71,28 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         }
     }
 
-    private static final String DELETE_TEMPLATE = "system-view\n" +
-            "interface %s\n" +
-            "undo ip address\n" +
-            "commit\n" +
-            "return";
+    private static final String DELETE_TEMPLATE = "system-view\n"
+            + "interface %s\n"
+            + "undo ip address\n"
+            + "commit\n"
+            + "return";
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                        @Nonnull Config config,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
         // TODO Probably not needed since we do not support IP configuraion
         // on any other subinterface
-        if (subId != ZERO_SUBINTERFACE_ID) {
-            throw new WriteFailedException.DeleteFailedException(instanceIdentifier,
-                    new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
+        if (subId
+                != ZERO_SUBINTERFACE_ID) {
+            throw new WriteFailedException.DeleteFailedException(instanceIdentifier, new IllegalArgumentException(
+                    "Unable to manage IP for subinterface: "
+                + subId));
         }
 
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
 
-        blockingDeleteAndRead(f(DELETE_TEMPLATE, ifcName),cli, instanceIdentifier);
+        blockingDeleteAndRead(f(DELETE_TEMPLATE, ifcName), cli, instanceIdentifier);
     }
 }

@@ -44,12 +44,13 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReader<Aggregate, AggregateKey, AggregateBuilder> {
+public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReader<Aggregate, AggregateKey,
+        AggregateBuilder> {
 
     private static final String GROUP_IP = "ip";
     private static final String GROUP_MASK = "mask";
-    private static final String DISPLAY_BGP_NETWORK_CONFIG =
-            "display current-configuration configuration bgp | include ^ ipv4-family|^ *network";
+    private static final String DISPLAY_BGP_NETWORK_CONFIG = "display current-configuration configuration bgp | "
+            + "include ^ ipv4-family|^ *network";
     private static final Pattern NEIGHBOR_LINE = Pattern.compile("network (?<ip>\\S*) (?<mask>\\S*).*");
     private final Cli cli;
 
@@ -59,16 +60,16 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
 
     @Nonnull
     @Override
-    public List<AggregateKey> getAllIdsForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier,
-                                               @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<AggregateKey> getAllIdsForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
         String niName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
         if (DEFAULT_BGP_INSTANCE.equals(niName)) {
-            return getDefaultAggregateKeys(
-                    blockingRead(DISPLAY_BGP_NETWORK_CONFIG, cli, instanceIdentifier, readContext));
+            return getDefaultAggregateKeys(blockingRead(DISPLAY_BGP_NETWORK_CONFIG, cli, instanceIdentifier,
+                    readContext));
         } else {
-            return getVrfAggregateKeys(
-                    blockingRead(DISPLAY_BGP_NETWORK_CONFIG, cli, instanceIdentifier, readContext), niName);
+            return getVrfAggregateKeys(blockingRead(DISPLAY_BGP_NETWORK_CONFIG, cli, instanceIdentifier, readContext),
+                    niName);
         }
     }
 
@@ -78,44 +79,39 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier,
-                                             @Nonnull AggregateBuilder aggregateBuilder,
-                                             @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
+            AggregateBuilder aggregateBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         aggregateBuilder.setKey(instanceIdentifier.firstKeyOf(Aggregate.class));
     }
 
     @VisibleForTesting
     static List<AggregateKey> getVrfAggregateKeys(String output, String vrfName) {
-        Optional<String> optionalVrfOutput =
-                Arrays.stream(NeighborReader.getSplitedOutput(output))
-                        .filter(value -> value.contains(vrfName))
-                        .reduce((s1, s2) -> s1 + s2);
+        Optional<String> optionalVrfOutput = Arrays.stream(NeighborReader.getSplitedOutput(output)).filter(value ->
+                value.contains(vrfName)).reduce((s1, s2) -> s1
+                + s2);
 
         if (optionalVrfOutput.isPresent()) {
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll("network", "\nnetwork"), 0,
-                    NEIGHBOR_LINE::matcher,
-                    BgpLocalAggregateReader::resolveGroups,
-                    value -> new AggregateKey(parsePrefix(parseNetworkPrefix(value))));
+                    NEIGHBOR_LINE::matcher, BgpLocalAggregateReader::resolveGroups, value -> new AggregateKey(
+                    parsePrefix(parseNetworkPrefix(value))));
         }
         return new ArrayList<>();
     }
 
-    private static IpPrefix parsePrefix(String s) {
-        return new IpPrefix(s.toCharArray());
+    private static IpPrefix parsePrefix(String string) {
+        return new IpPrefix(string.toCharArray());
     }
 
     @VisibleForTesting
     static List<AggregateKey> getDefaultAggregateKeys(String output) {
-        Optional<String> optionalVrfOutput =
-                Arrays.stream(NeighborReader.getSplitedOutput(output))
-                        .filter(value -> !value.contains("vpn-instance"))
-                        .reduce((s1, s2) -> s1 + s2);
+        Optional<String> optionalVrfOutput = Arrays.stream(NeighborReader.getSplitedOutput(output)).filter(value ->
+                !value.contains("vpn-instance")).reduce((s1, s2) -> s1
+                + s2);
 
         if (optionalVrfOutput.isPresent()) {
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll("network", "\nnetwork"), 0,
-                    NEIGHBOR_LINE::matcher,
-                    BgpLocalAggregateReader::resolveGroups,
-                    value -> new AggregateKey(parsePrefix(parseNetworkPrefix(value))));
+                    NEIGHBOR_LINE::matcher, BgpLocalAggregateReader::resolveGroups, value -> new AggregateKey(
+                    parsePrefix(parseNetworkPrefix(value))));
         }
         return new ArrayList<>();
     }
@@ -125,11 +121,11 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
         return utils.getInfo().getCidrSignature();
     }
 
-    private static HashMap<String, String> resolveGroups(Matcher m) {
+    private static HashMap<String, String> resolveGroups(Matcher matcher) {
         HashMap<String, String> hashMap = new HashMap<>();
 
-        hashMap.put(GROUP_IP, m.group(GROUP_IP));
-        hashMap.put(GROUP_MASK, m.group(GROUP_MASK));
+        hashMap.put(GROUP_IP, matcher.group(GROUP_IP));
+        hashMap.put(GROUP_MASK, matcher.group(GROUP_MASK));
 
         return hashMap;
     }
