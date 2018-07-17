@@ -64,7 +64,8 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
         Class<? extends InterfaceType> ifcType = parseType(name);
         String ifcTypeOnDevice = InterfaceConfigReader.getTypeOnDevice(ifcType);
         String ifcNumber = getIfcNumber(name);
-        parseInterfaceState(blockingRead(String.format(SH_SINGLE_INTERFACE, ifcTypeOnDevice, ifcNumber), cli, id, ctx), builder, name, ifcType);
+        parseInterfaceState(blockingRead(String.format(SH_SINGLE_INTERFACE, ifcTypeOnDevice, ifcNumber), cli, id,
+                ctx), builder, name, ifcType);
     }
 
     public static final String SH_SINGLE_INTERFACE = "sh inter %s %s";
@@ -75,44 +76,52 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
     public static final Pattern DESCR_LINE = Pattern.compile("\\s*Port name is (?<desc>.+)");
 
     @VisibleForTesting
-    static void parseInterfaceState(final String output, final StateBuilder builder, final String name, Class<? extends InterfaceType> type) {
+    static void parseInterfaceState(final String output, final StateBuilder builder, final String name, Class<?
+            extends InterfaceType> type) {
         builder.setName(name);
         builder.setType(type);
 
         parseField(output,
-                STATUS_LINE::matcher,
-                matcher -> {
-                    switch (matcher.group("admin").toUpperCase()) {
-                        case "UP" : return InterfaceCommonState.AdminStatus.UP;
-                        case "DOWN" : return InterfaceCommonState.AdminStatus.DOWN;
-                        default: return InterfaceCommonState.AdminStatus.DOWN;
-                    }
-                },
-                adminStatus -> {
-                    builder.setAdminStatus(adminStatus);
-                    builder.setEnabled(adminStatus == InterfaceCommonState.AdminStatus.UP);
-                });
+            STATUS_LINE::matcher,
+            matcher -> {
+                switch (matcher.group("admin").toUpperCase()) {
+                    case "UP":
+                        return InterfaceCommonState.AdminStatus.UP;
+                    case "DOWN":
+                        return InterfaceCommonState.AdminStatus.DOWN;
+                    default:
+                        return InterfaceCommonState.AdminStatus.DOWN;
+                }
+            },
+            adminStatus -> {
+                builder.setAdminStatus(adminStatus);
+                builder.setEnabled(adminStatus
+                        == InterfaceCommonState.AdminStatus.UP);
+            });
 
         parseField(output,
-                STATUS_LINE::matcher,
-                matcher -> {
-                    switch (matcher.group("line").toUpperCase()) {
-                        case "UP" : return InterfaceCommonState.OperStatus.UP;
-                        case "DOWN" : return InterfaceCommonState.OperStatus.DOWN;
-                        default: return InterfaceCommonState.OperStatus.UNKNOWN;
-                    }
-                },
+            STATUS_LINE::matcher,
+            matcher -> {
+                switch (matcher.group("line").toUpperCase()) {
+                    case "UP":
+                        return InterfaceCommonState.OperStatus.UP;
+                    case "DOWN":
+                        return InterfaceCommonState.OperStatus.DOWN;
+                    default:
+                        return InterfaceCommonState.OperStatus.UNKNOWN;
+                }
+            },
                 builder::setOperStatus);
 
         parseField(output,
-                MTU_LINE::matcher,
-                matcher -> Integer.valueOf(matcher.group("mtu")),
-                builder::setMtu);
+            MTU_LINE::matcher,
+            matcher -> Integer.valueOf(matcher.group("mtu")),
+            builder::setMtu);
 
         parseField(output,
-                DESCR_LINE::matcher,
-                matcher -> matcher.group("desc"),
-                builder::setDescription);
+            DESCR_LINE::matcher,
+            matcher -> matcher.group("desc"),
+            builder::setDescription);
     }
 
 }

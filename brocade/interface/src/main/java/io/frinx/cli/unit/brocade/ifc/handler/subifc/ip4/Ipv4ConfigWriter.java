@@ -37,10 +37,10 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n" +
-            "interface %s\n" +
-            "ip address %s %s\n" +
-            "end";
+    private static final String WRITE_TEMPLATE = "configure terminal\n"
+            + "interface %s\n"
+            + "ip address %s %s\n"
+            + "end";
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
@@ -48,9 +48,11 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        if (subId != SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (subId
+                != SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
-                    new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
+                    new IllegalArgumentException("Unable to manage IP for subinterface: "
+                            + subId));
         }
 
         SubnetUtils.SubnetInfo info = getSubnetInfo(config);
@@ -63,13 +65,18 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
     }
 
     private static SubnetUtils.SubnetInfo getSubnetInfo(@Nonnull Config config) {
-        return new SubnetUtils(config.getIp().getValue() + "/" + config.getPrefixLength()).getInfo();
+        return new SubnetUtils(config.getIp().getValue()
+                + "/"
+                + config.getPrefixLength()).getInfo();
     }
 
     private static String getIfcName(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
         Long subIfcIndex = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
-        Preconditions.checkArgument(subIfcIndex == SubinterfaceReader.ZERO_SUBINTERFACE_ID, "Only subinterface " + SubinterfaceReader.ZERO_SUBINTERFACE_ID + "  can have IP");
+        Preconditions.checkArgument(subIfcIndex
+                == SubinterfaceReader.ZERO_SUBINTERFACE_ID, "Only subinterface "
+                + SubinterfaceReader.ZERO_SUBINTERFACE_ID
+                + "  can have IP");
         return ifcName;
     }
 
@@ -86,10 +93,10 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
         }
     }
 
-    private static final String DELETE_TEMPLATE = "configure terminal\n" +
-            "interface %s\n" +
-            "no ip address %s %s\n" +
-            "end";
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
+            + "interface %s\n"
+            + "no ip address %s %s\n"
+            + "end";
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
@@ -97,7 +104,8 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (subId
+                == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             SubnetUtils.SubnetInfo info = getSubnetInfo(config);
 
             try {
@@ -111,7 +119,8 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
             }
         } else {
             throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
-                    new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
+                    new IllegalArgumentException("Unable to manage IP for subinterface: "
+                            + subId));
         }
     }
 }

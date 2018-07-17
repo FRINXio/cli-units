@@ -37,8 +37,9 @@ public class NetworkInstanceStateReader extends CompositeReader<State, StateBuil
 
     public NetworkInstanceStateReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<State, StateBuilder>>() {{
-            add(new L2P2PStateReader(cli));
-        }});
+                add(new L2P2PStateReader(cli));
+                }
+            });
     }
 
     @Nonnull

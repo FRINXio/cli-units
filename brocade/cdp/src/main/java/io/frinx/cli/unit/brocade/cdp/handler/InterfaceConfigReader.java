@@ -37,7 +37,8 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder
+            configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         configBuilder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
         configBuilder.setEnabled(true);
     }

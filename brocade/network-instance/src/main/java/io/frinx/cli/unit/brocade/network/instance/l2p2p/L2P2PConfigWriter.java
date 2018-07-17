@@ -32,20 +32,20 @@ public class L2P2PConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config config, WriteContext writeContext)
-            throws WriteFailedException.CreateFailedException {
+    public void writeCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config config, WriteContext
+            writeContext) throws WriteFailedException.CreateFailedException {
         // NOOP at this level
     }
 
     @Override
-    public void updateCurrentAttributes(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter, WriteContext writeContext)
-            throws WriteFailedException {
+    public void updateCurrentAttributes(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+                                        WriteContext writeContext) throws WriteFailedException {
         // NOOP at this level
     }
 
     @Override
-    public void deleteCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config config, WriteContext writeContext)
-            throws WriteFailedException.DeleteFailedException {
+    public void deleteCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config config, WriteContext
+            writeContext) throws WriteFailedException.DeleteFailedException {
         // NOOP at this level
     }
 }

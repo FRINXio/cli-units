@@ -74,7 +74,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                 "end");
     }
 
-    public static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES = Collections.singleton(EthernetCsmacd.class);
+    public static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES = Collections.singleton(EthernetCsmacd
+            .class);
 
     public static boolean isPhysicalInterface(Config data) {
         return PHYS_IFC_TYPES.contains(data.getType());

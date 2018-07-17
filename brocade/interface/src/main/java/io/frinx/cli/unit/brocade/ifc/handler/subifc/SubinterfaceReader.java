@@ -33,7 +33,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey, SubinterfaceBuilder> {
+public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey,
+        SubinterfaceBuilder> {
 
     public static final long ZERO_SUBINTERFACE_ID = 0L;
 
@@ -56,7 +57,8 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
                 blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP, instanceIdentifier),
                         cli, instanceIdentifier, readContext)).isEmpty();
 
-        if (hasIpv4Address || hasIpv6Address) {
+        if (hasIpv4Address
+                || hasIpv6Address) {
             return Collections.singletonList(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
         }
 

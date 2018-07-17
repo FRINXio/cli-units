@@ -37,8 +37,9 @@ public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigB
 
     public NetworkInstanceConfigReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {{
-            add(new L2P2PConfigReader(cli));
-        }});
+                add(new L2P2PConfigReader(cli));
+                }
+            });
     }
 
     @Nonnull

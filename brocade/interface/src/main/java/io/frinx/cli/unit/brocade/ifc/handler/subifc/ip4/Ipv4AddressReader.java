@@ -66,7 +66,8 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             Class<? extends InterfaceType> ifcType = parseType(id);
             String ifcNumber = getIfcNumber(id);
-            return parseAddressIds(blockingRead(String.format(SH_INTERFACE_IP, getTypeOnDevice(ifcType), ifcNumber), cli, instanceIdentifier, readContext));
+            return parseAddressIds(blockingRead(String.format(SH_INTERFACE_IP, getTypeOnDevice(ifcType), ifcNumber),
+                    cli, instanceIdentifier, readContext));
         } else {
             return Collections.emptyList();
         }
@@ -75,9 +76,9 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
     @VisibleForTesting
     public static List<AddressKey> parseAddressIds(String output) {
         return parseFields(output, 0,
-                INTERFACE_IP_LINE::matcher,
-                m -> m.group("ip"),
-                addr -> new AddressKey(new Ipv4AddressNoZone(addr)));
+            INTERFACE_IP_LINE::matcher,
+            m -> m.group("ip"),
+            addr -> new AddressKey(new Ipv4AddressNoZone(addr)));
     }
 
     @Override

@@ -63,24 +63,26 @@ public class Ipv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         Long subId = id.firstKeyOf(Subinterface.class).getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (subId
+                == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             Class<? extends InterfaceType> ifcType = parseType(name);
             String ifcNumber = getIfcNumber(name);
-            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, getTypeOnDevice(ifcType), ifcNumber), cli, id, readContext));
+            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, getTypeOnDevice(ifcType),
+                    ifcNumber), cli, id, readContext));
         }
     }
 
     @VisibleForTesting
     static void parseAddressConfig(ConfigBuilder configBuilder, String output) {
         parseField(output,
-                INTERFACE_IP_LINE::matcher,
-                m -> new Ipv4AddressNoZone(m.group("ip")),
-                configBuilder::setIp);
+            INTERFACE_IP_LINE::matcher,
+            m -> new Ipv4AddressNoZone(m.group("ip")),
+            configBuilder::setIp);
 
         parseField(output,
-                INTERFACE_IP_LINE::matcher,
-                m -> Short.parseShort(m.group("prefix")),
-                configBuilder::setPrefixLength);
+            INTERFACE_IP_LINE::matcher,
+            m -> Short.parseShort(m.group("prefix")),
+            configBuilder::setPrefixLength);
     }
 
     @Override
