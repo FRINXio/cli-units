@@ -130,7 +130,7 @@ public class IosCliInitializerUnit  implements TranslateUnit {
     /**
      * Initialize IOS CLI session to be usable by various CRUD and RPC handlers.
      */
-    public static final class IosCliInitializer implements SessionInitializationStrategy {
+    public static class IosCliInitializer implements SessionInitializationStrategy {
         private static final String PASSWORD_PROMPT = "Password:";
         private static final String PRIVILEGED_PROMPT_SUFFIX = "#";
         private static final String ENABLE_COMMAND = "enable";
@@ -165,10 +165,10 @@ public class IosCliInitializerUnit  implements TranslateUnit {
                         .toCompletableFuture()
                         .get();
 
-                LOG.debug("{}: IOS-XR cli session initialized output: {}", id, initOutput);
+                LOG.debug("{}: {} cli session initialized output: {}", id, getOsNameForLogging(), initOutput);
                 // If already in privileged mode, don't do anything else
                 if (initialPrompt.endsWith(PRIVILEGED_PROMPT_SUFFIX)) {
-                    LOG.info("{}: IOS cli session initialized successfully", id);
+                    LOG.info("{}: {} cli session initialized successfully", id, getOsNameForLogging());
                     return;
                 }
 
@@ -180,9 +180,10 @@ public class IosCliInitializerUnit  implements TranslateUnit {
 
                 // If not, fail
                 Preconditions.checkState(prompt.endsWith(PRIVILEGED_PROMPT_SUFFIX),
-                        "%s: IOS cli session initialization failed to enter privileged mode. Current prompt: %s", id, prompt);
+                        "%s: %s cli session initialization failed to enter privileged mode. Current prompt: %s",
+                        id, getOsNameForLogging(), prompt);
 
-                LOG.info("{}: IOS cli session initialized successfully", id);
+                LOG.info("{}: {} cli session initialized successfully", id, getOsNameForLogging());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
@@ -190,6 +191,10 @@ public class IosCliInitializerUnit  implements TranslateUnit {
                 LOG.warn("{}: Unable to initialize device", id, e);
                 throw new IllegalStateException(id + ": Unable to initialize device", e);
             }
+        }
+
+        protected String getOsNameForLogging() {
+            return "IOS";
         }
 
         private void tryToEnterPrivilegedMode(@Nonnull Session session, @Nonnull String newline)
