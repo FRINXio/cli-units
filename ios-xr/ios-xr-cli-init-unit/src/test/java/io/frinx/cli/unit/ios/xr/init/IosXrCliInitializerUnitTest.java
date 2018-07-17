@@ -48,13 +48,15 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 
 public class IosXrCliInitializerUnitTest {
 
-    private static final String SUCCESS_COMMIT = "Mon Feb 12 19:29:16.935 UTC\n" +
-            "RP/0/0/CPU0:XR-5(config)#";
+    private static final String SUCCESS_COMMIT = "Mon Feb 12 19:29:16.935 UTC\n"
+            + "RP/0/0/CPU0:XR-5(config)#";
 
-    private static final String FAILED_COMMIT = "Mon Feb 12 19:29:14.715 UTC\n" +
-            "\n" +
-            "% Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view the errors\n" +
-            "RP/0/0/CPU0:XR-5(config)#\n";
+    private static final String FAILED_COMMIT = "Mon Feb 12 19:29:14.715 UTC\n"
+            + "\n"
+            + "% Failed to commit one or more configuration items during a pseudo-atomic operation. All changes made "
+            + "have been reverted. Please issue 'show configuration failed [inheritance]' from this session to view "
+            + "the errors\n"
+            + "RP/0/0/CPU0:XR-5(config)#\n";
 
     private IosXrCliInitializerUnit unit;
 
@@ -82,11 +84,15 @@ public class IosXrCliInitializerUnitTest {
                 Pattern.compile("\\% (?i)Failed(?-i).*", Pattern.DOTALL)
         ));
         final CompletionStage<? extends Cli> cliStage =
-                new ErrorAwareCli.Configuration(idName, delegateCliConfig, errorPatterns, ForkJoinPool.commonPool()).init();
-        Cli globalCli = cliStage.toCompletableFuture().get();
-        Mockito.when(globalCli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class))).thenReturn(cliStage.toCompletableFuture());
+                new ErrorAwareCli.Configuration(idName, delegateCliConfig, errorPatterns, ForkJoinPool.commonPool())
+                        .init();
+        Cli globalCli = cliStage.toCompletableFuture()
+                .get();
+        Mockito.when(globalCli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class)))
+                .thenReturn(cliStage.toCompletableFuture());
 
-        Mockito.when(this.context.getTransport()).thenReturn(globalCli);
+        Mockito.when(this.context.getTransport())
+                .thenReturn(globalCli);
         RemoteDeviceId device = new RemoteDeviceId(new TopologyKey(new TopologyId("cli")),
                 "deviceId",
                 new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 1234));
@@ -99,7 +105,8 @@ public class IosXrCliInitializerUnitTest {
         Mockito.when(delegateCli.executeAndRead(Mockito.any(Command.class)))
                 .thenReturn(CompletableFuture.completedFuture(SUCCESS_COMMIT));
         try {
-            this.unit.getCommitHook(this.context).run();
+            this.unit.getCommitHook(this.context)
+                    .run();
             Assert.assertTrue(true);
         } catch (CommitFailedException e) {
             Assert.fail("Success commit shouldn't emit exception.");
@@ -116,7 +123,8 @@ public class IosXrCliInitializerUnitTest {
         Mockito.when(delegateCli.executeAndRead(IosXrCliInitializerUnit.SH_CONF_FAILED))
                 .thenReturn(CompletableFuture.completedFuture(""));
         thrown.expect(CommitFailedException.class);
-        this.unit.getCommitHook(this.context).run();
+        this.unit.getCommitHook(this.context)
+                .run();
     }
 
     @Test
@@ -125,7 +133,8 @@ public class IosXrCliInitializerUnitTest {
         Mockito.when(delegateCli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class)))
                 .thenReturn(CompletableFuture.completedFuture(""));
         thrown.expect(WriterRegistry.Reverter.RevertSuccessException.class);
-        this.unit.getPostFailedHook(this.context).run(null);
+        this.unit.getPostFailedHook(this.context)
+                .run(null);
     }
 
     @Test
@@ -133,6 +142,7 @@ public class IosXrCliInitializerUnitTest {
         Mockito.when(delegateCli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class)))
                 .thenThrow(InterruptedException.class);
         thrown.expect(WriterRegistry.Reverter.RevertFailedException.class);
-        this.unit.getPostFailedHook(this.context).run(null);
+        this.unit.getPostFailedHook(this.context)
+                .run(null);
     }
 }

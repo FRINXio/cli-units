@@ -31,8 +31,7 @@ class Ipv4Util {
     private static final Pattern PREC_LINE = Pattern.compile("match precedence ipv4 (?<prec>.+)");
 
     static void parseIpv4(String output, ConditionsBuilder builder) {
-        Ipv4Builder v4Builder = new Ipv4Builder();
-        ConfigBuilder cBuilder = new ConfigBuilder();
+
         QosIpv4ConditionAugBuilder augBuilder = new QosIpv4ConditionAugBuilder();
 
         parseAcl(output, augBuilder);
@@ -42,15 +41,19 @@ class Ipv4Util {
         if (augBuilder.getAclRef() == null && augBuilder.getPrecedences() == null) {
             return;
         }
-        cBuilder.addAugmentation(QosIpv4ConditionAug.class, augBuilder.build());
-        v4Builder.setConfig(cBuilder.build());
+
+        Ipv4Builder v4Builder = new Ipv4Builder();
+        ConfigBuilder configBuilder = new ConfigBuilder();
+
+        configBuilder.addAugmentation(QosIpv4ConditionAug.class, augBuilder.build());
+        v4Builder.setConfig(configBuilder.build());
         builder.setIpv4(v4Builder.build());
     }
 
     private static void parseAcl(String output, QosIpv4ConditionAugBuilder augBuilder) {
         ParsingUtils.parseField(output, ACL_LINE::matcher,
             matcher -> matcher.group("acl"),
-            augBuilder::setAclRef);
+                augBuilder::setAclRef);
     }
 
     private static void parsePrecedence(String output, QosIpv4ConditionAugBuilder augBuilder) {

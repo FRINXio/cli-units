@@ -21,8 +21,10 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.openconfig.acl.IIDs;
+
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,40 +63,42 @@ public class EgressAclSetConfigWriterTest {
     public ExpectedException thrown = ExpectedException.none();
 
     static void presetWriteContext(
-        final WriteContext context,
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface anInterface,
-        final EgressAclSets initEgressAclSets,
-        final IngressAclSets initIngressAclSets) {
+            final WriteContext context,
+            final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+                    .interfaces.Interface anInterface,
+            final EgressAclSets initEgressAclSets,
+            final IngressAclSets initIngressAclSets) {
         Mockito.when(context.readAfter(Mockito.any()))
-            .then(invocation -> {
-                final Object iidParam = invocation.getArguments()[0];
-                if (iidParam.getClass().equals(KeyedInstanceIdentifier.class)) {
-                    return Optional.of(anInterface);
-                } else if (iidParam.getClass().equals(InstanceIdentifier.class)) {
-                    if (((InstanceIdentifier) iidParam).getTargetType().equals(EgressAclSets.class)) {
-                        return Optional.of(initEgressAclSets);
-                    } else if (((InstanceIdentifier) iidParam).getTargetType().equals(IngressAclSets.class)) {
-                        return Optional.of(initIngressAclSets);
+                .then(invocation -> {
+                    final Object iidParam = invocation.getArguments()[0];
+                    if (iidParam.getClass().equals(KeyedInstanceIdentifier.class)) {
+                        return Optional.of(anInterface);
+                    } else if (iidParam.getClass().equals(InstanceIdentifier.class)) {
+                        if (((InstanceIdentifier) iidParam).getTargetType().equals(EgressAclSets.class)) {
+                            return Optional.of(initEgressAclSets);
+                        } else if (((InstanceIdentifier) iidParam).getTargetType().equals(IngressAclSets.class)) {
+                            return Optional.of(initIngressAclSets);
+                        }
+                        return Optional.of(TestData.ACL_SETS);
                     }
-                    return Optional.of(TestData.ACL_SETS);
-                }
 
-                return invocation.callRealMethod();
-            });
+                    return invocation.callRealMethod();
+                });
         Mockito.when(context.readBefore(Mockito.any()))
-            .then(invocation -> Optional.absent());
+                .then(invocation -> Optional.absent());
 
     }
 
     @Before
     public void setUp() throws Exception {
         Mockito.when(cliMock.executeAndRead(Mockito.any()))
-            .then(invocation -> CompletableFuture.completedFuture(""));
+                .then(invocation -> CompletableFuture.completedFuture(""));
     }
 
     @Test
     public void writeAclSet_LAGInterface_goldenPath() throws WriteFailedException {
-        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE, TestData.EGRESS_ACL_SETS_INIT, TestData.INGRESS_ACL_SETS_INIT_EMPTY);
+        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE, TestData.EGRESS_ACL_SETS_INIT, TestData
+                .INGRESS_ACL_SETS_INIT_EMPTY);
 
         final EgressAclSetConfigWriter writer = new EgressAclSetConfigWriter(cliMock);
 
@@ -105,13 +109,14 @@ public class EgressAclSetConfigWriterTest {
 
     @Test
     public void writeAclSet_multipleForOneType() throws WriteFailedException {
-        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE, TestData.EGRESS_ACL_SETS_MULTIPLE_FOR_TYPE, TestData.INGRESS_ACL_SETS_INIT_EMPTY);
+        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE, TestData.EGRESS_ACL_SETS_MULTIPLE_FOR_TYPE,
+                TestData.INGRESS_ACL_SETS_INIT_EMPTY);
 
         final EgressAclSetConfigWriter writer = new EgressAclSetConfigWriter(cliMock);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(
-            CoreMatchers.containsString("Could not add more than one")
+                CoreMatchers.containsString("Could not add more than one")
         );
 
         writer.writeCurrentAttributes(TestData.ACL_CONFIG_IID, TestData.ACL_CONFIG, context);
@@ -124,74 +129,79 @@ public class EgressAclSetConfigWriterTest {
         private static final String ACL_SET_NAME_OTHER = "bubu_group";
         private static final Class<? extends ACLTYPE> ACL_TYPE = ACLIPV6.class;
         static final AclSets ACL_SETS = new AclSetsBuilder()
-            .setAclSet(Arrays.asList(
-                createAclSet(ACL_SET_NAME, ACL_TYPE),
-                createAclSet(ACL_SET_NAME_OTHER, ACL_TYPE)
-            ))
-            .build();
+                .setAclSet(Arrays.asList(
+                        createAclSet(ACL_SET_NAME, ACL_TYPE),
+                        createAclSet(ACL_SET_NAME_OTHER, ACL_TYPE)
+                ))
+                .build();
 
-        static final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface
-            INTERFACE_CORRECT_TYPE =
-            new InterfaceBuilder()
-                .setName(INTERFACE_NAME)
-                .setConfig(
-                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
-                        .setType(Ieee8023adLag.class)
-                        .build())
-                .build();
-        static final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface
-            INTERFACE_WRONG_TYPE =
-            new InterfaceBuilder()
-                .setName(INTERFACE_NAME)
-                .setConfig(
-                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
-                        .setType(L2vlan.class)
-                        .build())
-                .build();
+        static final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+                .interfaces.Interface
+                INTERFACE_CORRECT_TYPE =
+                new InterfaceBuilder()
+                        .setName(INTERFACE_NAME)
+                        .setConfig(
+                                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                        .rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                                        .setType(Ieee8023adLag.class)
+                                        .build())
+                        .build();
+        static final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+                .interfaces.Interface
+                INTERFACE_WRONG_TYPE =
+                new InterfaceBuilder()
+                        .setName(INTERFACE_NAME)
+                        .setConfig(
+                                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                        .rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                                        .setType(L2vlan.class)
+                                        .build())
+                        .build();
 
         static final InstanceIdentifier<Config> ACL_CONFIG_IID = IIDs.AC_INTERFACES
-            .child(Interface.class, new InterfaceKey(new InterfaceId(INTERFACE_NAME)))
-            .child(EgressAclSets.class)
-            .child(EgressAclSet.class, new EgressAclSetKey(ACL_SET_NAME, ACL_TYPE))
-            .child(Config.class);
+                .child(Interface.class, new InterfaceKey(new InterfaceId(INTERFACE_NAME)))
+                .child(EgressAclSets.class)
+                .child(EgressAclSet.class, new EgressAclSetKey(ACL_SET_NAME, ACL_TYPE))
+                .child(Config.class);
         static final Config ACL_CONFIG = new ConfigBuilder()
-            .setSetName(ACL_SET_NAME)
-            .setType(ACL_TYPE)
-            .build();
+                .setSetName(ACL_SET_NAME)
+                .setType(ACL_TYPE)
+                .build();
         static final IngressAclSets INGRESS_ACL_SETS_INIT_EMPTY = new IngressAclSetsBuilder()
-            .build();
+                .build();
         static final EgressAclSets EGRESS_ACL_SETS_INIT = new EgressAclSetsBuilder()
-            .setEgressAclSet(Arrays.asList(new EgressAclSetBuilder()
-                .setConfig(ACL_CONFIG)
-                .setSetName(ACL_CONFIG.getSetName())
-                .setType(ACL_CONFIG.getType())
-                .build()))
-            .build();
+                .setEgressAclSet(Arrays.asList(new EgressAclSetBuilder()
+                        .setConfig(ACL_CONFIG)
+                        .setSetName(ACL_CONFIG.getSetName())
+                        .setType(ACL_CONFIG.getType())
+                        .build()))
+                .build();
         static final EgressAclSets EGRESS_ACL_SETS_MULTIPLE_FOR_TYPE = new EgressAclSetsBuilder()
-            .setEgressAclSet(Arrays.asList(
-                new EgressAclSetBuilder()
-                    .setConfig(ACL_CONFIG)
-                    .setSetName(ACL_CONFIG.getSetName())
-                    .setType(ACL_CONFIG.getType())
-                    .build(),
-                new EgressAclSetBuilder()
-                    .setConfig(ACL_CONFIG)
-                    .setSetName(ACL_SET_NAME_OTHER)
-                    .setType(ACL_CONFIG.getType())
-                    .build()))
-            .build();
+                .setEgressAclSet(Arrays.asList(
+                        new EgressAclSetBuilder()
+                                .setConfig(ACL_CONFIG)
+                                .setSetName(ACL_CONFIG.getSetName())
+                                .setType(ACL_CONFIG.getType())
+                                .build(),
+                        new EgressAclSetBuilder()
+                                .setConfig(ACL_CONFIG)
+                                .setSetName(ACL_SET_NAME_OTHER)
+                                .setType(ACL_CONFIG.getType())
+                                .build()))
+                .build();
 
         private static AclSet createAclSet(final String aclSetName,
                                            final Class<? extends ACLTYPE> aclType) {
             return new AclSetBuilder()
-                .setName(aclSetName)
-                .setType(aclType)
-                .setConfig(
-                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.acl.set.ConfigBuilder()
-                        .setName(aclSetName)
-                        .setType(aclType)
-                        .build())
-                .build();
+                    .setName(aclSetName)
+                    .setType(aclType)
+                    .setConfig(
+                            new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top
+                                    .acl.sets.acl.set.ConfigBuilder()
+                                    .setName(aclSetName)
+                                    .setType(aclType)
+                                    .build())
+                    .build();
         }
     }
 }

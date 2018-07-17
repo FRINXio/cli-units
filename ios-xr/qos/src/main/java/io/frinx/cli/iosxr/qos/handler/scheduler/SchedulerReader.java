@@ -49,8 +49,10 @@ public class SchedulerReader implements CliConfigListReader<Scheduler, Scheduler
 
     @Nonnull
     @Override
-    public List<SchedulerKey> getAllIds(@Nonnull InstanceIdentifier<Scheduler> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+    public List<SchedulerKey> getAllIds(@Nonnull InstanceIdentifier<Scheduler> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
         String output = blockingRead(f(SH_POLICY_MAP, policyName), cli, instanceIdentifier, readContext);
         return getSequenceIds(output);
     }
@@ -61,8 +63,8 @@ public class SchedulerReader implements CliConfigListReader<Scheduler, Scheduler
         List<SchedulerKey> keys = new ArrayList<>();
         for (String line : output.split(ParsingUtils.NEWLINE.pattern())) {
             line = line.trim();
-            Matcher m = CLASS_NAME_LINE.matcher(line);
-            if (m.matches()) {
+            Matcher matcher = CLASS_NAME_LINE.matcher(line);
+            if (matcher.matches()) {
                 keys.add(new SchedulerKey(seq));
                 seq++;
             }
@@ -76,9 +78,12 @@ public class SchedulerReader implements CliConfigListReader<Scheduler, Scheduler
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Scheduler> instanceIdentifier, @Nonnull SchedulerBuilder builder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        final Long sequence = instanceIdentifier.firstKeyOf(Scheduler.class).getSequence();
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Scheduler> instanceIdentifier, @Nonnull
+            SchedulerBuilder builder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        final Long sequence = instanceIdentifier.firstKeyOf(Scheduler.class)
+                .getSequence();
         builder.setSequence(sequence);
-        builder.setConfig(new ConfigBuilder().setSequence(sequence).build());
+        builder.setConfig(new ConfigBuilder().setSequence(sequence)
+                .build());
     }
 }

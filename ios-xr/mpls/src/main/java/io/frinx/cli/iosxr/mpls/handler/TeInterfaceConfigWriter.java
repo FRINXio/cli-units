@@ -20,11 +20,10 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top._interface.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
 
 public class TeInterfaceConfigWriter  implements CliWriter<Config> {
 
@@ -35,12 +34,15 @@ public class TeInterfaceConfigWriter  implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+            WriteContext writeContext) throws WriteFailedException {
+        final String name = id.firstKeyOf(Interface.class)
+                .getInterfaceId()
+                .getValue();
         blockingWriteAndRead(cli, id, data,
-            "mpls traffic-eng",
-            f("interface %s", name),
-            "root");
+                "mpls traffic-eng",
+                f("interface %s", name),
+                "root");
     }
 
     @Override
@@ -52,11 +54,14 @@ public class TeInterfaceConfigWriter  implements CliWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+            WriteContext writeContext) throws WriteFailedException {
+        final String name = id.firstKeyOf(Interface.class)
+                .getInterfaceId()
+                .getValue();
         blockingWriteAndRead(cli, id, data,
-            "mpls traffic-eng",
-            f("no interface %s", name),
-            "root");
+                "mpls traffic-eng",
+                f("no interface %s", name),
+                "root");
     }
 }

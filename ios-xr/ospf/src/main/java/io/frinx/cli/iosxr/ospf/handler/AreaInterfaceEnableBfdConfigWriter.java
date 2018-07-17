@@ -42,10 +42,13 @@ public class AreaInterfaceEnableBfdConfigWriter implements OspfWriter<Config> {
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
         final OspfAreaIdentifier areaId =
-                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Area.class)).get().getIdentifier();
+                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Area.class))
+                        .get()
+                        .getIdentifier();
         final InterfaceKey intfId = instanceIdentifier.firstKeyOf(Interface.class);
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
+                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class)
+                        .getName()),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 data.isEnabled() != null ? (data.isEnabled() ? "bfd fast-detect" : "bfd fast-detect disable") : "",
@@ -53,28 +56,35 @@ public class AreaInterfaceEnableBfdConfigWriter implements OspfWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter, WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+                                               WriteContext writeContext) throws WriteFailedException {
         final OspfAreaIdentifier areaId =
-                writeContext.readAfter(RWUtils.cutId(id, Area.class)).get().getIdentifier();
+                writeContext.readAfter(RWUtils.cutId(id, Area.class))
+                        .get()
+                        .getIdentifier();
         final InterfaceKey intfId = id.firstKeyOf(Interface.class);
         blockingWriteAndRead(cli, id, dataAfter,
-                f("router ospf %s", id.firstKeyOf(Protocol.class).getName()),
+                f("router ospf %s", id.firstKeyOf(Protocol.class)
+                        .getName()),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
-                dataAfter.isEnabled() != null ? (dataAfter.isEnabled() ? "bfd fast-detect" : "bfd fast-detect disable") : "no bfd fast-detect",
+                dataAfter.isEnabled() != null ? (dataAfter.isEnabled() ? "bfd fast-detect" : "bfd fast-detect "
+                        + "disable") : "no bfd fast-detect",
                 "root");
     }
 
     @Override
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
-        final OspfAreaIdentifier areaId = instanceIdentifier.firstKeyOf(Area.class).getIdentifier();
+        final OspfAreaIdentifier areaId = instanceIdentifier.firstKeyOf(Area.class)
+                .getIdentifier();
         final InterfaceKey intfId = instanceIdentifier.firstKeyOf(Interface.class);
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
+                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class)
+                        .getName()),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
-                "no bfd fast-detect" ,
+                "no bfd fast-detect",
                 "root");
     }
 }

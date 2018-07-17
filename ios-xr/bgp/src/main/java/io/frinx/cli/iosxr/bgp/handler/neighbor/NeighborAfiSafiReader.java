@@ -56,7 +56,8 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
     private static final String SH_AFI = "show running-config router bgp %s %s neighbor %s | include address-family";
     private static final String SH_AFI_SECTION = "show running-config router bgp %s %s neighbor %s address-family %s";
     private static final Pattern FAMILY_LINE = Pattern.compile("(.*)address-family (?<family>[^\\n].*)");
-    private static final Pattern SOFT_RECONFIGURATION_LINE = Pattern.compile("soft-reconfiguration inbound(?<always> always)*");
+    private static final Pattern SOFT_RECONFIGURATION_LINE = Pattern.compile("soft-reconfiguration inbound(?<always> "
+            + "always)*");
     private Cli cli;
 
     public NeighborAfiSafiReader(final Cli cli) {
@@ -65,7 +66,8 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
 
     @Nonnull
     @Override
-    public List<AfiSafiKey> getAllIdsForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<AfiSafiKey> getAllIdsForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
         final Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
                 .child(Global.class)
                 .child(Config.class))
@@ -74,10 +76,17 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
         if (globalConfig == null) {
             return Collections.EMPTY_LIST;
         }
-        String insName = instanceIdentifier.firstKeyOf(Protocol.class).getName().equals(NetworInstance.DEFAULT_NETWORK_NAME) ?
-                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        String neighborIp = new String(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress().getValue());
-        return getAfiKeys(blockingRead(String.format(SH_AFI, globalConfig.getAs().getValue(), insName, neighborIp), cli, instanceIdentifier, readContext));
+        String insName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName()
+                .equals(NetworInstance.DEFAULT_NETWORK_NAME)
+                ?
+                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
+        String neighborIp = new String(instanceIdentifier.firstKeyOf(Neighbor.class)
+                .getNeighborAddress()
+                .getValue());
+        return getAfiKeys(blockingRead(String.format(SH_AFI, globalConfig.getAs()
+                .getValue(), insName, neighborIp), cli, instanceIdentifier, readContext));
     }
 
     @Override
@@ -86,18 +95,27 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull
+            AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
                 .child(Global.class)
                 .child(Config.class))
                 .orNull();
 
-        String insName = instanceIdentifier.firstKeyOf(Protocol.class).getName().equals(NetworInstance.DEFAULT_NETWORK_NAME) ?
-                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        String neighborIp = new String(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress().getValue());
-        Class<? extends AFISAFITYPE> name = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();
+        String insName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName()
+                .equals(NetworInstance.DEFAULT_NETWORK_NAME)
+                ?
+                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
+        String neighborIp = new String(instanceIdentifier.firstKeyOf(Neighbor.class)
+                .getNeighborAddress()
+                .getValue());
+        Class<? extends AFISAFITYPE> name = instanceIdentifier.firstKeyOf(AfiSafi.class)
+                .getAfiSafiName();
 
-        String output = blockingRead(String.format(SH_AFI_SECTION, globalConfig.getAs().getValue(), insName, neighborIp,
+        String output = blockingRead(String.format(SH_AFI_SECTION, globalConfig.getAs()
+                        .getValue(), insName, neighborIp,
                 GlobalAfiSafiReader.transformAfiToString(name)), cli, instanceIdentifier, readContext);
         Optional<Matcher> reconfigMatch = NEWLINE.splitAsStream(output.trim())
                 .map(SOFT_RECONFIGURATION_LINE::matcher)
@@ -110,7 +128,8 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
         if (reconfigMatch.isPresent()) {
             configBuilder.addAugmentation(BgpNeAfAug.class, new BgpNeAfAugBuilder()
                     .setSoftReconfiguration(new SoftReconfigurationBuilder()
-                            .setAlways(reconfigMatch.get().group("always") != null)
+                            .setAlways(reconfigMatch.get()
+                                    .group("always") != null)
                             .build())
                     .build());
         }
@@ -122,8 +141,8 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
     public static List<AfiSafiKey> getAfiKeys(String output) {
         return ParsingUtils.parseFields(output, 0,
                 FAMILY_LINE::matcher,
-                matcher -> matcher.group("family"),
-                value -> new AfiSafiKey(GlobalAfiSafiReader.transformAfiFromString(value.trim())));
+            matcher -> matcher.group("family"),
+            value -> new AfiSafiKey(GlobalAfiSafiReader.transformAfiFromString(value.trim())));
     }
 
 }

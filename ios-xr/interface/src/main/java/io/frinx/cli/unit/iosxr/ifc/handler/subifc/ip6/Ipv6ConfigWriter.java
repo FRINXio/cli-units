@@ -46,34 +46,37 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id, @Nonnull final Config dataAfter,
                                        @Nonnull final WriteContext writeContext) throws WriteFailedException {
 
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         validateConfig(id, dataAfter, ifcName);
 
         // ipv6 <address> <IPv6 Prefix/length>
-        String dampConfCommand = f("ipv6 address %s/%s", dataAfter.getIp().getValue(), dataAfter.getPrefixLength());
+        String dampConfCommand = f("ipv6 address %s/%s", dataAfter.getIp()
+                .getValue(), dataAfter.getPrefixLength());
 
         blockingWriteAndRead(cli, id, dataAfter,
-            f("interface %s", ifcName),
-            dampConfCommand,
-            "root");
+                f("interface %s", ifcName),
+                dampConfCommand,
+                "root");
     }
 
     private void validateConfig(final InstanceIdentifier<Config> id,
                                 final Config dataAfter, final String ifcName) {
-        Long subIfcIndex = id.firstKeyOf(Subinterface.class).getIndex();
+        Long subIfcIndex = id.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         Preconditions.checkArgument(dataAfter.getIp() != null, MISSING_IP_ADDRESS_MSG);
         Preconditions.checkArgument(dataAfter.getPrefixLength() != null, MISSING_PREFIX_LENGTH_MSG);
-        Ipv6CheckUtil.checkParentInterfaceTypeWithExeption(ifcName, EthernetCsmacd.class, Ieee8023adLag.class,
-            SoftwareLoopback.class);
         Ipv6CheckUtil.checkSubInterfaceIdWithExeption(subIfcIndex, SubinterfaceReader.ZERO_SUBINTERFACE_ID);
+        Ipv6CheckUtil.checkParentInterfaceTypeWithExeption(ifcName, EthernetCsmacd.class, Ieee8023adLag.class,
+                SoftwareLoopback.class);
     }
 
     @Override
     public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id, @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter, @Nonnull final WriteContext writeContext)
-        throws WriteFailedException {
+            throws WriteFailedException {
 
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
@@ -81,12 +84,14 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id, @Nonnull final Config dataBefore,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
-        Long subifcIndex = id.firstKeyOf(Subinterface.class).getIndex();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
+        Long subifcIndex = id.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         blockingDeleteAndRead(cli, id,
-            f("interface %s", ifcName, subifcIndex),
-            NO_IPV6_ADDRESS_CMD,
-            "root");
+                f("interface %s", ifcName, subifcIndex),
+                NO_IPV6_ADDRESS_CMD,
+                "root");
     }
 }

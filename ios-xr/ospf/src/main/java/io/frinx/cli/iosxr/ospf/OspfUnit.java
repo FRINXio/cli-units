@@ -73,11 +73,15 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class OspfUnit implements TranslateUnit {
 
-    private static final InstanceIdentifier<Timers1> TIMERS1 = IIDs.NE_NE_PR_PR_OS_GL_TIMERS.augmentation(Timers1.class);
+    private static final InstanceIdentifier<Timers1> TIMERS1 = IIDs.NE_NE_PR_PR_OS_GL_TIMERS
+            .augmentation(Timers1.class);
     private static final InstanceIdentifier<MaxMetricTimers> MAX_METRIC_TIMERS = TIMERS1.child(MaxMetricTimers.class);
-    private static final InstanceIdentifier<MaxMetricTimer> MAX_METRIC_TIMER = MAX_METRIC_TIMERS.child(MaxMetricTimer.class);
-    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.max.metrics.fields.max.metric.timers.max.metric.timer.Config> CONFIG_IID =
-            MAX_METRIC_TIMER.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.max.metrics.fields.max.metric.timers.max.metric.timer.Config.class);
+    private static final InstanceIdentifier<MaxMetricTimer> MAX_METRIC_TIMER = MAX_METRIC_TIMERS.child(MaxMetricTimer
+            .class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco
+            .rev171124.max.metrics.fields.max.metric.timers.max.metric.timer.Config> CONFIG_IID =
+            MAX_METRIC_TIMER.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco
+                    .rev171124.max.metrics.fields.max.metric.timers.max.metric.timer.Config.class);
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
 
@@ -102,80 +106,93 @@ public class OspfUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigWriter(cli)),
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigWriter(cli)),
                 IIDs.NE_NE_PR_PR_CONFIG);
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TIMERS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(TIMERS1, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(MAX_METRIC_TIMERS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(MAX_METRIC_TIMER, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TI_MA_CONFIG, new NoopCliWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(CONFIG_IID, new MaxMetricTimerConfigWriter(cli)), IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TIMERS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(TIMERS1, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(MAX_METRIC_TIMERS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(MAX_METRIC_TIMER, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TI_MA_CONFIG, new NoopCliWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(CONFIG_IID, new MaxMetricTimerConfigWriter(cli)), IIDs
+                .NE_NE_PR_PR_OS_GL_CONFIG);
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new NoopCliListWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigWriter(cli)),
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new NoopCliListWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigWriter(cli)),
                 IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new NoopCliListWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG, new AreaInterfaceConfigWriter(cli)),
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG,
+                        new AreaInterfaceConfigWriter(cli)),
                 IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG);
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug.class), new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug.class)
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug
+                .class), new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug
+                .class)
                 .child(EnableBfd.class), new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug.class)
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug
+                .class)
                 .child(EnableBfd.class)
                 .child(Config.class), new AreaInterfaceEnableBfdConfigWriter(cli)));
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MPLS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IGPLDPSYNC, new NoopCliWriter<>()));
-        wRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IG_CONFIG, new AreaInterfaceMplsSyncConfigWriter(cli)),
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MPLS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IGPLDPSYNC, new NoopCliWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IG_CONFIG, new
+                        AreaInterfaceMplsSyncConfigWriter(cli)),
                 IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG);
 
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_IN_CONFIG, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_IN_CONFIG, new NoopCliWriter<>()));
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OSPFV2, Ospfv2Builder.class);
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GLOBAL, GlobalBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigReader(cli)));
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GL_TIMERS, TimersBuilder.class);
-        rRegistry.addStructuralReader(TIMERS1, Timers1Builder.class);
-        rRegistry.addStructuralReader(MAX_METRIC_TIMERS, MaxMetricTimersBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(MAX_METRIC_TIMER, new MaxMetricTimerReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(CONFIG_IID, new MaxMetricTimerConfigReader(cli)));
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AREAS, AreasBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new OspfAreaReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigReader()));
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new AreaInterfaceReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG, new AreaInterfaceConfigReader(cli)));
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MPLS, MplsBuilder.class);
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IGPLDPSYNC, IgpLdpSyncBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IG_CONFIG, new AreaInterfaceMplsSyncConfigReader(cli)));
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug.class), OspfAreaIfBfdExtAugBuilder.class);
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug.class)
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OSPFV2, Ospfv2Builder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GLOBAL, GlobalBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GL_TIMERS, TimersBuilder.class);
+        readRegistry.addStructuralReader(TIMERS1, Timers1Builder.class);
+        readRegistry.addStructuralReader(MAX_METRIC_TIMERS, MaxMetricTimersBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(MAX_METRIC_TIMER, new MaxMetricTimerReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(CONFIG_IID, new MaxMetricTimerConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AREAS, AreasBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new OspfAreaReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigReader()));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_INTERFACES, InterfacesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE,
+                new AreaInterfaceReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG,
+                new AreaInterfaceConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MPLS, MplsBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IGPLDPSYNC, IgpLdpSyncBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IG_CONFIG, new
+                AreaInterfaceMplsSyncConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug.class),
+                OspfAreaIfBfdExtAugBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug.class)
                 .child(EnableBfd.class), EnableBfdBuilder.class);
-        rRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE.augmentation(OspfAreaIfBfdExtAug.class)
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE
+                .augmentation(OspfAreaIfBfdExtAug.class)
                 .child(EnableBfd.class)
                 .child(Config.class), new AreaInterfaceEnableBfdConfigReader(cli)));
-        rRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, InterfaceRefBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, InterfaceRefBuilder.class);
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.ext.rev180211.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.$YangModuleInfoImpl
+                        .getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.ext.rev180211.$YangModuleInfoImpl
+                        .getInstance(),
                 $YangModuleInfoImpl.getInstance());
     }
 

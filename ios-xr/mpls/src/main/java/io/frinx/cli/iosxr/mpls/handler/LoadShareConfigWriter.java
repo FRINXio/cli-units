@@ -20,11 +20,10 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.Tunnel;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
 
 public class LoadShareConfigWriter implements CliWriter<Config> {
 
@@ -35,15 +34,17 @@ public class LoadShareConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = id.firstKeyOf(Tunnel.class).getName();
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+            WriteContext writeContext) throws WriteFailedException {
+        final String name = id.firstKeyOf(Tunnel.class)
+                .getName();
         if (data.getLoadShare() == null) {
             return;
         }
         blockingWriteAndRead(cli, id, data,
-            f("interface tunnel-te %s", name),
-            f("load-share %s", data.getLoadShare()),
-            "root");
+                f("interface tunnel-te %s", name),
+                f("load-share %s", data.getLoadShare()),
+                "root");
     }
 
     @Override
@@ -60,11 +61,13 @@ public class LoadShareConfigWriter implements CliWriter<Config> {
 
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = id.firstKeyOf(Tunnel.class).getName();
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+            WriteContext writeContext) throws WriteFailedException {
+        final String name = id.firstKeyOf(Tunnel.class)
+                .getName();
         blockingWriteAndRead(cli, id, data,
-            f("interface tunnel-te %s", name),
-            f("no load-share %s", data.getLoadShare()),
-            "root");
+                f("interface tunnel-te %s", name),
+                f("no load-share %s", data.getLoadShare()),
+                "root");
     }
 }

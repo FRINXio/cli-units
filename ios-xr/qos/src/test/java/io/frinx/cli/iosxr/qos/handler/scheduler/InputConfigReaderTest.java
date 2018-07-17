@@ -16,7 +16,6 @@
 
 package io.frinx.cli.iosxr.qos.handler.scheduler;
 
-import io.frinx.cli.iosxr.qos.handler.scheduler.InputConfigReader;
 import java.math.BigInteger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,26 +24,26 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 
 public class InputConfigReaderTest {
 
-    private static final String OUTPUT = "policy-map plmap\r\n" +
-        " class map1\r\n" +
-        "  set mpls experimental topmost 5\r\n" +
-        "  priority level 1 \r\n" +
-        " ! \r\n" +
-        " class class-default\r\n" +
-        "  priority level 2 \r\n" +
-        " ! \r\n" +
-        " end-policy-map\r\n" +
-        "! \r\n";
+    private static final String OUTPUT = "policy-map plmap\r\n"
+            + " class map1\r\n"
+            + "  set mpls experimental topmost 5\r\n"
+            + "  priority level 1 \r\n"
+            + " ! \r\n"
+            + " class class-default\r\n"
+            + "  priority level 2 \r\n"
+            + " ! \r\n"
+            + " end-policy-map\r\n"
+            + "! \r\n";
 
-    private static final String ENSURE_CORRECT_OUTPUT = "policy-map plmap\r\n" +
-        " class map1\r\n" +
-        "  set mpls experimental topmost 5\r\n" +
-        " ! \r\n" +
-        " class class-default\r\n" +
-        "  priority level 2 \r\n" +
-        " ! \r\n" +
-        " end-policy-map\r\n" +
-        "! \r\n";
+    private static final String ENSURE_CORRECT_OUTPUT = "policy-map plmap\r\n"
+            + " class map1\r\n"
+            + "  set mpls experimental topmost 5\r\n"
+            + " ! \r\n"
+            + " class class-default\r\n"
+            + "  priority level 2 \r\n"
+            + " ! \r\n"
+            + " end-policy-map\r\n"
+            + "! \r\n";
 
     @Test
     public void testPriority() {

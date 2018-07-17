@@ -34,7 +34,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ActionConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_POLICY_MAPS = "show running-config policy-map | utility egrep \"^policy-map| class %s\"";
+    private static final String SH_POLICY_MAPS = "show running-config policy-map | utility egrep \"^policy-map| class"
+            + " %s\"";
     private static final String RAW_POLICY_LINE = "(.*)policy-map (?<name>.+) class %s(.*)";
 
     private Cli cli;
@@ -44,8 +45,10 @@ public class ActionConfigReader implements CliConfigReader<Config, ConfigBuilder
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder
+            configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        String className = instanceIdentifier.firstKeyOf(Classifier.class)
+                .getName();
         // class-default has the policy-map name in it's name
         if (className.endsWith(ClassifierReader.DEFAULT_CLASS_SUFFIX)) {
             configBuilder.setTargetGroup(className.replace(ClassifierReader.DEFAULT_CLASS_SUFFIX, ""));

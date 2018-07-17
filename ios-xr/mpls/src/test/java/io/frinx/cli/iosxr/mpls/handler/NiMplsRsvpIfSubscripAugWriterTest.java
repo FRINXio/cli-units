@@ -40,25 +40,25 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class NiMplsRsvpIfSubscripAugWriterTest {
 
-    private static final String WRITE_INPUT = "rsvp\n" +
-            "interface Loopback0\n" +
-            "bandwidth 5\n" +
-            "root\n";
+    private static final String WRITE_INPUT = "rsvp\n"
+            + "interface Loopback0\n"
+            + "bandwidth 5\n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT = "rsvp\n" +
-            "interface Loopback0\n" +
-            "bandwidth 1.005\n" +
-            "root\n";
+    private static final String UPDATE_INPUT = "rsvp\n"
+            + "interface Loopback0\n"
+            + "bandwidth 1.005\n"
+            + "root\n";
 
-    private static final String UPDATE_DEFAULT_BW_INPUT = "rsvp\n" +
-            "interface Loopback0\n" +
-            "bandwidth\n" +
-            "root\n";
+    private static final String UPDATE_DEFAULT_BW_INPUT = "rsvp\n"
+            + "interface Loopback0\n"
+            + "bandwidth\n"
+            + "root\n";
 
-    private static final String DELETE_INPUT = "rsvp\n" +
-            "interface Loopback0\n" +
-            "no bandwidth\n" +
-            "root\n";
+    private static final String DELETE_INPUT = "rsvp\n"
+            + "interface Loopback0\n"
+            + "no bandwidth\n"
+            + "root\n";
 
     @Mock
     private Cli cli;
@@ -80,7 +80,8 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        Mockito.when(cli.executeAndRead(Mockito.any()))
+                .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new NiMplsRsvpIfSubscripAugWriter(this.cli);
         initializeData();
@@ -95,8 +96,10 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -108,8 +111,10 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -121,15 +126,19 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_DEFAULT_BW_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_DEFAULT_BW_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 }

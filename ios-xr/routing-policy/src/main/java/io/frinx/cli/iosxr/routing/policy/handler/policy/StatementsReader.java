@@ -106,7 +106,7 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
     }
 
     /**
-     * Collects lines of route-policy and produces a statement list using StatementsAccumulator
+     * Collects lines of route-policy and produces a statement list using StatementsAccumulator.
      */
     private static class StatementCollector implements Collector<String, StatementsAccumulator, List<Statement>> {
 
@@ -141,7 +141,8 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
      */
     private static class StatementsAccumulator {
 
-        // Conditions with or are split into multiple conditions and parsed as different statements with identical actions
+        // Conditions with or are split into multiple conditions and parsed as different statements with identical
+        // actions
         //  this will cause different rendering when writing back to device
         //  e.g. "if a or b then c" will result in "if a then c elseif b then c"
         //  which is functionally compatible
@@ -168,7 +169,9 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
                 // If there is or in the conditions, treat every section as a separate condition, create separate
                 // statement for it
                 if (line.contains(OR.pattern())) {
-                    List<String> ors = OR.splitAsStream(line).map(condition -> IF + " " + condition).collect(toList());
+                    List<String> ors = OR.splitAsStream(line)
+                            .map(condition -> IF + " " + condition)
+                            .collect(toList());
                     statementsToParseActionsFor = ors.size();
                     ors.forEach(this::acceptConditions);
                 } else {
@@ -199,7 +202,8 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
 
             // Getting conditions again, since the apply policy action is located under conditions in the model
             Conditions conditions = currentBuilder.getConditions();
-            ConditionsBuilder conditionsBuilder = conditions == null ? new ConditionsBuilder() : new ConditionsBuilder(conditions);
+            ConditionsBuilder conditionsBuilder = conditions == null ? new ConditionsBuilder() : new
+                    ConditionsBuilder(conditions);
 
             parseActions(actionsBuilder, conditionsBuilder, line);
             Actions newActions = actionsBuilder.build();
@@ -240,7 +244,8 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
         }
 
         StatementsAccumulator merge(StatementsAccumulator other) {
-            throw new UnsupportedOperationException("Cannot merge to accumulators, concurrent processing not supported");
+            throw new UnsupportedOperationException("Cannot merge to accumulators, concurrent processing not "
+                    + "supported");
         }
 
         private static final Statement EMPTY_STATEMENT = new StatementBuilder().build();

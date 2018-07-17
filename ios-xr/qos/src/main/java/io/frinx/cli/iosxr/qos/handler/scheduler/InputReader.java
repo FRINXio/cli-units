@@ -48,9 +48,12 @@ public class InputReader implements CliConfigListReader<Input, InputKey, InputBu
 
     @Nonnull
     @Override
-    public List<InputKey> getAllIds(@Nonnull InstanceIdentifier<Input> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
-        Long seq = instanceIdentifier.firstKeyOf(Scheduler.class).getSequence();
+    public List<InputKey> getAllIds(@Nonnull InstanceIdentifier<Input> instanceIdentifier, @Nonnull ReadContext
+            readContext) throws ReadFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
+        Long seq = instanceIdentifier.firstKeyOf(Scheduler.class)
+                .getSequence();
         String output = blockingRead(f(SH_POLICY_MAP_CLASSES, policyName), cli, instanceIdentifier, readContext);
         return getInputKeys(output, seq);
     }
@@ -61,7 +64,7 @@ public class InputReader implements CliConfigListReader<Input, InputKey, InputBu
         // timestamp and any other header), then the skipping takes place
         List<InputKey> keys = new ArrayList<>(1);
         parseField(output, seq.intValue() - 1,
-            SchedulerReader.CLASS_NAME_LINE::matcher,
+                SchedulerReader.CLASS_NAME_LINE::matcher,
             m -> m.group("name"), k -> keys.add(new InputKey(k)));
         return keys;
     }
@@ -72,8 +75,10 @@ public class InputReader implements CliConfigListReader<Input, InputKey, InputBu
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Input> instanceIdentifier, @Nonnull InputBuilder inputBuilder, @Nonnull ReadContext readContext)  {
-        String className = instanceIdentifier.firstKeyOf(Input.class).getId();
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Input> instanceIdentifier, @Nonnull InputBuilder
+            inputBuilder, @Nonnull ReadContext readContext) {
+        String className = instanceIdentifier.firstKeyOf(Input.class)
+                .getId();
         inputBuilder.setId(className);
     }
 }

@@ -26,58 +26,53 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 
 public class PrefixReaderTest {
 
-    private static final List<PrefixKey> OUTPUT1_KEYS1 = Lists.newArrayList(new PrefixKey(new IpPrefix("1.2.3.4/32".toCharArray()), "exact"));
+    private static final List<PrefixKey> OUTPUT1_KEYS1 = Lists.newArrayList(new PrefixKey(new IpPrefix("1.2.3.4/32"
+            .toCharArray()), "exact"));
 
-    public static final String OUTPUT1 = "Tue Mar 13 12:35:59.592 UTC\n" +
-            "prefix-set ab\n" +
-            "  1.2.3.4\r\n" +
-            "end-set\n" +
-            "!\n";
+    public static final String OUTPUT1 = "Tue Mar 13 12:35:59.592 UTC\n"
+            + "prefix-set ab\n"
+            + "  1.2.3.4\r\n"
+            + "end-set\n"
+            + "!\n";
 
-    private static final List<PrefixKey> OUTPUT1_KEYS2 = Lists.newArrayList(
-            new PrefixKey(new IpPrefix("1.2.3.4/32".toCharArray()), "exact"),
-            new PrefixKey(new IpPrefix("1.4.5.6/24".toCharArray()), "25..26")
-    );
+    private static final List<PrefixKey> OUTPUT1_KEYS2 = Lists.newArrayList(new PrefixKey(new IpPrefix("1.2.3.4/32"
+            .toCharArray()), "exact"), new PrefixKey(new IpPrefix("1.4.5.6/24".toCharArray()), "25..26"));
 
-    public static final String OUTPUT2 = "prefix-set dd\n" +
-            "  # comment\r\n" +
-            "  1.2.3.4,\r\n" +
-            "  1.4.5.6/24 ge 25 le 26\n" +
-            "end-set\n";
+    public static final String OUTPUT2 = "prefix-set dd\n"
+            + "  # comment\r\n"
+            + "  1.2.3.4,\r\n"
+            + "  1.4.5.6/24 ge 25 le 26\n"
+            + "end-set\n";
 
-    private static final List<PrefixKey> OUTPUT1_KEYS3 = Lists.newArrayList(
-            new PrefixKey(new IpPrefix("1.2.3.4/4".toCharArray()), "5..5"),
-            new PrefixKey(new IpPrefix("dddd:aaaa::/76".toCharArray()), "4..88")
-    );
+    private static final List<PrefixKey> OUTPUT1_KEYS3 = Lists.newArrayList(new PrefixKey(new IpPrefix("1.2.3.4/4"
+            .toCharArray()), "5..5"), new PrefixKey(new IpPrefix("dddd:aaaa::/76".toCharArray()), "4..88"));
 
-    public static final String OUTPUT3 = "prefix-set sd33\n" +
-            "  1.2.3.4/4 eq 5,\r\n" +
-            "  dddd:aaaa::/76 ge 4 le 88\r\n" +
-            "end-set\n";
+    public static final String OUTPUT3 = "prefix-set sd33\n"
+            + "  1.2.3.4/4 eq 5,\r\n"
+            + "  dddd:aaaa::/76 ge 4 le 88\r\n"
+            + "end-set\n";
 
-    private static final List<PrefixKey> OUTPUT1_KEYS4 = Lists.newArrayList(
-            new PrefixKey(new IpPrefix("dead:beef::/24".toCharArray()), "exact"),
-            new PrefixKey(new IpPrefix("dead:beef::/24".toCharArray()), "87..87"),
-            new PrefixKey(new IpPrefix("dead:beef::/24".toCharArray()), "87..100"),
-            new PrefixKey(new IpPrefix("aeed:beef::/64".toCharArray()), "exact"),
-            new PrefixKey(new IpPrefix("11:beef::1/128".toCharArray()), "exact"),
-            new PrefixKey(new IpPrefix("1.2.3.4/32".toCharArray()), "exact"),
-            new PrefixKey(new IpPrefix("5.43.2.0/24".toCharArray()), "exact"),
-            new PrefixKey(new IpPrefix("1.2.5.0/24".toCharArray()), "4..32")
-    );
+    private static final List<PrefixKey> OUTPUT1_KEYS4 = Lists.newArrayList(new PrefixKey(
+            new IpPrefix("dead:beef::/24".toCharArray()), "exact"), new PrefixKey(new IpPrefix("dead:beef::/24"
+            .toCharArray()),
+            "87..87"), new PrefixKey(new IpPrefix("dead:beef::/24".toCharArray()), "87..100"), new PrefixKey(new
+            IpPrefix("aeed:beef::/64".toCharArray()), "exact"), new PrefixKey(new IpPrefix("11:beef::1/128"
+            .toCharArray()), "exact"), new PrefixKey(new IpPrefix("1.2.3.4/32".toCharArray()), "exact"), new
+            PrefixKey(new IpPrefix("5.43.2.0/24".toCharArray()), "exact"), new PrefixKey(new IpPrefix("1.2.5.0/24"
+            .toCharArray()), "4..32"));
 
-    public static final String OUTPUT4 = "Tue Mar 13 12:36:10.281 UTC\n" +
-            "prefix-set 23445jasdj123\n" +
-            "  dead:beef::/24,\n" +
-            "  dead:beef::/24 eq 87,\r\n" +
-            "  dead:beef::/24 ge 87 le 100,\n" +
-            "  aeed:beef::/64,\n" +
-            "  11:beef::1,\r\n" +
-            "  1.2.3.4,\n" +
-            "  5.43.2.0/24,\n" +
-            "  1.2.5.0/24 ge 4\n" +
-            "end-set\n" +
-            "!\n";
+    public static final String OUTPUT4 = "Tue Mar 13 12:36:10.281 UTC\n"
+            + "prefix-set 23445jasdj123\n"
+            + "  dead:beef::/24,\n"
+            + "  dead:beef::/24 eq 87,\r\n"
+            + "  dead:beef::/24 ge 87 le 100,\n"
+            + "  aeed:beef::/64,\n"
+            + "  11:beef::1,\r\n"
+            + "  1.2.3.4,\n"
+            + "  5.43.2.0/24,\n"
+            + "  1.2.5.0/24 ge 4\n"
+            + "end-set\n"
+            + "!\n";
 
     @Test
     public void testAllIds() throws Exception {

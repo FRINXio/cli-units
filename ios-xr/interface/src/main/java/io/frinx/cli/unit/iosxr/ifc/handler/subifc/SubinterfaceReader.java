@@ -41,7 +41,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey, SubinterfaceBuilder> {
+public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey,
+        SubinterfaceBuilder> {
 
     private static final char SEPARATOR = '.';
     public static final long ZERO_SUBINTERFACE_ID = 0L;
@@ -56,19 +57,24 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
     @Override
     public List<SubinterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier,
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
-        String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        String id = instanceIdentifier.firstKeyOf(Interface.class)
+                .getName();
 
-        List<SubinterfaceKey> subinterfaceKeys = parseSubinterfaceIds(blockingRead(SH_RUN_INTERFACE, cli, instanceIdentifier, readContext), id);
+        List<SubinterfaceKey> subinterfaceKeys = parseSubinterfaceIds(blockingRead(SH_RUN_INTERFACE, cli,
+                instanceIdentifier, readContext), id);
 
         // Subinterface with ID 0 is reserved for IP addresses of the interface
         InstanceIdentifier<Subinterface> zeroSubIfaceIid = RWUtils.replaceLastInId(instanceIdentifier,
-                new InstanceIdentifier.IdentifiableItem<>(Subinterface.class, new SubinterfaceKey(ZERO_SUBINTERFACE_ID)));
+                new InstanceIdentifier.IdentifiableItem<>(Subinterface.class,
+                        new SubinterfaceKey(ZERO_SUBINTERFACE_ID)));
         boolean hasIpv4Address = !Ipv4AddressReader.parseAddressIds(
                 blockingRead(String.format(Ipv4AddressReader.SH_RUN_INT_IP, id),
-                        cli, instanceIdentifier, readContext)).isEmpty();
+                        cli, instanceIdentifier, readContext))
+                .isEmpty();
         boolean hasIpv6Address = !Ipv6AddressReader.parseAddressIds(
                 blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP, id),
-                        cli, instanceIdentifier, readContext)).isEmpty();
+                        cli, instanceIdentifier, readContext))
+                .isEmpty();
 
         if (hasIpv4Address || hasIpv6Address) {
             subinterfaceKeys.add(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
@@ -94,7 +100,8 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
         InterfaceKey ifcKey = id.firstKeyOf(Interface.class);
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
 
-        return ifcKey.getName() + SEPARATOR + subKey.getIndex().toString();
+        return ifcKey.getName() + SEPARATOR + subKey.getIndex()
+                .toString();
     }
 
     @Override
@@ -106,6 +113,7 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Subinterface> id,
                                       @Nonnull SubinterfaceBuilder builder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        builder.setIndex(id.firstKeyOf(Subinterface.class).getIndex());
+        builder.setIndex(id.firstKeyOf(Subinterface.class)
+                .getIndex());
     }
 }

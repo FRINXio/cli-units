@@ -91,433 +91,357 @@ public class StatementsTest {
                     .build()))
             .build();
 
-    private static final String APPLY_POLICY_OUTPUT = "route-policy route_policy_3\n" +
-            "  apply abcd\n" +
-            "end-policy\n";
+    private static final String APPLY_POLICY_OUTPUT = "route-policy route_policy_3\n"
+            + "  apply abcd\n"
+            + "end-policy\n";
 
-    public static final Statements DATA_APPLY_POLICY = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(new StatementBuilder()
-                    .setName("1")
-                    .setConfig(getStatementConfig("1"))
-                    .setConditions(new ConditionsBuilder()
-                            .setConfig(getConditionsConfig("abcd"))
-                            .build())
-                    .build()))
+    public static final Statements DATA_APPLY_POLICY = new StatementsBuilder().setStatement(Lists.newArrayList(new
+            StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setConditions(new ConditionsBuilder().setConfig(getConditionsConfig("abcd"))
+                    .build())
+            .build()))
             .build();
 
-    private static final String OUTPUT_SIMPLE = "route-policy route_policy_3\n" +
-            "  if destination in pset_name and as-path length le 44 then\n" +
-            "    drop\n" +
-            "end-policy\n";
+    private static final String OUTPUT_SIMPLE = "route-policy route_policy_3\n"
+            + "  if destination in pset_name and as-path length le 44 then\n"
+            + "    drop\n"
+            + "end-policy\n";
 
-    public static final Statements DATA_DONE = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(new StatementBuilder()
-                    .setName("1")
-                    .setConfig(getStatementConfig("1"))
-                    .setActions(new ActionsBuilder()
-                            .setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
-                            .build())
-                    .build()))
+    public static final Statements DATA_DONE = new StatementsBuilder().setStatement(Lists.newArrayList(new
+            StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
+                    .build())
+            .build()))
             .build();
 
-    private static final String NEXT_HOP = "route-policy route_policy_1\n" +
-            "    set next-hop 1.2.3.4\n" +
-            "end-policy";
+    private static final String NEXT_HOP = "route-policy route_policy_1\n"
+            + "    set next-hop 1.2.3.4\n"
+            + "end-policy";
 
-    private static final String NEXT_HOP_UNSUPPORTED = "route-policy route_policy_1\n" +
-            "    set next-hop peeras\n" +
-            "end-policy";
+    private static final String NEXT_HOP_UNSUPPORTED = "route-policy route_policy_1\n"
+            + "    set next-hop peeras\n"
+            + "end-policy";
 
-    public static final Statements NEXT_HOP_ACTIONS = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(new StatementBuilder()
-                    .setName("1")
-                    .setConfig(getStatementConfig("1"))
-                    .setActions(new ActionsBuilder()
-                            .addAugmentation(Actions2.class, new Actions2Builder()
-                                    .setBgpActions(new BgpActionsBuilder()
-                                            .setConfig(getBgpActionsNextHopConfig("1.2.3.4"))
-                                            .build())
-                                    .build())
-                            .build())
-                    .build()))
+    public static final Statements NEXT_HOP_ACTIONS = new StatementsBuilder().setStatement(Lists.newArrayList(new
+            StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setActions(new ActionsBuilder().addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new
+                    BgpActionsBuilder().setConfig(getBgpActionsNextHopConfig("1.2.3.4"))
+                    .build())
+                    .build())
+                    .build())
+            .build()))
             .build();
 
-    private static final String OUTPUT_DONE = "route-policy route_policy_3\n" +
-            "  done\n" +
-            "end-policy\n";
+    private static final String OUTPUT_DONE = "route-policy route_policy_3\n"
+            + "  done\n"
+            + "end-policy\n";
 
-    public static final Statements DATA_DROP = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(new StatementBuilder()
-                    .setName("1")
-                    .setConfig(getStatementConfig("1"))
-                    .setActions(new ActionsBuilder()
-                            .setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
-                            .build())
-                    .build()))
+    public static final Statements DATA_DROP = new StatementsBuilder().setStatement(Lists.newArrayList(new
+            StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
+                    .build())
+            .build()))
             .build();
 
-    private static final String OUTPUT_DROP = "route-policy route_policy_3\n" +
-            "  drop\n" +
-            "end-policy\n";
+    private static final String OUTPUT_DROP = "route-policy route_policy_3\n"
+            + "  drop\n"
+            + "end-policy\n";
 
-    public static final Statements DATA_EMPTY = new StatementsBuilder()
+    public static final Statements DATA_EMPTY = new StatementsBuilder().build();
+
+    private static final String OUTPUT1_UNKNOWN = "route-policy route_policy_3\n"
+            + "  if nonexisting condition then\n"
+            + "    nonexisting action"
+            + "  endif\n"
+            + "end-policy\n";
+
+    public static final Statements DATA_ALL_ACTIONS = new StatementsBuilder().setStatement(Lists.newArrayList(new
+            StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
+                    .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
+                            .setSetAsPathPrepend(getSetAsPathPrependAction(new AsNumber(455L), 5))
+                            .setSetCommunity(getSetCommunityAction(BgpSetCommunityOptionType.ADD, "comset"))
+                            .setConfig(getBgpActionsConfig(123L, 123L))
+                            .build())
+                            .build())
+                    .build())
+            .setConditions(new ConditionsBuilder().setConfig(getConditionsConfig("a_b_c_d"))
+                    .build())
+            .build()))
             .build();
 
-    private static final String OUTPUT1_UNKNOWN = "route-policy route_policy_3\n" +
-            "  if nonexisting condition then\n" +
-            "    nonexisting action" +
-            "  endif\n" +
-            "end-policy\n";
+    private static final String OUTPUT_ALL_ACTIONS = "route-policy route_policy_3\n"
+            + "  set med 123\n"
+            + "  set local-preference 123\n"
+            + "  prepend as-path 455 5\n"
+            + "  set community comset additive\n"
+            + "  apply a_b_c_d 1.2.3.4\r\n"
+            + "  drop\n"
+            + "end-policy\n";
 
-    public static final Statements DATA_ALL_ACTIONS = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(new StatementBuilder()
-                    .setName("1")
-                    .setConfig(getStatementConfig("1"))
-                    .setActions(new ActionsBuilder()
-                            .setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
-                            .addAugmentation(Actions2.class, new Actions2Builder()
-                                    .setBgpActions(new BgpActionsBuilder()
-                                            .setSetAsPathPrepend(getSetAsPathPrependAction(new AsNumber(455L), 5))
-                                            .setSetCommunity(getSetCommunityAction(BgpSetCommunityOptionType.ADD, "comset"))
-                                            .setConfig(getBgpActionsConfig(123L, 123L))
-                                            .build())
-                                    .build())
+    public static final Statements DATA_ALL_CONDITIONS = new StatementsBuilder().setStatement(Lists.newArrayList(new
+            StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setConditions(new ConditionsBuilder().setConfig(getConditionsConfig("a"))
+                    .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
+                    .addAugmentation(Conditions2.class, new Conditions2Builder().setBgpConditions(new
+                            BgpConditionsBuilder().setAsPathLength(getAsPathLengthCondition(44L, ATTRIBUTELE.class))
+                            .setMatchCommunitySet(getMatchCommunitySet("cset_name"))
+                            .setMatchAsPathSet(getMatchAsPathSet("aset_name"))
                             .build())
-                    .setConditions(new ConditionsBuilder()
-                            .setConfig(getConditionsConfig("a_b_c_d"))
                             .build())
-                    .build()))
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
+                    .build())
+            .build()))
             .build();
 
-    private static final String OUTPUT_ALL_ACTIONS = "route-policy route_policy_3\n" +
-            "  set med 123\n" +
-            "  set local-preference 123\n" +
-            "  prepend as-path 455 5\n" +
-            "  set community comset additive\n" +
-            "  apply a_b_c_d 1.2.3.4\r\n" +
-            "  drop\n" +
-            "end-policy\n";
+    private static final String OUTPUT_ALL_CONDITIONS = "route-policy route_policy_3\n"
+            + "  if destination in pset_name and as-path length le 44 and community matches-any cset_name and as-path"
+            + " in aset_name then\n"
+            + "    apply a\r\n"
+            + "    drop\n"
+            + "  endif\n"
+            + "end-policy\n";
 
-    public static final Statements DATA_ALL_CONDITIONS = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(new StatementBuilder()
-                    .setName("1")
-                    .setConfig(getStatementConfig("1"))
-                    .setConditions(new ConditionsBuilder()
-                            .setConfig(getConditionsConfig("a"))
-                            .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
-                            .addAugmentation(Conditions2.class, new Conditions2Builder()
-                                    .setBgpConditions(new BgpConditionsBuilder()
-                                            .setAsPathLength(getAsPathLengthCondition(44L, ATTRIBUTELE.class))
-                                            .setMatchCommunitySet(getMatchCommunitySet("cset_name"))
-                                            .setMatchAsPathSet(getMatchAsPathSet("aset_name"))
-                                            .build())
-                                    .build())
+    public static final Statements DATA_COMBINED = new StatementsBuilder().setStatement(Lists.newArrayList(new
+            StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setConditions(new ConditionsBuilder().setMatchPrefixSet(getMatchPrefixSet("pset_name"))
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
+                    .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
+                            .setConfig(getBgpActionsNextHopConfig("self"))
                             .build())
-                    .setActions(new ActionsBuilder()
-                            .setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
                             .build())
-                    .build()))
+                    .build())
+            .build(), new StatementBuilder().setName("2")
+            .setConfig(getStatementConfig("2"))
+            .setConditions(new ConditionsBuilder().addAugmentation(Conditions2.class, new Conditions2Builder()
+                    .setBgpConditions(new BgpConditionsBuilder().setMatchCommunitySet(getMatchCommunitySet("cset_name"))
+                    .build())
+                    .build())
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
+                    .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
+                            .setSetAsPathPrepend(getSetAsPathPrependAction(new AsNumber(123L), 3))
+                            .setConfig(getBgpActionsConfig(1, null))
+                            .build())
+                            .build())
+                    .build())
+            .build(), new StatementBuilder().setName("3")
+            .setConfig(getStatementConfig("3"))
+            .setConditions(new ConditionsBuilder().setMatchPrefixSet(getMatchPrefixSet("pset_name"))
+                    .addAugmentation(Conditions2.class, new Conditions2Builder().setBgpConditions(new
+                            BgpConditionsBuilder().setMatchAsPathSet(getMatchAsPathSet("aset_name"))
+                            .build())
+                            .build())
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
+                    .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
+                            .setConfig(getBgpActionsConfig(2, null))
+                            .build())
+                            .build())
+                    .build())
+            .build(), new StatementBuilder().setName("4")
+            .setConfig(getStatementConfig("4"))
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
+                    .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
+                            .setConfig(getBgpActionsNextHopConfig("dead:beef::1"))
+                            .setSetCommunity(getSetCommInlineAction(Lists.newArrayList("23:23"),
+                                    BgpSetCommunityOptionType.ADD))
+                            .build())
+                            .build())
+                    .build())
+            .build()))
             .build();
 
-    private static final String OUTPUT_ALL_CONDITIONS = "route-policy route_policy_3\n" +
-            "  if destination in pset_name and as-path length le 44 and community matches-any cset_name and as-path in aset_name then\n" +
-            "    apply a\r\n" +
-            "    drop\n" +
-            "  endif\n" +
-            "end-policy\n";
+    private static final String OUTPUT_COMBINED = "route-policy route_policy_3\r\n"
+            + "  if destination in pset_name then\r\n"
+            + "    set next-hop self\r\n"
+            + "    drop\r\n"
+            + "  elseif community matches-any cset_name then\r\n"
+            + "    set med 1\r\n"
+            + "    prepend as-path 123 3\r\n"
+            + "    done\r\n"
+            + "  elseif destination in pset_name and as-path in aset_name then\r\n"
+            + "    set med 2\r\n"
+            + "    done\r\n"
+            + "  else\r\n"
+            + "    set next-hop dead:beef::1\r\n"
+            + "    set community (23:23, no-export, peeras:45) additive\n"
+            + "    done\r\n"
+            + "  endif\r\n"
+            + "end-policy\r\n";
 
-    public static final Statements DATA_COMBINED = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(
-                    new StatementBuilder()
-                            .setName("1")
-                            .setConfig(getStatementConfig("1"))
-                            .setConditions(new ConditionsBuilder()
-                                    .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
-                                    .build())
-                            .setActions(new ActionsBuilder()
-                                    .setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
-                                    .addAugmentation(Actions2.class, new Actions2Builder()
-                                            .setBgpActions(new BgpActionsBuilder()
-                                                    .setConfig(getBgpActionsNextHopConfig("self"))
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build(),
-                    new StatementBuilder()
-                            .setName("2")
-                            .setConfig(getStatementConfig("2"))
-                            .setConditions(new ConditionsBuilder()
-                                    .addAugmentation(Conditions2.class, new Conditions2Builder()
-                                            .setBgpConditions(new BgpConditionsBuilder()
-                                                    .setMatchCommunitySet(getMatchCommunitySet("cset_name"))
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .setActions(new ActionsBuilder()
-                                    .setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
-                                    .addAugmentation(Actions2.class, new Actions2Builder()
-                                            .setBgpActions(new BgpActionsBuilder()
-                                                    .setSetAsPathPrepend(getSetAsPathPrependAction(new AsNumber(123L), 3))
-                                                    .setConfig(getBgpActionsConfig(1, null))
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build(),
-                    new StatementBuilder()
-                            .setName("3")
-                            .setConfig(getStatementConfig("3"))
-                            .setConditions(new ConditionsBuilder()
-                                    .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
-                                    .addAugmentation(Conditions2.class, new Conditions2Builder()
-                                            .setBgpConditions(new BgpConditionsBuilder()
-                                                    .setMatchAsPathSet(getMatchAsPathSet("aset_name"))
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .setActions(new ActionsBuilder()
-                                    .setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
-                                    .addAugmentation(Actions2.class, new Actions2Builder()
-                                            .setBgpActions(new BgpActionsBuilder()
-                                                    .setConfig(getBgpActionsConfig(2, null))
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build(),
-                    new StatementBuilder()
-                            .setName("4")
-                            .setConfig(getStatementConfig("4"))
-                            .setActions(new ActionsBuilder()
-                                    .setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
-                                    .addAugmentation(Actions2.class, new Actions2Builder()
-                                            .setBgpActions(new BgpActionsBuilder()
-                                                    .setConfig(getBgpActionsNextHopConfig("dead:beef::1"))
-                                                    .setSetCommunity(getSetCommInlineAction(Lists.newArrayList("23:23"), BgpSetCommunityOptionType.ADD))
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build()
-            )).build();
-
-    private static final String OUTPUT_COMBINED = "route-policy route_policy_3\r\n" +
-            "  if destination in pset_name then\r\n" +
-            "    set next-hop self\r\n" +
-            "    drop\r\n" +
-            "  elseif community matches-any cset_name then\r\n" +
-            "    set med 1\r\n" +
-            "    prepend as-path 123 3\r\n" +
-            "    done\r\n" +
-            "  elseif destination in pset_name and as-path in aset_name then\r\n" +
-            "    set med 2\r\n" +
-            "    done\r\n" +
-            "  else\r\n" +
-            "    set next-hop dead:beef::1\r\n" +
-            "    set community (23:23, no-export, peeras:45) additive\n" +
-            "    done\r\n" +
-            "  endif\r\n" +
-            "end-policy\r\n";
-
-    public static final Statements DATA_KNOWN_AND_UNKNOWN_CONDITIONS = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(new StatementBuilder()
-                    .setName("1")
-                    .setConfig(getStatementConfig("1"))
-                    .setConditions(new ConditionsBuilder()
-                            .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
-                            .build())
-                    .setActions(new ActionsBuilder()
-                            .setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
-                            .build())
-                    .build()))
+    public static final Statements DATA_KNOWN_AND_UNKNOWN_CONDITIONS = new StatementsBuilder().setStatement(Lists
+            .newArrayList(new StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setConditions(new ConditionsBuilder().setMatchPrefixSet(getMatchPrefixSet("pset_name"))
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
+                    .build())
+            .build()))
             .build();
 
-    private static final String OUTPUT_KNOWN_AND_UNKNOWN_CONDITIONS = "route-policy route_policy_3\r\n" +
-            "  if destination in pset_name and abcd in efgh then\r\n" +
-            "    drop\r\n" +
-            "  endif\r\n" +
-            "end-policy\r\n";
+    private static final String OUTPUT_KNOWN_AND_UNKNOWN_CONDITIONS = "route-policy route_policy_3\r\n"
+            + "  if destination in pset_name and abcd in efgh then\r\n"
+            + "    drop\r\n"
+            + "  endif\r\n"
+            + "end-policy\r\n";
 
-    public static final Statements DATA_MULTI_KNOWN_CONDITIONS = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(new StatementBuilder()
-                    .setName("1")
-                    .setConfig(getStatementConfig("1"))
-                    .setConditions(new ConditionsBuilder()
-                            .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
+    public static final Statements DATA_MULTI_KNOWN_CONDITIONS = new StatementsBuilder().setStatement(Lists
+            .newArrayList(new StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setConditions(new ConditionsBuilder().setMatchPrefixSet(getMatchPrefixSet("pset_name"))
 
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
+                    .build())
+            .build()))
+            .build();
+
+    private static final String OUTPUT_MULTI_KNOWN_CONDITIONS = "route-policy route_policy_3\r\n"
+            + "  if destination in pset_name and destination in pset_name2 then\r\n"
+            + "    drop\r\n"
+            + "  endif\r\n"
+            + "end-policy\r\n";
+
+    private static final String BIG_POLICY_1 = "route-policy big1\n"
+            + "  if destination in RFC1918-DSUA-out_deny then\n"
+            + "    drop\n"
+            + "  elseif community matches-any PEER-NOT-ADVERTISE then\n"
+            + "    drop\n"
+            + "  elseif community matches-any PEER-1PREPEND then\n"
+            + "    set med 100\n"
+            + "    prepend as-path 17676\n"
+            + "  elseif community matches-any PEER-2PREPEND then\n"
+            + "    set med 100\n"
+            + "    prepend as-path 17676 2\n"
+            + "  elseif community matches-any PEER-3PREPEND then\n"
+            + "    set med 100\n"
+            + "    prepend as-path 17676 3\n"
+            + "  elseif community matches-any Asia-PEER-NOT-ADVERTISE then\n"
+            + "    drop\n"
+            + "  elseif community matches-any Asia-PEER-1PREPEND then\n"
+            + "    set med 100\n"
+            + "    prepend as-path 17676\n"
+            + "  elseif community matches-any Asia-PEER-2PREPEND then\n"
+            + "    set med 100\n"
+            + "    prepend as-path 17676 2\n"
+            + "  elseif community matches-any Asia-PEER-3PREPEND then\n"
+            + "    set med 100\n"
+            + "    prepend as-path 17676 3\n"
+            + "  elseif destination in DENY_YBB_CIDR_long then\n"
+            + "    drop\n"
+            + "  elseif destination in YBB_CIDR and as-path in 2 then\n"
+            + "    set med 100\n"
+            + "  elseif destination in DENY_IPR_CIDR_long then\n"
+            + "    drop\n"
+            + "  elseif destination in IPR_CIDR and as-path in 2 then\n"
+            + "    set med 100\n"
+            + "  elseif community matches-any TRANSIT_MATCH or community matches-any PI_MATCH or community "
+            + "matches-any MultiAS-ODN-CIDR or community matches-any MultiAS-PI-ODN or community matches-any ODN-TRAN\n"
+            + "    set med 100\n"
+            + "  endif\n"
+            + "end-policy";
+
+    public static final Statements DATA_OR1 = new StatementsBuilder().setStatement(Lists.newArrayList(new
+            StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setConditions(new ConditionsBuilder().setConfig(getConditionsConfig("uiui"))
+                    .addAugmentation(Conditions2.class, new Conditions2Builder().setBgpConditions(new
+                            BgpConditionsBuilder().setMatchCommunitySet(getMatchCommunitySet("ab"))
                             .build())
-                    .setActions(new ActionsBuilder()
-                            .setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
                             .build())
-                    .build()))
+                    .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
+                    .build())
+            .build(), new StatementBuilder().setName("2")
+            .setConfig(getStatementConfig("2"))
+            .setConditions(new ConditionsBuilder().setConfig(getConditionsConfig("uiui"))
+                    .addAugmentation(Conditions2.class, new Conditions2Builder().setBgpConditions(new
+                            BgpConditionsBuilder().setMatchCommunitySet(getMatchCommunitySet("c"))
+                            .build())
+                            .build())
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
+                    .build())
+            .build(), new StatementBuilder().setName("3")
+            .setConfig(getStatementConfig("3"))
+            .setConditions(new ConditionsBuilder().setConfig(getConditionsConfig("uiui"))
+                    .setMatchPrefixSet(getMatchPrefixSet("bset_name"))
+                    .addAugmentation(Conditions2.class, new Conditions2Builder().setBgpConditions(new
+                            BgpConditionsBuilder().setMatchAsPathSet(getMatchAsPathSet("aset_name"))
+                            .build())
+                            .build())
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
+                    .build())
+            .build()))
             .build();
 
-    private static final String OUTPUT_MULTI_KNOWN_CONDITIONS = "route-policy route_policy_3\r\n" +
-            "  if destination in pset_name and destination in pset_name2 then\r\n" +
-            "    drop\r\n" +
-            "  endif\r\n" +
-            "end-policy\r\n";
+    private static final String OUTPUT_OR = "route-policy route_policy_3\r\n"
+            + "  if destination in pset_name and community matches-any ab or community matches-any c or as-path in "
+            + "aset_name and destination in bset_name then\r\n"
+            + "    apply uiui\r\n"
+            + "    done\r\n"
+            + "  endif\r\n"
+            + "end-policy\r\n";
 
-    private static final String BIG_POLICY_1 = "route-policy big1\n" +
-            "  if destination in RFC1918-DSUA-out_deny then\n" +
-            "    drop\n" +
-            "  elseif community matches-any PEER-NOT-ADVERTISE then\n" +
-            "    drop\n" +
-            "  elseif community matches-any PEER-1PREPEND then\n" +
-            "    set med 100\n" +
-            "    prepend as-path 17676\n" +
-            "  elseif community matches-any PEER-2PREPEND then\n" +
-            "    set med 100\n" +
-            "    prepend as-path 17676 2\n" +
-            "  elseif community matches-any PEER-3PREPEND then\n" +
-            "    set med 100\n" +
-            "    prepend as-path 17676 3\n" +
-            "  elseif community matches-any Asia-PEER-NOT-ADVERTISE then\n" +
-            "    drop\n" +
-            "  elseif community matches-any Asia-PEER-1PREPEND then\n" +
-            "    set med 100\n" +
-            "    prepend as-path 17676\n" +
-            "  elseif community matches-any Asia-PEER-2PREPEND then\n" +
-            "    set med 100\n" +
-            "    prepend as-path 17676 2\n" +
-            "  elseif community matches-any Asia-PEER-3PREPEND then\n" +
-            "    set med 100\n" +
-            "    prepend as-path 17676 3\n" +
-            "  elseif destination in DENY_YBB_CIDR_long then\n" +
-            "    drop\n" +
-            "  elseif destination in YBB_CIDR and as-path in 2 then\n" +
-            "    set med 100\n" +
-            "  elseif destination in DENY_IPR_CIDR_long then\n" +
-            "    drop\n" +
-            "  elseif destination in IPR_CIDR and as-path in 2 then\n" +
-            "    set med 100\n" +
-            "  elseif community matches-any TRANSIT_MATCH or community matches-any PI_MATCH or community matches-any MultiAS-ODN-CIDR or community matches-any MultiAS-PI-ODN or community matches-any ODN-TRAN\n" +
-            "    set med 100\n" +
-            "  endif\n" +
-            "end-policy";
-
-    public static final Statements DATA_OR1 = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(new StatementBuilder()
-                            .setName("1")
-                            .setConfig(getStatementConfig("1"))
-                            .setConditions(new ConditionsBuilder()
-                                    .setConfig(getConditionsConfig("uiui"))
-                                    .addAugmentation(Conditions2.class, new Conditions2Builder()
-                                            .setBgpConditions(new BgpConditionsBuilder()
-                                                    .setMatchCommunitySet(getMatchCommunitySet("ab"))
-                                                    .build())
-                                            .build())
-                                    .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
-                                    .build())
-                            .setActions(new ActionsBuilder()
-                                    .setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
-                                    .build())
-                            .build(),
-                    new StatementBuilder()
-                            .setName("2")
-                            .setConfig(getStatementConfig("2"))
-                            .setConditions(new ConditionsBuilder()
-                                    .setConfig(getConditionsConfig("uiui"))
-                                    .addAugmentation(Conditions2.class, new Conditions2Builder()
-                                            .setBgpConditions(new BgpConditionsBuilder()
-                                                    .setMatchCommunitySet(getMatchCommunitySet("c"))
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .setActions(new ActionsBuilder()
-                                    .setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
-                                    .build())
-                            .build(),
-                    new StatementBuilder()
-                            .setName("3")
-                            .setConfig(getStatementConfig("3"))
-                            .setConditions(new ConditionsBuilder()
-                                    .setConfig(getConditionsConfig("uiui"))
-                                    .setMatchPrefixSet(getMatchPrefixSet("bset_name"))
-                                    .addAugmentation(Conditions2.class, new Conditions2Builder()
-                                            .setBgpConditions(new BgpConditionsBuilder()
-                                                    .setMatchAsPathSet(getMatchAsPathSet("aset_name"))
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .setActions(new ActionsBuilder()
-                                    .setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
-                                    .build())
-                            .build()))
+    public static final Statements DATA_OR2 = new StatementsBuilder().setStatement(Lists.newArrayList(new
+            StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setConditions(new ConditionsBuilder().setConfig(getConditionsConfig("policy"))
+                    .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
+                    .build())
+            .build(), new StatementBuilder().setName("2")
+            .setConfig(getStatementConfig("2"))
+            .setConditions(new ConditionsBuilder().setConfig(getConditionsConfig("policy"))
+                    .addAugmentation(Conditions2.class, new Conditions2Builder().setBgpConditions(new
+                            BgpConditionsBuilder().setMatchCommunitySet(getMatchCommunitySet("ab"))
+                            .build())
+                            .build())
+                    .build())
+            .build(), new StatementBuilder().setName("3")
+            .setConfig(getStatementConfig("3"))
+            .setConditions(new ConditionsBuilder().setMatchPrefixSet(getMatchPrefixSet("bset_name"))
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
+                    .build())
+            .build(), new StatementBuilder().setName("4")
+            .setConfig(getStatementConfig("4"))
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
+                    .build())
+            .build()))
             .build();
 
-    private static final String OUTPUT_OR = "route-policy route_policy_3\r\n" +
-            "  if destination in pset_name and community matches-any ab or community matches-any c or as-path in aset_name and destination in bset_name then\r\n" +
-            "    apply uiui\r\n" +
-            "    done\r\n" +
-            "  endif\r\n" +
-            "end-policy\r\n";
-
-    public static final Statements DATA_OR2 = new StatementsBuilder()
-            .setStatement(Lists.newArrayList(new StatementBuilder()
-                            .setName("1")
-                            .setConfig(getStatementConfig("1"))
-                            .setConditions(new ConditionsBuilder()
-                                    .setConfig(getConditionsConfig("policy"))
-                                    .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
-                                    .build())
-                            .build(),
-                    new StatementBuilder()
-                            .setName("2")
-                            .setConfig(getStatementConfig("2"))
-                            .setConditions(new ConditionsBuilder()
-                                    .setConfig(getConditionsConfig("policy"))
-                                    .addAugmentation(Conditions2.class, new Conditions2Builder()
-                                            .setBgpConditions(new BgpConditionsBuilder()
-                                                    .setMatchCommunitySet(getMatchCommunitySet("ab"))
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .build(),
-                    new StatementBuilder()
-                            .setName("3")
-                            .setConfig(getStatementConfig("3"))
-                            .setConditions(new ConditionsBuilder()
-                                    .setMatchPrefixSet(getMatchPrefixSet("bset_name"))
-                                    .build())
-                            .setActions(new ActionsBuilder()
-                                    .setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
-                                    .build())
-                            .build(),
-                    new StatementBuilder()
-                            .setName("4")
-                            .setConfig(getStatementConfig("4"))
-                            .setActions(new ActionsBuilder()
-                                    .setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
-                                    .build())
-                            .build()))
-            .build();
-
-    private static final String OUTPUT_OR_2 = "route-policy route_policy_3\r\n" +
-            "  if destination in pset_name or community matches-any ab then\r\n" +
-            "    apply policy\r\n" +
-            "  elseif destination in bset_name\r\n" +
-            "    done\r\n" +
-            "  endif \r\n" +
-            "  drop\r\n" +
-            "end-policy\r\n";
+    private static final String OUTPUT_OR_2 = "route-policy route_policy_3\r\n"
+            + "  if destination in pset_name or community matches-any ab then\r\n"
+            + "    apply policy\r\n"
+            + "  elseif destination in bset_name\r\n"
+            + "    done\r\n"
+            + "  endif \r\n"
+            + "  drop\r\n"
+            + "end-policy\r\n";
 
     @Parameterized.Parameters(name = "statement test: {index}: {0}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {"simple", OUTPUT_SIMPLE, DATA_SIMPLE},
-                {"done", OUTPUT_DONE, DATA_DONE},
-                {"drop", OUTPUT_DROP, DATA_DROP},
-                {"apply policy", APPLY_POLICY_OUTPUT, DATA_APPLY_POLICY},
-                {"next hop", NEXT_HOP, NEXT_HOP_ACTIONS},
-                {"next hop unknown", NEXT_HOP_UNSUPPORTED, DATA_EMPTY},
-                {"unknown", OUTPUT1_UNKNOWN, DATA_EMPTY},
-                {"all actions", OUTPUT_ALL_ACTIONS, DATA_ALL_ACTIONS},
-                {"all conditions", OUTPUT_ALL_CONDITIONS, DATA_ALL_CONDITIONS},
-                {"complex example", OUTPUT_COMBINED, DATA_COMBINED},
-                {"known and unknown conditions", OUTPUT_KNOWN_AND_UNKNOWN_CONDITIONS, DATA_KNOWN_AND_UNKNOWN_CONDITIONS},
-                {"big policy 1", BIG_POLICY_1, null},
-                {"or 1", OUTPUT_OR, DATA_OR1},
-                {"or 2", OUTPUT_OR_2, DATA_OR2},
-                {"multiple same conditions", OUTPUT_MULTI_KNOWN_CONDITIONS, DATA_MULTI_KNOWN_CONDITIONS}
-        });
+        return Arrays.asList(new Object[][]{{"simple", OUTPUT_SIMPLE, DATA_SIMPLE}, {"done", OUTPUT_DONE, DATA_DONE},
+            {"drop", OUTPUT_DROP, DATA_DROP}, {"apply policy", APPLY_POLICY_OUTPUT, DATA_APPLY_POLICY}, {"next "
+                    + "hop", NEXT_HOP, NEXT_HOP_ACTIONS}, {"next hop unknown", NEXT_HOP_UNSUPPORTED, DATA_EMPTY},
+            {"unknown", OUTPUT1_UNKNOWN, DATA_EMPTY}, {"all actions", OUTPUT_ALL_ACTIONS, DATA_ALL_ACTIONS},
+            {"all conditions", OUTPUT_ALL_CONDITIONS, DATA_ALL_CONDITIONS}, {"complex example", OUTPUT_COMBINED,
+                DATA_COMBINED}, {"known and unknown conditions", OUTPUT_KNOWN_AND_UNKNOWN_CONDITIONS,
+                DATA_KNOWN_AND_UNKNOWN_CONDITIONS}, {"big policy 1", BIG_POLICY_1, null}, {"or 1", OUTPUT_OR,
+                DATA_OR1}, {"or 2", OUTPUT_OR_2, DATA_OR2}, {"multiple same conditions",
+                OUTPUT_MULTI_KNOWN_CONDITIONS, DATA_MULTI_KNOWN_CONDITIONS}});
     }
 
     private String name;
@@ -537,16 +461,16 @@ public class StatementsTest {
         StatementsReader.parseOutput(output, statementsBuilder);
         Statements parsed1 = statementsBuilder.build();
 
-        if (expected != null) {
+        if (expected
+                != null) {
             // Compare with prepared data
             assertEquals(expected, parsed1);
         }
 
         // Serialize
-        String serialized = StatementsWriter.processStatements(
-                parsed1.getStatement() != null ? parsed1.getStatement() : Collections.emptyList(), name, new CliFormatter() {});
-
-        System.err.println(serialized);
+        String serialized = StatementsWriter.processStatements(parsed1.getStatement()
+                != null ? parsed1.getStatement() : Collections.emptyList(), name, new CliFormatter() {
+                });
 
         // Parse serialized
         statementsBuilder = new StatementsBuilder();
@@ -558,114 +482,112 @@ public class StatementsTest {
     }
 
     private static MatchCommunitySet getMatchCommunitySet(String csetName) {
-        return new MatchCommunitySetBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.match.community.top.match.community.set.ConfigBuilder()
-                        .setCommunitySet(csetName)
-                        .setMatchSetOptions(MatchSetOptionsType.ANY)
-                        .build())
+        return new MatchCommunitySetBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net
+                .yang.bgp.policy.rev170730.match.community.top.match.community.set.ConfigBuilder()
+                .setCommunitySet(csetName)
+                .setMatchSetOptions(MatchSetOptionsType.ANY)
+                .build())
                 .build();
     }
 
     static MatchPrefixSet getMatchPrefixSet(String psetName) {
-        return new MatchPrefixSetBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.condition.top.match.prefix.set.ConfigBuilder()
-                        .setPrefixSet(psetName)
-                        .setMatchSetOptions(MatchSetOptionsRestrictedType.ANY)
-                        .build())
+        return new MatchPrefixSetBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                .routing.policy.rev170714.prefix.set.condition.top.match.prefix.set.ConfigBuilder()
+                .setPrefixSet(psetName)
+                .setMatchSetOptions(MatchSetOptionsRestrictedType.ANY)
+                .build())
                 .build();
     }
 
     private static MatchAsPathSet getMatchAsPathSet(String asetName) {
-        return new MatchAsPathSetBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.match.as.path.top.match.as.path.set.ConfigBuilder()
-                        .setAsPathSet(asetName)
-                        .setMatchSetOptions(MatchSetOptionsType.ANY)
-                        .build())
+        return new MatchAsPathSetBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                .bgp.policy.rev170730.match.as.path.top.match.as.path.set.ConfigBuilder().setAsPathSet(asetName)
+                .setMatchSetOptions(MatchSetOptionsType.ANY)
+                .build())
                 .build();
     }
 
-    private static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.actions.Config getActionsConfig(PolicyResultType rejectroute) {
-        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.actions.ConfigBuilder()
-                .setPolicyResult(rejectroute)
+    private static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy
+            .actions.top.actions.Config getActionsConfig(PolicyResultType rejectroute) {
+        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy
+                .actions.top.actions.ConfigBuilder().setPolicyResult(rejectroute)
                 .build();
     }
 
     private static AsPathLength getAsPathLengthCondition(long value, Class<? extends ATTRIBUTECOMPARISON> value1) {
-        return new AsPathLengthBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.length.top.as.path.length.ConfigBuilder()
-                        .setValue(value)
-                        .setOperator(value1)
-                        .build())
+        return new AsPathLengthBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                .bgp.policy.rev170730.as.path.length.top.as.path.length.ConfigBuilder().setValue(value)
+                .setOperator(value1)
+                .build())
                 .build();
     }
 
     private static Config getStatementConfig(String name) {
-        return new ConfigBuilder()
-                .setName(name)
+        return new ConfigBuilder().setName(name)
                 .build();
     }
 
-    private static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions.Config getBgpActionsConfig(long setMed, Long setLocalPref) {
-        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions.ConfigBuilder()
-                .setSetMed(new BgpSetMedType(setMed))
+    private static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top
+            .bgp.actions.Config getBgpActionsConfig(long setMed, Long setLocalPref) {
+        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top
+                .bgp.actions.ConfigBuilder().setSetMed(new BgpSetMedType(setMed))
                 .setSetLocalPref(setLocalPref)
                 .build();
     }
 
-    private static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions.Config getBgpActionsNextHopConfig(String nextHop) {
-        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions.ConfigBuilder()
-                .setSetNextHop(nextHop.equals("self") ?
-                        new BgpNextHopType(BgpNextHopType.Enumeration.SELF) :
-                        new BgpNextHopType(IpAddressBuilder.getDefaultInstance(nextHop)))
+    private static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top
+            .bgp.actions.Config getBgpActionsNextHopConfig(String nextHop) {
+        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top
+                .bgp.actions.ConfigBuilder().setSetNextHop(nextHop.equals("self") ? new BgpNextHopType(BgpNextHopType
+                .Enumeration.SELF) : new BgpNextHopType(IpAddressBuilder.getDefaultInstance(nextHop)))
                 .build();
     }
 
     private static SetAsPathPrepend getSetAsPathPrependAction(AsNumber as, int repeat) {
-        return new SetAsPathPrependBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.ConfigBuilder()
-                        .setAsn(as)
-                        .setRepeatN((short) repeat)
-                        .build())
+        return new SetAsPathPrependBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net
+                .yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.ConfigBuilder().setAsn(as)
+                .setRepeatN((short) repeat)
+                .build())
                 .build();
     }
 
     private static SetCommunity getSetCommunityAction(BgpSetCommunityOptionType add, String csetName) {
-        return new SetCommunityBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.set.community.ConfigBuilder()
-                        .setMethod(SetCommunityActionCommon.Method.REFERENCE)
-                        .setOptions(add)
+        return new SetCommunityBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                .bgp.policy.rev170730.set.community.action.top.set.community.ConfigBuilder()
+                .setMethod(SetCommunityActionCommon.Method.REFERENCE)
+                .setOptions(add)
+                .build())
+                .setReference(new ReferenceBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig
+                        .net.yang.bgp.policy.rev170730.set.community.reference.top.reference.ConfigBuilder()
+                        .setCommunitySetRef(csetName)
                         .build())
-                .setReference(new ReferenceBuilder()
-                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.reference.top.reference.ConfigBuilder()
-                                .setCommunitySetRef(csetName)
-                                .build())
                         .build())
                 .build();
     }
 
     static SetCommunity getSetCommInlineAction(ArrayList<String> comms, BgpSetCommunityOptionType add) {
-        List<SetCommunityInlineConfig.Communities> collect = comms
-                .stream()
+        List<SetCommunityInlineConfig.Communities> collect = comms.stream()
                 .map(s -> new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(s)))
                 .collect(toList());
         collect.forEach(SetCommunityInlineConfig.Communities::getValue);
 
-        return new SetCommunityBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.set.community.ConfigBuilder()
-                        .setMethod(SetCommunityActionCommon.Method.INLINE)
-                        .setOptions(add)
+        return new SetCommunityBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                .bgp.policy.rev170730.set.community.action.top.set.community.ConfigBuilder()
+                .setMethod(SetCommunityActionCommon.Method.INLINE)
+                .setOptions(add)
+                .build())
+                .setInline(new InlineBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net
+                        .yang.bgp.policy.rev170730.set.community.inline.top.inline.ConfigBuilder()
+                        .setCommunities(collect)
                         .build())
-                .setInline(new InlineBuilder()
-                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.inline.ConfigBuilder()
-                                .setCommunities(collect)
-                                .build())
                         .build())
                 .build();
     }
 
-    private static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.conditions.Config getConditionsConfig(String abcd) {
-        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.conditions.ConfigBuilder()
-                .setCallPolicy(abcd)
+    private static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy
+            .conditions.top.conditions.Config getConditionsConfig(String abcd) {
+        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy
+                .conditions.top.conditions.ConfigBuilder().setCallPolicy(abcd)
                 .build();
     }
 

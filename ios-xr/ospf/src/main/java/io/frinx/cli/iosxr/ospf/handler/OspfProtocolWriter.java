@@ -39,9 +39,11 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException {
-        String vrfId = id.firstKeyOf(NetworkInstance.class).getName();
+        String vrfId = id.firstKeyOf(NetworkInstance.class)
+                .getName();
         Preconditions.checkArgument(DEFAULT_NETWORK_NAME.equals(vrfId), "VRF-aware OSPF is not supported");
-        final String processName = id.firstKeyOf(Protocol.class).getName();
+        final String processName = id.firstKeyOf(Protocol.class)
+                .getName();
         blockingWriteAndRead(cli, id, data,
                 f("router ospf %s", processName),
                 "root");
@@ -56,7 +58,8 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
     @Override
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException {
-        final String processName = id.firstKeyOf(Protocol.class).getName();
+        final String processName = id.firstKeyOf(Protocol.class)
+                .getName();
         blockingWriteAndRead(cli, id, data,
                 f("no router ospf %s", processName));
     }

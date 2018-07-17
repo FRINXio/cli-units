@@ -22,6 +22,8 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.OspfMetric;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.Interface;
@@ -34,9 +36,6 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-import javax.annotation.Nonnull;
-import java.util.regex.Pattern;
-
 public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
 
     private static final String SHOW_OSPF_INT = "show running-config router ospf %s area %s interface %s";
@@ -48,19 +47,23 @@ public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Co
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+            ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final InterfaceKey key = instanceIdentifier.firstKeyOf(Interface.class);
-        final String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        final String areaId = AreaInterfaceReader.areaIdToString(instanceIdentifier.firstKeyOf(Area.class).getIdentifier());
+        final String ospfId = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
+        final String areaId = AreaInterfaceReader.areaIdToString(instanceIdentifier.firstKeyOf(Area.class)
+                .getIdentifier());
         configBuilder.setId(key.getId());
-        String output = blockingRead(String.format(SHOW_OSPF_INT, ospfId, areaId ,key.getId()), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SHOW_OSPF_INT, ospfId, areaId, key.getId()), cli,
+                instanceIdentifier, readContext);
         parseCost(output, configBuilder);
     }
 
     @VisibleForTesting
     public static void parseCost(String output, ConfigBuilder configBuilder) {
         ParsingUtils.parseField(output,
-            COST_LINE::matcher,
+                COST_LINE::matcher,
             matcher -> matcher.group("cost"),
             value -> configBuilder.setMetric(new OspfMetric(Integer.parseInt(value))));
     }

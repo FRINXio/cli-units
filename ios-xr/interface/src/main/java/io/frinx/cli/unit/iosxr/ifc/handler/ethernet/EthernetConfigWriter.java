@@ -34,25 +34,25 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EthernetConfigWriter implements CliWriter<Config> {
 
-    private static final String LACP_OPERATION_MODE_TEMPLATE = "mode" +
-            "{% if ($lacp_aug.lacp_mode == ACTIVE) %} active" +
-            "{% elseIf ($lacp_aug.lacp_mode == PASSIVE) %} passive" +
-            "{% else %} on" +
-            "{% endif %}" +
-            "\n";
+    private static final String LACP_OPERATION_MODE_TEMPLATE = "mode"
+            + "{% if ($lacp_aug.lacp_mode == ACTIVE) %} active"
+            + "{% elseIf ($lacp_aug.lacp_mode == PASSIVE) %} passive"
+            + "{% else %} on"
+            + "{% endif %}"
+            + "\n";
 
-    private static final String LACP_PERIOD_TEMPLATE = "{% if ($lacp_aug.interval == FAST) %}lacp period short" +
-            "{% else %}no lacp period short" +
-            "{% endif %}" +
-            "\n";
+    private static final String LACP_PERIOD_TEMPLATE = "{% if ($lacp_aug.interval == FAST) %}lacp period short"
+            + "{% else %}no lacp period short"
+            + "{% endif %}"
+            + "\n";
 
-    private static final String IFC_ETHERNET_CONFIG_TEMPLATE = "interface {$ifc_name}\n" +
-            "{% if ($bundle_id) %}bundle id {$bundle_id} " +
-            LACP_OPERATION_MODE_TEMPLATE +
-            "{% else %}no bundle id\n" +
-            "{% endif %}" +
-            LACP_PERIOD_TEMPLATE +
-            "root";
+    private static final String IFC_ETHERNET_CONFIG_TEMPLATE = "interface {$ifc_name}\n"
+            + "{% if ($bundle_id) %}bundle id {$bundle_id} "
+            + LACP_OPERATION_MODE_TEMPLATE
+            + "{% else %}no bundle id\n"
+            + "{% endif %}"
+            + LACP_PERIOD_TEMPLATE
+            + "root";
 
     private final Cli cli;
 
@@ -63,7 +63,8 @@ public class EthernetConfigWriter implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         checkIfcType(ifcName);
 
@@ -127,7 +128,8 @@ public class EthernetConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
 
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         checkIfcType(ifcName);
 

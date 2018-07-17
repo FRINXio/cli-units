@@ -23,12 +23,11 @@ import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.iosxr.ospf.handler.OspfProtocolReader;
+import io.frinx.cli.registry.common.CompositeListReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
-
-import io.frinx.cli.registry.common.CompositeListReader;
-import io.frinx.cli.unit.utils.CliConfigListReader;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ProtocolsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
@@ -47,7 +46,8 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
     }
 
     @Override
-    public List<ProtocolKey> getAllIdsForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<ProtocolKey> getAllIdsForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
         return delegate.getAllIds(instanceIdentifier, readContext);
     }
 
@@ -57,7 +57,8 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull ProtocolBuilder protocolBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull
+            ProtocolBuilder protocolBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         delegate.readCurrentAttributes(instanceIdentifier, protocolBuilder, readContext);
     }
 
@@ -66,9 +67,10 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
 
         public ProtocolReaderComposite(Cli cli) {
             super(new ArrayList<ListReaderCustomizer<Protocol, ProtocolKey, ProtocolBuilder>>() {{
-                add(new BgpProtocolReader(cli));
-                add(new OspfProtocolReader(cli));
-            }});
+                    add(new BgpProtocolReader(cli));
+                    add(new OspfProtocolReader(cli));
+                }
+            });
         }
 
         @Override

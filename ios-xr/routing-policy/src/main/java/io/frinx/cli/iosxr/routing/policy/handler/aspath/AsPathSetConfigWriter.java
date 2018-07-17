@@ -28,15 +28,15 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class AsPathSetConfigWriter implements CliWriter<Config> {
 
     @VisibleForTesting
-    static final String TEMPLATE = "as-path-set {$config.as_path_set_name}\n" +
-            "{% loop in $config.as_path_set_member as $m %}\n" +
-            "{$m}" +
-            "{% divider %}" +
-            ",\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "\n\n" +
-            "end-set";
+    static final String TEMPLATE = "as-path-set {$config.as_path_set_name}\n"
+            + "{% loop in $config.as_path_set_member as $m %}\n"
+            + "{$m}"
+            + "{% divider %}"
+            + ",\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "\n\n"
+            + "end-set";
 
     @VisibleForTesting
     static final String DELETE_TEMPLATE = "no as-path-set {$config.as_path_set_name}\n";

@@ -35,7 +35,8 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
-        final String processName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
+        final String processName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
         blockingWriteAndRead(cli, instanceIdentifier, data,
                 f("router ospf %s", processName),
                 "root");
@@ -50,7 +51,8 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
     @Override
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
-        final String processName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
+        final String processName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
         blockingWriteAndRead(cli, instanceIdentifier, data,
                 f("no router ospf %s", processName));
     }

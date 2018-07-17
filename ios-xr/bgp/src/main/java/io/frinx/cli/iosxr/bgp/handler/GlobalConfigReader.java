@@ -86,7 +86,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
     }
 
     @VisibleForTesting
-    public static void parseAs(String output, String name, ConfigBuilder cBuilder) {
+    public static void parseAs(String output, String name, ConfigBuilder configBuilder) {
         NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(bgp -> bgp.contains(String.format("instance %s", name)))
@@ -96,7 +96,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
                 .map(Long::valueOf)
                 .map(AsNumber::new)
                 .findFirst()
-                .ifPresent(cBuilder::setAs);
+                .ifPresent(configBuilder::setAs);
     }
 
     public static void parseRouterId(String output, ConfigBuilder configBuilder) {

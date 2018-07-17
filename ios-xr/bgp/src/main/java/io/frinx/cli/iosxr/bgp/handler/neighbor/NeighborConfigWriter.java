@@ -43,64 +43,73 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
         this.cli = cli;
     }
 
-    static final String NEIGHBOR_GLOBAL ="router bgp {$as} {$instance}\n" +
-            "neighbor {$address}\n" +
-            "{% if ($config.peer_as) %}" +
-                "remote-as {$config.peer_as.value}\n" +
-            "{% elseIf ($oldConfig.peer_as) %}" +
-                "no remote-as\n" +
-            "{% endif %}" +
-            "{% if ($config.auth_password) %}" +
-                "password clear {$config.auth_password.value}\n" +
-            "{% elseIf ($oldConfig.auth_password) %}" +
-                "no password\n" +
-            "{% endif %}" +
-            "{% if ($config.description) %}" +
-                "description {$config.description}\n" +
-            "{% elseIf ($oldConfig.description) %}" +
-                "no description\n" +
-            "{% endif %}" +
-            "{% if ($config.peer_group) %}" +
-                "use neighbor-group {$config.peer_group}\n" +
-            "{% elseIf ($oldConfig.peer_group) %}" +
-                "no use neighbor-group\n" +
-            "{% endif %}" +
-            "{.if ($enabled == TRUE) }no shutdown\n{.else}shutdown\n{/if}" +
-            "{% loop in $afiSafis as $afiSafi}\n" +
-                "address-family {$afiSafi}\n" +
-                "{% if ($config.send_community) %}" +
-                    "send-community-ebgp\n" +
-                "{% elseIf ($oldConfig.send_community) %}" +
-                    "no send-community-ebgp\n" +
-                "{% endif %}" +
-                "{% if ($config.remove_private_as) %}" +
-                    "remove-private-AS\n" +
-                "{% elseIf ($oldConfig.send_community) %}" +
-                    "no remove-private-AS\n" +
-                "{% endif %}" +
-                "exit\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "root\n";
+    static final String NEIGHBOR_GLOBAL = "router bgp {$as} {$instance}\n"
+            + "neighbor {$address}\n"
+            + "{% if ($config.peer_as) %}"
+            + "remote-as {$config.peer_as.value}\n"
+            + "{% elseIf ($oldConfig.peer_as) %}"
+            + "no remote-as\n"
+            + "{% endif %}"
+            + "{% if ($config.auth_password) %}"
+            + "password clear {$config.auth_password.value}\n"
+            + "{% elseIf ($oldConfig.auth_password) %}"
+            + "no password\n"
+            + "{% endif %}"
+            + "{% if ($config.description) %}"
+            + "description {$config.description}\n"
+            + "{% elseIf ($oldConfig.description) %}"
+            + "no description\n"
+            + "{% endif %}"
+            + "{% if ($config.peer_group) %}"
+            + "use neighbor-group {$config.peer_group}\n"
+            + "{% elseIf ($oldConfig.peer_group) %}"
+            + "no use neighbor-group\n"
+            + "{% endif %}"
+            + "{.if ($enabled == TRUE) }no shutdown\n{.else}shutdown\n{/if}"
+            + "{% loop in $afiSafis as $afiSafi}\n"
+            + "address-family {$afiSafi}\n"
+            + "{% if ($config.send_community) %}"
+            + "send-community-ebgp\n"
+            + "{% elseIf ($oldConfig.send_community) %}"
+            + "no send-community-ebgp\n"
+            + "{% endif %}"
+            + "{% if ($config.remove_private_as) %}"
+            + "remove-private-AS\n"
+            + "{% elseIf ($oldConfig.send_community) %}"
+            + "no remove-private-AS\n"
+            + "{% endif %}"
+            + "exit\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "root\n";
+
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        Optional<AfiSafis> optionalAfiSafis = writeContext.readAfter(id.firstIdentifierOf(Neighbor.class).child(AfiSafis.class));
+        Optional<AfiSafis> optionalAfiSafis = writeContext.readAfter(id.firstIdentifierOf(Neighbor.class)
+                .child(AfiSafis.class));
         List<String> afiSafis = new ArrayList<>();
         if (optionalAfiSafis.isPresent()) {
-            afiSafis = optionalAfiSafis.get().getAfiSafi().stream()
-            .map(afiSafi -> GlobalAfiSafiReader.transformAfiToString(afiSafi.getAfiSafiName()))
-            .collect(Collectors.toList());
+            afiSafis = optionalAfiSafis.get()
+                    .getAfiSafi()
+                    .stream()
+                    .map(afiSafi -> GlobalAfiSafiReader.transformAfiToString(afiSafi.getAfiSafiName()))
+                    .collect(Collectors.toList());
         }
 
         blockingWriteAndRead(fT(NEIGHBOR_GLOBAL,
-                "as", g.getConfig().getAs().getValue(),
+                "as", g.getConfig()
+                        .getAs()
+                        .getValue(),
                 "instance", instName,
-                "address", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
+                "address", new String(id.firstKeyOf(Neighbor.class)
+                        .getNeighborAddress()
+                        .getValue()),
                 "afiSafis", afiSafis,
                 "enabled", data.isEnabled(), //chunk can process only getters
                 "config", data,
@@ -113,20 +122,28 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
                                                WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        Optional<AfiSafis> optionalAfiSafis = writeContext.readAfter(id.firstIdentifierOf(Neighbor.class).child(AfiSafis.class));
+        Optional<AfiSafis> optionalAfiSafis = writeContext.readAfter(id.firstIdentifierOf(Neighbor.class)
+                .child(AfiSafis.class));
         List<String> afiSafis = new ArrayList<>();
         if (optionalAfiSafis.isPresent()) {
-            afiSafis = optionalAfiSafis.get().getAfiSafi().stream()
+            afiSafis = optionalAfiSafis.get()
+                    .getAfiSafi()
+                    .stream()
                     .map(afiSafi -> GlobalAfiSafiReader.transformAfiToString(afiSafi.getAfiSafiName()))
                     .collect(Collectors.toList());
         }
 
         blockingWriteAndRead(fT(NEIGHBOR_GLOBAL,
-                "as", g.getConfig().getAs().getValue(),
+                "as", g.getConfig()
+                        .getAs()
+                        .getValue(),
                 "instance", instName,
-                "address", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
+                "address", new String(id.firstKeyOf(Neighbor.class)
+                        .getNeighborAddress()
+                        .getValue()),
                 "afiSafis", afiSafis,
                 "enabled", dataAfter.isEnabled(), //chunk can process only getters
                 "config", dataAfter,
@@ -141,11 +158,16 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
         if (!bgpOptional.isPresent()) {
             return;
         }
-        final Global g = bgpOptional.get().getGlobal();
+        final Global g = bgpOptional.get()
+                .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         blockingDeleteAndRead(cli, id,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
-                f("no neighbor %s", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue())),
+                f("router bgp %s %s", g.getConfig()
+                        .getAs()
+                        .getValue(), instName),
+                f("no neighbor %s", new String(id.firstKeyOf(Neighbor.class)
+                        .getNeighborAddress()
+                        .getValue())),
                 "root");
     }
 }

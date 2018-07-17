@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.TypedListReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
+
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
@@ -45,7 +47,8 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AclEntryReader implements TypedListReader<AclEntry, AclEntryKey, AclEntryBuilder>, CliConfigListReader<AclEntry, AclEntryKey, AclEntryBuilder> {
+public class AclEntryReader implements TypedListReader<AclEntry, AclEntryKey, AclEntryBuilder>,
+        CliConfigListReader<AclEntry, AclEntryKey, AclEntryBuilder> {
     private static final String SH_ACCESS_LISTS_IPV4 = "show running-config ipv4 access-list %s";
     private static final String SH_ACCESS_LISTS_IPV6 = "show running-config ipv6 access-list %s";
     private static final Map<Class<? extends ACLTYPE>, String> TYPES_TO_COMMANDS = ImmutableMap.of(
@@ -54,7 +57,8 @@ public class AclEntryReader implements TypedListReader<AclEntry, AclEntryKey, Ac
     );
 
     // find lines starting with number and not continuing with word remark
-    private static final Pattern SEQUENCE_PATTERN = Pattern.compile("^\\s*(?<sequenceId>\\d+) (?!remark).*", Pattern.MULTILINE);
+    private static final Pattern SEQUENCE_PATTERN = Pattern.compile("^\\s*(?<sequenceId>\\d+) (?!remark).*", Pattern
+            .MULTILINE);
 
     private final Cli cli;
 
@@ -88,8 +92,8 @@ public class AclEntryReader implements TypedListReader<AclEntry, AclEntryKey, Ac
         Matcher matcher = SEQUENCE_PATTERN.matcher(output);
         List<AclEntryKey> result = new ArrayList<>();
         while (matcher.find()) {
-            long l = Long.parseLong(matcher.group(1));
-            result.add(new AclEntryKey(l));
+            long parseLong = Long.parseLong(matcher.group(1));
+            result.add(new AclEntryKey(parseLong));
         }
         return result;
     }
@@ -103,7 +107,7 @@ public class AclEntryReader implements TypedListReader<AclEntry, AclEntryKey, Ac
     public void readCurrentAttributesForType(@Nonnull final InstanceIdentifier<AclEntry> instanceIdentifier,
                                              @Nonnull final AclEntryBuilder aclEntryBuilder,
                                              @Nonnull final ReadContext readContext)
-        throws ReadFailedException {
+            throws ReadFailedException {
 
         String command = getAclCommand(instanceIdentifier);
         String output = blockingRead(command, cli, instanceIdentifier, readContext);

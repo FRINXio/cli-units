@@ -25,8 +25,8 @@ public class PolicyWriterTest implements CliFormatter {
 
     @Test
     public void testTemplate() throws Exception {
-        Assert.assertEquals("route-policy abcd\n" +
-                        "end-policy",
+        Assert.assertEquals("route-policy abcd\n"
+                        + "end-policy",
                 fT(PolicyConfigWriter.TEMPLATE,
                         "config", new PolicyDefinitionBuilder()
                                 .setName("abcd")

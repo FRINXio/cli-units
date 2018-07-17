@@ -28,19 +28,23 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ActionsWriter implements CliWriter<Actions> {
 
-    private static final String WRITE_CURR_ATTR = "policy-map {$name}\n" +
-        "{% if ($delete) %}no {% endif %}class {$className}\n" +
-        "{% if (!$delete) %}" +
-        "{% if ($mpls) %}" +
-        "set mpls experimental topmost {$mpls}\n{% else %}" +
-        "no set mpls experimental topmost\n{% endif %}" +
-        "{% if ($aug.set_qos_group) %}" +
-        "set qos-group {% loop in $aug.set_qos_group as $qos %}" + ClassifierWriter.LIST_QOS + "{% else %}" +
-        "no set qos-group\n{% endif %}" +
-        "{% if ($aug.set_precedences) %}" +
-        "set precedence {% loop in $aug.set_precedences as $prec %}" + ClassifierWriter.LIST_PREC + "{% else %}" +
-        "no set precedence\n{% endif %}" +
-        "{% endif %}root";
+    private static final String WRITE_CURR_ATTR = "policy-map {$name}\n"
+            + "{% if ($delete) %}no {% endif %}class {$className}\n"
+            + "{% if (!$delete) %}"
+            + "{% if ($mpls) %}"
+            + "set mpls experimental topmost {$mpls}\n{% else %}"
+            + "no set mpls experimental topmost\n{% endif %}"
+            + "{% if ($aug.set_qos_group) %}"
+            + "set qos-group {% loop in $aug.set_qos_group as $qos %}"
+            + ClassifierWriter.LIST_QOS
+            + "{% else %}"
+            + "no set qos-group\n{% endif %}"
+            + "{% if ($aug.set_precedences) %}"
+            + "set precedence {% loop in $aug.set_precedences as $prec %}"
+            + ClassifierWriter.LIST_PREC
+            + "{% else %}"
+            + "no set precedence\n{% endif %}"
+            + "{% endif %}root";
 
     private static final String DEFAULT_CLASS = "class-default";
 
@@ -51,30 +55,42 @@ public class ActionsWriter implements CliWriter<Actions> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Actions> instanceIdentifier, @Nonnull Actions actions, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Actions> instanceIdentifier, @Nonnull Actions
+            actions, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        String className = instanceIdentifier.firstKeyOf(Classifier.class)
+                .getName();
         if (className.endsWith(ClassifierReader.DEFAULT_CLASS_SUFFIX)) {
             className = DEFAULT_CLASS;
         }
-        final String policyName = actions.getConfig().getTargetGroup();
+        final String policyName = actions.getConfig()
+                .getTargetGroup();
         if (policyName != null) {
-            QosRemarkQosGroupAug aug = actions.getRemark() != null ? actions.getRemark().getConfig().getAugmentation(QosRemarkQosGroupAug.class) : null;
+            QosRemarkQosGroupAug aug = actions.getRemark() != null ? actions.getRemark()
+                    .getConfig()
+                    .getAugmentation(QosRemarkQosGroupAug.class) : null;
             blockingWriteAndRead(cli, instanceIdentifier, actions, fT(WRITE_CURR_ATTR,
-                "name", policyName,
-                "className", className,
-                "mpls", actions.getRemark() != null ? actions.getRemark().getConfig().getSetMplsTc() : null,
-                "aug", aug));
+                    "name", policyName,
+                    "className", className,
+                    "mpls", actions.getRemark() != null ? actions.getRemark()
+                            .getConfig()
+                            .getSetMplsTc() : null,
+                    "aug", aug));
         }
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Actions> id, @Nonnull Actions dataBefore, @Nonnull Actions dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Actions> id, @Nonnull Actions dataBefore,
+                                        @Nonnull Actions dataAfter, @Nonnull WriteContext writeContext) throws
+            WriteFailedException {
         // policy name was removed
         if (dataAfter.getConfig() == null) {
             deleteCurrentAttributes(id, dataBefore, writeContext);
-        } else if (dataBefore.getConfig() != null  && !dataBefore.getConfig().getTargetGroup().equals(dataAfter.getConfig().getTargetGroup())) {
+        } else if (dataBefore.getConfig() != null && !dataBefore.getConfig()
+                .getTargetGroup()
+                .equals(dataAfter.getConfig()
+                        .getTargetGroup())) {
             // policy reference changed or was added
-            deleteCurrentAttributes(id, dataBefore,writeContext);
+            deleteCurrentAttributes(id, dataBefore, writeContext);
             writeCurrentAttributes(id, dataAfter, writeContext);
         } else {
             // only attributes changed, we're safe to 'write'
@@ -83,12 +99,15 @@ public class ActionsWriter implements CliWriter<Actions> {
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Actions> instanceIdentifier, @Nonnull Actions actions, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
-        final String policyName = actions.getConfig().getTargetGroup();
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Actions> instanceIdentifier, @Nonnull Actions
+            actions, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        final String className = instanceIdentifier.firstKeyOf(Classifier.class)
+                .getName();
+        final String policyName = actions.getConfig()
+                .getTargetGroup();
         if (policyName != null) {
             blockingWriteAndRead(cli, instanceIdentifier, actions, fT(WRITE_CURR_ATTR,
-                "name", policyName, "className", className, "delete", true));
+                    "name", policyName, "className", className, "delete", true));
         }
     }
 }

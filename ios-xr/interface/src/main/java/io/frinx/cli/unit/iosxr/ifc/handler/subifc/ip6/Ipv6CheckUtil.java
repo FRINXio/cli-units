@@ -35,16 +35,20 @@ abstract class Ipv6CheckUtil {
         final boolean typeIsValid = checkTypes(infType, types);
 
         Preconditions.checkArgument(typeIsValid,
-            CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX + "one of %s",
-            Arrays.stream(types).map(Class::getCanonicalName).collect(Collectors.toList()));
+                CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX + "one of %s",
+                Arrays.stream(types)
+                        .map(Class::getCanonicalName)
+                        .collect(Collectors.toList()));
     }
 
     static boolean checkTypes(final Class<? extends InterfaceType> infType, final @Nonnull Class... types) {
-        return Lists.newArrayList(types).stream().anyMatch(type -> type.equals(infType));
+        return Lists.newArrayList(types)
+                .stream()
+                .anyMatch(type -> type.equals(infType));
     }
 
     static void checkSubInterfaceIdWithExeption(final long subIfcIndex, final long expectedSubInterfaceIndex) {
         Preconditions.checkArgument(subIfcIndex == expectedSubInterfaceIndex,
-            CHECK_SUBINTERFACE_MSG_PREFIX + "is %s", expectedSubInterfaceIndex);
+                CHECK_SUBINTERFACE_MSG_PREFIX + "is %s", expectedSubInterfaceIndex);
     }
 }

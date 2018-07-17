@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Translate unit that does not actually translate anything.
+ *
  * <p>
  * This translate unit's only responsibility is to properly initialize IOS-XR cli
  * session. That is, upon establishing connection to IOS-XR device, enter Privileged
@@ -113,8 +114,8 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
         // NO-OP
     }
@@ -138,7 +139,9 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
             try {
                 Cli cli = context.getTransport();
                 try {
-                    cli.executeAndRead(COMMIT).toCompletableFuture().get();
+                    cli.executeAndRead(COMMIT)
+                            .toCompletableFuture()
+                            .get();
                     LOG.debug("{}: Commit successful", deviceId);
                     try {
                         initializer.tryToExitConfigurationMode(cli);
@@ -174,7 +177,8 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
                 // the check if we are again in config mode is done automatically, so if no exception
                 // is thrown, consider this as a success
                 cli.executeAndSwitchPrompt(ABORT, IosXrCliInitializer.IS_PRIVELEGE_PROMPT)
-                        .toCompletableFuture().get();
+                        .toCompletableFuture()
+                        .get();
                 LOG.debug("{}: Revert successful.", deviceId);
                 throw new WriterRegistry.Reverter.RevertSuccessException(message);
             } catch (InterruptedException | ExecutionException e) {
@@ -184,7 +188,8 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
         };
     }
 
-    private @Nullable String getBottomErrorMessage(Throwable throwable) {
+    private @Nullable
+        String getBottomErrorMessage(Throwable throwable) {
         Throwable cause = throwable;
         while (cause.getCause() != null) {
             cause = cause.getCause();

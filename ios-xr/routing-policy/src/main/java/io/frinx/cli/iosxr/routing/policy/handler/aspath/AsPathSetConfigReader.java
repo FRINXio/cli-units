@@ -50,7 +50,8 @@ public class AsPathSetConfigReader implements CliConfigReader<Config, ConfigBuil
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
+                                      @Nonnull ReadContext ctx) throws ReadFailedException {
         AsPathSetKey prefixSetKey = id.firstKeyOf(AsPathSet.class);
 
         String output = blockingRead(f(SH_AS_PATH_SET, prefixSetKey.getAsPathSetName()), cli, id, ctx);

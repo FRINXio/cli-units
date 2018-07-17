@@ -54,7 +54,8 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
     public List<ProtocolKey> getAllIds(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier,
                                        @Nonnull ReadContext readContext)
             throws ReadFailedException {
-        String vrfId = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
+        String vrfId = instanceIdentifier.firstKeyOf(NetworkInstance.class)
+                .getName();
 
         // TODO We should add this check in all descendant readers
         Preconditions.checkArgument(DEFAULT_NETWORK_NAME.equals(vrfId), "VRF-aware OSPF is not supported");
@@ -68,8 +69,8 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
     public static List<ProtocolKey> parseOspfIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 ROUTER_OSPF_LINE::matcher,
-                matcher -> matcher.group("ospfName"),
-                s -> new ProtocolKey(TYPE, s));
+            matcher -> matcher.group("ospfName"),
+            s -> new ProtocolKey(TYPE, s));
     }
 
     @Override

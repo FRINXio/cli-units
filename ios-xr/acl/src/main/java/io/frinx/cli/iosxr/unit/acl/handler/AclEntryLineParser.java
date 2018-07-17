@@ -18,6 +18,7 @@ package io.frinx.cli.iosxr.unit.acl.handler;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
@@ -33,12 +35,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.HopRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.IcmpMsgType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv4AddressWildcarded;
@@ -118,9 +120,10 @@ public class AclEntryLineParser {
         long sequenceId = Long.parseLong(words.poll());
         // sequence id
         builder.setSequenceId(sequenceId);
-        builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.acl.entry.ConfigBuilder()
-            .setSequenceId(sequenceId)
-            .build()
+        builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list
+                .entries.top.acl.entries.acl.entry.ConfigBuilder()
+                .setSequenceId(sequenceId)
+                .build()
         );
         // fwd action
         Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
@@ -163,14 +166,15 @@ public class AclEntryLineParser {
     }
 
     private static class ParseIpv4LineResult {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config ipv4ProtocolFieldsConfig;
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol
+                .fields.top.ipv4.Config ipv4ProtocolFieldsConfig;
         final Transport transport;
         final AclEntry1 icmpMsgTypeAugment;
 
         ParseIpv4LineResult(
-            Config ipv4ProtocolFieldsConfig,
-            Transport transport,
-            final AclEntry1 icmpMsgTypeAugment) {
+                Config ipv4ProtocolFieldsConfig,
+                Transport transport,
+                final AclEntry1 icmpMsgTypeAugment) {
             this.ipv4ProtocolFieldsConfig = ipv4ProtocolFieldsConfig;
             this.transport = transport;
             this.icmpMsgTypeAugment = icmpMsgTypeAugment;
@@ -178,9 +182,13 @@ public class AclEntryLineParser {
     }
 
     private static ParseIpv4LineResult parseIpv4Line(IpProtocolType ipProtocolType, Queue<String> words) {
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder ipv4ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top
+                .ipv4.ConfigBuilder ipv4ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
+                .openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
         ipv4ProtocolFieldsConfigBuilder.setProtocol(ipProtocolType);
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top
+                .transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
+                .openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
 
         AclSetAclEntryIpv4WildcardedAugBuilder ipv4WildcardedAugBuilder = new AclSetAclEntryIpv4WildcardedAugBuilder();
         // src address
@@ -188,7 +196,8 @@ public class AclEntryLineParser {
         if (srcIpv4PrefixOpt.isPresent()) {
             ipv4ProtocolFieldsConfigBuilder.setSourceAddress(srcIpv4PrefixOpt.get());
         } else {
-            SourceAddressWildcarded srcIpv4Wildcarded = new SourceAddressWildcardedBuilder(parseIpv4Wildcarded(words)).build();
+            SourceAddressWildcarded srcIpv4Wildcarded = new SourceAddressWildcardedBuilder(parseIpv4Wildcarded(words)
+            ).build();
             ipv4WildcardedAugBuilder.setSourceAddressWildcarded(srcIpv4Wildcarded);
         }
 
@@ -200,7 +209,8 @@ public class AclEntryLineParser {
         if (dstIpv4PrefixOpt.isPresent()) {
             ipv4ProtocolFieldsConfigBuilder.setDestinationAddress(dstIpv4PrefixOpt.get());
         } else {
-            DestinationAddressWildcarded dstIpv4Wildcarded = new DestinationAddressWildcardedBuilder(parseIpv4Wildcarded(words)).build();
+            DestinationAddressWildcarded dstIpv4Wildcarded
+                = new DestinationAddressWildcardedBuilder(parseIpv4Wildcarded(words)).build();
             ipv4WildcardedAugBuilder.setDestinationAddressWildcarded(dstIpv4Wildcarded);
         }
 
@@ -240,14 +250,16 @@ public class AclEntryLineParser {
         return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);
     }
 
-    private static AclEntry1 parseIcmpMsgType(final IpProtocolType ipProtocolType, final Queue<String> words, boolean isIpv4Acl) {
+    private static AclEntry1 parseIcmpMsgType(final IpProtocolType ipProtocolType, final Queue<String> words, boolean
+            isIpv4Acl) {
         final AclEntry1Builder icmpMsgTypeAugment = new AclEntry1Builder();
         if (IP_PROTOCOL_ICMP.equals(ipProtocolType) || IP_PROTOCOL_ICMP_NUMBER.equals(ipProtocolType)) {
             Optional<Short> maybeMsgType = tryToParseIcmpType(words.peek(), isIpv4Acl);
             if (maybeMsgType.isPresent()) {
                 words.poll();
                 icmpMsgTypeAugment.setIcmp(new IcmpBuilder()
-                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.icmp.ConfigBuilder()
+                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext
+                                .rev180314.acl.icmp.type.icmp.ConfigBuilder()
                                 .setMsgType(new IcmpMsgType(maybeMsgType.get()))
                                 .build()
                         ).build()
@@ -259,14 +271,16 @@ public class AclEntryLineParser {
     }
 
     private static class ParseIpv6LineResult {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config ipv6ProtocolFieldsConfig;
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol
+                .fields.top.ipv6.Config ipv6ProtocolFieldsConfig;
         final Transport transport;
         final AclEntry1 icmpMsgTypeAugment;
 
         ParseIpv6LineResult(
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config ipv6ProtocolFieldsConfig,
-            Transport transport,
-            final AclEntry1 icmpMsgTypeAugment) {
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol
+                        .fields.top.ipv6.Config ipv6ProtocolFieldsConfig,
+                Transport transport,
+                final AclEntry1 icmpMsgTypeAugment) {
             this.ipv6ProtocolFieldsConfig = ipv6ProtocolFieldsConfig;
             this.transport = transport;
             this.icmpMsgTypeAugment = icmpMsgTypeAugment;
@@ -275,9 +289,13 @@ public class AclEntryLineParser {
 
     private static ParseIpv6LineResult parseIpv6Line(IpProtocolType ipProtocolType, Queue<String> words) {
 
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder ipv6ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top
+                .ipv6.ConfigBuilder ipv6ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
+                .openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
         ipv6ProtocolFieldsConfigBuilder.setProtocol(ipProtocolType);
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top
+                .transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
+                .openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
 
         AclSetAclEntryIpv6WildcardedAugBuilder ipv6WildcardedAugBuilder = new AclSetAclEntryIpv6WildcardedAugBuilder();
         // src address
@@ -285,7 +303,10 @@ public class AclEntryLineParser {
         if (srcIpv6PrefixOpt.isPresent()) {
             ipv6ProtocolFieldsConfigBuilder.setSourceAddress(srcIpv6PrefixOpt.get());
         } else {
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.SourceAddressWildcarded srcIpv6Wildcarded = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.SourceAddressWildcardedBuilder(parseIpv6Wildcarded(words)).build();
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address
+                    .wildcarded.SourceAddressWildcarded srcIpv6Wildcarded = new org.opendaylight.yang.gen.v1.http
+                    .frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded
+                    .SourceAddressWildcardedBuilder(parseIpv6Wildcarded(words)).build();
             ipv6WildcardedAugBuilder.setSourceAddressWildcarded(srcIpv6Wildcarded);
         }
 
@@ -297,7 +318,10 @@ public class AclEntryLineParser {
         if (dstIpv6PrefixOpt.isPresent()) {
             ipv6ProtocolFieldsConfigBuilder.setDestinationAddress(dstIpv6PrefixOpt.get());
         } else {
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.DestinationAddressWildcarded dstIpv6Wildcarded = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.DestinationAddressWildcardedBuilder(parseIpv6Wildcarded(words)).build();
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address
+                    .wildcarded.DestinationAddressWildcarded dstIpv6Wildcarded = new org.opendaylight.yang.gen
+                    .v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded
+                    .DestinationAddressWildcardedBuilder(parseIpv6Wildcarded(words)).build();
             ipv6WildcardedAugBuilder.setDestinationAddressWildcarded(dstIpv6Wildcarded);
         }
 
@@ -338,8 +362,9 @@ public class AclEntryLineParser {
     }
 
     private static void parseTransportSourcePort(
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder,
-        final Queue<String> words) {
+            final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
+                    .fields.top.transport.ConfigBuilder transportConfigBuilder,
+            final Queue<String> words) {
         if (!words.isEmpty() && isPortNumRange(words.peek())) {
             parsePortNumRange(words, transportConfigBuilder, true);
         } else {
@@ -348,8 +373,9 @@ public class AclEntryLineParser {
     }
 
     private static void parseTransportDestinationPort(
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder,
-        final Queue<String> words) {
+            final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
+                    .fields.top.transport.ConfigBuilder transportConfigBuilder,
+            final Queue<String> words) {
         if (!words.isEmpty() && isPortNumRange(words.peek())) {
             parsePortNumRange(words, transportConfigBuilder, false);
         } else {
@@ -419,16 +445,18 @@ public class AclEntryLineParser {
     }
 
     private static void parsePortNumRange(Queue<String> words,
-                                          org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder transportConfigBuilder,
+                                          org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields
+                                                  .rev171215.transport.fields.top.transport.ConfigBuilder
+                                                  transportConfigBuilder,
                                           boolean source) {
         String possiblePortRangeKeyword = words.poll();
 
         String port1String = words.poll();
         String port2String = possiblePortRangeKeyword.equals("range") ? words.peek() : null;
 
-        boolean arePortsNumeric = port2String == null ?
-                StringUtils.isNumeric(port1String) :
-                StringUtils.isNumeric(port1String) && StringUtils.isNumeric(port2String);
+        boolean arePortsNumeric = port2String == null
+                ? StringUtils.isNumeric(port1String) : StringUtils.isNumeric(port1String)
+                && StringUtils.isNumeric(port2String);
 
         if (arePortsNumeric) {
             Integer port1 = serviceToPortNumber(port1String);
@@ -436,31 +464,39 @@ public class AclEntryLineParser {
             if (source) {
                 transportConfigBuilder.setSourcePort(parsePortNumRangeNumbers(possiblePortRangeKeyword, port1, words));
             } else {
-                transportConfigBuilder.setDestinationPort(parsePortNumRangeNumbers(possiblePortRangeKeyword, port1, words));
+                transportConfigBuilder.setDestinationPort(parsePortNumRangeNumbers(possiblePortRangeKeyword, port1,
+                        words));
             }
         } else {
-            AclSetAclEntryTransportPortNamedAug existingAug = transportConfigBuilder.getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
-            AclSetAclEntryTransportPortNamedAugBuilder AclSetAclEntryTransportPortNamedAugBuilder = existingAug != null ? new AclSetAclEntryTransportPortNamedAugBuilder(existingAug) : new AclSetAclEntryTransportPortNamedAugBuilder();
+            AclSetAclEntryTransportPortNamedAug existingAug = transportConfigBuilder
+                    .getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
+            AclSetAclEntryTransportPortNamedAugBuilder aclSetAclEntryTransportPortNamedAugBuilder = existingAug
+                    != null ? new AclSetAclEntryTransportPortNamedAugBuilder(existingAug) : new
+                    AclSetAclEntryTransportPortNamedAugBuilder();
 
             if (source) {
-                AclSetAclEntryTransportPortNamedAugBuilder.setSourcePortNamed(parsePortNumRangeNamed(possiblePortRangeKeyword, port1String, words));
+                aclSetAclEntryTransportPortNamedAugBuilder
+                        .setSourcePortNamed(parsePortNumRangeNamed(possiblePortRangeKeyword, port1String, words));
             } else {
-                AclSetAclEntryTransportPortNamedAugBuilder.setDestinationPortNamed(parsePortNumRangeNamed(possiblePortRangeKeyword, port1String, words));
+                aclSetAclEntryTransportPortNamedAugBuilder
+                        .setDestinationPortNamed(parsePortNumRangeNamed(possiblePortRangeKeyword, port1String, words));
             }
 
-            transportConfigBuilder.addAugmentation(AclSetAclEntryTransportPortNamedAug.class, AclSetAclEntryTransportPortNamedAugBuilder
+            transportConfigBuilder.addAugmentation(AclSetAclEntryTransportPortNamedAug.class,
+                    aclSetAclEntryTransportPortNamedAugBuilder
                     .build());
         }
     }
 
-    private static PortNumRange parsePortNumRangeNumbers(String possiblePortRangeKeyword, int port1, Queue<String> words) {
+    private static PortNumRange parsePortNumRangeNumbers(String possiblePortRangeKeyword, int port1, Queue<String>
+            words) {
         switch (possiblePortRangeKeyword) {
             case "eq":
                 return new PortNumRange(new PortNumber(port1));
             case "neq":
                 if (port1 == 0) { // >0
                     return createPortNumRangeFromInt(1, MAX_PORT_NUMBER);
-                } else if (port1 == MAX_PORT_NUMBER) {// <65535
+                } else if (port1 == MAX_PORT_NUMBER) { // <65535
                     return createPortNumRangeFromInt(0, MAX_PORT_NUMBER - 1);
                 } else {
                     // not 22 = 23-21
@@ -485,9 +521,12 @@ public class AclEntryLineParser {
             case "neq":
                 Integer result = ServiceToPortMapping.TCP_MAPPING.get(port1);
                 if (result == null) {
-                    // This is best effort case. We can only transform not SSH, if we know the number behind SSH, otherwise
+                    // This is best effort case. We can only transform not SSH, if we know the number behind SSH,
+                    // otherwise
                     // we fail
-                    throw new IllegalArgumentException("Unknown named port, unable to translate to from 'neq' to range:" + port1);
+                    throw new IllegalArgumentException("Unknown named port, unable to translate to from 'neq' to "
+                            +
+                            "range:" + port1);
                 }
 
                 // not 22 = 23-21
@@ -605,7 +644,8 @@ public class AclEntryLineParser {
         String address = words.poll();
         Preconditions.checkState(!address.contains("/"), "Expected address and wildcard");
         String wildcard = words.poll();
-        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.SourceAddressWildcardedBuilder()
+        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address
+                .wildcarded.SourceAddressWildcardedBuilder()
                 .setAddress(new Ipv6Address(address))
                 .setWildcardMask(new Ipv6Address(wildcard))
                 .build();

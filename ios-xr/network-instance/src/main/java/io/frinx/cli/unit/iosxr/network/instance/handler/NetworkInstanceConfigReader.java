@@ -33,8 +33,9 @@ public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigB
 
     public NetworkInstanceConfigReader() {
         super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {{
-            add(new DefaultConfigReader());
-        }});
+                add(new DefaultConfigReader());
+            }
+        });
     }
 
     @Override

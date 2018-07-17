@@ -33,6 +33,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.PrecedenceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroup;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroupBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.Term;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.TermBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.Conditions;
@@ -41,8 +43,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroupBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroup;
 
 public class ConditionsReader implements CliConfigReader<Conditions, ConditionsBuilder> {
 
@@ -64,13 +64,16 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Conditions> instanceIdentifier, @Nonnull ConditionsBuilder conditionsBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String name = instanceIdentifier.firstKeyOf(Classifier.class).getName();
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Conditions> instanceIdentifier, @Nonnull
+            ConditionsBuilder conditionsBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        String name = instanceIdentifier.firstKeyOf(Classifier.class)
+                .getName();
         if (name.endsWith(ClassifierReader.DEFAULT_CLASS_SUFFIX)) {
             // we are reading class-default that does not have any matches, skip it
             return;
         }
-        String line = instanceIdentifier.firstKeyOf(Term.class).getId();
+        String line = instanceIdentifier.firstKeyOf(Term.class)
+                .getId();
         String output = blockingRead(f(TermReader.SH_TERMS_ALL, name), cli, instanceIdentifier, readContext);
 
         if (output.equals("")) {
@@ -89,8 +92,11 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
             // if we have a number as term id, just the condition on the specific line will be parsed
             // skip class-map def
             int skip = Integer.valueOf(line);
-            final String optLine = ParsingUtils.NEWLINE.splitAsStream(output).filter(p -> p.contains(MATCH)).skip(skip)
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Term with ID " + line + " does not exist."));
+            final String optLine = ParsingUtils.NEWLINE.splitAsStream(output)
+                    .filter(p -> p.contains(MATCH))
+                    .skip(skip)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Term with ID " + line + " does not exist."));
             parseConditions(optLine, conditionsBuilder);
         }
     }
@@ -115,7 +121,8 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
     public static List<QosGroup> parseQosGroups(String fullGroups) {
         String[] groups = fullGroups.split(" ");
         List<QosGroup> parsedGroups = new ArrayList<>();
-        Arrays.stream(groups).forEach(p -> parsedGroups.add(QosGroupBuilder.getDefaultInstance(p.replace("-", ".."))));
+        Arrays.stream(groups)
+                .forEach(p -> parsedGroups.add(QosGroupBuilder.getDefaultInstance(p.replace("-", ".."))));
         return parsedGroups;
     }
 
@@ -134,13 +141,14 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
 
     private static void parsePrecedence(String output, QosConditionAugBuilder augBuilder) {
         ParsingUtils.parseField(output, 0, PREC_LINE::matcher,
-                matcher -> matcher.group("prec"), p -> augBuilder.setPrecedences(parsePrecedence(p)));
+            matcher -> matcher.group("prec"), p -> augBuilder.setPrecedences(parsePrecedence(p)));
     }
 
     public static List<Precedence> parsePrecedence(String fullPrecs) {
         String[] precs = fullPrecs.split(" ");
         List<Precedence> parsedPrecs = new ArrayList<>();
-        Arrays.stream(precs).forEach(p -> parsedPrecs.add(PrecedenceBuilder.getDefaultInstance(p)));
+        Arrays.stream(precs)
+                .forEach(p -> parsedPrecs.add(PrecedenceBuilder.getDefaultInstance(p)));
         return parsedPrecs;
     }
 

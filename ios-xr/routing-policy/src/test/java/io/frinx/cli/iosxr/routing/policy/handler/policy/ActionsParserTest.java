@@ -37,26 +37,35 @@ public class ActionsParserTest {
     public void testParsePrepend() throws Exception {
         BgpActionsBuilder builder = new BgpActionsBuilder();
         ActionsParser.parsePrependAsPath(PREPEND_O2, builder);
-        assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.ConfigBuilder()
+        assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path
+                        .prepend.top.set.as.path.prepend.ConfigBuilder()
                         .setAsn(new AsNumber(23L))
                         .build(),
-                builder.build().getSetAsPathPrepend().getConfig());
+                builder.build()
+                        .getSetAsPathPrepend()
+                        .getConfig());
 
         builder = new BgpActionsBuilder();
         ActionsParser.parsePrependAsPath(PREPEND_O4, builder);
-        assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.ConfigBuilder()
+        assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path
+                        .prepend.top.set.as.path.prepend.ConfigBuilder()
                         .setAsn(new AsNumber(4848484L))
                         .setRepeatN((short) 23)
                         .build(),
-                builder.build().getSetAsPathPrepend().getConfig());
+                builder.build()
+                        .getSetAsPathPrepend()
+                        .getConfig());
 
         builder = new BgpActionsBuilder();
         ActionsParser.parsePrependAsPath(PREPEND_O5, builder);
-        assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.ConfigBuilder()
+        assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path
+                        .prepend.top.set.as.path.prepend.ConfigBuilder()
                         .setAsn(new AsNumber(23L))
                         .setRepeatN((short) 2)
                         .build(),
-                builder.build().getSetAsPathPrepend().getConfig());
+                builder.build()
+                        .getSetAsPathPrepend()
+                        .getConfig());
     }
 
     @Test
@@ -64,12 +73,14 @@ public class ActionsParserTest {
         BgpActionsBuilder builder = new BgpActionsBuilder();
         ActionsParser.parseSetCommunity("set community (17676:320, 17676:430, 17676:436)", builder);
         assertEquals(getSetCommInlineAction(Lists.newArrayList("17676:320", "17676:430", "17676:436"), null),
-                builder.build().getSetCommunity());
+                builder.build()
+                        .getSetCommunity());
 
         builder = new BgpActionsBuilder();
         ActionsParser.parseSetCommunity("set community (17676:320) additive", builder);
         assertEquals(getSetCommInlineAction(Lists.newArrayList("17676:320"), BgpSetCommunityOptionType.ADD),
-                builder.build().getSetCommunity());
+                builder.build()
+                        .getSetCommunity());
     }
 
 }

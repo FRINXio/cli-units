@@ -27,15 +27,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 
 public class AsPathSetConfigReaderTest {
 
-    static final String OUTPUT_1 = "as-path-set test\r\n" +
-            "  neighbor-is '1.1',\r\n" +
-            "  passes-through '54',\n" +
-            "  originates-from '3243',\n" +
-            "  length eq 444,\r\n" +
-            "  unique-length eq 44,\n" +
-            "  ios-regex '*'\n" +
-            "end-set\n" +
-            "";
+    static final String OUTPUT_1 = "as-path-set test\r\n"
+            + "  neighbor-is '1.1',\r\n"
+            + "  passes-through '54',\n"
+            + "  originates-from '3243',\n"
+            + "  length eq 444,\r\n"
+            + "  unique-length eq 44,\n"
+            + "  ios-regex '*'\n"
+            + "end-set\n"
+            + "";
 
     @Test
     public void testRead() throws Exception {

@@ -52,15 +52,16 @@ public class InterfaceDampingConfigReader implements CliConfigReader<Config, Con
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         parseDamping(blockingRead(String.format(SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx), builder);
     }
 
     private static Pattern DAMPING_ENABLED = Pattern.compile("\\s*dampening.*");
     private static Pattern DAMPING_REUSE = Pattern.compile("\\s*dampening (?<halfLife>\\d+).*");
-    private static Pattern FULL_DAMPING_CONFIG = Pattern.compile("\\s*dampening (?<halfLife>\\d+) (?<reuse>\\d+) " +
-            "(?<suppress>\\d+) (?<maxSuppress>\\d+).*");
+    private static Pattern FULL_DAMPING_CONFIG = Pattern.compile("\\s*dampening (?<halfLife>\\d+) (?<reuse>\\d+) "
+            + "(?<suppress>\\d+) (?<maxSuppress>\\d+).*");
 
     @VisibleForTesting
     static void parseDamping(String output, ConfigBuilder builder) {
@@ -68,7 +69,7 @@ public class InterfaceDampingConfigReader implements CliConfigReader<Config, Con
         // damping is not enabled, until proven otherwise
         ParsingUtils.parseField(output, 0,
                 DAMPING_ENABLED::matcher,
-                matcher -> true,
+            matcher -> true,
                 builder::setEnabled);
 
         // if not enabled, don't even try to set other values
@@ -82,22 +83,22 @@ public class InterfaceDampingConfigReader implements CliConfigReader<Config, Con
 
         ParsingUtils.parseField(output, 0,
                 DAMPING_REUSE::matcher,
-                matcher -> Long.valueOf(matcher.group("halfLife")),
+            matcher -> Long.valueOf(matcher.group("halfLife")),
                 builder::setHalfLife);
 
         ParsingUtils.parseField(output, 0,
                 FULL_DAMPING_CONFIG::matcher,
-                matcher -> Long.valueOf(matcher.group("reuse")),
+            matcher -> Long.valueOf(matcher.group("reuse")),
                 builder::setReuse);
 
         ParsingUtils.parseField(output, 0,
                 FULL_DAMPING_CONFIG::matcher,
-                matcher -> Long.valueOf(matcher.group("suppress")),
+            matcher -> Long.valueOf(matcher.group("suppress")),
                 builder::setSuppress);
 
         ParsingUtils.parseField(output, 0,
                 FULL_DAMPING_CONFIG::matcher,
-                matcher -> Long.valueOf(matcher.group("maxSuppress")),
+            matcher -> Long.valueOf(matcher.group("maxSuppress")),
                 builder::setMaxSuppress);
     }
 

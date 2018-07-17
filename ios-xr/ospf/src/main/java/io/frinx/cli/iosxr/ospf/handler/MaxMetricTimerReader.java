@@ -29,8 +29,8 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.MAXMETRICONSWITCHOVER;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.MAXMETRICALWAYS;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.MAXMETRICONSWITCHOVER;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.max.metrics.fields.MaxMetricTimersBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.max.metrics.fields.max.metric.timers.MaxMetricTimer;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.max.metrics.fields.max.metric.timers.MaxMetricTimerBuilder;
@@ -41,13 +41,14 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader<MaxMetricTimer, MaxMetricTimerKey, MaxMetricTimerBuilder> {
+public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader<MaxMetricTimer, MaxMetricTimerKey,
+        MaxMetricTimerBuilder> {
 
-    public static final Pattern MAX_METRIC_LINE = Pattern.compile("max-metric router-lsa(?<trigger>" +
-            "(?<onStartup> on-startup)|(?<onSwitchover> on-switchover))*" +
-            "(?<timeout> \\d+)*(?<includeStub> include-stub)*" +
-            "(?<summaryLsa> summary-lsa)*" +
-            "(?<externalLsa> external-lsa)*");
+    public static final Pattern MAX_METRIC_LINE = Pattern.compile("max-metric router-lsa(?<trigger>"
+            + "(?<onStartup> on-startup)|(?<onSwitchover> on-switchover))*"
+            + "(?<timeout> \\d+)*(?<includeStub> include-stub)*"
+            + "(?<summaryLsa> summary-lsa)*"
+            + "(?<externalLsa> external-lsa)*");
 
     public static final String SH_RUN_OSPF_MAX_METRIC = "show running-config router ospf %s | include ^ max-metric";
 
@@ -58,9 +59,12 @@ public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader
     }
 
     @Override
-    public List<MaxMetricTimerKey> getAllIdsForType(@Nonnull InstanceIdentifier<MaxMetricTimer> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        return parseTimerKeys(blockingRead(String.format(SH_RUN_OSPF_MAX_METRIC, ospfId), cli, instanceIdentifier, readContext));
+    public List<MaxMetricTimerKey> getAllIdsForType(@Nonnull InstanceIdentifier<MaxMetricTimer> instanceIdentifier,
+                                                    @Nonnull ReadContext readContext) throws ReadFailedException {
+        String ospfId = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
+        return parseTimerKeys(blockingRead(String.format(SH_RUN_OSPF_MAX_METRIC, ospfId), cli, instanceIdentifier,
+                readContext));
     }
 
     @Override
@@ -69,7 +73,8 @@ public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<MaxMetricTimer> instanceIdentifier, @Nonnull MaxMetricTimerBuilder builder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<MaxMetricTimer> instanceIdentifier, @Nonnull
+            MaxMetricTimerBuilder builder, @Nonnull ReadContext readContext) throws ReadFailedException {
         MaxMetricTimerKey timerKey = instanceIdentifier.firstKeyOf(MaxMetricTimer.class);
         builder.setKey(timerKey);
     }
@@ -77,7 +82,7 @@ public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader
     private List<MaxMetricTimerKey> parseTimerKeys(String output) {
 
         List<MaxMetricTimerKey> triggers = new ArrayList<>();
-        for(String line : output.split(NEWLINE.pattern())) {
+        for (String line : output.split(NEWLINE.pattern())) {
             Matcher matcher = MAX_METRIC_LINE.matcher(line);
             if (!matcher.find()) {
                 continue;
@@ -91,10 +96,12 @@ public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader
         if (trigger == null) {
             return MAXMETRICALWAYS.class;
         }
-        if (trigger.trim().equals("on-startup")) {
+        if (trigger.trim()
+                .equals("on-startup")) {
             return MAXMETRICONSYSTEMBOOT.class;
         }
-        if (trigger.trim().equals("on-switchover")) {
+        if (trigger.trim()
+                .equals("on-switchover")) {
             return MAXMETRICONSWITCHOVER.class;
         }
         LOG.warn("Unknown trigger type {}", trigger);

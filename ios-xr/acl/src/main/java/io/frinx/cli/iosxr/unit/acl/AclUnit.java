@@ -44,14 +44,16 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.acl.IIDs;
+
 import java.util.Set;
 import javax.annotation.Nonnull;
+
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.DestinationAddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSetsBuilder;
@@ -91,8 +93,10 @@ public class AclUnit implements TranslateUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.$YangModuleInfoImpl.getInstance(),
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.$YangModuleInfoImpl.getInstance()
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
+                        .$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
+                        .$YangModuleInfoImpl.getInstance()
         );
     }
 
@@ -102,173 +106,194 @@ public class AclUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
         Cli cli = context.getTransport();
-        provideReaders(rRegistry, cli);
-        provideWriters(wRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wRegistry, Cli cli) {
-        wRegistry.add(new GenericWriter<>(IIDs.ACL, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.AC_IN_INTERFACE, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_CONFIG, new NoopCliWriter<>()));
+    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+        writeRegistry.add(new GenericWriter<>(IIDs.ACL, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_CONFIG, new NoopCliWriter<>()));
 
         // ingress
-        wRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli)));
 
         // egress
-        wRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_EG_EGRESSACLSET, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_EG_EGRESSACLSET, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigWriter(cli)));
 
-        wRegistry.add(new GenericWriter<>(IIDs.AC_ACLSETS, new NoopCliWriter<>()));
-        wRegistry.add(new GenericListWriter<>(IIDs.AC_AC_ACLSET, new NoopCliListWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.AC_AC_AC_CONFIG, new NoopCliWriter<>()));
-        wRegistry.add(new GenericWriter<>(IIDs.AC_AC_AC_ACLENTRIES, new NoopCliWriter<>()));
-        wRegistry.subtreeAdd(Sets.newHashSet(
+        writeRegistry.add(new GenericWriter<>(IIDs.AC_ACLSETS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericListWriter<>(IIDs.AC_AC_ACLSET, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.AC_AC_AC_CONFIG, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.AC_AC_AC_ACLENTRIES, new NoopCliWriter<>()));
+        writeRegistry.subtreeAdd(Sets.newHashSet(
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.acl.entry.Config.class),
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                .acl.rev170526.access.list.entries.top.acl.entries.acl.entry.Config.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv4.class),
+                        .child(Ipv4.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv4.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class),
+                        .child(Ipv4.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv4.protocol.fields.top.ipv4.Config.class)
+                        .augmentation(AclSetAclEntryIpv4WildcardedAug.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv4.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class)
-                    .augmentation(Config1.class),
+                        .child(Ipv4.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv4.protocol.fields.top.ipv4.Config.class)
+                        .augmentation(AclSetAclEntryIpv4WildcardedAug.class)
+                        .child(SourceAddressWildcarded.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv4.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class)
-                    .augmentation(AclSetAclEntryIpv4WildcardedAug.class),
+                        .child(Ipv4.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv4.protocol.fields.top.ipv4.Config.class)
+                        .augmentation(AclSetAclEntryIpv4WildcardedAug.class)
+                        .child(DestinationAddressWildcarded.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv4.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class)
-                    .augmentation(AclSetAclEntryIpv4WildcardedAug.class)
-                    .child(SourceAddressWildcarded.class),
+                        .child(Ipv6.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv4.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class)
-                    .augmentation(AclSetAclEntryIpv4WildcardedAug.class)
-                    .child(DestinationAddressWildcarded.class),
+                        .child(Ipv6.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv6.protocol.fields.top.ipv6.Config.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv6.class),
+                        .child(Ipv6.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv6.protocol.fields.top.ipv6.Config.class)
+                        .augmentation(Config2.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv6.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class),
+                        .child(Ipv6.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv6.protocol.fields.top.ipv6.Config.class)
+                        .augmentation(AclSetAclEntryIpv6WildcardedAug.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv6.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class)
-                    .augmentation(Config2.class),
+                        .child(Ipv6.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv6.protocol.fields.top.ipv6.Config.class)
+                        .augmentation(AclSetAclEntryIpv6WildcardedAug.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst
+                                .ipv6.address.wildcarded.SourceAddressWildcarded.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv6.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class)
-                    .augmentation(AclSetAclEntryIpv6WildcardedAug.class),
+                        .child(Ipv6.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv6.protocol.fields.top.ipv6.Config.class)
+                        .augmentation(AclSetAclEntryIpv6WildcardedAug.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst
+                                .ipv6.address.wildcarded.DestinationAddressWildcarded.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv6.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class)
-                    .augmentation(AclSetAclEntryIpv6WildcardedAug.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.SourceAddressWildcarded.class),
+                        .child(Transport.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Ipv6.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class)
-                    .augmentation(AclSetAclEntryIpv6WildcardedAug.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv6.address.wildcarded.DestinationAddressWildcarded.class),
+                        .child(Transport.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .transport.fields.top.transport.Config.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Transport.class),
+                        .child(Transport.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .transport.fields.top.transport.Config.class)
+                        .augmentation(AclSetAclEntryTransportPortNamedAug.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Transport.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.Config.class),
+                        .child(Actions.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Transport.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.Config.class)
-                    .augmentation(AclSetAclEntryTransportPortNamedAug.class),
+                        .child(Actions.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
+                                .action.top.actions.Config.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Actions.class),
+                        .augmentation(AclEntry1.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .child(Actions.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.action.top.actions.Config.class),
+                        .augmentation(AclEntry1.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
+                                .acl.icmp.type.Icmp.class),
                 InstanceIdentifier.create(AclEntry.class)
-                    .augmentation(AclEntry1.class),
-                InstanceIdentifier.create(AclEntry.class)
-                    .augmentation(AclEntry1.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.Icmp.class),
-                InstanceIdentifier.create(AclEntry.class)
-                    .augmentation(AclEntry1.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.Icmp.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.icmp.Config.class)
+                        .augmentation(AclEntry1.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
+                                .acl.icmp.type.Icmp.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
+                                .acl.icmp.type.icmp.Config.class)
                 ),
                 new GenericWriter<>(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryWriter(cli)));
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rRegistry, Cli cli) {
-        rRegistry.addStructuralReader(IIDs.ACL, AclBuilder.class);
+    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.addStructuralReader(IIDs.ACL, AclBuilder.class);
 
-        rRegistry.addStructuralReader(IIDs.AC_INTERFACES, InterfacesBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_CONFIG, new AclInterfaceConfigReader()));
+        readRegistry.addStructuralReader(IIDs.AC_INTERFACES, InterfacesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_CONFIG, new AclInterfaceConfigReader()));
 
         // ingress
-        rRegistry.addStructuralReader(IIDs.AC_IN_IN_INGRESSACLSETS, IngressAclSetsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.AC_IN_IN_INGRESSACLSETS, IngressAclSetsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigReader(cli)));
 
         // egress
-        rRegistry.addStructuralReader(IIDs.AC_IN_IN_EGRESSACLSETS, EgressAclSetsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_IN_EG_EGRESSACLSET, new EgressAclSetReader(cli)));
-        rRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.AC_IN_IN_EGRESSACLSETS, EgressAclSetsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_IN_EG_EGRESSACLSET, new EgressAclSetReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigReader(cli)));
 
         // sets
-        rRegistry.addStructuralReader(IIDs.AC_ACLSETS, AclSetsBuilder.class);
-        rRegistry.add(new GenericConfigListReader<>(IIDs.AC_AC_ACLSET, new AclSetReader(cli)));
+        readRegistry.addStructuralReader(IIDs.AC_ACLSETS, AclSetsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_AC_ACLSET, new AclSetReader(cli)));
         // acl-set/config
-        rRegistry.add(new GenericConfigReader<>(IIDs.AC_AC_AC_CONFIG, new AclSetConfigReader()));
+        readRegistry.add(new GenericConfigReader<>(IIDs.AC_AC_AC_CONFIG, new AclSetConfigReader()));
         // Access list entries inside acl-set
-        rRegistry.addStructuralReader(IIDs.AC_AC_AC_ACLENTRIES, AclEntriesBuilder.class);
+        readRegistry.addStructuralReader(IIDs.AC_AC_AC_ACLENTRIES, AclEntriesBuilder.class);
 
         // ACL Entry subtree
         final InstanceIdentifier<AclEntry> ACL_ENTRY_TREE_BASE = InstanceIdentifier.create(AclEntry.class);
-        rRegistry.subtreeAdd(Sets.newHashSet(
-            ACL_ENTRY_TREE_BASE
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.acl.entry.Config.class),
-            ACL_ENTRY_TREE_BASE.child(Actions.class),
-            ACL_ENTRY_TREE_BASE
-                .child(Actions.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.action.top.actions.Config.class),
-            ACL_ENTRY_TREE_BASE.child(Ipv4.class),
-            ACL_ENTRY_TREE_BASE
-                .child(Ipv4.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class),
-            ACL_ENTRY_TREE_BASE
-                .child(Ipv4.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config.class)
-                .augmentation(Config1.class),
-            ACL_ENTRY_TREE_BASE.child(Ipv6.class),
-            ACL_ENTRY_TREE_BASE
-                .child(Ipv6.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class),
-            ACL_ENTRY_TREE_BASE
-                .child(Ipv6.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.Config.class)
-                .augmentation(Config2.class),
-            ACL_ENTRY_TREE_BASE.child(Transport.class),
-            ACL_ENTRY_TREE_BASE
-                .child(Transport.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.Config.class),
-            ACL_ENTRY_TREE_BASE
-                .child(Transport.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.Config.class)
-                .augmentation(AclSetAclEntryTransportPortNamedAug.class),
-            ACL_ENTRY_TREE_BASE.augmentation(AclEntry1.class),
-            ACL_ENTRY_TREE_BASE
-                .augmentation(AclEntry1.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.Icmp.class),
-            ACL_ENTRY_TREE_BASE
-                .augmentation(AclEntry1.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.Icmp.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.icmp.Config.class)
+        readRegistry.subtreeAdd(Sets.newHashSet(
+                ACL_ENTRY_TREE_BASE
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
+                                .access.list.entries.top.acl.entries.acl.entry.Config.class),
+                ACL_ENTRY_TREE_BASE.child(Actions.class),
+                ACL_ENTRY_TREE_BASE
+                        .child(Actions.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
+                                .action.top.actions.Config.class),
+                ACL_ENTRY_TREE_BASE.child(Ipv4.class),
+                ACL_ENTRY_TREE_BASE
+                        .child(Ipv4.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv4.protocol.fields.top.ipv4.Config.class),
+                ACL_ENTRY_TREE_BASE
+                        .child(Ipv4.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv4.protocol.fields.top.ipv4.Config.class)
+                        .augmentation(Config1.class),
+                ACL_ENTRY_TREE_BASE.child(Ipv6.class),
+                ACL_ENTRY_TREE_BASE
+                        .child(Ipv6.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv6.protocol.fields.top.ipv6.Config.class),
+                ACL_ENTRY_TREE_BASE
+                        .child(Ipv6.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv6.protocol.fields.top.ipv6.Config.class)
+                        .augmentation(Config2.class),
+                ACL_ENTRY_TREE_BASE.child(Transport.class),
+                ACL_ENTRY_TREE_BASE
+                        .child(Transport.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .transport.fields.top.transport.Config.class),
+                ACL_ENTRY_TREE_BASE
+                        .child(Transport.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .transport.fields.top.transport.Config.class)
+                        .augmentation(AclSetAclEntryTransportPortNamedAug.class),
+                ACL_ENTRY_TREE_BASE.augmentation(AclEntry1.class),
+                ACL_ENTRY_TREE_BASE
+                        .augmentation(AclEntry1.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
+                                .acl.icmp.type.Icmp.class),
+                ACL_ENTRY_TREE_BASE
+                        .augmentation(AclEntry1.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
+                                .acl.icmp.type.Icmp.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
+                                .acl.icmp.type.icmp.Config.class)
         ), new GenericConfigListReader<>(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryReader(cli)));
     }
 

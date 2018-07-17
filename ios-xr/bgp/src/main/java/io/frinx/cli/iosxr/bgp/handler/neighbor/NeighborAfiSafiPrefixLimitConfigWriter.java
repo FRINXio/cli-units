@@ -40,32 +40,38 @@ public class NeighborAfiSafiPrefixLimitConfigWriter implements BgpWriter<Config>
         this.cli = cli;
     }
 
-    static final String NEIGHBOR_AFI_PREFIX_LIMIT ="router bgp {$as} {$instance}\n" +
-            "neighbor {$address}\n" +
-            "address-family {$afiSafi}\n" +
-            "{.if ($config.max_prefixes) }maximum-prefix {$config.max_prefixes}{.else}no maximum-prefix{/if}" +
-            "{.if ($config.shutdown_threshold_pct.value) } {$config.shutdown_threshold_pct.value}{/if}" +
-            "\n" +
-            "root\n";
+    static final String NEIGHBOR_AFI_PREFIX_LIMIT = "router bgp {$as} {$instance}\n"
+            + "neighbor {$address}\n"
+            + "address-family {$afiSafi}\n"
+            + "{.if ($config.max_prefixes) }maximum-prefix {$config.max_prefixes}{.else}no maximum-prefix{/if}"
+            + "{.if ($config.shutdown_threshold_pct.value) } {$config.shutdown_threshold_pct.value}{/if}"
+            + "\n"
+            + "root\n";
 
-    static final String DELETE_NEIGHBOR_AFI_PREFIX_LIMIT ="router bgp {$as} {$instance}\n" +
-            "neighbor {$address}\n" +
-            "address-family {$afiSafi}\n" +
-            "no maximum-prefix\n" +
-            "root\n";
+    static final String DELETE_NEIGHBOR_AFI_PREFIX_LIMIT = "router bgp {$as} {$instance}\n"
+            + "neighbor {$address}\n"
+            + "address-family {$afiSafi}\n"
+            + "no maximum-prefix\n"
+            + "root\n";
 
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
                                               WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         blockingWriteAndRead(fT(NEIGHBOR_AFI_PREFIX_LIMIT,
-                "as", g.getConfig().getAs().getValue(),
+                "as", g.getConfig()
+                        .getAs()
+                        .getValue(),
                 "instance", instName,
-                "address", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class).getAfiSafiName()),
+                "address", new String(id.firstKeyOf(Neighbor.class)
+                        .getNeighborAddress()
+                        .getValue()),
+                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class)
+                        .getAfiSafiName()),
                 "config", config),
                 cli, id, config);
     }
@@ -83,13 +89,19 @@ public class NeighborAfiSafiPrefixLimitConfigWriter implements BgpWriter<Config>
         if (!bgpOptional.isPresent()) {
             return;
         }
-        final Global g = bgpOptional.get().getGlobal();
+        final Global g = bgpOptional.get()
+                .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         blockingDeleteAndRead(fT(DELETE_NEIGHBOR_AFI_PREFIX_LIMIT,
-                "as", g.getConfig().getAs().getValue(),
+                "as", g.getConfig()
+                        .getAs()
+                        .getValue(),
                 "instance", instName,
-                "address", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class).getAfiSafiName())),
+                "address", new String(id.firstKeyOf(Neighbor.class)
+                        .getNeighborAddress()
+                        .getValue()),
+                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class)
+                        .getAfiSafiName())),
                 cli, id);
     }
 }

@@ -60,12 +60,20 @@ public class OneRateTwoColorConfigReader implements CliConfigReader<Config, Conf
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
-        Long seq = instanceIdentifier.firstKeyOf(Scheduler.class).getSequence();
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder
+            configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
+        Long seq = instanceIdentifier.firstKeyOf(Scheduler.class)
+                .getSequence();
         // there is always at least class-default
-        Inputs inp = readContext.read(RWUtils.cutId(instanceIdentifier, Schedulers.class).child(Scheduler.class, new SchedulerKey(seq)).child(Inputs.class)).get();
-        String classname = inp.getInput().get(0).getId();
+        Inputs inp = readContext.read(RWUtils.cutId(instanceIdentifier, Schedulers.class)
+                .child(Scheduler.class, new SchedulerKey(seq))
+                .child(Inputs.class))
+                .get();
+        String classname = inp.getInput()
+                .get(0)
+                .getId();
         String output = blockingRead(f(SH_POLICY_MAP, policyName, classname), cli, instanceIdentifier, readContext);
         String finalOutput = limitOutput(output, classname);
         fillInConfig(finalOutput, configBuilder);
@@ -81,7 +89,7 @@ public class OneRateTwoColorConfigReader implements CliConfigReader<Config, Conf
             // to the line where the next class declaration begins
             int first = 0;
             int until = 0;
-            for (int i = 0; i < full.length; i ++) {
+            for (int i = 0; i < full.length; i++) {
                 // first occurence should be the class definition
                 Matcher matchDef = classDef.matcher(full[i]);
                 if (matchDef.matches()) {
@@ -93,7 +101,8 @@ public class OneRateTwoColorConfigReader implements CliConfigReader<Config, Conf
                     until = i;
                 }
             }
-            return String.join("\n", Arrays.asList(full).subList(first, until));
+            return String.join("\n", Arrays.asList(full)
+                    .subList(first, until));
         }
         return String.join("\n", full);
     }

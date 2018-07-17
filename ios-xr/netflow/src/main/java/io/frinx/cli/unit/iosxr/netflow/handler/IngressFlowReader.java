@@ -41,7 +41,8 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class IngressFlowReader implements TypedListReader<IngressFlow, IngressFlowKey, IngressFlowBuilder>, CliConfigListReader<IngressFlow, IngressFlowKey, IngressFlowBuilder> {
+public class IngressFlowReader implements TypedListReader<IngressFlow, IngressFlowKey, IngressFlowBuilder>,
+        CliConfigListReader<IngressFlow, IngressFlowKey, IngressFlowBuilder> {
 
     private static final String SH_NETFLOW_INTF = "show running-config interface %s | include ingress";
     private static final Pattern FLOW_LINE = Pattern.compile("flow (?<type>.+) monitor \\S+( sampler .+)? ingress");
@@ -60,16 +61,19 @@ public class IngressFlowReader implements TypedListReader<IngressFlow, IngressFl
 
     @Nonnull
     @Override
-    public List<IngressFlowKey> getAllIdsForType(@Nonnull InstanceIdentifier<IngressFlow> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
-        InterfaceId interfaceId = instanceIdentifier.firstKeyOf(Interface.class).getId();
-        return parseFlowKeys(blockingRead(String.format(SH_NETFLOW_INTF, interfaceId.getValue()), cli, instanceIdentifier, readContext));
+    public List<IngressFlowKey> getAllIdsForType(@Nonnull InstanceIdentifier<IngressFlow> instanceIdentifier,
+                                                 @Nonnull ReadContext readContext) throws ReadFailedException {
+        InterfaceId interfaceId = instanceIdentifier.firstKeyOf(Interface.class)
+                .getId();
+        return parseFlowKeys(blockingRead(String.format(SH_NETFLOW_INTF, interfaceId.getValue()), cli,
+                instanceIdentifier, readContext));
     }
 
     private static List<IngressFlowKey> parseFlowKeys(String output) {
         return ParsingUtils.parseFields(output, 0,
-            FLOW_LINE::matcher,
+                FLOW_LINE::matcher,
             matcher -> NetflowUtils.getType(matcher.group("type")),
-            IngressFlowKey::new
+                IngressFlowKey::new
         );
     }
 
@@ -79,7 +83,8 @@ public class IngressFlowReader implements TypedListReader<IngressFlow, IngressFl
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<IngressFlow> instanceIdentifier, @Nonnull IngressFlowBuilder ingressFlowBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<IngressFlow> instanceIdentifier, @Nonnull
+            IngressFlowBuilder ingressFlowBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final IngressFlowKey key = instanceIdentifier.firstKeyOf(IngressFlow.class);
         ingressFlowBuilder.setNetflowType(key.getNetflowType());
     }

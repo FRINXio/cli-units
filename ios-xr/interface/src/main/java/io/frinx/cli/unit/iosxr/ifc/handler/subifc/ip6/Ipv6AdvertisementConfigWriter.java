@@ -42,8 +42,10 @@ public class Ipv6AdvertisementConfigWriter implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id, @Nonnull final Config dataAfter,
                                        @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
-        Long subIfcIndex = id.firstKeyOf(Subinterface.class).getIndex();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
+        Long subIfcIndex = id.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         Ipv6CheckUtil.checkParentInterfaceTypeWithExeption(ifcName, EthernetCsmacd.class, Ieee8023adLag.class);
         Ipv6CheckUtil.checkSubInterfaceIdWithExeption(subIfcIndex, SubinterfaceReader.ZERO_SUBINTERFACE_ID);
@@ -51,9 +53,9 @@ public class Ipv6AdvertisementConfigWriter implements CliWriter<Config> {
         String dampConfCommand = getAdvertisementCommand(dataAfter);
 
         blockingWriteAndRead(cli, id, dataAfter,
-            f("interface %s", ifcName),
-            dampConfCommand,
-            "root");
+                f("interface %s", ifcName),
+                dampConfCommand,
+                "root");
     }
 
     private String getAdvertisementCommand(final Config dataAfter) {
@@ -67,22 +69,24 @@ public class Ipv6AdvertisementConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id, @Nonnull final Config dataBefore,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
-        Long subIfcIndex = id.firstKeyOf(Subinterface.class).getIndex();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
+        Long subIfcIndex = id.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         Ipv6CheckUtil.checkParentInterfaceTypeWithExeption(ifcName, EthernetCsmacd.class, Ieee8023adLag.class);
         Ipv6CheckUtil.checkSubInterfaceIdWithExeption(subIfcIndex, SubinterfaceReader.ZERO_SUBINTERFACE_ID);
 
         blockingDeleteAndRead(cli, id,
-            f("interface %s", ifcName),
-            NO_IPV6_ND_SUPPRESS,
-            "root");
+                f("interface %s", ifcName),
+                NO_IPV6_ND_SUPPRESS,
+                "root");
     }
 
     @Override
     public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id, @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter, @Nonnull final WriteContext writeContext)
-        throws WriteFailedException {
+            throws WriteFailedException {
 
         writeCurrentAttributes(id, dataAfter, writeContext);
     }

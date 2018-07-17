@@ -35,6 +35,14 @@ public abstract class InterfaceCheckUtil {
     // TODO merge check util classes in ACL, ipv6 subinterfaces, and netflow
     static final String CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX = "Parent interface should be ";
 
+    private static boolean checkInterfaceType(final String ifcName, final @Nonnull Class... types) {
+        final Class<? extends InterfaceType> infType = parseType(ifcName);
+
+        return Lists.newArrayList(types)
+                .stream()
+                .anyMatch(type -> type.equals(infType));
+    }
+
     public static boolean checkInterfaceType(final InstanceIdentifier<?> iid, final @Nonnull Class... types) {
         final Optional<String> interfaceName = getInterfaceName(iid);
         if (interfaceName.isPresent()) {
@@ -48,8 +56,8 @@ public abstract class InterfaceCheckUtil {
         final boolean typeIsValid = checkInterfaceType(iid, types);
 
         Preconditions.checkArgument(typeIsValid,
-            CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX + "one of %s",
-            types);
+                CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX + "one of %s",
+                types);
     }
 
     private static Optional<String> getInterfaceName(final InstanceIdentifier<?> iid) {
@@ -65,17 +73,12 @@ public abstract class InterfaceCheckUtil {
         return Optional.of(interfaceId.getValue());
     }
 
-    private static boolean checkInterfaceType(final String ifcName, final @Nonnull Class... types) {
-        final Class<? extends InterfaceType> infType = parseType(ifcName);
-
-        return Lists.newArrayList(types).stream().anyMatch(type -> type.equals(infType));
-    }
-
-    // TODO extract to util module together with io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader.parseType() in ios-xr-interface-unit
+    // TODO extract to util module together with io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader.parseType
+    // () in ios-xr-interface-unit
     public static Class<? extends InterfaceType> parseType(String name) {
         if (name.startsWith("FastEther") || name.startsWith("GigabitEthernet") || name.startsWith("TenGigE")) {
             return EthernetCsmacd.class;
-        }  else if (name.startsWith("Loopback")) {
+        } else if (name.startsWith("Loopback")) {
             return SoftwareLoopback.class;
         } else if (name.startsWith("Bundle-Ether")) {
             return Ieee8023adLag.class;

@@ -46,18 +46,20 @@ public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, C
 
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                      @Nonnull ConfigBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        parseRouterId(blockingRead(String.format(SH_OSPF, ospfId), cli, instanceIdentifier, readContext), configBuilder);
+                                             @Nonnull ConfigBuilder configBuilder,
+                                             @Nonnull ReadContext readContext) throws ReadFailedException {
+        String ospfId = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
+        parseRouterId(blockingRead(String.format(SH_OSPF, ospfId), cli, instanceIdentifier, readContext),
+                configBuilder);
     }
 
     @VisibleForTesting
     static void parseRouterId(String output, ConfigBuilder builder) {
         ParsingUtils.parseField(output,
                 ROUTER_ID::matcher,
-                matcher -> matcher.group("routerId"),
-                value -> builder.setRouterId(new DottedQuad(value)));
+            matcher -> matcher.group("routerId"),
+            value -> builder.setRouterId(new DottedQuad(value)));
     }
 
     @Override

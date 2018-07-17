@@ -22,23 +22,24 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import java.util.Collections;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class InterfaceConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
     private static final Set<Class<? extends InterfaceType>> SUPPORTED_INTERFACE_TYPES = Sets.newHashSet();
+
     static {
         SUPPORTED_INTERFACE_TYPES.add(Ieee8023adLag.class);
         SUPPORTED_INTERFACE_TYPES.add(SoftwareLoopback.class);
@@ -90,7 +91,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             Preconditions.checkArgument(result,
                     "LAG interface name must be in format: Bundle-Ether45, not: %s", data.getName());
         } else {
-            throw new IllegalArgumentException("Interface " + data.getName() + " has unknown type: " + data.getType().getSimpleName());
+            throw new IllegalArgumentException("Interface " + data.getName() + " has unknown type: " + data.getType()
+                    .getSimpleName());
         }
     }
 
@@ -103,7 +105,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
+        Preconditions.checkArgument(dataBefore.getType()
+                        .equals(dataAfter.getType()),
                 "Changing interface type is not permitted. Before: %s, After: %s",
                 dataBefore.getType(), dataAfter.getType());
 

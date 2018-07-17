@@ -23,20 +23,19 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ag
 
 public class AggregateConfigReaderTest {
 
-    private static String SH_RUN_INT = "Mon Nov 27 13:03:17.446 UTC\n" +
-            "interface Bundle-Ether4\n" +
-            " bundle minimum-active links 30\n" +
-            "!\n" +
-            "\n";
+    private static String SH_RUN_INT = "Mon Nov 27 13:03:17.446 UTC\n"
+            + "interface Bundle-Ether4\n"
+            + " bundle minimum-active links 30\n"
+            + "!\n"
+            + "\n";
 
-    private static Config EXPECTED_CONFIG = new ConfigBuilder()
-            .setMinLinks(30)
+    private static Config EXPECTED_CONFIG = new ConfigBuilder().setMinLinks(30)
             .build();
 
-    private static String SH_RUN_INT_NO_BUNDLE_CONFIG = "Mon Nov 27 13:08:49.703 UTC\n" +
-            "interface Bundle-Ether6\n" +
-            "!\n" +
-            "\n";
+    private static String SH_RUN_INT_NO_BUNDLE_CONFIG = "Mon Nov 27 13:08:49.703 UTC\n"
+            + "interface Bundle-Ether6\n"
+            + "!\n"
+            + "\n";
 
     private static Config EXPECTED_NO_BUNDLE_CONFIG = new ConfigBuilder()
             .build();

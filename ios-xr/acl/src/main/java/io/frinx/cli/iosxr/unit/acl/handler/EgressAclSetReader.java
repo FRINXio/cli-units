@@ -25,9 +25,11 @@ import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
 import io.frinx.cli.iosxr.unit.acl.handler.util.NameTypeEntry;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSet;
@@ -44,7 +46,7 @@ public class EgressAclSetReader implements CliConfigListReader<EgressAclSet, Egr
 
     private static final String SH_ACL_INTF = "show running-config interface %s";
     private static final Pattern ALL_EGRESS_ACLS_LINE =
-        Pattern.compile("(?<type>.+) access-group (?<name>.+) egress.*", Pattern.DOTALL);
+            Pattern.compile("(?<type>.+) access-group (?<name>.+) egress.*", Pattern.DOTALL);
 
     private final Cli cli;
 
@@ -60,15 +62,19 @@ public class EgressAclSetReader implements CliConfigListReader<EgressAclSet, Egr
     @VisibleForTesting
     static void parseAcl(final String output, final Builder configBuilder, final String setName) {
         Preconditions.checkArgument(
-            configBuilder instanceof EgressAclSetBuilder || configBuilder instanceof ConfigBuilder
+                configBuilder instanceof EgressAclSetBuilder || configBuilder instanceof ConfigBuilder
         );
 
         final Pattern aclLine = aclPatternByName(setName);
 
         ParsingUtils.parseField(output, 0,
             aclLine::matcher,
-            matcher -> AclUtil.getType(matcher.group("type")),
-            value -> setNameAndType(configBuilder, setName, value));
+            matcher -> {
+                return AclUtil.getType(matcher.group("type"));
+            },
+            value -> {
+                setNameAndType(configBuilder, setName, value);
+            });
     }
 
     private static void setNameAndType(final Builder builder, String name, Class<? extends ACLTYPE> type) {
@@ -86,7 +92,9 @@ public class EgressAclSetReader implements CliConfigListReader<EgressAclSet, Egr
         return ParsingUtils.parseFields(output, 0,
             ALL_EGRESS_ACLS_LINE::matcher,
             NameTypeEntry::fromMatcher,
-            nameTypeEntry -> new EgressAclSetKey(nameTypeEntry.getName(), nameTypeEntry.getType())
+            nameTypeEntry -> {
+                return new EgressAclSetKey(nameTypeEntry.getName(), nameTypeEntry.getType());
+            }
         );
     }
 
@@ -96,7 +104,7 @@ public class EgressAclSetReader implements CliConfigListReader<EgressAclSet, Egr
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
         InterfaceId interfaceId = instanceIdentifier.firstKeyOf(Interface.class).getId();
         return parseAclKeys(
-            blockingRead(String.format(SH_ACL_INTF, interfaceId.getValue()), cli, instanceIdentifier, readContext));
+                blockingRead(String.format(SH_ACL_INTF, interfaceId.getValue()), cli, instanceIdentifier, readContext));
     }
 
     @Override
@@ -113,10 +121,10 @@ public class EgressAclSetReader implements CliConfigListReader<EgressAclSet, Egr
 
         final String readCommand = f(EgressAclSetConfigReader.SH_ACL_INTF, interfaceName);
         final String readConfig = blockingRead(
-            readCommand,
-            cli,
-            instanceIdentifier,
-            readContext
+                readCommand,
+                cli,
+                instanceIdentifier,
+                readContext
         );
 
         parseAcl(readConfig, egressAclSetBuilder, setName);

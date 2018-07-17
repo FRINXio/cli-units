@@ -28,11 +28,14 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AreaConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder>, CliReader<Config, ConfigBuilder> {
+public class AreaConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder>, CliReader<Config,
+        ConfigBuilder> {
 
     @Override
-    public void readCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, ConfigBuilder configBuilder, ReadContext readContext) {
-        configBuilder.setIdentifier(instanceIdentifier.firstKeyOf(Area.class).getIdentifier());
+    public void readCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, ConfigBuilder
+            configBuilder, ReadContext readContext) {
+        configBuilder.setIdentifier(instanceIdentifier.firstKeyOf(Area.class)
+                .getIdentifier());
     }
 
     @Override

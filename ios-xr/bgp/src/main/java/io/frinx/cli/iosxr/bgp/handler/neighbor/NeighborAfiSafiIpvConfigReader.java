@@ -59,34 +59,44 @@ public abstract class NeighborAfiSafiIpvConfigReader implements BgpReader.BgpCon
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
+                globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
                 .child(Global.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config.class))
+                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
+                        .Config.class))
                 .orNull();
 
         if (globalConfig == null) {
             return;
         }
-        Class<? extends AFISAFITYPE> afiClass = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();
+        Class<? extends AFISAFITYPE> afiClass = instanceIdentifier.firstKeyOf(AfiSafi.class)
+                .getAfiSafiName();
         // prevent creating ipv4 container under ipv6 address-family and vice versa
         if (!isCorrectAfi(afiClass)) {
             return;
         }
 
-        IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress();
+        IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class)
+                .getNeighborAddress();
         String address = new String(neighborIp.getValue());
-        String insName = instanceIdentifier.firstKeyOf(Protocol.class).getName().equals(NetworInstance.DEFAULT_NETWORK_NAME) ?
-                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class).getName();
+        String insName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName()
+                .equals(NetworInstance.DEFAULT_NETWORK_NAME)
+                ?
+                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
         String afiName = GlobalAfiSafiReader.transformAfiToString(afiClass);
 
 
-        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs().getValue().intValue(), insName, address, afiName), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs()
+                .getValue()
+                .intValue(), insName, address, afiName), cli, instanceIdentifier, readContext);
 
         // default is disabled
         configBuilder.setSendDefaultRoute(false);
         ParsingUtils.parseField(output.trim(), 0,
                 DEFAULT_ORIGINATE_LINE::matcher,
-                matcher -> matcher.matches(),
-                matches -> configBuilder.setSendDefaultRoute(matches));
+            matcher -> matcher.matches(),
+            matches -> configBuilder.setSendDefaultRoute(matches));
     }
 }

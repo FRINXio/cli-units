@@ -30,14 +30,15 @@ public class RpfCheckUtils {
 
     static void appendAllowConfigCmdParams(final @Nonnull AllowConfigTop dataAfter, final StringBuilder verifyCmd) {
         if (dataAfter.getAllowConfig() != null) {
-            dataAfter.getAllowConfig().forEach(allowConfig -> {
-                if (allowConfig.equals(RPFALLOWSELFPING.class)) {
-                    verifyCmd.append(CMD_POSTFIX_ALLOW_SELF_PING);
-                }
-                if (allowConfig.equals(RPFALLOWDEFAULT.class)) {
-                    verifyCmd.append(CMD_POSTFIX_ALLOW_DEFAULT);
-                }
-            });
+            dataAfter.getAllowConfig()
+                    .forEach(allowConfig -> {
+                        if (allowConfig.equals(RPFALLOWSELFPING.class)) {
+                            verifyCmd.append(CMD_POSTFIX_ALLOW_SELF_PING);
+                        }
+                        if (allowConfig.equals(RPFALLOWDEFAULT.class)) {
+                            verifyCmd.append(CMD_POSTFIX_ALLOW_DEFAULT);
+                        }
+                    });
         }
     }
 }

@@ -37,7 +37,8 @@ public class AggregateConfigWriter implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         checkIfcType(ifcName);
 
@@ -66,7 +67,8 @@ public class AggregateConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         checkIfcType(ifcName);
 

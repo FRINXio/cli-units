@@ -18,7 +18,6 @@ package io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding;
 
 import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
 import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -42,7 +41,8 @@ public class PolicyForwardingInterfaceReader implements CliConfigListReader<Inte
 
     private final Cli cli;
     private static final String SH_SERVICE_POLICY_INT =
-            "show running-config interface | utility egrep \"^interface|^ service-policy input|^ service-policy output\"";
+            "show running-config interface | utility egrep \"^interface|^ service-policy input|^ service-policy "
+                    + "output\"";
 
     public PolicyForwardingInterfaceReader(Cli cli) {
         this.cli = cli;
@@ -77,7 +77,8 @@ public class PolicyForwardingInterfaceReader implements CliConfigListReader<Inte
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> id, @Nonnull InterfaceBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
-        builder.setInterfaceId(id.firstKeyOf(Interface.class).getInterfaceId());
+        builder.setInterfaceId(id.firstKeyOf(Interface.class)
+                .getInterfaceId());
     }
 
     private static String realignPFInterfacesOutput(String output) {

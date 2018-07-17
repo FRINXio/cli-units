@@ -40,7 +40,8 @@ public class BfdConfigWriter implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         checkIfcType(ifcName);
 
@@ -51,9 +52,12 @@ public class BfdConfigWriter implements CliWriter<Config> {
                 f("interface %s", ifcName),
                 "bfd mode ietf",
                 "bfd address-family ipv4 fast-detect",
-                dataAfter.getMultiplier() != null ? f("bfd address-family ipv4 multiplier %s", dataAfter.getMultiplier()) : "no bfd address-family ipv4 multiplier",
-                dataAfter.getMinInterval() != null ? f("bfd address-family ipv4 minimum-interval %s", dataAfter.getMinInterval()) : "no bfd address-family ipv4 minimum-interval",
-                destinationIpv4 != null ? f("bfd address-family ipv4 destination %s", destinationIpv4.getValue()) : "no bfd address-family ipv4 destination",
+                dataAfter.getMultiplier() != null ? f("bfd address-family ipv4 multiplier %s", dataAfter
+                        .getMultiplier()) : "no bfd address-family ipv4 multiplier",
+                dataAfter.getMinInterval() != null ? f("bfd address-family ipv4 minimum-interval %s", dataAfter
+                        .getMinInterval()) : "no bfd address-family ipv4 minimum-interval",
+                destinationIpv4 != null ? f("bfd address-family ipv4 destination %s", destinationIpv4.getValue()) :
+                        "no bfd address-family ipv4 destination",
                 "root");
     }
 
@@ -73,7 +77,8 @@ public class BfdConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         checkIfcType(ifcName);
 

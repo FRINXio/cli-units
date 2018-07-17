@@ -40,8 +40,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class PolicyForwardingInterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SHOW_SERVICE_POLICY_IFC = "show running-config interface %s | include ^ service-policy";
-    private static final Pattern INPUT_SERVICE_POLICY = Pattern.compile("\\s*service-policy input (?<policyMap>\\S+).*");
-    private static final Pattern OUTPUT_SERVICE_POLICY = Pattern.compile("\\s*service-policy output (?<policyMap>\\S+).*");
+    private static final Pattern INPUT_SERVICE_POLICY = Pattern.compile("\\s*service-policy input (?<policyMap>\\S+)"
+            + ".*");
+    private static final Pattern OUTPUT_SERVICE_POLICY = Pattern.compile("\\s*service-policy output "
+            + "(?<policyMap>\\S+).*");
 
     private final Cli cli;
 
@@ -56,20 +58,22 @@ public class PolicyForwardingInterfaceConfigReader implements CliConfigReader<Co
             return;
         }
 
-        String ifcName = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getInterfaceId()
+                .getValue();
         String output = blockingRead(String.format(SHOW_SERVICE_POLICY_IFC, ifcName), cli, id, ctx);
 
         NiPfIfCiscoAugBuilder niPfIfCiscoAugBuilder = new NiPfIfCiscoAugBuilder();
 
         ParsingUtils.parseFields(output, 0,
                 INPUT_SERVICE_POLICY::matcher,
-                matcher -> matcher.group("policyMap"),
+            matcher -> matcher.group("policyMap"),
                 niPfIfCiscoAugBuilder::setInputServicePolicy);
 
 
         ParsingUtils.parseFields(output, 0,
                 OUTPUT_SERVICE_POLICY::matcher,
-                matcher -> matcher.group("policyMap"),
+            matcher -> matcher.group("policyMap"),
                 niPfIfCiscoAugBuilder::setOutputServicePolicy);
 
         if (niPfIfCiscoAugBuilder.getInputServicePolicy() == null

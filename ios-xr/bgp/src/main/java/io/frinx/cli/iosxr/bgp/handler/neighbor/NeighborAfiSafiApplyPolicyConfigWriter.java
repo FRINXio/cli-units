@@ -42,35 +42,41 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
         this.cli = cli;
     }
 
-    static final String WRITE_NEIGHBOR_AFI_APPLY_POLICY ="router bgp {$as} {$instance}\n" +
-            "neighbor {$address}\n" +
-            "address-family {$afiSafi}\n" +
-            "{% loop in $config.import_policy as $inPolicy}\n" +
-                "{.if ($delete)}no {/if}route-policy {$inPolicy} in\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "{% loop in $config.export_policy as $outPolicy}\n" +
-                "{.if ($outPolicy == $nexthopself) }" +
-                    "{.if ($delete)}no {/if}next-hop-self\n" +
-                "{.else}" +
-                    "{.if ($delete)}no {/if}route-policy {$outPolicy} out\n" +
-                "{/if}" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "root\n";
+    static final String WRITE_NEIGHBOR_AFI_APPLY_POLICY = "router bgp {$as} {$instance}\n"
+            + "neighbor {$address}\n"
+            + "address-family {$afiSafi}\n"
+            + "{% loop in $config.import_policy as $inPolicy}\n"
+            + "{.if ($delete)}no {/if}route-policy {$inPolicy} in\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "{% loop in $config.export_policy as $outPolicy}\n"
+            + "{.if ($outPolicy == $nexthopself) }"
+            + "{.if ($delete)}no {/if}next-hop-self\n"
+            + "{.else}"
+            + "{.if ($delete)}no {/if}route-policy {$outPolicy} out\n"
+            + "{/if}"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "root\n";
 
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
                                               WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         blockingWriteAndRead(fT(WRITE_NEIGHBOR_AFI_APPLY_POLICY,
-                "as", g.getConfig().getAs().getValue(),
+                "as", g.getConfig()
+                        .getAs()
+                        .getValue(),
                 "instance", instName,
-                "address", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class).getAfiSafiName()),
+                "address", new String(id.firstKeyOf(Neighbor.class)
+                        .getNeighborAddress()
+                        .getValue()),
+                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class)
+                        .getAfiSafiName()),
                 "nexthopself", NEXTHOPSELF_POLICY_NAME,
                 "config", config),
                 cli, id, config);
@@ -90,13 +96,19 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
         if (!bgpOptional.isPresent()) {
             return;
         }
-        final Global g = bgpOptional.get().getGlobal();
+        final Global g = bgpOptional.get()
+                .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         blockingWriteAndRead(fT(WRITE_NEIGHBOR_AFI_APPLY_POLICY,
-                "as", g.getConfig().getAs().getValue(),
+                "as", g.getConfig()
+                        .getAs()
+                        .getValue(),
                 "instance", instName,
-                "address", new String(id.firstKeyOf(Neighbor.class).getNeighborAddress().getValue()),
-                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class).getAfiSafiName()),
+                "address", new String(id.firstKeyOf(Neighbor.class)
+                        .getNeighborAddress()
+                        .getValue()),
+                "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class)
+                        .getAfiSafiName()),
                 "nexthopself", NEXTHOPSELF_POLICY_NAME,
                 "config", config,
                 "delete", true),

@@ -27,13 +27,12 @@ public class AclEntryReaderTest {
 
     @Test
     public void test() {
-        List<AclEntryKey> result = AclEntryReader.parseAclEntryKey(
-                "Fri Feb 23 15:25:27.410 UTC\n" +
-                "ipv4 access-list ipv4foo\n" +
-                " 1 permit ipv4 any any\n" +
-                " 10 remark remark1\n" +
-                "!");
-        assertEquals(Arrays.asList(new AclEntryKey(1l)), result);
+        List<AclEntryKey> result = AclEntryReader.parseAclEntryKey("Fri Feb 23 15:25:27.410 UTC\n"
+                + "ipv4 access-list ipv4foo\n"
+                + " 1 permit ipv4 any any\n"
+                + " 10 remark remark1\n"
+                + "!");
+        assertEquals(Arrays.asList(new AclEntryKey(1L)), result);
     }
 
 }

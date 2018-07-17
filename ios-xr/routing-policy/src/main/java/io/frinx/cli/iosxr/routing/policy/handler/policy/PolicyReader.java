@@ -33,7 +33,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class PolicyReader implements CliConfigListReader<PolicyDefinition, PolicyDefinitionKey, PolicyDefinitionBuilder> {
+public class PolicyReader implements CliConfigListReader<PolicyDefinition, PolicyDefinitionKey,
+        PolicyDefinitionBuilder> {
 
     private static final String SH_ALL_POLICY = "show running-config | include ^route-policy";
     private static final Pattern ID_PATTERN = Pattern.compile("route-policy (?<id>\\S+)");
@@ -46,7 +47,8 @@ public class PolicyReader implements CliConfigListReader<PolicyDefinition, Polic
 
     @Nonnull
     @Override
-    public List<PolicyDefinitionKey> getAllIds(@Nonnull InstanceIdentifier<PolicyDefinition> id, @Nonnull ReadContext context) throws ReadFailedException {
+    public List<PolicyDefinitionKey> getAllIds(@Nonnull InstanceIdentifier<PolicyDefinition> id, @Nonnull ReadContext
+            context) throws ReadFailedException {
         String output = blockingRead(SH_ALL_POLICY, cli, id, context);
         return parseAllIds(output);
     }
@@ -55,7 +57,7 @@ public class PolicyReader implements CliConfigListReader<PolicyDefinition, Polic
     static List<PolicyDefinitionKey> parseAllIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 ID_PATTERN::matcher,
-                m -> m.group("id"),
+            m -> m.group("id"),
                 PolicyDefinitionKey::new);
     }
 

@@ -26,10 +26,12 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
+
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.Config;
@@ -54,12 +56,12 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
         checkEgressAclSetConfigExists(instanceIdentifier, aclType, writeContext, interfaceName);
 
         final String aclCommand =
-            f("%s access-group %s egress", AclUtil.getStringType(aclType), config.getSetName());
+                f("%s access-group %s egress", AclUtil.getStringType(aclType), config.getSetName());
 
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            f("interface %s", interfaceName),
-            aclCommand,
-            "root");
+                f("interface %s", interfaceName),
+                aclCommand,
+                "root");
     }
 
     private void checkEgressAclSetConfigExists(final InstanceIdentifier<Config> instanceIdentifier,
@@ -68,21 +70,21 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
                                                final String interfaceName) {
         // find multiple egress acl sets already set for type (ipv4/ipv6)
         final Optional<EgressAclSets> egressAclSetsOptional =
-            writeContext.readAfter(RWUtils.cutId(instanceIdentifier, EgressAclSets.class));
+                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, EgressAclSets.class));
 
         final long storedAclSetsCount = Stream
-            .of(egressAclSetsOptional)
-            .filter(Optional::isPresent)
-            .map(item -> item.get().getEgressAclSet())
-            .filter(Objects::nonNull)
-            .flatMap(Collection::stream)
-            .filter(aclSet -> aclSet.getType().equals(aclType))
-            .count();
+                .of(egressAclSetsOptional)
+                .filter(Optional::isPresent)
+                .map(item -> item.get().getEgressAclSet())
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .filter(aclSet -> aclSet.getType().equals(aclType))
+                .count();
 
         if (storedAclSetsCount > 1) {
             throw new IllegalArgumentException(f(
-                "Could not add more than one egress-acl-set config for type %s for interface %s.",
-                aclType, interfaceName));
+                    "Could not add more than one egress-acl-set config for type %s for interface %s.",
+                    aclType, interfaceName));
         }
     }
 
@@ -101,10 +103,12 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
         final String name = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
 
         boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
-            new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey(
-                name)))
-            .isPresent();
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+                        .interfaces.Interface.class,
+                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+                        .interfaces.InterfaceKey(
+                        name)))
+                .isPresent();
         if (!ifcExists) {
             // No point in removing ACL from nonexisting ifc
             return;
@@ -114,11 +118,11 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
         Preconditions.checkArgument(aclType != null, "Missing acl type");
 
         final String aclCommand =
-            f("no %s access-group %s egress", AclUtil.getStringType(aclType), config.getSetName());
+                f("no %s access-group %s egress", AclUtil.getStringType(aclType), config.getSetName());
 
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            f("interface %s", name),
-            aclCommand,
-            "root");
+                f("interface %s", name),
+                aclCommand,
+                "root");
     }
 }

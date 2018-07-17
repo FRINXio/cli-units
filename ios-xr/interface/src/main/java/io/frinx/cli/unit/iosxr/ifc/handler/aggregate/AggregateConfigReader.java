@@ -45,7 +45,8 @@ public class AggregateConfigReader implements CliConfigReader<Config, ConfigBuil
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         if (!isLAGInterface(ifcName)) {
             // we should read aggregate config just for LAG interfaces
@@ -63,7 +64,7 @@ public class AggregateConfigReader implements CliConfigReader<Config, ConfigBuil
     static void parseAggregateConfig(String output, ConfigBuilder builder) {
         ParsingUtils.parseField(output,
                 BUNDLE_MINIMUM_LINKS_LINE::matcher,
-                matcher -> Integer.valueOf(matcher.group("minLinks")),
+            matcher -> Integer.valueOf(matcher.group("minLinks")),
                 builder::setMinLinks);
     }
 

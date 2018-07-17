@@ -33,16 +33,18 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OneRateTwoColorConfigWriter implements CliWriter<Config> {
 
-    private final static String COLOR_T = "policy-map {$name}\n" +
-            "class {$className}\n" +
-            "{% if ($config.cir_pct) %}bandwidth percent {$config.cir_pct.value}\n{% else %}no bandwidth\n{% endif %}" +
-            "{% if ($config.cir_pct_remaining) %}bandwidth remaining percent {$config.cir_pct_remaining.value}\n{% else %}no bandwidth remaining\n{% endif %}" +
-            "{% if ($config.max_queue_depth_percent) %}police rate percent {$config.max_queue_depth_percent.value}\n{% else %}no police\n{% endif %}" +
-            "{% if ($aug) %}{% if ($aug.max_queue_depth_ms) %}" +
-            "queue-limit {$aug.max_queue_depth_ms} ms\n{% endif %}" +
-            "{% else %}no queue-limit\n" +
-            "{% endif %}" +
-            "root";
+    private static final String COLOR_T = "policy-map {$name}\n"
+            + "class {$className}\n"
+            + "{% if ($config.cir_pct) %}bandwidth percent {$config.cir_pct.value}\n{% else %}no bandwidth\n{% endif %}"
+            + "{% if ($config.cir_pct_remaining) %}bandwidth remaining percent {$config.cir_pct_remaining.value}\n{% "
+            + "else %}no bandwidth remaining\n{% endif %}"
+            + "{% if ($config.max_queue_depth_percent) %}police rate percent {$config.max_queue_depth_percent"
+            + ".value}\n{% else %}no police\n{% endif %}"
+            + "{% if ($aug) %}{% if ($aug.max_queue_depth_ms) %}"
+            + "queue-limit {$aug.max_queue_depth_ms} ms\n{% endif %}"
+            + "{% else %}no queue-limit\n"
+            + "{% endif %}"
+            + "root";
 
     private Cli cli;
 
@@ -51,28 +53,45 @@ public class OneRateTwoColorConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
-        Long seq = instanceIdentifier.firstKeyOf(Scheduler.class).getSequence();
-        Inputs inp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Schedulers.class).child(Scheduler.class, new SchedulerKey(seq)).child(Inputs.class)).get();
-        String classname = inp.getInput().get(0).getId();
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
+        Long seq = instanceIdentifier.firstKeyOf(Scheduler.class)
+                .getSequence();
+        Inputs inp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Schedulers.class)
+                .child(Scheduler.class, new SchedulerKey(seq))
+                .child(Inputs.class))
+                .get();
+        String classname = inp.getInput()
+                .get(0)
+                .getId();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            fT(COLOR_T, "name", policyName, "className", classname,
-            "config", config, "aug", config.getAugmentation(QosMaxQueueDepthMsAug.class)));
+                fT(COLOR_T, "name", policyName, "className", classname,
+                        "config", config, "aug", config.getAugmentation(QosMaxQueueDepthMsAug.class)));
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull
+            Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
-        Long seq = instanceIdentifier.firstKeyOf(Scheduler.class).getSequence();
-        Inputs inp = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Schedulers.class).child(Scheduler.class, new SchedulerKey(seq)).child(Inputs.class)).get();
-        String classname = inp.getInput().get(0).getId();
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class)
+                .getName();
+        Long seq = instanceIdentifier.firstKeyOf(Scheduler.class)
+                .getSequence();
+        Inputs inp = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Schedulers.class)
+                .child(Scheduler.class, new SchedulerKey(seq))
+                .child(Inputs.class))
+                .get();
+        String classname = inp.getInput()
+                .get(0)
+                .getId();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-            fT(COLOR_T, "name", policyName, "className", classname));
+                fT(COLOR_T, "name", policyName, "className", classname));
     }
 }

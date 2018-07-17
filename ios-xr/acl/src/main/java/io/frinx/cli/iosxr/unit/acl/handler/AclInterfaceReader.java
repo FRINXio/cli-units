@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.InterfaceBuilder;
@@ -50,7 +52,8 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
 
     @Nonnull
     @Override
-    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
         return getInterfaceKeys(blockingRead(SH_IFACES, cli, instanceIdentifier, readContext));
     }
 
@@ -59,10 +62,11 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
         List<InterfaceKey> keys = new ArrayList<>();
         List<String> candidates = Pattern.compile("!").splitAsStream(output).collect(Collectors.toList());
         for (String candidate : candidates) {
-            Optional<Boolean> maybeAcl = ParsingUtils.parseField(candidate, 0, Pattern.compile(".*access-group.*")::matcher, Matcher::matches);
+            Optional<Boolean> maybeAcl = ParsingUtils.parseField(candidate, 0, Pattern.compile(".*access-group.*")
+                    ::matcher, Matcher::matches);
             if (maybeAcl.isPresent() && maybeAcl.get()) {
                 ParsingUtils.parseField(candidate, 0, IFACE_LINE::matcher, matcher -> matcher.group("name"))
-                    .ifPresent(s -> keys.add(new InterfaceKey(new InterfaceId(s))));
+                        .ifPresent(s -> keys.add(new InterfaceKey(new InterfaceId(s))));
             }
         }
         return keys;
@@ -74,7 +78,8 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull InterfaceBuilder interfaceBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull
+            InterfaceBuilder interfaceBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         InterfaceKey key = instanceIdentifier.firstKeyOf(Interface.class);
         interfaceBuilder.setId(key.getId());
     }

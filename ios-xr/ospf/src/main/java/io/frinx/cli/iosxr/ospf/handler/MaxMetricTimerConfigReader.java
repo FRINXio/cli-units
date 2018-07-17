@@ -24,12 +24,15 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.MAXMETRICALWAYS;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.MAXMETRICONSWITCHOVER;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.MAXMETRICSUMMARYLSA;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.max.metrics.fields.max.metric.timers.MaxMetricTimer;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.max.metrics.fields.max.metric.timers.MaxMetricTimerBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.max.metrics.fields.max.metric.timers.MaxMetricTimerKey;
@@ -42,10 +45,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.re
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
-import javax.annotation.Nonnull;
-import java.math.BigInteger;
-import java.util.regex.Matcher;
 
 public class MaxMetricTimerConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
 
@@ -64,7 +63,8 @@ public class MaxMetricTimerConfigReader implements OspfReader.OspfConfigReader<C
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
+        String ospfId = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
         MaxMetricTimerKey timerKey = instanceIdentifier.firstKeyOf(MaxMetricTimer.class);
         configBuilder.setTrigger(timerKey.getTrigger());
         parseTimers(blockingRead(String.format(MaxMetricTimerReader.SH_RUN_OSPF_MAX_METRIC, ospfId),
@@ -75,14 +75,19 @@ public class MaxMetricTimerConfigReader implements OspfReader.OspfConfigReader<C
     public static void parseTimers(String output, ConfigBuilder builder) {
 
         Set<Class<? extends MAXMETRICINCLUDE>> includes = new HashSet<>();
-        for(String line : output.split(NEWLINE.pattern())) {
+        for (String line : output.split(NEWLINE.pattern())) {
             Matcher matcher = MaxMetricTimerReader.MAX_METRIC_LINE.matcher(line);
             if (!matcher.find()) {
                 continue;
             }
-            if ((builder.getTrigger().equals(MAXMETRICALWAYS.class) && matcher.group("trigger") != null) ||
-                (builder.getTrigger().equals(MAXMETRICONSWITCHOVER.class) && matcher.group("onSwitchover") == null) ||
-                builder.getTrigger().equals(MAXMETRICONSYSTEMBOOT.class) && matcher.group("onStartup") == null) {
+            if ((builder.getTrigger()
+                    .equals(MAXMETRICALWAYS.class) && matcher.group("trigger") != null)
+                    ||
+                    (builder.getTrigger()
+                            .equals(MAXMETRICONSWITCHOVER.class) && matcher.group("onSwitchover") == null)
+                    ||
+                    builder.getTrigger()
+                            .equals(MAXMETRICONSYSTEMBOOT.class) && matcher.group("onStartup") == null) {
                 continue;
             }
             if (matcher.group("externalLsa") != null) {
@@ -95,7 +100,8 @@ public class MaxMetricTimerConfigReader implements OspfReader.OspfConfigReader<C
                 includes.add(MAXMETRICINCLUDESTUB.class);
             }
             if (matcher.group("timeout") != null) {
-                builder.setTimeout(new BigInteger(matcher.group("timeout").trim()));
+                builder.setTimeout(new BigInteger(matcher.group("timeout")
+                        .trim()));
             }
         }
         if (includes.size() > 0) {

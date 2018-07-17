@@ -54,7 +54,7 @@ public class InterfaceStatisticsConfigReader implements CliConfigReader<Config, 
     static void parseLoadInterval(String output, ConfigBuilder builder) {
         ParsingUtils.parseField(output, 0,
                 LOAD_INTERVAL::matcher,
-                matcher -> Long.valueOf(matcher.group("loadInterval")),
+            matcher -> Long.valueOf(matcher.group("loadInterval")),
                 builder::setLoadInterval);
     }
 

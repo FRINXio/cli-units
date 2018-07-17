@@ -17,7 +17,6 @@
 package io.frinx.cli.iosxr.qos.handler.classifier;
 
 import com.google.common.collect.Lists;
-import io.frinx.cli.iosxr.qos.handler.classifier.TermReader;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
@@ -26,19 +25,19 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 
 public class TermReaderTest {
 
-    private static String OUTPUT_ANY = "Mon Mar 12 11:46:44.799 UTC\n" +
-            "class-map match-any map1\n" +
-            " match access-group ipv4 inacl222 \n" +
-            " match access-group ipv6 ahojgroup \n" +
-            " match precedence ipv4 1 5 \n" +
-            " match precedence 5 3 0 1 2 4 6 7 \n" +
-            " match precedence ipv6 1 \n" +
-            " match qos-group 10 \n";
+    private static String OUTPUT_ANY = "Mon Mar 12 11:46:44.799 UTC\n"
+            + "class-map match-any map1\n"
+            + " match access-group ipv4 inacl222 \n"
+            + " match access-group ipv6 ahojgroup \n"
+            + " match precedence ipv4 1 5 \n"
+            + " match precedence 5 3 0 1 2 4 6 7 \n"
+            + " match precedence ipv6 1 \n"
+            + " match qos-group 10 \n";
 
-    private static String OUTPUT_ALL = "Mon Mar 12 11:46:44.799 UTC\n" +
-            "class-map match-all map1\n" +
-            " match access-group ipv4 inacl222 \n" +
-            " match access-group ipv6 ahojgroup \n";
+    private static String OUTPUT_ALL = "Mon Mar 12 11:46:44.799 UTC\n"
+            + "class-map match-all map1\n"
+            + " match access-group ipv4 inacl222 \n"
+            + " match access-group ipv6 ahojgroup \n";
 
     @Test
     public void testIds() {

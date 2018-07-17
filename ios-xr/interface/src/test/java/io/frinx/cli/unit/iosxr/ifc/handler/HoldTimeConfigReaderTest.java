@@ -24,25 +24,24 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 
 public class HoldTimeConfigReaderTest {
 
-    private static final String SH_RUN_INTERFACE = "Fri Nov 24 14:29:00.530 UTC\n" +
-            "interface GigabitEthernet0/0/0/5\n" +
-            " carrier-delay up 100 down 0\n" +
-            " shutdown\n" +
-            "!\n" +
-            "\n";
+    private static final String SH_RUN_INTERFACE = "Fri Nov 24 14:29:00.530 UTC\n"
+            + "interface GigabitEthernet0/0/0/5\n"
+            + " carrier-delay up 100 down 0\n"
+            + " shutdown\n"
+            + "!\n"
+            + "\n";
 
-    private static final Config EXPECTED_CONFIG = new ConfigBuilder()
-            .setUp(100L)
+    private static final Config EXPECTED_CONFIG = new ConfigBuilder().setUp(100L)
             .setDown(0L)
             .build();
 
-    private static final String SH_RUN_INTERFACE2 = "Fri Nov 24 14:29:00.530 UTC\n" +
-            "interface GigabitEthernet0/0/0/4\n" +
-            " shutdown\n" +
-            " load-interval 0\n" +
-            " dampening\n" +
-            "!\n" +
-            "\n";
+    private static final String SH_RUN_INTERFACE2 = "Fri Nov 24 14:29:00.530 UTC\n"
+            + "interface GigabitEthernet0/0/0/4\n"
+            + " shutdown\n"
+            + " load-interval 0\n"
+            + " dampening\n"
+            + "!\n"
+            + "\n";
 
     private static final Config EXPECTED_CONFIG2 = new ConfigBuilder()
 

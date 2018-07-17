@@ -57,18 +57,26 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
 
     @Nonnull
     @Override
-    public List<AfiSafiKey> getAllIdsForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
+    public List<AfiSafiKey> getAllIdsForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull
+            ReadContext readContext) throws ReadFailedException {
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
+                globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
                 .child(Global.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config.class))
+                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
+                        .Config.class))
                 .orNull();
 
         if (globalConfig == null) {
             return Collections.EMPTY_LIST;
         }
-        String insName = instanceIdentifier.firstKeyOf(Protocol.class).getName().equals(NetworInstance.DEFAULT_NETWORK_NAME) ?
-                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class).getName();
-        return getAfiKeys(blockingRead(String.format(SH_AFI, globalConfig.getAs().getValue(), insName), cli, instanceIdentifier, readContext));
+        String insName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName()
+                .equals(NetworInstance.DEFAULT_NETWORK_NAME)
+                ?
+                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
+        return getAfiKeys(blockingRead(String.format(SH_AFI, globalConfig.getAs()
+                .getValue(), insName), cli, instanceIdentifier, readContext));
     }
 
     @Override
@@ -77,23 +85,26 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        Class<? extends AFISAFITYPE> key = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull
+            AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        Class<? extends AFISAFITYPE> key = instanceIdentifier.firstKeyOf(AfiSafi.class)
+                .getAfiSafiName();
         afiSafiBuilder.setAfiSafiName(key);
-        afiSafiBuilder.setConfig(new ConfigBuilder().setAfiSafiName(key).build());
+        afiSafiBuilder.setConfig(new ConfigBuilder().setAfiSafiName(key)
+                .build());
     }
 
     @VisibleForTesting
     public static List<AfiSafiKey> getAfiKeys(String output) {
         return ParsingUtils.parseFields(output, 0,
                 FAMILY_LINE::matcher,
-                matcher -> matcher.group("family"),
-                value -> new AfiSafiKey(transformAfiFromString(value.trim())));
+            matcher -> matcher.group("family"),
+            value -> new AfiSafiKey(transformAfiFromString(value.trim())));
     }
 
     public static Class<? extends AFISAFITYPE> transformAfiFromString(String afi) {
         // FIXME: add more if necessary
-        switch(afi) {
+        switch (afi) {
             case "ipv4 unicast":
                 return IPV4UNICAST.class;
             case "vpnv4 unicast":
@@ -102,6 +113,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
                 return IPV6UNICAST.class;
             case "vpnv6 unicast":
                 return L3VPNIPV6UNICAST.class;
+            default: break;
         }
         throw new IllegalArgumentException("Unknown AFI/SAFI type " + afi);
     }

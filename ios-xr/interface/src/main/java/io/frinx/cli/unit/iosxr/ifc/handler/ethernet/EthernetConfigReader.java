@@ -56,7 +56,8 @@ public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuild
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        String ifcName = id.firstKeyOf(Interface.class)
+                .getName();
 
         if (!InterfaceConfigWriter.PHYS_IFC_TYPES.contains(InterfaceConfigReader.parseType(ifcName))) {
             // we should parse ethernet configuration just for ethernet interfaces
@@ -68,7 +69,8 @@ public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuild
     }
 
     private static final Pattern BUNDLE_ID_LINE = Pattern.compile("\\s*bundle id (?<id>\\d+).*");
-    private static final Pattern LACP_MODE_LINE = Pattern.compile("\\s*bundle id (?<id>\\d+) mode (?<mode>active|passive).*");
+    private static final Pattern LACP_MODE_LINE = Pattern.compile("\\s*bundle id (?<id>\\d+) mode "
+            + "(?<mode>active|passive).*");
     private static final Pattern LACP_PERIOD_LINE = Pattern.compile("\\s*lacp period short.*");
 
     @VisibleForTesting
@@ -77,7 +79,7 @@ public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuild
         Config1Builder ethIfAggregationConfigBuilder = new Config1Builder();
         ParsingUtils.parseField(output,
                 BUNDLE_ID_LINE::matcher,
-                matcher -> getLAGInterfaceId(matcher.group("id")),
+            matcher -> getLAGInterfaceId(matcher.group("id")),
                 ethIfAggregationConfigBuilder::setAggregateId);
 
         if (ethIfAggregationConfigBuilder.getAggregateId() == null) {
@@ -91,8 +93,8 @@ public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuild
         LacpEthConfigAugBuilder ethConfigAugBuilder = new LacpEthConfigAugBuilder();
         ParsingUtils.parseField(output,
                 LACP_MODE_LINE::matcher,
-                matcher -> matcher.group("mode"),
-                mode -> ethConfigAugBuilder.setLacpMode(LacpActivityType.valueOf(mode.toUpperCase())));
+            matcher -> matcher.group("mode"),
+            mode -> ethConfigAugBuilder.setLacpMode(LacpActivityType.valueOf(mode.toUpperCase())));
 
         // set slow until proven otherwise
         ethConfigAugBuilder.setInterval(LacpPeriodType.SLOW);

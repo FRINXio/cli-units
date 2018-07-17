@@ -48,20 +48,20 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class PolicyForwardingInterfaceConfigWriterTest {
 
-    private static final String WRITE_INPUT = "interface Loopback0\n" +
-        "service-policy input input-pol\n" +
-        "service-policy output output-pol\n" +
-        "root\n";
+    private static final String WRITE_INPUT = "interface Loopback0\n"
+            + "service-policy input input-pol\n"
+            + "service-policy output output-pol\n"
+            + "root\n";
 
-    private static final String UPDATE_INPUT = "interface Loopback0\n" +
-        "service-policy input input-pol1\n" +
-        "no service-policy output\n" +
-        "root\n";
+    private static final String UPDATE_INPUT = "interface Loopback0\n"
+            + "service-policy input input-pol1\n"
+            + "no service-policy output\n"
+            + "root\n";
 
-    private static final String DELETE_INPUT = "interface Loopback0\n" +
-        "no service-policy output\n" +
-        "no service-policy input\n" +
-        "root\n";
+    private static final String DELETE_INPUT = "interface Loopback0\n"
+            + "no service-policy output\n"
+            + "no service-policy input\n"
+            + "root\n";
 
     @Mock
     private Cli cli;
@@ -74,8 +74,10 @@ public class PolicyForwardingInterfaceConfigWriterTest {
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier iid = KeyedInstanceIdentifier.create(NetworkInstances.class)
-            .child(NetworkInstance.class, new NetworkInstanceKey(DEFAULT_NETWORK)).child(PolicyForwarding.class)
-            .child(Interfaces.class).child(Interface.class, new InterfaceKey(new InterfaceId("Loopback0")));
+            .child(NetworkInstance.class, new NetworkInstanceKey(DEFAULT_NETWORK))
+            .child(PolicyForwarding.class)
+            .child(Interfaces.class)
+            .child(Interface.class, new InterfaceKey(new InterfaceId("Loopback0")));
 
     // test data
     private Config data;
@@ -84,7 +86,8 @@ public class PolicyForwardingInterfaceConfigWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        Mockito.when(cli.executeAndRead(Mockito.any()))
+                .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new PolicyForwardingInterfaceConfigWriter(this.cli);
         initializeData();
@@ -93,20 +96,23 @@ public class PolicyForwardingInterfaceConfigWriterTest {
     private void initializeData() {
         data = new ConfigBuilder().addAugmentation(NiPfIfCiscoAug.class,
                 new NiPfIfCiscoAugBuilder()
-                    .setInputServicePolicy("input-pol")
-                    .setOutputServicePolicy("output-pol")
-                .build())
-        .build();
+                        .setInputServicePolicy("input-pol")
+                        .setOutputServicePolicy("output-pol")
+                        .build())
+                .build();
 
-        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(""));
+        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class)))
+                .thenReturn(Optional.of(""));
     }
 
     @Test
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -120,17 +126,24 @@ public class PolicyForwardingInterfaceConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
-        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
+        Mockito.verify(cli, Mockito.times(2))
+                .executeAndRead(response.capture());
 
-        Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0).getContent());
-        Assert.assertEquals(UPDATE_INPUT, response.getAllValues().get(1).getContent());
+        Assert.assertEquals(DELETE_INPUT, response.getAllValues()
+                .get(0)
+                .getContent());
+        Assert.assertEquals(UPDATE_INPUT, response.getAllValues()
+                .get(1)
+                .getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 }

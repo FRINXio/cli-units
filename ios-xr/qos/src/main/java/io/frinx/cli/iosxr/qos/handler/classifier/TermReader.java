@@ -20,7 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -37,8 +36,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.TermKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.ClassifierKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.classifier.Config;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -49,7 +46,8 @@ public class TermReader implements CliConfigListReader<Term, TermKey, TermBuilde
      * IOS XR devices are configured to store class-maps as "match-all" or "match-any".
      * XR supports show command where the "match-all" or "match-any" piece is omitted (show run class-map a),
      * but our CliReader does not have this functionality.
-     * It cannot find the right class-map without calling the right term: match-all or match-any (show run class-map matcher-any a).
+     * It cannot find the right class-map without calling the right term: match-all or match-any (show run class-map
+     * matcher-any a).
      * We do not store information about this term, so we must call the both commands: SH_TERMS_ALL and SH_TERMS_ANY.
      */
     static final String SH_TERMS_ALL = "show running-config class-map match-all %s";
@@ -65,8 +63,10 @@ public class TermReader implements CliConfigListReader<Term, TermKey, TermBuilde
 
     @Nonnull
     @Override
-    public List<TermKey> getAllIds(@Nonnull InstanceIdentifier<Term> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String name = instanceIdentifier.firstKeyOf(Classifier.class).getName();
+    public List<TermKey> getAllIds(@Nonnull InstanceIdentifier<Term> instanceIdentifier, @Nonnull ReadContext
+            readContext) throws ReadFailedException {
+        String name = instanceIdentifier.firstKeyOf(Classifier.class)
+                .getName();
         String output = blockingRead(f(SH_TERMS_ALL, name), cli, instanceIdentifier, readContext);
 
         // class-default will always have only one term, let it be "all"
@@ -96,14 +96,21 @@ public class TermReader implements CliConfigListReader<Term, TermKey, TermBuilde
 
         // if class-map is of type match-any, all the match statements need to have a separate term
         // count terms from 1, the number represents the line where the match statement is in config
-        long found = ParsingUtils.NEWLINE.splitAsStream(output).map(String::trim)
-            .map(MATCH_LINE::matcher).filter(Matcher::matches).count();
-        return LongStream.rangeClosed(1, found).mapToObj(i -> new TermKey(String.valueOf(i))).collect(Collectors.toList());
+        long found = ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .map(MATCH_LINE::matcher)
+                .filter(Matcher::matches)
+                .count();
+        return LongStream.rangeClosed(1, found)
+                .mapToObj(i -> new TermKey(String.valueOf(i)))
+                .collect(Collectors.toList());
     }
 
     private static ClassMapType parseClassMapType(String output) {
         return ParsingUtils.parseField(output, 0, CLASS_TYPE_LINE::matcher,
-            matcher -> matcher.group("type")).map(ClassMapType::parseOutput).orElse(null);
+            matcher -> matcher.group("type"))
+                .map(ClassMapType::parseOutput)
+                .orElse(null);
     }
 
     @Override
@@ -112,9 +119,12 @@ public class TermReader implements CliConfigListReader<Term, TermKey, TermBuilde
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Term> instanceIdentifier, @Nonnull TermBuilder termBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        String id = instanceIdentifier.firstKeyOf(Term.class).getId();
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Term> instanceIdentifier, @Nonnull TermBuilder
+            termBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        String id = instanceIdentifier.firstKeyOf(Term.class)
+                .getId();
         termBuilder.setId(id);
-        termBuilder.setConfig(new ConfigBuilder().setId(id).build());
+        termBuilder.setConfig(new ConfigBuilder().setId(id)
+                .build());
     }
 }

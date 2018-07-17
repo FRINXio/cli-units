@@ -50,10 +50,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class SnmpInterfacesReader implements CliConfigReader<Interfaces, InterfacesBuilder> {
 
     private static final String SH_RUN_SNM_IFCS =
-            "show running-config snmp-server | utility egrep \"^snmp-server interface|^ notification linkupdown disable\"";
+            "show running-config snmp-server | utility egrep \"^snmp-server interface|^ notification linkupdown "
+                    + "disable\"";
 
     // TODO try to reuse pattern from interface translate unit's interface reader
-    private static final Pattern INTERFACE_ID = Pattern.compile(".*interface (?<id>\\S+)\\s*.*?(?<linkupDisable>notification linkupdown disable)?");
+    private static final Pattern INTERFACE_ID = Pattern.compile(".*interface (?<id>\\S+)\\s*.*?"
+            + "(?<linkupDisable>notification linkupdown disable)?");
 
     private static final EnabledTrapForEvent LINK_UP_DOWN_EVENT = new EnabledTrapForEventBuilder()
             .setEventName(LINKUPDOWN.class)
@@ -66,7 +68,8 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
             .build();
 
     static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST = Collections.singletonList(LINK_UP_DOWN_EVENT);
-    static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST_DISABLED = Collections.singletonList(LINK_UP_DOWN_EVENT_DISABLED);
+    static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST_DISABLED
+            = Collections.singletonList(LINK_UP_DOWN_EVENT_DISABLED);
 
     private Cli cli;
 
@@ -90,7 +93,9 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
                 .map(String::trim)
                 .map(INTERFACE_ID::matcher)
                 .filter(Matcher::matches)
-                .map(matcher -> new AbstractMap.SimpleEntry<>(matcher.group("id"), matcher.group("linkupDisable") == null))
+                .map(matcher -> new AbstractMap.SimpleEntry<>(matcher.group("id"), matcher.group("linkupDisable")
+                        ==
+                        null))
                 .map(e -> new AbstractMap.SimpleEntry<>(new InterfaceId(e.getKey()), e.getValue()))
                 .map(e -> new AbstractMap.SimpleEntry<>(new InterfaceKey(e.getKey()), e.getValue()))
                 .collect(Collectors.toList());
@@ -105,8 +110,10 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
 
     private static Config getIfcConfig(Map.Entry<InterfaceKey, Boolean> ifcEntry) {
         return new ConfigBuilder()
-                .setInterfaceId(ifcEntry.getKey().getInterfaceId())
-                .setEnabledTrapForEvent(ifcEntry.getValue() ? LINK_UP_DOWN_EVENT_LIST : LINK_UP_DOWN_EVENT_LIST_DISABLED)
+                .setInterfaceId(ifcEntry.getKey()
+                        .getInterfaceId())
+                .setEnabledTrapForEvent(ifcEntry.getValue() ? LINK_UP_DOWN_EVENT_LIST :
+                        LINK_UP_DOWN_EVENT_LIST_DISABLED)
                 .build();
     }
 

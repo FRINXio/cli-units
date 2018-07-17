@@ -23,10 +23,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 
 public class GlobalConfigReaderTest {
 
-    private final String output = "Thu Feb 22 22:59:47.601 UTC\n" +
-            "router bgp 1 instance inst\n" +
-            "router bgp 65505 instance test\n" +
-            "router bgp 1";
+    private final String output = "Thu Feb 22 22:59:47.601 UTC\n"
+            + "router bgp 1 instance inst\n"
+            + "router bgp 65505 instance test\n"
+            + "router bgp 1";
 
     @Test
     public void testGlobal() {

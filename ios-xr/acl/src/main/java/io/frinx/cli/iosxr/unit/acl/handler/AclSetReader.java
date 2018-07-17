@@ -23,9 +23,11 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.unit.acl.handler.util.NameTypeEntry;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
@@ -48,7 +50,8 @@ public class AclSetReader implements CliConfigListReader<AclSet, AclSetKey, AclS
 
     @Nonnull
     @Override
-    public List<AclSetKey> getAllIds(@Nonnull InstanceIdentifier<AclSet> id, @Nonnull ReadContext context) throws ReadFailedException {
+    public List<AclSetKey> getAllIds(@Nonnull InstanceIdentifier<AclSet> id, @Nonnull ReadContext context) throws
+            ReadFailedException {
         return parseAccessLists(blockingRead(SH_ACCESS_LISTS, cli, id, context));
     }
 
@@ -57,15 +60,19 @@ public class AclSetReader implements CliConfigListReader<AclSet, AclSetKey, AclS
         return ParsingUtils.parseFields(output, 0,
             ACL_LINE::matcher,
             NameTypeEntry::fromMatcher,
-            nameTypeEntry -> new AclSetKey(nameTypeEntry.getKey(), nameTypeEntry.getValue()));
+            nameTypeEntry -> {
+                return new AclSetKey(nameTypeEntry.getKey(), nameTypeEntry.getValue());
+            });
     }
+
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<AclSet> readData) {
         ((AclSetsBuilder) builder).setAclSet(readData);
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<AclSet> id, @Nonnull AclSetBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<AclSet> id, @Nonnull AclSetBuilder builder,
+                                      @Nonnull ReadContext ctx) throws ReadFailedException {
         final AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
         final String aclName = aclSetKey.getName();
         final Class<? extends ACLTYPE> aclType = aclSetKey.getType();

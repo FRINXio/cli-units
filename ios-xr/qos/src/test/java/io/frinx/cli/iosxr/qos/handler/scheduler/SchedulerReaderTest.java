@@ -25,16 +25,16 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 
 public class SchedulerReaderTest {
 
-    private static String OUTPUT = "policy-map plmap\r\n" +
-        " class map1\r\n" +
-        "  set mpls experimental topmost 5\r\n" +
-        "  priority level 1 \r\n" +
-        " ! \r\n" +
-        " class class-default\r\n" +
-        "  priority level 2 \r\n" +
-        " ! \r\n" +
-        " end-policy-map\r\n" +
-        "! \r\n";
+    private static String OUTPUT = "policy-map plmap\r\n"
+            + " class map1\r\n"
+            + "  set mpls experimental topmost 5\r\n"
+            + "  priority level 1 \r\n"
+            + " ! \r\n"
+            + " class class-default\r\n"
+            + "  priority level 2 \r\n"
+            + " ! \r\n"
+            + " end-policy-map\r\n"
+            + "! \r\n";
 
     @Test
     public void testSequenceIds() {

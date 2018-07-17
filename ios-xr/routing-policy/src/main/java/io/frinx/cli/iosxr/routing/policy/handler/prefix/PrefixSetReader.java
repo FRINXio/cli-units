@@ -46,7 +46,8 @@ public class PrefixSetReader implements CliConfigListReader<PrefixSet, PrefixSet
 
     @Nonnull
     @Override
-    public List<PrefixSetKey> getAllIds(@Nonnull InstanceIdentifier<PrefixSet> id, @Nonnull ReadContext context) throws ReadFailedException {
+    public List<PrefixSetKey> getAllIds(@Nonnull InstanceIdentifier<PrefixSet> id, @Nonnull ReadContext context)
+            throws ReadFailedException {
         String output = blockingRead(SH_ALL_PREFIX_SETS, cli, id, context);
         return parseAllIds(output);
     }
@@ -55,7 +56,7 @@ public class PrefixSetReader implements CliConfigListReader<PrefixSet, PrefixSet
     static List<PrefixSetKey> parseAllIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 ID_PATTERN::matcher,
-                m -> m.group("id"),
+            m -> m.group("id"),
                 PrefixSetKey::new);
     }
 
@@ -65,7 +66,8 @@ public class PrefixSetReader implements CliConfigListReader<PrefixSet, PrefixSet
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<PrefixSet> id, @Nonnull PrefixSetBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<PrefixSet> id, @Nonnull PrefixSetBuilder builder,
+                                      @Nonnull ReadContext ctx) throws ReadFailedException {
         PrefixSetKey prefixSetKey = id.firstKeyOf(PrefixSet.class);
         builder.setName(prefixSetKey.getName());
     }

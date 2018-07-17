@@ -46,7 +46,8 @@ public class CommunitySetReader implements CliConfigListReader<CommunitySet, Com
 
     @Nonnull
     @Override
-    public List<CommunitySetKey> getAllIds(@Nonnull InstanceIdentifier<CommunitySet> id, @Nonnull ReadContext context) throws ReadFailedException {
+    public List<CommunitySetKey> getAllIds(@Nonnull InstanceIdentifier<CommunitySet> id, @Nonnull ReadContext
+            context) throws ReadFailedException {
         String output = blockingRead(SH_ALL_PREFIX_SETS, cli, id, context);
         return parseAllIds(output);
     }
@@ -55,7 +56,7 @@ public class CommunitySetReader implements CliConfigListReader<CommunitySet, Com
     static List<CommunitySetKey> parseAllIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 ID_PATTERN::matcher,
-                m -> m.group("id"),
+            m -> m.group("id"),
                 CommunitySetKey::new);
     }
 
@@ -65,7 +66,8 @@ public class CommunitySetReader implements CliConfigListReader<CommunitySet, Com
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<CommunitySet> id, @Nonnull CommunitySetBuilder builder, @Nonnull ReadContext ctx) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<CommunitySet> id, @Nonnull CommunitySetBuilder
+            builder, @Nonnull ReadContext ctx) throws ReadFailedException {
         CommunitySetKey communitySetKey = id.firstKeyOf(CommunitySet.class);
         builder.setCommunitySetName(communitySetKey.getCommunitySetName());
     }

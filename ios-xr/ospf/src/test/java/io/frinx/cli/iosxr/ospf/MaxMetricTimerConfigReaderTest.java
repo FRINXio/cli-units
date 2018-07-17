@@ -29,8 +29,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.re
 
 public class MaxMetricTimerConfigReaderTest {
 
-    private final String output = "Wed Feb 14 13:31:07.209 UTC\n" +
-            " max-metric router-lsa on-startup 60 include-stub summary-lsa external-lsa";
+    private final String output = "Wed Feb 14 13:31:07.209 UTC\n"
+            + " max-metric router-lsa on-startup 60 include-stub summary-lsa external-lsa";
 
 
     @Test
@@ -38,9 +38,12 @@ public class MaxMetricTimerConfigReaderTest {
         ConfigBuilder builder = new ConfigBuilder();
         builder.setTrigger(MAXMETRICONSYSTEMBOOT.class);
         MaxMetricTimerConfigReader.parseTimers(output, builder);
-        Assert.assertEquals(60, builder.getTimeout().intValue());
+        Assert.assertEquals(60, builder.getTimeout()
+                .intValue());
 
-        Assert.assertTrue(builder.getInclude().containsAll(
-                Sets.newHashSet(MAXMETRICINCLUDESTUB.class, MAXMETRICSUMMARYLSA.class, MAXMETRICINCLUDETYPE2EXTERNAL.class)));
+        Assert.assertTrue(builder.getInclude()
+                .containsAll(
+                        Sets.newHashSet(MAXMETRICINCLUDESTUB.class, MAXMETRICSUMMARYLSA.class,
+                                MAXMETRICINCLUDETYPE2EXTERNAL.class)));
     }
 }

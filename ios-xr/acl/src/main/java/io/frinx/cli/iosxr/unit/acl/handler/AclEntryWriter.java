@@ -21,19 +21,21 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListWriter;
+
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv4AddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv6AddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
@@ -58,36 +60,44 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
+public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
 
     private static final int MAX_TTL = 255;
     private static final int MAX_PORT = 65535;
     private static final String RANGE_SEPARATOR = "..";
     private static final Function<String, String> WRONG_RANGE_FORMAT_MSG = rangeString -> String.format(
-        "incorrect range format, range parameter should contains two numbers separated by '%s', entered: %s",
-        RANGE_SEPARATOR, rangeString);
+            "incorrect range format, range parameter should contains two numbers separated by '%s', entered: %s",
+            RANGE_SEPARATOR, rangeString);
     private static final String ANY = "any";
-    public static final String SOURCE_ADDRESS_AND_SOURCE_ADDRESS_WILDCARDED_TOGETHER_ERROR = "source-address and source-address-wildcarded cannot be defined in ACL together";
-    public static final String NONE_SOURCE_ADDRESS_OR_SOURCE_ADDRESS_WILDCARDED_ERROR = "source-address or source-address-wildcarded must be defined in ACL";
-    public static final String SOURCE_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR = "source-address-wildcarded must contain address and wildcard-mask";
-    public static final String DESTINATION_ADDRESS_AND_DESTINATION_ADDRESS_WILDCARDED_TOGETHER_ERROR = "destination-address and destination-address-wildcarded cannot be defined in ACL together";
-    public static final String NONE_DESTINATION_ADDRESS_OR_DESTINATION_ADDRESS_WILDCARDED_ERROR = "destination-address or destination-address-wildcarded must be defined in ACL";
-    public static final String DESTINATION_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR = "destination-address-wildcarded must contain address and wildcard-mask";
+    public static final String SOURCE_ADDRESS_AND_SOURCE_ADDRESS_WILDCARDED_TOGETHER_ERROR
+            = "source-address and source-address-wildcarded cannot be defined in ACL together";
+    public static final String NONE_SOURCE_ADDRESS_OR_SOURCE_ADDRESS_WILDCARDED_ERROR
+            = "source-address or source-address-wildcarded must be defined in ACL";
+    public static final String SOURCE_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR = "source-address-wildcarded must "
+            + "contain address and wildcard-mask";
+    public static final String DESTINATION_ADDRESS_AND_DESTINATION_ADDRESS_WILDCARDED_TOGETHER_ERROR =
+            "destination-address and destination-address-wildcarded cannot be defined in ACL together";
+    public static final String NONE_DESTINATION_ADDRESS_OR_DESTINATION_ADDRESS_WILDCARDED_ERROR =
+            "destination-address or destination-address-wildcarded must be defined in ACL";
+    public static final String DESTINATION_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR = "destination-address-wildcarded "
+            + "must contain address and wildcard-mask";
 
-    private final String ACL_IP_ENTRY = "{$type} access-list {$acl_name}\n" +
-            "{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_ttl}\n" +
-            "root\n";
-    private final String ACL_TCP_ENTRY = "{$type} access-list {$acl_name}\n" +
-            "{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_src_port} {$acl_dst_addr} {$acl_dst_port} {$acl_ttl}\n" +
-            "root\n";
-    private final String ACL_ICMP_ENTRY = "{$type} access-list {$acl_name}\n" +
-            "{$acl_seq_id} {$acl_fwd_action} {$acl_protocol} {$acl_src_addr} {$acl_dst_addr} {$acl_icmp_msg_type} {$acl_ttl}\n" +
-            "root\n";
-    private final String ACL_DELETE = "{$type} access-list {$acl_name}\n" +
-            "no {$acl_seq_id}\n" +
-            "root\n";
-    private final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
-    private final Pattern PORT_RANGE_NAMED_PATTERN = Pattern.compile("(?<from>\\S*)\\.\\.(?<to>\\S*)");
+    private static final String ACL_IP_ENTRY = "{$type} access-list {$aclName}\n"
+            + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclTtl}\n"
+            + "root\n";
+    private static final String ACL_TCP_ENTRY = "{$type} access-list {$aclName}\n"
+            + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclSrcPort} {$aclDstAddr} "
+            + "{$aclDstPort} {$aclTtl}\n"
+            + "root\n";
+    private static final String ACL_ICMP_ENTRY = "{$type} access-list {$aclName}\n"
+            + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType} "
+            + "{$aclTtl}\n"
+            + "root\n";
+    private static final String ACL_DELETE = "{$type} access-list {$aclName}\n"
+            + "no {$aclSeqId}\n"
+            + "root\n";
+    private static final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
+    private static final Pattern PORT_RANGE_NAMED_PATTERN = Pattern.compile("(?<from>\\S*)\\.\\.(?<to>\\S*)");
 
     private final Cli cli;
 
@@ -121,20 +131,20 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
         final String aclSequenceId = dataBefore.getSequenceId().toString();
 
         blockingWriteAndRead(
-            fT(ACL_DELETE,
-                "type", aclType,
-                "acl_name", aclName,
-                "acl_seq_id", aclSequenceId),
-            cli, id, dataBefore);
+                fT(ACL_DELETE,
+                        "type", aclType,
+                        "aclName", aclName,
+                        "aclSeqId", aclSequenceId),
+                cli, id, dataBefore);
     }
 
     private void processChange(@Nonnull InstanceIdentifier<AclEntry> id,
                                @Nonnull AclEntry entry) throws WriteFailedException.CreateFailedException {
         MaxMetricCommandDTO commandVars = new MaxMetricCommandDTO();
         AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
-        commandVars.acl_name = aclSetKey.getName();
+        commandVars.aclName = aclSetKey.getName();
         commandVars.type = aclSetKey.getType().equals(ACLIPV4.class) ? "ipv4" : "ipv6";
-        commandVars.acl_seq_id = entry.getSequenceId().toString();
+        commandVars.aclSeqId = entry.getSequenceId().toString();
         // ipv4|ipv6
         if (entry.getIpv4() != null) {
             processIpv4(entry, commandVars);
@@ -149,92 +159,102 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
         // actions
         processActions(entry, commandVars);
 
-        switch (commandVars.acl_protocol) {
+        switch (commandVars.aclProtocol) {
             case "ipv4":
             case "ipv6":
                 blockingWriteAndRead(fT(ACL_IP_ENTRY,
                         "type", commandVars.type,
-                        "acl_name", commandVars.acl_name,
-                        "acl_seq_id", commandVars.acl_seq_id,
-                        "acl_fwd_action", commandVars.acl_fwd_action,
-                        "acl_protocol", commandVars.acl_protocol,
-                        "acl_src_addr", commandVars.acl_src_addr,
-                        "acl_dst_addr", commandVars.acl_dst_addr,
-                        "acl_ttl", commandVars.acl_ttl),
+                        "aclName", commandVars.aclName,
+                        "aclSeqId", commandVars.aclSeqId,
+                        "aclFwdAction", commandVars.aclFwdAction,
+                        "aclProtocol", commandVars.aclProtocol,
+                        "aclSrcAddr", commandVars.aclSrcAddr,
+                        "aclDstAddr", commandVars.aclDstAddr,
+                        "aclTtl", commandVars.aclTtl),
                         cli, id, entry);
                 break;
             case "udp":
             case "tcp":
                 blockingWriteAndRead(fT(ACL_TCP_ENTRY,
                         "type", commandVars.type,
-                        "acl_name", commandVars.acl_name,
-                        "acl_seq_id", commandVars.acl_seq_id,
-                        "acl_fwd_action", commandVars.acl_fwd_action,
-                        "acl_protocol", commandVars.acl_protocol,
-                        "acl_src_addr", commandVars.acl_src_addr,
-                        "acl_src_port", commandVars.acl_src_port,
-                        "acl_dst_addr", commandVars.acl_dst_addr,
-                        "acl_dst_port", commandVars.acl_dst_port,
-                        "acl_ttl", commandVars.acl_ttl),
+                        "aclName", commandVars.aclName,
+                        "aclSeqId", commandVars.aclSeqId,
+                        "aclFwdAction", commandVars.aclFwdAction,
+                        "aclProtocol", commandVars.aclProtocol,
+                        "aclSrcAddr", commandVars.aclSrcAddr,
+                        "aclSrcPort", commandVars.aclSrcPort,
+                        "aclDstAddr", commandVars.aclDstAddr,
+                        "aclDstPort", commandVars.aclDstPort,
+                        "aclTtl", commandVars.aclTtl),
                         cli, id, entry);
                 break;
             case "icmp":
             case "icmpv6":
                 blockingWriteAndRead(fT(ACL_ICMP_ENTRY,
                         "type", commandVars.type,
-                        "acl_name", commandVars.acl_name,
-                        "acl_seq_id", commandVars.acl_seq_id,
-                        "acl_fwd_action", commandVars.acl_fwd_action,
-                        "acl_protocol", commandVars.acl_protocol,
-                        "acl_src_addr", commandVars.acl_src_addr,
-                        "acl_dst_addr", commandVars.acl_dst_addr,
-                        "acl_icmp_msg_type", commandVars.acl_icmp_msg_type,
-                        "acl_ttl", commandVars.acl_ttl),
+                        "aclName", commandVars.aclName,
+                        "aclSeqId", commandVars.aclSeqId,
+                        "aclFwdAction", commandVars.aclFwdAction,
+                        "aclProtocol", commandVars.aclProtocol,
+                        "aclSrcAddr", commandVars.aclSrcAddr,
+                        "aclDstAddr", commandVars.aclDstAddr,
+                        "aclIcmpMsgType", commandVars.aclIcmpMsgType,
+                        "aclTtl", commandVars.aclTtl),
                         cli, id, entry);
                 break;
+            default: break;
         }
     }
 
     private void processIpv4(AclEntry entry, MaxMetricCommandDTO commandVars) {
-        if (entry.getIpv4().getConfig().getAugmentation(Config1.class) != null &&
-                entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange() != null) {
-            commandVars.acl_ttl =
-                formatTTL(entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange().getValue());
+        if (entry.getIpv4().getConfig().getAugmentation(Config1.class) != null
+                && entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange() != null) {
+            commandVars.aclTtl =
+                    formatTTL(entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange().getValue());
         }
-        if (entry.getAugmentation(AclEntry1.class) != null &&
-            entry.getAugmentation(AclEntry1.class).getIcmp() != null) {
-            commandVars.acl_icmp_msg_type =
-                entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString();
+        if (entry.getAugmentation(AclEntry1.class) != null
+                && entry.getAugmentation(AclEntry1.class).getIcmp() != null) {
+            commandVars.aclIcmpMsgType =
+                    entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString();
         }
         // src address
         Optional<String> ipv4PrefixOpt = getIpv4Prefix(entry, Ipv4ProtocolFieldsConfig::getSourceAddress);
-        Optional<Ipv4AddressWildcarded> ipv4WildcardedOpt = getIpv4Wildcarded(entry, AclSetAclEntryIpv4WildcardedAug::getSourceAddressWildcarded);
+        Optional<Ipv4AddressWildcarded> ipv4WildcardedOpt = getIpv4Wildcarded(entry,
+                AclSetAclEntryIpv4WildcardedAug::getSourceAddressWildcarded);
         if (ipv4PrefixOpt.isPresent()) {
-            Preconditions.checkArgument(!ipv4WildcardedOpt.isPresent(), SOURCE_ADDRESS_AND_SOURCE_ADDRESS_WILDCARDED_TOGETHER_ERROR);
-            commandVars.acl_src_addr = ipv4PrefixOpt.get();
+            Preconditions.checkArgument(!ipv4WildcardedOpt.isPresent(),
+                    SOURCE_ADDRESS_AND_SOURCE_ADDRESS_WILDCARDED_TOGETHER_ERROR);
+            commandVars.aclSrcAddr = ipv4PrefixOpt.get();
         } else {
-            Preconditions.checkArgument(ipv4WildcardedOpt.isPresent(), NONE_SOURCE_ADDRESS_OR_SOURCE_ADDRESS_WILDCARDED_ERROR);
-            Preconditions.checkArgument(ipv4WildcardedOpt.get().getAddress() != null && ipv4WildcardedOpt.get().getWildcardMask() != null,
+            Preconditions.checkArgument(ipv4WildcardedOpt.isPresent(),
+                    NONE_SOURCE_ADDRESS_OR_SOURCE_ADDRESS_WILDCARDED_ERROR);
+            Preconditions.checkArgument(ipv4WildcardedOpt.get().getAddress() != null && ipv4WildcardedOpt.get()
+                            .getWildcardMask() != null,
                     SOURCE_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR);
-            commandVars.acl_src_addr = ipv4WildcardedOpt.get().getAddress().getValue() + " " + ipv4WildcardedOpt.get().getWildcardMask().getValue();
+            commandVars.aclSrcAddr = ipv4WildcardedOpt.get().getAddress().getValue() + " " + ipv4WildcardedOpt.get()
+                    .getWildcardMask().getValue();
         }
         // dst address
         ipv4PrefixOpt = getIpv4Prefix(entry, Ipv4ProtocolFieldsConfig::getDestinationAddress);
         ipv4WildcardedOpt = getIpv4Wildcarded(entry, AclSetAclEntryIpv4WildcardedAug::getDestinationAddressWildcarded);
         if (ipv4PrefixOpt.isPresent()) {
-            Preconditions.checkArgument(!ipv4WildcardedOpt.isPresent(), DESTINATION_ADDRESS_AND_DESTINATION_ADDRESS_WILDCARDED_TOGETHER_ERROR);
-            commandVars.acl_dst_addr = ipv4PrefixOpt.get();
+            Preconditions.checkArgument(!ipv4WildcardedOpt.isPresent(),
+                    DESTINATION_ADDRESS_AND_DESTINATION_ADDRESS_WILDCARDED_TOGETHER_ERROR);
+            commandVars.aclDstAddr = ipv4PrefixOpt.get();
         } else {
-            Preconditions.checkArgument(ipv4WildcardedOpt.isPresent(), NONE_DESTINATION_ADDRESS_OR_DESTINATION_ADDRESS_WILDCARDED_ERROR);
-            Preconditions.checkArgument(ipv4WildcardedOpt.get().getAddress() != null && ipv4WildcardedOpt.get().getWildcardMask() != null,
+            Preconditions.checkArgument(ipv4WildcardedOpt.isPresent(),
+                    NONE_DESTINATION_ADDRESS_OR_DESTINATION_ADDRESS_WILDCARDED_ERROR);
+            Preconditions.checkArgument(ipv4WildcardedOpt.get().getAddress() != null && ipv4WildcardedOpt.get()
+                            .getWildcardMask() != null,
                     DESTINATION_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR);
-            commandVars.acl_dst_addr = ipv4WildcardedOpt.get().getAddress().getValue() + " " + ipv4WildcardedOpt.get().getWildcardMask().getValue();
+            commandVars.aclDstAddr = ipv4WildcardedOpt.get().getAddress().getValue() + " " + ipv4WildcardedOpt.get()
+                    .getWildcardMask().getValue();
         }
 
         IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv4().getConfig())
                 .map(config -> config.getProtocol())
                 .orElse(null);
-        commandVars.acl_protocol = formatProtocol(ipProtocolType, commandVars.type);
+        commandVars.aclProtocol = formatProtocol(ipProtocolType, commandVars.type);
     }
 
     private Optional<String> getIpv4Prefix(AclEntry entry, Function<Ipv4ProtocolFieldsConfig, Ipv4Prefix> mapper) {
@@ -245,7 +265,9 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
                 .map(Ipv4Prefix::getValue);
     }
 
-    private Optional<Ipv4AddressWildcarded> getIpv4Wildcarded(AclEntry entry, Function<AclSetAclEntryIpv4WildcardedAug, Ipv4AddressWildcarded> mapper) {
+    private Optional<Ipv4AddressWildcarded> getIpv4Wildcarded(AclEntry entry,
+                                                              Function<AclSetAclEntryIpv4WildcardedAug,
+                                                                      Ipv4AddressWildcarded> mapper) {
         return Optional.ofNullable(entry)
                 .map(AclEntry::getIpv4)
                 .map(Ipv4::getConfig)
@@ -254,45 +276,54 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
     }
 
     private void processIpv6(AclEntry entry, MaxMetricCommandDTO commandVars) {
-        if (entry.getIpv6().getConfig().getAugmentation(Config2.class) != null &&
-                entry.getIpv6().getConfig().getAugmentation(Config2.class).getHopRange() != null) {
-            commandVars.acl_ttl =
-                formatTTL(entry.getIpv6().getConfig().getAugmentation(Config2.class).getHopRange().getValue());
+        if (entry.getIpv6().getConfig().getAugmentation(Config2.class) != null
+                && entry.getIpv6().getConfig().getAugmentation(Config2.class).getHopRange() != null) {
+            commandVars.aclTtl =
+                    formatTTL(entry.getIpv6().getConfig().getAugmentation(Config2.class).getHopRange().getValue());
         }
-        if (entry.getAugmentation(AclEntry1.class) != null &&
-            entry.getAugmentation(AclEntry1.class).getIcmp() != null) {
-            commandVars.acl_icmp_msg_type =
-                entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString();
+        if (entry.getAugmentation(AclEntry1.class) != null
+                && entry.getAugmentation(AclEntry1.class).getIcmp() != null) {
+            commandVars.aclIcmpMsgType =
+                    entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString();
         }
         // src address
         Optional<String> ipv6PrefixOpt = getIpv6Prefix(entry, Ipv6ProtocolFieldsConfig::getSourceAddress);
-        Optional<Ipv6AddressWildcarded> ipv6WildcardedOpt = getIpv6Wildcarded(entry, AclSetAclEntryIpv6WildcardedAug::getSourceAddressWildcarded);
+        Optional<Ipv6AddressWildcarded> ipv6WildcardedOpt = getIpv6Wildcarded(entry,
+                AclSetAclEntryIpv6WildcardedAug::getSourceAddressWildcarded);
         if (ipv6PrefixOpt.isPresent()) {
-            Preconditions.checkArgument(!ipv6WildcardedOpt.isPresent(), SOURCE_ADDRESS_AND_SOURCE_ADDRESS_WILDCARDED_TOGETHER_ERROR);
-            commandVars.acl_src_addr = ipv6PrefixOpt.get();
+            Preconditions.checkArgument(!ipv6WildcardedOpt.isPresent(),
+                    SOURCE_ADDRESS_AND_SOURCE_ADDRESS_WILDCARDED_TOGETHER_ERROR);
+            commandVars.aclSrcAddr = ipv6PrefixOpt.get();
         } else {
-            Preconditions.checkArgument(ipv6WildcardedOpt.isPresent(), NONE_SOURCE_ADDRESS_OR_SOURCE_ADDRESS_WILDCARDED_ERROR);
-            Preconditions.checkArgument(ipv6WildcardedOpt.get().getAddress() != null && ipv6WildcardedOpt.get().getWildcardMask() != null,
+            Preconditions.checkArgument(ipv6WildcardedOpt.isPresent(),
+                    NONE_SOURCE_ADDRESS_OR_SOURCE_ADDRESS_WILDCARDED_ERROR);
+            Preconditions.checkArgument(ipv6WildcardedOpt.get().getAddress() != null && ipv6WildcardedOpt.get()
+                            .getWildcardMask() != null,
                     SOURCE_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR);
-            commandVars.acl_src_addr = ipv6WildcardedOpt.get().getAddress().getValue() + " " + ipv6WildcardedOpt.get().getWildcardMask().getValue();
+            commandVars.aclSrcAddr = ipv6WildcardedOpt.get().getAddress().getValue() + " " + ipv6WildcardedOpt.get()
+                    .getWildcardMask().getValue();
         }
         // dst address
         ipv6PrefixOpt = getIpv6Prefix(entry, Ipv6ProtocolFieldsConfig::getDestinationAddress);
         ipv6WildcardedOpt = getIpv6Wildcarded(entry, AclSetAclEntryIpv6WildcardedAug::getDestinationAddressWildcarded);
         if (ipv6PrefixOpt.isPresent()) {
-            Preconditions.checkArgument(!ipv6WildcardedOpt.isPresent(), DESTINATION_ADDRESS_AND_DESTINATION_ADDRESS_WILDCARDED_TOGETHER_ERROR);
-            commandVars.acl_dst_addr = ipv6PrefixOpt.get();
+            Preconditions.checkArgument(!ipv6WildcardedOpt.isPresent(),
+                    DESTINATION_ADDRESS_AND_DESTINATION_ADDRESS_WILDCARDED_TOGETHER_ERROR);
+            commandVars.aclDstAddr = ipv6PrefixOpt.get();
         } else {
-            Preconditions.checkArgument(ipv6WildcardedOpt.isPresent(), NONE_DESTINATION_ADDRESS_OR_DESTINATION_ADDRESS_WILDCARDED_ERROR);
-            Preconditions.checkArgument(ipv6WildcardedOpt.get().getAddress() != null && ipv6WildcardedOpt.get().getWildcardMask() != null,
+            Preconditions.checkArgument(ipv6WildcardedOpt.isPresent(),
+                    NONE_DESTINATION_ADDRESS_OR_DESTINATION_ADDRESS_WILDCARDED_ERROR);
+            Preconditions.checkArgument(ipv6WildcardedOpt.get().getAddress() != null && ipv6WildcardedOpt.get()
+                            .getWildcardMask() != null,
                     DESTINATION_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR);
-            commandVars.acl_dst_addr = ipv6WildcardedOpt.get().getAddress().getValue() + " " + ipv6WildcardedOpt.get().getWildcardMask().getValue();
+            commandVars.aclDstAddr = ipv6WildcardedOpt.get().getAddress().getValue() + " " + ipv6WildcardedOpt.get()
+                    .getWildcardMask().getValue();
         }
 
         IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv6().getConfig())
                 .map(config -> config.getProtocol())
                 .orElse(null);
-        commandVars.acl_protocol = formatProtocol(ipProtocolType, commandVars.type);
+        commandVars.aclProtocol = formatProtocol(ipProtocolType, commandVars.type);
     }
 
     private Optional<String> getIpv6Prefix(AclEntry entry, Function<Ipv6ProtocolFieldsConfig, Ipv6Prefix> mapper) {
@@ -303,7 +334,9 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
                 .map(Ipv6Prefix::getValue);
     }
 
-    private Optional<Ipv6AddressWildcarded> getIpv6Wildcarded(AclEntry entry, Function<AclSetAclEntryIpv6WildcardedAug, Ipv6AddressWildcarded> mapper) {
+    private Optional<Ipv6AddressWildcarded> getIpv6Wildcarded(AclEntry entry,
+                                                              Function<AclSetAclEntryIpv6WildcardedAug,
+                                                                      Ipv6AddressWildcarded> mapper) {
         return Optional.ofNullable(entry)
                 .map(AclEntry::getIpv6)
                 .map(Ipv6::getConfig)
@@ -313,18 +346,19 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
 
     private void processTransport(AclEntry entry, MaxMetricCommandDTO commandVars) {
         if (entry.getTransport() != null && entry.getTransport().getConfig() != null) {
-            AclSetAclEntryTransportPortNamedAug aug = entry.getTransport().getConfig().getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
+            AclSetAclEntryTransportPortNamedAug aug = entry.getTransport().getConfig()
+                    .getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
 
             if (entry.getTransport().getConfig().getSourcePort() != null) {
-                commandVars.acl_src_port = formatPort(entry.getTransport().getConfig().getSourcePort());
+                commandVars.aclSrcPort = formatPort(entry.getTransport().getConfig().getSourcePort());
             } else if (aug != null && aug.getSourcePortNamed() != null) {
-                commandVars.acl_src_port = formatNamedPort(aug.getSourcePortNamed());
+                commandVars.aclSrcPort = formatNamedPort(aug.getSourcePortNamed());
             }
 
             if (entry.getTransport().getConfig().getDestinationPort() != null) {
-                commandVars.acl_dst_port = formatPort(entry.getTransport().getConfig().getDestinationPort());
+                commandVars.aclDstPort = formatPort(entry.getTransport().getConfig().getDestinationPort());
             } else if (aug != null && aug.getDestinationPortNamed() != null) {
-                commandVars.acl_dst_port = formatNamedPort(aug.getDestinationPortNamed());
+                commandVars.aclDstPort = formatNamedPort(aug.getDestinationPortNamed());
             }
         }
     }
@@ -335,9 +369,9 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
         }
         Class<? extends FORWARDINGACTION> action = entry.getActions().getConfig().getForwardingAction();
         if (action.equals(ACCEPT.class)) {
-            commandVars.acl_fwd_action = "permit";
+            commandVars.aclFwdAction = "permit";
         } else if (action.equals(DROP.class)) {
-            commandVars.acl_fwd_action = "deny";
+            commandVars.aclFwdAction = "deny";
         } else {
             throw new IllegalStateException(f("No action found for entry %s", entry));
         }
@@ -367,7 +401,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
                     return "icmpv6";
                 default:
                     LOG.warn("Unknown protocol {}", protocol);
-                    throw new IllegalArgumentException("ACL contains unsupported protocol: " + protocol.getSimpleName());
+                    throw new IllegalArgumentException("ACL contains unsupported protocol: "
+                            + protocol.getSimpleName());
             }
         }
         LOG.warn("Unknown protocol {}", protocol);
@@ -420,10 +455,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
                 return f("gt %s", from);
             }
             if (StringUtils.isNumeric(from) && StringUtils.isNumeric(to)) {
-                Integer f = Integer.valueOf(from);
-                Integer t = Integer.valueOf(to);
+                Integer fr = Integer.valueOf(from);
+                Integer toI = Integer.valueOf(to);
 
-                if (f > t && f - 1 == t + 1) {
+                if (fr > toI && fr - 1 == toI + 1) {
                     return f("neq %s", from);
                 }
             }
@@ -466,8 +501,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
             // minRangeParam > maxRangeParam
             // |0, .........., maxRangeParam, minParamRange, .........., MAX_TTL|
             Preconditions.checkArgument(minRangeParam - maxRangeParam == 2,
-                "incorrect range param for 'neq', first range param has to be greater then second by 2, entered: %s",
-                rangeString);
+                    "incorrect range param for 'neq', first range param has to be greater then second by 2, entered: "
+                            +
+                            "%s",
+                    rangeString);
             ttlString = ttlString + " neq " + (minRangeParam - 1);
         }
 
@@ -476,7 +513,16 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey>{
 
     private class MaxMetricCommandDTO {
 
-        private String type = "", acl_name = "", acl_seq_id = "", acl_fwd_action = "", acl_protocol = "", acl_src_addr = "",
-                acl_src_port = "", acl_dst_addr = "", acl_dst_port = "", acl_icmp_msg_type = "", acl_ttl = "";
+        private String type = "";
+        private String aclName = "";
+        private String aclSeqId = "";
+        private String aclFwdAction = "";
+        private String aclProtocol = "";
+        private String aclSrcAddr = "";
+        private String aclSrcPort = "";
+        private String aclDstAddr = "";
+        private String aclDstPort = "";
+        private String aclIcmpMsgType = "";
+        private String aclTtl = "";
     }
 }

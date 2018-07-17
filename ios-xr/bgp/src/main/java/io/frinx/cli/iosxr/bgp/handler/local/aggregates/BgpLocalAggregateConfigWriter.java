@@ -37,32 +37,32 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
 
     private Cli cli;
 
-    static final String LOCAL_AGGREGATE_CONFIG ="router bgp {$as} {$instance}\n" +
-            "{% loop in $oldAfiSafis as $afiSafi}\n" +
-                "{% if ($afiSafi == ipv4unicast) && ($configOld.prefix.ipv4_prefix|default(nonIpv4) != nonIpv4) %}" +
-                    "address-family ipv4 unicast\n" +
-                    "no network {$configOld.prefix.ipv4_prefix.value}{.if ($oldPolicy)} route-policy {$oldPolicy}{/if}\n" +
-                    "exit\n" +
-                "{% elseIf ($afiSafi == ipv6unicast) && ($configOld.prefix.ipv6_prefix|default(nonIpv6) != nonIpv6) %}" +
-                    "address-family ipv6 unicast\n" +
-                    "no network {$configOld.prefix.ipv6_prefix.value}{.if ($oldPolicy)} route-policy {$oldPolicy}{/if}\n" +
-                    "exit\n" +
-                "{% endif %}" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "{% loop in $newAfiSafis as $afiSafi}\n" +
-                "{% if ($afiSafi == ipv4unicast) && ($configNew.prefix.ipv4_prefix|default(nonIpv4) != nonIpv4) %}" +
-                    "address-family ipv4 unicast\n" +
-                    "network {$configNew.prefix.ipv4_prefix.value}{.if ($newPolicy)} route-policy {$newPolicy}{/if}\n" +
-                    "exit\n" +
-                "{% elseIf ($afiSafi == ipv6unicast) && ($configNew.prefix.ipv6_prefix|default(nonIpv6) != nonIpv6) %}" +
-                    "address-family ipv6 unicast\n" +
-                    "network {$configNew.prefix.ipv6_prefix.value}{.if ($newPolicy)} route-policy {$newPolicy}{/if}\n" +
-                    "exit\n" +
-                "{% endif %}" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "root\n";
+    static final String LOCAL_AGGREGATE_CONFIG = "router bgp {$as} {$instance}\n"
+            + "{% loop in $oldAfiSafis as $afiSafi}\n"
+            + "{% if ($afiSafi == ipv4unicast) && ($configOld.prefix.ipv4_prefix|default(nonIpv4) != nonIpv4) %}"
+            + "address-family ipv4 unicast\n"
+            + "no network {$configOld.prefix.ipv4_prefix.value}{.if ($oldPolicy)} route-policy {$oldPolicy}{/if}\n"
+            + "exit\n"
+            + "{% elseIf ($afiSafi == ipv6unicast) && ($configOld.prefix.ipv6_prefix|default(nonIpv6) != nonIpv6) %}"
+            + "address-family ipv6 unicast\n"
+            + "no network {$configOld.prefix.ipv6_prefix.value}{.if ($oldPolicy)} route-policy {$oldPolicy}{/if}\n"
+            + "exit\n"
+            + "{% endif %}"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "{% loop in $newAfiSafis as $afiSafi}\n"
+            + "{% if ($afiSafi == ipv4unicast) && ($configNew.prefix.ipv4_prefix|default(nonIpv4) != nonIpv4) %}"
+            + "address-family ipv4 unicast\n"
+            + "network {$configNew.prefix.ipv4_prefix.value}{.if ($newPolicy)} route-policy {$newPolicy}{/if}\n"
+            + "exit\n"
+            + "{% elseIf ($afiSafi == ipv6unicast) && ($configNew.prefix.ipv6_prefix|default(nonIpv6) != nonIpv6) %}"
+            + "address-family ipv6 unicast\n"
+            + "network {$configNew.prefix.ipv6_prefix.value}{.if ($newPolicy)} route-policy {$newPolicy}{/if}\n"
+            + "exit\n"
+            + "{% endif %}"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "root\n";
 
     public BgpLocalAggregateConfigWriter(Cli cli) {
         this.cli = cli;
@@ -71,20 +71,28 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
                                               WriteContext writeContext) throws WriteFailedException {
-        Optional<Bgp> bgpOptional = writeContext.readAfter(id.firstIdentifierOf(Protocol.class).child(Bgp.class));
+        Optional<Bgp> bgpOptional = writeContext.readAfter(id.firstIdentifierOf(Protocol.class)
+                .child(Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
-        Preconditions.checkArgument(g.getAfiSafis() != null && g.getAfiSafis().getAfiSafi() != null,
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
+        Preconditions.checkArgument(g.getAfiSafis() != null && g.getAfiSafis()
+                        .getAfiSafi() != null,
                 "Address-family for network doesn't exist");
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         String policy = null;
         if (config.getAugmentation(NiProtAggAug.class) != null) {
-            policy = config.getAugmentation(NiProtAggAug.class).getApplyPolicy();
+            policy = config.getAugmentation(NiProtAggAug.class)
+                    .getApplyPolicy();
         }
         blockingWriteAndRead(fT(LOCAL_AGGREGATE_CONFIG,
-                "as",  g.getConfig().getAs().getValue(),
+                "as", g.getConfig()
+                        .getAs()
+                        .getValue(),
                 "instance", instName,
-                "newAfiSafis", g.getAfiSafis().getAfiSafi().stream()
+                "newAfiSafis", g.getAfiSafis()
+                        .getAfiSafi()
+                        .stream()
                         .map(afi -> GlobalAfiSafiReader.transformAfiToString(afi.getAfiSafiName()))
                         .map(afi -> afi.replaceAll(" ", ""))
                         .collect(Collectors.toList()),
@@ -99,24 +107,33 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
-        Optional<Bgp> bgpOptional = writeContext.readAfter(id.firstIdentifierOf(Protocol.class).child(Bgp.class));
+        Optional<Bgp> bgpOptional = writeContext.readAfter(id.firstIdentifierOf(Protocol.class)
+                .child(Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
-        final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
-        Preconditions.checkArgument(g.getAfiSafis() != null && g.getAfiSafis().getAfiSafi() != null,
+        final Global g = Preconditions.checkNotNull(bgpOptional.get()
+                .getGlobal());
+        Preconditions.checkArgument(g.getAfiSafis() != null && g.getAfiSafis()
+                        .getAfiSafi() != null,
                 "Address-family for network doesn't exist");
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         String oldPolicy = null;
         if (dataBefore.getAugmentation(NiProtAggAug.class) != null) {
-            oldPolicy = dataBefore.getAugmentation(NiProtAggAug.class).getApplyPolicy();
+            oldPolicy = dataBefore.getAugmentation(NiProtAggAug.class)
+                    .getApplyPolicy();
         }
         String newPolicy = null;
         if (dataAfter.getAugmentation(NiProtAggAug.class) != null) {
-            newPolicy = dataAfter.getAugmentation(NiProtAggAug.class).getApplyPolicy();
+            newPolicy = dataAfter.getAugmentation(NiProtAggAug.class)
+                    .getApplyPolicy();
         }
         blockingWriteAndRead(fT(LOCAL_AGGREGATE_CONFIG,
-                "as",  g.getConfig().getAs().getValue(),
+                "as", g.getConfig()
+                        .getAs()
+                        .getValue(),
                 "instance", instName,
-                "newAfiSafis", g.getAfiSafis().getAfiSafi().stream()
+                "newAfiSafis", g.getAfiSafis()
+                        .getAfiSafi()
+                        .stream()
                         .map(afi -> GlobalAfiSafiReader.transformAfiToString(afi.getAfiSafiName()))
                         .map(afi -> afi.replaceAll(" ", ""))
                         .collect(Collectors.toList()),
@@ -124,31 +141,39 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                 "oldPolicy", oldPolicy,
                 "newPolicy", newPolicy,
                 "configNew", dataAfter,
-                "configOld",dataBefore) ,
+                "configOld", dataBefore),
                 cli, id, dataAfter);
     }
 
     @Override
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
                                                WriteContext writeContext) throws WriteFailedException {
-        Optional<Bgp> bgpOptional = writeContext.readAfter(id.firstIdentifierOf(Protocol.class).child(Bgp.class));
+        Optional<Bgp> bgpOptional = writeContext.readAfter(id.firstIdentifierOf(Protocol.class)
+                .child(Bgp.class));
         if (!bgpOptional.isPresent()) {
             return;
         }
-        final Global g = bgpOptional.get().getGlobal();
-        if (g.getAfiSafis() == null || g.getAfiSafis().getAfiSafi() == null) {
+        final Global g = bgpOptional.get()
+                .getGlobal();
+        if (g.getAfiSafis() == null || g.getAfiSafis()
+                .getAfiSafi() == null) {
             return;
         }
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
         String policy = null;
         if (config.getAugmentation(NiProtAggAug.class) != null) {
-            policy = config.getAugmentation(NiProtAggAug.class).getApplyPolicy();
+            policy = config.getAugmentation(NiProtAggAug.class)
+                    .getApplyPolicy();
         }
         blockingDeleteAndRead(fT(LOCAL_AGGREGATE_CONFIG,
-                "as",  g.getConfig().getAs().getValue(),
+                "as", g.getConfig()
+                        .getAs()
+                        .getValue(),
                 "instance", instName,
                 "newAfiSafis", Collections.EMPTY_LIST,
-                "oldAfiSafis", g.getAfiSafis().getAfiSafi().stream()
+                "oldAfiSafis", g.getAfiSafis()
+                        .getAfiSafi()
+                        .stream()
                         .map(afi -> GlobalAfiSafiReader.transformAfiToString(afi.getAfiSafiName()))
                         .map(afi -> afi.replaceAll(" ", ""))
                         .collect(Collectors.toList()),

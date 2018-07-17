@@ -55,12 +55,15 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
     @Override
     public List<AddressKey> getAllIds(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+        String id = instanceIdentifier.firstKeyOf(Interface.class)
+                .getName();
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            return parseAddressIds(blockingRead(String.format(SH_RUN_INT_IP, id), cli, instanceIdentifier, readContext));
+            return parseAddressIds(blockingRead(String.format(SH_RUN_INT_IP, id), cli, instanceIdentifier,
+                    readContext));
         } else {
             return Collections.emptyList();
         }
@@ -70,8 +73,8 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
     public static List<AddressKey> parseAddressIds(String output) {
         return parseFields(output, 0,
                 INTERFACE_IP_LINE::matcher,
-                m -> m.group("address"),
-                addr -> new AddressKey(new Ipv4AddressNoZone(addr)));
+            m -> m.group("address"),
+            addr -> new AddressKey(new Ipv4AddressNoZone(addr)));
     }
 
     @Override
@@ -84,11 +87,13 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
                                       @Nonnull AddressBuilder addressBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class)
+                .getIndex();
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class).getIp());
+            addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class)
+                    .getIp());
         }
     }
 }

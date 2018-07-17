@@ -44,11 +44,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class RpfCheckWriterTest {
 
-    private static final InstanceIdentifier<VerifyUnicastSourceReachableVia> RPF_IID = IIDs.
-        INTERFACES.child(Interface.class, new InterfaceKey("Bundle-Ether666"))
-        .augmentation(
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.Interface1.class)
-        .child(VerifyUnicastSourceReachableVia.class);
+    private static final InstanceIdentifier<VerifyUnicastSourceReachableVia> RPF_IID = IIDs
+            .INTERFACES.child(Interface.class, new InterfaceKey("Bundle-Ether666"))
+            .augmentation(
+                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco
+                            .rev171024.Interface1.class)
+            .child(VerifyUnicastSourceReachableVia.class);
     private static final InstanceIdentifier<Ipv4> RPF_IPV4_IID = RPF_IID.child(Ipv4.class);
     private static final InstanceIdentifier<Ipv6> RPF_IPV6_IID = RPF_IID.child(Ipv6.class);
 
@@ -61,21 +62,23 @@ public class RpfCheckWriterTest {
         cli = Mockito.mock(Cli.class);
 
         Mockito.when(cli.executeAndRead(Mockito.any()))
-            .then(invocation -> CompletableFuture.completedFuture(""));
+                .then(invocation -> CompletableFuture.completedFuture(""));
     }
 
     @Test
     public void prepareCmdFull_ipv4() throws WriteFailedException {
         final Ipv4 ipv4Data = new Ipv4Builder()
-            .setRpfCheck(RpfCheck.ANY)
-            .setAllowConfig(Arrays.asList(RPFALLOWSELFPING.class, RPFALLOWDEFAULT.class))
-            .build();
+                .setRpfCheck(RpfCheck.ANY)
+                .setAllowConfig(Arrays.asList(RPFALLOWSELFPING.class, RPFALLOWDEFAULT.class))
+                .build();
 
         RpfCheckIpv4Writer ipv4Writer = new RpfCheckIpv4Writer(cli);
 
         ipv4Writer.writeCurrentAttributes(RPF_IPV4_IID, ipv4Data, context);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(responseString.capture());
-        final String ipv4Cmd = responseString.getValue().getContent();
+        Mockito.verify(cli, Mockito.times(1))
+                .executeAndRead(responseString.capture());
+        final String ipv4Cmd = responseString.getValue()
+                .getContent();
         assertTrue(ipv4Cmd.contains("ipv4 verify"));
         assertTrue(ipv4Cmd.contains("reachable-via any"));
         assertTrue(ipv4Cmd.contains("allow-default"));
@@ -85,15 +88,17 @@ public class RpfCheckWriterTest {
     @Test
     public void prepareCmdFull_ipv6() throws WriteFailedException {
         final Ipv6 ipv6Data = new Ipv6Builder()
-            .setRpfCheck(RpfCheck.ANY)
-            .setAllowConfig(Arrays.asList(RPFALLOWSELFPING.class, RPFALLOWDEFAULT.class))
-            .build();
+                .setRpfCheck(RpfCheck.ANY)
+                .setAllowConfig(Arrays.asList(RPFALLOWSELFPING.class, RPFALLOWDEFAULT.class))
+                .build();
 
         RpfCheckIpv6Writer ipv6Writer = new RpfCheckIpv6Writer(cli);
 
         ipv6Writer.writeCurrentAttributes(RPF_IPV6_IID, ipv6Data, context);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(responseString.capture());
-        final String ipv6Cmd = responseString.getValue().getContent();
+        Mockito.verify(cli, Mockito.times(1))
+                .executeAndRead(responseString.capture());
+        final String ipv6Cmd = responseString.getValue()
+                .getContent();
         assertTrue(ipv6Cmd.contains("ipv6 verify"));
         assertTrue(ipv6Cmd.contains("reachable-via any"));
         assertTrue(ipv6Cmd.contains("allow-default"));
@@ -103,15 +108,17 @@ public class RpfCheckWriterTest {
     @Test
     public void prepareCmdAllowDefault_ipv4() throws WriteFailedException {
         final Ipv4 ipv4Data = new Ipv4Builder()
-            .setRpfCheck(RpfCheck.ANY)
-            .setAllowConfig(Arrays.asList(RPFALLOWDEFAULT.class))
-            .build();
+                .setRpfCheck(RpfCheck.ANY)
+                .setAllowConfig(Arrays.asList(RPFALLOWDEFAULT.class))
+                .build();
 
         RpfCheckIpv4Writer ipv4Writer = new RpfCheckIpv4Writer(cli);
 
         ipv4Writer.writeCurrentAttributes(RPF_IPV4_IID, ipv4Data, context);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(responseString.capture());
-        final String ipv4Cmd = responseString.getValue().getContent();
+        Mockito.verify(cli, Mockito.times(1))
+                .executeAndRead(responseString.capture());
+        final String ipv4Cmd = responseString.getValue()
+                .getContent();
         assertTrue(ipv4Cmd.contains("ipv4 verify"));
         assertTrue(ipv4Cmd.contains("reachable-via any"));
         assertTrue(ipv4Cmd.contains("allow-default"));
@@ -121,15 +128,17 @@ public class RpfCheckWriterTest {
     @Test
     public void prepareCmdAllowDefault_ipv6() throws WriteFailedException {
         final Ipv6 ipv6Data = new Ipv6Builder()
-            .setRpfCheck(RpfCheck.ANY)
-            .setAllowConfig(Arrays.asList(RPFALLOWDEFAULT.class))
-            .build();
+                .setRpfCheck(RpfCheck.ANY)
+                .setAllowConfig(Arrays.asList(RPFALLOWDEFAULT.class))
+                .build();
 
         RpfCheckIpv6Writer ipv6Writer = new RpfCheckIpv6Writer(cli);
 
         ipv6Writer.writeCurrentAttributes(RPF_IPV6_IID, ipv6Data, context);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(responseString.capture());
-        final String ipv6Cmd = responseString.getValue().getContent();
+        Mockito.verify(cli, Mockito.times(1))
+                .executeAndRead(responseString.capture());
+        final String ipv6Cmd = responseString.getValue()
+                .getContent();
         assertTrue(ipv6Cmd.contains("ipv6 verify"));
         assertTrue(ipv6Cmd.contains("reachable-via any"));
         assertTrue(ipv6Cmd.contains("allow-default"));
@@ -139,15 +148,17 @@ public class RpfCheckWriterTest {
     @Test
     public void prepareCmdAllowSelfPing_ipv4() throws WriteFailedException {
         final Ipv4 ipv4Data = new Ipv4Builder()
-            .setRpfCheck(RpfCheck.ANY)
-            .setAllowConfig(Arrays.asList(RPFALLOWSELFPING.class))
-            .build();
+                .setRpfCheck(RpfCheck.ANY)
+                .setAllowConfig(Arrays.asList(RPFALLOWSELFPING.class))
+                .build();
 
         RpfCheckIpv4Writer ipv4Writer = new RpfCheckIpv4Writer(cli);
 
         ipv4Writer.writeCurrentAttributes(RPF_IPV4_IID, ipv4Data, context);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(responseString.capture());
-        final String ipv4Cmd = responseString.getValue().getContent();
+        Mockito.verify(cli, Mockito.times(1))
+                .executeAndRead(responseString.capture());
+        final String ipv4Cmd = responseString.getValue()
+                .getContent();
         assertTrue(ipv4Cmd.contains("ipv4 verify"));
         assertTrue(ipv4Cmd.contains("reachable-via any"));
         assertFalse(ipv4Cmd.contains("allow-default"));
@@ -157,15 +168,17 @@ public class RpfCheckWriterTest {
     @Test
     public void prepareCmdAllowSelfPing_ipv6() throws WriteFailedException {
         final Ipv6 ipv6Data = new Ipv6Builder()
-            .setRpfCheck(RpfCheck.ANY)
-            .setAllowConfig(Arrays.asList(RPFALLOWSELFPING.class))
-            .build();
+                .setRpfCheck(RpfCheck.ANY)
+                .setAllowConfig(Arrays.asList(RPFALLOWSELFPING.class))
+                .build();
 
         RpfCheckIpv6Writer ipv6Writer = new RpfCheckIpv6Writer(cli);
 
         ipv6Writer.writeCurrentAttributes(RPF_IPV6_IID, ipv6Data, context);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(responseString.capture());
-        final String ipv6Cmd = responseString.getValue().getContent();
+        Mockito.verify(cli, Mockito.times(1))
+                .executeAndRead(responseString.capture());
+        final String ipv6Cmd = responseString.getValue()
+                .getContent();
         assertTrue(ipv6Cmd.contains("ipv6 verify"));
         assertTrue(ipv6Cmd.contains("reachable-via any"));
         assertFalse(ipv6Cmd.contains("allow-default"));
@@ -175,14 +188,16 @@ public class RpfCheckWriterTest {
     @Test
     public void prepareCmdEmptyAllow_ipv4() throws WriteFailedException {
         final Ipv4 ipv4Data = new Ipv4Builder()
-            .setRpfCheck(RpfCheck.ANY)
-            .build();
+                .setRpfCheck(RpfCheck.ANY)
+                .build();
 
         RpfCheckIpv4Writer ipv4Writer = new RpfCheckIpv4Writer(cli);
 
         ipv4Writer.writeCurrentAttributes(RPF_IPV4_IID, ipv4Data, context);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(responseString.capture());
-        final String ipv4Cmd = responseString.getValue().getContent();
+        Mockito.verify(cli, Mockito.times(1))
+                .executeAndRead(responseString.capture());
+        final String ipv4Cmd = responseString.getValue()
+                .getContent();
         assertTrue(ipv4Cmd.contains("ipv4 verify"));
         assertTrue(ipv4Cmd.contains("reachable-via any"));
         assertFalse(ipv4Cmd.contains("allow-default"));
@@ -192,14 +207,16 @@ public class RpfCheckWriterTest {
     @Test
     public void prepareCmdEmptyAllow_ipv6() throws WriteFailedException {
         final Ipv6 ipv6Data = new Ipv6Builder()
-            .setRpfCheck(RpfCheck.ANY)
-            .build();
+                .setRpfCheck(RpfCheck.ANY)
+                .build();
 
         RpfCheckIpv6Writer ipv6Writer = new RpfCheckIpv6Writer(cli);
 
         ipv6Writer.writeCurrentAttributes(RPF_IPV6_IID, ipv6Data, context);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(responseString.capture());
-        final String ipv6Cmd = responseString.getValue().getContent();
+        Mockito.verify(cli, Mockito.times(1))
+                .executeAndRead(responseString.capture());
+        final String ipv6Cmd = responseString.getValue()
+                .getContent();
         assertTrue(ipv6Cmd.contains("ipv6 verify"));
         assertTrue(ipv6Cmd.contains("reachable-via any"));
         assertFalse(ipv6Cmd.contains("allow-default"));
@@ -209,14 +226,16 @@ public class RpfCheckWriterTest {
     @Test
     public void prepareCmdRx_ipv4() throws WriteFailedException {
         final Ipv4 ipv4Data = new Ipv4Builder()
-            .setRpfCheck(RpfCheck.RX)
-            .build();
+                .setRpfCheck(RpfCheck.RX)
+                .build();
 
         RpfCheckIpv4Writer ipv4Writer = new RpfCheckIpv4Writer(cli);
 
         ipv4Writer.writeCurrentAttributes(RPF_IPV4_IID, ipv4Data, context);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(responseString.capture());
-        final String ipv4Cmd = responseString.getValue().getContent();
+        Mockito.verify(cli, Mockito.times(1))
+                .executeAndRead(responseString.capture());
+        final String ipv4Cmd = responseString.getValue()
+                .getContent();
         assertTrue(ipv4Cmd.contains("ipv4 verify"));
         assertTrue(ipv4Cmd.contains("reachable-via rx"));
     }
@@ -224,14 +243,16 @@ public class RpfCheckWriterTest {
     @Test
     public void prepareCmdRx_ipv6() throws WriteFailedException {
         final Ipv6 ipv6Data = new Ipv6Builder()
-            .setRpfCheck(RpfCheck.RX)
-            .build();
+                .setRpfCheck(RpfCheck.RX)
+                .build();
 
         RpfCheckIpv6Writer ipv6Writer = new RpfCheckIpv6Writer(cli);
 
         ipv6Writer.writeCurrentAttributes(RPF_IPV6_IID, ipv6Data, context);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(responseString.capture());
-        final String ipv6Cmd = responseString.getValue().getContent();
+        Mockito.verify(cli, Mockito.times(1))
+                .executeAndRead(responseString.capture());
+        final String ipv6Cmd = responseString.getValue()
+                .getContent();
         assertTrue(ipv6Cmd.contains("ipv6 verify"));
         assertTrue(ipv6Cmd.contains("reachable-via rx"));
     }

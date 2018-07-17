@@ -44,12 +44,14 @@ import org.opendaylight.yangtools.yang.binding.ChildOf;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class RpfCheckReader implements CliConfigReader<VerifyUnicastSourceReachableVia, VerifyUnicastSourceReachableViaBuilder> {
+public class RpfCheckReader implements CliConfigReader<VerifyUnicastSourceReachableVia,
+        VerifyUnicastSourceReachableViaBuilder> {
 
     private static final String SH_RPF_INTF =
-        "show running-config interface %s | include verify unicast source reachable-via";
+            "show running-config interface %s | include verify unicast source reachable-via";
     private static final Pattern ALL_INGRESS_ACLS_LINE = Pattern.compile(
-        "(?<type>.+) verify unicast source reachable-via (?<config>(any|rx))( ?(?<allowConfig>.*))?", Pattern.DOTALL);
+            "(?<type>.+) verify unicast source reachable-via (?<config>(any|rx))( ?(?<allowConfig>.*))?", Pattern
+                    .DOTALL);
 
     private final Cli cli;
 
@@ -59,19 +61,21 @@ public class RpfCheckReader implements CliConfigReader<VerifyUnicastSourceReacha
     //ipv4/ipv6 verify unicast source reachable-via any
 
     @Override
-    public void readCurrentAttributes(@Nonnull final InstanceIdentifier<VerifyUnicastSourceReachableVia> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull final InstanceIdentifier<VerifyUnicastSourceReachableVia>
+                                                  instanceIdentifier,
                                       @Nonnull final VerifyUnicastSourceReachableViaBuilder builder,
                                       @Nonnull final ReadContext readContext)
-        throws ReadFailedException {
+            throws ReadFailedException {
 
-        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class)
+                .getName();
 
         final String readCommand = f(SH_RPF_INTF, interfaceName);
         final String readConfig = blockingRead(
-            readCommand,
-            cli,
-            instanceIdentifier,
-            readContext
+                readCommand,
+                cli,
+                instanceIdentifier,
+                readContext
         );
 
         parseRpfCheckConfig(readConfig, builder);
@@ -80,8 +84,8 @@ public class RpfCheckReader implements CliConfigReader<VerifyUnicastSourceReacha
     @VisibleForTesting
     void parseRpfCheckConfig(final String readConfig, final VerifyUnicastSourceReachableViaBuilder builder) {
         ParsingUtils.parseFields(readConfig, 0,
-            ALL_INGRESS_ACLS_LINE::matcher,
-            this::configFromMatcher,
+                ALL_INGRESS_ACLS_LINE::matcher,
+                this::configFromMatcher,
             value -> {
                 if (value instanceof Ipv4) {
                     builder.setIpv4((Ipv4) value);
@@ -108,14 +112,14 @@ public class RpfCheckReader implements CliConfigReader<VerifyUnicastSourceReacha
 
         if ("ipv4".equalsIgnoreCase(type)) {
             return new Ipv4Builder()
-                .setRpfCheck(RpfCheck.valueOf(rpfConfig.toUpperCase()))
-                .setAllowConfig(allowConfig)
-                .build();
+                    .setRpfCheck(RpfCheck.valueOf(rpfConfig.toUpperCase()))
+                    .setAllowConfig(allowConfig)
+                    .build();
         } else if ("ipv6".equalsIgnoreCase(type)) {
             return new Ipv6Builder()
-                .setRpfCheck(RpfCheck.valueOf(rpfConfig.toUpperCase()))
-                .setAllowConfig(allowConfig)
-                .build();
+                    .setRpfCheck(RpfCheck.valueOf(rpfConfig.toUpperCase()))
+                    .setAllowConfig(allowConfig)
+                    .build();
         }
 
         throw new IllegalArgumentException("Could not parse RPF check config type, Should be ipv4 or ipv6.");

@@ -32,7 +32,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
 import org.opendaylight.yangtools.concepts.Builder;
@@ -56,28 +55,34 @@ public class NeighborTransportConfigReader implements BgpReader.BgpConfigReader<
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                             @Nonnull ConfigBuilder configBuilder,
-                                             @Nonnull ReadContext readContext) throws ReadFailedException {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+            ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
+                globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
                 .child(Global.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config.class))
+                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
+                        .Config.class))
                 .orNull();
 
-        if (globalConfig == null) {
+        if (globalConfig
+                == null) {
             return;
         }
 
-        IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress();
+        IpAddress neighborIp = instanceIdentifier.firstKeyOf(Neighbor.class)
+                .getNeighborAddress();
         String address = new String(neighborIp.getValue());
-        String insName = instanceIdentifier.firstKeyOf(Protocol.class).getName().equals(NetworInstance.DEFAULT_NETWORK_NAME) ?
-                "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class).getName();
+        String insName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName()
+                .equals(NetworInstance.DEFAULT_NETWORK_NAME) ? "" : "instance "
+                + instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
 
-        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs().getValue().intValue(), insName, address), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs()
+                .getValue()
+                .intValue(), insName, address), cli, instanceIdentifier, readContext);
 
-        ParsingUtils.parseField(output.trim(), 0,
-                UPADTE_SOURCE_LINE::matcher,
-                matcher -> matcher.group("iface"),
-                iface -> configBuilder.setLocalAddress(new BgpCommonNeighborGroupTransportConfig.LocalAddress(iface)));
+        ParsingUtils.parseField(output.trim(), 0, UPADTE_SOURCE_LINE::matcher, matcher -> matcher.group("iface"),
+            iface -> configBuilder.setLocalAddress(new BgpCommonNeighborGroupTransportConfig.LocalAddress(iface)));
     }
 }
