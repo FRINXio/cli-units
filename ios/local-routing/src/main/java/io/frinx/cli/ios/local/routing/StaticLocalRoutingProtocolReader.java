@@ -36,7 +36,8 @@ public class StaticLocalRoutingProtocolReader implements CliConfigListReader<Pro
 
     @Nonnull
     @Override
-    public List<ProtocolKey> getAllIds(@Nonnull InstanceIdentifier<Protocol> id, @Nonnull ReadContext context) throws ReadFailedException {
+    public List<ProtocolKey> getAllIds(@Nonnull InstanceIdentifier<Protocol> id, @Nonnull ReadContext context) throws
+            ReadFailedException {
         String vrf = id.firstKeyOf(NetworkInstance.class).getName();
         return Collections.singletonList(new ProtocolKey(TYPE, vrf));
     }

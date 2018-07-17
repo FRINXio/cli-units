@@ -31,7 +31,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class InterfaceConfigReader implements CliOperReader<Config, ConfigBuilder> {
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder
+            configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         configBuilder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
         configBuilder.setEnabled(true);
     }

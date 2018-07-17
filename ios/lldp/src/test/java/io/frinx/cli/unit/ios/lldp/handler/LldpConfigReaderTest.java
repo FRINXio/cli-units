@@ -23,8 +23,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev16051
 
 public class LldpConfigReaderTest {
 
-    private static final String OUTPUT = "hostname XE3\n" +
-            "ip domain name FRINX.LOCAL\n";
+    private static final String OUTPUT = "hostname XE3\n"
+            + "ip domain name FRINX.LOCAL\n";
 
     private static final String OUTPUT2 = "hostname XE3\n";
 

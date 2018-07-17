@@ -69,8 +69,8 @@ public class VrfReader implements CliConfigListReader<NetworkInstance, NetworkIn
     static List<NetworkInstanceKey> parseVrfIds(String output) {
         List<NetworkInstanceKey> networkInstanceKeys = ParsingUtils.parseFields(output, 0,
                 VRF_ID_LINE::matcher,
-                m -> m.group("id"),
-                value -> new NetworkInstanceKey(value.trim()));
+            m -> m.group("id"),
+            value -> new NetworkInstanceKey(value.trim()));
 
         networkInstanceKeys.add(DEFAULT_NETWORK);
 

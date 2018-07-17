@@ -32,7 +32,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class ProtocolConfigReader implements L3VrfReader.L3VrfConfigReader<Config, ConfigBuilder> {
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+            ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
         configBuilder.setIdentifier(protocolKey.getIdentifier());
         configBuilder.setName(protocolKey.getName());

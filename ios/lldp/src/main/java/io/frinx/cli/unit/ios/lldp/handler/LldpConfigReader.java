@@ -63,7 +63,7 @@ public class LldpConfigReader implements CliOperReader<Config, ConfigBuilder> {
     static void parseConfig(ConfigBuilder configBuilder, String hostnameOutput) {
         Optional<String> host = ParsingUtils.parseField(hostnameOutput, 0,
                 HOSTNAME_PATTERN::matcher,
-                m -> m.group("name"));
+            m -> m.group("name"));
 
         if (!host.isPresent()) {
             return;
@@ -71,10 +71,10 @@ public class LldpConfigReader implements CliOperReader<Config, ConfigBuilder> {
 
         Optional<String> domain = ParsingUtils.parseField(hostnameOutput, 0,
                 DOMAINNAME_PATTERN::matcher,
-                m -> m.group("name"));
+            m -> m.group("name"));
 
         configBuilder.setSystemName(domain
-                .map(s -> host.get() + "." + s)
+            .map(s -> host.get() + "." + s)
                 .orElseGet(host::get));
     }
 

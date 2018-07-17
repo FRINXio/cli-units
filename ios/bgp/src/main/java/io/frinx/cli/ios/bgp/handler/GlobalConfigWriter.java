@@ -62,8 +62,9 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
         this.cli = cli;
     }
 
-    @Override public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
-        WriteContext writeContext) throws WriteFailedException {
+    @Override
+    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
+                                              WriteContext writeContext) throws WriteFailedException {
 
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         ProtocolKey protoKey = id.firstKeyOf(Protocol.class);
@@ -73,13 +74,15 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             // Only set global router id for default network
             blockingWriteAndRead(cli, id, config,
-                "configure terminal",
-                f("router bgp %s", config.getAs().getValue()),
-                config.getRouterId() == null ? "no bgp router id" : f("bgp router-id %s", config.getRouterId().getValue()),
-                "end");
+                    "configure terminal",
+                    f("router bgp %s", config.getAs().getValue()),
+                    config.getRouterId() == null ? "no bgp router id" : f("bgp router-id %s", config.getRouterId()
+                            .getValue()),
+                    "end");
         } else {
             // Compare AS for global and current VRF. Must match for IOS
-            writeContext.readAfter(IIDs.NETWORKINSTANCES.child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK).child(Protocols.class))
+            writeContext.readAfter(IIDs.NETWORKINSTANCES.child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
+                    .child(Protocols.class))
                     .get()
                     .getProtocol().stream()
                     .filter(protocol -> protocol.getConfig().getIdentifier().equals(BGP.class))
@@ -134,7 +137,7 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
     }
 
     /**
-     * Collect all afi safi referenced in this instance
+     * Collect all afi safi referenced in this instance.
      */
     public static Set<AfiSafi> getAfiSafis(@Nullable Bgp bgp) {
         List<AfiSafi> globalAfiSafi = Optional.ofNullable(bgp)
@@ -161,7 +164,8 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
                 .map(BgpNeighborBase::getAfiSafis)
                 .filter(Objects::nonNull)
                 .map(BgpNeighborAfiSafiList::getAfiSafi)
-                .flatMap(a -> (a == null ? Collections.<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi>emptyList() : a).stream())
+                .flatMap(a -> (a == null ? Collections.<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                        .bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi>emptyList() : a).stream())
                 .map(a -> new AfiSafiBuilder().setAfiSafiName(a.getAfiSafiName()).build())
                 .collect(Collectors.toSet());
     }

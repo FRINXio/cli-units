@@ -27,13 +27,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 
 public class NeighborConfigReaderTest {
 
-    public static final String OUTPUT = "router bgp 65000\n" +
-            " neighbor 1.2.3.4 remote-as 45\n" +
-            " neighbor 1.2.3.4 password passwd\n" +
-            " neighbor 1.2.3.4 peer-group group12\n" +
-            " neighbor 1.2.3.4 description description\n" +
-            " neighbor 1.2.3.4 send-community both\n" +
-            " neighbor 1.2.3.4 activate\n";
+    public static final String OUTPUT = "router bgp 65000\n"
+            + " neighbor 1.2.3.4 remote-as 45\n"
+            + " neighbor 1.2.3.4 password passwd\n"
+            + " neighbor 1.2.3.4 peer-group group12\n"
+            + " neighbor 1.2.3.4 description description\n"
+            + " neighbor 1.2.3.4 send-community both\n"
+            + " neighbor 1.2.3.4 activate\n";
 
     @Test
     public void testParse() throws Exception {

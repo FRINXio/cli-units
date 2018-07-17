@@ -39,12 +39,14 @@ public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigB
 
     public NetworkInstanceConfigReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {{
-            add(new VrfConfigReader(cli));
-            add(new DefaultConfigReader());
-            add(new L2P2PConfigReader(cli));
-            add(new L2VSIConfigReader(cli));
-        }});
+                add(new VrfConfigReader(cli));
+                add(new DefaultConfigReader());
+                add(new L2P2PConfigReader(cli));
+                add(new L2VSIConfigReader(cli));
+            }
+        });
     }
+
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
         ((NetworkInstanceBuilder) builder).setConfig(config);

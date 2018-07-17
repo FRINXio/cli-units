@@ -40,11 +40,13 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
         CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
     public static final String SH_INTERFACES_XCONNECT = "show running-config | include ^interface|^ *xconnect";
-    public static final Pattern XCONNECT_ID_LINE = Pattern.compile("(?<interface>\\S+)\\s+xconnect\\s+(?<ip>\\S+)\\s+(?<vccid>\\S+)\\s+(?<encaps>.*)");
+    public static final Pattern XCONNECT_ID_LINE = Pattern.compile("(?<interface>\\S+)\\s+xconnect\\s+(?<ip>\\S+)\\s+"
+            + "(?<vccid>\\S+)\\s+(?<encaps>.*)");
     private static final Pattern PW_CLASS = Pattern.compile(".*pw-class (?<pwclass>\\S+)");
 
     public static final String SH_LOCAL_CONNECT = "show running-config | include interworking ethernet";
-    public static final Pattern LOCAL_CONNECT_ID_LINE = Pattern.compile("connect (?<network>\\S+)\\s+(?<interface1>\\S+)\\s+(?<interface2>\\S+)\\s+interworking ethernet");
+    public static final Pattern LOCAL_CONNECT_ID_LINE = Pattern.compile("connect (?<network>\\S+)\\s+"
+            + "(?<interface1>\\S+)\\s+(?<interface2>\\S+)\\s+interworking ethernet");
 
     private Cli cli;
 
@@ -63,12 +65,14 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
                                               @Nonnull ReadContext readContext,
                                               @Nonnull Cli cli,
                                               @Nonnull CliReader reader) throws ReadFailedException {
-        if (!instanceIdentifier.getTargetType().equals(NetworkInstance.class)) {
+        if (!instanceIdentifier.getTargetType()
+                .equals(NetworkInstance.class)) {
             instanceIdentifier = RWUtils.cutId(instanceIdentifier, NetworkInstance.class);
         }
 
         // Parse xconnect based local-remote l2p2p
-        List<NetworkInstanceKey> l2Ids = parseXconnectIds(reader.blockingRead(SH_INTERFACES_XCONNECT, cli, instanceIdentifier, readContext));
+        List<NetworkInstanceKey> l2Ids = parseXconnectIds(reader.blockingRead(SH_INTERFACES_XCONNECT, cli,
+                instanceIdentifier, readContext));
         // Parse xconnect based local-local l2p2p
         l2Ids.addAll(parseLocalConnectIds(reader.blockingRead(SH_LOCAL_CONNECT, cli, instanceIdentifier, readContext)));
 
@@ -89,7 +93,7 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
     static List<NetworkInstanceKey> parseLocalConnectIds(String output) {
         return parseFields(output, 0,
                 LOCAL_CONNECT_ID_LINE::matcher,
-                matcher -> matcher.group("network"),
+            matcher -> matcher.group("network"),
                 NetworkInstanceKey::new);
     }
 
@@ -118,7 +122,8 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier,
                                       @Nonnull NetworkInstanceBuilder networkInstanceBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
+        String name = instanceIdentifier.firstKeyOf(NetworkInstance.class)
+                .getName();
         networkInstanceBuilder.setName(name);
     }
 }

@@ -33,15 +33,15 @@ public class ProtocolStateReader implements L3VrfReader.L3VrfOperReader<State, S
 
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
-                                             @Nonnull StateBuilder StateBuilder,
+                                             @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
-        StateBuilder.setIdentifier(protocolKey.getIdentifier());
-        StateBuilder.setName(protocolKey.getName());
+        stateBuilder.setIdentifier(protocolKey.getIdentifier());
+        stateBuilder.setName(protocolKey.getName());
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State State) {
-        ((ProtocolBuilder) builder).setState(State);
+    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State state) {
+        ((ProtocolBuilder) builder).setState(state);
     }
 }

@@ -44,7 +44,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReader<Aggregate, AggregateKey, AggregateBuilder> {
+public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReader<Aggregate, AggregateKey,
+        AggregateBuilder> {
 
     private static final String GROUP_IP = "ip";
     private static final String GROUP_MASK = "mask";
@@ -67,13 +68,13 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll("network", "\nnetwork"), 0,
                     NEIGHBOR_LINE::matcher,
                     BgpLocalAggregateReader::resolveGroups,
-                    value -> new AggregateKey(parsePrefix(parseNetworkPrefix(value))));
+                value -> new AggregateKey(parsePrefix(parseNetworkPrefix(value))));
         }
         return new ArrayList<>();
     }
 
-    private static IpPrefix parsePrefix(String s) {
-        return new IpPrefix(s.toCharArray());
+    private static IpPrefix parsePrefix(String string) {
+        return new IpPrefix(string.toCharArray());
     }
 
     @VisibleForTesting
@@ -87,7 +88,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll("network", "\nnetwork"), 0,
                     NEIGHBOR_LINE::matcher,
                     BgpLocalAggregateReader::resolveGroups,
-                    value -> new AggregateKey(parsePrefix(parseNetworkPrefix(value))));
+                value -> new AggregateKey(parsePrefix(parseNetworkPrefix(value))));
         }
         return new ArrayList<>();
     }
@@ -97,11 +98,11 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
         return utils.getInfo().getCidrSignature();
     }
 
-    private static HashMap<String, String> resolveGroups(Matcher m) {
+    private static HashMap<String, String> resolveGroups(Matcher matcher) {
         HashMap<String, String> hashMap = new HashMap<>();
 
-        hashMap.put(GROUP_IP, m.group(GROUP_IP));
-        hashMap.put(GROUP_MASK, m.group(GROUP_MASK));
+        hashMap.put(GROUP_IP, matcher.group(GROUP_IP));
+        hashMap.put(GROUP_MASK, matcher.group(GROUP_MASK));
 
         return hashMap;
     }
@@ -126,7 +127,8 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
 
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier,
-                                             @Nonnull AggregateBuilder aggregateBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+                                             @Nonnull AggregateBuilder aggregateBuilder, @Nonnull ReadContext
+                                                         readContext) throws ReadFailedException {
         aggregateBuilder.setKey(instanceIdentifier.firstKeyOf(Aggregate.class));
     }
 }

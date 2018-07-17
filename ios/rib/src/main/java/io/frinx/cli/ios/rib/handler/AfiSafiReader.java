@@ -42,7 +42,8 @@ public class AfiSafiReader implements CliOperListReader<AfiSafi, AfiSafiKey, Afi
 
     @Nonnull
     @Override
-    public List<AfiSafiKey> getAllIds(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<AfiSafiKey> getAllIds(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull ReadContext
+            readContext) throws ReadFailedException {
         return Lists.newArrayList(new AfiSafiKey(IPV4UNICAST.class), new AfiSafiKey(IPV6UNICAST.class));
     }
 
@@ -52,9 +53,12 @@ public class AfiSafiReader implements CliOperListReader<AfiSafi, AfiSafiKey, Afi
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        Class<? extends AFISAFITYPE> key = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull
+            AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+        Class<? extends AFISAFITYPE> key = instanceIdentifier.firstKeyOf(AfiSafi.class)
+                .getAfiSafiName();
         afiSafiBuilder.setAfiSafiName(key);
-        afiSafiBuilder.setState(new StateBuilder().setAfiSafiName(key).build());
+        afiSafiBuilder.setState(new StateBuilder().setAfiSafiName(key)
+                .build());
     }
 }

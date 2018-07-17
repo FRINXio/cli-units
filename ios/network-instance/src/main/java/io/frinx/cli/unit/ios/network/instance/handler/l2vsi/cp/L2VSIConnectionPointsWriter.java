@@ -58,25 +58,32 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
     public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
                                               @Nonnull ConnectionPoints dataAfter,
                                               @Nonnull WriteContext writeContext) throws WriteFailedException {
-        checkArgument(dataAfter.getConnectionPoint().size() >= 2,
+        checkArgument(dataAfter.getConnectionPoint()
+                        .size() >= 2,
                 "L2VSI network only supports at least 2 endpoints, but were: %s", dataAfter.getConnectionPoint());
 
         Set<String> usedInterfaces = getUsedInterfaces(id, writeContext);
 
         ConnectionPoint remotePoint = getCPoint(dataAfter, L2VSIConnectionPointsReader.REMOTE_POINT_ID);
         Endpoint remoteEndpoint = getEndpoint(remotePoint, writeContext, usedInterfaces, true, false);
-        checkArgument(remoteEndpoint.getConfig().getType() == REMOTE.class,
-                "Endpoint %s is not remote is not of type %s", L2VSIConnectionPointsReader.REMOTE_POINT_ID, REMOTE.class);
+        checkArgument(remoteEndpoint.getConfig()
+                        .getType() == REMOTE.class,
+                "Endpoint %s is not remote is not of type %s", L2VSIConnectionPointsReader.REMOTE_POINT_ID, REMOTE
+                        .class);
 
-        String netName = id.firstKeyOf(NetworkInstance.class).getName();
+        String netName = id.firstKeyOf(NetworkInstance.class)
+                .getName();
         int bdIndex = findNextFreeBd(id, netName, dataAfter);
 
         writeAutodiscovery(remoteEndpoint, id, dataAfter, writeContext, bdIndex);
 
-        Map<String, Endpoint> locals = dataAfter.getConnectionPoint().stream()
+        Map<String, Endpoint> locals = dataAfter.getConnectionPoint()
+                .stream()
                 // skip remote
-                .filter(cp -> !cp.getConnectionPointId().equals(L2VSIConnectionPointsReader.REMOTE_POINT_ID))
-                .map(cp -> new AbstractMap.SimpleEntry<>(cp.getConnectionPointId(), getEndpoint(cp, writeContext, usedInterfaces, true, false)))
+                .filter(cp -> !cp.getConnectionPointId()
+                        .equals(L2VSIConnectionPointsReader.REMOTE_POINT_ID))
+                .map(cp -> new AbstractMap.SimpleEntry<>(cp.getConnectionPointId(), getEndpoint(cp, writeContext,
+                        usedInterfaces, true, false)))
                 .map(this::ensureLocal)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -89,8 +96,11 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         return NumberUtils.isDigits(netName) && Integer.parseInt(netName) > 0 && Integer.parseInt(netName) < 4096;
     }
 
-    private void writeAutodiscovery(Endpoint remoteEndpoint, InstanceIdentifier<ConnectionPoints> id, ConnectionPoints dataAfter, WriteContext writeContext, int bdIndex) throws WriteFailedException.CreateFailedException {
-        String netName = id.firstKeyOf(NetworkInstance.class).getName();
+    private void writeAutodiscovery(Endpoint remoteEndpoint, InstanceIdentifier<ConnectionPoints> id,
+                                    ConnectionPoints dataAfter, WriteContext writeContext, int bdIndex) throws
+            WriteFailedException.CreateFailedException {
+        String netName = id.firstKeyOf(NetworkInstance.class)
+                .getName();
 
         // FIXME check bridge domain not in use
         // FIXME check vfi not in use
@@ -98,19 +108,22 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         blockingWriteAndRead(cli, id, dataAfter,
                 "configure terminal",
                 f("l2 vfi %s autodiscovery", netName),
-                f("vpn id %s", remoteEndpoint.getRemote().getConfig().getVirtualCircuitIdentifier()),
+                f("vpn id %s", remoteEndpoint.getRemote()
+                        .getConfig()
+                        .getVirtualCircuitIdentifier()),
                 f("bridge-domain %s", bdIndex),
                 "end");
     }
 
-    private int findNextFreeBd(InstanceIdentifier<ConnectionPoints> id, String netName, ConnectionPoints dataAfter) throws WriteFailedException.CreateFailedException {
+    private int findNextFreeBd(InstanceIdentifier<ConnectionPoints> id, String netName, ConnectionPoints dataAfter)
+            throws WriteFailedException.CreateFailedException {
         if (isValidAsBd(netName)) {
             return Integer.parseInt(netName);
         }
 
         String output = blockingWriteAndRead(SH_RUN_INCLUDE_BRIDGE_DOMAIN, this.cli, id, dataAfter);
         Set<Integer> bdomains = Sets.newHashSet(ParsingUtils.parseFields(output, 0, BD_PATTERN::matcher,
-                m -> m.group("bdIndex"),
+            m -> m.group("bdIndex"),
                 Integer::valueOf));
         int bdIndex = -1;
 
@@ -125,8 +138,10 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         return bdIndex;
     }
 
-    private void deleteAutodiscovery(Endpoint remoteEndpoint, InstanceIdentifier<ConnectionPoints> id, ConnectionPoints dataBefore) throws WriteFailedException.CreateFailedException {
-        String netName = id.firstKeyOf(NetworkInstance.class).getName();
+    private void deleteAutodiscovery(Endpoint remoteEndpoint, InstanceIdentifier<ConnectionPoints> id,
+                                     ConnectionPoints dataBefore) throws WriteFailedException.CreateFailedException {
+        String netName = id.firstKeyOf(NetworkInstance.class)
+                .getName();
 
         blockingWriteAndRead(cli, id, dataBefore,
                 "configure terminal",
@@ -134,45 +149,54 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
                 "end");
     }
 
-    private void writeLocal(String cpId, Endpoint endpoint, InstanceIdentifier<ConnectionPoints> id, ConnectionPoints dataAfter, int bdIndex) throws WriteFailedException.CreateFailedException {
+    private void writeLocal(String cpId, Endpoint endpoint, InstanceIdentifier<ConnectionPoints> id, ConnectionPoints
+            dataAfter, int bdIndex) throws WriteFailedException.CreateFailedException {
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint);
 
-        if (endpoint.getLocal().getConfig().getSubinterface() == null) {
+        if (endpoint.getLocal()
+                .getConfig()
+                .getSubinterface() == null) {
             // TODO check service instance not in use
             blockingWriteAndRead(cli, id, dataAfter,
-                            "configure terminal",
-                            f("interface %s", ifc1.toParentIfcString()),
-                            f("service instance %s ethernet", cpId),
-                            "encapsulation untagged",
-                            f("bridge-domain %s", bdIndex),
-                            "end");
+                    "configure terminal",
+                    f("interface %s", ifc1.toParentIfcString()),
+                    f("service instance %s ethernet", cpId),
+                    "encapsulation untagged",
+                    f("bridge-domain %s", bdIndex),
+                    "end");
         } else {
             // TODO check service instance not in use
             blockingWriteAndRead(cli, id, dataAfter,
-                            "configure terminal",
-                            f("interface %s", ifc1.toParentIfcString()),
-                            f("service instance %s ethernet", cpId),
-                            f("encapsulation dot1q %s", endpoint.getLocal().getConfig().getSubinterface()),
-                            "rewrite ingress tag pop 1 symmetric",
-                            f("bridge-domain %s", bdIndex),
-                            "end");
+                    "configure terminal",
+                    f("interface %s", ifc1.toParentIfcString()),
+                    f("service instance %s ethernet", cpId),
+                    f("encapsulation dot1q %s", endpoint.getLocal()
+                            .getConfig()
+                            .getSubinterface()),
+                    "rewrite ingress tag pop 1 symmetric",
+                    f("bridge-domain %s", bdIndex),
+                    "end");
         }
     }
 
-    private void deleteLocal(String cpId, Endpoint endpoint, InstanceIdentifier<ConnectionPoints> id, ConnectionPoints dataBefore) throws WriteFailedException.CreateFailedException {
+    private void deleteLocal(String cpId, Endpoint endpoint, InstanceIdentifier<ConnectionPoints> id,
+                             ConnectionPoints dataBefore) throws WriteFailedException.CreateFailedException {
 
         L2P2PConnectionPointsReader.InterfaceId ifc1 = L2P2PConnectionPointsReader.InterfaceId.fromEndpoint(endpoint);
 
         blockingWriteAndRead(cli, id, dataBefore,
-                        "configure terminal",
-                        f("interface %s", ifc1.toParentIfcString()),
-                        f("no service instance %s ethernet", cpId),
-                        "end");
+                "configure terminal",
+                f("interface %s", ifc1.toParentIfcString()),
+                f("no service instance %s ethernet", cpId),
+                "end");
     }
 
     private Map.Entry<String, Endpoint> ensureLocal(AbstractMap.SimpleEntry<String, Endpoint> endpoint) {
-        checkArgument(endpoint.getValue().getConfig().getType() == LOCAL.class,
-                "Endpoint %s is not of type %s, only 1 remote (autodiscovery) is allowed", endpoint.getKey(), LOCAL.class);
+        checkArgument(endpoint.getValue()
+                        .getConfig()
+                        .getType() == LOCAL.class,
+                "Endpoint %s is not of type %s, only 1 remote (autodiscovery) is allowed", endpoint.getKey(), LOCAL
+                        .class);
         return endpoint;
     }
 
@@ -184,10 +208,13 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
         ConnectionPoint remotePoint = getCPoint(dataBefore, L2VSIConnectionPointsReader.REMOTE_POINT_ID);
         Endpoint remoteEndpoint = getEndpoint(remotePoint, writeContext, Collections.emptySet(), false, false);
 
-        Map<String, Endpoint> locals = dataBefore.getConnectionPoint().stream()
+        Map<String, Endpoint> locals = dataBefore.getConnectionPoint()
+                .stream()
                 // skip remote
-                .filter(cp -> !cp.getConnectionPointId().equals(L2VSIConnectionPointsReader.REMOTE_POINT_ID))
-                .map(cp -> new AbstractMap.SimpleEntry<>(cp.getConnectionPointId(), getEndpoint(cp, writeContext, Collections.emptySet(), false, false)))
+                .filter(cp -> !cp.getConnectionPointId()
+                        .equals(L2VSIConnectionPointsReader.REMOTE_POINT_ID))
+                .map(cp -> new AbstractMap.SimpleEntry<>(cp.getConnectionPointId(), getEndpoint(cp, writeContext,
+                        Collections.emptySet(), false, false)))
                 .map(this::ensureLocal)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -201,7 +228,8 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
     @Override
     public void updateCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
                                                @Nonnull ConnectionPoints dataBefore,
-                                               @Nonnull ConnectionPoints dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
+                                               @Nonnull ConnectionPoints dataAfter, @Nonnull WriteContext
+                                                           writeContext) throws WriteFailedException {
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }

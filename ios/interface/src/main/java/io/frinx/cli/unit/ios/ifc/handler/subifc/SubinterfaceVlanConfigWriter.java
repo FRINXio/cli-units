@@ -36,10 +36,10 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n" +
-            "interface %s\n" +
-            "encapsulation dot1Q %s\n" +
-            "end";
+    private static final String WRITE_TEMPLATE = "configure terminal\n"
+            + "interface %s\n"
+            + "encapsulation dot1Q %s\n"
+            + "end";
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
@@ -67,10 +67,10 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
-    private static final String DELETE_TEMPLATE = "configure terminal\n" +
-            "interface %s\n" +
-            "no encapsulation dot1Q %s\n" +
-            "end";
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
+            + "interface %s\n"
+            + "no encapsulation dot1Q %s\n"
+            + "end";
 
 
     @Override

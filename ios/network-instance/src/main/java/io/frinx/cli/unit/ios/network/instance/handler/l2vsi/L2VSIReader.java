@@ -39,7 +39,8 @@ public class L2VSIReader implements CliConfigListReader<NetworkInstance, Network
         CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
     public static final String SH_L2_VFI = "show running-config | include ^l2 vfi|^ vpn id|^ bridge-domain";
-    public static final Pattern L2_VFI_LINE = Pattern.compile("l2 vfi (?<vfi>\\S+) autodiscovery\\s+vpn id (?<vccid>\\S+)\\s+bridge-domain (?<bd>\\S+).*");
+    public static final Pattern L2_VFI_LINE = Pattern.compile("l2 vfi (?<vfi>\\S+) autodiscovery\\s+vpn id "
+            + "(?<vccid>\\S+)\\s+bridge-domain (?<bd>\\S+).*");
 
     private Cli cli;
 
@@ -58,7 +59,8 @@ public class L2VSIReader implements CliConfigListReader<NetworkInstance, Network
                                               @Nonnull ReadContext readContext,
                                               @Nonnull Cli cli,
                                               @Nonnull CliReader reader) throws ReadFailedException {
-        if (!instanceIdentifier.getTargetType().equals(NetworkInstance.class)) {
+        if (!instanceIdentifier.getTargetType()
+                .equals(NetworkInstance.class)) {
             instanceIdentifier = RWUtils.cutId(instanceIdentifier, NetworkInstance.class);
         }
 
@@ -71,7 +73,7 @@ public class L2VSIReader implements CliConfigListReader<NetworkInstance, Network
 
         return parseFields(linePerL2Vsi, 0,
                 L2_VFI_LINE::matcher,
-                m -> m.group("vfi"),
+            m -> m.group("vfi"),
                 NetworkInstanceKey::new);
     }
 
@@ -84,7 +86,8 @@ public class L2VSIReader implements CliConfigListReader<NetworkInstance, Network
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier,
                                       @Nonnull NetworkInstanceBuilder networkInstanceBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
+        String name = instanceIdentifier.firstKeyOf(NetworkInstance.class)
+                .getName();
         networkInstanceBuilder.setName(name);
     }
 }

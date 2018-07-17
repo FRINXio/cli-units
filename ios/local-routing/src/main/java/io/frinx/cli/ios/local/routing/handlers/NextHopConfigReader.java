@@ -74,7 +74,7 @@ public class NextHopConfigReader implements LrReader.LrConfigReader<Config, Conf
 
     static String switchIndex(String index) {
         return SPACE.splitAsStream(index)
-                .reduce((iFace, ipAddress) -> String.format("%s %s", ipAddress, iFace))
+                .reduce((iface, ipAddress) -> String.format("%s %s", ipAddress, iface))
                 .orElse(index);
     }
 
@@ -82,12 +82,12 @@ public class NextHopConfigReader implements LrReader.LrConfigReader<Config, Conf
     static void parseMetric(String output, ConfigBuilder configBuilder) {
         ParsingUtils.parseField(output, 0,
                 StaticReader::getMatcher,
-                matcher -> matcher.group("metric") == null ? -1L : Long.valueOf(matcher.group("metric")),
-                metric -> {
-                    if (metric != -1) {
-                        configBuilder.setMetric(metric);
-                    }
-                });
+            matcher -> matcher.group("metric") == null ? -1L : Long.valueOf(matcher.group("metric")),
+            metric -> {
+                if (metric != -1) {
+                    configBuilder.setMetric(metric);
+                }
+            });
     }
 
     @Override

@@ -16,6 +16,8 @@
 
 package io.frinx.cli.unit.ios.init;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
@@ -46,11 +48,9 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.tran
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Translate unit that does not actually translate anything.
- *
  * This translate unit's only responsibility is to properly initialize IOS cli
  * session. That is, upon establishing connection to IOS device, enter privileged
  * EXEC mode by issuing the 'enable' command and filling in the secret.
@@ -80,8 +80,7 @@ public class IosCliInitializerUnit  implements TranslateUnit {
         this.registry = registry;
     }
 
-    public void init()
-    {
+    public void init() {
         iosReg = registry.registerTranslateUnit(IOS, this);
     }
 
@@ -108,8 +107,8 @@ public class IosCliInitializerUnit  implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         // NO-OP
     }
@@ -129,7 +128,7 @@ public class IosCliInitializerUnit  implements TranslateUnit {
     }
 
     /**
-     * Initialize IOS CLI session to be usable by various CRUD and RPC handlers
+     * Initialize IOS CLI session to be usable by various CRUD and RPC handlers.
      */
     public static final class IosCliInitializer implements SessionInitializationStrategy {
         private static final String PASSWORD_PROMPT = "Password:";
@@ -151,7 +150,6 @@ public class IosCliInitializerUnit  implements TranslateUnit {
         @Override
         public void accept(@Nonnull Session session, @Nonnull String newline) {
             try {
-                String initialPrompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
 
                 // Set terminal length to 0 to prevent "--More--" situation
                 LOG.debug("{}: Setting terminal length to 0 to prevent \"--More--\" situation", id);
@@ -160,6 +158,8 @@ public class IosCliInitializerUnit  implements TranslateUnit {
                 // Set terminal width to 0 to prevent command shortening
                 LOG.debug("{}: Setting terminal width to 0", id);
                 write(session, newline, SET_TERMINAL_WIDTH_COMMAND);
+
+                String initialPrompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
 
                 String initOutput = session.readUntilOutput(initialPrompt)
                         .toCompletableFuture()

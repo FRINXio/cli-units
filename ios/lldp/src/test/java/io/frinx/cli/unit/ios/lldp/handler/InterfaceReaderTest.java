@@ -18,21 +18,20 @@ package io.frinx.cli.unit.ios.lldp.handler;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp._interface.top.interfaces.InterfaceKey;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class InterfaceReaderTest {
 
-    private static final String SH_LLDP_INTERFACE_OUTPUT = "\n" +
-            "GigabitEthernet1:\n" +
-            "    Tx: enabled\n" +
-            "    Rx: enabled\n" +
-            "    Tx state: IDLE\n" +
-            "    Rx state: WAIT FOR FRAME\n";
+    private static final String SH_LLDP_INTERFACE_OUTPUT = "\n"
+            + "GigabitEthernet1:\n"
+            + "    Tx: enabled\n"
+            + "    Rx: enabled\n"
+            + "    Tx state: IDLE\n"
+            + "    Rx state: WAIT FOR FRAME\n";
 
     private static final List<InterfaceKey> EXPECTED_KEYES = Lists.newArrayList("GigabitEthernet1")
             .stream()

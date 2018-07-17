@@ -28,31 +28,31 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 
 public class OspfTableConnectionReaderTest {
 
-    private static final String OUTPUT ="router ospf 992 vrf abcd\n" +
-            "router ospf 3737\n" +
-            " redistribute ospf 888 subnets\n" +
-            "router ospf 991 vrf abcd\n" +
-            "router ospf 888\n" +
-            " redistribute bgp 65002 subnets\n" +
-            "router ospf 1 vrf aaa\n" +
-            " redistribute bgp 65002 subnets route-map adsds\n" +
-            "router ospf 2\n" +
-            " redistribute ospf 888 subnets\n" +
-            "  redistribute ospf 88 route-map alala\n" +
-            "  redistribute ospf 888\n" +
-            "  redistribute ospf 88\n" +
-            "  redistribute ospf 1 route-map pass\n";
+    private static final String OUTPUT = "router ospf 992 vrf abcd\n"
+            + "router ospf 3737\n"
+            + " redistribute ospf 888 subnets\n"
+            + "router ospf 991 vrf abcd\n"
+            + "router ospf 888\n"
+            + " redistribute bgp 65002 subnets\n"
+            + "router ospf 1 vrf aaa\n"
+            + " redistribute bgp 65002 subnets route-map adsds\n"
+            + "router ospf 2\n"
+            + " redistribute ospf 888 subnets\n"
+            + "  redistribute ospf 88 route-map alala\n"
+            + "  redistribute ospf 888\n"
+            + "  redistribute ospf 88\n"
+            + "  redistribute ospf 1 route-map pass\n";
 
-    private static final String OUTPUT2 = " router ospf 3737\n" +
-            " redistribute bgp 65002 subnets\n" +
-            " redistribute ospf 3738 subnets route-map passALL\n" +
-            " redistribute ospf 3739 subnets route-map passALL\n" +
-            "router ospf 3738\n" +
-            " redistribute ospf 3737 subnets route-map passALL\n" +
-            " redistribute ospf 3739 subnets route-map passALL\n" +
-            "router ospf 3739\n" +
-            " redistribute ospf 3737 subnets route-map passALL\n" +
-            " redistribute ospf 3738 subnets route-map passALL\n";
+    private static final String OUTPUT2 = " router ospf 3737\n"
+            + " redistribute bgp 65002 subnets\n"
+            + " redistribute ospf 3738 subnets route-map passALL\n"
+            + " redistribute ospf 3739 subnets route-map passALL\n"
+            + "router ospf 3738\n"
+            + " redistribute ospf 3737 subnets route-map passALL\n"
+            + " redistribute ospf 3739 subnets route-map passALL\n"
+            + "router ospf 3739\n"
+            + " redistribute ospf 3737 subnets route-map passALL\n"
+            + " redistribute ospf 3738 subnets route-map passALL\n";
 
     @Test
     public void getAllIds() throws Exception {

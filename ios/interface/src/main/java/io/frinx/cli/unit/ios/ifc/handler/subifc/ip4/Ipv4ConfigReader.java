@@ -63,12 +63,12 @@ public class Ipv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
     static void parseAddressConfig(ConfigBuilder configBuilder, String output) {
         parseField(output,
                 INTERFACE_IP_LINE::matcher,
-                m -> new Ipv4AddressNoZone(m.group("ip")),
+            m -> new Ipv4AddressNoZone(m.group("ip")),
                 configBuilder::setIp);
 
         parseField(output,
                 INTERFACE_IP_LINE::matcher,
-                m -> prefixFromNetmask(m.group("prefix")),
+            m -> prefixFromNetmask(m.group("prefix")),
                 configBuilder::setPrefixLength);
     }
 

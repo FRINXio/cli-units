@@ -74,8 +74,9 @@ public class PeerGroupReader implements BgpListReader.BgpConfigListReader<PeerGr
 
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<PeerGroup> instanceIdentifier,
-                                             @Nonnull PeerGroupBuilder PeerGroupBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        PeerGroupBuilder.setPeerGroupName(instanceIdentifier.firstKeyOf(PeerGroup.class).getPeerGroupName());
+                                             @Nonnull PeerGroupBuilder peerGroupBuilder, @Nonnull ReadContext
+                                                         readContext) throws ReadFailedException {
+        peerGroupBuilder.setPeerGroupName(instanceIdentifier.firstKeyOf(PeerGroup.class).getPeerGroupName());
     }
 
     @VisibleForTesting

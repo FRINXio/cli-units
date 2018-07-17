@@ -50,61 +50,62 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
 
-    private static final String PEER_GROUP_ESSENTIAL_CONFIG =
-            "neighbor {$neighbor_id} peer-group\n" +
-            "{.if ($neighbor.config.peer_as.value) }neighbor {$neighbor_id} remote-as {$neighbor.config.peer_as.value}\n{/if}";
+    private static final String PEER_GROUP_ESSENTIAL_CONFIG = "neighbor {$neighbor_id} peer-group\n"
+            + "{.if ($neighbor.config.peer_as.value) }neighbor {$neighbor_id} remote-as {$neighbor.config.peer_as"
+            + ".value}\n{/if}";
 
     private static final String PEER_GROUP_DELETE = "no neighbor {$neighbor_id} peer-group\n";
 
-    static final String PEER_GROUP_GLOBAL = "configure terminal\n" +
-            "router bgp {$as}\n" +
-            PEER_GROUP_ESSENTIAL_CONFIG +
-            NEIGHBOR_COMMON_CONFIG +
-            NEIGHBOR_TRANSPORT +
-            NEIGHBOR_POLICIES +
+    static final String PEER_GROUP_GLOBAL = "configure terminal\n"
+            + "router bgp {$as}\n"
+            + PEER_GROUP_ESSENTIAL_CONFIG
+            + NEIGHBOR_COMMON_CONFIG
+            + NEIGHBOR_TRANSPORT
+            + NEIGHBOR_POLICIES
+            +
 
-            "{% loop in $afis as $af_name:af %}\n" +
-            "address-family {$af_name}\n" +
-            NEIGHBOR_SEND_COMMUNITY_CONFIG +
-            NEIGHBOR_RR_CONFIG +
-            NEIGHBOR_AFI_POLICIES +
-            "exit\n" +
-            "{% onEmpty %}" +
-            NEIGHBOR_SEND_COMMUNITY_CONFIG +
-            NEIGHBOR_RR_CONFIG +
-            "{% endloop %}" +
-            "end";
+            "{% loop in $afis as $af_name:af %}\n"
+            + "address-family {$af_name}\n"
+            + NEIGHBOR_SEND_COMMUNITY_CONFIG
+            + NEIGHBOR_RR_CONFIG
+            + NEIGHBOR_AFI_POLICIES
+            + "exit\n"
+            + "{% onEmpty %}"
+            + NEIGHBOR_SEND_COMMUNITY_CONFIG
+            + NEIGHBOR_RR_CONFIG
+            + "{% endloop %}"
+            + "end";
 
-    static final String PEER_GROUP_VRF = "configure terminal\n" +
-            "router bgp {$as}\n" +
-            "{% loop in $afis as $af_name:af %}\n" +
-            "address-family {$af_name} vrf {$vrf}\n" +
-            PEER_GROUP_ESSENTIAL_CONFIG +
-            NEIGHBOR_COMMON_CONFIG +
-            NEIGHBOR_TRANSPORT +
-            NEIGHBOR_SEND_COMMUNITY_CONFIG +
-            NEIGHBOR_RR_CONFIG +
-            NEIGHBOR_POLICIES +
-            NEIGHBOR_AFI_POLICIES +
-            "exit\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "end";
+    static final String PEER_GROUP_VRF = "configure terminal\n"
+            + "router bgp {$as}\n"
+            + "{% loop in $afis as $af_name:af %}\n"
+            + "address-family {$af_name} vrf {$vrf}\n"
+            + PEER_GROUP_ESSENTIAL_CONFIG
+            + NEIGHBOR_COMMON_CONFIG
+            + NEIGHBOR_TRANSPORT
+            + NEIGHBOR_SEND_COMMUNITY_CONFIG
+            + NEIGHBOR_RR_CONFIG
+            + NEIGHBOR_POLICIES
+            + NEIGHBOR_AFI_POLICIES
+            + "exit\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "end";
 
-    static final String PEER_GROUP_GLOBAL_DELETE = "configure terminal\n" +
-            "router bgp {$as}\n" +
-            PEER_GROUP_DELETE +
-            "end";
+    static final String PEER_GROUP_GLOBAL_DELETE = "configure terminal\n"
+            + "router bgp {$as}\n"
+            + PEER_GROUP_DELETE
+            + "end";
 
-    static final String PEER_GROUP_VRF_DELETE = "configure terminal\n" +
-            "router bgp {$as}\n" +
-            "{% loop in $afis as $af_name:af %}\n" +
-            "address-family {$af_name} vrf {$vrf}\n" +
-            PEER_GROUP_DELETE +
-            "exit\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "end";
+    static final String PEER_GROUP_VRF_DELETE = "configure terminal\n"
+            + "router bgp {$as}\n"
+            + "{% loop in $afis as $af_name:af %}\n"
+            + "address-family {$af_name} vrf {$vrf}\n"
+            + PEER_GROUP_DELETE
+            + "exit\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "end";
 
     private Cli cli;
 
@@ -119,7 +120,8 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
 
         final Global bgpGlobal = getGlobalBgp(instanceIdentifier, writeContext);
         Long bgpAs = getAsValue(bgpGlobal);
-        Map<String, Object> groupAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForPeerGroup(neighbor.getAfiSafis()));
+        Map<String, Object> groupAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForPeerGroup(neighbor
+                .getAfiSafis()));
         String groupId = getPeerGroupId(instanceIdentifier);
 
         renderNeighbor(this, cli, instanceIdentifier,
@@ -128,9 +130,11 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
     }
 
     static Map<String, Object> getAfiSafisForPeerGroup(AfiSafis afiSafis) {
-        List<AfiSafi> configured = (afiSafis != null && afiSafis.getAfiSafi() != null) ? afiSafis.getAfiSafi() : Collections.emptyList();
+        List<AfiSafi> configured = (afiSafis != null && afiSafis.getAfiSafi() != null) ? afiSafis.getAfiSafi() :
+                Collections.emptyList();
         return configured.stream()
-                .map(afi -> new AbstractMap.SimpleEntry<>(GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afi.getAfiSafiName()), afi))
+                .map(afi -> new AbstractMap.SimpleEntry<>(GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afi
+                        .getAfiSafiName()), afi))
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -144,8 +148,10 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
         final Global bgpGlobalBefore = getGlobalBgpForDelete(instanceIdentifier, writeContext);
         Long bgpAs = getAsValue(bgpGlobal);
 
-        Map<String, Object> groupAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForPeerGroup(neighbor.getAfiSafis()));
-        Map<String, Object> groupAfiSafiBefore = getAfiSafisForNeighbor(bgpGlobalBefore, getAfiSafisForPeerGroup(before.getAfiSafis()));
+        Map<String, Object> groupAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForPeerGroup(neighbor
+                .getAfiSafis()));
+        Map<String, Object> groupAfiSafiBefore = getAfiSafisForNeighbor(bgpGlobalBefore, getAfiSafisForPeerGroup(
+                before.getAfiSafis()));
         String groupId = getPeerGroupId(instanceIdentifier);
 
         renderNeighbor(this, cli, instanceIdentifier,
@@ -161,7 +167,8 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
         final Global bgpGlobal = getGlobalBgpForDelete(instanceIdentifier, writeContext);
         Long bgpAs = getAsValue(bgpGlobal);
 
-        Map<String, Object> groupAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForPeerGroup(neighbor.getAfiSafis()));
+        Map<String, Object> groupAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForPeerGroup(neighbor
+                .getAfiSafis()));
         String groupId = getPeerGroupId(instanceIdentifier);
 
         deleteNeighbor(this, cli, instanceIdentifier, neighbor, vrfKey, bgpAs, groupAfiSafi, groupId,

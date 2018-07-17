@@ -70,12 +70,12 @@ public class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigB
         // Actually check if disabled
         parseField(output, 0,
                 InterfaceConfigReader.SHUTDOWN_LINE::matcher,
-                matcher -> false,
+            matcher -> false,
                 builder::setEnabled);
 
         parseField(output,
                 InterfaceConfigReader.DESCR_LINE::matcher,
-                matcher -> matcher.group("desc"),
+            matcher -> matcher.group("desc"),
                 builder::setDescription);
     }
 

@@ -40,7 +40,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey, SubinterfaceBuilder> {
+public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey,
+        SubinterfaceBuilder> {
 
     private static final char SEPARATOR = '.';
     public static final long ZERO_SUBINTERFACE_ID = 0L;
@@ -57,7 +58,8 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
         String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
 
-        List<SubinterfaceKey> subinterfaceKeys = parseInterfaceIds(blockingRead(SH_INTERFACE, cli, instanceIdentifier, readContext), id);
+        List<SubinterfaceKey> subinterfaceKeys = parseInterfaceIds(blockingRead(SH_INTERFACE, cli,
+                instanceIdentifier, readContext), id);
 
         // Subinterface with ID 0 is reserved for IP addresses of the interface
         boolean hasIpv4Address = !Ipv4AddressReader.parseAddressIds(
@@ -67,7 +69,6 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
         boolean hasIpv6Address = !Ipv6AddressReader.parseAddressIds(
                 blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP, id),
                         cli, instanceIdentifier, readContext)).isEmpty();
-        
         if (hasIpv4Address || hasIpv6Address) {
             subinterfaceKeys.add(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
         }

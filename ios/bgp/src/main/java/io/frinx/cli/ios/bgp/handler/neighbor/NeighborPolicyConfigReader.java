@@ -63,7 +63,8 @@ public class NeighborPolicyConfigReader implements BgpReader.BgpConfigReader<Con
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String ipAddress = NeighborWriter.getNeighborIp(instanceIdentifier);
 
-        String output = blockingRead(String.format(NeighborConfigReader.SH_SUMM, ipAddress), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(NeighborConfigReader.SH_SUMM, ipAddress), cli, instanceIdentifier,
+                readContext);
         String[] outputLines = NeighborReader.splitOutput(output);
         Stream<String> outputStream = Arrays.stream(outputLines)
                 .filter(line -> !line.contains("address-family"));
@@ -83,7 +84,7 @@ public class NeighborPolicyConfigReader implements BgpReader.BgpConfigReader<Con
     private static void parseDefault(ConfigBuilder configBuilder, Stream<String> output) {
         Optional<String> defaultNetworkNeighbors = output
                 .filter(value -> !value.contains("vrf"))
-                .reduce((s, s2) -> s + s2);
+                .reduce((s1, s2) -> s1 + s2);
 
         setAttributes(configBuilder, defaultNetworkNeighbors.orElse(""));
     }
@@ -96,16 +97,16 @@ public class NeighborPolicyConfigReader implements BgpReader.BgpConfigReader<Con
         String processed = defaultInstance.replaceAll(" neighbor", "\n neighbor");
 
         List<String> inPolicies = ParsingUtils.parseFields(processed, 0, NEIGHBOR_POLICY_IN_PATTERN::matcher,
-                m -> m.group("updateSource"),
-                Function.identity());
+            m -> m.group("updateSource"),
+            Function.identity());
 
         if (!inPolicies.isEmpty()) {
             configBuilder.setImportPolicy(inPolicies);
         }
 
         List<String> outPolicies = ParsingUtils.parseFields(processed, 0, NEIGHBOR_POLICY_OUT_PATTERN::matcher,
-                m -> m.group("updateSource"),
-                Function.identity());
+            m -> m.group("updateSource"),
+            Function.identity());
 
         if (!outPolicies.isEmpty()) {
             configBuilder.setExportPolicy(outPolicies);
@@ -114,8 +115,8 @@ public class NeighborPolicyConfigReader implements BgpReader.BgpConfigReader<Con
 
     private static void parseVrf(ConfigBuilder configBuilder, String vrfName, Stream<String> output) {
         Optional<String> optionalVrfOutput = output
-                        .filter(value -> value.contains(vrfName))
-                        .findFirst();
+                .filter(value -> value.contains(vrfName))
+                .findFirst();
 
         setAttributes(configBuilder, optionalVrfOutput.orElse(""));
     }

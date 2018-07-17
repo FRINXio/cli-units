@@ -59,7 +59,7 @@ public class NeighborReader implements CliOperListReader<Neighbor, NeighborKey, 
     static List<NeighborKey> parseNeighborIds(String output) {
         return ParsingUtils.parseFields(output, 0,
                 CDP_NEIGHBOR_LINE::matcher,
-                matcher -> matcher.group("id"),
+            matcher -> matcher.group("id"),
                 NeighborKey::new);
     }
 

@@ -49,16 +49,19 @@ public class PeerGroupConfigReader implements BgpReader.BgpConfigReader<Config, 
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        String pG = instanceIdentifier.firstKeyOf(PeerGroup.class).getPeerGroupName();
-        configBuilder.setPeerGroupName(pG);
+        String peerGroupName = instanceIdentifier.firstKeyOf(PeerGroup.class).getPeerGroupName();
+        configBuilder.setPeerGroupName(peerGroupName);
 
-        String output = blockingRead(String.format(NeighborConfigReader.SH_SUMM, pG), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(NeighborConfigReader.SH_SUMM, peerGroupName), cli,
+                instanceIdentifier, readContext);
         parseConfigAttributes(output, configBuilder, vrfName);
     }
 
     static void parseConfigAttributes(String output, ConfigBuilder configBuilder, String vrfName) {
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder neighborBuilder =
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder();
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder
+                neighborBuilder =
+                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base
+                        .ConfigBuilder();
         // Reuse NeighboConfigReader to parse the fields
         NeighborConfigReader.parseConfigAttributes(output, neighborBuilder, vrfName);
         configBuilder.fieldsFrom(neighborBuilder.build());

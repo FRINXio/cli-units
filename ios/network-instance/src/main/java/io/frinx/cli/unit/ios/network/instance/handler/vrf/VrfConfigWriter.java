@@ -38,14 +38,17 @@ public class VrfConfigWriter implements CliWriter<Config> {
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n" +
-            "ip vrf {$config.name}\n" +
-            "{.if ($config.description) }description {$config.description}\n{.else}{.if ($before.description) }no description\n{/if}{/if}" +
-            "{.if ($config.route_distinguisher.string) }rd {$config.route_distinguisher.string}\n{.else}{.if ($before.route_distinguisher.string) }no rd\n{/if}{/if}" +
-            "end";
+    private static final String WRITE_TEMPLATE = "configure terminal\n"
+            + "ip vrf {$config.name}\n"
+            + "{.if ($config.description) }description {$config.description}\n{.else}{.if ($before.description) }no "
+            + "description\n{/if}{/if}"
+            + "{.if ($config.route_distinguisher.string) }rd {$config.route_distinguisher.string}\n{.else}{.if ($before"
+            + ".route_distinguisher.string) }no rd\n{/if}{/if}"
+            + "end";
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext)
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
 
         renderCurrentAttributes(instanceIdentifier, config, null, writeContext);
@@ -53,8 +56,10 @@ public class VrfConfigWriter implements CliWriter<Config> {
 
     public void renderCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config, @Nonnull Config before,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException.CreateFailedException {
-        if (config.getType().equals(L3VRF.class)) {
+                                        @Nonnull WriteContext writeContext) throws WriteFailedException
+            .CreateFailedException {
+        if (config.getType()
+                .equals(L3VRF.class)) {
 
             checkUniqueRd(writeContext, config.getName(), config.getRouteDistinguisher());
 
@@ -71,20 +76,26 @@ public class VrfConfigWriter implements CliWriter<Config> {
             return;
         }
 
-        HashMultiset<String> rds = writeContext.readAfter(IIDs.NETWORKINSTANCES).get()
+        HashMultiset<String> rds = writeContext.readAfter(IIDs.NETWORKINSTANCES)
+                .get()
                 .getNetworkInstance()
                 .stream()
-                .filter(i -> i.getConfig().getType() == L3VRF.class)
-                .filter(i -> i.getConfig().getRouteDistinguisher() != null)
+                .filter(i -> i.getConfig()
+                        .getType() == L3VRF.class)
+                .filter(i -> i.getConfig()
+                        .getRouteDistinguisher() != null)
                 .map(NetworkInstance::getConfig)
-                .collect(HashMultiset::<String>create, (set, config) -> set.add(config.getRouteDistinguisher().getString()), (configs, configs2) -> configs.addAll(configs2));
+                .collect(HashMultiset::<String>create, (set, config) -> set.add(config.getRouteDistinguisher()
+                        .getString()), (configs, configs2) -> configs.addAll(configs2));
 
         Preconditions.checkArgument(rds.count(routeDistinguisher.getString()) == 1,
-                "Cannot configure VRF: %s, route-distinguisher: %s already in use", name, routeDistinguisher.getString());
+                "Cannot configure VRF: %s, route-distinguisher: %s already in use", name, routeDistinguisher
+                        .getString());
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull
+            Config dataAfter, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
         // Not using trivial update. Write template supports update as well
         // The problem with updating VRF by delete+write is that on IOS, VRF deletion happens in background after
@@ -93,15 +104,17 @@ public class VrfConfigWriter implements CliWriter<Config> {
         renderCurrentAttributes(id, dataAfter, dataBefore, writeContext);
     }
 
-    private static final String DELETE_TEMPLATE = "configure terminal\n" +
-            "no ip vrf {$config.name}\n" +
-            "end";
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
+            + "no ip vrf {$config.name}\n"
+            + "end";
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config, @Nonnull WriteContext writeContext)
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+            config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.DeleteFailedException {
 
-        if (config.getType().equals(L3VRF.class)) {
+        if (config.getType()
+                .equals(L3VRF.class)) {
 
             blockingDeleteAndRead(cli, instanceIdentifier,
                     fT(DELETE_TEMPLATE,

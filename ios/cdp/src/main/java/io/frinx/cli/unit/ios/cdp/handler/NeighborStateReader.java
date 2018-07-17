@@ -50,12 +50,14 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
         String interfaceId = instanceIdentifier.firstKeyOf(Interface.class).getName();
         String neighborId = instanceIdentifier.firstKeyOf(Neighbor.class).getId();
 
-        String output = blockingRead(String.format(NeighborReader.SH_CDP_NEIGH, interfaceId), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(NeighborReader.SH_CDP_NEIGH, interfaceId), cli,
+                instanceIdentifier, readContext);
         parseNeighborStateFields(stateBuilder, output, neighborId);
     }
 
     // Relying on at least 3 spaces to appear between columns
-    private static final Pattern CDP_NEIGH_PORT_LINE = Pattern.compile(".*Port ID \\(outgoing port\\): (?<remotePort>.+).*", Pattern.DOTALL);
+    private static final Pattern CDP_NEIGH_PORT_LINE = Pattern.compile(".*Port ID \\(outgoing port\\): (?<remotePort>"
+            + ".+).*", Pattern.DOTALL);
 
     @VisibleForTesting
     static void parseNeighborStateFields(StateBuilder stateBuilder, String output, String neighborId) {

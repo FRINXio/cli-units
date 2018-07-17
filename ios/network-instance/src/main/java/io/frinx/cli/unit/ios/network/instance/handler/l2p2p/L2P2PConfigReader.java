@@ -50,6 +50,7 @@ public class L2P2PConfigReader implements CliConfigReader<Config, ConfigBuilder>
     }
 
     private boolean isP2P(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {
-        return L2P2PReader.getAllIds(id, readContext, cli, this).contains(id.firstKeyOf(NetworkInstance.class));
+        return L2P2PReader.getAllIds(id, readContext, cli, this)
+                .contains(id.firstKeyOf(NetworkInstance.class));
     }
 }

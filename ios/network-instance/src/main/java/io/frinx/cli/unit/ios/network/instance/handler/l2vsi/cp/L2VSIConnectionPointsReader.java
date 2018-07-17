@@ -45,13 +45,16 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.REMOTE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L2VSIConnectionPointsReader implements L2vsiReader.L2vsiConfigReader<ConnectionPoints, ConnectionPointsBuilder>,
+public class L2VSIConnectionPointsReader implements L2vsiReader.L2vsiConfigReader<ConnectionPoints,
+        ConnectionPointsBuilder>,
         CompositeReader.Child<ConnectionPoints, ConnectionPointsBuilder> {
 
     static final String REMOTE_POINT_ID = "remote";
 
-    private static final String SH_L2_VFI_IFC = "show running-config | include ^interface|^ service instance|^  bridge-domain";
-    private static final Pattern L2_VFI_IFC_LINE = Pattern.compile("interface (?<interface>\\S+)\\s+service instance (?<sId>\\S+) ethernet\\s+bridge-domain (?<bd>\\S+).*");
+    private static final String SH_L2_VFI_IFC = "show running-config | include ^interface|^ service instance|^  "
+            + "bridge-domain";
+    private static final Pattern L2_VFI_IFC_LINE = Pattern.compile("interface (?<interface>\\S+)\\s+service instance "
+            + "(?<sId>\\S+) ethernet\\s+bridge-domain (?<bd>\\S+).*");
 
     private final Cli cli;
 
@@ -65,16 +68,19 @@ public class L2VSIConnectionPointsReader implements L2vsiReader.L2vsiConfigReade
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
         boolean isOper = isOper(ctx);
 
-        String vsiName = id.firstKeyOf(NetworkInstance.class).getName();
+        String vsiName = id.firstKeyOf(NetworkInstance.class)
+                .getName();
         builder.setConnectionPoint(getConnectionPoints(vsiName, id, ctx, isOper));
     }
 
     private boolean isOper(ReadContext ctx) {
-        Object flag = ctx.getModificationCache().get(Reader.DS_TYPE_FLAG);
+        Object flag = ctx.getModificationCache()
+                .get(Reader.DS_TYPE_FLAG);
         return flag != null && flag == LogicalDatastoreType.OPERATIONAL;
     }
 
-    private List<ConnectionPoint> getConnectionPoints(String vfiName, InstanceIdentifier<ConnectionPoints> id, ReadContext ctx, boolean isOper)
+    private List<ConnectionPoint> getConnectionPoints(String vfiName, InstanceIdentifier<ConnectionPoints> id,
+                                                      ReadContext ctx, boolean isOper)
             throws ReadFailedException {
 
         ArrayList<ConnectionPoint> connectionPoints = new ArrayList<>();
@@ -99,10 +105,12 @@ public class L2VSIConnectionPointsReader implements L2vsiReader.L2vsiConfigReade
                 .map(L2_VFI_IFC_LINE::matcher)
                 .filter(Matcher::matches)
                 // bridge domains must match, that tells us interface is part of L2VPNl
-                .filter(m -> m.group("bd").equals(bd))
+                .filter(m -> m.group("bd")
+                        .equals(bd))
                 .map(m -> L2P2PConnectionPointsReader.getConnectionPointBuilder(isOper,
                         L2P2PConnectionPointsReader.getEndpoint(isOper, LOCAL.class)
-                                .setLocal(L2P2PConnectionPointsReader.getLocal(isOper, L2P2PConnectionPointsReader.InterfaceId.parse(m.group("interface"))))
+                                .setLocal(L2P2PConnectionPointsReader.getLocal(isOper, L2P2PConnectionPointsReader
+                                        .InterfaceId.parse(m.group("interface"))))
                                 .build(),
                         m.group("sId"))
                         .build())
@@ -121,7 +129,8 @@ public class L2VSIConnectionPointsReader implements L2vsiReader.L2vsiConfigReade
                 .map(String::trim)
                 .map(L2_VFI_LINE::matcher)
                 .filter(Matcher::matches)
-                .filter(m -> m.group("vfi").equals(vfiName))
+                .filter(m -> m.group("vfi")
+                        .equals(vfiName))
                 .map(m -> m.group("vccid"))
                 .findFirst()
                 .map(vccId -> L2P2PConnectionPointsReader.getConnectionPointBuilder(isOper,
@@ -139,7 +148,8 @@ public class L2VSIConnectionPointsReader implements L2vsiReader.L2vsiConfigReade
                 .map(String::trim)
                 .map(L2_VFI_LINE::matcher)
                 .filter(Matcher::matches)
-                .filter(m -> m.group("vfi").equals(vfiName))
+                .filter(m -> m.group("vfi")
+                        .equals(vfiName))
                 .map(m -> m.group("bd"))
                 .findFirst();
     }

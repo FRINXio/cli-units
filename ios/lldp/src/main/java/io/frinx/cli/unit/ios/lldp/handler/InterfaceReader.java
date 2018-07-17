@@ -56,7 +56,7 @@ public class InterfaceReader implements CliOperListReader<Interface, InterfaceKe
     static List<InterfaceKey> parseInterfaceIds(String showLldpInterfaceOutput) {
         return ParsingUtils.parseFields(showLldpInterfaceOutput, 0,
                 INTERFACE_PATTERN::matcher,
-                matcher -> matcher.group("interface"),
+            matcher -> matcher.group("interface"),
                 InterfaceKey::new);
     }
 

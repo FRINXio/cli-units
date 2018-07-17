@@ -89,12 +89,14 @@ public class OspfTableConnectionReader implements
     }
 
     private static Predicate<String> getVrfMatch(NetworkInstanceKey vrfKey) {
-        return vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ?
+        return vrfKey.equals(NetworInstance.DEFAULT_NETWORK)
+                ?
                     s -> !s.contains("vrf") :
                     s -> s.contains("vrf " + vrfKey.getName());
     }
 
-    private static Stream<Map.Entry<TableConnectionKey, Config>> getRedistributes(String output, Predicate<String> vrf) {
+    private static Stream<Map.Entry<TableConnectionKey, Config>> getRedistributes(String output, Predicate<String>
+            vrf) {
         return NEWLINE.splitAsStream(output)
                 // Skip header line(s)
                 .map(String::trim)
@@ -108,11 +110,12 @@ public class OspfTableConnectionReader implements
                 .map(Optional::get);
     }
 
-    private static Optional<Map.Entry<TableConnectionKey, Config>> toKey(Matcher m) {
-        Optional<Class<? extends INSTALLPROTOCOLTYPE>> protocol = transformProtocol(m.group("protocol"));
+    private static Optional<Map.Entry<TableConnectionKey, Config>> toKey(Matcher matcher) {
+        Optional<Class<? extends INSTALLPROTOCOLTYPE>> protocol = transformProtocol(matcher.group("protocol"));
 
-        Matcher policyMatcher = POLICY_LINE.matcher(m.group(0));
-        List<String> policies = policyMatcher.matches() ?
+        Matcher policyMatcher = POLICY_LINE.matcher(matcher.group(0));
+        List<String> policies = policyMatcher.matches()
+                ?
                 transformPolicies(policyMatcher.group("policy")) :
                 Collections.emptyList();
 
@@ -140,6 +143,7 @@ public class OspfTableConnectionReader implements
                 return Optional.of(OSPF.class);
             case "bgp":
                 return Optional.of(BGP.class);
+            default: break;
         }
 
         return Optional.empty();
@@ -151,7 +155,7 @@ public class OspfTableConnectionReader implements
         output = NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(s -> s.startsWith("router ospf"))
-                .reduce((s, s2) -> s + "\n" + s2)
+                .reduce((s1, s2) -> s1 + "\n" + s2)
                 .orElse("");
         return output;
     }

@@ -55,17 +55,21 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
-        final OspfAreaIdentifier areaId = instanceIdentifier.firstKeyOf(Area.class).getIdentifier();
-        String protocolName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
+        final OspfAreaIdentifier areaId = instanceIdentifier.firstKeyOf(Area.class)
+                .getIdentifier();
+        String protocolName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
 
         boolean ifcInVrf = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, IIDs.NE_NETWORKINSTANCE))
                 .transform(NetworkInstance::getInterfaces)
                 .transform(Interfaces::getInterface)
                 .or(Collections.emptyList())
                 .stream()
-                .anyMatch(i -> i.getId().equals(data.getId()));
+                .anyMatch(i -> i.getId()
+                        .equals(data.getId()));
 
-        Preconditions.checkArgument(ifcInVrf, "Interface: %s cannot be in OSPF router: %s, not in the same VRF", data.getId(), protocolName);
+        Preconditions.checkArgument(ifcInVrf, "Interface: %s cannot be in OSPF router: %s, not in the same VRF", data
+                .getId(), protocolName);
 
         blockingWriteAndRead(cli, instanceIdentifier, data,
                 fT(WRITE_TEMPLATE,
@@ -76,7 +80,8 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter, WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+                                               WriteContext writeContext) throws WriteFailedException {
         deleteCurrentAttributesForType(id, dataBefore, writeContext);
         writeCurrentAttributesForType(id, dataAfter, writeContext);
     }
@@ -84,8 +89,10 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
     @Override
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
-        final OspfAreaIdentifier areaId = instanceIdentifier.firstKeyOf(Area.class).getIdentifier();
-        String protocolName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
+        final OspfAreaIdentifier areaId = instanceIdentifier.firstKeyOf(Area.class)
+                .getIdentifier();
+        String protocolName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
 
         blockingDeleteAndRead(cli, instanceIdentifier,
                 fT(DELETE_TEMPLATE,

@@ -60,7 +60,8 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            return parseAddressIds(blockingRead(String.format(SH_INTERFACE_IP, id), cli, instanceIdentifier, readContext));
+            return parseAddressIds(blockingRead(String.format(SH_INTERFACE_IP, id), cli, instanceIdentifier,
+                    readContext));
         } else {
             return Collections.emptyList();
         }
@@ -70,8 +71,8 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
     public static List<AddressKey> parseAddressIds(String output) {
         return parseFields(output, 0,
                 INTERFACE_IP_LINE::matcher,
-                m -> m.group("ip"),
-                addr -> new AddressKey(new Ipv4AddressNoZone(addr)));
+            m -> m.group("ip"),
+            addr -> new AddressKey(new Ipv4AddressNoZone(addr)));
     }
 
     @Override

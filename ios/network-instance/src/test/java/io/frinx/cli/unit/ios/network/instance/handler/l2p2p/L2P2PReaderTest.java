@@ -26,23 +26,24 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 
 public class L2P2PReaderTest {
 
-    private static final String OUTPUT = "interface Loopback0\n"+
-            "interface GigabitEthernet0/0\n"+
-            "interface GigabitEthernet0/1\n"+
-            " xconnect 10.1.0.7 222 pw-class vpn1234\n"+
-            "interface GigabitEthernet0/2\n"+
-            " xconnect 10.1.0.7 222 pw-class vpn1235\n"+
-            "interface GigabitEthernet0/3\n"+
-            "interface GigabitEthernet0/3.444\n"+
-            "interface GigabitEthernet0/3.666\n"+
-            " xconnect 10.1.0.7 666 pw-class vpn1236\n"+
-            "interface GigabitEthernet0/4\n"+
-            "interface GigabitEthernet0/5\n"+
-            " xconnect 10.1.0.7 555 encapsulation mpls\n"+
-            "interface GigabitEthernet0/6\n"+
-            "interface GigabitEthernet0/7\n";
+    private static final String OUTPUT = "interface Loopback0\n"
+            + "interface GigabitEthernet0/0\n"
+            + "interface GigabitEthernet0/1\n"
+            + " xconnect 10.1.0.7 222 pw-class vpn1234\n"
+            + "interface GigabitEthernet0/2\n"
+            + " xconnect 10.1.0.7 222 pw-class vpn1235\n"
+            + "interface GigabitEthernet0/3\n"
+            + "interface GigabitEthernet0/3.444\n"
+            + "interface GigabitEthernet0/3.666\n"
+            + " xconnect 10.1.0.7 666 pw-class vpn1236\n"
+            + "interface GigabitEthernet0/4\n"
+            + "interface GigabitEthernet0/5\n"
+            + " xconnect 10.1.0.7 555 encapsulation mpls\n"
+            + "interface GigabitEthernet0/6\n"
+            + "interface GigabitEthernet0/7\n";
 
-    private static final List<NetworkInstanceKey> EXPECTED = Lists.newArrayList("vpn1234", "vpn1235", "vpn1236", "GigabitEthernet0/5 xconnect 10.1.0.7")
+    private static final List<NetworkInstanceKey> EXPECTED = Lists.newArrayList("vpn1234", "vpn1235", "vpn1236",
+            "GigabitEthernet0/5 xconnect 10.1.0.7")
             .stream()
             .map(NetworkInstanceKey::new)
             .collect(Collectors.toList());

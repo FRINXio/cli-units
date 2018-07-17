@@ -41,15 +41,15 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class OspfTableConnectionWriter implements
         L3VrfWriter<Config> {
 
-    private static final String UPDATE_REDIS = "configure terminal\n" +
-            "router ospf {$ospf}" +
-            "{.if ($vrf) } vrf {$vrf}{/if}" +
-            "\n" +
-            "{.if ($add) }{.else}no {/if}" +
-            "redistribute {$protocol} {$protocol_id}" +
-            "{.if ($add) }{.if ($policy) } route-map {$policy}{/if}{/if}" +
-            "\n" +
-            "end";
+    private static final String UPDATE_REDIS = "configure terminal\n"
+            + "router ospf {$ospf}"
+            + "{.if ($vrf) } vrf {$vrf}{/if}"
+            + "\n"
+            + "{.if ($add) }{.else}no {/if}"
+            + "redistribute {$protocol} {$protocol_id}"
+            + "{.if ($add) }{.if ($policy) } route-map {$policy}{/if}{/if}"
+            + "\n"
+            + "end";
 
     private Cli cli;
 
@@ -61,13 +61,18 @@ public class OspfTableConnectionWriter implements
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier,
                                               Config config,
                                               WriteContext writeContext) throws WriteFailedException {
-        if (config.getDstProtocol().equals(OSPF.class)) {
-            List<Protocol> allProtocols = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, IIDs.NE_NETWORKINSTANCE).child(Protocols.class))
-                    .or(new ProtocolsBuilder().setProtocol(Collections.emptyList()).build())
+        if (config.getDstProtocol()
+                .equals(OSPF.class)) {
+            List<Protocol> allProtocols = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, IIDs
+                    .NE_NETWORKINSTANCE)
+                    .child(Protocols.class))
+                    .or(new ProtocolsBuilder().setProtocol(Collections.emptyList())
+                            .build())
                     .getProtocol();
 
             List<Protocol> dstProtocols = allProtocols.stream()
-                    .filter(p -> p.getIdentifier().equals(OSPF.class))
+                    .filter(p -> p.getIdentifier()
+                            .equals(OSPF.class))
                     .collect(Collectors.toList());
 
             for (Protocol dstProtocol : dstProtocols) {
@@ -84,15 +89,17 @@ public class OspfTableConnectionWriter implements
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
 
         List<Protocol> srcProtocols = protocols.stream()
-                .filter(p -> p.getIdentifier().equals(config.getSrcProtocol()))
+                .filter(p -> p.getIdentifier()
+                        .equals(config.getSrcProtocol()))
                 .collect(Collectors.toList());
 
         Preconditions.checkArgument(!srcProtocols.isEmpty(),
                 "No protocols: %s configured in current network", config.getSrcProtocol());
 
-        List<String> importPolicy = config.getImportPolicy() == null ? Collections.emptyList() : config.getImportPolicy();
+        List<String> importPolicy = config.getImportPolicy() == null ? Collections.emptyList() : config
+                .getImportPolicy();
 
-        Preconditions.checkArgument(importPolicy.isEmpty() || importPolicy.size() ==1,
+        Preconditions.checkArgument(importPolicy.isEmpty() || importPolicy.size() == 1,
                 "Only a single import policy is supported: %s", importPolicy);
 
         for (Protocol srcProto : srcProtocols) {
@@ -101,7 +108,12 @@ public class OspfTableConnectionWriter implements
                             "ospf", ospfProtocol.getName(),
                             "add", add ? true : null,
                             "protocol", toDeviceProtocol(srcProto.getIdentifier()),
-                            "protocol_id", srcProto.getIdentifier().equals(BGP.class) ? srcProto.getBgp().getGlobal().getConfig().getAs().getValue() : srcProto.getName(),
+                            "protocol_id", srcProto.getIdentifier()
+                                    .equals(BGP.class) ? srcProto.getBgp()
+                                    .getGlobal()
+                                    .getConfig()
+                                    .getAs()
+                                    .getValue() : srcProto.getName(),
                             "vrf", vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ? null : vrfKey.getName(),
                             "policy", importPolicy.isEmpty() ? null : importPolicy.get(0)));
         }
@@ -131,13 +143,18 @@ public class OspfTableConnectionWriter implements
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier,
                                                Config config,
                                                WriteContext writeContext) throws WriteFailedException {
-        if (config.getDstProtocol().equals(OSPF.class)) {
-            List<Protocol> allProtocols = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, IIDs.NE_NETWORKINSTANCE).child(Protocols.class))
-                    .or(new ProtocolsBuilder().setProtocol(Collections.emptyList()).build())
+        if (config.getDstProtocol()
+                .equals(OSPF.class)) {
+            List<Protocol> allProtocols = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, IIDs
+                    .NE_NETWORKINSTANCE)
+                    .child(Protocols.class))
+                    .or(new ProtocolsBuilder().setProtocol(Collections.emptyList())
+                            .build())
                     .getProtocol();
 
             List<Protocol> dstProtocols = allProtocols.stream()
-                    .filter(p -> p.getIdentifier().equals(OSPF.class))
+                    .filter(p -> p.getIdentifier()
+                            .equals(OSPF.class))
                     .collect(Collectors.toList());
 
             for (Protocol dstProtocol : dstProtocols) {

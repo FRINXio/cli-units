@@ -24,12 +24,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 
 public class GlobalConfigReaderTest {
 
-    private static final String OUTPUT = "router ospf 99\r\n" +
-            " router-id 5.5.5.5\r\n" +
-            " router-id 5.5.5.6\r\n" +
-            "router ospf 3737\n" +
-            " router-id 99.6.7.4\n" +
-            " bgp router-id 5.5.5.5\n";
+    private static final String OUTPUT = "router ospf 99\r\n"
+            + " router-id 5.5.5.5\r\n"
+            + " router-id 5.5.5.6\r\n"
+            + "router ospf 3737\n"
+            + " router-id 99.6.7.4\n"
+            + " bgp router-id 5.5.5.5\n";
 
     @Test
     public void testParse() throws Exception {

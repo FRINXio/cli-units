@@ -45,7 +45,8 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
     private static final String SH_IP_STATIC_ROUTE = "show running-config | include ip route|ipv6 route";
 
     static final Pattern ROUTE_LINE_IP =
-            Pattern.compile("ip route (vrf \\S+)?\\s*(?<net>[\\d.]+)\\s*(?<mask>[\\d.]+)\\s*(?<ifc>[A-Z][\\w.]+)?\\s*(?<ip>[\\d]+.[\\d.]+)?\\s*(?<metric>[\\d]+)?.*");
+            Pattern.compile("ip route (vrf \\S+)?\\s*(?<net>[\\d.]+)\\s*(?<mask>[\\d.]+)\\s*(?<ifc>[A-Z][\\w.]+)?\\s*"
+                    + "(?<ip>[\\d]+.[\\d.]+)?\\s*(?<metric>[\\d]+)?.*");
     static final Pattern ROUTE_LINE_IP6 =
             Pattern.compile("ipv6 route (vrf \\S+)?\\s*(?<net>[\\d:/A-F]+)\\s*(?<ifc>[A-Z][\\w.]+)?\\s*(?<ip>\\d*:[\\d:A-F]+)?\\s*(?<metric>[\\d]+)?.*");
 
@@ -63,7 +64,8 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
 
         if (value.containsKey(GROUP_MASK)) {
             SubnetUtils subnetUtils = new SubnetUtils(value.get(GROUP_IP), value.get(GROUP_MASK));
-            prefix = subnetUtils.getInfo().getCidrSignature();
+            prefix = subnetUtils.getInfo()
+                    .getCidrSignature();
         } else {
             prefix = value.get(GROUP_IP);
         }
@@ -71,13 +73,13 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
         return new StaticKey(new IpPrefix(prefix.toCharArray()));
     }
 
-    private static HashMap<String, String> resolveGroups(Matcher m) {
+    private static HashMap<String, String> resolveGroups(Matcher matcher) {
         HashMap<String, String> hashMap = new HashMap<>();
 
-        hashMap.put(GROUP_IP, m.group(GROUP_IP));
+        hashMap.put(GROUP_IP, matcher.group(GROUP_IP));
 
-        if (m.pattern() == ROUTE_LINE_IP) {
-            hashMap.put(GROUP_MASK, m.group(GROUP_MASK));
+        if (matcher.pattern() == ROUTE_LINE_IP) {
+            hashMap.put(GROUP_MASK, matcher.group(GROUP_MASK));
         }
 
         return hashMap;
@@ -87,7 +89,8 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
     @Override
     public List<StaticKey> getAllIdsForType(@Nonnull InstanceIdentifier<Static> instanceIdentifier,
                                             @Nonnull ReadContext readContext) throws ReadFailedException {
-        String vrfName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
+        String vrfName = instanceIdentifier.firstKeyOf(Protocol.class)
+                .getName();
 
         return parseStaticPrefixes(blockingRead(SH_IP_STATIC_ROUTE, cli, instanceIdentifier, readContext), vrfName);
     }
@@ -103,20 +106,21 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
     }
 
     static String filterVrf(String output, String vrfKey) {
-        Predicate<? super String> filter = vrfKey.equals(NetworInstance.DEFAULT_NETWORK_NAME) ?
-                s -> !s.contains("route vrf ") :
-                s -> s.contains("route vrf " + vrfKey);
+        Predicate<? super String> filter = vrfKey.equals(NetworInstance.DEFAULT_NETWORK_NAME)
+                ?
+                    s -> !s.contains("route vrf ") :
+                    s -> s.contains("route vrf " + vrfKey);
 
         output = ParsingUtils.NEWLINE.splitAsStream(output)
                 .filter(filter)
-                .reduce((s, s2) -> String.format("%s\n%s", s, s2))
+            .reduce((s1, s2) -> String.format("%s\n%s", s1, s2))
                 .orElse("");
         return output;
     }
 
-    static Matcher getMatcher(String s) {
-        Matcher matcher = ROUTE_LINE_IP.matcher(s);
-        return matcher.matches() ? matcher : ROUTE_LINE_IP6.matcher(s);
+    static Matcher getMatcher(String string) {
+        Matcher matcher = ROUTE_LINE_IP.matcher(string);
+        return matcher.matches() ? matcher : ROUTE_LINE_IP6.matcher(string);
     }
 
     @Override
@@ -128,7 +132,8 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Static> instanceIdentifier,
                                              @Nonnull StaticBuilder staticBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        staticBuilder.setPrefix(instanceIdentifier.firstKeyOf(Static.class).getPrefix());
+        staticBuilder.setPrefix(instanceIdentifier.firstKeyOf(Static.class)
+                .getPrefix());
     }
 
 }

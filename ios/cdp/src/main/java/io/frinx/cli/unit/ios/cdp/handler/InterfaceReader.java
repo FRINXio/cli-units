@@ -57,7 +57,7 @@ public class InterfaceReader implements CliOperListReader<Interface, InterfaceKe
     static List<InterfaceKey> parseCdpInterfaces(String output) {
         return ParsingUtils.parseFields(output, 0,
                 CDP_INTER_LINE::matcher,
-                matcher -> matcher.group("id"),
+            matcher -> matcher.group("id"),
                 InterfaceKey::new);
     }
 

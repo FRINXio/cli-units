@@ -29,11 +29,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalConfigWriter implements OspfWriter<Config> {
 
-    private static final String TEMPLATE = "configure terminal\n" +
-            "router ospf {$ospf}" + "{.if ($vrf) } vrf {$vrf}{/if}" +
-            "\n" +
-            "{.if ($config.router_id) } router-id {$config.router_id.value}\n{.else}no router-id\n{/if}" +
-            "end";
+    private static final String TEMPLATE = "configure terminal\n"
+            + "router ospf {$ospf}"
+            + "{.if ($vrf) } vrf {$vrf}{/if}"
+            + "\n"
+            + "{.if ($config.router_id) } router-id {$config.router_id.value}\n{.else}no router-id\n{/if}"
+            + "end";
 
     private Cli cli;
 

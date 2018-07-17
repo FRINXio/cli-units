@@ -16,11 +16,11 @@
 
 package io.frinx.cli.ios.rib;
 
+import io.frinx.cli.io.Cli;
+import io.frinx.cli.ios.rib.handler.Ipv4RoutesReader;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.rib.handler.Ipv4RoutesReader;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,11 +32,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rib.bgp.rev16
 
 public class Ipv4RoutesReaderTest {
 
-    private String output = "Network          Next Hop            Metric LocPrf Weight Path\n" +
-                            "r>i 1.1.1.101/32     10.255.255.2             0    100      0 i\n" +
-                            "*>i 1.1.1.102/32     10.255.255.2             0    100      0 i\n" +
-                            "*>i 1.1.1.103/32     10.255.255.2             0    100      0 i\n" +
-                            "*>  10.255.1.0/24    0.0.0.0                  0         32768 i";
+    private String output = "Network          Next Hop            Metric LocPrf Weight Path\n"
+            + "r>i 1.1.1.101/32     10.255.255.2             0    100      0 i\n"
+            + "*>i 1.1.1.102/32     10.255.255.2             0    100      0 i\n"
+            + "*>i 1.1.1.103/32     10.255.255.2             0    100      0 i\n"
+            + "*>  10.255.1.0/24    0.0.0.0                  0         32768 i";
 
     private String partialOutput1 = "r>i 1.1.1.101/32     10.255.255.2             0    100      0 i\n";
     private String partialOutput2 = "*>  10.255.1.0/24    0.0.0.0                  0         32768 i\n";
@@ -50,7 +50,7 @@ public class Ipv4RoutesReaderTest {
 
     @Test
     public void testAllIds() {
-        BgpRibBuilder b = new BgpRibBuilder();
+        BgpRibBuilder bb = new BgpRibBuilder();
         List<RouteKey> keys = this.reader.getRouteKeys(output);
         Assert.assertArrayEquals(new String[]{"1.1.1.101/32", "1.1.1.102/32", "1.1.1.103/32", "10.255.1.0/24"},
                 keys.stream().map(RouteKey::getPrefix).collect(Collectors.toList()).toArray());

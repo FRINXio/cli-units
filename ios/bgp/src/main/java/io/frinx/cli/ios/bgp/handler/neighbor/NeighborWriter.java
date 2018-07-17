@@ -18,8 +18,8 @@ package io.frinx.cli.ios.bgp.handler.neighbor;
 
 import static java.util.stream.Collectors.toMap;
 
-import com.google.common.collect.Maps;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -48,160 +48,177 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
-    // TODO split this into regular smaller writers if possible. Especially the AFI SAFI handling (update and removal) is
+    // TODO split this into regular smaller writers if possible. Especially the AFI SAFI handling (update and
+    // removal) is
     // difficult this way, since diff has to be performed in this writer
     // Applies for PeerGroupWriter as well
 
-    public static final String NEIGHBOR_COMMON_CONFIG =
-            "{%if ($neighbor.config.description) %}neighbor {$neighbor_id} description {$neighbor.config.description}\n" +
-                    "{% elseIf ($before.config.description) %}no neighbor {$neighbor_id} description\n{% endif %}" +
-            "{%if ($neighbor.config.auth_password.value) %}neighbor {$neighbor_id} password {$neighbor.config.auth_password.value}\n" +
-                    "{% elseIf ($before.config.auth_password.value) %}no neighbor {$neighbor_id} password\n{% endif %}";
+    public static final String NEIGHBOR_COMMON_CONFIG = "{%if ($neighbor.config.description) %}neighbor "
+            + "{$neighbor_id} description {$neighbor.config.description}\n"
+            + "{% elseIf ($before.config.description) %}no neighbor {$neighbor_id} description\n{% endif %}"
+            + "{%if ($neighbor.config.auth_password.value) %}neighbor {$neighbor_id} password {$neighbor.config"
+            + ".auth_password.value}\n"
+            + "{% elseIf ($before.config.auth_password.value) %}no neighbor {$neighbor_id} password\n{% endif %}";
 
-    public static final String NEIGHBOR_RR_CONFIG =
-            "{%if ($route_reflect_client) %}neighbor {$neighbor_id} route-reflector-client\n" +
-                    "{% elseIf ($before_route_reflect_client) %}no neighbor {$neighbor_id} route-reflector-client\n{% endif %}";
+    public static final String NEIGHBOR_RR_CONFIG = "{%if ($route_reflect_client) %}neighbor {$neighbor_id} "
+            + "route-reflector-client\n"
+            + "{% elseIf ($before_route_reflect_client) %}no neighbor {$neighbor_id} route-reflector-client\n{% endif"
+            + " %}";
 
-    public static final String NEIGHBOR_ENABLE_CONFIG =
-            "{%if ($enabled) %}neighbor {$neighbor_id} activate\n" +
-                    "{% elseIf ($before_enabled) %}no neighbor {$neighbor_id} activate\n{% endif %}";
+    public static final String NEIGHBOR_ENABLE_CONFIG = "{%if ($enabled) %}neighbor {$neighbor_id} activate\n"
+            + "{% elseIf ($before_enabled) %}no neighbor {$neighbor_id} activate\n{% endif %}";
 
-    public static final String NEIGHBOR_SEND_COMMUNITY_CONFIG =
-            "{%if ($neighbor.config.send_community.name) %}neighbor {$neighbor_id} send-community {$neighbor.config.send_community.name|lc}\n" +
-                    "{% elseIf ($before.config.send_community.name) %}no neighbor {$neighbor_id} send-community {$before.config.send_community.name|lc}\n{% endif %}";
+    public static final String NEIGHBOR_SEND_COMMUNITY_CONFIG = "{%if ($neighbor.config.send_community.name) "
+            + "%}neighbor {$neighbor_id} send-community {$neighbor.config.send_community.name|lc}\n"
+            + "{% elseIf ($before.config.send_community.name) %}no neighbor {$neighbor_id} send-community {$before"
+            + ".config.send_community.name|lc}\n{% endif %}";
 
-    private static final String NEIGHBOR_ESSENTIAL_CONFIG =
-            "{%if ($neighbor.config.peer_as.value) %}neighbor {$neighbor_id} remote-as {$neighbor.config.peer_as.value}\n" +
-                    "{% elseIf ($before.config.peer_as.value) %}no neighbor {$neighbor_id} remote-as\n{% endif %}" +
-                    "{%if ($neighbor.config.peer_group) %}neighbor {$neighbor_id} peer-group {$neighbor.config.peer_group}\n" +
-                    "{% elseIf ($before.config.peer_group) %}no neighbor {$neighbor_id} peer-group\n{% endif %}";
+    private static final String NEIGHBOR_ESSENTIAL_CONFIG = "{%if ($neighbor.config.peer_as.value) %}neighbor "
+            + "{$neighbor_id} remote-as {$neighbor.config.peer_as.value}\n"
+            + "{% elseIf ($before.config.peer_as.value) %}no neighbor {$neighbor_id} remote-as\n{% endif %}"
+            + "{%if ($neighbor.config.peer_group) %}neighbor {$neighbor_id} peer-group {$neighbor.config.peer_group}\n"
+            + "{% elseIf ($before.config.peer_group) %}no neighbor {$neighbor_id} peer-group\n{% endif %}";
 
-    private static final String NEIGHBOR_DELETE =
-            "{%if ($neighbor.config.peer_group) %}no neighbor {$neighbor_id} peer-group {$neighbor.config.peer_group}\n{% endif %}" +
-                    "{%if ($neighbor.config.peer_as.value) %}no neighbor {$neighbor_id} remote-as {$neighbor.config.peer_as.value}\n{% endif %}";
+    private static final String NEIGHBOR_DELETE = "{%if ($neighbor.config.peer_group) %}no neighbor {$neighbor_id} "
+            + "peer-group {$neighbor.config.peer_group}\n{% endif %}"
+            + "{%if ($neighbor.config.peer_as.value) %}no neighbor {$neighbor_id} remote-as {$neighbor.config.peer_as"
+            + ".value}\n{% endif %}";
 
     public static final String NEIGHBOR_TRANSPORT =
             //Set update source
-            "{%if ($neighbor.transport.config.local_address.string) %}neighbor {$neighbor_id} update-source {$neighbor.transport.config.local_address.string}\n" +
-                    "{% elseIf ($before.transport.config.local_address.string) %}no neighbor {$neighbor_id} update-source {$before.transport.config.local_address.string}\n{% endif %}" +
-                    "{%if ($neighbor.transport.config|lc =~ /passivemode=true/) %}neighbor {$neighbor_id} transport connection-mode passive\n" +
-                    "{% elseIf ($before.transport.config|lc =~ /passivemode=true/) %}no neighbor {$neighbor_id} transport connection-mode passive\n{% endif %}";
+            "{%if ($neighbor.transport.config.local_address.string) %}neighbor {$neighbor_id} update-source "
+                    + "{$neighbor.transport.config.local_address.string}\n"
+                    + "{% elseIf ($before.transport.config.local_address.string) %}no neighbor {$neighbor_id} "
+                    + "update-source {$before.transport.config.local_address.string}\n{% endif %}"
+                    + "{%if ($neighbor.transport.config|lc =~ /passivemode=true/) %}neighbor {$neighbor_id} transport"
+                    + " connection-mode passive\n"
+                    + "{% elseIf ($before.transport.config|lc =~ /passivemode=true/) %}no neighbor {$neighbor_id} "
+                    + "transport connection-mode passive\n{% endif %}";
 
-    public static final String NEIGHBOR_POLICIES =
-            "{% loop in $neighbor.apply_policy.config.import_policy as $im_p %}\n" +
-            "neighbor {$neighbor_id} route-map {$im_p} in\n" +
-            "{% onEmpty %}" +
-                // Remove before policies if there were any set
-                "{% loop in $before.apply_policy.config.import_policy as $im_p_before %}\n" +
-                "no neighbor {$neighbor_id} route-map {$im_p_before} in\n" +
-                "{% onEmpty %}" +
-                "{% endloop %}" +
-            "{% endloop %}" +
-            "{% loop in $neighbor.apply_policy.config.export_policy as $ex_p %}\n" +
-            "neighbor {$neighbor_id} route-map {$ex_p} out\n" +
-            "{% onEmpty %}" +
-                // Remove before policies if there were any set
-                "{% loop in $before.apply_policy.config.export_policy as $ex_p_before %}\n" +
-                "no neighbor {$neighbor_id} route-map {$ex_p_before} out\n" +
-                "{% onEmpty %}" +
-                "{% endloop %}" +
-            "{% endloop %}";
+    public static final String NEIGHBOR_POLICIES = "{% loop in $neighbor.apply_policy.config.import_policy as $im_p "
+            + "%}\n"
+            + "neighbor {$neighbor_id} route-map {$im_p} in\n"
+            + "{% onEmpty %}"
+            +
+            // Remove before policies if there were any set
+            "{% loop in $before.apply_policy.config.import_policy as $im_p_before %}\n"
+            + "no neighbor {$neighbor_id} route-map {$im_p_before} in\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "{% endloop %}"
+            + "{% loop in $neighbor.apply_policy.config.export_policy as $ex_p %}\n"
+            + "neighbor {$neighbor_id} route-map {$ex_p} out\n"
+            + "{% onEmpty %}"
+            +
+            // Remove before policies if there were any set
+            "{% loop in $before.apply_policy.config.export_policy as $ex_p_before %}\n"
+            + "no neighbor {$neighbor_id} route-map {$ex_p_before} out\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "{% endloop %}";
 
-    public static final String NEIGHBOR_AFI_POLICIES =
-            "{% loop in $af.apply_policy.config.import_policy as $im_p %}\n" +
-            "neighbor {$neighbor_id} route-map {$im_p} in\n" +
-            "{% onEmpty %}" +
-                    // Find the afi from before and remove its policies
-                    "{% loop in $before_afis as $af_name_before:af_before %}\n" +
-                    "{% if ($af_name == $af_name_before)}" +
-                        "{% loop in $af_before.apply_policy.config.import_policy as $im_p_before %}\n" +
-                        "no neighbor {$neighbor_id} route-map {$im_p_before} in\n" +
-                        "{% onEmpty %}" +
-                        "{% endloop %}" +
-                    "{% endif %}" +
-                    "{% onEmpty %}" +
-                    "{% endloop %}" +
-            "{% endloop %}" +
-            "{% loop in $af.apply_policy.config.export_policy as $ex_p %}\n" +
-            "neighbor {$neighbor_id} route-map {$ex_p} out\n" +
-            "{% onEmpty %}" +
-                    // Find the afi from before and remove its policies
-                    "{% loop in $before_afis as $af_name_before:af_before %}\n" +
-                    "{% if ($af_name == $af_name_before)}" +
-                        "{% loop in $af_before.apply_policy.config.export_policy as $ex_p_before %}\n" +
-                        "no neighbor {$neighbor_id} route-map {$ex_p_before} out\n" +
-                        "{% onEmpty %}" +
-                        "{% endloop %}" +
-                    "{% endif %}" +
-                    "{% onEmpty %}" +
-                    "{% endloop %}" +
-            "{% endloop %}";
+    public static final String NEIGHBOR_AFI_POLICIES = "{% loop in $af.apply_policy.config.import_policy as $im_p %}\n"
+            + "neighbor {$neighbor_id} route-map {$im_p} in\n"
+            + "{% onEmpty %}"
+            +
+            // Find the afi from before and remove its policies
+            "{% loop in $before_afis as $af_name_before:af_before %}\n"
+            + "{% if ($af_name == $af_name_before)}"
+            + "{% loop in $af_before.apply_policy.config.import_policy as $im_p_before %}\n"
+            + "no neighbor {$neighbor_id} route-map {$im_p_before} in\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "{% endif %}"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "{% endloop %}"
+            + "{% loop in $af.apply_policy.config.export_policy as $ex_p %}\n"
+            + "neighbor {$neighbor_id} route-map {$ex_p} out\n"
+            + "{% onEmpty %}"
+            +
+            // Find the afi from before and remove its policies
+            "{% loop in $before_afis as $af_name_before:af_before %}\n"
+            + "{% if ($af_name == $af_name_before)}"
+            + "{% loop in $af_before.apply_policy.config.export_policy as $ex_p_before %}\n"
+            + "no neighbor {$neighbor_id} route-map {$ex_p_before} out\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "{% endif %}"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "{% endloop %}";
 
-    static final String NEIGHBOR_GLOBAL = "configure terminal\n" +
-            "router bgp {$as}\n" +
-            NEIGHBOR_ESSENTIAL_CONFIG +
-            NEIGHBOR_COMMON_CONFIG +
-            NEIGHBOR_TRANSPORT +
-            NEIGHBOR_POLICIES +
+    static final String NEIGHBOR_GLOBAL = "configure terminal\n"
+            + "router bgp {$as}\n"
+            + NEIGHBOR_ESSENTIAL_CONFIG
+            + NEIGHBOR_COMMON_CONFIG
+            + NEIGHBOR_TRANSPORT
+            + NEIGHBOR_POLICIES
+            +
 
-            "{% loop in $afis as $af_name:af %}\n" +
-            "address-family {$af_name}\n" +
-            NEIGHBOR_SEND_COMMUNITY_CONFIG +
-            NEIGHBOR_RR_CONFIG +
-            NEIGHBOR_AFI_POLICIES +
-            NEIGHBOR_ENABLE_CONFIG +
-            "exit\n" +
-            "{% onEmpty %}" +
-            NEIGHBOR_SEND_COMMUNITY_CONFIG +
-            NEIGHBOR_RR_CONFIG +
-            NEIGHBOR_ENABLE_CONFIG +
-            "{% endloop %}" +
+            "{% loop in $afis as $af_name:af %}\n"
+            + "address-family {$af_name}\n"
+            + NEIGHBOR_SEND_COMMUNITY_CONFIG
+            + NEIGHBOR_RR_CONFIG
+            + NEIGHBOR_AFI_POLICIES
+            + NEIGHBOR_ENABLE_CONFIG
+            + "exit\n"
+            + "{% onEmpty %}"
+            + NEIGHBOR_SEND_COMMUNITY_CONFIG
+            + NEIGHBOR_RR_CONFIG
+            + NEIGHBOR_ENABLE_CONFIG
+            + "{% endloop %}"
+            + "end";
+
+    static final String NEIGHBOR_VRF = "configure terminal\n"
+            + "router bgp {$as}\n"
+            +
+
+            "{% loop in $afis as $af_name:af %}\n"
+            + "address-family {$af_name} vrf {$vrf}\n"
+            + NEIGHBOR_ESSENTIAL_CONFIG
+            + NEIGHBOR_COMMON_CONFIG
+            + NEIGHBOR_TRANSPORT
+            + NEIGHBOR_SEND_COMMUNITY_CONFIG
+            + NEIGHBOR_RR_CONFIG
+            + NEIGHBOR_POLICIES
+            + NEIGHBOR_AFI_POLICIES
+            + NEIGHBOR_ENABLE_CONFIG
+            + "exit\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            + "end";
+
+    static final String NEIGHBOR_GLOBAL_DELETE = "configure terminal\n"
+            + "router bgp {$as}\n"
+            + NEIGHBOR_DELETE
+            + "end";
+
+    static final String NEIGHBOR_GLOBAL_DELETE_AFI = "configure terminal\n"
+            + "router bgp {$as}\n"
+            +
+
+            "{% loop in $afis as $af_name:af %}\n"
+            + "address-family {$af_name}\n"
+            + "no neighbor {$neighbor_id} activate\n"
+            + "exit\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            +
+
             "end";
 
-    static final String NEIGHBOR_VRF = "configure terminal\n" +
-            "router bgp {$as}\n" +
+    static final String NEIGHBOR_VRF_DELETE = "configure terminal\n"
+            + "router bgp {$as}\n"
+            +
 
-            "{% loop in $afis as $af_name:af %}\n" +
-            "address-family {$af_name} vrf {$vrf}\n" +
-            NEIGHBOR_ESSENTIAL_CONFIG +
-            NEIGHBOR_COMMON_CONFIG +
-            NEIGHBOR_TRANSPORT +
-            NEIGHBOR_SEND_COMMUNITY_CONFIG +
-            NEIGHBOR_RR_CONFIG +
-            NEIGHBOR_POLICIES +
-            NEIGHBOR_AFI_POLICIES +
-            NEIGHBOR_ENABLE_CONFIG +
-            "exit\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-            "end";
-
-    static final String NEIGHBOR_GLOBAL_DELETE = "configure terminal\n" +
-            "router bgp {$as}\n" +
-            NEIGHBOR_DELETE +
-            "end";
-
-    static final String NEIGHBOR_GLOBAL_DELETE_AFI = "configure terminal\n" +
-            "router bgp {$as}\n" +
-
-            "{% loop in $afis as $af_name:af %}\n" +
-            "address-family {$af_name}\n" +
-            "no neighbor {$neighbor_id} activate\n" +
-            "exit\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
-
-            "end";
-
-    static final String NEIGHBOR_VRF_DELETE = "configure terminal\n" +
-            "router bgp {$as}\n" +
-
-            "{% loop in $afis as $af_name:af %}\n" +
-            "address-family {$af_name} vrf {$vrf}\n" +
-            NEIGHBOR_DELETE +
-            "exit\n" +
-            "{% onEmpty %}" +
-            "{% endloop %}" +
+            "{% loop in $afis as $af_name:af %}\n"
+            + "address-family {$af_name} vrf {$vrf}\n"
+            + NEIGHBOR_DELETE
+            + "exit\n"
+            + "{% onEmpty %}"
+            + "{% endloop %}"
+            +
 
             "end";
 
@@ -218,7 +235,8 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
         final Global bgpGlobal = getGlobalBgp(instanceIdentifier, writeContext);
         Long bgpAs = getAsValue(bgpGlobal);
-        Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor.getAfiSafis()));
+        Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor
+                .getAfiSafis()));
         String neighborIp = getNeighborIp(instanceIdentifier);
         Boolean enabled = neighbor.getConfig().isEnabled();
 
@@ -235,19 +253,35 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
         return writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class)).get().getGlobal();
     }
 
-    public static <T extends BgpCommonStructureNeighborGroupRouteReflector> void renderNeighbor(CliWriter<T> writer, Cli cli,
-                                                                                                InstanceIdentifier<T> instanceIdentifier,
-                                                                                                T neighbor,
-                                                                                                T before,
-                                                                                                Boolean enabled,
-                                                                                                Boolean beforeEnabled,
-                                                                                                NetworkInstanceKey vrfKey,
-                                                                                                Long bgpAs,
-                                                                                                Map<String, Object> neighAfiSafi,
-                                                                                                Map<String, Object> beforeAfiSafi,
-                                                                                                String neighborId,
-                                                                                                String globalTemplate,
-                                                                                                String vrfTemplate) throws WriteFailedException.CreateFailedException {
+    private static <T extends DataObject> void renderNeighbor(CliWriter<T> writer, Cli cli,
+                                                              String template,
+                                                              InstanceIdentifier<T> id,
+                                                              T data,
+                                                              Object... params) throws WriteFailedException
+            .CreateFailedException {
+        writer.blockingWriteAndRead(writer.fT(template, params), cli, id, data);
+    }
+
+    public static <T extends BgpCommonStructureNeighborGroupRouteReflector> void renderNeighbor(
+            CliWriter<T> writer,
+            Cli cli,
+            InstanceIdentifier<T>
+            instanceIdentifier,
+            T neighbor,
+            T before,
+            Boolean enabled,
+            Boolean beforeEnabled,
+            NetworkInstanceKey
+            vrfKey,
+            Long bgpAs,
+            Map<String, Object>
+            neighAfiSafi,
+            Map<String, Object>
+            beforeAfiSafi,
+            String neighborId,
+            String globalTemplate,
+            String vrfTemplate)
+            throws WriteFailedException.CreateFailedException {
 
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             renderNeighbor(writer, cli, globalTemplate, instanceIdentifier, neighbor,
@@ -263,7 +297,8 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
                     "before_enabled", beforeEnabled);
         } else {
             String vrfName = vrfKey.getName();
-            Preconditions.checkArgument(!neighAfiSafi.isEmpty(), "No afi safi defined for neighbor: %s in VRF: %s", neighborId, vrfName);
+            Preconditions.checkArgument(!neighAfiSafi.isEmpty(), "No afi safi defined for neighbor: %s in VRF: %s",
+                    neighborId, vrfName);
             renderNeighbor(writer, cli, vrfTemplate, instanceIdentifier, neighbor,
                     "as", bgpAs,
                     "vrf", vrfName,
@@ -279,15 +314,20 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
         }
     }
 
-    public static <T extends BgpCommonStructureNeighborGroupRouteReflector> void renderNeighborAfiRemoval(CliWriter<T> writer, Cli cli,
-                                                                                                InstanceIdentifier<T> instanceIdentifier,
-                                                                                                T neighbor,
-                                                                                                NetworkInstanceKey vrfKey,
-                                                                                                Long bgpAs,
-                                                                                                Map<String, Object> neighAfiSafi,
-                                                                                                String neighborId,
-                                                                                                String globalTemplate,
-                                                                                                String vrfTemplate) throws WriteFailedException.CreateFailedException {
+    public static <T extends BgpCommonStructureNeighborGroupRouteReflector> void renderNeighborAfiRemoval(
+            CliWriter<T> writer, Cli cli,
+            InstanceIdentifier<T> instanceIdentifier,
+            T neighbor,
+            NetworkInstanceKey vrfKey,
+            Long bgpAs,
+            Map<String,
+                    Object> neighAfiSafi,
+            String
+                    neighborId,
+            String
+                    globalTemplate,
+            String
+                    vrfTemplate) throws WriteFailedException.CreateFailedException {
 
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             renderNeighbor(writer, cli, globalTemplate, instanceIdentifier, neighbor,
@@ -313,18 +353,43 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
                 .orElse(null);
     }
 
-    private static <T extends DataObject> void renderNeighbor(CliWriter<T> writer, Cli cli,
-                                                              String template,
-                                                              InstanceIdentifier<T> id,
-                                                              T data,
-                                                              Object... params) throws WriteFailedException.CreateFailedException {
-        writer.blockingWriteAndRead(writer.fT(template, params), cli, id, data);
+    public static <T extends BgpCommonStructureNeighborGroupRouteReflector> void deleteNeighbor(
+            CliWriter<T> writer,
+            Cli cli,
+            InstanceIdentifier<T>
+                    instanceIdentifier,
+            T neighbor,
+            NetworkInstanceKey
+                    vrfKey,
+            Long bgpAs,
+            Map<String, Object>
+                    neighAfiSafi,
+            String neighborId,
+            String globalTemplate, String vrfTemplate) throws WriteFailedException.DeleteFailedException {
+        if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
+            deleteNeighbor(writer, cli, globalTemplate, instanceIdentifier,
+                    "as", bgpAs,
+                    "neighbor_id", neighborId,
+                    "neighbor", neighbor,
+                    "afis", neighAfiSafi,
+                    "route_reflect_client", isRouteReflectClient(neighbor));
+        } else {
+            String vrfName = vrfKey.getName();
+            deleteNeighbor(writer, cli, vrfTemplate, instanceIdentifier,
+                    "as", bgpAs,
+                    "vrf", vrfName,
+                    "neighbor_id", neighborId,
+                    "neighbor", neighbor,
+                    "afis", neighAfiSafi,
+                    "route_reflect_client", isRouteReflectClient(neighbor));
+        }
     }
 
     private static <T extends DataObject> void deleteNeighbor(CliWriter<T> writer, Cli cli,
                                                               String template,
                                                               InstanceIdentifier<T> id,
-                                                              Object... params) throws WriteFailedException.DeleteFailedException {
+                                                              Object... params) throws WriteFailedException
+            .DeleteFailedException {
         writer.blockingDeleteAndRead(writer.fT(template, params), cli, id);
     }
 
@@ -333,21 +398,24 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     }
 
     static Map<String, Object> getAfiSafisForNeighbor(AfiSafis afiSafis) {
-        List<AfiSafi> configured = (afiSafis != null && afiSafis.getAfiSafi() != null) ? afiSafis.getAfiSafi() : Collections.emptyList();
+        List<AfiSafi> configured = (afiSafis != null && afiSafis.getAfiSafi() != null) ? afiSafis.getAfiSafi() :
+                Collections.emptyList();
         return configured.stream()
-                .map(afi -> new AbstractMap.SimpleEntry<>(GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afi.getAfiSafiName()), afi))
+                .map(afi -> new AbstractMap.SimpleEntry<>(GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afi
+                        .getAfiSafiName()), afi))
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**
-     * Get neighbor specific afiSafi list or if empty, use BGP instance specific afi safi list
+     * Get neighbor specific afiSafi list or if empty, use BGP instance specific afi safi list.
      */
     public static Map<String, Object> getAfiSafisForNeighbor(Global bgpGlobal,
                                                              Map<String, Object> neighAfiSafi) {
         if (neighAfiSafi.isEmpty()) {
             if (bgpGlobal.getAfiSafis() != null && bgpGlobal.getAfiSafis().getAfiSafi() != null) {
                 neighAfiSafi = bgpGlobal.getAfiSafis().getAfiSafi().stream()
-                        .map(afi -> new AbstractMap.SimpleEntry<>(GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afi.getAfiSafiName()), afi))
+                        .map(afi -> new AbstractMap.SimpleEntry<>(GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afi
+                                .getAfiSafiName()), afi))
                         .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
             }
         }
@@ -362,10 +430,12 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
         final Global bgpGlobal = getGlobalBgp(instanceIdentifier, writeContext);
         Long bgpAs = getAsValue(bgpGlobal);
-        Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor.getAfiSafis()));
+        Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor
+                .getAfiSafis()));
 
         final Global bgpGlobalBefore = getGlobalBgpForDelete(instanceIdentifier, writeContext);
-        Map<String, Object> neighAfiSafiBefore = getAfiSafisForNeighbor(bgpGlobalBefore, getAfiSafisForNeighbor(before.getAfiSafis()));
+        Map<String, Object> neighAfiSafiBefore = getAfiSafisForNeighbor(bgpGlobalBefore, getAfiSafisForNeighbor(
+                before.getAfiSafis()));
         Map<String, Object> afisToRemove = Maps.difference(neighAfiSafiBefore, neighAfiSafi).entriesOnlyOnLeft();
 
         String neighborIp = getNeighborIp(instanceIdentifier);
@@ -393,38 +463,12 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
         final Global bgpGlobal = getGlobalBgpForDelete(instanceIdentifier, writeContext);
         Long bgpAs = getAsValue(bgpGlobal);
 
-        Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor.getAfiSafis()));
+        Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor
+                .getAfiSafis()));
         String neighborIp = getNeighborIp(instanceIdentifier);
 
         deleteNeighbor(this, cli, instanceIdentifier, neighbor, vrfKey, bgpAs, neighAfiSafi, neighborIp,
                 NEIGHBOR_GLOBAL_DELETE, NEIGHBOR_VRF_DELETE);
-    }
-
-    public static <T extends BgpCommonStructureNeighborGroupRouteReflector> void deleteNeighbor(CliWriter<T> writer, Cli cli,
-                                                                                                InstanceIdentifier<T> instanceIdentifier,
-                                                                                                T neighbor,
-                                                                                                NetworkInstanceKey vrfKey,
-                                                                                                Long bgpAs,
-                                                                                                Map<String, Object> neighAfiSafi,
-                                                                                                String neighborId,
-                                                                                                String globalTemplate, String vrfTemplate) throws WriteFailedException.DeleteFailedException {
-        if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
-            deleteNeighbor(writer, cli, globalTemplate, instanceIdentifier,
-                    "as", bgpAs,
-                    "neighbor_id", neighborId,
-                    "neighbor", neighbor,
-                    "afis", neighAfiSafi,
-                    "route_reflect_client", isRouteReflectClient(neighbor));
-        } else {
-            String vrfName = vrfKey.getName();
-            deleteNeighbor(writer, cli, vrfTemplate, instanceIdentifier,
-                    "as", bgpAs,
-                    "vrf", vrfName,
-                    "neighbor_id", neighborId,
-                    "neighbor", neighbor,
-                    "afis", neighAfiSafi,
-                    "route_reflect_client", isRouteReflectClient(neighbor));
-        }
     }
 
     public static String getNeighborIp(InstanceIdentifier<?> neigh) {
@@ -433,7 +477,8 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     }
 
     public static String getNeighborIp(IpAddress addr) {
-        return addr.getIpv4Address() != null ?
+        return addr.getIpv4Address() != null
+                ?
                 addr.getIpv4Address().getValue() :
                 addr.getIpv6Address().getValue();
     }

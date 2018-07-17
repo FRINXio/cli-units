@@ -45,8 +45,10 @@ public class ComponentReader implements CliOperListReader<Component, ComponentKe
 
     private static final String SH_MODULE = "show module";
     static final Pattern SEPARATOR = Pattern.compile("^\\s+Mod\\s+", Pattern.MULTILINE);
-    static final Pattern LINE = Pattern.compile("\\s*(?<index>\\d+)\\s+(?<ports>\\d+)\\s+(?<type>.+)\\s+(?<model>\\S+)\\s+(?<serial>\\S+)\\s*");
-    static final Pattern LINE_HW_SW_FW = Pattern.compile("\\s*(?<index>\\d+)\\s+(?<macs>.+)\\s+(?<hw>\\S+)\\s+(?<fw>\\S+)\\s+(?<sw>\\S+)\\s+(?<status>\\S+)\\s*");
+    static final Pattern LINE = Pattern.compile("\\s*(?<index>\\d+)\\s+(?<ports>\\d+)\\s+(?<type>.+)\\s+"
+            + "(?<model>\\S+)\\s+(?<serial>\\S+)\\s*");
+    static final Pattern LINE_HW_SW_FW = Pattern.compile("\\s*(?<index>\\d+)\\s+(?<macs>.+)\\s+(?<hw>\\S+)\\s+"
+            + "(?<fw>\\S+)\\s+(?<sw>\\S+)\\s+(?<status>\\S+)\\s*");
 
 
     @Override
@@ -55,13 +57,16 @@ public class ComponentReader implements CliOperListReader<Component, ComponentKe
     }
 
     @Override
-    public void readCurrentAttributes(InstanceIdentifier<Component> instanceIdentifier, ComponentBuilder componentBuilder, ReadContext readContext) {
-        componentBuilder.setName(instanceIdentifier.firstKeyOf(Component.class).getName());
+    public void readCurrentAttributes(InstanceIdentifier<Component> instanceIdentifier, ComponentBuilder
+            componentBuilder, ReadContext readContext) {
+        componentBuilder.setName(instanceIdentifier.firstKeyOf(Component.class)
+                .getName());
     }
 
     @Nonnull
     @Override
-    public List<ComponentKey> getAllIds(@Nonnull InstanceIdentifier<Component> id, @Nonnull ReadContext context) throws ReadFailedException {
+    public List<ComponentKey> getAllIds(@Nonnull InstanceIdentifier<Component> id, @Nonnull ReadContext context)
+            throws ReadFailedException {
         List<ComponentKey> componentKeys = getComponents(blockingRead(SH_MODULE, cli, id, context) + parseOS());
         componentKeys.addAll(parseOS());
         return componentKeys;
@@ -79,7 +84,7 @@ public class ComponentReader implements CliOperListReader<Component, ComponentKe
     private static List<ComponentKey> parseIds(String cardList) {
         return ParsingUtils.parseFields(cardList, 0,
                 LINE::matcher,
-                m -> m.group("index"),
+            m -> m.group("index"),
                 ComponentKey::new);
     }
 

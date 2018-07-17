@@ -91,7 +91,8 @@ public class BgpTableConnectionReader implements
     }
 
     private static Predicate<String> getVrfMatch(NetworkInstanceKey vrfKey) {
-        return vrfKey.equals(NetworInstance.DEFAULT_NETWORK) ?
+        return vrfKey.equals(NetworInstance.DEFAULT_NETWORK)
+                ?
                     s -> !s.contains("vrf") :
                     s -> s.contains("vrf " + vrfKey.getName());
     }
@@ -108,12 +109,13 @@ public class BgpTableConnectionReader implements
                 .map(Optional::get);
     }
 
-    private static Optional<Map.Entry<TableConnectionKey, Config>> toKey(Matcher m) {
-        Optional<Class<? extends ADDRESSFAMILY>> family = transformAfi(m.group("family"));
-        Optional<Class<? extends INSTALLPROTOCOLTYPE>> protocol = transformProtocol(m.group("protocol"));
+    private static Optional<Map.Entry<TableConnectionKey, Config>> toKey(Matcher matcher) {
+        Optional<Class<? extends ADDRESSFAMILY>> family = transformAfi(matcher.group("family"));
+        Optional<Class<? extends INSTALLPROTOCOLTYPE>> protocol = transformProtocol(matcher.group("protocol"));
 
-        Matcher policyMatcher = POLICY_LINE.matcher(m.group(0));
-        List<String> policies = policyMatcher.matches() ?
+        Matcher policyMatcher = POLICY_LINE.matcher(matcher.group(0));
+        List<String> policies = policyMatcher.matches()
+                ?
                 transformPolicies(policyMatcher.group("policy")) :
                 Collections.emptyList();
 
@@ -138,6 +140,7 @@ public class BgpTableConnectionReader implements
                 return Optional.of(IPV4.class);
             case "ipv6":
                 return Optional.of(IPV6.class);
+            default: break;
         }
 
         return Optional.empty();
@@ -153,6 +156,7 @@ public class BgpTableConnectionReader implements
                 return Optional.of(OSPF.class);
             case "bgp":
                 return Optional.of(BGP.class);
+            default: break;
         }
 
         return Optional.empty();

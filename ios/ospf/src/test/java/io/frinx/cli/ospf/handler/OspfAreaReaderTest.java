@@ -26,10 +26,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 
 public class OspfAreaReaderTest {
 
-    public static final String OSPF_1 = " ip ospf 1 area 0\n" +
-            " ip ospf 1 area 48\n" +
-            " ip ospf 1 area 0.0.0.0\n" +
-            " ip ospf 1 area 9.9.9.9\n";
+    public static final String OSPF_1 = " ip ospf 1 area 0\n"
+            + " ip ospf 1 area 48\n"
+            + " ip ospf 1 area 0.0.0.0\n"
+            + " ip ospf 1 area 9.9.9.9\n";
 
     public static final List<AreaKey> AREAS = Lists.newArrayList("0", "48", "0.0.0.0", "9.9.9.9")
             .stream()

@@ -74,7 +74,8 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        String ipAddress = NeighborWriter.getNeighborIp(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
+        String ipAddress = NeighborWriter.getNeighborIp(instanceIdentifier.firstKeyOf(Neighbor.class)
+                .getNeighborAddress());
 
         configBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
         parseConfigAttributes(blockingRead(String.format(SH_SUMM, ipAddress), cli, instanceIdentifier, readContext),
@@ -96,7 +97,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
     private static void parseDefault(ConfigBuilder configBuilder, String[] output) {
         Optional<String> defaultNetworkNeighbors = Arrays.stream(output)
                 .filter(value -> !value.contains("vrf"))
-                .reduce((s, s2) -> s + s2);
+                .reduce((s1, s2) -> s1 + s2);
 
         setAttributes(configBuilder, defaultNetworkNeighbors.orElse(""));
     }
@@ -122,32 +123,33 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
 
     private static void setDescription(ConfigBuilder configBuilder, String defaultInstance) {
         ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, DESCRIPTION_PATTERN::matcher,
-                m -> findGroup(m, "description"),
-                groupsHashMap -> configBuilder.setDescription(groupsHashMap.get("description")));
+            m -> findGroup(m, "description"),
+            groupsHashMap -> configBuilder.setDescription(groupsHashMap.get("description")));
     }
 
     private static void setPasswd(ConfigBuilder configBuilder, String defaultInstance) {
         ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, PASSWORD_PATTERN::matcher,
-                m -> findGroup(m, "password"),
-                groupsHashMap -> configBuilder.setAuthPassword(new RoutingPassword(groupsHashMap.get("password"))));
+            m -> findGroup(m, "password"),
+            groupsHashMap -> configBuilder.setAuthPassword(new RoutingPassword(groupsHashMap.get("password"))));
     }
 
     private static void setPeerGroup(ConfigBuilder configBuilder, String defaultInstance) {
         ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, PEER_GROUP_PATTERN::matcher,
-                m -> findGroup(m, "peerGroup"),
-                groupsHashMap -> configBuilder.setPeerGroup(groupsHashMap.get("peerGroup")));
+            m -> findGroup(m, "peerGroup"),
+            groupsHashMap -> configBuilder.setPeerGroup(groupsHashMap.get("peerGroup")));
     }
 
     private static void setAs(ConfigBuilder configBuilder, String defaultInstance) {
         ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, REMOTE_AS_PATTERN::matcher,
-                m -> findGroup(m, "remoteAs"),
-                groupsHashMap -> configBuilder.setPeerAs(new AsNumber(Long.valueOf(groupsHashMap.get("remoteAs")))));
+            m -> findGroup(m, "remoteAs"),
+            groupsHashMap -> configBuilder.setPeerAs(new AsNumber(Long.valueOf(groupsHashMap.get("remoteAs")))));
     }
 
     private static void setCommunity(ConfigBuilder configBuilder, String defaultInstance) {
         ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, SEND_COMMUNITY_PATTERN::matcher,
-                m -> findGroup(m, "community"),
-                groupsHashMap -> configBuilder.setSendCommunity(CommunityType.valueOf(groupsHashMap.get("community").toUpperCase())));
+            m -> findGroup(m, "community"),
+            groupsHashMap -> configBuilder.setSendCommunity(CommunityType.valueOf(groupsHashMap.get("community")
+                        .toUpperCase())));
     }
 
     private static String preprocessOutput(String defaultInstance) {
@@ -158,15 +160,15 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
 
     private static void setEnabled(ConfigBuilder configBuilder, String defaultInstance) {
         ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, NEIGHBOR_ACTIVATE_PATTERN::matcher,
-                m -> findGroup(m, "enabled"),
-                groupsHashMap -> configBuilder.setEnabled("activate".equals(groupsHashMap.get("enabled"))));
+            m -> findGroup(m, "enabled"),
+            groupsHashMap -> configBuilder.setEnabled("activate".equals(groupsHashMap.get("enabled"))));
     }
 
-    private static HashMap<String, String> findGroup(Matcher m, String group) {
+    private static HashMap<String, String> findGroup(Matcher matcher, String group) {
         HashMap<String, String> hashMap = new HashMap<>();
 
-        hashMap.put("neighborIp", m.group("neighborIp"));
-        hashMap.put(group, m.group(group));
+        hashMap.put("neighborIp", matcher.group("neighborIp"));
+        hashMap.put(group, matcher.group(group));
 
         return hashMap;
     }
