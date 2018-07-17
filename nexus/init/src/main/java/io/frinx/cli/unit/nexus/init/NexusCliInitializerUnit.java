@@ -54,7 +54,7 @@ public class NexusCliInitializerUnit  implements TranslateUnit {
 
     private static final Device IOS = new DeviceIdBuilder()
             .setDeviceType("nexus")
-            .setDeviceVersion("9000")
+            .setDeviceVersion("*")
             .build();
 
     private TranslationUnitCollector registry;
