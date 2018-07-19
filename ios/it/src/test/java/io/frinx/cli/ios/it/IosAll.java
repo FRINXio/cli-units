@@ -323,6 +323,7 @@ public class IosAll {
     }
 
     @Ignore
+    @SuppressWarnings("IllegalCatch")
     @Test
     public void getAllDOMBenchmark() throws Exception {
         benchmark(2, 10, () -> {

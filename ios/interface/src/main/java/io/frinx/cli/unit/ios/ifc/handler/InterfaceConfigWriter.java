@@ -55,6 +55,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
     private static final Pattern LOOPBACK_NAME_PATTERN = Pattern.compile("Loopback(?<number>[0-9]+)");
 
+    @SuppressWarnings("IllegalCatch")
     private void writeLoopbackInterface(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
 
@@ -82,6 +83,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
+    @SuppressWarnings("IllegalCatch")
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
@@ -132,6 +134,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
         }
     }
 
+    @SuppressWarnings("IllegalCatch")
     private void deleteLoopbackInterface(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException.DeleteFailedException {
         Matcher matcher = LOOPBACK_NAME_PATTERN.matcher(data.getName());

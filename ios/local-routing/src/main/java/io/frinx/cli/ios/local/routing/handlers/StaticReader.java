@@ -48,7 +48,8 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
             Pattern.compile("ip route (vrf \\S+)?\\s*(?<net>[\\d.]+)\\s*(?<mask>[\\d.]+)\\s*(?<ifc>[A-Z][\\w.]+)?\\s*"
                     + "(?<ip>[\\d]+.[\\d.]+)?\\s*(?<metric>[\\d]+)?.*");
     static final Pattern ROUTE_LINE_IP6 =
-            Pattern.compile("ipv6 route (vrf \\S+)?\\s*(?<net>[\\d:/A-F]+)\\s*(?<ifc>[A-Z][\\w.]+)?\\s*(?<ip>\\d*:[\\d:A-F]+)?\\s*(?<metric>[\\d]+)?.*");
+            Pattern.compile("ipv6 route (vrf \\S+)?\\s*(?<net>[\\d:/A-F]+)\\s*(?<ifc>[A-Z][\\w.]+)?"
+                    + "\\s*(?<ip>\\d*:[\\d:A-F]+)?\\s*(?<metric>[\\d]+)?.*");
 
     private static final String GROUP_MASK = "mask";
     private static final String GROUP_IP = "net";

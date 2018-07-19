@@ -41,7 +41,8 @@ public class StaticStateReader implements LrReader.LrOperReader<State, StateBuil
     private static final String SH_IPV6_STATIC_ROUTE = "show ipv6 route | include %s";
 
     private static final Pattern STATIC_IP_ROUTE =
-            Pattern.compile("(?<state>[A-Z]+)\\s*(?<net>[\\d.]+)\\s*\\[(?<metric>[\\d/]+)\\]\\s*via\\s*(?<ip>[\\d.]+).*");
+            Pattern.compile("(?<state>[A-Z]+)\\s*(?<net>[\\d.]+)\\s*\\["
+                    + "(?<metric>[\\d/]+)\\]\\s*via\\s*(?<ip>[\\d.]+).*");
     private static final Pattern STATIC_IPV6_ROUTE =
             Pattern.compile("(?<state>[A-Z]+)\\s*(?<net>[\\d:/A-F]+)\\s*\\[(?<metric>[\\d/]+)\\].*");
     private static final Pattern IP_ROUTE = Pattern.compile("(?<address>[\\d.]+)/(?<mask>[\\d.]+)");
@@ -52,31 +53,32 @@ public class StaticStateReader implements LrReader.LrOperReader<State, StateBuil
         this.cli = cli;
     }
 
-    private static Matcher getMatcher(String s) {
-        Matcher matcher = STATIC_IP_ROUTE.matcher(s);
-        return matcher.matches() ? matcher : STATIC_IPV6_ROUTE.matcher(s);
+    private static Matcher getMatcher(String string) {
+        Matcher matcher = STATIC_IP_ROUTE.matcher(string);
+        return matcher.matches() ? matcher : STATIC_IPV6_ROUTE.matcher(string);
     }
 
-    private static String getIpAddres(String fullAddress){
-        Optional<String> ipAddress = ParsingUtils.parseField(fullAddress, 0, IP_ROUTE::matcher,matcher -> matcher.group("address"));
+    private static String getIpAddres(String fullAddress) {
+        Optional<String> ipAddress = ParsingUtils.parseField(fullAddress, 0, IP_ROUTE::matcher,
+            matcher -> matcher.group("address"));
         return ipAddress.orElse(fullAddress);
     }
 
     @VisibleForTesting
     static boolean isPrefixStatic(String output) {
-        Optional<String> state = ParsingUtils.parseField(output, 0, StaticStateReader::getMatcher, m -> m.group("state"));
+        Optional<String> state = ParsingUtils.parseField(output, 0, StaticStateReader::getMatcher,
+            matcher -> matcher.group("state"));
         return state.isPresent() && state.get().equals("S");
     }
-
 
     @Override
     public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         IpPrefix ipPrefix = instanceIdentifier.firstKeyOf(Static.class).getPrefix();
-        String cmd = ipPrefix.getIpv6Prefix() == null ?
-                String.format(SH_IP_STATIC_ROUTE, getIpAddres(ipPrefix.getIpv4Prefix().getValue())) :
-                String.format(SH_IPV6_STATIC_ROUTE, ipPrefix.getIpv6Prefix().getValue());
+        String cmd = ipPrefix.getIpv6Prefix() == null
+                ? String.format(SH_IP_STATIC_ROUTE, getIpAddres(ipPrefix.getIpv4Prefix().getValue()))
+                : String.format(SH_IPV6_STATIC_ROUTE, ipPrefix.getIpv6Prefix().getValue());
         if (isPrefixStatic(blockingRead(cmd, cli, instanceIdentifier, readContext))) {
             stateBuilder.setPrefix(ipPrefix);
         }
