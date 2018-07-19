@@ -65,8 +65,11 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
     }
 
     @Override
+    @SuppressWarnings("VariableDeclarationUsageDistance")
     public void accept(@Nonnull Session session, @Nonnull String newline) {
         try {
+            String initialPrompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline)
+                    .trim();
 
             // Set terminal length to 0 to prevent "--More--" situation
             LOG.debug("{}: Setting terminal length to 0 to prevent \"--More--\" situation", id);
@@ -75,9 +78,6 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
             // Set terminal width to 0 to prevent command shortening
             LOG.debug("{}: Setting terminal width to 0", id);
             write(session, newline, SET_TERMINAL_WIDTH_COMMAND);
-
-            String initialPrompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline)
-                    .trim();
 
             String initOutput = session.readUntilOutput(initialPrompt)
                     .toCompletableFuture()

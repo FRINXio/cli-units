@@ -187,6 +187,7 @@ public class EthernetConfigWriterTest {
     }
 
     @Test
+    @SuppressWarnings("EmptyBlock")
     public void updateLacpMode() throws Exception {
         Config newData = new ConfigBuilder()
                 .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder()
