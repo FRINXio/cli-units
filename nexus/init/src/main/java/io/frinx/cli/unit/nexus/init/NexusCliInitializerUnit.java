@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Translate unit that does not actually translate anything.
- *
  * This translate unit's only responsibility is to properly initialize IOS cli
  * session. That is, upon establishing connection to IOS device, enter privileged
  * EXEC mode by issuing the 'enable' command and filling in the secret.
@@ -65,8 +64,7 @@ public class NexusCliInitializerUnit  implements TranslateUnit {
         this.registry = registry;
     }
 
-    public void init()
-    {
+    public void init() {
         iosReg = registry.registerTranslateUnit(IOS, this);
     }
 
@@ -98,8 +96,8 @@ public class NexusCliInitializerUnit  implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder rRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder wRegistry,
+    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
+                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         // NO-OP
     }
