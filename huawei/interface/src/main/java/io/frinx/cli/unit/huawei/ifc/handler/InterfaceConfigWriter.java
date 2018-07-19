@@ -114,6 +114,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
         return PHYS_IFC_TYPES.contains(data.getType());
     }
 
+    @SuppressWarnings("IllegalCatch")
     @Override
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore,
