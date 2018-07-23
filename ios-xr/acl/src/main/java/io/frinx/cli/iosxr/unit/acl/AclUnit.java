@@ -140,6 +140,15 @@ public class AclUnit implements TranslateUnit {
                 InstanceIdentifier.create(AclEntry.class)
                         .child(Ipv4.class)
                         .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv4.protocol.fields.top.ipv4.Config.class),
+                InstanceIdentifier.create(AclEntry.class)
+                        .child(Ipv4.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
+                                .ipv4.protocol.fields.top.ipv4.Config.class)
+                        .augmentation(Config1.class),
+                InstanceIdentifier.create(AclEntry.class)
+                        .child(Ipv4.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
                                 .ipv4.protocol.fields.top.ipv4.Config.class)
                         .augmentation(AclSetAclEntryIpv4WildcardedAug.class),
                 InstanceIdentifier.create(AclEntry.class)
