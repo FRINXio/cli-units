@@ -102,7 +102,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTree;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.TipProducingDataTree;
+import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeConfiguration;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.TreeType;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
@@ -196,7 +196,7 @@ public class IosAll {
         WriterRegistry writerRegistry = writerRegistryBuilder.build();
 
         // Get DOM brokers
-        TipProducingDataTree dataTree = getDataTree(schemaCtx, TreeType.CONFIGURATION);
+        DataTree dataTree = getDataTree(schemaCtx, TreeType.CONFIGURATION);
         domBroker = getDomBroker(schemaCtx, NOOP_DATA_BROKER, codec, readerRegistry, writerRegistry, dataTree);
 
         // Get & register RPC handlers
@@ -254,8 +254,8 @@ public class IosAll {
         return reg;
     }
 
-    private static TipProducingDataTree getDataTree(SchemaContext ctx, TreeType configuration) {
-        final TipProducingDataTree dataTree = InMemoryDataTreeFactory.getInstance().create(configuration);
+    private static DataTree getDataTree(SchemaContext ctx, TreeType configuration) {
+        DataTree dataTree = new InMemoryDataTreeFactory().create(DataTreeConfiguration.builder(configuration).build());
         dataTree.setSchemaContext(ctx);
         return dataTree;
     }

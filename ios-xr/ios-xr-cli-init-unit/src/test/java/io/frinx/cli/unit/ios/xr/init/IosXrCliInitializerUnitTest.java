@@ -18,7 +18,8 @@ package io.frinx.cli.unit.ios.xr.init;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.write.CommitFailedException;
-import io.fd.honeycomb.translate.write.registry.WriterRegistry;
+import io.fd.honeycomb.translate.write.RevertFailedException;
+import io.fd.honeycomb.translate.write.RevertSuccessException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.io.impl.cli.ErrorAwareCli;
@@ -132,7 +133,7 @@ public class IosXrCliInitializerUnitTest {
         // doesn't matter what we return
         Mockito.when(delegateCli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class)))
                 .thenReturn(CompletableFuture.completedFuture(""));
-        thrown.expect(WriterRegistry.Reverter.RevertSuccessException.class);
+        thrown.expect(RevertSuccessException.class);
         this.unit.getPostFailedHook(this.context)
                 .run(null);
     }
@@ -141,7 +142,7 @@ public class IosXrCliInitializerUnitTest {
     public void testRevertFailedCommitFailed() throws Exception {
         Mockito.when(delegateCli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class)))
                 .thenThrow(InterruptedException.class);
-        thrown.expect(WriterRegistry.Reverter.RevertFailedException.class);
+        thrown.expect(RevertFailedException.class);
         this.unit.getPostFailedHook(this.context)
                 .run(null);
     }

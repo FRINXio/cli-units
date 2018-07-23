@@ -25,8 +25,9 @@ import io.fd.honeycomb.translate.spi.write.CommitFailedException;
 import io.fd.honeycomb.translate.spi.write.PostCommitHook;
 import io.fd.honeycomb.translate.spi.write.PostFailedHook;
 import io.fd.honeycomb.translate.spi.write.PreCommitHook;
+import io.fd.honeycomb.translate.write.RevertFailedException;
+import io.fd.honeycomb.translate.write.RevertSuccessException;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.io.SessionInitializationStrategy;
@@ -181,10 +182,10 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
                         .toCompletableFuture()
                         .get();
                 LOG.debug("{}: Revert successful.", deviceId);
-                throw new WriterRegistry.Reverter.RevertSuccessException(message);
+                throw new RevertSuccessException(message);
             } catch (InterruptedException | ExecutionException e) {
                 LOG.warn("{}: Failed to abort commit. Reason: {}", deviceId, e.getMessage(), e);
-                throw new WriterRegistry.Reverter.RevertFailedException(e);
+                throw new RevertFailedException(e);
             }
         };
     }

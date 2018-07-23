@@ -19,13 +19,13 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.5.rc18-frinx-SNAPSHOT</version>
+        <version>4.1.0</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-it</artifactId>
-    <version>3.1.5.rc18-frinx-SNAPSHOT</version>
+    <version>4.1.0</version>
 
     <build>
         <plugins>
@@ -48,27 +48,22 @@
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>io-impl</artifactId>
-            <version>${cli.version}</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>topology-api</artifactId>
-            <version>${cli.version}</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry</artifactId>
-            <version>${cli.version}</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry-model</artifactId>
-            <version>${cli.version}</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>utils</artifactId>
-            <version>${cli.version}</version>
         </dependency>
 
         <!-- Honeycomb -->
@@ -80,16 +75,6 @@
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>data-impl</artifactId>
-            <version>${hc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.fd.honeycomb</groupId>
-            <artifactId>translate-impl</artifactId>
-            <version>${hc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.fd.honeycomb</groupId>
-            <artifactId>translate-utils</artifactId>
             <version>${hc.version}</version>
         </dependency>
         <dependency>
@@ -125,22 +110,18 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>sal-binding-api</artifactId>
-            <version>${controller.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>sal-binding-broker-impl</artifactId>
-            <version>${controller.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>sal-common-api</artifactId>
-            <version>${controller.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>sal-core-api</artifactId>
-            <version>${controller.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
@@ -160,56 +141,47 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-cli-init-unit</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-bgp-unit</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-rib-unit</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-interface-unit</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-network-instance-unit</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-ospf-unit</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-local-routing-unit</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-cdp-unit</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-lldp-unit</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -217,7 +189,6 @@
         <dependency>
             <groupId>io.frinx.openconfig</groupId>
             <artifactId>openconfig-interfaces</artifactId>
-            <version>${openconfig.version}</version>
             <scope>test</scope>
         </dependency>
 

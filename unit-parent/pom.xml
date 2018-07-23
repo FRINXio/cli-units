@@ -22,23 +22,80 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.opendaylight.mdsal</groupId>
-        <artifactId>binding-parent</artifactId>
-        <version>0.10.1-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</version>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>bundle-parent</artifactId>
+        <version>3.1.1</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>3.1.5.rc18-frinx-SNAPSHOT</version>
+    <version>4.1.0</version>
     <packaging>pom</packaging>
 
     <properties>
-        <cli.version>3.1.5.rc18-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.5.rc18-frinx-SNAPSHOT</openconfig.version>
-        <hc.version>1.17.10-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</hc.version>
-        <controller.version>1.5.1-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</controller.version>
+        <cli.version>4.1.0</cli.version>
+        <openconfig.version>4.1.0</openconfig.version>
+        <hc.version>1.18.04</hc.version>
+        <controller.version>1.7.2</controller.version>
+        <yangtools.version>2.0.5</yangtools.version>
+        <mdsal.model.version>0.12.2</mdsal.model.version>
+        <mdsal.version>2.4.2</mdsal.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.opendaylight.yangtools</groupId>
+                <artifactId>yangtools-artifacts</artifactId>
+                <type>pom</type>
+                <version>${yangtools.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.mdsal.model</groupId>
+                <artifactId>mdsal-model-artifacts</artifactId>
+                <type>pom</type>
+                <version>${mdsal.model.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.mdsal</groupId>
+                <artifactId>mdsal-artifacts</artifactId>
+                <type>pom</type>
+                <version>${mdsal.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.controller</groupId>
+                <artifactId>mdsal-artifacts</artifactId>
+                <type>pom</type>
+                <version>${controller.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.frinx.openconfig</groupId>
+                <artifactId>openconfig-artifacts</artifactId>
+                <type>pom</type>
+                <version>${openconfig.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.frinx.cli</groupId>
+                <artifactId>cli-artifacts</artifactId>
+                <type>pom</type>
+                <version>${cli.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>cli-units-artifacts</artifactId>
+                <type>pom</type>
+                <version>${project.version}</version>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -79,11 +136,25 @@
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>translate-impl</artifactId>
             <version>${hc.version}</version>
-        </dependency>
+         </dependency>
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>translate-utils</artifactId>
             <version>${hc.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jgrapht</groupId>
+                    <artifactId>jgrapht-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jgrapht</groupId>
+                    <artifactId>jgrapht-ext</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.tinyjee.jgraphx</groupId>
+                    <artifactId>jgraphx</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

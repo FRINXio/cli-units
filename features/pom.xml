@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright © 2018 Frinx and others.
+  ~ Copyright © 2018 FRINX s.r.o. All rights reserved.
   ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
+  ~ This program and the accompanying materials are made available under the
+  ~ terms of the FRINX ODL End User License Agreement which accompanies this distribution,
+  ~ and is available at https://frinx.io/wp-content/uploads/2017/01/EULA_ODL_20170104_v102.pdf
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -20,319 +12,33 @@
 
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
-    <artifactId>features-parent</artifactId>
-    <version>1.8.1-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</version>
-    <relativePath/>
+    <artifactId>odlparent-lite</artifactId>
+    <version>3.1.1</version>
+    <relativePath />
   </parent>
 
   <groupId>io.frinx.cli</groupId>
-  <artifactId>cli-units-features</artifactId>
-  <version>3.1.5.rc18-frinx-SNAPSHOT</version>
+  <artifactId>features-aggregator</artifactId>
+  <version>4.1.0</version>
+  <packaging>pom</packaging>
   <name>${project.artifactId}</name>
 
-  <properties>
-    <mdsal.model.version>0.10.1-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</mdsal.model.version>
-    <mdsal.version>1.5.1-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</mdsal.version>
-    <netconf.version>1.2.1-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</netconf.version>
-    <yangtools.version>1.1.1-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</yangtools.version>
-    <configfile.directory>etc/opendaylight/karaf</configfile.directory>
-    <hc.version>1.17.10-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</hc.version>
-    <jgraph.version>0.9.2</jgraph.version>
-    <cli.version>3.1.5.rc18-frinx-SNAPSHOT</cli.version>
-    <openconfig.version>3.1.5.rc18-frinx-SNAPSHOT</openconfig.version>
-  </properties>
+  <modules>
+    <module>cli-unit-features</module>
+    <module>frinx-cli-unit-all-units</module>
 
-  <dependencyManagement>
-    <dependencies>
-      <!-- project specific dependencies -->
-      <dependency>
-        <groupId>org.opendaylight.controller</groupId>
-        <artifactId>mdsal-artifacts</artifactId>
-        <version>${mdsal.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.opendaylight.yangtools</groupId>
-        <artifactId>yangtools-artifacts</artifactId>
-        <version>${yangtools.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>features-yangtools</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
-      <artifactId>features-mdsal-model</artifactId>
-      <version>${mdsal.model.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>features-mdsal</artifactId>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>cli-southbound-features</artifactId>
-      <version>${cli.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-essential-model</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.frinx.openconfig</groupId>
-      <artifactId>openconfig-features</artifactId>
-      <version>${openconfig.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-cli-init-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-cli-init-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!--<dependency>-->
-      <!--<groupId>io.frinx.cli</groupId>-->
-      <!--<artifactId>ios-essential-unit</artifactId>-->
-      <!--<version>${project.version}</version>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>common-handlers</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-net</groupId>
-      <artifactId>commons-net</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-interface-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-bgp-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-rib-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-network-instance-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-configuration-metadata-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-utils</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>junos-cli-init-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!--<dependency>-->
-      <!--<groupId>io.frinx.cli</groupId>-->
-      <!--<artifactId>ios-xr-essential-unit</artifactId>-->
-      <!--<version>${project.version}</version>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-network-instance-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-bgp-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-configuration-metadata-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>brocade-cli-init-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>brocade-essential-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>brocade-interface-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>brocade-network-instance-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>brocade-cdp-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-interface-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-utils</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-logging-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-mpls-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-lldp-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-ospf-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-snmp-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-acl-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-routing-policy-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-netflow-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-qos-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-ospf-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-local-routing-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-routing-policy-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-cdp-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-lldp-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-platform-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>huawei-cli-init-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>huawei-interface-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>huawei-network-instance-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>huawei-bgp-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>huawei-routing-policy-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>nexus-cli-init-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-  </dependencies>
+    <module>frinx-cli-unit-brocade</module>
+    <module>frinx-cli-unit-huawei</module>
+    <module>frinx-cli-unit-ios</module>
+    <module>frinx-cli-unit-ios-initializer</module>
+    <module>frinx-cli-unit-ios-common-handlers</module>
+    <module>frinx-cli-unit-ios-common-models</module>
+    <module>frinx-cli-unit-ios-utils</module>
+    <module>frinx-cli-unit-ios-xr</module>
+    <module>frinx-cli-unit-ios-xr-initializer</module>
+    <module>frinx-cli-unit-ios-xr-lldp</module>
+    <module>frinx-cli-unit-ios-xr-utils</module>
+    <module>frinx-cli-unit-junos</module>
+    <module>frinx-cli-unit-nexus</module>
+  </modules>
 </project>

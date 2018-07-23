@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.opendaylight.mdsal</groupId>
         <artifactId>binding-parent</artifactId>
-        <version>0.10.1-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</version>
+        <version>0.12.2</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>ios-essential-model</artifactId>
-    <version>3.1.5.rc18-frinx-SNAPSHOT</version>
+    <version>4.1.0</version>
     <packaging>bundle</packaging>
 
     <dependencies>

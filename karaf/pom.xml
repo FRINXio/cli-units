@@ -26,7 +26,7 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-karaf</artifactId>
-  <version>3.1.5.rc18-frinx-SNAPSHOT</version>
+  <version>4.1.0</version>
   <name>${project.artifactId}</name>
   <packaging>pom</packaging>
 
@@ -35,10 +35,10 @@
   </prerequisites>
 
   <properties>
-    <restconf.version>1.5.1-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</restconf.version>
-    <netconf.version>1.2.1-Carbon-SR1.3_1_5_rc18-frinxodl-SNAPSHOT</netconf.version>
-    <cli.version>3.1.5.rc18-frinx-SNAPSHOT</cli.version>
-    <openconfig.version>3.1.5.rc18-frinx-SNAPSHOT</openconfig.version>
+    <restconf.version>1.4.2</restconf.version>
+    <netconf.version>1.4.2</netconf.version>
+    <cli.version>4.1.0</cli.version>
+    <openconfig.version>4.1.0</openconfig.version>
   </properties>
 
   <dependencies>
@@ -58,7 +58,7 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>io.frinx.cli</groupId>
       <artifactId>cli-southbound-features</artifactId>
       <version>${cli.version}</version>
       <classifier>features</classifier>

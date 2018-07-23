@@ -31,7 +31,7 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.openconfig.openconfig.configuration.metadata.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.configuration.metadata.rev700101.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.configuration.metadata.norev.$YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class ConfigurationUnit implements TranslateUnit {
