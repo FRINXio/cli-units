@@ -76,6 +76,7 @@ public class IronwareCliInitializerUnit implements TranslateUnit {
         return new IosCliInitializerUnit.IosCliInitializer(cliNodeConfiguration, id);
     }
 
+    @SuppressWarnings("IllegalCatch")
     @Override
     public PostTransactionHook getPostTransactionHook(Context ctx) {
         return () -> {

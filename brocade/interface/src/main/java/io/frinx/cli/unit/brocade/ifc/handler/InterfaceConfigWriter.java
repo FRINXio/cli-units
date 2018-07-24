@@ -59,12 +59,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             throws WriteFailedException.CreateFailedException {
 
         Matcher matcher = LOOPBACK_NAME_PATTERN.matcher(data.getName());
-        try {
-            checkArgument(matcher.matches(),
-                    "Loopback name must be in format: Loopback45, not: %s", data.getName());
-        } catch (RuntimeException e) {
-            throw new WriteFailedException.CreateFailedException(id, data, e);
-        }
+        checkArgument(matcher.matches(), "Loopback name must be in format: Loopback45, not: %s", data.getName());
 
         blockingWriteAndRead(cli, id, data,
                 "configure terminal",
@@ -86,13 +81,9 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        try {
-            checkArgument(dataBefore.getType().equals(dataAfter.getType()),
+        checkArgument(dataBefore.getType().equals(dataAfter.getType()),
                     "Changing interface type is not permitted. Before: %s, After: %s",
                     dataBefore.getType(), dataAfter.getType());
-        } catch (RuntimeException e) {
-            throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter, e);
-        }
 
         if (isPhysicalInterface(dataAfter)) {
             updatePhysicalInterface(id, dataAfter, writeContext);
@@ -136,12 +127,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     private void deleteLoopbackInterface(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException.DeleteFailedException {
         Matcher matcher = LOOPBACK_NAME_PATTERN.matcher(data.getName());
-        try {
-            checkArgument(matcher.matches(),
+        checkArgument(matcher.matches(),
                     "Loopback name must be in format: Loopback45, not: %s", data.getName());
-        } catch (RuntimeException e) {
-            throw new WriteFailedException.DeleteFailedException(id, e);
-        }
 
         blockingDeleteAndRead(cli, id,
                 "configure terminal",
