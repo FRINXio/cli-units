@@ -18,7 +18,7 @@
   </parent>
 
   <groupId>io.frinx.cli</groupId>
-  <artifactId>features-aggregator</artifactId>
+  <artifactId>cli-units-features-aggregator</artifactId>
   <version>4.1.0</version>
   <packaging>pom</packaging>
   <name>${project.artifactId}</name>
