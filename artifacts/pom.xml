@@ -14,22 +14,20 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <!-- vi: set et smarttab sw=4 tabstop=4: -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent-lite</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.1-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-artifacts</artifactId>
-    <version>4.1.0</version>
+    <version>4.1.0.rc1-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <dependencyManagement>
@@ -369,4 +367,3 @@
         </dependencies>
     </dependencyManagement>
 </project>
-

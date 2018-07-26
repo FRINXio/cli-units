@@ -6,20 +6,19 @@
   ~ terms of the FRINX ODL End User License Agreement which accompanies this distribution,
   ~ and is available at https://frinx.io/wp-content/uploads/2017/01/EULA_ODL_20170104_v102.pdf
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>odlparent-lite</artifactId>
-    <version>3.1.1</version>
-    <relativePath />
+    <version>3.1.1-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
+    <relativePath/>
   </parent>
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-features-aggregator</artifactId>
-  <version>4.1.0</version>
+  <version>4.1.0.rc1-frinx-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>${project.artifactId}</name>
 

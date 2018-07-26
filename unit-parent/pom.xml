@@ -14,33 +14,30 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <!-- vi: set et smarttab sw=4 tabstop=4: -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>bundle-parent</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.1-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>4.1.0</version>
+    <version>4.1.0.rc1-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
-        <cli.version>4.1.0</cli.version>
-        <openconfig.version>4.1.0</openconfig.version>
-        <hc.version>1.18.04</hc.version>
-        <controller.version>1.7.2</controller.version>
-        <yangtools.version>2.0.5</yangtools.version>
-        <mdsal.model.version>0.12.2</mdsal.model.version>
-        <mdsal.version>2.4.2</mdsal.version>
+        <cli.version>4.1.0.rc1-frinx-SNAPSHOT</cli.version>
+        <openconfig.version>4.1.0.rc1-frinx-SNAPSHOT</openconfig.version>
+        <hc.version>1.18.04-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</hc.version>
+        <controller.version>1.7.2-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</controller.version>
+        <yangtools.version>2.0.5-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</yangtools.version>
+        <mdsal.model.version>0.12.2-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</mdsal.model.version>
+        <mdsal.version>2.4.2-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</mdsal.version>
     </properties>
 
     <dependencyManagement>
