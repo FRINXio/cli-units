@@ -123,6 +123,7 @@
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>rpc-api</artifactId>
             <version>${hc.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
