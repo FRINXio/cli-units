@@ -23,7 +23,7 @@
   <name>${project.artifactId}</name>
 
   <modules>
-    <module>cli-unit-features</module>
+    <module>cli-units-features</module>
     <module>frinx-cli-unit-all-units</module>
 
     <module>frinx-cli-unit-brocade</module>
