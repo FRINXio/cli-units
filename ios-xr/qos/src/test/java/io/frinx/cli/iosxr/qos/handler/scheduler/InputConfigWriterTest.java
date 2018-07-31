@@ -16,9 +16,6 @@
 
 package io.frinx.cli.iosxr.qos.handler.scheduler;
 
-import static org.mockito.Mockito.doReturn;
-
-import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -32,15 +29,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.OneRateTwoColor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.inputs.input.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.inputs.input.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.SchedulerPolicies;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicy;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicyKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.Schedulers;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.Scheduler;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.SchedulerKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
@@ -67,20 +60,12 @@ public class InputConfigWriterTest {
     @Mock
     private WriteContext context;
 
-    @Mock
-    private Scheduler scheduler;
-
-    @Mock
-    private OneRateTwoColor oneRateTwoColor;
-
     private InputConfigWriter writer;
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier piid = KeyedInstanceIdentifier.create(SchedulerPolicies.class)
-            .child(SchedulerPolicy.class, new SchedulerPolicyKey("plmap"))
-            .child(Schedulers.class)
-            .child(Scheduler.class, new SchedulerKey(0L));
+            .child(SchedulerPolicy.class, new SchedulerPolicyKey("plmap"));
 
     // test data
     private Config data;
@@ -95,8 +80,6 @@ public class InputConfigWriterTest {
         this.writer = new InputConfigWriter(this.cli);
 
         initializeData();
-        doReturn(Optional.of(scheduler)).when(context).readAfter(Mockito.any(InstanceIdentifier.class));
-        doReturn(oneRateTwoColor).when(scheduler).getOneRateTwoColor();
     }
 
     private void initializeData() {
@@ -108,6 +91,7 @@ public class InputConfigWriterTest {
     @Test
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributes(piid, data, context);
+
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue()
