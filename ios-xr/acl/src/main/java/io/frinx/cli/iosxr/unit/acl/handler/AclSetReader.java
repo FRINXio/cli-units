@@ -60,9 +60,7 @@ public class AclSetReader implements CliConfigListReader<AclSet, AclSetKey, AclS
         return ParsingUtils.parseFields(output, 0,
             ACL_LINE::matcher,
             NameTypeEntry::fromMatcher,
-            nameTypeEntry -> {
-                return new AclSetKey(nameTypeEntry.getKey(), nameTypeEntry.getValue());
-            });
+            nameTypeEntry -> new AclSetKey(nameTypeEntry.getKey(), nameTypeEntry.getValue()));
     }
 
     @Override

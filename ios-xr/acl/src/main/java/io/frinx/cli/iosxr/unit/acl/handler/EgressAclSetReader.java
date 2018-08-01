@@ -69,12 +69,8 @@ public class EgressAclSetReader implements CliConfigListReader<EgressAclSet, Egr
 
         ParsingUtils.parseField(output, 0,
             aclLine::matcher,
-            matcher -> {
-                return AclUtil.getType(matcher.group("type"));
-            },
-            value -> {
-                setNameAndType(configBuilder, setName, value);
-            });
+            matcher -> AclUtil.getType(matcher.group("type")),
+            value -> setNameAndType(configBuilder, setName, value));
     }
 
     private static void setNameAndType(final Builder builder, String name, Class<? extends ACLTYPE> type) {
@@ -92,9 +88,7 @@ public class EgressAclSetReader implements CliConfigListReader<EgressAclSet, Egr
         return ParsingUtils.parseFields(output, 0,
             ALL_EGRESS_ACLS_LINE::matcher,
             NameTypeEntry::fromMatcher,
-            nameTypeEntry -> {
-                return new EgressAclSetKey(nameTypeEntry.getName(), nameTypeEntry.getType());
-            }
+            nameTypeEntry -> new EgressAclSetKey(nameTypeEntry.getName(), nameTypeEntry.getType())
         );
     }
 

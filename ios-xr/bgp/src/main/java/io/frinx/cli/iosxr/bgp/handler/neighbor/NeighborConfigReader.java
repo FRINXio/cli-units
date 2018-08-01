@@ -26,6 +26,7 @@ import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Config;
@@ -132,16 +133,16 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
         // description
         ParsingUtils.parseField(output, DESCRIPTION_LINE::matcher,
             matcher -> matcher.group("description"),
-            password -> configBuilder.setDescription(password));
+                configBuilder::setDescription);
 
         // send-community-ebgp
         ParsingUtils.parseField(output, SEND_COMMUNITY_LINE::matcher,
-            matcher -> matcher.matches(),
+                Matcher::matches,
             matches -> configBuilder.setSendCommunity(matches ? CommunityType.BOTH : null));
 
         // remove-private-AS
         ParsingUtils.parseField(output, REMOVE_AS_LINE::matcher,
-            matcher -> matcher.matches(),
+                Matcher::matches,
             matches -> configBuilder.setRemovePrivateAs(matches ? PRIVATEASREMOVEALL.class : null));
     }
 

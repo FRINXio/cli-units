@@ -57,9 +57,7 @@ public class VersionReader implements CliOperReader<Version, VersionBuilder> {
     static void parseShowVersion(String output, VersionBuilder builder) {
         parseField(output, 0,
                 DESCRIPTION_LINE::matcher,
-            matcher -> {
-                return matcher.group("image");
-            },
+            matcher -> matcher.group("image"),
             builder::setSysImage);
 
         builder.setOsFamily("IronWare");

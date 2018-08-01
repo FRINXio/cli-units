@@ -33,7 +33,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupRouteReflectorConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonStructureNeighborGroupRouteReflector;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflector;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.AfiSafis;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
@@ -347,9 +349,9 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
 
     public static Boolean isRouteReflectClient(BgpCommonStructureNeighborGroupRouteReflector neighbor) {
         return Optional.ofNullable(neighbor)
-                .map(n -> n.getRouteReflector())
-                .map(r -> r.getConfig())
-                .map(c -> c.isRouteReflectorClient())
+                .map(BgpCommonStructureNeighborGroupRouteReflector::getRouteReflector)
+                .map(RouteReflector::getConfig)
+                .map(BgpCommonNeighborGroupRouteReflectorConfig::isRouteReflectorClient)
                 .orElse(null);
     }
 
