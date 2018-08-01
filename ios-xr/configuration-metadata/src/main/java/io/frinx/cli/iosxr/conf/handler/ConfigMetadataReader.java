@@ -22,7 +22,6 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.text.ParseException;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -44,7 +43,7 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
     }
 
     @VisibleForTesting
-    static Optional<String> getLastConfigurationFingerprint(String timeFormat) throws ParseException {
+    static Optional<String> getLastConfigurationFingerprint(String timeFormat) {
 
         return ParsingUtils.parseField(timeFormat, 0, PATTERN::matcher, m -> m.group("time"));
     }
@@ -55,12 +54,8 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
             ReadFailedException {
         String output = blockingRead(SHOW_LAST_COMMIT_TIME, cli, instanceIdentifier, readContext);
 
-        try {
-            Optional<String> data = getLastConfigurationFingerprint(output);
-            data.ifPresent(configurationMetadataBuilder::setLastConfigurationFingerprint);
-        } catch (ParseException e) {
-            throw new ReadFailedException(instanceIdentifier, e);
-        }
+        Optional<String> data = getLastConfigurationFingerprint(output);
+        data.ifPresent(configurationMetadataBuilder::setLastConfigurationFingerprint);
     }
 
     @Override

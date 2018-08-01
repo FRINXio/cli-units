@@ -261,7 +261,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         return Optional.ofNullable(entry)
                 .map(AclEntry::getIpv4)
                 .map(Ipv4::getConfig)
-                .map(mapper::apply)
+                .map(mapper)
                 .map(Ipv4Prefix::getValue);
     }
 
@@ -272,7 +272,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 .map(AclEntry::getIpv4)
                 .map(Ipv4::getConfig)
                 .map(config -> config.getAugmentation(AclSetAclEntryIpv4WildcardedAug.class))
-                .map(mapper::apply);
+                .map(mapper);
     }
 
     private void processIpv6(AclEntry entry, MaxMetricCommandDTO commandVars) {
@@ -330,7 +330,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         return Optional.ofNullable(entry)
                 .map(AclEntry::getIpv6)
                 .map(Ipv6::getConfig)
-                .map(mapper::apply)
+                .map(mapper)
                 .map(Ipv6Prefix::getValue);
     }
 
@@ -341,7 +341,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 .map(AclEntry::getIpv6)
                 .map(Ipv6::getConfig)
                 .map(config -> config.getAugmentation(AclSetAclEntryIpv6WildcardedAug.class))
-                .map(mapper::apply);
+                .map(mapper);
     }
 
     private void processTransport(AclEntry entry, MaxMetricCommandDTO commandVars) {

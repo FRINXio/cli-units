@@ -89,7 +89,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
                                 .getValue()));
     }
 
-    private static void checkNotZeroSubinterface(@Nonnull InstanceIdentifier<?> id) throws WriteFailedException {
+    private static void checkNotZeroSubinterface(@Nonnull InstanceIdentifier<?> id) {
         Long subifcIndex = id.firstKeyOf(Subinterface.class)
                 .getIndex();
         Preconditions.checkArgument(subifcIndex != ZERO_SUBINTERFACE_ID,

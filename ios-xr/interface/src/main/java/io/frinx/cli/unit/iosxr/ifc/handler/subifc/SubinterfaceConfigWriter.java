@@ -95,7 +95,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         }
     }
 
-    private static boolean isZeroSubinterface(@Nonnull InstanceIdentifier<?> id) throws WriteFailedException {
+    private static boolean isZeroSubinterface(@Nonnull InstanceIdentifier<?> id) {
         Long subifcIndex = id.firstKeyOf(Subinterface.class)
                 .getIndex();
         return subifcIndex == ZERO_SUBINTERFACE_ID;

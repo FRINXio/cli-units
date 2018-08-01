@@ -75,10 +75,6 @@ public final class IosCdpUnit implements TranslateUnit {
                                 @Nonnull final Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
-        provideWriters(writeRegistry, cli);
-    }
-
-    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder readeRegistry, Cli cli) {
