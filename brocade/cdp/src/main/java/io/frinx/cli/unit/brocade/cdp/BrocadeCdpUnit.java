@@ -79,10 +79,7 @@ public final class BrocadeCdpUnit implements TranslateUnit {
                                 @Nonnull final Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
-        provideWriters(writeRegistry, cli);
     }
-
-    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {}
 
     private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.CDP, CdpBuilder.class);

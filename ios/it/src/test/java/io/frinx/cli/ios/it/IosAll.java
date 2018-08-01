@@ -335,7 +335,7 @@ public class IosAll {
         });
     }
 
-    static void benchmark(int warmups, int rounds, Runnable code) throws Exception {
+    static void benchmark(int warmups, int rounds, Runnable code) {
         long averageTime = 0;
 
         for (int i = 0; i < warmups; i++) {

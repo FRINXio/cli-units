@@ -68,11 +68,6 @@ public class PlatformUnit implements TranslateUnit {
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
-        provideWriters(writeRegistry, cli);
-    }
-
-    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
-        //noop
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {

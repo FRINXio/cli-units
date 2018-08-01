@@ -78,11 +78,6 @@ public class RibUnit implements TranslateUnit {
                                 @Nonnull final TranslateUnit.Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
-        provideWriters(writeRegistry, cli);
-    }
-
-    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
-        // no writers
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
