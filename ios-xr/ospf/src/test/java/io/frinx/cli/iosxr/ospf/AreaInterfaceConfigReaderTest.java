@@ -23,20 +23,41 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 
 public class AreaInterfaceConfigReaderTest {
 
-    private final String output = "Thu Dec 21 15:40:02.857 UTC\n"
+    private final String enablePassive = "Thu Dec 21 15:40:02.857 UTC\n"
             + "router ospf 100\n"
             + " area 0\n"
             + "  interface Loopback97\n"
             + "   cost 1\n"
+            + "   passive enable\n"
+            + "  !\n"
+            + " !\n"
+            + "!\n";
+
+    private final String disablePassive = "Thu Dec 21 15:40:02.857 UTC\n"
+            + "router ospf 100\n"
+            + " area 0\n"
+            + "  interface Loopback97\n"
+            + "   cost 1\n"
+            + "   passive disable\n"
             + "  !\n"
             + " !\n"
             + "!\n";
 
     @Test
-    public void test() {
+    public void testPassiveEnable() {
         ConfigBuilder builder = new ConfigBuilder();
-        AreaInterfaceConfigReader.parseCost(output, builder);
-        Assert.assertEquals(Integer.valueOf(1), builder.getMetric()
-                .getValue());
+        AreaInterfaceConfigReader.parseCost(enablePassive, builder);
+        Assert.assertEquals(Integer.valueOf(1), builder.getMetric().getValue());
+        AreaInterfaceConfigReader.parsePassive(enablePassive, builder);
+        Assert.assertTrue(builder.isPassive());
+    }
+
+    @Test
+    public void testPassiveDisable() {
+        ConfigBuilder builder = new ConfigBuilder();
+        AreaInterfaceConfigReader.parseCost(disablePassive, builder);
+        Assert.assertEquals(Integer.valueOf(1), builder.getMetric().getValue());
+        AreaInterfaceConfigReader.parsePassive(disablePassive, builder);
+        Assert.assertFalse(builder.isPassive());
     }
 }
