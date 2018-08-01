@@ -24,6 +24,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.ipv4.ipv6.unicast.common.Config;
@@ -96,7 +97,7 @@ public abstract class NeighborAfiSafiIpvConfigReader implements BgpReader.BgpCon
         configBuilder.setSendDefaultRoute(false);
         ParsingUtils.parseField(output.trim(), 0,
                 DEFAULT_ORIGINATE_LINE::matcher,
-            matcher -> matcher.matches(),
-            matches -> configBuilder.setSendDefaultRoute(matches));
+                Matcher::matches,
+                configBuilder::setSendDefaultRoute);
     }
 }

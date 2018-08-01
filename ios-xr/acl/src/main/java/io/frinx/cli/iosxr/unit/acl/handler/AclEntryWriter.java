@@ -46,6 +46,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.IpProtocolFieldsCommonConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.Ipv4ProtocolFieldsConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.Ipv6ProtocolFieldsConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.Ipv4;
@@ -252,7 +253,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         }
 
         IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv4().getConfig())
-                .map(config -> config.getProtocol())
+                .map(IpProtocolFieldsCommonConfig::getProtocol)
                 .orElse(null);
         commandVars.aclProtocol = formatProtocol(ipProtocolType, commandVars.type);
     }
@@ -321,7 +322,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         }
 
         IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv6().getConfig())
-                .map(config -> config.getProtocol())
+                .map(IpProtocolFieldsCommonConfig::getProtocol)
                 .orElse(null);
         commandVars.aclProtocol = formatProtocol(ipProtocolType, commandVars.type);
     }

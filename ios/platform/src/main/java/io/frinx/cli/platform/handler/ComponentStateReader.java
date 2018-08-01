@@ -72,9 +72,7 @@ public class ComponentStateReader implements CliOperReader<State, StateBuilder> 
         ParsingUtils.parseField(cardLine, 0,
                 LINE::matcher,
             m -> m.group("type"),
-            desc -> {
-                stateBuilder.setDescription(desc.trim());
-            });
+            desc -> stateBuilder.setDescription(desc.trim()));
 
         ParsingUtils.parseField(cardLine, 0,
                 LINE::matcher,
