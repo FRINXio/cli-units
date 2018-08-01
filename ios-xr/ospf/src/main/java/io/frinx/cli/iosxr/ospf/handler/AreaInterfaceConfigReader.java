@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
@@ -40,6 +41,7 @@ public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Co
 
     private static final String SHOW_OSPF_INT = "show running-config router ospf %s area %s interface %s";
     private static final Pattern COST_LINE = Pattern.compile("cost (?<cost>.+)");
+    private static final Pattern PASSIVE_LINE = Pattern.compile("passive (?<passive>.+)");
     private final Cli cli;
 
     public AreaInterfaceConfigReader(final Cli cli) {
@@ -58,6 +60,7 @@ public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Co
         String output = blockingRead(String.format(SHOW_OSPF_INT, ospfId, areaId, key.getId()), cli,
                 instanceIdentifier, readContext);
         parseCost(output, configBuilder);
+        parsePassive(output, configBuilder);
     }
 
     @VisibleForTesting
@@ -66,6 +69,22 @@ public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Co
                 COST_LINE::matcher,
             matcher -> matcher.group("cost"),
             value -> configBuilder.setMetric(new OspfMetric(Integer.parseInt(value))));
+    }
+
+    @VisibleForTesting
+    public static void parsePassive(String output, ConfigBuilder configBuilder) {
+
+        ParsingUtils.NEWLINE.splitAsStream(output)
+            .map(PASSIVE_LINE::matcher)
+            .filter(Matcher::find)
+            .findAny()
+            .ifPresent(matcher -> {
+                if ("disable".equals(matcher.group("passive"))) {
+                    configBuilder.setPassive(false);
+                } else {
+                    configBuilder.setPassive(true);
+                }
+            });
     }
 
     @Override
