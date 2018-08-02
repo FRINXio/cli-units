@@ -69,7 +69,6 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
             .setDeviceVersion("*")
             .build();
 
-    private static final Command COMMIT = Command.create("commit");
     private static final Command ABORT = Command.create("abort");
 
     @VisibleForTesting
@@ -135,12 +134,13 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
 
     @Override
     @SuppressWarnings("IllegalCatch")
-    public PostCommitHook getCommitHook(Context context) {
+    public PostCommitHook getCommitHook(Context context, Set<Pattern> errorCommitPatterns) {
         return () -> {
             try {
                 Cli cli = context.getTransport();
                 try {
-                    cli.executeAndRead(COMMIT)
+                    final Command commit = Command.createCheckedCommand("commit", errorCommitPatterns);
+                    cli.executeAndRead(commit)
                             .toCompletableFuture()
                             .get();
                     LOG.debug("{}: Commit successful", deviceId);
@@ -203,9 +203,13 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
         return Sets.newLinkedHashSet(Arrays.asList(
                 Pattern.compile("^\\s+\\^.*", Pattern.DOTALL),
                 Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL),
-                Pattern.compile("\\% (?i)Incomplete command(?-i).*", Pattern.DOTALL),
-                Pattern.compile("\\% (?i)Failed(?-i).*")
+                Pattern.compile("\\% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
         ));
+    }
+
+    @Override
+    public Set<Pattern> getCommitErrorPatterns(MountPointContext mpCtx) {
+        return Sets.newLinkedHashSet(Collections.singletonList(Pattern.compile("\\% (?i)Failed(?-i).*")));
     }
 
     @Override
