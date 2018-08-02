@@ -144,12 +144,13 @@ public class IosAll {
 
     private static final KeepaliveCli.ReconnectListener RECONNECT_LISTENER = new KeepaliveCli.ReconnectListener() {
         @Override
-        public void onDisconnected(@Nonnull CompletionStage<? extends Cli> init, Throwable throwable) {
+        public void onDisconnected(@Nonnull CompletionStage<? extends Cli> init, Throwable throwable,
+                                   int reconnectCount) {
             throw new RuntimeException("Disconnected !");
         }
 
         @Override
-        public void onReconnecting(Throwable throwable) {
+        public void onReconnecting(Throwable throwable, int reconnectCount) {
             throw new RuntimeException("Disconnected !");
         }
     };

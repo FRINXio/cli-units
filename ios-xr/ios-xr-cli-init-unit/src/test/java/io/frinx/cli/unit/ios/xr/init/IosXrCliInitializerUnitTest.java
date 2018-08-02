@@ -59,6 +59,10 @@ public class IosXrCliInitializerUnitTest {
             + "the errors\n"
             + "RP/0/0/CPU0:XR-5(config)#\n";
 
+    private static final Set<Pattern> COMMIT_ERROR_PATTERNS = Sets.newLinkedHashSet(Collections.singletonList(
+            Pattern.compile("\\% (?i)Failed(?-i).*", Pattern.DOTALL)
+    ));
+
     private IosXrCliInitializerUnit unit;
 
     @Mock
@@ -82,11 +86,12 @@ public class IosXrCliInitializerUnitTest {
                 .thenAnswer(invocation -> CompletableFuture.completedFuture(delegateCli));
 
         final Set<Pattern> errorPatterns = Sets.newLinkedHashSet(Collections.singletonList(
-                Pattern.compile("\\% (?i)Failed(?-i).*", Pattern.DOTALL)
+                Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL)
         ));
+
         final CompletionStage<? extends Cli> cliStage =
-                new ErrorAwareCli.Configuration(idName, delegateCliConfig, errorPatterns, ForkJoinPool.commonPool())
-                        .init();
+                new ErrorAwareCli.Configuration(idName, delegateCliConfig, errorPatterns,
+                        ForkJoinPool.commonPool()).init();
         Cli globalCli = cliStage.toCompletableFuture()
                 .get();
         Mockito.when(globalCli.executeAndSwitchPrompt(Mockito.any(Command.class), Mockito.any(Predicate.class)))
@@ -106,7 +111,7 @@ public class IosXrCliInitializerUnitTest {
         Mockito.when(delegateCli.executeAndRead(Mockito.any(Command.class)))
                 .thenReturn(CompletableFuture.completedFuture(SUCCESS_COMMIT));
         try {
-            this.unit.getCommitHook(this.context)
+            this.unit.getCommitHook(this.context, COMMIT_ERROR_PATTERNS)
                     .run();
             Assert.assertTrue(true);
         } catch (CommitFailedException e) {
@@ -124,7 +129,7 @@ public class IosXrCliInitializerUnitTest {
         Mockito.when(delegateCli.executeAndRead(IosXrCliInitializerUnit.SH_CONF_FAILED))
                 .thenReturn(CompletableFuture.completedFuture(""));
         thrown.expect(CommitFailedException.class);
-        this.unit.getCommitHook(this.context)
+        this.unit.getCommitHook(this.context, COMMIT_ERROR_PATTERNS)
                 .run();
     }
 
