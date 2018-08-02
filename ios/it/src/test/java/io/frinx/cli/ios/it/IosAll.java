@@ -38,7 +38,7 @@ import io.fd.honeycomb.translate.read.registry.ReaderRegistry;
 import io.fd.honeycomb.translate.util.YangDAG;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.io.impl.IOFactory;
+import io.frinx.cli.io.impl.IOConfigurationBuilder;
 import io.frinx.cli.io.impl.cli.KeepaliveCli;
 import io.frinx.cli.ios.bgp.BgpUnit;
 import io.frinx.cli.ios.local.routing.LocalRoutingUnit;
@@ -178,8 +178,17 @@ public class IosAll {
         TranslateContext translateContext = reg.getTranslateContext(getDeviceId());
 
         RemoteDeviceId remoteId = new RemoteDeviceId(CLI_TOPO_KEY, MOUNT_ID, getAddress());
-        cli = IOFactory.getIO(remoteId, getCliNode(), translateContext.getInitializer(remoteId, getCliNode()),
-                EXECUTOR, ForkJoinPool.commonPool(), RECONNECT_LISTENER, Collections.emptySet())
+
+        IOConfigurationBuilder ioConfigurationBuilder = new IOConfigurationBuilder()
+                .setId(remoteId)
+                .setCliConfiguration(getCliNode())
+                .setInitializer(translateContext.getInitializer(remoteId, getCliNode()))
+                .setKeepaliveExecutor(EXECUTOR)
+                .setCliInitExecutor(ForkJoinPool.commonPool())
+                .setReconnectListener(RECONNECT_LISTENER)
+                .setErrorPatterns(Collections.emptySet());
+
+        cli = ioConfigurationBuilder.getIO()
                 .toCompletableFuture()
                 .get();
 
@@ -286,8 +295,16 @@ public class IosAll {
 
         for (int i = 0; i < 20; i++) {
 
-            Cli io = IOFactory.getIO(remoteId, getCliNode(), translateContext.getInitializer(remoteId, getCliNode()),
-                    EXECUTOR, ForkJoinPool.commonPool(), RECONNECT_LISTENER, Collections.emptySet())
+            IOConfigurationBuilder ioConfigurationBuilder = new IOConfigurationBuilder()
+                    .setId(remoteId)
+                    .setCliConfiguration(getCliNode())
+                    .setInitializer(translateContext.getInitializer(remoteId, getCliNode()))
+                    .setKeepaliveExecutor(EXECUTOR)
+                    .setCliInitExecutor(ForkJoinPool.commonPool())
+                    .setReconnectListener(RECONNECT_LISTENER)
+                    .setErrorPatterns(Collections.emptySet());
+
+            Cli io = ioConfigurationBuilder.getIO()
                     .toCompletableFuture()
                     .get();
 
