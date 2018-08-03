@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.iosxr.snmp.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +66,11 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
             .setEnabled(false)
             .build();
 
-    static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST = Collections.singletonList(LINK_UP_DOWN_EVENT);
+    @VisibleForTesting
+    static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST =
+            Collections.singletonList(LINK_UP_DOWN_EVENT);
+
+    @VisibleForTesting
     static final List<EnabledTrapForEvent> LINK_UP_DOWN_EVENT_LIST_DISABLED
             = Collections.singletonList(LINK_UP_DOWN_EVENT_DISABLED);
 
@@ -89,13 +92,12 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
     static void parseInterfaces(String snmpInterfaceOutput, InterfacesBuilder interfacesBuilder) {
         String realignedOutput = realignSnmpDisabledInterfacesOutput(snmpInterfaceOutput);
 
-        List<Map.Entry<InterfaceKey, Boolean>> ifcKeyes = NEWLINE.splitAsStream(realignedOutput)
+        List<Map.Entry<InterfaceKey, Boolean>> ifcKeyes = ParsingUtils.NEWLINE.splitAsStream(realignedOutput)
                 .map(String::trim)
                 .map(INTERFACE_ID::matcher)
                 .filter(Matcher::matches)
-                .map(matcher -> new AbstractMap.SimpleEntry<>(matcher.group("id"), matcher.group("linkupDisable")
-                        ==
-                        null))
+                .map(matcher -> new AbstractMap.SimpleEntry<>(matcher.group("id"),
+                        matcher.group("linkupDisable") == null))
                 .map(e -> new AbstractMap.SimpleEntry<>(new InterfaceId(e.getKey()), e.getValue()))
                 .map(e -> new AbstractMap.SimpleEntry<>(new InterfaceKey(e.getKey()), e.getValue()))
                 .collect(Collectors.toList());
@@ -130,7 +132,7 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
     }
 
     private static String realignSnmpDisabledInterfacesOutput(String output) {
-        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), "");
+        String withoutNewlines = output.replaceAll(ParsingUtils.NEWLINE.pattern(), "");
         return withoutNewlines.replace("snmp-server", "\n");
     }
 }
