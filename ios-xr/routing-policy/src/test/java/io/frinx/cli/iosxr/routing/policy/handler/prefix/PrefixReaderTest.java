@@ -16,10 +16,9 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.prefix;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import java.util.List;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.PrefixKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
@@ -76,9 +75,9 @@ public class PrefixReaderTest {
 
     @Test
     public void testAllIds() throws Exception {
-        assertEquals(OUTPUT1_KEYS1, PrefixReader.parseIds(OUTPUT1));
-        assertEquals(OUTPUT1_KEYS2, PrefixReader.parseIds(OUTPUT2));
-        assertEquals(OUTPUT1_KEYS3, PrefixReader.parseIds(OUTPUT3));
-        assertEquals(OUTPUT1_KEYS4, PrefixReader.parseIds(OUTPUT4));
+        Assert.assertEquals(OUTPUT1_KEYS1, PrefixReader.parseIds(OUTPUT1));
+        Assert.assertEquals(OUTPUT1_KEYS2, PrefixReader.parseIds(OUTPUT2));
+        Assert.assertEquals(OUTPUT1_KEYS3, PrefixReader.parseIds(OUTPUT3));
+        Assert.assertEquals(OUTPUT1_KEYS4, PrefixReader.parseIds(OUTPUT4));
     }
 }

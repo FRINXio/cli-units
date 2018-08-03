@@ -16,12 +16,10 @@
 
 package io.frinx.cli.ios.bgp.handler.neighbor;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafiKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV4UNICAST;
@@ -71,26 +69,26 @@ public class NeighborAfiSafiReaderTest {
     public void testAllIds() throws Exception {
         List<AfiSafiKey> defaults = NeighborAfiSafiReader.getAfiKeys(OUTPUT, NetworInstance.DEFAULT_NETWORK, line ->
                 line.contains("activate"));
-        assertEquals(defaults.size(), 1);
-        assertThat(defaults, hasItem(new AfiSafiKey(IPV4UNICAST.class)));
+        Assert.assertEquals(defaults.size(), 1);
+        Assert.assertThat(defaults, CoreMatchers.hasItem(new AfiSafiKey(IPV4UNICAST.class)));
 
         defaults = NeighborAfiSafiReader.getAfiKeys(OUTPUT2, NetworInstance.DEFAULT_NETWORK, line -> line.contains(
                 "activate"));
-        assertEquals(defaults.size(), 1);
-        assertThat(defaults, hasItem(new AfiSafiKey(IPV4UNICAST.class)));
+        Assert.assertEquals(defaults.size(), 1);
+        Assert.assertThat(defaults, CoreMatchers.hasItem(new AfiSafiKey(IPV4UNICAST.class)));
 
         List<AfiSafiKey> abcds = NeighborAfiSafiReader.getAfiKeys(OUTPUT, new NetworkInstanceKey("abcd"), line ->
                 line.contains("activate"));
-        assertEquals(abcds.size(), 1);
-        assertThat(abcds, hasItem(new AfiSafiKey(IPV4UNICAST.class)));
+        Assert.assertEquals(abcds.size(), 1);
+        Assert.assertThat(abcds, CoreMatchers.hasItem(new AfiSafiKey(IPV4UNICAST.class)));
 
         abcds = NeighborAfiSafiReader.getAfiKeys(OUTPUT3, new NetworkInstanceKey("abcd"), line -> line.contains(
                 "activate"));
-        assertEquals(abcds.size(), 1);
-        assertThat(abcds, hasItem(new AfiSafiKey(IPV4UNICAST.class)));
+        Assert.assertEquals(abcds.size(), 1);
+        Assert.assertThat(abcds, CoreMatchers.hasItem(new AfiSafiKey(IPV4UNICAST.class)));
 
         List<AfiSafiKey> abcds2 = NeighborAfiSafiReader.getAfiKeys(OUTPUT, new NetworkInstanceKey("abcd2"), line ->
                 line.contains("activate"));
-        assertEquals(abcds2.size(), 0);
+        Assert.assertEquals(abcds2.size(), 0);
     }
 }

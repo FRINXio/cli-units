@@ -16,12 +16,6 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.policy;
 
-import static io.frinx.cli.iosxr.routing.policy.handler.policy.ActionsParser.EMPTY_ACTIONS;
-import static io.frinx.cli.iosxr.routing.policy.handler.policy.ActionsParser.parseActions;
-import static io.frinx.cli.iosxr.routing.policy.handler.policy.ConditionParser.EMPTY_CONDITIONS;
-import static io.frinx.cli.iosxr.routing.policy.handler.policy.ConditionParser.parseConditions;
-import static java.util.stream.Collectors.toList;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -40,6 +34,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.Actions;
@@ -171,7 +166,7 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
                 if (line.contains(OR.pattern())) {
                     List<String> ors = OR.splitAsStream(line)
                             .map(condition -> IF + " " + condition)
-                            .collect(toList());
+                            .collect(Collectors.toList());
                     statementsToParseActionsFor = ors.size();
                     ors.forEach(this::acceptConditions);
                 } else {
@@ -205,17 +200,17 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
             ConditionsBuilder conditionsBuilder = conditions == null ? new ConditionsBuilder() : new
                     ConditionsBuilder(conditions);
 
-            parseActions(actionsBuilder, conditionsBuilder, line);
+            ActionsParser.parseActions(actionsBuilder, conditionsBuilder, line);
             Actions newActions = actionsBuilder.build();
             Conditions newConditions = conditionsBuilder.build();
 
             // Do not set empty
-            if (!EMPTY_ACTIONS.equals(newActions)) {
+            if (!ActionsParser.EMPTY_ACTIONS.equals(newActions)) {
                 currentBuilder.setActions(newActions);
             }
 
             // Do not set empty
-            if (!EMPTY_CONDITIONS.equals(newConditions)) {
+            if (!ConditionParser.EMPTY_CONDITIONS.equals(newConditions)) {
                 currentBuilder.setConditions(newConditions);
             }
         }
@@ -225,10 +220,10 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
             line = line.trim();
 
             currentBuilder = newBuilder();
-            Conditions conds = parseConditions(line);
+            Conditions conds = ConditionParser.parseConditions(line);
 
             // Do not set empty
-            if (!EMPTY_CONDITIONS.equals(conds)) {
+            if (!ConditionParser.EMPTY_CONDITIONS.equals(conds)) {
                 currentBuilder.setConditions(conds);
             }
         }
@@ -255,7 +250,7 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
             List<Statement> unnamendStatements = builders.stream()
                     .map(StatementBuilder::build)
                     .filter(o -> !EMPTY_STATEMENT.equals(o))
-                    .collect(toList());
+                    .collect(Collectors.toList());
 
             // Add name based on statement index
             return IntStream.range(0, unnamendStatements.size())
@@ -267,7 +262,7 @@ public class StatementsReader implements CliConfigReader<Statements, StatementsB
                                     .setName(Integer.toString(e.getKey()))
                                     .build())
                             .build())
-                    .collect(toList());
+                    .collect(Collectors.toList());
         }
     }
 

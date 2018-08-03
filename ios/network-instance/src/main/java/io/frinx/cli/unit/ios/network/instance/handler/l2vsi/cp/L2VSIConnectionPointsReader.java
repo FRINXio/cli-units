@@ -16,10 +16,6 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.l2vsi.cp;
 
-import static io.frinx.cli.unit.ios.network.instance.handler.l2vsi.L2VSIReader.L2_VFI_LINE;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2vsi.L2VSIReader.realignL2vsi;
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.read.Reader;
@@ -118,16 +114,16 @@ public class L2VSIConnectionPointsReader implements L2vsiReader.L2vsiConfigReade
     }
 
     private static String realignL2vsiIfcs(String output) {
-        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), "");
+        String withoutNewlines = output.replaceAll(ParsingUtils.NEWLINE.pattern(), "");
         return withoutNewlines.replace("interface", "\ninterface");
     }
 
     private Optional<ConnectionPoint> parseRemotePoint(String output, String vfiName, boolean isOper) {
-        String linePerL2Vsi = realignL2vsi(output);
+        String linePerL2Vsi = L2VSIReader.realignL2vsi(output);
 
         return ParsingUtils.NEWLINE.splitAsStream(linePerL2Vsi)
                 .map(String::trim)
-                .map(L2_VFI_LINE::matcher)
+                .map(L2VSIReader.L2_VFI_LINE::matcher)
                 .filter(Matcher::matches)
                 .filter(m -> m.group("vfi")
                         .equals(vfiName))
@@ -142,11 +138,11 @@ public class L2VSIConnectionPointsReader implements L2vsiReader.L2vsiConfigReade
     }
 
     private Optional<String> parseBridgeDomain(String output, String vfiName) {
-        String linePerL2Vsi = realignL2vsi(output);
+        String linePerL2Vsi = L2VSIReader.realignL2vsi(output);
 
         return ParsingUtils.NEWLINE.splitAsStream(linePerL2Vsi)
                 .map(String::trim)
-                .map(L2_VFI_LINE::matcher)
+                .map(L2VSIReader.L2_VFI_LINE::matcher)
                 .filter(Matcher::matches)
                 .filter(m -> m.group("vfi")
                         .equals(vfiName))

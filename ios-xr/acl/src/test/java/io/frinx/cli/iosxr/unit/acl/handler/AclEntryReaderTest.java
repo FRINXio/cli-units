@@ -16,10 +16,9 @@
 
 package io.frinx.cli.iosxr.unit.acl.handler;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.List;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
 
@@ -32,7 +31,7 @@ public class AclEntryReaderTest {
                 + " 1 permit ipv4 any any\n"
                 + " 10 remark remark1\n"
                 + "!");
-        assertEquals(Arrays.asList(new AclEntryKey(1L)), result);
+        Assert.assertEquals(Arrays.asList(new AclEntryKey(1L)), result);
     }
 
 }

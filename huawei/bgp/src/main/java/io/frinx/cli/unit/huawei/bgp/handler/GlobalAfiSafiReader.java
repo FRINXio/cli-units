@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.huawei.bgp.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
 import java.util.Optional;
@@ -73,7 +72,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     }
 
     private static String realignOutput(String output) {
-        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), "");
+        String withoutNewlines = output.replaceAll(ParsingUtils.NEWLINE.pattern(), "");
         withoutNewlines = withoutNewlines.replace("ipv4-family", "\nipv4-family");
         return withoutNewlines;
     }
@@ -95,7 +94,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     static List<AfiSafiKey> getAfiKeys(String output, String vrf) {
         output = realignOutput(output);
 
-        return NEWLINE.splitAsStream(output)
+        return ParsingUtils.NEWLINE.splitAsStream(output)
                 // Skip header line(s)
                 .map(String::trim)
                 .map(FAMILY_VRF_LINE::matcher)
@@ -109,7 +108,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     static List<AfiSafiKey> getDefaultAfiKeys(String output) {
         output = realignOutput(output);
 
-        return NEWLINE.splitAsStream(output)
+        return ParsingUtils.NEWLINE.splitAsStream(output)
                 // Skip header line(s)
                 .map(String::trim)
                 .map(FAMILY_LINE::matcher)

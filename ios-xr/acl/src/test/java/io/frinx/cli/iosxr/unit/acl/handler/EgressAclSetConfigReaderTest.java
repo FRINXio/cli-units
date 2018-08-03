@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.unit.acl.handler;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.ModificationCache;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -28,6 +26,7 @@ import io.frinx.openconfig.openconfig.acl.IIDs;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,8 +82,8 @@ public class EgressAclSetConfigReaderTest {
         final ConfigBuilder builder = new ConfigBuilder();
         EgressAclSetReader.parseAcl(readOutput, builder, setName);
 
-        assertEquals(builder.getSetName(), setName);
-        assertEquals(builder.getType(), AclUtil.getType(type));
+        Assert.assertEquals(builder.getSetName(), setName);
+        Assert.assertEquals(builder.getType(), AclUtil.getType(type));
     }
 
 
@@ -97,8 +96,8 @@ public class EgressAclSetConfigReaderTest {
         EgressAclSetConfigReader reader = new EgressAclSetConfigReader(cliMock);
         reader.readCurrentAttributes(TestData.ACL_CONFIG_IID, aclSetBuilder, context);
 
-        assertEquals(TestData.ACL_SET_NAME, aclSetBuilder.getSetName());
-        assertEquals(TestData.ACL_TYPE, aclSetBuilder.getType());
+        Assert.assertEquals(TestData.ACL_SET_NAME, aclSetBuilder.getSetName());
+        Assert.assertEquals(TestData.ACL_TYPE, aclSetBuilder.getType());
     }
 
     private static class TestData {

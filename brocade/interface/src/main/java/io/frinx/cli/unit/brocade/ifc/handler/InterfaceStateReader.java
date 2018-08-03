@@ -16,15 +16,12 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler;
 
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getIfcNumber;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.parseType;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceCommonState;
@@ -61,9 +58,9 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
                                       @Nonnull final StateBuilder builder,
                                       @Nonnull final ReadContext ctx) throws ReadFailedException {
         String name = id.firstKeyOf(Interface.class).getName();
-        Class<? extends InterfaceType> ifcType = parseType(name);
+        Class<? extends InterfaceType> ifcType = InterfaceConfigReader.parseType(name);
         String ifcTypeOnDevice = InterfaceConfigReader.getTypeOnDevice(ifcType);
-        String ifcNumber = getIfcNumber(name);
+        String ifcNumber = InterfaceConfigReader.getIfcNumber(name);
         parseInterfaceState(blockingRead(String.format(SH_SINGLE_INTERFACE, ifcTypeOnDevice, ifcNumber), cli, id,
                 ctx), builder, name, ifcType);
     }
@@ -81,7 +78,7 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
         builder.setName(name);
         builder.setType(type);
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             STATUS_LINE::matcher,
             matcher -> {
                 switch (matcher.group("admin").toUpperCase()) {
@@ -99,7 +96,7 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
                         == InterfaceCommonState.AdminStatus.UP);
             });
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             STATUS_LINE::matcher,
             matcher -> {
                 switch (matcher.group("line").toUpperCase()) {
@@ -113,12 +110,12 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
             },
                 builder::setOperStatus);
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             MTU_LINE::matcher,
             matcher -> Integer.valueOf(matcher.group("mtu")),
             builder::setMtu);
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             DESCR_LINE::matcher,
             matcher -> matcher.group("desc"),
             builder::setDescription);

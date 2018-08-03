@@ -16,13 +16,12 @@
 
 package io.frinx.cli.handlers.def;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
-import static java.util.Collections.singletonList;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
@@ -37,7 +36,7 @@ public class DefaultReader implements CliConfigListReader<NetworkInstance, Netwo
     @Override
     public List<NetworkInstanceKey> getAllIds(@Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier,
                                               @Nonnull ReadContext readContext) throws ReadFailedException {
-        return singletonList(DEFAULT_NETWORK);
+        return Collections.singletonList(NetworInstance.DEFAULT_NETWORK);
     }
 
     @Override

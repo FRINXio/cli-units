@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.routing.policy;
 
-import static io.frinx.cli.iosxr.IosXrDevices.IOS_XR_ALL;
-
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
@@ -28,6 +26,7 @@ import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.iosxr.routing.policy.handler.aspath.AsPathSetConfigReader;
 import io.frinx.cli.iosxr.routing.policy.handler.aspath.AsPathSetConfigWriter;
 import io.frinx.cli.iosxr.routing.policy.handler.aspath.AsPathSetReader;
@@ -237,7 +236,7 @@ public class RoutingPolicyUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = registry.registerTranslateUnit(IOS_XR_ALL, this);
+        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
     }
 
     public void close() {

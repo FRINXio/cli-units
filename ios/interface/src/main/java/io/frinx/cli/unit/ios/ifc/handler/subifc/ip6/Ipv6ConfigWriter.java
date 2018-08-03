@@ -16,12 +16,11 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip6;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -53,7 +52,7 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class)
                 .getIndex();
 
-        if (subId != ZERO_SUBINTERFACE_ID) {
+        if (subId != SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
                     new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
         }
@@ -89,8 +88,8 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
                 .getName();
         Long subIfcIndex = instanceIdentifier.firstKeyOf(Subinterface.class)
                 .getIndex();
-        checkArgument(subIfcIndex == ZERO_SUBINTERFACE_ID, "Only subinterface " + ZERO_SUBINTERFACE_ID + "  can have "
-                + "IP");
+        Preconditions.checkArgument(subIfcIndex == SubinterfaceReader.ZERO_SUBINTERFACE_ID,
+                "Only subinterface " + SubinterfaceReader.ZERO_SUBINTERFACE_ID + " can have IP");
         return ifcName;
     }
 
@@ -119,7 +118,7 @@ public class Ipv6ConfigWriter implements CliWriter<Config> {
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class)
                 .getIndex();
 
-        if (subId == ZERO_SUBINTERFACE_ID) {
+        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
 
             try {
                 blockingWriteAndRead(cli, instanceIdentifier, config,

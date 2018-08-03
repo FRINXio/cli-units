@@ -16,14 +16,12 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler;
 
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceStateReader.STATUS_LINE;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
@@ -57,8 +55,8 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
     }
 
     public static List<InterfaceKey> parseAllInterfaceIds(String output) {
-        return parseFields(output, 0,
-            STATUS_LINE::matcher,
+        return ParsingUtils.parseFields(output, 0,
+            InterfaceStateReader.STATUS_LINE::matcher,
             matcher -> matcher.group("id").trim(),
             InterfaceKey::new);
     }

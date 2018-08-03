@@ -16,9 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
-
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -50,7 +47,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
 
         blockingWriteAndRead(cli, id, dataAfter,
                 f(WRITE_TEMPLATE,
-                        getSubinterfaceName(id),
+                        SubinterfaceReader.getSubinterfaceName(id),
                         dataAfter.getVlanId()
                                 .getVlanId()
                                 .getValue()));
@@ -83,7 +80,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
 
         blockingDeleteAndRead(cli, id,
                 f(DELETE_TEMPLATE,
-                        getSubinterfaceName(id),
+                        SubinterfaceReader.getSubinterfaceName(id),
                         dataBefore.getVlanId()
                                 .getVlanId()
                                 .getValue()));
@@ -92,7 +89,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
     private static void checkNotZeroSubinterface(@Nonnull InstanceIdentifier<?> id) {
         Long subifcIndex = id.firstKeyOf(Subinterface.class)
                 .getIndex();
-        Preconditions.checkArgument(subifcIndex != ZERO_SUBINTERFACE_ID,
+        Preconditions.checkArgument(subifcIndex != SubinterfaceReader.ZERO_SUBINTERFACE_ID,
                 "Vlan configuration is not allowed for .%s subinterface", subifcIndex);
 
     }

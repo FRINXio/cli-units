@@ -16,14 +16,13 @@
 
 package io.frinx.cli.ios.rib;
 
-import static io.frinx.cli.ios.IosDevices.IOS_ALL;
-
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ios.IosDevices;
 import io.frinx.cli.ios.rib.handler.AfiSafiReader;
 import io.frinx.cli.ios.rib.handler.Ipv4RoutesReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
@@ -53,7 +52,7 @@ public class RibUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = registry.registerTranslateUnit(IOS_ALL, this);
+        reg = registry.registerTranslateUnit(IosDevices.IOS_ALL, this);
     }
 
     public void close() {

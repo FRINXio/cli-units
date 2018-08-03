@@ -16,9 +16,7 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip6;
 
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6AddressReaderTest.OUTPUT;
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.Addresses;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
@@ -34,9 +32,9 @@ public class Ipv6ConfigReaderTest {
         final ConfigBuilder builder = new ConfigBuilder();
         final InstanceIdentifier idLocal = InstanceIdentifier.create(Addresses.class)
                 .child(Address.class, new AddressKey((new Ipv6AddressNoZone("FE80::C801:7FF:FEBC:1C"))));
-        Ipv6ConfigReader.parseAddressConfig(builder, OUTPUT, idLocal);
+        Ipv6ConfigReader.parseAddressConfig(builder, Ipv6AddressReaderTest.OUTPUT, idLocal);
 
-        assertEquals(new ConfigBuilder()
+        Assert.assertEquals(new ConfigBuilder()
                         .setIp(new Ipv6AddressNoZone("FE80::C801:7FF:FEBC:1C"))
                         .setPrefixLength((short) 64)
                         .build(),
@@ -44,9 +42,9 @@ public class Ipv6ConfigReaderTest {
 
         InstanceIdentifier idUnicast = InstanceIdentifier.create(Addresses.class)
                 .child(Address.class, new AddressKey((new Ipv6AddressNoZone("2002::1"))));
-        Ipv6ConfigReader.parseAddressConfig(builder, OUTPUT, idUnicast);
+        Ipv6ConfigReader.parseAddressConfig(builder, Ipv6AddressReaderTest.OUTPUT, idUnicast);
 
-        assertEquals(new ConfigBuilder()
+        Assert.assertEquals(new ConfigBuilder()
                 .setIp(new Ipv6AddressNoZone("2002::1"))
                 .setPrefixLength((short) 65)
                 .build(),
@@ -54,9 +52,9 @@ public class Ipv6ConfigReaderTest {
 
         idUnicast = InstanceIdentifier.create(Addresses.class)
                 .child(Address.class, new AddressKey((new Ipv6AddressNoZone("2003::1"))));
-        Ipv6ConfigReader.parseAddressConfig(builder, OUTPUT, idUnicast);
+        Ipv6ConfigReader.parseAddressConfig(builder, Ipv6AddressReaderTest.OUTPUT, idUnicast);
 
-        assertEquals(new ConfigBuilder()
+        Assert.assertEquals(new ConfigBuilder()
                 .setIp(new Ipv6AddressNoZone("2003::1"))
                 .setPrefixLength((short) 124)
                 .build(),

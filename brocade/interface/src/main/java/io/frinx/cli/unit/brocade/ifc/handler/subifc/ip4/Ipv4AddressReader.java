@@ -16,17 +16,14 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4;
 
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getIfcNumber;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getTypeOnDevice;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.parseType;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -64,9 +61,10 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            Class<? extends InterfaceType> ifcType = parseType(id);
-            String ifcNumber = getIfcNumber(id);
-            return parseAddressIds(blockingRead(String.format(SH_INTERFACE_IP, getTypeOnDevice(ifcType), ifcNumber),
+            Class<? extends InterfaceType> ifcType = InterfaceConfigReader.parseType(id);
+            String ifcNumber = InterfaceConfigReader.getIfcNumber(id);
+            return parseAddressIds(blockingRead(String.format(SH_INTERFACE_IP,
+                    InterfaceConfigReader.getTypeOnDevice(ifcType), ifcNumber),
                     cli, instanceIdentifier, readContext));
         } else {
             return Collections.emptyList();
@@ -75,7 +73,7 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
 
     @VisibleForTesting
     public static List<AddressKey> parseAddressIds(String output) {
-        return parseFields(output, 0,
+        return ParsingUtils.parseFields(output, 0,
             INTERFACE_IP_LINE::matcher,
             m -> m.group("ip"),
             addr -> new AddressKey(new Ipv4AddressNoZone(addr)));

@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.unit.acl.handler;
 
-import static io.frinx.cli.iosxr.unit.acl.handler.EgressAclSetConfigWriterTest.presetWriteContext;
-
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -66,8 +64,8 @@ public class IngressAclSetConfigWriterTest {
 
     @Test
     public void writeAclSet_LAGInterface_goldenPath() throws WriteFailedException {
-        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE, TestData.EGRESS_ACL_SETS_INIT_EMPTY, TestData
-                .INGRESS_ACL_SETS_INIT);
+        EgressAclSetConfigWriterTest.presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE,
+                TestData.EGRESS_ACL_SETS_INIT_EMPTY, TestData.INGRESS_ACL_SETS_INIT);
 
         final IngressAclSetConfigWriter writer = new IngressAclSetConfigWriter(cliMock);
 
@@ -79,8 +77,8 @@ public class IngressAclSetConfigWriterTest {
 
     @Test
     public void writeAclSet_multipleForOneType() throws WriteFailedException {
-        presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE, TestData.EGRESS_ACL_SETS_INIT_EMPTY, TestData
-                .INGRESS_ACL_SETS_MULTIPLE_FOR_TYPE);
+        EgressAclSetConfigWriterTest.presetWriteContext(context, TestData.INTERFACE_CORRECT_TYPE,
+                TestData.EGRESS_ACL_SETS_INIT_EMPTY, TestData.INGRESS_ACL_SETS_MULTIPLE_FOR_TYPE);
 
         final IngressAclSetConfigWriter writer = new IngressAclSetConfigWriter(cliMock);
 

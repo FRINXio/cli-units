@@ -16,8 +16,7 @@
 
 package io.frinx.cli.unit.ios.ifc.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -61,7 +60,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
         Matcher matcher = LOOPBACK_NAME_PATTERN.matcher(data.getName());
         try {
-            checkArgument(matcher.matches(),
+            Preconditions.checkArgument(matcher.matches(),
                     "Loopback name must be in format: Loopback45, not: %s", data.getName());
         } catch (RuntimeException e) {
             throw new WriteFailedException.CreateFailedException(id, data, e);
@@ -89,7 +88,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         try {
-            checkArgument(dataBefore.getType()
+            Preconditions.checkArgument(dataBefore.getType()
                             .equals(dataAfter.getType()),
                     "Changing interface type is not permitted. Before: %s, After: %s",
                     dataBefore.getType(), dataAfter.getType());
@@ -139,7 +138,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             throws WriteFailedException.DeleteFailedException {
         Matcher matcher = LOOPBACK_NAME_PATTERN.matcher(data.getName());
         try {
-            checkArgument(matcher.matches(),
+            Preconditions.checkArgument(matcher.matches(),
                     "Loopback name must be in format: Loopback45, not: %s", data.getName());
         } catch (RuntimeException e) {
             throw new WriteFailedException.DeleteFailedException(id, e);

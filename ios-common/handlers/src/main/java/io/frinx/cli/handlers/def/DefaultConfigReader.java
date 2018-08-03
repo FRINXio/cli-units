@@ -16,12 +16,11 @@
 
 package io.frinx.cli.handlers.def;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.registry.common.CompositeReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
@@ -43,7 +42,7 @@ public class DefaultConfigReader implements CliConfigReader<Config, ConfigBuilde
     }
 
     static boolean isDefault(InstanceIdentifier<?> instanceIdentifier) {
-        return instanceIdentifier.firstKeyOf(NetworkInstance.class).equals(DEFAULT_NETWORK);
+        return instanceIdentifier.firstKeyOf(NetworkInstance.class).equals(NetworInstance.DEFAULT_NETWORK);
     }
 
 }

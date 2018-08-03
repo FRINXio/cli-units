@@ -16,13 +16,12 @@
 
 package io.frinx.cli.iosxr.qos.handler.scheduler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -63,7 +62,7 @@ public class InputReader implements CliConfigListReader<Input, InputKey, InputBu
         //if seq = 1 meaning we want first class-map, do not skip anything as first matching is done (which removes the
         // timestamp and any other header), then the skipping takes place
         List<InputKey> keys = new ArrayList<>(1);
-        parseField(output, seq.intValue() - 1,
+        ParsingUtils.parseField(output, seq.intValue() - 1,
                 SchedulerReader.CLASS_NAME_LINE::matcher,
             m -> m.group("name"), k -> keys.add(new InputKey(k)));
         return keys;

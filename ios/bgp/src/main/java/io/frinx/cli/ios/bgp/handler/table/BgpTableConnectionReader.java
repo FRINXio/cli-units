@@ -16,14 +16,13 @@
 
 package io.frinx.cli.ios.bgp.handler.table;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -98,7 +97,7 @@ public class BgpTableConnectionReader implements
     }
 
     static Stream<Map.Entry<TableConnectionKey, Config>> getRedistributes(String output, Predicate<String> vrf) {
-        return NEWLINE.splitAsStream(output)
+        return ParsingUtils.NEWLINE.splitAsStream(output)
                 // Skip header line(s)
                 .map(String::trim)
                 .filter(vrf)
@@ -165,7 +164,7 @@ public class BgpTableConnectionReader implements
     static String realignOutput(String output) {
         output = output.replaceAll("\\n|\\r", "");
         output = output.replace("router bgp ", "\nrouter bgp ");
-        output = NEWLINE.splitAsStream(output)
+        output = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(s -> s.startsWith("router bgp"))
                 .findFirst()

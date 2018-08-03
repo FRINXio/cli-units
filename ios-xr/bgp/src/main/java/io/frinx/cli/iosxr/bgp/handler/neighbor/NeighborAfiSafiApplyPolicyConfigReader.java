@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.bgp.handler.neighbor;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -25,6 +23,7 @@ import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,7 +86,7 @@ public class NeighborAfiSafiApplyPolicyConfigReader implements BgpReader.BgpConf
                 .getValue()
                 .intValue(), instName, address, afiName), cli, instanceIdentifier, readContext);
 
-        List<String> importPolicy = NEWLINE.splitAsStream(output.trim())
+        List<String> importPolicy = ParsingUtils.NEWLINE.splitAsStream(output.trim())
                 .map(ROUTE_POLICY_IN_LINE::matcher)
                 .filter(Matcher::find)
                 .map(matcher -> matcher.group("policyName"))
@@ -98,13 +97,13 @@ public class NeighborAfiSafiApplyPolicyConfigReader implements BgpReader.BgpConf
         }
 
         List<String> exportPolicy;
-        exportPolicy = NEWLINE.splitAsStream(output.trim())
+        exportPolicy = ParsingUtils.NEWLINE.splitAsStream(output.trim())
                 .map(ROUTE_POLICY_OUT_LINE::matcher)
                 .filter(Matcher::find)
                 .map(matcher -> matcher.group("policyName"))
                 .collect(Collectors.toList());
 
-        if (NEWLINE.splitAsStream(output.trim())
+        if (ParsingUtils.NEWLINE.splitAsStream(output.trim())
                 .map(NEXT_HOP_SELF_LINE::matcher)
                 .anyMatch(Matcher::find)) {
             exportPolicy.add(NEXTHOPSELF_POLICY_NAME);

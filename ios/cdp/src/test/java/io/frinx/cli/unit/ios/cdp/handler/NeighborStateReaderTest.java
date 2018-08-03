@@ -16,8 +16,7 @@
 
 package io.frinx.cli.unit.ios.cdp.handler;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp.neighbor.top.neighbors.neighbor.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp.neighbor.top.neighbors.neighbor.StateBuilder;
@@ -76,15 +75,15 @@ public class NeighborStateReaderTest {
     public void parseNeighborStateFields() throws Exception {
         StateBuilder stateBuilder = new StateBuilder();
         NeighborStateReader.parseNeighborStateFields(stateBuilder, IOS_OUTPUT, "PE2.demo.frinx.io");
-        assertEquals(IOS_EXPECTED1, stateBuilder.build());
+        Assert.assertEquals(IOS_EXPECTED1, stateBuilder.build());
 
         stateBuilder = new StateBuilder();
         NeighborStateReader.parseNeighborStateFields(stateBuilder, IOS_OUTPUT, "TELNET");
-        assertEquals(IOS_EXPECTED2, stateBuilder.build());
+        Assert.assertEquals(IOS_EXPECTED2, stateBuilder.build());
 
         stateBuilder = new StateBuilder();
         NeighborStateReader.parseNeighborStateFields(stateBuilder, XE_OUTPUT, "TELNET");
-        assertEquals(XE_EXPECTED, stateBuilder.build());
+        Assert.assertEquals(XE_EXPECTED, stateBuilder.build());
     }
 
 }

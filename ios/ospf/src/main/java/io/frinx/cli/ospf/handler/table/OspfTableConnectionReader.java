@@ -16,14 +16,13 @@
 
 package io.frinx.cli.ospf.handler.table;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -97,11 +96,11 @@ public class OspfTableConnectionReader implements
 
     private static Stream<Map.Entry<TableConnectionKey, Config>> getRedistributes(String output, Predicate<String>
             vrf) {
-        return NEWLINE.splitAsStream(output)
+        return ParsingUtils.NEWLINE.splitAsStream(output)
                 // Skip header line(s)
                 .map(String::trim)
                 .filter(vrf)
-                .flatMap(line -> NEWLINE.splitAsStream(line.replaceAll("redistribute", "\nredistribute")))
+                .flatMap(line -> ParsingUtils.NEWLINE.splitAsStream(line.replaceAll("redistribute", "\nredistribute")))
                 .map(String::trim)
                 .map(REDIS_LINE::matcher)
                 .filter(Matcher::matches)
@@ -152,7 +151,7 @@ public class OspfTableConnectionReader implements
     private static String realignOutput(String output) {
         output = output.replaceAll("\\n|\\r", "");
         output = output.replace("router ospf ", "\nrouter ospf ");
-        output = NEWLINE.splitAsStream(output)
+        output = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(s -> s.startsWith("router ospf"))
                 .reduce((s1, s2) -> s1 + "\n" + s2)

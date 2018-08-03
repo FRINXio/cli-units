@@ -16,11 +16,10 @@
 
 package io.frinx.cli.unit.ios.cdp.handler;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp.neighbor.top.neighbors.NeighborKey;
 
@@ -45,7 +44,7 @@ public class NeighborReaderTest {
 
     @Test
     public void parseNeighborIds() throws Exception {
-        assertEquals(IOS_EXPECTED, NeighborReader.parseNeighborIds(IOS_OUTPUT));
+        Assert.assertEquals(IOS_EXPECTED, NeighborReader.parseNeighborIds(IOS_OUTPUT));
     }
 
 }

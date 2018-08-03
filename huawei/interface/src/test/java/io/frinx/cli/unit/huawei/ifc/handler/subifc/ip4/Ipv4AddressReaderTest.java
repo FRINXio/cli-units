@@ -16,12 +16,11 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.AddressKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
@@ -54,13 +53,13 @@ public class Ipv4AddressReaderTest {
     public void testParse() throws Exception {
         List<AddressKey> addressKeys = Ipv4AddressReader.parseAddressIds(DISPLAY_IP_INT_BR_OUTPUT);
         ArrayList<AddressKey> expected = Lists.newArrayList(new AddressKey(new Ipv4AddressNoZone("10.230.10.1")));
-        assertEquals(expected, addressKeys);
+        Assert.assertEquals(expected, addressKeys);
     }
 
     @Test
     public void testParseNoIpAddress() {
         List<AddressKey> addressKeys = Ipv4AddressReader.parseAddressIds(DISPLAY_IP_INT_BR_NO_IP_OUTPUT);
         List<AddressKey> expected = Collections.emptyList();
-        assertEquals(expected, addressKeys);
+        Assert.assertEquals(expected, addressKeys);
     }
 }

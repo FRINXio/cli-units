@@ -16,19 +16,14 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4;
 
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getIfcNumber;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getTypeOnDevice;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.parseType;
-import static io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4AddressReader.INTERFACE_IP_LINE;
-import static io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4AddressReader.SH_INTERFACE_IP;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.AddressBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
@@ -65,22 +60,23 @@ public class Ipv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId
                 == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            Class<? extends InterfaceType> ifcType = parseType(name);
-            String ifcNumber = getIfcNumber(name);
-            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, getTypeOnDevice(ifcType),
+            Class<? extends InterfaceType> ifcType = InterfaceConfigReader.parseType(name);
+            String ifcNumber = InterfaceConfigReader.getIfcNumber(name);
+            parseAddressConfig(configBuilder, blockingRead(String.format(Ipv4AddressReader.SH_INTERFACE_IP,
+                    InterfaceConfigReader.getTypeOnDevice(ifcType),
                     ifcNumber), cli, id, readContext));
         }
     }
 
     @VisibleForTesting
     static void parseAddressConfig(ConfigBuilder configBuilder, String output) {
-        parseField(output,
-            INTERFACE_IP_LINE::matcher,
+        ParsingUtils.parseField(output,
+            Ipv4AddressReader.INTERFACE_IP_LINE::matcher,
             m -> new Ipv4AddressNoZone(m.group("ip")),
             configBuilder::setIp);
 
-        parseField(output,
-            INTERFACE_IP_LINE::matcher,
+        ParsingUtils.parseField(output,
+            Ipv4AddressReader.INTERFACE_IP_LINE::matcher,
             m -> Short.parseShort(m.group("prefix")),
             configBuilder::setPrefixLength);
     }

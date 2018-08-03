@@ -16,12 +16,11 @@
 
 package io.frinx.cli.iosxr.logging.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,7 +66,7 @@ public class LoggingInterfacesReader implements CliConfigReader<Interfaces, Inte
         String output = blockingRead(SH_RUN_INTERFACE_LOGGING, cli, id, ctx);
         String realignedOutput = realignLoggingEnabledInterfacesOutput(output);
 
-        List<InterfaceKey> ifcKeyes = NEWLINE.splitAsStream(realignedOutput)
+        List<InterfaceKey> ifcKeyes = ParsingUtils.NEWLINE.splitAsStream(realignedOutput)
                 .map(String::trim)
                 .filter(ifcLine -> ifcLine.contains("logging events link-status"))
                 .map(ifcLine -> ifcLine.split(" ")[0])
@@ -99,7 +98,7 @@ public class LoggingInterfacesReader implements CliConfigReader<Interfaces, Inte
     }
 
     private static String realignLoggingEnabledInterfacesOutput(String output) {
-        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), "");
+        String withoutNewlines = output.replaceAll(ParsingUtils.NEWLINE.pattern(), "");
         return withoutNewlines.replace("interface ", "\n");
     }
 

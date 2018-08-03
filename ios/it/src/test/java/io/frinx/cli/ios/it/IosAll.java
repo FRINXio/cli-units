@@ -54,6 +54,7 @@ import io.frinx.cli.unit.ios.ifc.IosInterfaceUnit;
 import io.frinx.cli.unit.ios.init.IosCliInitializerUnit;
 import io.frinx.cli.unit.ios.lldp.LldpUnit;
 import io.frinx.cli.unit.ios.network.instance.IosNetworkInstanceUnit;
+import io.frinx.cli.utils.NoopDataBroker;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.io.StringWriter;
 import java.net.InetSocketAddress;
@@ -70,6 +71,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -206,7 +208,8 @@ public class IosAll {
 
         // Get DOM brokers
         DataTree dataTree = getDataTree(schemaCtx, TreeType.CONFIGURATION);
-        domBroker = getDomBroker(schemaCtx, NOOP_DATA_BROKER, codec, readerRegistry, writerRegistry, dataTree);
+        domBroker = getDomBroker(schemaCtx, NoopDataBroker.NOOP_DATA_BROKER, codec, readerRegistry, writerRegistry,
+                dataTree);
 
         // Get & register RPC handlers
         RpcRegistryBuilder rpcRegBuilder = new RpcRegistryBuilder();
@@ -237,14 +240,15 @@ public class IosAll {
     }
 
     private void mockBroker() {
-        doReturn(Futures.immediateCheckedFuture(null)).when(mockTx).submit();
-        doReturn(mock(ReadOnlyTransaction.class)).when(mockBroker).newReadOnlyTransaction();
-        doReturn(mockTx).when(mockBroker).newReadWriteTransaction();
-        doReturn(mockTx).when(mockBroker).newWriteOnlyTransaction();
-        doReturn(mockTxChain).when(mockBroker).createTransactionChain(any(TransactionChainListener.class));
-        doReturn(mock(ReadOnlyTransaction.class)).when(mockTxChain).newReadOnlyTransaction();
-        doReturn(mockTx).when(mockTxChain).newReadWriteTransaction();
-        doReturn(mockTx).when(mockTxChain).newWriteOnlyTransaction();
+        Mockito.doReturn(Futures.immediateCheckedFuture(null)).when(mockTx).submit();
+        Mockito.doReturn(Mockito.mock(ReadOnlyTransaction.class)).when(mockBroker).newReadOnlyTransaction();
+        Mockito.doReturn(mockTx).when(mockBroker).newReadWriteTransaction();
+        Mockito.doReturn(mockTx).when(mockBroker).newWriteOnlyTransaction();
+        Mockito.doReturn(mockTxChain).when(mockBroker)
+                .createTransactionChain(Mockito.any(TransactionChainListener.class));
+        Mockito.doReturn(Mockito.mock(ReadOnlyTransaction.class)).when(mockTxChain).newReadOnlyTransaction();
+        Mockito.doReturn(mockTx).when(mockTxChain).newReadWriteTransaction();
+        Mockito.doReturn(mockTx).when(mockTxChain).newWriteOnlyTransaction();
     }
 
     protected TranslateRegistryImpl getTranslateRegistry(DataBroker mockBroker) {

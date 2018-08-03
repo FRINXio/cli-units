@@ -16,16 +16,13 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6;
 
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.concurrent.CompletableFuture;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -92,7 +89,8 @@ public class Ipv6AdvertisementConfigReaderTest {
 
         reader.parseAdvertisementConfig(cliOutput, builder);
 
-        Assert.assertThat(builder.isSuppress(), anyOf(is(nullValue()), is(false)));
+        Assert.assertThat(builder.isSuppress(), CoreMatchers.anyOf(CoreMatchers.is(CoreMatchers.nullValue()),
+                CoreMatchers.is(false)));
     }
 
     @Test

@@ -16,9 +16,7 @@
 
 package io.frinx.cli.unit.ios.lldp.handler;
 
-import static io.frinx.cli.unit.ios.lldp.handler.NeighborReaderTest.SH_LLDP_NEIGHBOR;
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp.neighbor.top.neighbors.neighbor.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp.neighbor.top.neighbors.neighbor.StateBuilder;
@@ -50,14 +48,16 @@ public class NeighborStateReaderTest {
     @Test
     public void testParseNeighborStateFields() {
         StateBuilder stateBuilder = new StateBuilder();
-        NeighborStateReader.parseNeighborStateFields(NeighborStateReader.extractSingleNeighbor(SH_LLDP_NEIGHBOR,
+        NeighborStateReader.parseNeighborStateFields(
+                NeighborStateReader.extractSingleNeighbor(NeighborReaderTest.SH_LLDP_NEIGHBOR,
                 "001e.bdb2.5200 Port:Gi3"), "001e.bdb2.5200 Port:Gi3", stateBuilder);
-        assertEquals(IOS_EXPECTED1, stateBuilder.build());
+        Assert.assertEquals(IOS_EXPECTED1, stateBuilder.build());
 
         stateBuilder = new StateBuilder();
-        NeighborStateReader.parseNeighborStateFields(NeighborStateReader.extractSingleNeighbor(SH_LLDP_NEIGHBOR,
+        NeighborStateReader.parseNeighborStateFields(
+                NeighborStateReader.extractSingleNeighbor(NeighborReaderTest.SH_LLDP_NEIGHBOR,
                 "0261.826a.a405 Port:Gi0/0/0/4"), "0261.826a.a405 Port:Gi0/0/0/4", stateBuilder);
-        assertEquals(IOS_EXPECTED2, stateBuilder.build());
+        Assert.assertEquals(IOS_EXPECTED2, stateBuilder.build());
     }
 
 }

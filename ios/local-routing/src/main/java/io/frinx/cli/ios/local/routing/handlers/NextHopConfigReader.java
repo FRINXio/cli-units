@@ -16,14 +16,13 @@
 
 package io.frinx.cli.ios.local.routing.handlers;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.local.routing.common.LrReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
@@ -63,7 +62,7 @@ public class NextHopConfigReader implements LrReader.LrConfigReader<Config, Conf
         NextHopKey nextHopKey = id.firstKeyOf(NextHop.class);
         String index = nextHopKey.getIndex();
 
-        String showCommand = vrfKey.equals(DEFAULT_NETWORK)
+        String showCommand = vrfKey.equals(NetworInstance.DEFAULT_NETWORK)
                 ? String.format(SHOW_IP_STATIC_ROUTE_DEFAULT, ipPrefix, switchIndex(index))
                 : String.format(SHOW_IP_STATIC_ROUTE_VRF, vrfKey.getName(), ipPrefix, switchIndex(index));
 

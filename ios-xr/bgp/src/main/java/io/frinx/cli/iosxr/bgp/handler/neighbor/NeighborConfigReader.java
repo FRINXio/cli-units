@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.bgp.handler.neighbor;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -106,7 +104,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
     public static void readNeighbor(final String output, final ConfigBuilder configBuilder, final String
             neighborAddress) {
 
-        String neighbor = NEWLINE.splitAsStream(realignOutput(output))
+        String neighbor = ParsingUtils.NEWLINE.splitAsStream(realignOutput(output))
                 .filter(neighborLine -> neighborLine.contains(neighborAddress))
                 .findFirst()
                 .orElse("");

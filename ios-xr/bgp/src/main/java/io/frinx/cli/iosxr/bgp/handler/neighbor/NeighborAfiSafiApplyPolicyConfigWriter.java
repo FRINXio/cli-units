@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.bgp.handler.neighbor;
 
-import static io.frinx.cli.iosxr.bgp.handler.neighbor.NeighborAfiSafiApplyPolicyConfigReader.NEXTHOPSELF_POLICY_NAME;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -77,7 +75,7 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
                         .getValue()),
                 "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class)
                         .getAfiSafiName()),
-                "nexthopself", NEXTHOPSELF_POLICY_NAME,
+                "nexthopself", NeighborAfiSafiApplyPolicyConfigReader.NEXTHOPSELF_POLICY_NAME,
                 "config", config),
                 cli, id, config);
     }
@@ -109,7 +107,7 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
                         .getValue()),
                 "afiSafi", GlobalAfiSafiReader.transformAfiToString(id.firstKeyOf(AfiSafi.class)
                         .getAfiSafiName()),
-                "nexthopself", NEXTHOPSELF_POLICY_NAME,
+                "nexthopself", NeighborAfiSafiApplyPolicyConfigReader.NEXTHOPSELF_POLICY_NAME,
                 "config", config,
                 "delete", true),
                 cli, id, config);

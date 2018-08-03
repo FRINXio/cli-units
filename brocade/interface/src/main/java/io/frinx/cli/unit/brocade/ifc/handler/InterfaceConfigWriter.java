@@ -16,8 +16,7 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -59,7 +58,8 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
             throws WriteFailedException.CreateFailedException {
 
         Matcher matcher = LOOPBACK_NAME_PATTERN.matcher(data.getName());
-        checkArgument(matcher.matches(), "Loopback name must be in format: Loopback45, not: %s", data.getName());
+        Preconditions.checkArgument(matcher.matches(), "Loopback name must be in format: Loopback45, not: %s",
+                data.getName());
 
         blockingWriteAndRead(cli, id, data,
                 "configure terminal",
@@ -81,7 +81,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        checkArgument(dataBefore.getType().equals(dataAfter.getType()),
+        Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
                     "Changing interface type is not permitted. Before: %s, After: %s",
                     dataBefore.getType(), dataAfter.getType());
 
@@ -127,7 +127,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     private void deleteLoopbackInterface(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException.DeleteFailedException {
         Matcher matcher = LOOPBACK_NAME_PATTERN.matcher(data.getName());
-        checkArgument(matcher.matches(),
+        Preconditions.checkArgument(matcher.matches(),
                     "Loopback name must be in format: Loopback45, not: %s", data.getName());
 
         blockingDeleteAndRead(cli, id,

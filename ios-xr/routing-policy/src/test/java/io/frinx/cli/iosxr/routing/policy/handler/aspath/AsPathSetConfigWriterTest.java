@@ -16,11 +16,10 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.aspath;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import io.frinx.cli.unit.utils.CliFormatter;
 import java.util.Collections;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.as.path.sets.as.path.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.as.path.sets.as.path.set.ConfigBuilder;
@@ -59,9 +58,9 @@ public class AsPathSetConfigWriterTest implements CliFormatter {
     @Test
     public void testWrite() throws Exception {
         String output = fT(AsPathSetConfigWriter.TEMPLATE, "config", CFG_1);
-        assertEquals(OUTPUT_1, output);
+        Assert.assertEquals(OUTPUT_1, output);
 
         output = fT(AsPathSetConfigWriter.TEMPLATE, "config", CFG_2);
-        assertEquals(OUTPUT_2, output);
+        Assert.assertEquals(OUTPUT_2, output);
     }
 }

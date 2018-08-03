@@ -16,18 +16,14 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigReader.DESCR_LINE;
-import static io.frinx.cli.unit.ios.ifc.handler.InterfaceStateReader.SH_SINGLE_INTERFACE;
-import static io.frinx.cli.unit.ios.ifc.handler.InterfaceStateReader.STATUS_LINE;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigReader;
+import io.frinx.cli.unit.ios.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.utils.CliOperReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceCommonState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
@@ -53,13 +49,13 @@ public class SubinterfaceStateReader implements CliOperReader<State, StateBuilde
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
 
         // Only parse configuration for non 0 subifc
-        if (subKey.getIndex() == ZERO_SUBINTERFACE_ID) {
+        if (subKey.getIndex() == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             return;
         }
 
-        String subIfcName = getSubinterfaceName(id);
+        String subIfcName = SubinterfaceReader.getSubinterfaceName(id);
 
-        String cmd = String.format(SH_SINGLE_INTERFACE, subIfcName);
+        String cmd = String.format(InterfaceStateReader.SH_SINGLE_INTERFACE, subIfcName);
         parseInterfaceState(blockingRead(cmd, cli, id, ctx), builder, subKey.getIndex(), subIfcName);
     }
 
@@ -68,21 +64,21 @@ public class SubinterfaceStateReader implements CliOperReader<State, StateBuilde
         builder.setName(name);
         builder.setIndex(index);
 
-        parseField(output,
-                STATUS_LINE::matcher,
+        ParsingUtils.parseField(output,
+            InterfaceStateReader.STATUS_LINE::matcher,
             matcher -> InterfaceCommonState.AdminStatus.valueOf(matcher.group("admin").toUpperCase()),
             adminStatus -> {
                 builder.setAdminStatus(adminStatus);
                 builder.setEnabled(adminStatus == InterfaceCommonState.AdminStatus.UP);
             });
 
-        parseField(output,
-                STATUS_LINE::matcher,
+        ParsingUtils.parseField(output,
+            InterfaceStateReader.STATUS_LINE::matcher,
             matcher -> InterfaceCommonState.OperStatus.valueOf(matcher.group("line").toUpperCase()),
                 builder::setOperStatus);
 
-        parseField(output,
-                DESCR_LINE::matcher,
+        ParsingUtils.parseField(output,
+            InterfaceConfigReader.DESCR_LINE::matcher,
             matcher -> matcher.group("desc"),
                 builder::setDescription);
     }

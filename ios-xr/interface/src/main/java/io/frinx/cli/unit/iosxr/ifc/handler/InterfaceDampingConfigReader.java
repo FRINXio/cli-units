@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler;
 
-import static io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -55,7 +53,8 @@ public class InterfaceDampingConfigReader implements CliConfigReader<Config, Con
         String ifcName = id.firstKeyOf(Interface.class)
                 .getName();
 
-        parseDamping(blockingRead(String.format(SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx), builder);
+        parseDamping(blockingRead(String.format(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, ifcName),
+                cli, id, ctx), builder);
     }
 
     private static Pattern DAMPING_ENABLED = Pattern.compile("\\s*dampening.*");

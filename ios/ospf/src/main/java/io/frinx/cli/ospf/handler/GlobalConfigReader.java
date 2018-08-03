@@ -16,13 +16,12 @@
 
 package io.frinx.cli.ospf.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -60,7 +59,7 @@ public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, C
 
         output = output.replace("router ospf", "\nrouter ospf");
 
-        NEWLINE.splitAsStream(output)
+        ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(s -> s.startsWith("router ospf " + ospfId))
                 .map(ROUTER_ID::matcher)

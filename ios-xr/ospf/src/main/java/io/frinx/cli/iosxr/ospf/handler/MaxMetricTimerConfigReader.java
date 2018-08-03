@@ -16,14 +16,13 @@
 
 package io.frinx.cli.iosxr.ospf.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
@@ -75,7 +74,7 @@ public class MaxMetricTimerConfigReader implements OspfReader.OspfConfigReader<C
     public static void parseTimers(String output, ConfigBuilder builder) {
 
         Set<Class<? extends MAXMETRICINCLUDE>> includes = new HashSet<>();
-        for (String line : output.split(NEWLINE.pattern())) {
+        for (String line : output.split(ParsingUtils.NEWLINE.pattern())) {
             Matcher matcher = MaxMetricTimerReader.MAX_METRIC_LINE.matcher(line);
             if (!matcher.find()) {
                 continue;

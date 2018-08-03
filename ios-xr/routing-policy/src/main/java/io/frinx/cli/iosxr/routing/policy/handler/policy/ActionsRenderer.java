@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.policy;
 
-import static io.frinx.cli.iosxr.routing.policy.handler.policy.ActionsParser.MED_TYPE4_VALUE;
-
 import io.frinx.cli.unit.utils.CliFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,7 +86,7 @@ class ActionsRenderer {
             + "{.endif}";
 
     private static final String SET_MED_TEMPLATE = "{.if ($config.config.set_med.uint32 == "
-            + MED_TYPE4_VALUE
+            + ActionsParser.MED_TYPE4_VALUE
             + ")}set med max-reachable{.endif}"
             + "{.if ($config.config.set_med.uint32)}set med {$config.config.set_med.uint32}{.endif}"
             + "{.if ($config.config.set_med.enumeration == IGP)}set med igp-cost{.endif}"

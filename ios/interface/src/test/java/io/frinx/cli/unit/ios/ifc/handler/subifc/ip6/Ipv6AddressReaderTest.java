@@ -16,12 +16,11 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip6;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6AddressNoZone;
@@ -45,6 +44,6 @@ public class Ipv6AddressReaderTest {
         expected.add((new AddressKey(new Ipv6AddressNoZone("2002::1"))));
         expected.add((new AddressKey(new Ipv6AddressNoZone("2003::1"))));
 
-        assertEquals(expected, actual.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+        Assert.assertEquals(expected, actual.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
 }

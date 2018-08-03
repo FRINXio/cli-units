@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.ospf.handler;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -27,6 +25,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -58,7 +57,8 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
                 .getName();
 
         // TODO We should add this check in all descendant readers
-        Preconditions.checkArgument(DEFAULT_NETWORK_NAME.equals(vrfId), "VRF-aware OSPF is not supported");
+        Preconditions.checkArgument(NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfId),
+                "VRF-aware OSPF is not supported");
 
         String output = blockingRead(SH_RUN_OSPF, cli, instanceIdentifier, readContext);
 

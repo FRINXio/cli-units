@@ -16,14 +16,12 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler;
 
-import static io.frinx.cli.unit.huawei.ifc.handler.InterfaceConfigReader.parseType;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceCommonState;
@@ -70,9 +68,9 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
     // TODO Parametrize logs with instanceId
     static void parseInterfaceState(final String output, final StateBuilder builder, final String name) {
         builder.setName(name);
-        builder.setType(parseType(name));
+        builder.setType(InterfaceConfigReader.parseType(name));
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             ADMIN_STATUS_LINE::matcher,
             matcher -> InterfaceCommonState.AdminStatus.valueOf(matcher.group("admin").toUpperCase()),
             adminStatus -> {
@@ -88,7 +86,7 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
             builder.setEnabled(false);
         }
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             OPER_STATUS_LINE::matcher,
             matcher -> InterfaceCommonState.OperStatus.valueOf(matcher.group("oper").toUpperCase()),
             builder::setOperStatus);
@@ -99,12 +97,12 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
             builder.setOperStatus(InterfaceCommonState.OperStatus.UNKNOWN);
         }
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             MTU_LINE::matcher,
             matcher -> Integer.valueOf(matcher.group("mtu")),
             builder::setMtu);
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             DESCR_LINE::matcher,
             matcher -> matcher.group("desc"),
             builder::setDescription);

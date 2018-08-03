@@ -16,15 +16,12 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigWriter.PHYS_IFC_TYPES;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
-
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -67,10 +64,10 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                 .getConfig()
                 .getType();
 
-        if (PHYS_IFC_TYPES.contains(parentIfcType)) {
+        if (InterfaceConfigWriter.PHYS_IFC_TYPES.contains(parentIfcType)) {
             blockingWriteAndRead(cli, id, data,
                     "configure terminal",
-                    f("interface %s", getSubinterfaceName(id)),
+                    f("interface %s", SubinterfaceReader.getSubinterfaceName(id)),
                     f("description %s", data.getDescription()),
                     data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
                     "end");
@@ -83,7 +80,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
 
     private static boolean isZeroSubinterface(@Nonnull InstanceIdentifier<?> id) {
         Long subifcIndex = id.firstKeyOf(Subinterface.class).getIndex();
-        return subifcIndex == ZERO_SUBINTERFACE_ID;
+        return subifcIndex == SubinterfaceReader.ZERO_SUBINTERFACE_ID;
     }
 
     @Override
@@ -111,10 +108,10 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                 .getConfig()
                 .getType();
 
-        if (PHYS_IFC_TYPES.contains(parentIfcType)) {
+        if (InterfaceConfigWriter.PHYS_IFC_TYPES.contains(parentIfcType)) {
             blockingDeleteAndRead(cli, id,
                     "configure terminal",
-                    f("no interface %s", getSubinterfaceName(id)),
+                    f("no interface %s", SubinterfaceReader.getSubinterfaceName(id)),
                     "end");
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,

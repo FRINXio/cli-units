@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.huawei.bgp.handler.neighbor;
 
-import static io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborAfiSafiReader.getNeighborIp;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpReader;
@@ -69,7 +67,8 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        String ipAddress = getNeighborIp(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
+        String ipAddress = NeighborAfiSafiReader.getNeighborIp(
+                instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
 
         configBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
         parseConfigAttributes(blockingRead(String.format(DISPLAY_PEER_CONFIG, ipAddress), cli, instanceIdentifier,

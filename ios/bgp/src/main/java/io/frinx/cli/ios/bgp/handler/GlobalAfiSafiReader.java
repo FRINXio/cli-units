@@ -16,13 +16,12 @@
 
 package io.frinx.cli.ios.bgp.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
 import java.util.Optional;
@@ -76,7 +75,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     private static String realignOutput(String output) {
         output = output.replaceAll("\\n|\\r", "");
         output = output.replace("router bgp ", "\nrouter bgp");
-        output = NEWLINE.splitAsStream(output)
+        output = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(s -> s.startsWith("router bgp"))
                 .findFirst()
@@ -103,7 +102,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     static List<AfiSafiKey> getAfiKeys(String output, String vrf) {
         output = realignOutput(output);
 
-        return NEWLINE.splitAsStream(output)
+        return ParsingUtils.NEWLINE.splitAsStream(output)
                 // Skip header line(s)
                 .map(String::trim)
                 .map(FAMILY_VRF_LINE::matcher)
@@ -121,7 +120,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     static List<AfiSafiKey> getDefaultAfiKeys(String output) {
         output = realignOutput(output);
 
-        return NEWLINE.splitAsStream(output)
+        return ParsingUtils.NEWLINE.splitAsStream(output)
                 // Skip header line(s)
                 .map(String::trim)
                 .map(FAMILY_LINE::matcher)

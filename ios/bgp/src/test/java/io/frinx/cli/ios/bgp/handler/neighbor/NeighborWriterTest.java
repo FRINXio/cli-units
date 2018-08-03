@@ -16,17 +16,6 @@
 
 package io.frinx.cli.ios.bgp.handler.neighbor;
 
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.NEIGHBOR_VRF_DELETE;
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.deleteNeighbor;
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.getAfiSafisForNeighbor;
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.renderNeighbor;
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.renderNeighborAfiRemoval;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.frinx.cli.io.Cli;
@@ -46,7 +35,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.verification.VerificationModeFactory;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupTransportConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflectorBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafiBuilder;
@@ -154,12 +145,12 @@ public class NeighborWriterTest implements CliFormatter {
 
         CompletableFuture<String> output = new CompletableFuture<>();
         output.complete("");
-        doReturn(output).when(cli).executeAndRead(any(Command.class));
-        CliWriter writer = spy(new NeighborWriter(cli));
+        Mockito.doReturn(output).when(cli).executeAndRead(Mockito.any(Command.class));
+        CliWriter writer = Mockito.spy(new NeighborWriter(cli));
 
-        Map<String, Object> afiSafisForNeighborSource = getAfiSafisForNeighbor(bgpConfig, getAfiSafisForNeighbor(
-                source.getAfiSafis()));
-        renderNeighbor(writer, cli, id,
+        Map<String, Object> afiSafisForNeighborSource = NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
+                NeighborWriter.getAfiSafisForNeighbor(source.getAfiSafis()));
+        NeighborWriter.renderNeighbor(writer, cli, id,
                 source, null, source.getConfig().isEnabled(), null, id.firstKeyOf(NetworkInstance.class), as,
                 afiSafisForNeighborSource, Collections.emptyMap(),
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), NeighborWriter.NEIGHBOR_GLOBAL,
@@ -169,18 +160,18 @@ public class NeighborWriterTest implements CliFormatter {
         Assert.assertEquals(write, writeRender);
 
         if (after != null) {
-            Map<String, Object> afiSafisForNeighborAfter = getAfiSafisForNeighbor(bgpConfig, getAfiSafisForNeighbor(
-                    after.getAfiSafis()));
+            Map<String, Object> afiSafisForNeighborAfter = NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
+                    NeighborWriter.getAfiSafisForNeighbor(after.getAfiSafis()));
             Map<String, Object> afiToRemove = Maps.difference(afiSafisForNeighborSource, afiSafisForNeighborAfter)
                     .entriesOnlyOnLeft();
 
-            renderNeighborAfiRemoval(writer, cli, id,
+            NeighborWriter.renderNeighborAfiRemoval(writer, cli, id,
                     after, id.firstKeyOf(NetworkInstance.class), as, afiToRemove, NeighborWriter.getNeighborIp(after
                             .getNeighborAddress()),
-                    NeighborWriter.NEIGHBOR_GLOBAL_DELETE_AFI, NEIGHBOR_VRF_DELETE);
+                    NeighborWriter.NEIGHBOR_GLOBAL_DELETE_AFI, NeighborWriter.NEIGHBOR_VRF_DELETE);
             String updateAfiSafiRender = getCommands(writer, false, 2);
 
-            renderNeighbor(writer, cli, id,
+            NeighborWriter.renderNeighbor(writer, cli, id,
                     after, source, after.getConfig().isEnabled(), source.getConfig().isEnabled(), id.firstKeyOf(
                             NetworkInstance.class), as, afiSafisForNeighborAfter, afiSafisForNeighborSource,
                     NeighborWriter.getNeighborIp(after.getNeighborAddress()), NeighborWriter.NEIGHBOR_GLOBAL,
@@ -190,9 +181,9 @@ public class NeighborWriterTest implements CliFormatter {
             Assert.assertEquals(update, updateRender.trim());
         }
 
-        deleteNeighbor(writer, cli, id,
-                source, id.firstKeyOf(NetworkInstance.class), as, getAfiSafisForNeighbor(bgpConfig,
-                        getAfiSafisForNeighbor(source.getAfiSafis())),
+        NeighborWriter.deleteNeighbor(writer, cli, id,
+                source, id.firstKeyOf(NetworkInstance.class), as, NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
+                        NeighborWriter.getAfiSafisForNeighbor(source.getAfiSafis())),
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), NeighborWriter.NEIGHBOR_GLOBAL_DELETE,
                 NeighborWriter.NEIGHBOR_VRF_DELETE);
 
@@ -213,11 +204,11 @@ public class NeighborWriterTest implements CliFormatter {
     public static String getCommands(CliWriter writer, boolean isDelete, int times) throws Exception {
         ArgumentCaptor<String> commandsCaptor = ArgumentCaptor.forClass(String.class);
         if (isDelete) {
-            verify(writer, times(times)).blockingDeleteAndRead(commandsCaptor.capture(), any(Cli.class), any(
-                    InstanceIdentifier.class));
+            Mockito.verify(writer, VerificationModeFactory.times(times)).blockingDeleteAndRead(commandsCaptor.capture(),
+                    Mockito.any(Cli.class), Mockito.any(InstanceIdentifier.class));
         } else {
-            verify(writer, times(times)).blockingWriteAndRead(commandsCaptor.capture(), any(Cli.class), any(
-                    InstanceIdentifier.class), any(DataObject.class));
+            Mockito. verify(writer, VerificationModeFactory.times(times)).blockingWriteAndRead(commandsCaptor.capture(),
+                    Mockito.any(Cli.class), Mockito.any(InstanceIdentifier.class), Mockito.any(DataObject.class));
         }
         return commandsCaptor.getAllValues().get(times - 1);
     }

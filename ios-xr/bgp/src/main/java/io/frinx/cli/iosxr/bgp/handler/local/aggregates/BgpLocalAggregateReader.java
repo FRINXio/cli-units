@@ -16,13 +16,12 @@
 
 package io.frinx.cli.iosxr.bgp.handler.local.aggregates;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -84,7 +83,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
                 .getValue()
                 .intValue(), instName), cli, instanceIdentifier, readContext);
 
-        return NEWLINE.splitAsStream(output.trim())
+        return ParsingUtils.NEWLINE.splitAsStream(output.trim())
                 .map(NETWORK_LINE::matcher)
                 .filter(Matcher::find)
                 .map(matcher -> matcher.group("prefix"))
@@ -108,7 +107,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
                 .getValue()
                 .intValue(), instName), cli, instanceIdentifier, readContext);
 
-        Optional<String> policies = NEWLINE.splitAsStream(output.trim())
+        Optional<String> policies = ParsingUtils.NEWLINE.splitAsStream(output.trim())
                 .map(NETWORK_LINE::matcher)
                 .filter(Matcher::find)
                 .filter(matcher -> matcher.group("prefix")

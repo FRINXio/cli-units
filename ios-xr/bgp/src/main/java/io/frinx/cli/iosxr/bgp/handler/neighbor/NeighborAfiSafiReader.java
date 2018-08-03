@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.bgp.handler.neighbor;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -117,7 +115,7 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
         String output = blockingRead(String.format(SH_AFI_SECTION, globalConfig.getAs()
                         .getValue(), insName, neighborIp,
                 GlobalAfiSafiReader.transformAfiToString(name)), cli, instanceIdentifier, readContext);
-        Optional<Matcher> reconfigMatch = NEWLINE.splitAsStream(output.trim())
+        Optional<Matcher> reconfigMatch = ParsingUtils.NEWLINE.splitAsStream(output.trim())
                 .map(SOFT_RECONFIGURATION_LINE::matcher)
                 .filter(Matcher::find)
                 .findAny();

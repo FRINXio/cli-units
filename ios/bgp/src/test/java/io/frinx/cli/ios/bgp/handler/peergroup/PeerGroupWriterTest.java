@@ -16,19 +16,11 @@
 
 package io.frinx.cli.ios.bgp.handler.peergroup;
 
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.deleteNeighbor;
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.getAfiSafisForNeighbor;
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter.renderNeighbor;
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriterTest.getCommands;
-import static io.frinx.cli.ios.bgp.handler.peergroup.PeerGroupWriter.getAfiSafisForPeerGroup;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter;
+import io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriterTest;
 import io.frinx.cli.unit.utils.CliFormatter;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
@@ -43,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupTransportConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflectorBuilder;
@@ -138,38 +131,39 @@ public class PeerGroupWriterTest implements CliFormatter {
 
         CompletableFuture<String> output = new CompletableFuture<>();
         output.complete("");
-        doReturn(output).when(cli).executeAndRead(any(Command.class));
-        CliWriter writer = spy(new NeighborWriter(cli));
+        Mockito.doReturn(output).when(cli).executeAndRead(Mockito.any(Command.class));
+        CliWriter writer = Mockito.spy(new NeighborWriter(cli));
 
-        Map<String, Object> afiSafisForGroupSource = getAfiSafisForNeighbor(bgpConfig, getAfiSafisForPeerGroup(source
-                .getAfiSafis()));
+        Map<String, Object> afiSafisForGroupSource = NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
+                PeerGroupWriter.getAfiSafisForPeerGroup(source.getAfiSafis()));
 
-        renderNeighbor(writer, cli, id,
+        NeighborWriter.renderNeighbor(writer, cli, id,
                 source, null, null, null, id.firstKeyOf(NetworkInstance.class), as, afiSafisForGroupSource,
                 Collections.emptyMap(),
                 PeerGroupWriter.getPeerGroupId(id), PeerGroupWriter.PEER_GROUP_GLOBAL, PeerGroupWriter.PEER_GROUP_VRF);
 
-        String writeRender = getCommands(writer, false, 1);
+        String writeRender = NeighborWriterTest.getCommands(writer, false, 1);
         Assert.assertEquals(write, writeRender);
 
         if (after != null) {
-            renderNeighbor(writer, cli, id,
-                    after, source, null, null, id.firstKeyOf(NetworkInstance.class), as, getAfiSafisForNeighbor(
-                            bgpConfig, getAfiSafisForPeerGroup(after.getAfiSafis())), afiSafisForGroupSource,
-                    PeerGroupWriter.getPeerGroupId(id), PeerGroupWriter.PEER_GROUP_GLOBAL, PeerGroupWriter
-                            .PEER_GROUP_VRF);
+            NeighborWriter.renderNeighbor(writer, cli, id,
+                    after, source, null, null, id.firstKeyOf(NetworkInstance.class), as,
+                    NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
+                            PeerGroupWriter.getAfiSafisForPeerGroup(after.getAfiSafis())),
+                    afiSafisForGroupSource, PeerGroupWriter.getPeerGroupId(id), PeerGroupWriter.PEER_GROUP_GLOBAL,
+                    PeerGroupWriter.PEER_GROUP_VRF);
 
-            String updateRender = getCommands(writer, false, 2);
+            String updateRender = NeighborWriterTest.getCommands(writer, false, 2);
             Assert.assertEquals(update, updateRender);
         }
 
-        deleteNeighbor(writer, cli, id,
-                source, id.firstKeyOf(NetworkInstance.class), as, getAfiSafisForNeighbor(bgpConfig,
-                        getAfiSafisForPeerGroup(source.getAfiSafis())),
+        NeighborWriter.deleteNeighbor(writer, cli, id,
+                source, id.firstKeyOf(NetworkInstance.class), as, NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
+                        PeerGroupWriter.getAfiSafisForPeerGroup(source.getAfiSafis())),
                 PeerGroupWriter.getPeerGroupId(id), PeerGroupWriter.PEER_GROUP_GLOBAL_DELETE, PeerGroupWriter
                         .PEER_GROUP_VRF_DELETE);
 
-        String deleteRender = getCommands(writer, true, 1);
+        String deleteRender = NeighborWriterTest.getCommands(writer, true, 1);
         Assert.assertEquals(delete, deleteRender);
     }
 

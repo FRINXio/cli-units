@@ -16,8 +16,7 @@
 
 package io.frinx.cli.unit.ios.ifc.handler;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceCommonState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.State;
@@ -179,18 +178,18 @@ public class InterfaceStateReaderTest {
     public void testParseInterfaceState() throws Exception {
         StateBuilder parsed = new StateBuilder();
         InterfaceStateReader.parseInterfaceState(SH_INTERFACE, parsed, "FastEthernet0/0");
-        assertEquals(EXPECTED_INTERFACE_STATE, parsed.build());
+        Assert.assertEquals(EXPECTED_INTERFACE_STATE, parsed.build());
 
         parsed = new StateBuilder();
         InterfaceStateReader.parseInterfaceState(SH_INTERFACE2, parsed, "GigabitEthernet1/0");
-        assertEquals(EXPECTED_INTERFACE_STATE2, parsed.build());
+        Assert.assertEquals(EXPECTED_INTERFACE_STATE2, parsed.build());
 
         parsed = new StateBuilder();
         InterfaceStateReader.parseInterfaceState(SH_INTERFACE3, parsed, "GigabitEthernet0/0");
-        assertEquals(EXPECTED_INTERFACE_STATE3, parsed.build());
+        Assert.assertEquals(EXPECTED_INTERFACE_STATE3, parsed.build());
 
         parsed = new StateBuilder();
         InterfaceStateReader.parseInterfaceState(SH_INTERFACE_FALLBACK, parsed, "GigabitEthernet0/2");
-        assertEquals(EXPECTED_FALLBACK_INTERFACE_STATE, parsed.build());
+        Assert.assertEquals(EXPECTED_FALLBACK_INTERFACE_STATE, parsed.build());
     }
 }

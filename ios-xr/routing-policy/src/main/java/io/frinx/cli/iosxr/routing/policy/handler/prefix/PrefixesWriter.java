@@ -16,9 +16,8 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.prefix;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -136,7 +135,7 @@ public class PrefixesWriter implements CliWriter<Prefixes> {
 
         private static ConfigDto fromConfig(Config config) {
             Matcher matcher = MASK_RANGE_PATTERN.matcher(config.getMasklengthRange());
-            checkArgument(matcher.matches(), "Mask length range in unsupported format: %s, should be: %s",
+            Preconditions.checkArgument(matcher.matches(), "Mask length range in unsupported format: %s, should be: %s",
                     config.getMasklengthRange(), MASK_RANGE_PATTERN.pattern());
 
             String geGroup = matcher.group("ge");

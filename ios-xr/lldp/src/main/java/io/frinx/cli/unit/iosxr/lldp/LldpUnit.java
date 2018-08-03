@@ -16,11 +16,10 @@
 
 package io.frinx.cli.unit.iosxr.lldp;
 
-import static io.frinx.cli.iosxr.IosXrDevices.IOS_XR_ALL;
-
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import java.util.Set;
@@ -44,7 +43,7 @@ public class LldpUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = registry.registerTranslateUnit(IOS_XR_ALL, this);
+        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
     }
 
     public void close() {

@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.brocade.cdp.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,11 +59,11 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
     @VisibleForTesting
     static List<InterfaceKey> parseCdpInterfaces(String output) {
         // The output needs to be preprocessed, so put everything on 1 line
-        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), " ");
+        String withoutNewlines = output.replaceAll(ParsingUtils.NEWLINE.pattern(), " ");
         // And then split per neighbor
         String linePerInterfaceOutput = withoutNewlines.replace("interface", "\ninterface");
 
-        return NEWLINE.splitAsStream(linePerInterfaceOutput)
+        return ParsingUtils.NEWLINE.splitAsStream(linePerInterfaceOutput)
                 .map(String::trim)
                 .map(CDP_INTER_LINE::matcher)
                 .filter(Matcher::matches)

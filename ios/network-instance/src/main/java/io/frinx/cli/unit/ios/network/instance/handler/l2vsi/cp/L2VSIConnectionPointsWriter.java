@@ -16,17 +16,14 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.l2vsi.cp;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter.getCPoint;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter.getEndpoint;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter.getUsedInterfaces;
-
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.network.instance.L2vsiWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsReader;
+import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -58,15 +55,17 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
     public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
                                               @Nonnull ConnectionPoints dataAfter,
                                               @Nonnull WriteContext writeContext) throws WriteFailedException {
-        checkArgument(dataAfter.getConnectionPoint()
+        Preconditions.checkArgument(dataAfter.getConnectionPoint()
                         .size() >= 2,
                 "L2VSI network only supports at least 2 endpoints, but were: %s", dataAfter.getConnectionPoint());
 
-        Set<String> usedInterfaces = getUsedInterfaces(id, writeContext);
+        Set<String> usedInterfaces = L2P2PConnectionPointsWriter.getUsedInterfaces(id, writeContext);
 
-        ConnectionPoint remotePoint = getCPoint(dataAfter, L2VSIConnectionPointsReader.REMOTE_POINT_ID);
-        Endpoint remoteEndpoint = getEndpoint(remotePoint, writeContext, usedInterfaces, true, false);
-        checkArgument(remoteEndpoint.getConfig()
+        ConnectionPoint remotePoint = L2P2PConnectionPointsWriter.getCPoint(dataAfter,
+                L2VSIConnectionPointsReader.REMOTE_POINT_ID);
+        Endpoint remoteEndpoint = L2P2PConnectionPointsWriter.getEndpoint(remotePoint, writeContext, usedInterfaces,
+                true, false);
+        Preconditions.checkArgument(remoteEndpoint.getConfig()
                         .getType() == REMOTE.class,
                 "Endpoint %s is not remote is not of type %s", L2VSIConnectionPointsReader.REMOTE_POINT_ID, REMOTE
                         .class);
@@ -82,8 +81,8 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
                 // skip remote
                 .filter(cp -> !cp.getConnectionPointId()
                         .equals(L2VSIConnectionPointsReader.REMOTE_POINT_ID))
-                .map(cp -> new AbstractMap.SimpleEntry<>(cp.getConnectionPointId(), getEndpoint(cp, writeContext,
-                        usedInterfaces, true, false)))
+                .map(cp -> new AbstractMap.SimpleEntry<>(cp.getConnectionPointId(),
+                        L2P2PConnectionPointsWriter.getEndpoint(cp, writeContext, usedInterfaces, true, false)))
                 .map(this::ensureLocal)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -134,7 +133,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
             }
         }
 
-        checkArgument(bdIndex > 0, "Unable to find available bridge domain for L2VPN: %s", id);
+        Preconditions.checkArgument(bdIndex > 0, "Unable to find available bridge domain for L2VPN: %s", id);
         return bdIndex;
     }
 
@@ -192,7 +191,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
     }
 
     private Map.Entry<String, Endpoint> ensureLocal(AbstractMap.SimpleEntry<String, Endpoint> endpoint) {
-        checkArgument(endpoint.getValue()
+        Preconditions.checkArgument(endpoint.getValue()
                         .getConfig()
                         .getType() == LOCAL.class,
                 "Endpoint %s is not of type %s, only 1 remote (autodiscovery) is allowed", endpoint.getKey(), LOCAL
@@ -205,15 +204,18 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
                                                @Nonnull ConnectionPoints dataBefore,
                                                @Nonnull WriteContext writeContext)
             throws WriteFailedException {
-        ConnectionPoint remotePoint = getCPoint(dataBefore, L2VSIConnectionPointsReader.REMOTE_POINT_ID);
-        Endpoint remoteEndpoint = getEndpoint(remotePoint, writeContext, Collections.emptySet(), false, false);
+        ConnectionPoint remotePoint = L2P2PConnectionPointsWriter.getCPoint(dataBefore,
+                L2VSIConnectionPointsReader.REMOTE_POINT_ID);
+        Endpoint remoteEndpoint = L2P2PConnectionPointsWriter.getEndpoint(remotePoint, writeContext,
+                Collections.emptySet(), false, false);
 
         Map<String, Endpoint> locals = dataBefore.getConnectionPoint()
                 .stream()
                 // skip remote
                 .filter(cp -> !cp.getConnectionPointId()
                         .equals(L2VSIConnectionPointsReader.REMOTE_POINT_ID))
-                .map(cp -> new AbstractMap.SimpleEntry<>(cp.getConnectionPointId(), getEndpoint(cp, writeContext,
+                .map(cp -> new AbstractMap.SimpleEntry<>(cp.getConnectionPointId(),
+                        L2P2PConnectionPointsWriter.getEndpoint(cp, writeContext,
                         Collections.emptySet(), false, false)))
                 .map(this::ensureLocal)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

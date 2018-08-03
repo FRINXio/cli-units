@@ -16,14 +16,12 @@
 
 package io.frinx.cli.ios.local.routing.handlers;
 
-import static io.frinx.cli.ios.local.routing.handlers.StaticReader.parseStaticPrefixes;
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
@@ -79,15 +77,17 @@ public class StaticReaderTest {
 
     @Test
     public void testParseStaticPrefixes() {
-        assertEquals(EXPECTED_IDS, parseStaticPrefixes(STATIC_OUTPUT, DEFAULT_NETWORK_NAME));
+        Assert.assertEquals(EXPECTED_IDS,
+                StaticReader.parseStaticPrefixes(STATIC_OUTPUT, NetworInstance.DEFAULT_NETWORK_NAME));
 
-        assertEquals(EXPECTED_IDS2, parseStaticPrefixes(STATIC_OUTPUT2, DEFAULT_NETWORK_NAME));
+        Assert.assertEquals(EXPECTED_IDS2,
+                StaticReader.parseStaticPrefixes(STATIC_OUTPUT2, NetworInstance.DEFAULT_NETWORK_NAME));
     }
 
     @Test
     public void testParseStaticPrefixesVrf() {
-        assertEquals(EXPECTED_IDS_VRF, parseStaticPrefixes(STATIC_OUTPUT, VRF_NAME));
-        assertEquals(Collections.singletonList(new StaticKey(new IpPrefix("4009::/64".toCharArray()))),
-                parseStaticPrefixes(STATIC_OUTPUT2, VRF_NAME));
+        Assert.assertEquals(EXPECTED_IDS_VRF, StaticReader.parseStaticPrefixes(STATIC_OUTPUT, VRF_NAME));
+        Assert.assertEquals(Collections.singletonList(new StaticKey(new IpPrefix("4009::/64".toCharArray()))),
+                StaticReader.parseStaticPrefixes(STATIC_OUTPUT2, VRF_NAME));
     }
 }

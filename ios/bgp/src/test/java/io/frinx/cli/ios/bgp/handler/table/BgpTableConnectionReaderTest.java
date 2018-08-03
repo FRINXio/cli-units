@@ -16,10 +16,9 @@
 
 package io.frinx.cli.ios.bgp.handler.table;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static org.junit.Assert.assertEquals;
-
+import com.google.common.collect.Lists;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.table.connections.TableConnectionKey;
@@ -44,19 +43,19 @@ public class BgpTableConnectionReaderTest {
 
     @Test
     public void getAllIds() throws Exception {
-        assertEquals(
-                newArrayList(
+        Assert.assertEquals(
+                Lists.newArrayList(
                         new TableConnectionKey(IPV4.class, BGP.class, OSPF.class),
                         new TableConnectionKey(IPV6.class, BGP.class, OSPF.class)),
                 BgpTableConnectionReader.parseRedistributes(NetworInstance.DEFAULT_NETWORK, OUTPUT));
 
-        assertEquals(
-                newArrayList(
+        Assert.assertEquals(
+                Lists.newArrayList(
                         new TableConnectionKey(IPV4.class, BGP.class, OSPF.class)),
                 BgpTableConnectionReader.parseRedistributes(new NetworkInstanceKey("aaa"), OUTPUT));
 
-        assertEquals(
-                newArrayList(),
+        Assert.assertEquals(
+                Lists.newArrayList(),
                 BgpTableConnectionReader.parseRedistributes(new NetworkInstanceKey("NONEXISTING"), OUTPUT));
 
         Config redis = BgpTableConnectionReader
@@ -65,6 +64,6 @@ public class BgpTableConnectionReaderTest {
                 .get()
                 .getValue();
 
-        assertEquals(newArrayList("alala"), redis.getImportPolicy());
+        Assert.assertEquals(Lists.newArrayList("alala"), redis.getImportPolicy());
     }
 }

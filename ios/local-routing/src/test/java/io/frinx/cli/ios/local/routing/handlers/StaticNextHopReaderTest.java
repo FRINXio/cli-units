@@ -16,13 +16,12 @@
 
 package io.frinx.cli.ios.local.routing.handlers;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHopKey;
@@ -55,27 +54,27 @@ public class StaticNextHopReaderTest {
 
     @Test
     public void testReader() {
-        assertEquals(EXPECTED_IDS,
+        Assert.assertEquals(EXPECTED_IDS,
                 NextHopReader.parseNextHopPrefixes(STATIC_OUTPUT1,
                         NextHopReader.getDevicePrefix(new StaticKey(new IpPrefix("192.0.2.0/24".toCharArray()))),
                         NetworInstance.DEFAULT_NETWORK));
 
-        assertEquals(Collections.singletonList(new NextHopKey("10.10.10.10")),
+        Assert.assertEquals(Collections.singletonList(new NextHopKey("10.10.10.10")),
                 NextHopReader.parseNextHopPrefixes(STATIC_OUTPUT2,
                         NextHopReader.getDevicePrefix(new StaticKey(new IpPrefix("192.0.3.0/24".toCharArray()))),
                         new NetworkInstanceKey("TMP")));
 
-        assertEquals(Collections.singletonList(new NextHopKey("GigabitEthernet1")),
+        Assert.assertEquals(Collections.singletonList(new NextHopKey("GigabitEthernet1")),
                 NextHopReader.parseNextHopPrefixes(STATIC_OUTPUT3,
                         NextHopReader.getDevicePrefix(new StaticKey(new IpPrefix("4001::/64".toCharArray()))),
                         NetworInstance.DEFAULT_NETWORK));
 
-        assertEquals(Collections.singletonList(new NextHopKey("4005::2 GigabitEthernet3")),
+        Assert.assertEquals(Collections.singletonList(new NextHopKey("4005::2 GigabitEthernet3")),
                 NextHopReader.parseNextHopPrefixes(STATIC_OUTPUT4,
                         NextHopReader.getDevicePrefix(new StaticKey(new IpPrefix("4009::/64".toCharArray()))),
                         new NetworkInstanceKey("TMP")));
 
-        assertEquals(Collections.emptyList(),
+        Assert.assertEquals(Collections.emptyList(),
                 NextHopReader.parseNextHopPrefixes("",
                         NextHopReader.getDevicePrefix(new StaticKey(new IpPrefix("4009::/64".toCharArray()))),
                         new NetworkInstanceKey("NONEXISTING")));

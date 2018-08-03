@@ -16,8 +16,6 @@
 
 package io.frinx.cli.ios.conf.handler;
 
-import static org.junit.Assert.assertFalse;
-
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,6 +53,6 @@ public class ConfigMetadataReaderTest {
         Assert.assertEquals(EXPECTED, date1.get());
 
         Optional<String> date2 = (ConfigMetadataReader.getLastConfigurationFingerprint(""));
-        assertFalse(date2.isPresent());
+        Assert.assertFalse(date2.isPresent());
     }
 }

@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.bgp.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -68,7 +66,7 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
             matcher -> matcher.group("instance"),
             v -> new ProtocolKey(TYPE, v));
 
-        boolean isDefaultInstanceConfigured = NEWLINE.splitAsStream(output)
+        boolean isDefaultInstanceConfigured = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .map(DEFAULT_INSTANCE_PATTERN::matcher)
                 .anyMatch(Matcher::matches);

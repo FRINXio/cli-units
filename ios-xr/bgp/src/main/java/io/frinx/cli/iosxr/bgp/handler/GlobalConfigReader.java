@@ -16,14 +16,12 @@
 
 package io.frinx.cli.iosxr.bgp.handler;
 
-import static io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader.DEFAULT_BGP_INSTANCE;
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -62,7 +60,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
 
         String output = blockingRead(SH_RUN_BGP, cli, instanceIdentifier, readContext);
 
-        if (DEFAULT_BGP_INSTANCE.equals(name)) {
+        if (BgpProtocolReader.DEFAULT_BGP_INSTANCE.equals(name)) {
             parseDefaultAs(output, configBuilder);
         } else {
             parseAs(output, name, configBuilder);
@@ -73,7 +71,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
 
     @VisibleForTesting
     public static void parseDefaultAs(String output, ConfigBuilder configBuilder) {
-        NEWLINE.splitAsStream(output)
+        ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(defBgp -> !defBgp.contains("instance"))
                 .map(CONFIG_LINE::matcher)
@@ -87,7 +85,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
 
     @VisibleForTesting
     public static void parseAs(String output, String name, ConfigBuilder configBuilder) {
-        NEWLINE.splitAsStream(output)
+        ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(bgp -> bgp.contains(String.format("instance %s", name)))
                 .map(CONFIG_LINE::matcher)
@@ -100,7 +98,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
     }
 
     public static void parseRouterId(String output, ConfigBuilder configBuilder) {
-        NEWLINE.splitAsStream(output)
+        ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .map(ROUTER_ID_LINE::matcher)
                 .filter(Matcher::matches)

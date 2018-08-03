@@ -16,14 +16,13 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6;
 
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.TypedReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
@@ -79,7 +78,7 @@ public class Ipv6AdvertisementConfigReader implements TypedReader<Config, Config
 
         return interfaceKey != null && subinterfaceKey != null
                 && Ipv6CheckUtil.checkTypes(infType, EthernetCsmacd.class, Ieee8023adLag.class)
-                && subinterfaceKey.getIndex() == ZERO_SUBINTERFACE_ID;
+                && subinterfaceKey.getIndex() == SubinterfaceReader.ZERO_SUBINTERFACE_ID;
     }
 
     @VisibleForTesting

@@ -16,8 +16,6 @@
 
 package io.frinx.cli.ios.bgp.handler.neighbor;
 
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborPolicyConfigReader.parseConfigAttributes;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpReader;
@@ -63,6 +61,6 @@ public class NeighborAfiSafiPolicyConfigReader implements BgpReader.BgpConfigRea
         Stream<String> outputStream = Arrays.stream(outputLines)
                 .filter(line -> line.contains("address-family " + afiSafi));
 
-        parseConfigAttributes(configBuilder, vrfName, outputStream);
+        NeighborPolicyConfigReader.parseConfigAttributes(configBuilder, vrfName, outputStream);
     }
 }

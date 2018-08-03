@@ -16,13 +16,12 @@
 
 package io.frinx.cli.iosxr.ospf.handler;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
-
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
@@ -41,7 +40,8 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
             throws WriteFailedException {
         String vrfId = id.firstKeyOf(NetworkInstance.class)
                 .getName();
-        Preconditions.checkArgument(DEFAULT_NETWORK_NAME.equals(vrfId), "VRF-aware OSPF is not supported");
+        Preconditions.checkArgument(NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfId),
+                "VRF-aware OSPF is not supported");
         final String processName = id.firstKeyOf(Protocol.class)
                 .getName();
         blockingWriteAndRead(cli, id, data,

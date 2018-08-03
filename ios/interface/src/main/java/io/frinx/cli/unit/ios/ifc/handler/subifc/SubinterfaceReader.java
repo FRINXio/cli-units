@@ -16,9 +16,6 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.ios.ifc.handler.InterfaceReader.SH_INTERFACE;
-import static io.frinx.cli.unit.ios.ifc.handler.InterfaceReader.parseAllInterfaceIds;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -58,7 +55,7 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
         String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
 
-        List<SubinterfaceKey> subinterfaceKeys = parseInterfaceIds(blockingRead(SH_INTERFACE, cli,
+        List<SubinterfaceKey> subinterfaceKeys = parseInterfaceIds(blockingRead(InterfaceReader.SH_INTERFACE, cli,
                 instanceIdentifier, readContext), id);
 
         // Subinterface with ID 0 is reserved for IP addresses of the interface
@@ -78,7 +75,7 @@ public final class SubinterfaceReader implements CliConfigListReader<Subinterfac
 
     @VisibleForTesting
     static List<SubinterfaceKey> parseInterfaceIds(String output, String ifcName) {
-        return parseAllInterfaceIds(output)
+        return InterfaceReader.parseAllInterfaceIds(output)
                 // Now exclude interfaces
                 .stream()
                 .filter(InterfaceReader::isSubinterface)

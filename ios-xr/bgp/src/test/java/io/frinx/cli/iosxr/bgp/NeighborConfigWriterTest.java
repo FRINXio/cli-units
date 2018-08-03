@@ -16,14 +16,13 @@
 
 package io.frinx.cli.iosxr.bgp;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
-
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.iosxr.bgp.handler.neighbor.NeighborConfigWriter;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -92,7 +91,7 @@ public class NeighborConfigWriterTest {
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier iid = KeyedInstanceIdentifier.create(NetworkInstances.class)
-            .child(NetworkInstance.class, new NetworkInstanceKey(DEFAULT_NETWORK))
+            .child(NetworkInstance.class, new NetworkInstanceKey(NetworInstance.DEFAULT_NETWORK))
             .child(Protocols.class)
             .child(Protocol.class, new ProtocolKey(BGP.class, "test"))
             .child(Bgp.class)

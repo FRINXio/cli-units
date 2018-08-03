@@ -16,12 +16,11 @@
 
 package io.frinx.cli.ospf.handler;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
-
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.Config;
@@ -52,7 +51,7 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, config,
                 fT(TEMPLATE,
                         "ospf", protocolName,
-                        "vrf", vrfName.equals(DEFAULT_NETWORK_NAME) ? null : vrfName,
+                        "vrf", vrfName.equals(NetworInstance.DEFAULT_NETWORK_NAME) ? null : vrfName,
                         "config", config));
     }
 
@@ -72,6 +71,6 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
         blockingWriteAndRead(cli, instanceIdentifier, config,
                 fT(TEMPLATE,
                         "ospf", protocolName,
-                        "vrf", vrfName.equals(DEFAULT_NETWORK_NAME) ? null : vrfName));
+                        "vrf", vrfName.equals(NetworInstance.DEFAULT_NETWORK_NAME) ? null : vrfName));
     }
 }

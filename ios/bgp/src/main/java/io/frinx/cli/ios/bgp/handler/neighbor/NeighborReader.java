@@ -16,14 +16,12 @@
 
 package io.frinx.cli.ios.bgp.handler.neighbor;
 
-import static io.frinx.cli.io.Cli.NEWLINE;
-import static io.frinx.cli.ios.bgp.handler.BgpProtocolReader.DEFAULT_BGP_INSTANCE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ios.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +59,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
                                               @Nonnull ReadContext readContext) throws ReadFailedException {
 
         String networkInstanceName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        if (DEFAULT_BGP_INSTANCE.equals(networkInstanceName)) {
+        if (BgpProtocolReader.DEFAULT_BGP_INSTANCE.equals(networkInstanceName)) {
             return getDefaultNeighborKeys(blockingRead(SH_SUMM, cli, instanceIdentifier, readContext));
         } else {
             return getVrfNeighborKeys(blockingRead(SH_SUMM, cli, instanceIdentifier, readContext),
@@ -111,7 +109,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
     public static String[] splitOutput(String output) {
         // Skip any output before "router bgp" such as address-family definitions for VRFs or OSPF
         output = output.substring(output.indexOf("router bgp"));
-        return output.replaceAll(NEWLINE, "")
+        return output.replaceAll(Cli.NEWLINE, "")
                 .replaceAll("\r", "")
                 .replaceAll(" address-family", "\n address-family")
                 .split("\\n");

@@ -16,8 +16,6 @@
 
 package io.frinx.cli.ios.bgp.handler.neighbor;
 
-import static java.util.stream.Collectors.toMap;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -33,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupRouteReflectorConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonStructureNeighborGroupRouteReflector;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflector;
@@ -405,7 +404,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
         return configured.stream()
                 .map(afi -> new AbstractMap.SimpleEntry<>(GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afi
                         .getAfiSafiName()), afi))
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**
@@ -418,7 +417,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
                 neighAfiSafi = bgpGlobal.getAfiSafis().getAfiSafi().stream()
                         .map(afi -> new AbstractMap.SimpleEntry<>(GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afi
                                 .getAfiSafiName()), afi))
-                        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             }
         }
         return neighAfiSafi;
