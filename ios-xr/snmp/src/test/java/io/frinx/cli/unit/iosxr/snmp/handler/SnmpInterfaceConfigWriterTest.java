@@ -1,9 +1,17 @@
 /*
- * Copyright © 2018 Frinx and others. All rights reserved.
+ * Copyright © 2018 Frinx and others.
  *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 which accompanies this distribution,
- * and is available at http://www.eclipse.org/legal/epl-v10.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.frinx.cli.unit.iosxr.snmp.handler;
@@ -34,9 +42,9 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class SnmpInterfaceConfigWriterTest {
 
-    private static final String WRITE_INPUT = "snmp-server interface Loopback0\n" +
-            "no notification linkupdown disable\n" +
-            "root\n";
+    private static final String WRITE_INPUT = "snmp-server interface Loopback0\n"
+            + "no notification linkupdown disable\n"
+            + "root\n";
 
     private static final String DELETE_INPUT = "no snmp-server interface Loopback0\n";
 
@@ -90,10 +98,9 @@ public class SnmpInterfaceConfigWriterTest {
     public void update() throws WriteFailedException {
         this.writer.updateCurrentAttributes(iid, data, data, context);
 
-        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
+        Mockito.verify(cli).executeAndRead(response.capture());
 
-        Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0).getContent());
-        Assert.assertEquals(WRITE_INPUT, response.getAllValues().get(1).getContent());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test

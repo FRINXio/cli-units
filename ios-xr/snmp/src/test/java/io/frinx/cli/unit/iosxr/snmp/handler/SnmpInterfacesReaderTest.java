@@ -1,15 +1,20 @@
 /*
- * Copyright © 2018 Frinx and others. All rights reserved.
+ * Copyright © 2018 Frinx and others.
  *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 which accompanies this distribution,
- * and is available at http://www.eclipse.org/legal/epl-v10.html
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package io.frinx.cli.unit.iosxr.snmp.handler;
-
-import static io.frinx.cli.unit.iosxr.snmp.handler.SnmpInterfacesReader.LINK_UP_DOWN_EVENT_LIST;
-import static io.frinx.cli.unit.iosxr.snmp.handler.SnmpInterfacesReader.LINK_UP_DOWN_EVENT_LIST_DISABLED;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -27,26 +32,30 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev17102
 
 public class SnmpInterfacesReaderTest {
 
-    private static final String SH_RUN_SNMP_SERVER = "Thu Feb 15 11:40:49.064 UTC\n" +
-            "snmp-server interface Bundle-Ether1\n" +
-            "snmp-server interface Bundle-Ether7000\n" +
-            "snmp-server interface tunnel-te55\n" +
-            " notification linkupdown disable\n" +
-            "snmp-server interface tunnel-te56\n" +
-            " notification linkupdown disable\n" +
-            "snmp-server interface GigabitEthernet0/0/0/1.100\n" +
-            "snmp-server interface GigabitEthernet0/0/0/4\n" +
-            " notification linkupdown disable";
+    private static final String SH_RUN_SNMP_SERVER = "Thu Feb 15 11:40:49.064 UTC\n"
+            + "snmp-server interface Bundle-Ether1\n"
+            + "snmp-server interface Bundle-Ether7000\n"
+            + "snmp-server interface tunnel-te55\n"
+            + " notification linkupdown disable\n"
+            + "snmp-server interface tunnel-te56\n"
+            + " notification linkupdown disable\n"
+            + "snmp-server interface GigabitEthernet0/0/0/1.100\n"
+            + "snmp-server interface GigabitEthernet0/0/0/4\n"
+            + " notification linkupdown disable";
 
-    private static final HashSet<String> DISABLED = Sets.newHashSet("tunnel-te55", "tunnel-te56", "GigabitEthernet0/0/0/4");
+    private static final HashSet<String> DISABLED = Sets.newHashSet("tunnel-te55", "tunnel-te56",
+            "GigabitEthernet0/0/0/4");
 
     private static final List<Interface> INTERFACE_LIST =
-            Lists.newArrayList("Bundle-Ether1", "Bundle-Ether7000", "tunnel-te55", "tunnel-te56", "GigabitEthernet0/0/0/1.100", "GigabitEthernet0/0/0/4")
+            Lists.newArrayList("Bundle-Ether1", "Bundle-Ether7000", "tunnel-te55", "tunnel-te56",
+                    "GigabitEthernet0/0/0/1.100", "GigabitEthernet0/0/0/4")
                     .stream()
                     .map(InterfaceId::new)
                     .map(ifcId -> new ConfigBuilder()
                             .setInterfaceId(ifcId)
-                            .setEnabledTrapForEvent(DISABLED.contains(ifcId.getValue()) ? LINK_UP_DOWN_EVENT_LIST_DISABLED : LINK_UP_DOWN_EVENT_LIST)
+                            .setEnabledTrapForEvent(DISABLED.contains(ifcId.getValue())
+                                    ? SnmpInterfacesReader.LINK_UP_DOWN_EVENT_LIST_DISABLED
+                                    : SnmpInterfacesReader.LINK_UP_DOWN_EVENT_LIST)
                             .build())
                     .map(config -> new InterfaceBuilder()
                             .setInterfaceId(config.getInterfaceId())
