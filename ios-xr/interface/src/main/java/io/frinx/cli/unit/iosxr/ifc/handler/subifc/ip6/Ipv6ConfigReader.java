@@ -16,17 +16,13 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6;
 
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6AddressReader.IPV6_UNICAST_ADDRESS;
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6AddressReader.SH_INTERFACE_IP;
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
@@ -63,14 +59,14 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             Ipv6AddressNoZone address = id.firstKeyOf(Address.class)
                     .getIp();
-            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name),
+            parseAddressConfig(configBuilder, blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP, name),
                     cli, id, readContext), address);
         }
     }
 
     @VisibleForTesting
     static void parseAddressConfig(ConfigBuilder configBuilder, String output, Ipv6AddressNoZone address) {
-        Optional<String> optionalAddressLine = NEWLINE.splitAsStream(output)
+        Optional<String> optionalAddressLine = ParsingUtils.NEWLINE.splitAsStream(output)
                 .filter(line -> line.contains(address.getValue()))
                 .findAny();
 
@@ -81,8 +77,8 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         configBuilder.setIp(address);
         configBuilder.setPrefixLength(DEFAULT_PREFIX_LENGHT);
 
-        parseField(optionalAddressLine.get(),
-                IPV6_UNICAST_ADDRESS::matcher,
+        ParsingUtils.parseField(optionalAddressLine.get(),
+                Ipv6AddressReader.IPV6_UNICAST_ADDRESS::matcher,
             m -> Short.parseShort(m.group("prefix")),
                 configBuilder::setPrefixLength);
     }

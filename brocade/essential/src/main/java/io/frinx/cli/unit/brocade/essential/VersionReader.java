@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.brocade.essential;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.ios.essential.rev170520.Version;
@@ -55,21 +54,21 @@ public class VersionReader implements CliOperReader<Version, VersionBuilder> {
 
     @VisibleForTesting
     static void parseShowVersion(String output, VersionBuilder builder) {
-        parseField(output, 0,
+        ParsingUtils.parseField(output, 0,
                 DESCRIPTION_LINE::matcher,
             matcher -> matcher.group("image"),
             builder::setSysImage);
 
         builder.setOsFamily("IronWare");
-        parseField(output, 0,
+        ParsingUtils.parseField(output, 0,
             VERSION_LINE::matcher,
             matcher -> matcher.group("version"),
             builder::setOsVersion);
-        parseField(output, 0,
+        ParsingUtils.parseField(output, 0,
             PLATFORM_LINE::matcher,
             matcher -> matcher.group("platform"),
             builder::setPlatform);
-        parseField(output, 0,
+        ParsingUtils.parseField(output, 0,
             PLATFORM_LINE::matcher,
             matcher -> matcher.group("serial"),
             builder::setSerialId);

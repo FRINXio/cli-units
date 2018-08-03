@@ -16,9 +16,8 @@
 
 package io.frinx.cli.ios.bgp.handler.peergroup;
 
-import static org.junit.Assert.assertEquals;
-
 import io.frinx.openconfig.network.instance.NetworInstance;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupTransportConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.transport.ConfigBuilder;
@@ -43,7 +42,7 @@ public class PeerGroupTransportConfigReaderTest {
         ConfigBuilder configBuilder = new ConfigBuilder();
         PeerGroupTransportConfigReader.parseConfigAttributes(OUTPUT, configBuilder, NetworInstance
                 .DEFAULT_NETWORK_NAME);
-        assertEquals(new ConfigBuilder()
+        Assert.assertEquals(new ConfigBuilder()
                         .setPassiveMode(true)
                         .setLocalAddress(new BgpCommonNeighborGroupTransportConfig.LocalAddress("Loopback0"))
                         .build(),
@@ -52,7 +51,7 @@ public class PeerGroupTransportConfigReaderTest {
         configBuilder = new ConfigBuilder();
         PeerGroupTransportConfigReader.parseConfigAttributes(OUTPUT2, configBuilder, NetworInstance
                 .DEFAULT_NETWORK_NAME);
-        assertEquals(new ConfigBuilder()
+        Assert.assertEquals(new ConfigBuilder()
                         .setPassiveMode(false)
                         .build(),
                 configBuilder.build());

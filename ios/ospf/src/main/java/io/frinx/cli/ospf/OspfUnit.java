@@ -16,8 +16,6 @@
 
 package io.frinx.cli.ospf;
 
-import static io.frinx.cli.ios.IosDevices.IOS_ALL;
-
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
@@ -27,6 +25,7 @@ import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ios.IosDevices;
 import io.frinx.cli.ospf.handler.AreaConfigReader;
 import io.frinx.cli.ospf.handler.AreaInterfaceConfigReader;
 import io.frinx.cli.ospf.handler.AreaInterfaceConfigWriter;
@@ -61,7 +60,7 @@ public class OspfUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = registry.registerTranslateUnit(IOS_ALL, this);
+        reg = registry.registerTranslateUnit(IosDevices.IOS_ALL, this);
     }
 
     public void close() {

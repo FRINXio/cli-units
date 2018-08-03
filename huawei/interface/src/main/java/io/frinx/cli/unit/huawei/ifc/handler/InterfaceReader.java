@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,7 +70,7 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
 
     @VisibleForTesting
     static List<InterfaceKey> parseAllInterfaceIds(String output) {
-        return NEWLINE.splitAsStream(output)
+        return ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .map(INTERFACE_ID_LINE::matcher)
                 .filter(Matcher::matches)

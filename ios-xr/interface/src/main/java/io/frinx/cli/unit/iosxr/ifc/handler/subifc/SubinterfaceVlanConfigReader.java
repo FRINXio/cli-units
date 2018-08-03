@@ -15,9 +15,6 @@
  */
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -52,11 +49,11 @@ public class SubinterfaceVlanConfigReader implements CliConfigReader<Config, Con
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
 
         // Only parse configuration for non 0 subifc
-        if (subKey.getIndex() == ZERO_SUBINTERFACE_ID) {
+        if (subKey.getIndex() == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             return;
         }
 
-        String subIfcName = getSubinterfaceName(id);
+        String subIfcName = SubinterfaceReader.getSubinterfaceName(id);
 
         String output = blockingRead(String.format("show running-config interface %s", subIfcName), cli, id, ctx);
         parseVlanTag(output, builder);

@@ -16,9 +16,8 @@
 
 package io.frinx.cli.ios.bgp.handler.peergroup;
 
-import static org.junit.Assert.assertEquals;
-
 import io.frinx.openconfig.network.instance.NetworInstance;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.RoutingPassword;
@@ -40,7 +39,7 @@ public class PeerGroupConfigReaderTest {
     public void testParse() throws Exception {
         ConfigBuilder configBuilder = new ConfigBuilder();
         PeerGroupConfigReader.parseConfigAttributes(OUTPUT, configBuilder, NetworInstance.DEFAULT_NETWORK_NAME);
-        assertEquals(new ConfigBuilder()
+        Assert.assertEquals(new ConfigBuilder()
                         .setDescription("description")
                         .setAuthPassword(new RoutingPassword("passwd"))
                         .setPeerAs(new AsNumber(45L))

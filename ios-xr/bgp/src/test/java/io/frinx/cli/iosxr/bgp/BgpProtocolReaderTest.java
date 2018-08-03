@@ -16,9 +16,8 @@
 
 package io.frinx.cli.iosxr.bgp;
 
-import static io.frinx.cli.handlers.bgp.BgpReader.TYPE;
-
 import com.google.common.collect.Lists;
+import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,12 +38,12 @@ public class BgpProtocolReaderTest {
 
     private static final List<ProtocolKey> EXPECTED_KEYS = Lists.newArrayList("inst", "test", "default")
             .stream()
-            .map(instance -> new ProtocolKey(TYPE, instance))
+            .map(instance -> new ProtocolKey(BgpReader.TYPE, instance))
             .collect(Collectors.toList());
 
     private static final List<ProtocolKey> EXPECTED_KEYS_WITHOUT_DEFAULT = Lists.newArrayList("inst", "test")
             .stream()
-            .map(instance -> new ProtocolKey(TYPE, instance))
+            .map(instance -> new ProtocolKey(BgpReader.TYPE, instance))
             .collect(Collectors.toList());
 
     @Test

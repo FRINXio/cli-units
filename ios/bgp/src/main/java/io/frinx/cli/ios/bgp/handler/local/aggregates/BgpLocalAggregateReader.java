@@ -16,13 +16,12 @@
 
 package io.frinx.cli.ios.bgp.handler.local.aggregates;
 
-import static io.frinx.cli.ios.bgp.handler.BgpProtocolReader.DEFAULT_BGP_INSTANCE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ios.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
@@ -113,7 +112,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
                                                @Nonnull ReadContext readContext) throws ReadFailedException {
         String niName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
-        if (DEFAULT_BGP_INSTANCE.equals(niName)) {
+        if (BgpProtocolReader.DEFAULT_BGP_INSTANCE.equals(niName)) {
             return getDefaultAggregateKeys(blockingRead(SH_SUMM, cli, instanceIdentifier, readContext));
         } else {
             return getVrfAggregateKeys(blockingRead(SH_SUMM, cli, instanceIdentifier, readContext), niName);

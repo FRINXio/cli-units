@@ -16,10 +16,8 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.policy;
 
-import static io.frinx.cli.iosxr.routing.policy.handler.policy.StatementsTest.getSetCommInlineAction;
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.BgpSetCommunityOptionType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.BgpActionsBuilder;
@@ -37,7 +35,7 @@ public class ActionsParserTest {
     public void testParsePrepend() throws Exception {
         BgpActionsBuilder builder = new BgpActionsBuilder();
         ActionsParser.parsePrependAsPath(PREPEND_O2, builder);
-        assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path
+        Assert.assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path
                         .prepend.top.set.as.path.prepend.ConfigBuilder()
                         .setAsn(new AsNumber(23L))
                         .build(),
@@ -47,7 +45,7 @@ public class ActionsParserTest {
 
         builder = new BgpActionsBuilder();
         ActionsParser.parsePrependAsPath(PREPEND_O4, builder);
-        assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path
+        Assert.assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path
                         .prepend.top.set.as.path.prepend.ConfigBuilder()
                         .setAsn(new AsNumber(4848484L))
                         .setRepeatN((short) 23)
@@ -58,7 +56,7 @@ public class ActionsParserTest {
 
         builder = new BgpActionsBuilder();
         ActionsParser.parsePrependAsPath(PREPEND_O5, builder);
-        assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path
+        Assert.assertEquals(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path
                         .prepend.top.set.as.path.prepend.ConfigBuilder()
                         .setAsn(new AsNumber(23L))
                         .setRepeatN((short) 2)
@@ -72,13 +70,15 @@ public class ActionsParserTest {
     public void testParseCommunity() throws Exception {
         BgpActionsBuilder builder = new BgpActionsBuilder();
         ActionsParser.parseSetCommunity("set community (17676:320, 17676:430, 17676:436)", builder);
-        assertEquals(getSetCommInlineAction(Lists.newArrayList("17676:320", "17676:430", "17676:436"), null),
+        Assert.assertEquals(StatementsTest.getSetCommInlineAction(
+                Lists.newArrayList("17676:320", "17676:430", "17676:436"), null),
                 builder.build()
                         .getSetCommunity());
 
         builder = new BgpActionsBuilder();
         ActionsParser.parseSetCommunity("set community (17676:320) additive", builder);
-        assertEquals(getSetCommInlineAction(Lists.newArrayList("17676:320"), BgpSetCommunityOptionType.ADD),
+        Assert.assertEquals(StatementsTest.getSetCommInlineAction(
+                Lists.newArrayList("17676:320"), BgpSetCommunityOptionType.ADD),
                 builder.build()
                         .getSetCommunity());
     }

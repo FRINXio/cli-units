@@ -16,9 +16,6 @@
 
 package io.frinx.cli.ospf.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK_NAME;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfReader;
@@ -26,6 +23,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,13 +57,13 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
         String output = blockingRead(SH_RUN_INCLUDE_OSPF, cli, instanceIdentifier, readContext);
         String vrfId = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
-        if (vrfId.equals(DEFAULT_NETWORK_NAME)) {
+        if (vrfId.equals(NetworInstance.DEFAULT_NETWORK_NAME)) {
             return ParsingUtils.parseFields(output, 0,
                     OSPF_NO_VRF::matcher,
                 matcher -> matcher.group("id"),
                 s -> new ProtocolKey(TYPE, s));
         } else {
-            return NEWLINE.splitAsStream(output)
+            return ParsingUtils.NEWLINE.splitAsStream(output)
                     .map(String::trim)
                     // Only include those from VRF
                     .filter(s -> s.contains("vrf " + vrfId))

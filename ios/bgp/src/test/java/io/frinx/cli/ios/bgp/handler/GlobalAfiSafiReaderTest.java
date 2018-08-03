@@ -16,12 +16,9 @@
 
 package io.frinx.cli.ios.bgp.handler;
 
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafiKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV4UNICAST;
@@ -40,10 +37,10 @@ public class GlobalAfiSafiReaderTest {
         List<AfiSafiKey> bfamilies = GlobalAfiSafiReader.getAfiKeys(BGP_OUTPUT, "b");
         List<AfiSafiKey> defaultFamilies = GlobalAfiSafiReader.getDefaultAfiKeys(BGP_OUTPUT);
         AfiSafiKey ipv4Key = new AfiSafiKey(IPV4UNICAST.class);
-        assertThat(afamilies, hasItems(ipv4Key));
-        assertTrue(bfamilies.isEmpty());
-        assertEquals(1, defaultFamilies.size());
-        assertThat(defaultFamilies, hasItems(ipv4Key));
+        Assert.assertThat(afamilies, CoreMatchers.hasItems(ipv4Key));
+        Assert.assertTrue(bfamilies.isEmpty());
+        Assert.assertEquals(1, defaultFamilies.size());
+        Assert.assertThat(defaultFamilies, CoreMatchers.hasItems(ipv4Key));
 
     }
 }

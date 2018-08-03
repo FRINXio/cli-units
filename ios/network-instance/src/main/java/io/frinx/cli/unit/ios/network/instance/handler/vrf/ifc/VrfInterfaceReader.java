@@ -16,14 +16,12 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.AbstractMap;
 import java.util.List;
@@ -65,14 +63,15 @@ public class VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListReader
 
     @VisibleForTesting
     static List<InterfaceKey> parseIds(String vrfName, String output) {
-        String noNewlines = NEWLINE.matcher(output)
+        String noNewlines = ParsingUtils.NEWLINE.matcher(output)
                 .replaceAll("");
         String ifcPerLine = noNewlines.replaceAll("interface", "\ninterface");
 
         if (vrfName.equals(NetworInstance.DEFAULT_NETWORK_NAME)) {
-            return parseFields(ifcPerLine, 0, INTERFACE_ID_LINE::matcher, m -> m.group("id"), InterfaceKey::new);
+            return ParsingUtils.parseFields(ifcPerLine, 0, INTERFACE_ID_LINE::matcher, m -> m.group("id"),
+                    InterfaceKey::new);
         } else {
-            return parseFields(ifcPerLine, 0,
+            return ParsingUtils.parseFields(ifcPerLine, 0,
                     VRF_INTERFACE_ID_LINE::matcher,
                 m -> new AbstractMap.SimpleEntry<>(m.group("id"), m.group("vrfId")),
                 e -> new InterfaceKey(e.getKey()),

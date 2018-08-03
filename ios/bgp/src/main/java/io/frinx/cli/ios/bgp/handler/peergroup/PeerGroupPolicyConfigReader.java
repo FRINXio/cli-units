@@ -16,13 +16,12 @@
 
 package io.frinx.cli.ios.bgp.handler.peergroup;
 
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborPolicyConfigReader.parseConfigAttributes;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborConfigReader;
+import io.frinx.cli.ios.bgp.handler.neighbor.NeighborPolicyConfigReader;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborReader;
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -61,6 +60,6 @@ public class PeerGroupPolicyConfigReader implements BgpReader.BgpConfigReader<Co
         Stream<String> outputStream = Arrays.stream(outputSplit)
                 .filter(line -> !line.contains("address-family"));
 
-        parseConfigAttributes(configBuilder, vrfKey.getName(), outputStream);
+        NeighborPolicyConfigReader.parseConfigAttributes(configBuilder, vrfKey.getName(), outputStream);
     }
 }

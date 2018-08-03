@@ -16,9 +16,8 @@
 
 package io.frinx.cli.unit.brocade.network.instance.l2p2p.cp;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.network.instance.L2p2pWriter;
@@ -52,7 +51,7 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
     @Override
     public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id, @Nonnull
             ConnectionPoints dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        checkArgument(dataAfter.getConnectionPoint().size()
+        Preconditions.checkArgument(dataAfter.getConnectionPoint().size()
                 == 2, "L2P2P network only supports 2 endpoints, but were: %s", dataAfter.getConnectionPoint());
 
         Set<String> usedInterfaces = getUsedInterfaces(id, writeContext);
@@ -206,8 +205,8 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
     private static Endpoint getEndpoint(ConnectionPoint connectionPoint1, WriteContext writeContext, Set<String>
             usedInterfaces, boolean isWrite) {
         Endpoint endpoint1 = connectionPoint1.getEndpoints().getEndpoint().get(0);
-        checkArgument(endpoint1.getEndpointId().equals(ConnectionPointsReader.ENDPOINT_ID), "Endpoint has to be "
-                + "named: %s, not %s", ConnectionPointsReader.ENDPOINT_ID, endpoint1.getConfig());
+        Preconditions.checkArgument(endpoint1.getEndpointId().equals(ConnectionPointsReader.ENDPOINT_ID),
+                "Endpoint has to be named: %s, not %s", ConnectionPointsReader.ENDPOINT_ID, endpoint1.getConfig());
 
         // Verify existing interfaces
         if (endpoint1.getLocal()
@@ -220,10 +219,10 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
             getInterfaceData(writeContext, isWrite, interfaceId);
 
             // Check interface not used already (or its parent)
-            checkArgument(!usedInterfaces.contains(interfaceId.toString()), "Interface %s already used in L2P2P "
-                    + "network as: %s", interfaceId, interfaceId);
-            checkArgument(!usedInterfaces.contains(interfaceId.toParentIfcString()), "Interface %s already used in "
-                    + "L2P2P network as: %s", interfaceId, interfaceId.toParentIfcString());
+            Preconditions.checkArgument(!usedInterfaces.contains(interfaceId.toString()),
+                    "Interface %s already used in L2P2P network as: %s", interfaceId, interfaceId);
+            Preconditions.checkArgument(!usedInterfaces.contains(interfaceId.toParentIfcString()),
+                    "Interface %s already used in L2P2P network as: %s", interfaceId, interfaceId.toParentIfcString());
 
             // No subinterface verification required here
         }
@@ -236,7 +235,7 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
                 InterfaceKey(ifcName.toParentIfcString()))) : writeContext.readBefore(IIDs.INTERFACES.child(Interface
                 .class, new InterfaceKey(ifcName.toParentIfcString())));
 
-        checkArgument(ifcData.isPresent(), "Unknown interface %s, cannot configure l2p2p", ifcName);
+        Preconditions.checkArgument(ifcData.isPresent(), "Unknown interface %s, cannot configure l2p2p", ifcName);
 
         return ifcData.get();
     }
@@ -245,10 +244,10 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
         ConnectionPoint connectionPoint = dataAfter.getConnectionPoint().stream().filter(cp -> cp.getKey()
                 .getConnectionPointId().equals(expectedPointId)).findFirst().get();
 
-        checkArgument(connectionPoint.getConnectionPointId().equals(expectedPointId), "Connection point has to be "
-                + "named: %s, not %s", expectedPointId, connectionPoint.getConfig());
-        checkArgument(connectionPoint.getEndpoints().getEndpoint().size()
-                == 1, "Connection point must contain only 1 endpoint, but has: %s", connectionPoint.getEndpoints()
+        Preconditions.checkArgument(connectionPoint.getConnectionPointId().equals(expectedPointId),
+                "Connection point has to be named: %s, not %s", expectedPointId, connectionPoint.getConfig());
+        Preconditions.checkArgument(connectionPoint.getEndpoints().getEndpoint().size() == 1,
+                "Connection point must contain only 1 endpoint, but has: %s", connectionPoint.getEndpoints()
                 .getEndpoint());
         return connectionPoint;
     }

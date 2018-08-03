@@ -16,13 +16,12 @@
 
 package io.frinx.cli.ios.bgp.handler.peergroup;
 
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborRouteReflectorConfigReader.parseConfigAttributes;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborConfigReader;
+import io.frinx.cli.ios.bgp.handler.neighbor.NeighborRouteReflectorConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflectorBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.route.reflector.Config;
@@ -53,7 +52,8 @@ public class PeerGroupRouteReflectorConfigReader implements BgpReader.BgpConfigR
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String peerGroupName = instanceIdentifier.firstKeyOf(PeerGroup.class).getPeerGroupName();
 
-        parseConfigAttributes(blockingRead(String.format(NeighborConfigReader.SH_SUMM, peerGroupName), cli,
+        NeighborRouteReflectorConfigReader.parseConfigAttributes(
+                blockingRead(String.format(NeighborConfigReader.SH_SUMM, peerGroupName), cli,
                 instanceIdentifier,
                 readContext),
                 configBuilder, vrfName);

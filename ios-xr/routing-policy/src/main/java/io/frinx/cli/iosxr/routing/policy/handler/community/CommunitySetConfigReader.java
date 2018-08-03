@@ -16,13 +16,12 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.community;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -62,7 +61,7 @@ public class CommunitySetConfigReader implements CliConfigReader<Config, ConfigB
 
     @VisibleForTesting
     static void parseMembers(@Nonnull ConfigBuilder builder, CommunitySetKey communitySetKey, String output) {
-        List<CommunitySetConfig.CommunityMember> comms = NEWLINE.splitAsStream(output)
+        List<CommunitySetConfig.CommunityMember> comms = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(AS_PATH_PATTERN::matcher)
                 .filter(Matcher::matches)
                 .map(m -> m.group("communityRule"))

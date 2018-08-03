@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.verify;
 
-import static io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckUtils.IPV6_VERIFY_CMD_BASE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -55,7 +53,7 @@ public class RpfCheckIpv6Writer implements CliWriter<Ipv6> {
     @VisibleForTesting
     StringBuilder prepareCmd(final @Nonnull Ipv6 dataAfter) {
         final StringBuilder verifyCmd = new StringBuilder(
-                f(IPV6_VERIFY_CMD_BASE, dataAfter.getRpfCheck()
+                f(RpfCheckUtils.IPV6_VERIFY_CMD_BASE, dataAfter.getRpfCheck()
                         .getName()
                         .toLowerCase())
         );
@@ -80,7 +78,7 @@ public class RpfCheckIpv6Writer implements CliWriter<Ipv6> {
 
         blockingDeleteAndRead(cli, instanceIdentifier,
                 f("interface %s", interfaceName),
-                f("no " + IPV6_VERIFY_CMD_BASE, dataBefore.getRpfCheck()
+                f("no " + RpfCheckUtils.IPV6_VERIFY_CMD_BASE, dataBefore.getRpfCheck()
                         .getName()
                         .toLowerCase()),
                 "root");

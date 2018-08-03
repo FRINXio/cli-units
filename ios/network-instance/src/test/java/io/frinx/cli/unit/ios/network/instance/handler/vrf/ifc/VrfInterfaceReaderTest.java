@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -53,10 +52,10 @@ public class VrfInterfaceReaderTest {
 
     @Test
     public void testReader() {
-        assertEquals(IDS_EXPECTED, VrfInterfaceReader.parseIds(NetworInstance.DEFAULT_NETWORK_NAME,
+        Assert.assertEquals(IDS_EXPECTED, VrfInterfaceReader.parseIds(NetworInstance.DEFAULT_NETWORK_NAME,
                 SH_IP_VRF_INTERFACES));
-        assertEquals(IDS_EXPECTED_VRF, VrfInterfaceReader.parseIds("a", SH_IP_VRF_INTERFACES));
-        assertEquals(Collections.emptyList(), VrfInterfaceReader.parseIds("b", SH_IP_VRF_INTERFACES));
+        Assert.assertEquals(IDS_EXPECTED_VRF, VrfInterfaceReader.parseIds("a", SH_IP_VRF_INTERFACES));
+        Assert.assertEquals(Collections.emptyList(), VrfInterfaceReader.parseIds("b", SH_IP_VRF_INTERFACES));
     }
 
 }

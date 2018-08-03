@@ -16,9 +16,6 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.l2vsi;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -27,6 +24,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -71,14 +69,14 @@ public class L2VSIReader implements CliConfigListReader<NetworkInstance, Network
     static List<NetworkInstanceKey> parseL2Vfis(String output) {
         String linePerL2Vsi = realignL2vsi(output);
 
-        return parseFields(linePerL2Vsi, 0,
+        return ParsingUtils.parseFields(linePerL2Vsi, 0,
                 L2_VFI_LINE::matcher,
             m -> m.group("vfi"),
                 NetworkInstanceKey::new);
     }
 
     public static String realignL2vsi(String output) {
-        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), "");
+        String withoutNewlines = output.replaceAll(ParsingUtils.NEWLINE.pattern(), "");
         return withoutNewlines.replace("l2 vfi", "\nl2 vfi");
     }
 

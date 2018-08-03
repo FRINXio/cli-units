@@ -16,17 +16,14 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6;
 
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getIfcNumber;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getTypeOnDevice;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.parseType;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,9 +64,10 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId
                 == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            Class<? extends InterfaceType> ifcType = parseType(id);
-            String ifcNumber = getIfcNumber(id);
-            final String input = blockingRead(String.format(SH_INTERFACE_IP, getTypeOnDevice(ifcType), ifcNumber),
+            Class<? extends InterfaceType> ifcType = InterfaceConfigReader.parseType(id);
+            String ifcNumber = InterfaceConfigReader.getIfcNumber(id);
+            final String input = blockingRead(String.format(SH_INTERFACE_IP,
+                    InterfaceConfigReader.getTypeOnDevice(ifcType), ifcNumber),
                     cli, instanceIdentifier, readContext);
             return parseAddressIds(input);
         } else {
@@ -80,11 +78,11 @@ public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKe
     @VisibleForTesting
     public static List<AddressKey> parseAddressIds(String output) {
         List<AddressKey> addressKeys = new ArrayList<>();
-        addressKeys.addAll(parseFields(output, 0,
+        addressKeys.addAll(ParsingUtils.parseFields(output, 0,
             IPV6_LOCAL_ADDRESS::matcher,
             m -> m.group("ipv6local"),
             addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
-        addressKeys.addAll(parseFields(output, 0,
+        addressKeys.addAll(ParsingUtils.parseFields(output, 0,
             IPV6_UNICAST_ADDRESS::matcher,
             m -> m.group("ipv6unicast"),
             addr -> new AddressKey(new Ipv6AddressNoZone(addr))));

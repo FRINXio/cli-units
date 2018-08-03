@@ -16,9 +16,6 @@
 
 package io.frinx.cli.ios.routing.policy.handlers;
 
-import static io.frinx.cli.ios.routing.policy.handlers.ExtCommunitySetReader.ROUTE_TARGET_EXPORT_SET;
-import static io.frinx.cli.ios.routing.policy.handlers.ExtCommunitySetReader.ROUTE_TARGET_IMPORT_SET;
-
 import io.frinx.openconfig.openconfig.policy.IIDs;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,25 +92,25 @@ public class ExtCommunitySetReaderTest {
     private static final String VRF_2 = "vrf2";
     private static final String VRF_3 = "vrf3";
     private static final List<ExtCommunitySetKey> VRF1_RESULT = Arrays.asList(new ExtCommunitySetKey(VRF_1
-            + ROUTE_TARGET_EXPORT_SET), new ExtCommunitySetKey(VRF_1
-            + ROUTE_TARGET_IMPORT_SET));
+            + ExtCommunitySetReader.ROUTE_TARGET_EXPORT_SET), new ExtCommunitySetKey(VRF_1
+            + ExtCommunitySetReader.ROUTE_TARGET_IMPORT_SET));
 
     private static final List<ExtCommunitySetKey> VRF2_RESULT = Collections.singletonList(new ExtCommunitySetKey(VRF_2
-            + ROUTE_TARGET_EXPORT_SET));
+            + ExtCommunitySetReader.ROUTE_TARGET_EXPORT_SET));
     private static final List<ExtCommunitySetKey> VRF3_RESULT = Collections.singletonList(new ExtCommunitySetKey(VRF_3
-            + ROUTE_TARGET_IMPORT_SET));
+            + ExtCommunitySetReader.ROUTE_TARGET_IMPORT_SET));
     private static final KeyedInstanceIdentifier<ExtCommunitySet, ExtCommunitySetKey> EXPORT_IID = IIDs
             .RO_DEFINEDSETS.augmentation(DefinedSets2.class)
             .child(BgpDefinedSets.class)
             .child(ExtCommunitySets.class)
             .child(ExtCommunitySet.class, new ExtCommunitySetKey(VRF_1
-                    + ROUTE_TARGET_EXPORT_SET));
+                    + ExtCommunitySetReader.ROUTE_TARGET_EXPORT_SET));
     private static final KeyedInstanceIdentifier<ExtCommunitySet, ExtCommunitySetKey> IMPORT_IID = IIDs
             .RO_DEFINEDSETS.augmentation(DefinedSets2.class)
             .child(BgpDefinedSets.class)
             .child(ExtCommunitySets.class)
             .child(ExtCommunitySet.class, new ExtCommunitySetKey(VRF_1
-                    + ROUTE_TARGET_IMPORT_SET));
+                    + ExtCommunitySetReader.ROUTE_TARGET_IMPORT_SET));
     private static final List<ExtCommunitySetConfig.ExtCommunityMember> RT_EXP_RESULT = Arrays.asList(new
             ExtCommunitySetConfig.ExtCommunityMember(new BgpExtCommunityType("100:1000")), new ExtCommunitySetConfig
             .ExtCommunityMember(new BgpExtCommunityType("100:1001")),

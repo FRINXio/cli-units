@@ -16,18 +16,14 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6;
 
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getIfcNumber;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getTypeOnDevice;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.parseType;
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
@@ -67,10 +63,10 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            Class<? extends InterfaceType> ifcType = parseType(name);
-            String ifcNumber = getIfcNumber(name);
+            Class<? extends InterfaceType> ifcType = InterfaceConfigReader.parseType(name);
+            String ifcNumber = InterfaceConfigReader.getIfcNumber(name);
             parseAddressConfig(configBuilder, blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP,
-                    getTypeOnDevice(ifcType), ifcNumber), cli, id, readContext), id);
+                    InterfaceConfigReader.getTypeOnDevice(ifcType), ifcNumber), cli, id, readContext), id);
         }
     }
 
@@ -79,9 +75,10 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         Ipv6AddressNoZone address = id.firstKeyOf(Address.class).getIp();
         configBuilder.setIp(address);
         configBuilder.setPrefixLength(DEFAULT_PREFIX_LENGHT);
-        output = String.valueOf(Arrays.stream(output.split(NEWLINE.pattern())).filter(line -> line.contains(address
+        output = String.valueOf(Arrays.stream(output.split(
+                ParsingUtils.NEWLINE.pattern())).filter(line -> line.contains(address
                 .getValue())).findAny());
-        parseField(output,
+        ParsingUtils.parseField(output,
             Ipv6AddressReader.IPV6_UNICAST_ADDRESS::matcher,
             m -> Short.parseShort(m.group("prefix")),
             configBuilder::setPrefixLength);

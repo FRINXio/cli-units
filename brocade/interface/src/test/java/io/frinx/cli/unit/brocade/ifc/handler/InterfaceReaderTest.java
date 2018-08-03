@@ -16,10 +16,9 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.junit.Assert.assertThat;
-
 import java.util.List;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 
@@ -39,6 +38,6 @@ public class InterfaceReaderTest {
     @Test
     public void testAllIds() throws Exception {
         List<InterfaceKey> interfaceKeys = InterfaceReader.parseAllInterfaceIds(OUTPUT);
-        assertThat(interfaceKeys, hasItem(new InterfaceKey("10GigabitEthernet4/2")));
+        Assert.assertThat(interfaceKeys, CoreMatchers.hasItem(new InterfaceKey("10GigabitEthernet4/2")));
     }
 }

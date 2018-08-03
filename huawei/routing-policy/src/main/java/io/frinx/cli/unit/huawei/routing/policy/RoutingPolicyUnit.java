@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.huawei.routing.policy;
 
-import static io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG;
-
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
@@ -106,7 +104,8 @@ public class RoutingPolicyUnit implements TranslateUnit {
         writeRegistry.add(new GenericWriter<>(BGP_DEFINED_SETS, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(EXT_COMMUNITY_SETS, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(EXT_COMMUNITY_SET, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(EXT_CS_CONFIG,new ExtCommunitySetConfigWriter(cli)), NE_NE_CONFIG);
+        writeRegistry.addAfter(new GenericWriter<>(EXT_CS_CONFIG,new ExtCommunitySetConfigWriter(cli)),
+                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {

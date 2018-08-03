@@ -16,9 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.verify;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -26,6 +23,7 @@ import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -79,10 +77,10 @@ public class RpfCheckWriterTest {
                 .executeAndRead(responseString.capture());
         final String ipv4Cmd = responseString.getValue()
                 .getContent();
-        assertTrue(ipv4Cmd.contains("ipv4 verify"));
-        assertTrue(ipv4Cmd.contains("reachable-via any"));
-        assertTrue(ipv4Cmd.contains("allow-default"));
-        assertTrue(ipv4Cmd.contains("allow-self-ping"));
+        Assert.assertTrue(ipv4Cmd.contains("ipv4 verify"));
+        Assert.assertTrue(ipv4Cmd.contains("reachable-via any"));
+        Assert.assertTrue(ipv4Cmd.contains("allow-default"));
+        Assert.assertTrue(ipv4Cmd.contains("allow-self-ping"));
     }
 
     @Test
@@ -99,10 +97,10 @@ public class RpfCheckWriterTest {
                 .executeAndRead(responseString.capture());
         final String ipv6Cmd = responseString.getValue()
                 .getContent();
-        assertTrue(ipv6Cmd.contains("ipv6 verify"));
-        assertTrue(ipv6Cmd.contains("reachable-via any"));
-        assertTrue(ipv6Cmd.contains("allow-default"));
-        assertTrue(ipv6Cmd.contains("allow-self-ping"));
+        Assert.assertTrue(ipv6Cmd.contains("ipv6 verify"));
+        Assert.assertTrue(ipv6Cmd.contains("reachable-via any"));
+        Assert.assertTrue(ipv6Cmd.contains("allow-default"));
+        Assert.assertTrue(ipv6Cmd.contains("allow-self-ping"));
     }
 
     @Test
@@ -119,10 +117,10 @@ public class RpfCheckWriterTest {
                 .executeAndRead(responseString.capture());
         final String ipv4Cmd = responseString.getValue()
                 .getContent();
-        assertTrue(ipv4Cmd.contains("ipv4 verify"));
-        assertTrue(ipv4Cmd.contains("reachable-via any"));
-        assertTrue(ipv4Cmd.contains("allow-default"));
-        assertFalse(ipv4Cmd.contains("allow-self-ping"));
+        Assert.assertTrue(ipv4Cmd.contains("ipv4 verify"));
+        Assert.assertTrue(ipv4Cmd.contains("reachable-via any"));
+        Assert.assertTrue(ipv4Cmd.contains("allow-default"));
+        Assert.assertFalse(ipv4Cmd.contains("allow-self-ping"));
     }
 
     @Test
@@ -139,10 +137,10 @@ public class RpfCheckWriterTest {
                 .executeAndRead(responseString.capture());
         final String ipv6Cmd = responseString.getValue()
                 .getContent();
-        assertTrue(ipv6Cmd.contains("ipv6 verify"));
-        assertTrue(ipv6Cmd.contains("reachable-via any"));
-        assertTrue(ipv6Cmd.contains("allow-default"));
-        assertFalse(ipv6Cmd.contains("allow-self-ping"));
+        Assert.assertTrue(ipv6Cmd.contains("ipv6 verify"));
+        Assert.assertTrue(ipv6Cmd.contains("reachable-via any"));
+        Assert.assertTrue(ipv6Cmd.contains("allow-default"));
+        Assert.assertFalse(ipv6Cmd.contains("allow-self-ping"));
     }
 
     @Test
@@ -159,10 +157,10 @@ public class RpfCheckWriterTest {
                 .executeAndRead(responseString.capture());
         final String ipv4Cmd = responseString.getValue()
                 .getContent();
-        assertTrue(ipv4Cmd.contains("ipv4 verify"));
-        assertTrue(ipv4Cmd.contains("reachable-via any"));
-        assertFalse(ipv4Cmd.contains("allow-default"));
-        assertTrue(ipv4Cmd.contains("allow-self-ping"));
+        Assert.assertTrue(ipv4Cmd.contains("ipv4 verify"));
+        Assert.assertTrue(ipv4Cmd.contains("reachable-via any"));
+        Assert.assertFalse(ipv4Cmd.contains("allow-default"));
+        Assert.assertTrue(ipv4Cmd.contains("allow-self-ping"));
     }
 
     @Test
@@ -179,10 +177,10 @@ public class RpfCheckWriterTest {
                 .executeAndRead(responseString.capture());
         final String ipv6Cmd = responseString.getValue()
                 .getContent();
-        assertTrue(ipv6Cmd.contains("ipv6 verify"));
-        assertTrue(ipv6Cmd.contains("reachable-via any"));
-        assertFalse(ipv6Cmd.contains("allow-default"));
-        assertTrue(ipv6Cmd.contains("allow-self-ping"));
+        Assert.assertTrue(ipv6Cmd.contains("ipv6 verify"));
+        Assert.assertTrue(ipv6Cmd.contains("reachable-via any"));
+        Assert.assertFalse(ipv6Cmd.contains("allow-default"));
+        Assert.assertTrue(ipv6Cmd.contains("allow-self-ping"));
     }
 
     @Test
@@ -198,10 +196,10 @@ public class RpfCheckWriterTest {
                 .executeAndRead(responseString.capture());
         final String ipv4Cmd = responseString.getValue()
                 .getContent();
-        assertTrue(ipv4Cmd.contains("ipv4 verify"));
-        assertTrue(ipv4Cmd.contains("reachable-via any"));
-        assertFalse(ipv4Cmd.contains("allow-default"));
-        assertFalse(ipv4Cmd.contains("allow-self-ping"));
+        Assert.assertTrue(ipv4Cmd.contains("ipv4 verify"));
+        Assert.assertTrue(ipv4Cmd.contains("reachable-via any"));
+        Assert.assertFalse(ipv4Cmd.contains("allow-default"));
+        Assert.assertFalse(ipv4Cmd.contains("allow-self-ping"));
     }
 
     @Test
@@ -217,10 +215,10 @@ public class RpfCheckWriterTest {
                 .executeAndRead(responseString.capture());
         final String ipv6Cmd = responseString.getValue()
                 .getContent();
-        assertTrue(ipv6Cmd.contains("ipv6 verify"));
-        assertTrue(ipv6Cmd.contains("reachable-via any"));
-        assertFalse(ipv6Cmd.contains("allow-default"));
-        assertFalse(ipv6Cmd.contains("allow-self-ping"));
+        Assert.assertTrue(ipv6Cmd.contains("ipv6 verify"));
+        Assert.assertTrue(ipv6Cmd.contains("reachable-via any"));
+        Assert.assertFalse(ipv6Cmd.contains("allow-default"));
+        Assert.assertFalse(ipv6Cmd.contains("allow-self-ping"));
     }
 
     @Test
@@ -236,8 +234,8 @@ public class RpfCheckWriterTest {
                 .executeAndRead(responseString.capture());
         final String ipv4Cmd = responseString.getValue()
                 .getContent();
-        assertTrue(ipv4Cmd.contains("ipv4 verify"));
-        assertTrue(ipv4Cmd.contains("reachable-via rx"));
+        Assert.assertTrue(ipv4Cmd.contains("ipv4 verify"));
+        Assert.assertTrue(ipv4Cmd.contains("reachable-via rx"));
     }
 
     @Test
@@ -253,7 +251,7 @@ public class RpfCheckWriterTest {
                 .executeAndRead(responseString.capture());
         final String ipv6Cmd = responseString.getValue()
                 .getContent();
-        assertTrue(ipv6Cmd.contains("ipv6 verify"));
-        assertTrue(ipv6Cmd.contains("reachable-via rx"));
+        Assert.assertTrue(ipv6Cmd.contains("ipv6 verify"));
+        Assert.assertTrue(ipv6Cmd.contains("reachable-via rx"));
     }
 }

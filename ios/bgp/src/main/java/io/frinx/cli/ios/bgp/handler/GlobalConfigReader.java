@@ -16,8 +16,6 @@
 
 package io.frinx.cli.ios.bgp.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -90,7 +88,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
     }
 
     private static String realignOutput(String output) {
-        output = output.replaceAll(NEWLINE.pattern(), "");
+        output = output.replaceAll(ParsingUtils.NEWLINE.pattern(), "");
         output = output.replaceAll("address-family", "\naddress-family");
         return output;
     }
@@ -98,7 +96,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
     private static void setVrfRouterId(ConfigBuilder configBuilder, String output, String vrf) {
         output = realignOutput(output);
 
-        NEWLINE.splitAsStream(output)
+        ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .map(ROUTER_ID_PATTERN::matcher)
                 .filter(Matcher::matches)

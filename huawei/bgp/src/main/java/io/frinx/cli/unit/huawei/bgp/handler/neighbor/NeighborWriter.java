@@ -16,9 +16,7 @@
 
 package io.frinx.cli.unit.huawei.bgp.handler.neighbor;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -157,8 +155,8 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
             }
         } else {
             String vrfName = vrfKey.getName();
-            checkArgument(!neighAfiSafi.isEmpty(), "No afi safi defined for neighbor: %s in VRF: %s", neighborIp,
-                    vrfName);
+            Preconditions.checkArgument(!neighAfiSafi.isEmpty(),
+                    "No afi safi defined for neighbor: %s in VRF: %s", neighborIp, vrfName);
 
             for (Class<? extends AFISAFITYPE> afiClass : neighAfiSafi) {
                 renderNeighbor(NEIGHBOR_VRF, instanceIdentifier, neighbor,
@@ -182,7 +180,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     }
 
     private Long getAsValue(Global global) {
-        return checkNotNull(checkNotNull(global.getConfig()).getAs()).getValue();
+        return Preconditions.checkNotNull(Preconditions.checkNotNull(global.getConfig()).getAs()).getValue();
     }
 
     /**

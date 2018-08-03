@@ -16,11 +16,10 @@
 
 package io.frinx.cli.ospf.handler;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.AreaKey;
 
@@ -40,6 +39,6 @@ public class OspfAreaReaderTest {
     @Test
     public void testParseArea() throws Exception {
         List<AreaKey> areaKeys = OspfAreaReader.parseAreasIds(OSPF_1);
-        assertEquals(AREAS, areaKeys);
+        Assert.assertEquals(AREAS, areaKeys);
     }
 }

@@ -16,10 +16,6 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler;
 
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getIfcNumber;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.getTypeOnDevice;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader.parseType;
-
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -44,9 +40,9 @@ public final class TpIdInterfaceWriter implements CliWriter<Config1> {
                                        @Nonnull Config1 dataAfter,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         String name = id.firstKeyOf(Interface.class).getName();
-        Class<? extends InterfaceType> ifcType = parseType(name);
-        String typeOnDevice = getTypeOnDevice(ifcType);
-        String ifcNumber = getIfcNumber(name);
+        Class<? extends InterfaceType> ifcType = InterfaceConfigReader.parseType(name);
+        String typeOnDevice = InterfaceConfigReader.getTypeOnDevice(ifcType);
+        String ifcNumber = InterfaceConfigReader.getIfcNumber(name);
 
         String tpIdForDevice = getTpIdForDevice(dataAfter);
 
@@ -70,9 +66,9 @@ public final class TpIdInterfaceWriter implements CliWriter<Config1> {
                                         @Nonnull Config1 dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         String name = id.firstKeyOf(Interface.class).getName();
-        Class<? extends InterfaceType> ifcType = parseType(name);
-        String typeOnDevice = getTypeOnDevice(ifcType);
-        String ifcNumber = getIfcNumber(name);
+        Class<? extends InterfaceType> ifcType = InterfaceConfigReader.parseType(name);
+        String typeOnDevice = InterfaceConfigReader.getTypeOnDevice(ifcType);
+        String ifcNumber = InterfaceConfigReader.getIfcNumber(name);
 
         String tpIdForDevice = getTpIdForDevice(dataBefore);
 

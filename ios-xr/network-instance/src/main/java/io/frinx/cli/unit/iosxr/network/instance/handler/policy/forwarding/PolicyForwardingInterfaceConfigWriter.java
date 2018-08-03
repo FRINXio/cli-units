@@ -15,13 +15,12 @@
  */
 package io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
-
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
@@ -42,7 +41,7 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        Preconditions.checkArgument(DEFAULT_NETWORK.equals(id.firstKeyOf(NetworkInstance.class)),
+        Preconditions.checkArgument(NetworInstance.DEFAULT_NETWORK.equals(id.firstKeyOf(NetworkInstance.class)),
                 "Policy forwarding should be configured in default network instance");
 
         String ifcName = id.firstKeyOf(Interface.class)

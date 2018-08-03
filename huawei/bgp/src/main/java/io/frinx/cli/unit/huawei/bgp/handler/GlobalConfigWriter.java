@@ -16,9 +16,7 @@
 
 package io.frinx.cli.unit.huawei.bgp.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.bgp.BgpWriter;
@@ -66,7 +64,7 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
 
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         ProtocolKey protoKey = id.firstKeyOf(Protocol.class);
-        checkArgument(protoKey.getName().equals(BgpProtocolReader.DEFAULT_BGP_INSTANCE),
+        Preconditions.checkArgument(protoKey.getName().equals(BgpProtocolReader.DEFAULT_BGP_INSTANCE),
                 "BGP protocol instance has to be named: %s. Not: %s", BgpProtocolReader.DEFAULT_BGP_INSTANCE, protoKey);
 
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
@@ -87,7 +85,7 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
                     .filter(protocol -> protocol.getConfig().getIdentifier().equals(BGP.class))
                     .findFirst()
                     .map(bgp -> bgp.getBgp().getGlobal().getConfig().getAs())
-                    .ifPresent(globalAs -> checkArgument(globalAs.equals(config.getAs()),
+                    .ifPresent(globalAs -> Preconditions.checkArgument(globalAs.equals(config.getAs()),
                             "BGP for VRF contains different AS: %s than global BGP: %s", config.getAs(), globalAs));
 
             blockingWriteAndRead(cli, id, config,

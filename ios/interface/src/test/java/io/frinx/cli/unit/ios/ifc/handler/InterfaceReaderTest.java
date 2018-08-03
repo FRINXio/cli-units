@@ -16,11 +16,10 @@
 
 package io.frinx.cli.unit.ios.ifc.handler;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 
@@ -50,11 +49,11 @@ public class InterfaceReaderTest {
 
     @Test
     public void testParseInterfaceIds() throws Exception {
-        assertEquals(IDS_EXPECTED, InterfaceReader.parseInterfaceIds(SH_INTERFACE));
+        Assert.assertEquals(IDS_EXPECTED, InterfaceReader.parseInterfaceIds(SH_INTERFACE));
     }
 
     @Test
     public void testParseAllInterfaceIds() throws Exception {
-        assertEquals(IDS_ALL_EXPECTED, InterfaceReader.parseAllInterfaceIds(SH_INTERFACE));
+        Assert.assertEquals(IDS_ALL_EXPECTED, InterfaceReader.parseAllInterfaceIds(SH_INTERFACE));
     }
 }

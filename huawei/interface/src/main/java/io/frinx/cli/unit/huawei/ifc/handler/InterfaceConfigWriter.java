@@ -16,8 +16,7 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -91,7 +90,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
     private static void validateIfcConfiguration(Config data) {
         if (data.getType() == SoftwareLoopback.class) {
-            checkArgument(data.getMtu() == null,
+            Preconditions.checkArgument(data.getMtu() == null,
                     "Cannot configure mtu for interface %s of type SoftwareLoopback",
                     data.getName());
         }
@@ -103,7 +102,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
         if (data.getType() == SoftwareLoopback.class) {
             Matcher matcher = LOOPBACK_NAME_PATTERN.matcher(data.getName());
-            checkArgument(matcher.matches(),
+            Preconditions.checkArgument(matcher.matches(),
                     "Loopback name must be in format: Loopback45, not: %s", data.getName());
         } else {
             throw new IllegalArgumentException("Cannot create interface of type: " + data.getType());
@@ -121,7 +120,7 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         try {
-            checkArgument(dataBefore.getType().equals(dataAfter.getType()),
+            Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
                     "Changing interface type is not permitted. Before: %s, After: %s",
                     dataBefore.getType(), dataAfter.getType());
         } catch (RuntimeException e) {

@@ -16,10 +16,8 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.network.instance.L2p2pWriter;
@@ -65,12 +63,12 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
     public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
                                               @Nonnull ConnectionPoints dataAfter,
                                               @Nonnull WriteContext writeContext) throws WriteFailedException {
-        checkArgument(dataAfter.getConnectionPoint()
+        Preconditions.checkArgument(dataAfter.getConnectionPoint()
                         .size() == 2,
                 "L2P2P network only supports 2 endpoints, but were: %s", dataAfter.getConnectionPoint());
         String netName = id.firstKeyOf(NetworkInstance.class)
                 .getName();
-        checkArgument(netName.length() <= NET_NAME_LENGTH,
+        Preconditions.checkArgument(netName.length() <= NET_NAME_LENGTH,
                 "L2P2P network name is too long: %s. Maximum chars is: %s", netName, NET_NAME_LENGTH);
 
         Set<String> usedInterfaces = getUsedInterfaces(id, writeContext);
@@ -182,7 +180,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                 f("connect %s %s %s interworking ethernet", netName, ifc1, ifc2),
                 "end");
 
-        checkState(!output.toLowerCase()
+        Preconditions.checkState(!output.toLowerCase()
                 .contains("invalid command"), "Local connect configuration failed with output: %s", output);
     }
 
@@ -201,7 +199,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
         Endpoint endpoint1 = connectionPoint1.getEndpoints()
                 .getEndpoint()
                 .get(0);
-        checkArgument(endpoint1.getEndpointId()
+        Preconditions.checkArgument(endpoint1.getEndpointId()
                         .equals(L2P2PConnectionPointsReader.ENDPOINT_ID),
                 "Endpoint has to be named: %s, not %s", L2P2PConnectionPointsReader.ENDPOINT_ID, endpoint1.getConfig());
 
@@ -243,9 +241,9 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
     private static void checkIfcNotUsedAlready(Set<String> usedInterfaces, L2P2PConnectionPointsReader.InterfaceId
             interfaceId) {
         // Check interface not used already (or its parent)
-        checkArgument(!usedInterfaces.contains(interfaceId.toString()),
+        Preconditions.checkArgument(!usedInterfaces.contains(interfaceId.toString()),
                 "Interface %s already used in L2VPN network as: %s", interfaceId, interfaceId);
-        checkArgument(!usedInterfaces.contains(interfaceId.toParentIfcString()),
+        Preconditions.checkArgument(!usedInterfaces.contains(interfaceId.toParentIfcString()),
                 "Interface %s already used in L2VPN network as: %s", interfaceId, interfaceId.toParentIfcString());
     }
 
@@ -257,7 +255,8 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                 .child(Subinterface.class, new SubinterfaceKey(subifc));
 
         Optional<Subinterface> subData = writeContext.readAfter(subIfcId);
-        checkArgument(subData.isPresent(), "Unknown subinterface %s.%s, cannot configure L2VPN", interfaceId);
+        Preconditions.checkArgument(subData.isPresent(),
+                "Unknown subinterface %s.%s, cannot configure L2VPN", interfaceId);
     }
 
     private static void checkSubIfcDoesntExist(WriteContext writeContext, String ifcName, L2P2PConnectionPointsReader
@@ -268,7 +267,8 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                 .child(Subinterface.class, new SubinterfaceKey(subifc));
 
         Optional<Subinterface> subData = writeContext.readAfter(subIfcId);
-        checkArgument(!subData.isPresent(), "Subinterface %s.%s already exists, cannot configure L2VPN", interfaceId);
+        Preconditions.checkArgument(!subData.isPresent(),
+                "Subinterface %s.%s already exists, cannot configure L2VPN", interfaceId);
     }
 
     private static void checkIfcExists(WriteContext writeContext, boolean isWrite, L2P2PConnectionPointsReader
@@ -277,7 +277,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                 .child(Interface.class, new InterfaceKey(interfaceId.toParentIfcString()));
 
         Optional<Interface> ifcData = isWrite ? writeContext.readAfter(ifcId) : writeContext.readBefore(ifcId);
-        checkArgument(ifcData.isPresent(), "Unknown interface %s, cannot configure L2VPN", ifcData);
+        Preconditions.checkArgument(ifcData.isPresent(), "Unknown interface %s, cannot configure L2VPN", ifcData);
     }
 
     private static void checkInterfaceNoIp(WriteContext writeContext,
@@ -294,7 +294,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                 .child(Ipv4.class)
                 .child(Addresses.class));
         // Ensure no IPv4
-        checkState(!ipv4.isPresent() || ipv4.get()
+        Preconditions.checkState(!ipv4.isPresent() || ipv4.get()
                         .getAddress()
                         .isEmpty(),
                 "Interface: %s cannot be used in L2VPN. It has IP address configured: %s", interfaceId, ipv4);
@@ -306,7 +306,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                         .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip
                                 .rev161222.ipv6.top.ipv6.Addresses.class));
         // Ensure no IPv6
-        checkState(!ipv6.isPresent() || ipv6.get()
+        Preconditions.checkState(!ipv6.isPresent() || ipv6.get()
                         .getAddress()
                         .isEmpty(),
                 "Interface: %s cannot be used in L2VPN. It has IPv6 address configured: %s", interfaceId, ipv6);
@@ -321,10 +321,10 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                 .findFirst()
                 .get();
 
-        checkArgument(connectionPoint.getConnectionPointId()
+        Preconditions.checkArgument(connectionPoint.getConnectionPointId()
                         .equals(expectedPointId),
                 "Connection point has to be named: %s, not %s", expectedPointId, connectionPoint.getConfig());
-        checkArgument(connectionPoint.getEndpoints()
+        Preconditions.checkArgument(connectionPoint.getEndpoints()
                         .getEndpoint()
                         .size() == 1,
                 "Connection point must contain only 1 endpoint, but has: %s", connectionPoint.getEndpoints()

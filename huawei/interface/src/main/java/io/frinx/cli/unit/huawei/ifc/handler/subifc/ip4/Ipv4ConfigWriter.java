@@ -16,11 +16,10 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4;
 
-import static io.frinx.cli.unit.huawei.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.huawei.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
@@ -47,8 +46,7 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
             config, @Nonnull WriteContext writeContext) throws WriteFailedException {
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        if (subId
-                != ZERO_SUBINTERFACE_ID) {
+        if (subId != SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             throw new WriteFailedException.CreateFailedException(instanceIdentifier, config, new
                     IllegalArgumentException("Unable to manage IP for subinterface: "
                     + subId));
@@ -84,8 +82,7 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
 
         // TODO Probably not needed since we do not support IP configuraion
         // on any other subinterface
-        if (subId
-                != ZERO_SUBINTERFACE_ID) {
+        if (subId != SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             throw new WriteFailedException.DeleteFailedException(instanceIdentifier, new IllegalArgumentException(
                     "Unable to manage IP for subinterface: "
                 + subId));

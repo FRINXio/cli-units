@@ -16,9 +16,6 @@
 
 package io.frinx.cli.iosxr.unit.acl.handler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.ModificationCache;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -26,11 +23,10 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
 import io.frinx.openconfig.openconfig.acl.IIDs;
-
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -82,8 +78,8 @@ public class IngressAclSetReaderTest {
         final IngressAclSetBuilder builder = new IngressAclSetBuilder();
         IngressAclSetReader.parseAcl(readOutput, builder, setName);
 
-        assertEquals(builder.getSetName(), setName);
-        assertEquals(builder.getType(), AclUtil.getType(type));
+        Assert.assertEquals(builder.getSetName(), setName);
+        Assert.assertEquals(builder.getType(), AclUtil.getType(type));
     }
 
     @Test
@@ -95,8 +91,8 @@ public class IngressAclSetReaderTest {
         IngressAclSetReader reader = new IngressAclSetReader(cliMock);
         reader.readCurrentAttributes(TestData.ACL_SET_IID, aclSetBuilder, context);
 
-        assertEquals(TestData.ACL_SET_NAME, aclSetBuilder.getSetName());
-        assertEquals(TestData.ACL_TYPE, aclSetBuilder.getType());
+        Assert.assertEquals(TestData.ACL_SET_NAME, aclSetBuilder.getSetName());
+        Assert.assertEquals(TestData.ACL_TYPE, aclSetBuilder.getType());
     }
 
     @Test
@@ -104,7 +100,7 @@ public class IngressAclSetReaderTest {
         IngressAclSetReader reader = new IngressAclSetReader(cliMock);
         final List<IngressAclSetKey> aclIds = reader.getAllIds(TestData.ACL_SET_IID, context);
 
-        assertThat(aclIds, CoreMatchers.allOf(
+        Assert.assertThat(aclIds, CoreMatchers.allOf(
                 CoreMatchers.hasItem(new IngressAclSetKey(TestData.ACL_SET_NAME, TestData.ACL_TYPE)),
                 CoreMatchers.hasItem(new IngressAclSetKey(TestData.ACL_SET_NAME_OTHER, TestData.ACL_TYPE))
                 )

@@ -16,11 +16,10 @@
 
 package io.frinx.cli.unit.ios.cdp.handler;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp._interface.top.interfaces.InterfaceKey;
 
@@ -67,7 +66,7 @@ public class InterfaceReaderTest {
 
     @Test
     public void testCdpInterfaceIds() throws Exception {
-        assertEquals(IOS_EXPECTED, InterfaceReader.parseCdpInterfaces(IOS_OUTPUT));
-        assertEquals(XE_EXPECTED, InterfaceReader.parseCdpInterfaces(XE_OUTPUT));
+        Assert.assertEquals(IOS_EXPECTED, InterfaceReader.parseCdpInterfaces(IOS_OUTPUT));
+        Assert.assertEquals(XE_EXPECTED, InterfaceReader.parseCdpInterfaces(XE_OUTPUT));
     }
 }

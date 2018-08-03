@@ -16,15 +16,13 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
@@ -60,7 +58,7 @@ public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
     static void parseVrfConfig(String output, ConfigBuilder builder, String vrf) {
         String realignedOutput = realignOutput(output);
 
-        String config = NEWLINE.splitAsStream(realignedOutput)
+        String config = ParsingUtils.NEWLINE.splitAsStream(realignedOutput)
                 .filter(vrfConfigLine -> vrfConfigLine.contains(String.format("ip vrf %s ", vrf)))
                 .findAny()
                 .orElse("");
@@ -68,7 +66,7 @@ public class VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         builder.setName(vrf);
         builder.setType(L3VRF.class);
 
-        parseField(config,
+        ParsingUtils.parseField(config,
             RD_LINE::matcher,
             matcher -> matcher.group("rd"),
             rd -> builder.setRouteDistinguisher(new RouteDistinguisher(rd)));

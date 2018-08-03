@@ -16,17 +16,13 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip6;
 
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6AddressReader.IPV6_UNICAST_ADDRESS;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6AddressReader.SH_INTERFACE_IP;
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressBuilder;
@@ -60,8 +56,8 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name), cli, id,
-                    readContext), id);
+            parseAddressConfig(configBuilder, blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP, name),
+                    cli, id, readContext), id);
         }
     }
 
@@ -72,13 +68,13 @@ public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
         configBuilder.setIp(address);
         configBuilder.setPrefixLength(DEFAULT_PREFIX_LENGHT);
 
-        output = NEWLINE.splitAsStream(output)
+        output = ParsingUtils.NEWLINE.splitAsStream(output)
             .filter(line -> line.contains(address.getValue()))
                 .findAny()
                 .orElse("");
 
-        parseField(output,
-                IPV6_UNICAST_ADDRESS::matcher,
+        ParsingUtils.parseField(output,
+                Ipv6AddressReader.IPV6_UNICAST_ADDRESS::matcher,
             m -> Short.parseShort(m.group("prefix")),
                 configBuilder::setPrefixLength);
     }

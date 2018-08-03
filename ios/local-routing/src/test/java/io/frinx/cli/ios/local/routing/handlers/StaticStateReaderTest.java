@@ -16,9 +16,7 @@
 
 package io.frinx.cli.ios.local.routing.handlers;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class StaticStateReaderTest {
@@ -32,9 +30,9 @@ public class StaticStateReaderTest {
 
     @Test
     public void testParseStaticPrefixes() {
-        assertTrue(StaticStateReader.isPrefixStatic(IP_OUTPUT1));
-        assertFalse(StaticStateReader.isPrefixStatic(IP_OUTPUT2));
-        assertFalse(StaticStateReader.isPrefixStatic(IP_OUTPUT3));
-        assertTrue(StaticStateReader.isPrefixStatic(IPV6_OUTPUT1));
+        Assert.assertTrue(StaticStateReader.isPrefixStatic(IP_OUTPUT1));
+        Assert.assertFalse(StaticStateReader.isPrefixStatic(IP_OUTPUT2));
+        Assert.assertFalse(StaticStateReader.isPrefixStatic(IP_OUTPUT3));
+        Assert.assertTrue(StaticStateReader.isPrefixStatic(IPV6_OUTPUT1));
     }
 }

@@ -16,9 +16,6 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.l2p2p;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -27,6 +24,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,7 +81,7 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
     static List<NetworkInstanceKey> parseXconnectIds(String output) {
         String linePerInterface = realignXconnectInterfacesOutput(output);
 
-        return parseFields(linePerInterface, 0,
+        return ParsingUtils.parseFields(linePerInterface, 0,
                 XCONNECT_ID_LINE::matcher,
                 L2P2PReader::getXconnectId,
                 NetworkInstanceKey::new);
@@ -91,14 +89,14 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
 
     @VisibleForTesting
     static List<NetworkInstanceKey> parseLocalConnectIds(String output) {
-        return parseFields(output, 0,
+        return ParsingUtils.parseFields(output, 0,
                 LOCAL_CONNECT_ID_LINE::matcher,
             matcher -> matcher.group("network"),
                 NetworkInstanceKey::new);
     }
 
     public static String realignXconnectInterfacesOutput(String output) {
-        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), "");
+        String withoutNewlines = output.replaceAll(ParsingUtils.NEWLINE.pattern(), "");
         return withoutNewlines.replace("interface ", "\n");
     }
 

@@ -16,13 +16,12 @@
 
 package io.frinx.cli.ios.bgp.handler.peergroup;
 
-import static io.frinx.cli.ios.bgp.handler.BgpProtocolReader.DEFAULT_BGP_INSTANCE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ios.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborReader;
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +50,7 @@ public class PeerGroupReader implements BgpListReader.BgpConfigListReader<PeerGr
                                                @Nonnull ReadContext readContext) throws ReadFailedException {
 
         String networkInstanceName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        if (DEFAULT_BGP_INSTANCE.equals(networkInstanceName)) {
+        if (BgpProtocolReader.DEFAULT_BGP_INSTANCE.equals(networkInstanceName)) {
             return getDefaultPeerGroupKeys(blockingRead(NeighborReader.SH_SUMM, cli, instanceIdentifier, readContext));
         } else {
             return getVrfPeerGroupKeys(blockingRead(NeighborReader.SH_SUMM, cli, instanceIdentifier, readContext),

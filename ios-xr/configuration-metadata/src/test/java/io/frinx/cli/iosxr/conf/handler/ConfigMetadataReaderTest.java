@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.conf.handler;
 
-import static org.junit.Assert.assertFalse;
-
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,10 +27,9 @@ public class ConfigMetadataReaderTest {
 
         Optional<String> date1 = ConfigMetadataReader.getLastConfigurationFingerprint("Tue Apr  3 14:03:27.250 UTC\n1"
                 + "    1000007068            cisco     vty1:node0_0_CPU0   CLI         Tue Apr  3 13:03:39 2018\n");
-        Assert.assertEquals(date1.get()
-                .toString(), "Tue Apr  3 13:03:39 2018");
+        Assert.assertEquals(date1.get(), "Tue Apr  3 13:03:39 2018");
 
         Optional<String> date2 = (ConfigMetadataReader.getLastConfigurationFingerprint(""));
-        assertFalse(date2.isPresent());
+        Assert.assertFalse(date2.isPresent());
     }
 }

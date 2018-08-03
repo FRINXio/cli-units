@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.ios.cdp.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -62,11 +61,11 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
     @VisibleForTesting
     static void parseNeighborStateFields(StateBuilder stateBuilder, String output, String neighborId) {
         // The output needs to be preprocessed, so put everything on 1 line
-        String withoutNewlines = output.replaceAll(NEWLINE.pattern(), " ");
+        String withoutNewlines = output.replaceAll(ParsingUtils.NEWLINE.pattern(), " ");
         // And then split per neighbor
         String linePerNeighborOutput = withoutNewlines.replace("Device ID: ", "\n");
 
-        NEWLINE.splitAsStream(linePerNeighborOutput)
+        ParsingUtils.NEWLINE.splitAsStream(linePerNeighborOutput)
                 .map(String::trim)
                 .filter(s -> s.startsWith(neighborId))
                 .map(CDP_NEIGH_PORT_LINE::matcher)

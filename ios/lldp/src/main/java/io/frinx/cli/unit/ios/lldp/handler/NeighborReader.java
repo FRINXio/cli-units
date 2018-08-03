@@ -16,9 +16,8 @@
 
 package io.frinx.cli.unit.ios.lldp.handler;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -74,10 +73,10 @@ public class NeighborReader implements CliOperListReader<Neighbor, NeighborKey, 
             String portString = collect.get(i + 1);
 
             Matcher chMatcher = CHASSIS.matcher(chassisString);
-            checkState(chMatcher.matches());
+            Preconditions.checkState(chMatcher.matches());
             String chassis = chMatcher.group("chassis");
             Matcher ppMatcher = PORT.matcher(portString);
-            checkState(ppMatcher.matches());
+            Preconditions.checkState(ppMatcher.matches());
             String port = ppMatcher.group("portId");
 
             keys.add(new NeighborKey(String.format(KEY_FORMAT, chassis, port)));

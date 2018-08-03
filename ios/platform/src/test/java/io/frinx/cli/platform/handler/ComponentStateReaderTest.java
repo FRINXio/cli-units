@@ -16,8 +16,7 @@
 
 package io.frinx.cli.platform.handler;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.PlatformComponentState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.component.StateBuilder;
@@ -145,7 +144,7 @@ public class ComponentStateReaderTest {
     public void testParse() throws Exception {
         StateBuilder stateBuilder = new StateBuilder();
         ComponentStateReader.parseFields(stateBuilder, "2", OUTPUT2);
-        assertEquals(new StateBuilder().setId("2")
+        Assert.assertEquals(new StateBuilder().setId("2")
                         .setDescription("SFM-capable 48 port 10/100/1000mb RJ45")
                         .setName("2")
                         .setPartNo("WS-X6548-GE-TX")
@@ -158,7 +157,7 @@ public class ComponentStateReaderTest {
 
         stateBuilder = new StateBuilder();
         ComponentStateReader.parseFields(stateBuilder, "1", OUTPUT1);
-        assertEquals(new StateBuilder().setId("1")
+        Assert.assertEquals(new StateBuilder().setId("1")
                         .setDescription("SFM-capable 48 port 10/100/1000mb RJ45")
                         .setName("1")
                         .setPartNo("WS-X6548-GE-TX")
@@ -171,7 +170,7 @@ public class ComponentStateReaderTest {
 
         stateBuilder = new StateBuilder();
         ComponentStateReader.parseFields(stateBuilder, "5", OUTPUT5);
-        assertEquals(new StateBuilder().setId("5")
+        Assert.assertEquals(new StateBuilder().setId("5")
                         .setDescription("Supervisor Engine 720 (Active)")
                         .setName("5")
                         .setPartNo("WS-SUP720-3B")
@@ -184,7 +183,7 @@ public class ComponentStateReaderTest {
 
         stateBuilder = new StateBuilder();
         ComponentStateReader.parseOSVersions(stateBuilder, OUTPUT_VERSION);
-        assertEquals(new StateBuilder().setId("IOS")
+        Assert.assertEquals(new StateBuilder().setId("IOS")
                         .setName("OS")
                         .setSoftwareVersion("15.2(4)S5")
                         .build(),

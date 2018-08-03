@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.ethernet;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -98,7 +96,7 @@ public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuild
 
         // set slow until proven otherwise
         ethConfigAugBuilder.setInterval(LacpPeriodType.SLOW);
-        NEWLINE.splitAsStream(output)
+        ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .map(LACP_PERIOD_LINE::matcher)
                 .filter(Matcher::matches)

@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.huawei.bgp.handler;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
-
 import com.google.common.collect.ImmutableList;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -25,6 +23,7 @@ import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliListReader;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -63,7 +62,7 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
                                              @Nonnull ProtocolBuilder builder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
 
-        if (!DEFAULT_NETWORK.equals(iid.firstKeyOf(NetworkInstance.class))) {
+        if (!NetworInstance.DEFAULT_NETWORK.equals(iid.firstKeyOf(NetworkInstance.class))) {
             setBaseAttributes(iid, builder);
             //todo check if more attributes need to be handled for BGP VRF-awareness
             return;

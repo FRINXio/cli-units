@@ -16,8 +16,7 @@
 
 package io.frinx.cli.unit.huawei.bgp.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -86,8 +85,8 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
             blockingWriteAndRead(f(GLOBAL_BGP_AFI_SAFI, as, toDeviceAddressFamily(config.getAfiSafiName())), cli, id,
                     config);
         } else {
-            checkArgument(writeContext.readAfter(RWUtils.cutId(id, NetworkInstance.class)).get().getConfig()
-                    .getRouteDistinguisher()
+            Preconditions.checkArgument(writeContext.readAfter(RWUtils.cutId(id, NetworkInstance.class))
+                    .get().getConfig().getRouteDistinguisher()
                     != null, "Route distinguisher missing for VRF: %s. Cannot configure BGP afi/safi", vrfName);
 
             DottedQuad routerId = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get().getGlobal().getConfig()

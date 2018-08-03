@@ -16,8 +16,7 @@
 
 package io.frinx.cli.unit.ios.ifc.handler;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
@@ -53,10 +52,10 @@ public class InterfaceConfigReaderTest {
     public void testParseInterface() throws Exception {
         ConfigBuilder parsed = new ConfigBuilder();
         InterfaceConfigReader.parseInterface(SH_INTERFACE_RUN, parsed, "GigabitEthernet1/0");
-        assertEquals(EXPECTED_INTERFACE, parsed.build());
+        Assert.assertEquals(EXPECTED_INTERFACE, parsed.build());
 
         parsed = new ConfigBuilder();
         InterfaceConfigReader.parseInterface(SH_INTERFACE_RUN2, parsed, "FastEthernet0/0");
-        assertEquals(EXPECTED_INTERFACE2, parsed.build());
+        Assert.assertEquals(EXPECTED_INTERFACE2, parsed.build());
     }
 }

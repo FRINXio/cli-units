@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 
-import static io.frinx.openconfig.network.instance.NetworInstance.DEFAULT_NETWORK;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -27,6 +25,7 @@ import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -72,7 +71,7 @@ public class VrfReader implements CliConfigListReader<NetworkInstance, NetworkIn
             m -> m.group("id"),
             value -> new NetworkInstanceKey(value.trim()));
 
-        networkInstanceKeys.add(DEFAULT_NETWORK);
+        networkInstanceKeys.add(NetworInstance.DEFAULT_NETWORK);
 
         return networkInstanceKeys;
     }

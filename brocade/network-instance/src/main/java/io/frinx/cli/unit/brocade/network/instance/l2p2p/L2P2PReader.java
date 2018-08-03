@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.brocade.network.instance.l2p2p;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -26,6 +24,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -74,7 +73,7 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
 
     @VisibleForTesting
     static List<NetworkInstanceKey> parseVllIds(String output) {
-        return parseFields(output, 0,
+        return ParsingUtils.parseFields(output, 0,
             VLL_ID_LINE::matcher,
             matcher -> matcher.group("network"),
             NetworkInstanceKey::new);
@@ -82,7 +81,7 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
 
     @VisibleForTesting
     static List<NetworkInstanceKey> parseLocalConnectIds(String output) {
-        return parseFields(output, 0,
+        return ParsingUtils.parseFields(output, 0,
             VLL_LOCAL_ID_LINE::matcher,
             matcher -> matcher.group("network"),
             NetworkInstanceKey::new);

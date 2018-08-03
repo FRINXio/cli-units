@@ -16,19 +16,15 @@
 
 package io.frinx.cli.unit.brocade.network.instance.l2p2p.cp;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceStateReader.SH_SINGLE_INTERFACE;
-import static io.frinx.cli.unit.brocade.ifc.handler.InterfaceStateReader.STATUS_LINE;
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.read.Reader;
 import io.frinx.cli.handlers.network.instance.L2p2pReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.brocade.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
@@ -131,23 +127,24 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
 
     private List<ConnectionPoint> parseVllPoints(String output, boolean isOper, InstanceIdentifier<ConnectionPoints>
             id, ReadContext ctx) throws ReadFailedException {
-        Optional<String> remoteIp = parseField(output, 0, VLL_PEER_LINE::matcher, m -> m.group("remoteIp"));
+        Optional<String> remoteIp = ParsingUtils.parseField(output, 0, VLL_PEER_LINE::matcher,
+            m -> m.group("remoteIp"));
         if (!remoteIp.isPresent()) {
             return Collections.emptyList();
         }
 
-        Optional<String> vccId = parseField(output, 0,
+        Optional<String> vccId = ParsingUtils.parseField(output, 0,
             VLL_VCCID_LINE::matcher,
             m -> m.group("vccid"));
         if (!vccId.isPresent()) {
             return Collections.emptyList();
         }
 
-        Optional<String> localIfc = parseField(output, 0,
+        Optional<String> localIfc = ParsingUtils.parseField(output, 0,
             VLL_LOCAL_IFC_LINE::matcher,
             m -> m.group("ifc"));
 
-        Optional<String> localSubifc = parseField(output, 0,
+        Optional<String> localSubifc = ParsingUtils.parseField(output, 0,
             VLL_LOCAL_SUBIFC_LINE::matcher,
             m -> String.format("%s.%s", m.group("ifc"), m.group("vlan")));
         if (!localIfc.isPresent() && !localSubifc.isPresent()) {
@@ -192,10 +189,12 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
 
     private InterfaceId expandIfcName(InterfaceId ifc, InstanceIdentifier<ConnectionPoints> id, ReadContext ctx)
             throws ReadFailedException {
-        String output = blockingRead(String.format(SH_SINGLE_INTERFACE, ifc.toParentIfcString(), ""), cli, id, ctx);
-        Optional<String> fullIfcName = ParsingUtils.parseField(output, 0, STATUS_LINE::matcher, m -> m.group("id"));
+        String output = blockingRead(String.format(InterfaceStateReader.SH_SINGLE_INTERFACE,
+                ifc.toParentIfcString(), ""), cli, id, ctx);
+        Optional<String> fullIfcName = ParsingUtils.parseField(output, 0,
+                InterfaceStateReader.STATUS_LINE::matcher, m -> m.group("id"));
 
-        checkArgument(fullIfcName.isPresent(), "Unknown interface %s", ifc);
+        Preconditions.checkArgument(fullIfcName.isPresent(), "Unknown interface %s", ifc);
         return new InterfaceId(fullIfcName.get(), ifc.subifc);
     }
 
@@ -204,7 +203,7 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
                                                String endpointToMatch,
                                                Pattern matcher,
                                                Function<Matcher, String> extract) {
-        return NEWLINE.splitAsStream(output)
+        return ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(line -> line.contains(endpointToMatch))
                 .map(matcher::matcher)

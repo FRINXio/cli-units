@@ -16,16 +16,13 @@
 
 package io.frinx.cli.unit.ios.lldp.handler;
 
-import static io.frinx.cli.unit.ios.lldp.handler.NeighborReader.KEY_FORMAT;
-import static io.frinx.cli.unit.ios.lldp.handler.NeighborReader.SHOW_LLDP_NEIGHBOR;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,7 +58,7 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
             throws ReadFailedException {
         String interfaceId = instanceIdentifier.firstKeyOf(Interface.class).getName();
         String neighborId = instanceIdentifier.firstKeyOf(Neighbor.class).getId();
-        String cmd = String.format(SHOW_LLDP_NEIGHBOR, interfaceId);
+        String cmd = String.format(NeighborReader.SHOW_LLDP_NEIGHBOR, interfaceId);
         String output = blockingRead(cmd, cli, instanceIdentifier, readContext);
 
         parseNeighborStateFields(extractSingleNeighbor(output, neighborId), neighborId, stateBuilder);
@@ -85,8 +82,8 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
         builder.setPortId(split[1]);
 
         // Optional TLVs
-        parseField(output, PORT_DESC::matcher, m -> m.group("portDescr"), builder::setPortDescription);
-        parseField(output, NAME::matcher, m -> m.group("name"), builder::setSystemName);
+        ParsingUtils.parseField(output, PORT_DESC::matcher, m -> m.group("portDescr"), builder::setPortDescription);
+        ParsingUtils.parseField(output, NAME::matcher, m -> m.group("name"), builder::setSystemName);
 
         Matcher descrMatcher = DESCR.matcher(output);
         if (descrMatcher.find()) {
@@ -94,9 +91,9 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
             builder.setSystemDescription(descr.length() >= 255 ? descr.substring(0, 254) : descr);
         }
 
-        Optional<String> mgmtIp4 = parseField(output, 0, IP::matcher, m -> m.group("ip"));
+        Optional<String> mgmtIp4 = ParsingUtils.parseField(output, 0, IP::matcher, m -> m.group("ip"));
         String mgmtIp = mgmtIp4
-                .orElse(parseField(output, 0, IPV6::matcher, m -> m.group("ip")).orElse(null));
+                .orElse(ParsingUtils.parseField(output, 0, IPV6::matcher, m -> m.group("ip")).orElse(null));
         if (mgmtIp != null) {
             builder.setManagementAddress(mgmtIp);
         }
@@ -105,7 +102,7 @@ public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
     private static String[] splitId(String neighborId) {
         String[] split = neighborId.split(" Port:");
         Preconditions.checkArgument(split.length == 2,
-                "Invalid neighbor id format, expected: %s", KEY_FORMAT);
+                "Invalid neighbor id format, expected: %s", NeighborReader.KEY_FORMAT);
         return split;
     }
 

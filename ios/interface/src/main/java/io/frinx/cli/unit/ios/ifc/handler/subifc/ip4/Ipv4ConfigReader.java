@@ -16,17 +16,14 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
-import static io.frinx.cli.handlers.NetUtils.prefixFromNetmask;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4AddressReader.INTERFACE_IP_LINE;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4AddressReader.SH_INTERFACE_IP;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.handlers.NetUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.AddressBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
@@ -55,20 +52,21 @@ public class Ipv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> 
 
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            parseAddressConfig(configBuilder, blockingRead(String.format(SH_INTERFACE_IP, name), cli, id, readContext));
+            parseAddressConfig(configBuilder, blockingRead(
+                    String.format(Ipv4AddressReader.SH_INTERFACE_IP, name), cli, id, readContext));
         }
     }
 
     @VisibleForTesting
     static void parseAddressConfig(ConfigBuilder configBuilder, String output) {
-        parseField(output,
-                INTERFACE_IP_LINE::matcher,
+        ParsingUtils.parseField(output,
+                Ipv4AddressReader.INTERFACE_IP_LINE::matcher,
             m -> new Ipv4AddressNoZone(m.group("ip")),
                 configBuilder::setIp);
 
-        parseField(output,
-                INTERFACE_IP_LINE::matcher,
-            m -> prefixFromNetmask(m.group("prefix")),
+        ParsingUtils.parseField(output,
+                Ipv4AddressReader.INTERFACE_IP_LINE::matcher,
+            m -> NetUtils.prefixFromNetmask(m.group("prefix")),
                 configBuilder::setPrefixLength);
     }
 

@@ -16,12 +16,11 @@
 
 package io.frinx.cli.ospf.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,7 +67,7 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     static List<InterfaceKey> parseInterfaceIds(String ospfId, String output, OspfAreaIdentifier areaId) {
         String realignedOutput = realignOSPFInterfaces(output);
 
-        return NEWLINE.splitAsStream(realignedOutput)
+        return ParsingUtils.NEWLINE.splitAsStream(realignedOutput)
                 .map(String::trim)
                 .filter(ifcLine -> ifcLine.contains(String.format("ip ospf %s area %s", ospfId,
                         areaIdToString(areaId))))

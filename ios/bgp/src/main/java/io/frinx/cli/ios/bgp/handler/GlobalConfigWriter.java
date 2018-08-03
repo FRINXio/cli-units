@@ -16,9 +16,6 @@
 
 package io.frinx.cli.ios.bgp.handler;
 
-import static io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter.VRF_BGP_AFI_SAFI_ROUTER_ID;
-import static io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter.toDeviceAddressFamily;
-
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
@@ -103,8 +100,9 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
 
             Set<AfiSafi> allAfiSafis = getAfiSafis(writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).orNull());
             for (AfiSafi afiSafi : allAfiSafis) {
-                blockingWriteAndRead(f(VRF_BGP_AFI_SAFI_ROUTER_ID,
-                        config.getAs().getValue(), toDeviceAddressFamily(afiSafi.getAfiSafiName()),
+                blockingWriteAndRead(f(GlobalAfiSafiConfigWriter.VRF_BGP_AFI_SAFI_ROUTER_ID,
+                        config.getAs().getValue(),
+                        GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afiSafi.getAfiSafiName()),
                         vrfKey.getName(),
                         config.getRouterId().getValue()),
                         cli, id, config);

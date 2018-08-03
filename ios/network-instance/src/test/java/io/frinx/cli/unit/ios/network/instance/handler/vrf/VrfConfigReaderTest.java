@@ -16,8 +16,7 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
@@ -56,16 +55,16 @@ public class VrfConfigReaderTest {
         // route distinguisher set
         ConfigBuilder actualConfigBuilder = new ConfigBuilder();
         VrfConfigReader.parseVrfConfig(OUTPUT, actualConfigBuilder, "TEST");
-        assertEquals(EXPECTED_VRF_TEST, actualConfigBuilder.build());
+        Assert.assertEquals(EXPECTED_VRF_TEST, actualConfigBuilder.build());
 
         actualConfigBuilder = new ConfigBuilder();
         VrfConfigReader.parseVrfConfig(OUTPUT, actualConfigBuilder, "ANOTHER_TEST");
-        assertEquals(EXPECTED_VRF_ANOTHER_TEST, actualConfigBuilder.build());
+        Assert.assertEquals(EXPECTED_VRF_ANOTHER_TEST, actualConfigBuilder.build());
 
         // no distinguisher set
         actualConfigBuilder = new ConfigBuilder();
         VrfConfigReader.parseVrfConfig(OUTPUT, actualConfigBuilder, "WITHOUT_RD");
-        assertEquals(EXPECTED_VRF_WITHOUT_VRF, actualConfigBuilder.build());
+        Assert.assertEquals(EXPECTED_VRF_WITHOUT_VRF, actualConfigBuilder.build());
 
     }
 }

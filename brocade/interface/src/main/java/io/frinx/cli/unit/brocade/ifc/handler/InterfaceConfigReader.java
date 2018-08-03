@@ -16,15 +16,14 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -75,7 +74,7 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
 
     public static String getIfcNumber(String name) {
         Matcher matcher = IFC_NAME.matcher(name);
-        checkArgument(matcher.matches(), "Interface name %s in unexpected format. Expected format: "
+        Preconditions.checkArgument(matcher.matches(), "Interface name %s in unexpected format. Expected format: "
                 + "GigabitEthernet1/0", name);
         return matcher.group("number");
     }
@@ -97,17 +96,17 @@ public final class InterfaceConfigReader implements CliConfigReader<Config, Conf
         builder.setType(ifcType);
 
         // Actually check if disabled
-        parseField(output, 0,
+        ParsingUtils.parseField(output, 0,
             SHUTDOWN_LINE::matcher,
             matcher -> true,
             builder::setEnabled);
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             MTU_LINE::matcher,
             matcher -> Integer.valueOf(matcher.group("mtu")),
             builder::setMtu);
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             DESCR_LINE::matcher,
             matcher -> matcher.group("desc"),
             builder::setDescription);

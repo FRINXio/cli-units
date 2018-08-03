@@ -16,9 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-import static io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -61,7 +58,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         if (!writeContext.readBefore(parentIfcId)
                 .isPresent()
                 && id.firstKeyOf(Subinterface.class)
-                .getIndex() == ZERO_SUBINTERFACE_ID) {
+                .getIndex() == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             Preconditions.checkArgument(data.getDescription() == null,
                     "'description' cannot be specified for .0 subinterface. "
                             + "Use 'description' under interface/config instead.");
@@ -84,7 +81,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
 
         if (isSupportedType(parentIfcType)) {
             blockingWriteAndRead(cli, id, data,
-                    f("interface %s", getSubinterfaceName(id)),
+                    f("interface %s", SubinterfaceReader.getSubinterfaceName(id)),
                     data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
                     data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
                     "root");
@@ -98,7 +95,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
     private static boolean isZeroSubinterface(@Nonnull InstanceIdentifier<?> id) {
         Long subifcIndex = id.firstKeyOf(Subinterface.class)
                 .getIndex();
-        return subifcIndex == ZERO_SUBINTERFACE_ID;
+        return subifcIndex == SubinterfaceReader.ZERO_SUBINTERFACE_ID;
 
     }
 
@@ -121,7 +118,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         if (!writeContext.readAfter(parentIfcId)
                 .isPresent()
                 && id.firstKeyOf(Subinterface.class)
-                .getIndex() == ZERO_SUBINTERFACE_ID) {
+                .getIndex() == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             return;
         }
 
@@ -138,7 +135,7 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
 
         if (isSupportedType(parentIfcType)) {
             blockingDeleteAndRead(cli, id,
-                    f("no interface %s", getSubinterfaceName(id)));
+                    f("no interface %s", SubinterfaceReader.getSubinterfaceName(id)));
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Unable to create subinterface for interface of type: "

@@ -16,13 +16,6 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp;
 
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader.LOCAL_CONNECT_ID_LINE;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader.SH_INTERFACES_XCONNECT;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader.SH_LOCAL_CONNECT;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader.XCONNECT_ID_LINE;
-import static io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader.realignXconnectInterfacesOutput;
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -30,6 +23,8 @@ import io.fd.honeycomb.translate.read.Reader;
 import io.frinx.cli.handlers.network.instance.L2p2pReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeReader;
+import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -100,25 +95,25 @@ public class L2P2PConnectionPointsReader implements L2p2pReader.L2p2pConfigReade
     private List<ConnectionPoint> getXconnectPoints(InstanceIdentifier<ConnectionPoints> id, ReadContext ctx, String
             netName, boolean isOper)
             throws ReadFailedException {
-        String output = blockingRead(SH_INTERFACES_XCONNECT, this.cli, id, ctx);
+        String output = blockingRead(L2P2PReader.SH_INTERFACES_XCONNECT, this.cli, id, ctx);
         return parseXconnectPoints(netName, output, isOper);
     }
 
     private List<ConnectionPoint> getLocalConnectPoints(InstanceIdentifier<ConnectionPoints> id, ReadContext ctx,
                                                         String netName, boolean isOper)
             throws ReadFailedException {
-        String output = blockingRead(SH_LOCAL_CONNECT, this.cli, id, ctx);
+        String output = blockingRead(L2P2PReader.SH_LOCAL_CONNECT, this.cli, id, ctx);
         return parseLocalConnectPoints(netName, output, isOper);
     }
 
     private List<ConnectionPoint> parseXconnectPoints(String netName, String output, boolean isOper) {
-        String linePerInterface = realignXconnectInterfacesOutput(output);
+        String linePerInterface = L2P2PReader.realignXconnectInterfacesOutput(output);
 
-        return NEWLINE.splitAsStream(linePerInterface)
+        return ParsingUtils.NEWLINE.splitAsStream(linePerInterface)
                 .map(String::trim)
                 .map(line -> line.replaceAll("\\s+", " "))
                 .filter(line -> line.contains(netName))
-                .map(XCONNECT_ID_LINE::matcher)
+                .map(L2P2PReader.XCONNECT_ID_LINE::matcher)
                 .filter(Matcher::matches)
                 .findFirst()
                 .map(matcher -> extractXconnectPoints(matcher, isOper))
@@ -126,12 +121,12 @@ public class L2P2PConnectionPointsReader implements L2p2pReader.L2p2pConfigReade
     }
 
     private List<ConnectionPoint> parseLocalConnectPoints(String netName, String output, boolean isOper) {
-        String linePerInterface = realignXconnectInterfacesOutput(output);
+        String linePerInterface = L2P2PReader.realignXconnectInterfacesOutput(output);
 
-        return NEWLINE.splitAsStream(linePerInterface)
+        return ParsingUtils.NEWLINE.splitAsStream(linePerInterface)
                 .map(String::trim)
                 .filter(line -> line.contains(netName))
-                .map(LOCAL_CONNECT_ID_LINE::matcher)
+                .map(L2P2PReader.LOCAL_CONNECT_ID_LINE::matcher)
                 .filter(Matcher::matches)
                 .findFirst()
                 .map(matcher -> extractLocalConnectPoints(matcher, isOper))

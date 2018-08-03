@@ -16,11 +16,10 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 
@@ -43,6 +42,6 @@ public class SubniterfaceReaderTest {
 
     @Test
     public void testParseInterfaceIds() throws Exception {
-        assertEquals(IDS_EXPECTED, SubinterfaceReader.parseInterfaceIds(SH_INTERFACE, "FastEthernet4/0"));
+        Assert.assertEquals(IDS_EXPECTED, SubinterfaceReader.parseInterfaceIds(SH_INTERFACE, "FastEthernet4/0"));
     }
 }

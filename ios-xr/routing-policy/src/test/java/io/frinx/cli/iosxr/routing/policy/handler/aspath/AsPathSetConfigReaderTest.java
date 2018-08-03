@@ -16,11 +16,7 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.aspath;
 
-import static io.frinx.cli.iosxr.routing.policy.handler.aspath.AsPathSetConfigWriterTest.CFG_1;
-import static io.frinx.cli.iosxr.routing.policy.handler.aspath.AsPathSetConfigWriterTest.CFG_2;
-import static io.frinx.cli.iosxr.routing.policy.handler.aspath.AsPathSetConfigWriterTest.OUTPUT_2;
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.as.path.sets.AsPathSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.as.path.sets.as.path.set.ConfigBuilder;
@@ -41,10 +37,10 @@ public class AsPathSetConfigReaderTest {
     public void testRead() throws Exception {
         ConfigBuilder builder = new ConfigBuilder();
         AsPathSetConfigReader.parseMembers(builder, new AsPathSetKey("test"), OUTPUT_1);
-        assertEquals(CFG_1, builder.build());
+        Assert.assertEquals(AsPathSetConfigWriterTest.CFG_1, builder.build());
 
         builder = new ConfigBuilder();
-        AsPathSetConfigReader.parseMembers(builder, new AsPathSetKey("test"), OUTPUT_2);
-        assertEquals(CFG_2, builder.build());
+        AsPathSetConfigReader.parseMembers(builder, new AsPathSetKey("test"), AsPathSetConfigWriterTest.OUTPUT_2);
+        Assert.assertEquals(AsPathSetConfigWriterTest.CFG_2, builder.build());
     }
 }

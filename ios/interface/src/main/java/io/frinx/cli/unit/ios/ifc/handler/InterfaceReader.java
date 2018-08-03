@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.ios.ifc.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -68,7 +67,7 @@ public final class InterfaceReader implements CliConfigListReader<Interface, Int
     }
 
     public static List<InterfaceKey> parseAllInterfaceIds(String output) {
-        return parseFields(output, 0,
+        return ParsingUtils.parseFields(output, 0,
                 INTERFACE_ID_LINE::matcher,
             m -> m.group("id"),
                 InterfaceKey::new);

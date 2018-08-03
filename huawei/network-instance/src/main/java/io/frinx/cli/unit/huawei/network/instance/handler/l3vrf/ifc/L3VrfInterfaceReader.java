@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.ifc;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -71,7 +70,7 @@ public class L3VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListRead
             return parseDefaultVrfInterfacesIds(realignedOutput);
         }
 
-        return NEWLINE.splitAsStream(realignedOutput)
+        return ParsingUtils.NEWLINE.splitAsStream(realignedOutput)
             .map(String::trim)
             .filter(line -> line.contains(String.format("ip binding vpn-instance %s", vrfName)))
             .map(INTERFACE_ID_PATTERN::matcher)
@@ -82,7 +81,7 @@ public class L3VrfInterfaceReader implements L3VrfListReader.L3VrfConfigListRead
     }
 
     private static List<InterfaceKey> parseDefaultVrfInterfacesIds(String realignedOutput) {
-        return NEWLINE.splitAsStream(realignedOutput)
+        return ParsingUtils.NEWLINE.splitAsStream(realignedOutput)
             .map(String::trim)
             .filter(line -> !line.contains("ip binding vpn-instance"))
             .map(INTERFACE_ID_PATTERN::matcher)

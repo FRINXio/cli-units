@@ -16,8 +16,7 @@
 
 package io.frinx.cli.ios.bgp.handler.peergroup;
 
-import static io.frinx.cli.ios.bgp.handler.neighbor.NeighborReaderTest.SUMM_OUTPUT_NEIGHBORS;
-
+import io.frinx.cli.ios.bgp.handler.neighbor.NeighborReaderTest;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,11 +26,11 @@ public class PeerGroupReaderTest {
 
     @Test
     public void testNeighborIds() {
-        List<PeerGroupKey> keys = PeerGroupReader.getDefaultPeerGroupKeys(SUMM_OUTPUT_NEIGHBORS);
+        List<PeerGroupKey> keys = PeerGroupReader.getDefaultPeerGroupKeys(NeighborReaderTest.SUMM_OUTPUT_NEIGHBORS);
         Assert.assertArrayEquals(new String[]{"abcd"},
                 keys.stream().map(PeerGroupKey::getPeerGroupName).toArray());
 
-        keys = PeerGroupReader.getVrfPeerGroupKeys(SUMM_OUTPUT_NEIGHBORS, "vrf1");
+        keys = PeerGroupReader.getVrfPeerGroupKeys(NeighborReaderTest.SUMM_OUTPUT_NEIGHBORS, "vrf1");
         Assert.assertArrayEquals(new String[]{"abcdVRF", "abcdVRF2"},
                 keys.stream().map(PeerGroupKey::getPeerGroupName).toArray());
     }

@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.huawei.network.instance.handler.l3vrf;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.parseField;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
@@ -60,12 +59,12 @@ public class L3VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>
 
     private void parseVrfConfig(String output, ConfigBuilder builder, String vrf) {
         builder.setName(vrf);
-        parseField(output,
+        ParsingUtils.parseField(output,
             RD_CONFIG::matcher,
             matcher -> matcher.group("rd"),
             rd -> builder.setRouteDistinguisher(new RouteDistinguisher(rd)));
 
-        parseField(output,
+        ParsingUtils.parseField(output,
             DESC_CONFIG::matcher,
             matcher -> matcher.group("desc"),
             builder::setDescription);

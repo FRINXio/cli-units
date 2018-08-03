@@ -16,14 +16,13 @@
 
 package io.frinx.cli.iosxr.bgp.handler.neighbor;
 
-import static io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader.DEFAULT_BGP_INSTANCE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
@@ -64,7 +63,8 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
             ReadContext readContext) throws ReadFailedException {
         final String protName = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
-        final String instance = DEFAULT_BGP_INSTANCE.equals(protName) ? "" : String.format("instance %s", protName);
+        final String instance = BgpProtocolReader.DEFAULT_BGP_INSTANCE.equals(protName)
+                ? "" : String.format("instance %s", protName);
 
         // TODO Same as in NeighborConfigReader
         final Config globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)

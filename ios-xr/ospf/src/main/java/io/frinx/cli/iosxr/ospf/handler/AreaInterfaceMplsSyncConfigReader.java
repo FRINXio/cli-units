@@ -16,13 +16,12 @@
 
 package io.frinx.cli.iosxr.ospf.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -67,7 +66,7 @@ public class AreaInterfaceMplsSyncConfigReader implements OspfReader.OspfConfigR
 
     @VisibleForTesting
     public static void parseMplsSync(String output, ConfigBuilder configBuilder) {
-        NEWLINE.splitAsStream(output)
+        ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(MPLS_SYNC_LINE::matcher)
                 .filter(Matcher::find)
                 .findAny()

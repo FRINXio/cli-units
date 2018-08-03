@@ -16,13 +16,12 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.policy;
 
-import static java.util.stream.Collectors.toList;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.BgpNextHopType;
@@ -181,7 +180,7 @@ class ActionsParser {
                     .filter(c -> INLINE_COM.matcher(c)
                             .matches())
                     .map(ActionsParser::parseSingleInlineCommunity)
-                    .collect(toList());
+                    .collect(Collectors.toList());
             String additive = matcher.group("additive");
 
             builder.setSetCommunity(new SetCommunityBuilder()

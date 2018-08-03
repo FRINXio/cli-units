@@ -16,9 +16,6 @@
 
 package io.frinx.cli.ios.routing.policy;
 
-import static io.frinx.cli.ios.IosDevices.IOS_ALL;
-import static io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG;
-
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
@@ -26,6 +23,7 @@ import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ios.IosDevices;
 import io.frinx.cli.ios.routing.policy.handlers.ExtCommunitySetConfigWriter;
 import io.frinx.cli.ios.routing.policy.handlers.ExtCommunitySetReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
@@ -69,7 +67,7 @@ public class RoutingPolicyUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = registry.registerTranslateUnit(IOS_ALL, this);
+        reg = registry.registerTranslateUnit(IosDevices.IOS_ALL, this);
     }
 
     public void close() {
@@ -101,7 +99,7 @@ public class RoutingPolicyUnit implements TranslateUnit {
         writerRegistryBuilder.add(new GenericWriter<>(EXT_COMMUNITY_SETS, new NoopCliWriter<>()));
         writerRegistryBuilder.add(new GenericWriter<>(EXT_COMMUNITY_SET, new NoopCliWriter<>()));
         writerRegistryBuilder.addAfter(new GenericWriter<>(EXT_CS_CONFIG, new ExtCommunitySetConfigWriter(cli)),
-                NE_NE_CONFIG);
+                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readerRegistryBuilder, Cli cli) {

@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.netflow;
 
-import static io.frinx.cli.iosxr.IosXrDevices.IOS_XR_ALL;
-
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
@@ -26,6 +24,7 @@ import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.api.TranslationUnitCollector.Registration;
 import io.frinx.cli.registry.spi.TranslateUnit;
@@ -58,7 +57,7 @@ public final class IosXRNetflowUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = registry.registerTranslateUnit(IOS_XR_ALL, this);
+        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
     }
 
     public void close() {

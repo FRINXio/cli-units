@@ -16,11 +16,10 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.l2p2p;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 
@@ -51,6 +50,6 @@ public class L2P2PReaderTest {
     @Test
     public void testIds() throws Exception {
         List<NetworkInstanceKey> networkInstanceKeys = L2P2PReader.parseXconnectIds(OUTPUT);
-        assertEquals(EXPECTED, networkInstanceKeys);
+        Assert.assertEquals(EXPECTED, networkInstanceKeys);
     }
 }

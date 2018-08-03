@@ -16,15 +16,13 @@
 
 package io.frinx.cli.unit.huawei.bgp.handler.neighbor;
 
-import static io.frinx.cli.io.Cli.NEWLINE;
-import static io.frinx.cli.unit.huawei.bgp.handler.BgpProtocolReader.DEFAULT_BGP_INSTANCE;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.huawei.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Arrays;
 import java.util.List;
@@ -57,7 +55,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
                                                         @Nonnull ReadContext readContext) throws ReadFailedException {
 
         String networkInstanceName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        if (DEFAULT_BGP_INSTANCE.equals(networkInstanceName)) {
+        if (BgpProtocolReader.DEFAULT_BGP_INSTANCE.equals(networkInstanceName)) {
             return getDefaultNeighborKeys(blockingRead(DISPLAY_PEER_CONFIG, cli, instanceIdentifier, readContext));
         } else {
             return getVrfNeighborKeys(blockingRead(DISPLAY_PEER_CONFIG, cli, instanceIdentifier, readContext),
@@ -109,7 +107,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
     }
 
     public static String[] getSplitedOutput(String output) {
-        return output.replaceAll(NEWLINE, "").replaceAll("\r", "")
+        return output.replaceAll(Cli.NEWLINE, "").replaceAll("\r", "")
                 .replaceAll(" ipv4-family", "\n ipv4-family")
                 .split("\\n");
     }

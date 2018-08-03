@@ -16,9 +16,6 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
-
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -47,13 +44,14 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         Long subId = id.firstKeyOf(Subinterface.class).getIndex();
 
-        if (subId == ZERO_SUBINTERFACE_ID) {
+        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             throw new WriteFailedException.CreateFailedException(id, dataAfter,
-                    new IllegalArgumentException("Unable to manage Vlan for subinterface: " + ZERO_SUBINTERFACE_ID));
+                    new IllegalArgumentException("Unable to manage Vlan for subinterface: "
+                            + SubinterfaceReader.ZERO_SUBINTERFACE_ID));
         } else {
             blockingWriteAndRead(cli, id, dataAfter,
                     f(WRITE_TEMPLATE,
-                            getSubinterfaceName(id),
+                            SubinterfaceReader.getSubinterfaceName(id),
                             dataAfter.getVlanId().getVlanId().getValue()));
         }
     }
@@ -79,13 +77,14 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         Long subId = id.firstKeyOf(Subinterface.class).getIndex();
 
-        if (subId == ZERO_SUBINTERFACE_ID) {
+        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             throw new WriteFailedException.CreateFailedException(id, dataBefore,
-                    new IllegalArgumentException("Unable to manage Vlan for subinterface: " + ZERO_SUBINTERFACE_ID));
+                    new IllegalArgumentException("Unable to manage Vlan for subinterface: "
+                            + SubinterfaceReader.ZERO_SUBINTERFACE_ID));
         } else {
             blockingDeleteAndRead(cli, id,
                     f(DELETE_TEMPLATE,
-                            getSubinterfaceName(id),
+                            SubinterfaceReader.getSubinterfaceName(id),
                             dataBefore.getVlanId().getVlanId().getValue()));
         }
     }

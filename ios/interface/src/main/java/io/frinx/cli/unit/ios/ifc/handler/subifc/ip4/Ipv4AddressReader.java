@@ -16,14 +16,13 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.parseFields;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -69,7 +68,7 @@ public class Ipv4AddressReader implements CliConfigListReader<Address, AddressKe
 
     @VisibleForTesting
     public static List<AddressKey> parseAddressIds(String output) {
-        return parseFields(output, 0,
+        return ParsingUtils.parseFields(output, 0,
                 INTERFACE_IP_LINE::matcher,
             m -> m.group("ip"),
             addr -> new AddressKey(new Ipv4AddressNoZone(addr)));

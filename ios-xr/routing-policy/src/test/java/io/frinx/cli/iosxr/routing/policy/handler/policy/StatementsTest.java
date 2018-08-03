@@ -16,9 +16,6 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.policy;
 
-import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import io.frinx.cli.unit.utils.CliFormatter;
 import java.util.ArrayList;
@@ -26,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -464,7 +463,7 @@ public class StatementsTest {
         if (expected
                 != null) {
             // Compare with prepared data
-            assertEquals(expected, parsed1);
+            Assert.assertEquals(expected, parsed1);
         }
 
         // Serialize
@@ -478,7 +477,7 @@ public class StatementsTest {
         Statements parsed2 = statementsBuilder.build();
 
         // Compare parsed #1 and parsed #2
-        assertEquals(parsed1, parsed2);
+        Assert.assertEquals(parsed1, parsed2);
     }
 
     private static MatchCommunitySet getMatchCommunitySet(String csetName) {
@@ -568,7 +567,7 @@ public class StatementsTest {
     static SetCommunity getSetCommInlineAction(ArrayList<String> comms, BgpSetCommunityOptionType add) {
         List<SetCommunityInlineConfig.Communities> collect = comms.stream()
                 .map(s -> new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(s)))
-                .collect(toList());
+                .collect(Collectors.toList());
         collect.forEach(SetCommunityInlineConfig.Communities::getValue);
 
         return new SetCommunityBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang

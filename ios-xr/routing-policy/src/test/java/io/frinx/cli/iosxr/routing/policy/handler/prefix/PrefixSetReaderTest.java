@@ -16,10 +16,9 @@
 
 package io.frinx.cli.iosxr.routing.policy.handler.prefix;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Lists;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.top.prefix.sets.PrefixSetKey;
 
@@ -34,7 +33,7 @@ public class PrefixSetReaderTest {
 
     @Test
     public void testIds() throws Exception {
-        assertEquals(Lists.newArrayList("ab", "dd", "sd33", "asdasd", "23445jasdj123")
+        Assert.assertEquals(Lists.newArrayList("ab", "dd", "sd33", "asdasd", "23445jasdj123")
                 .stream()
                 .map(PrefixSetKey::new)
                 .collect(Collectors.toList()),
