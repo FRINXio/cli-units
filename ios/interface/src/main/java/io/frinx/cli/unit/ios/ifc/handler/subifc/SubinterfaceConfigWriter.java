@@ -17,8 +17,10 @@
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
 import static io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigWriter.PHYS_IFC_TYPES;
+import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.ZERO_SUBINTERFACE_ID;
 import static io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader.getSubinterfaceName;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -26,6 +28,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -42,6 +45,22 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config data,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (isZeroSubinterface(id)) {
+            // Check that config is empty for .0 subinterface and do nothing.
+            // .0 subinterface is special auto-generated subinterface
+            // containing just IP configuration of the parent interface.
+            Preconditions.checkArgument(data.getDescription() == null,
+                    "'description' cannot be specified for .0 subinterface."
+                            + "Use 'description' under interface/config instead.");
+            Preconditions.checkArgument(data.getName() == null,
+                    "'name' cannot be specified for .0 subinterface."
+                            + "Use 'name' under interface/config instead.");
+            Preconditions.checkArgument(data.isEnabled() == null,
+                    "'enabled' cannot be specified for .0 subinterface."
+                            + "Use 'name' under interface/config instead.");
+            return;
+        }
+
         InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
         Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId)
                 .get()
@@ -62,6 +81,11 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         }
     }
 
+    private static boolean isZeroSubinterface(@Nonnull InstanceIdentifier<?> id) {
+        Long subifcIndex = id.firstKeyOf(Subinterface.class).getIndex();
+        return subifcIndex == ZERO_SUBINTERFACE_ID;
+    }
+
     @Override
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore,
@@ -75,6 +99,12 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config data,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
+
+        if (isZeroSubinterface(id)) {
+            // do nothing for .0 subinterface
+            return;
+        }
+
         InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
         Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId)
                 .get()
