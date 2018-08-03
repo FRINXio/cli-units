@@ -161,10 +161,13 @@ public final class IosInterfaceUnit implements TranslateUnit {
 
         writeRegistry.add(new GenericWriter<>(SUBIFC_IPV4_ADDRESS_ID, new NoopCliListWriter<>()));
         writeRegistry.addAfter(new GenericWriter<>(SUBIFC_IPV4_CFG_ID, new Ipv4ConfigWriter(cli)),
-                IIDs.IN_IN_CONFIG);
+                Sets.newHashSet(IIDs.IN_IN_CONFIG,
+                        io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_IN_INTERFACE));
 
         writeRegistry.add(new GenericWriter<>(SUBIFC_IPV6_ADDRESS_ID, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(SUBIFC_IPV6_CFG_ID, new Ipv6ConfigWriter(cli)));
+        writeRegistry.addAfter(new GenericWriter<>(SUBIFC_IPV6_CFG_ID, new Ipv6ConfigWriter(cli)),
+                Sets.newHashSet(IIDs.IN_IN_CONFIG,
+                        io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_IN_INTERFACE));
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
