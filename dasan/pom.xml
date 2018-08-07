@@ -22,6 +22,7 @@
   <modules>
     <module>init</module>
     <module>utils</module>
+    <module>network-instance</module>
   </modules>
 
   <parent>
