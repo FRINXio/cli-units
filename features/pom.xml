@@ -193,6 +193,11 @@
     </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
+      <artifactId>ios-xr-platform</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
       <artifactId>brocade-cli-init-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
