@@ -332,6 +332,11 @@
       <artifactId>huawei-routing-policy-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>huawei-platform-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>io.frinx.cli</groupId>

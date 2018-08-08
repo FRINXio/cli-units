@@ -25,6 +25,7 @@
     <module>network-instance</module>
     <module>bgp</module>
     <module>routing-policy</module>
+    <module>platform</module>
   </modules>
 
   <parent>
