@@ -60,6 +60,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-platform</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-xr-configuration-metadata-unit</artifactId>
         </dependency>
         <dependency>
