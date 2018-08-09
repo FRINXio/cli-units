@@ -145,7 +145,7 @@ public class DasanCliUtilTest {
         try {
             DasanCliUtil.getPhysicalPorts(cli, cliReader, id, readContext);
             fail("Expected exception was not occurred.");
-        } catch (Exception e) {
+        } catch (ReadFailedException e) {
             assertThat(e, sameInstance(exception));
         }
 
