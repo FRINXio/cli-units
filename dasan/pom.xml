@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   ~ Copyright © 2018 Frinx and others.
   ~
@@ -14,8 +15,14 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <modules>
+    <module>dasan-cli-init-unit</module>
+    <module>dasan-cli-utils</module>
+  </modules>
 
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
@@ -25,23 +32,9 @@
   </parent>
 
   <groupId>io.frinx.cli</groupId>
-  <artifactId>cli-units-aggregator</artifactId>
+  <artifactId>dasan</artifactId>
   <version>4.1.0.rc1-frinx-SNAPSHOT</version>
   <packaging>pom</packaging>
-
-  <modules>
-    <module>artifacts</module>
-    <module>ios-common</module>
-    <module>ios</module>
-    <module>ios-xr</module>
-    <module>brocade</module>
-    <module>junos</module>
-    <module>huawei</module>
-    <module>features</module>
-    <module>unit-parent</module>
-    <module>nexus</module>
-    <module>dasan</module>
-  </modules>
 
   <build>
     <plugins>
@@ -63,16 +56,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>karaf</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>karaf</module>
-      </modules>
-    </profile>
-
     <profile>
       <!--
           This profile is to ensure we only build javadocs reports
@@ -98,7 +81,7 @@
                   <goal>aggregate</goal>
                 </goals>
                 <phase>package</phase>
-            </execution>
+              </execution>
             </executions>
           </plugin>
         </plugins>
