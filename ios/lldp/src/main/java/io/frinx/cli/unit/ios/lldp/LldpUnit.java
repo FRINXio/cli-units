@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import io.frinx.cli.ios.IosDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
@@ -90,8 +91,8 @@ public class LldpUnit implements TranslateUnit {
         readRegistry.add(new GenericOperReader<>(IIDs.LL_IN_IN_NE_NE_STATE, new NeighborStateReader(cli)));
     }
 
-    protected String getShowHostnameCommand() {
-        return LldpConfigReader.SHOW_HOSTNAME;
+    protected Command getShowHostnameCommand() {
+        return Command.createUnCached(LldpConfigReader.SHOW_HOSTNAME);
     }
 
     @Override

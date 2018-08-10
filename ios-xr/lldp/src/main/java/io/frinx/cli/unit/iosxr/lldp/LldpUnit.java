@@ -19,6 +19,7 @@ package io.frinx.cli.unit.iosxr.lldp;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.frinx.cli.io.Command;
 import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
@@ -36,8 +37,8 @@ public class LldpUnit implements TranslateUnit {
         this.registry = registry;
         this.delegate = new io.frinx.cli.unit.ios.lldp.LldpUnit(registry) {
             @Override
-            protected String getShowHostnameCommand() {
-                return "sh ru | utility egrep \"^hostname|^domain name\"";
+            protected Command getShowHostnameCommand() {
+                return Command.createUnCached("show running-config | utility egrep \"^hostname|^domain name\"");
             }
         };
     }

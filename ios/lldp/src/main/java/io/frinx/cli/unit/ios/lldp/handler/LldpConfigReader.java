@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
 import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
@@ -36,17 +37,16 @@ public class LldpConfigReader implements CliOperReader<Config, ConfigBuilder> {
 
     // The "sh ru" here is intentional to bypass the caching of entire "show run" output
     // We don't want that here
-    // TODO expose control whether to cache or not from CliReader (add an option to Command interface ? )
 
-    public static final String SHOW_HOSTNAME = "sh ru | include ^hostname|^ip domain name";
+    public static final String SHOW_HOSTNAME = "show running-config | include ^hostname|^ip domain name";
 
     private static final Pattern HOSTNAME_PATTERN = Pattern.compile("hostname (?<name>.+)");
     private static final Pattern DOMAINNAME_PATTERN = Pattern.compile("(ip )?domain name (?<name>.+)");
 
     private final Cli cli;
-    private final String command;
+    private final Command command;
 
-    public LldpConfigReader(Cli cli, String command) {
+    public LldpConfigReader(Cli cli, Command command) {
         this.cli = cli;
         this.command = command;
     }
