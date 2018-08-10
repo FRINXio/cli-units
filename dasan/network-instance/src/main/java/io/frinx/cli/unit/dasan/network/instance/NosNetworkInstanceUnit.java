@@ -30,6 +30,7 @@ import io.frinx.cli.unit.dasan.network.instance.handler.NetworkInstanceConfigRea
 import io.frinx.cli.unit.dasan.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.dasan.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.dasan.network.instance.handler.vlan.VlanConfigReader;
+import io.frinx.cli.unit.dasan.network.instance.handler.vlan.VlanConfigWriter;
 import io.frinx.cli.unit.dasan.network.instance.handler.vlan.VlanReader;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
@@ -95,6 +96,16 @@ public class NosNetworkInstanceUnit implements TranslateUnit {
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
         writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli)),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
+
+        // VLAN(L3)
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_VLANS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_VL_VLAN, new NoopCliWriter<>()));
+
+        writeRegistry.subtreeAdd(Sets.newHashSet(
+                VLAN_CONFIG_ROOT_ID.augmentation(
+                        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.dasan.rev180801.Config1.class)
+                ),
+                new GenericWriter<>(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli)));
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
