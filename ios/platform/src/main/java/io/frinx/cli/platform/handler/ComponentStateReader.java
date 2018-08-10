@@ -50,7 +50,7 @@ public class ComponentStateReader implements CliOperReader<State, StateBuilder> 
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         String name = instanceIdentifier.firstKeyOf(Component.class)
                 .getName();
-        if (name.equals(OsComponent.OS_KEY)) {
+        if (name.equals(OsComponent.OS_KEY.getName())) {
             parseOSVersions(stateBuilder, blockingRead(f(SH_MODULE_VERSION), cli, instanceIdentifier, readContext));
         } else {
             parseFields(stateBuilder, name, blockingRead(f(SH_MODULE_SINGLE, name), cli, instanceIdentifier,
