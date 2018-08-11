@@ -343,6 +343,16 @@
       <artifactId>nexus-cli-init-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>nexus-lldp-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>nexus-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
   </dependencies>
 </project>
