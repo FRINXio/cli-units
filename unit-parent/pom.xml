@@ -111,6 +111,38 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.opendaylight.yangtools</groupId>
+                <artifactId>yang-maven-plugin</artifactId>
+                <version>${yangtools.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.frinx.cli</groupId>
+                        <artifactId>yang-docs-plugin</artifactId>
+                        <version>3.1.6.rc6-frinx-SNAPSHOT</version>
+                        <type>jar</type>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <id>yang-docs</id>
+                        <goals>
+                            <goal>generate-sources</goal>
+                        </goals>
+                        <configuration>
+                            <codeGenerators>
+                                <generator>
+                                    <codeGeneratorClass>io.frinx.binding.ids.YangDocsGenerator</codeGeneratorClass>
+                                    <outputBaseDir>${salGeneratorPath}</outputBaseDir>
+                                    <resourceBaseDir>${project.build.directory}/generated-sources/spi</resourceBaseDir>
+                                </generator>
+                            </codeGenerators>
+                            <inspectDependencies>true</inspectDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <executions>
                     <execution>
