@@ -93,6 +93,11 @@
                 <artifactId>huawei-routing-policy-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>huawei-platform-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- IOS -->
             <dependency>
@@ -242,6 +247,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>ios-xr-snmp-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xr-platform-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
