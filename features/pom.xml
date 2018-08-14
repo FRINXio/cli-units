@@ -193,7 +193,7 @@
     </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-platform</artifactId>
+      <artifactId>ios-xr-platform-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

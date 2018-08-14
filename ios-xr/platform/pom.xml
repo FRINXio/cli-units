@@ -26,7 +26,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>ios-xr-platform</artifactId>
+    <artifactId>ios-xr-platform-unit</artifactId>
     <version>3.1.6.rc4-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
