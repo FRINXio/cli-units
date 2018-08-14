@@ -47,7 +47,7 @@
     <module>configuration-metadata</module>
     <module>lldp</module>
     <module>it</module>
-    <module>ios-xr-platform</module>
+    <module>platform</module>
   </modules>
 
   <build>
