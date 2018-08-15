@@ -55,18 +55,21 @@ public class AreaInterfaceConfigWriterTest {
             + "area 1000\n"
             + "interface Loopback97\n"
             + "cost 300\n"
+            + "passive enable\n"
             + "root\n";
 
     private static final String UPDATE_COST_INPUT = "router ospf default\n"
             + "area 1000\n"
             + "interface Loopback97\n"
             + "cost 500\n"
+            + "passive disable\n"
             + "root\n";
 
     private static final String REMOVE_COST_INPUT = "router ospf default\n"
             + "area 1000\n"
             + "interface Loopback97\n"
             + "no cost\n"
+            + "no passive\n"
             + "root\n";
 
     private static final String DELETE_INPUT = "router ospf default\n"
@@ -111,8 +114,8 @@ public class AreaInterfaceConfigWriterTest {
     }
 
     private void initializeData() {
-        data = new ConfigBuilder().setMetric(new OspfMetric(300))
-                .build();
+        ConfigBuilder builder = new ConfigBuilder().setMetric(new OspfMetric(300));
+        data = builder.setPassive(true).build();
         area = new AreaBuilder().setIdentifier(new OspfAreaIdentifier(1000L))
                 .build();
         anInterface = new InterfaceBuilder().setKey(new InterfaceKey("Loopback97"))
@@ -139,8 +142,8 @@ public class AreaInterfaceConfigWriterTest {
     @Test
     public void update() throws WriteFailedException {
         // cost to 500
-        Config newData = new ConfigBuilder().setMetric(new OspfMetric(500))
-                .build();
+        ConfigBuilder builder = new ConfigBuilder().setMetric(new OspfMetric(500));
+        Config newData = builder.setPassive(false).build();
 
         this.writer.updateCurrentAttributesForType(piid, data, newData, context);
 

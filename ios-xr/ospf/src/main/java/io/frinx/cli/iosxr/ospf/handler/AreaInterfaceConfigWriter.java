@@ -55,7 +55,8 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 data.getMetric() != null ? f("cost %s", data.getMetric()
-                        .getValue()) : "no cost",
+                        .getValue()) : "",
+                data.isPassive() != null ? data.isPassive() ? "passive enable" : "passive disable" : "",
                 "root");
     }
 
@@ -63,7 +64,19 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config dataBefore,
                                                Config dataAfter, WriteContext writeContext) throws
             WriteFailedException {
-        writeCurrentAttributesForType(instanceIdentifier, dataAfter, writeContext);
+        final OspfAreaIdentifier areaId =
+                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Area.class)).get().getIdentifier();
+        final InterfaceKey intfId =
+                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Interface.class)).get().getKey();
+        blockingWriteAndRead(cli, instanceIdentifier, dataAfter,
+                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
+                f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
+                f("interface %s", intfId.getId()),
+                dataAfter.getMetric() != null ? f("cost %s", dataAfter.getMetric().getValue())
+                        : dataBefore.getMetric() != null ? "no cost" : "",
+                dataAfter.isPassive() != null ? dataAfter.isPassive() == false ? "passive disable" : "passive enable" :
+                    dataBefore.isPassive() != null ? "no passive" : "",
+                "root");
     }
 
     @Override
@@ -77,7 +90,7 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                 writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Interface.class))
                         .get()
                         .getKey();
-        blockingWriteAndRead(cli, instanceIdentifier, data,
+        blockingDeleteAndRead(cli, instanceIdentifier,
                 f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class)
                         .getName()),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
