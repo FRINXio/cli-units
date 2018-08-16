@@ -35,6 +35,7 @@ public final class InterfaceStateReader extends CompositeReader<State, StateBuil
     public InterfaceStateReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<State,StateBuilder>>() {
             {
+                add(new PhysicalPortInterfaceStateReader(cli));
             }
         });
     }
