@@ -56,7 +56,7 @@
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>frinx-cli-topology-api</artifactId>
+            <artifactId>frinx-cli-southbound-unit-generic</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
