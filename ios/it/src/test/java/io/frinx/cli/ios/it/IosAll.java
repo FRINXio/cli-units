@@ -229,10 +229,10 @@ public class IosAll {
     private void setRootLogLevel() {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.INFO);
-        Logger cli = (Logger) LoggerFactory.getLogger("io.frinx.cli");
-        cli.setLevel(Level.DEBUG);
-//        cli = (Logger) LoggerFactory.getLogger("org.apache.sshd");
-//        cli.setLevel(Level.TRACE);
+        Logger localCli = (Logger) LoggerFactory.getLogger("io.frinx.cli");
+        localCli.setLevel(Level.DEBUG);
+//        localCli = (Logger) LoggerFactory.getLogger("org.apache.sshd");
+//        localCli.setLevel(Level.TRACE);
     }
 
     private void mockBroker() {
@@ -247,8 +247,8 @@ public class IosAll {
         Mockito.doReturn(mockTx).when(mockTxChain).newWriteOnlyTransaction();
     }
 
-    protected TranslateRegistryImpl getTranslateRegistry(DataBroker mockBroker) {
-        TranslateRegistryImpl reg = new TranslateRegistryImpl(mockBroker);
+    protected TranslateRegistryImpl getTranslateRegistry(DataBroker broker) {
+        TranslateRegistryImpl reg = new TranslateRegistryImpl(broker);
 
         new GenericTranslateUnit(reg).init();
         new IosInterfaceUnit(reg).init();
@@ -374,10 +374,10 @@ public class IosAll {
         JSONCodecFactory codecFac = JSONCodecFactory.getShared(schemaCtx);
         StringWriter out = new StringWriter();
 
-        try (final JsonWriter jsonWriter = new JsonWriter(out)) {
+        try (JsonWriter jsonWriter = new JsonWriter(out)) {
             jsonWriter.setIndent("  ");
             jsonWriter.beginObject();
-            final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(
+            NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(
                     JSONNormalizedNodeStreamWriter.createNestedWriter(codecFac, SchemaPath.ROOT, null, jsonWriter),
                     true);
 

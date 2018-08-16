@@ -24,11 +24,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.ConditionsBuilder;
 
-class Ipv4Util {
+final class Ipv4Util {
 
     private static final Pattern ACL_LINE = Pattern.compile("match access-group ipv4 (?<acl>.+)");
 
     private static final Pattern PREC_LINE = Pattern.compile("match precedence ipv4 (?<prec>.+)");
+
+    private Ipv4Util() {
+
+    }
 
     static void parseIpv4(String output, ConditionsBuilder builder) {
 

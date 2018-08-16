@@ -24,11 +24,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv6ConditionAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.ConditionsBuilder;
 
-class Ipv6Util {
+final class Ipv6Util {
 
     private static final Pattern ACL_LINE = Pattern.compile("match access-group ipv6 (?<acl>.+)");
 
     private static final Pattern PREC_LINE = Pattern.compile("match precedence ipv6 (?<prec>.+)");
+
+    private Ipv6Util() {
+
+    }
 
     static void parseIpv6(String output, ConditionsBuilder builder) {
         QosIpv6ConditionAugBuilder augBuilder = new QosIpv6ConditionAugBuilder();

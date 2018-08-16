@@ -29,7 +29,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NetflowUtils {
+public final class NetflowUtils {
+
+    private NetflowUtils() {
+
+    }
 
     public static Class<? extends NETFLOWTYPE> getType(final String stringType) {
         if ("ipv4".equals(stringType)) {

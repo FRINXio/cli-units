@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc;
 
-
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.stream.Collectors;

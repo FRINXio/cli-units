@@ -21,12 +21,16 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.RPFALLOWDEFAULT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.RPFALLOWSELFPING;
 
-public class RpfCheckUtils {
+public final class RpfCheckUtils {
 
     public static final String IPV4_VERIFY_CMD_BASE = "ipv4 verify unicast source reachable-via %s";
     public static final String IPV6_VERIFY_CMD_BASE = "ipv6 verify unicast source reachable-via %s";
     public static final String CMD_POSTFIX_ALLOW_SELF_PING = " allow-self-ping";
     public static final String CMD_POSTFIX_ALLOW_DEFAULT = " allow-default";
+
+    private RpfCheckUtils() {
+
+    }
 
     static void appendAllowConfigCmdParams(final @Nonnull AllowConfigTop dataAfter, final StringBuilder verifyCmd) {
         if (dataAfter.getAllowConfig() != null) {

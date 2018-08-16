@@ -21,7 +21,11 @@ import java.util.Set;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 
-public class IosXrDevices {
+public final class IosXrDevices {
+
+    private IosXrDevices() {
+
+    }
 
     public static final Device IOS_4 = new DeviceIdBuilder()
             .setDeviceType("ios xr")

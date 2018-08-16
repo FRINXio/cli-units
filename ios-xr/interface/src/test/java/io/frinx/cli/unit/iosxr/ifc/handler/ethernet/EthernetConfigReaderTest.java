@@ -15,7 +15,6 @@
  */
 package io.frinx.cli.unit.iosxr.ifc.handler.ethernet;
 
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

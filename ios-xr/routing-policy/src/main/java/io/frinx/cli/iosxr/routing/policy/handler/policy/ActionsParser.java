@@ -44,7 +44,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.polic
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddressBuilder;
 
-class ActionsParser {
+final class ActionsParser {
 
     static final Actions EMPTY_ACTIONS = new ActionsBuilder().build();
 
@@ -55,6 +55,10 @@ class ActionsParser {
     }
 
     private static final BgpActions EMPTY_BGP_ACTIONS = new BgpActionsBuilder().build();
+
+    private ActionsParser() {
+
+    }
 
     @VisibleForTesting
     static void parseBgpActions(String line, ActionsBuilder actionsBuilder) {

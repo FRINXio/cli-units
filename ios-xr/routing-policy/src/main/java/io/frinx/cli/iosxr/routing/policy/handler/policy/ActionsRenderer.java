@@ -26,9 +26,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.Conditions;
 
-class ActionsRenderer {
+final class ActionsRenderer {
 
     private static final CliFormatter FORMAT = new CliFormatter() {};
+
+    private ActionsRenderer() {
+
+    }
 
     static List<String> renderActions(Actions actions, Conditions conditions) {
         List<String> actionsStrings = new ArrayList<>();

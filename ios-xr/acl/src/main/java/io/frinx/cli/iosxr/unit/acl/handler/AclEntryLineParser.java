@@ -82,7 +82,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AclEntryLineParser {
+public final class AclEntryLineParser {
     private static final Logger LOG = LoggerFactory.getLogger(AclEntryLineParser.class);
     static final Ipv4Prefix IPV4_HOST_ANY = new Ipv4Prefix("0.0.0.0/0");
     static final Ipv6Prefix IPV6_HOST_ANY = new Ipv6Prefix("::/0");
@@ -95,6 +95,10 @@ public class AclEntryLineParser {
     private static final IpProtocolType IP_PROTOCOL_UDP = new IpProtocolType(IPUDP.class);
     private static final IpProtocolType IP_PROTOCOL_UDP_NUMBER = new IpProtocolType((short) 17);
     public static final Pattern ZERO_TO_255_PATTERN = Pattern.compile("^2[0-5][0-5]|2[0-4][0-9]|1?[0-9]?[0-9]$");
+
+    private AclEntryLineParser() {
+
+    }
 
     static Optional<String> findAclEntryWithSequenceId(InstanceIdentifier<?> id, String lines) {
         // search for line containing current sequence number
@@ -440,7 +444,7 @@ public class AclEntryLineParser {
         try {
             return Integer.parseInt(portNumberOrServiceName);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Cannot parse port:" + portNumberOrServiceName);
+            throw new IllegalArgumentException("Cannot parse port:" + portNumberOrServiceName, e);
         }
     }
 
