@@ -25,6 +25,7 @@ public final class InterfaceConfigWriter extends CompositeWriter<Config> {
 
     public InterfaceConfigWriter(Cli cli) {
         super(Lists.newArrayList(
+            new PhysicalPortInterfaceConfigWriter(cli)
         ));
     }
 }
