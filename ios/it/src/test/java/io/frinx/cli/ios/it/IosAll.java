@@ -15,11 +15,6 @@
  */
 package io.frinx.cli.ios.it;
 
-import static io.frinx.cli.utils.NoopDataBroker.NOOP_DATA_BROKER;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.google.common.base.Optional;
