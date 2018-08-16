@@ -134,7 +134,7 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    @SuppressWarnings("IllegalCatch")
+    @SuppressWarnings({"IllegalCatch", "AvoidHidingCauseException"})
     public PostCommitHook getCommitHook(Context context, Set<Pattern> errorCommitPatterns) {
         return () -> {
             try {

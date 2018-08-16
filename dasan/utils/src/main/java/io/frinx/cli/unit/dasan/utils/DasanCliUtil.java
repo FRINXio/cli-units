@@ -34,9 +34,10 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class DasanCliUtil {
+public final class DasanCliUtil {
 
     private DasanCliUtil() {
+
     }
 
     private static final Pattern FIELD_SEPARATOR_PATTERN = Pattern.compile(",");
@@ -92,7 +93,7 @@ public class DasanCliUtil {
      * @param target target port
      * @return true: Target port is included in range.
      */
-    public static final boolean containsPort(List<String> ports, String ranges, String target) {
+    public static boolean containsPort(List<String> ports, String ranges, String target) {
         return parsePortRanges(ports, ranges).contains(target);
     }
 
@@ -102,7 +103,7 @@ public class DasanCliUtil {
      * @param ranges range notation
      * @return List of ports in range
      */
-    public static final Set<String> parsePortRanges(List<String> ports, String ranges) {
+    public static Set<String> parsePortRanges(List<String> ports, String ranges) {
         Map<String, Integer> portIndex = new HashMap<>();
         int count = 0;
         for (String name : ports) {
@@ -120,7 +121,7 @@ public class DasanCliUtil {
      * @param ranges range notation
      * @return List of ports in range
      */
-    public static final Set<String> parsePortRanges(List<String> ports, Map<String, Integer> portIndex, String ranges) {
+    public static Set<String> parsePortRanges(List<String> ports, Map<String, Integer> portIndex, String ranges) {
 
         Set<String> ret = new HashSet<>();
 
@@ -151,7 +152,7 @@ public class DasanCliUtil {
      * @param target target id
      * @return true: Target id is included in range.
      */
-    public static final boolean containsId(String ranges, String target) {
+    public static boolean containsId(String ranges, String target) {
         return parseIdRanges(ranges).contains(target);
     }
 
@@ -160,7 +161,7 @@ public class DasanCliUtil {
      * @param ranges range notation
      * @return list of individual notation
      */
-    public static final Set<String> parseIdRanges(String ranges) {
+    public static Set<String> parseIdRanges(String ranges) {
         Matcher fieldMatcher = FIELD_SEPARATOR_PATTERN.matcher(ranges);
         Matcher rangeMatcher = RANGE_PATTERN.matcher(ranges);
 

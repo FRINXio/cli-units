@@ -484,7 +484,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             minRangeParam = Integer.valueOf(rangeParams[0]);
             maxRangeParam = Integer.valueOf(rangeParams[1]);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(WRONG_RANGE_FORMAT_MSG.apply(rangeString));
+            throw new IllegalArgumentException(WRONG_RANGE_FORMAT_MSG.apply(rangeString), e);
         }
 
         String ttlString = "ttl";

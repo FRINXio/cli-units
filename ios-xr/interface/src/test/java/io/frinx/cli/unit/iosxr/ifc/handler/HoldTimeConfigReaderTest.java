@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler;
 
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222._interface.phys.holdtime.top.hold.time.Config;

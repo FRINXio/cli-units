@@ -25,9 +25,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.conditions.top.BgpConditions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.conditions.top.Conditions;
 
-class ConditionRenderer {
+final class ConditionRenderer {
 
     private static final CliFormatter FORMAT = new CliFormatter() {};
+
+    private ConditionRenderer() {
+
+    }
 
     static List<String> renderConditions(Conditions conditions) {
         if (conditions == null) {

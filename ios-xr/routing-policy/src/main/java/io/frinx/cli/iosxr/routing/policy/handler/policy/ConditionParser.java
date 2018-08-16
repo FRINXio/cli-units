@@ -37,7 +37,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.polic
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.condition.top.MatchPrefixSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.condition.top.MatchPrefixSetBuilder;
 
-class ConditionParser {
+final class ConditionParser {
+
+    private ConditionParser() {
+
+    }
 
     static final Conditions EMPTY_CONDITIONS = new ConditionsBuilder().build();
 

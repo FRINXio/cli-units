@@ -19,12 +19,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServiceToPortMapping {
+public final class ServiceToPortMapping {
 
     public static final Map<String, Integer> TCP_MAPPING;
     public static final Map<String, Short> ICMP_MAPPING;
     public static final Map<String, Short> ICMPV6_MAPPING;
 
+    private ServiceToPortMapping() {
+
+    }
 
     static {
         Map<String, Integer> tcpMap = new HashMap<>();

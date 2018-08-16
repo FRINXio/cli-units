@@ -16,7 +16,6 @@
 
 package io.frinx.cli.iosxr.unit.acl.handler;
 
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
