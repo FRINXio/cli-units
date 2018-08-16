@@ -34,11 +34,39 @@
   <packaging>bundle</packaging>
 
   <dependencies>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>dasan-cli-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Openconfig models -->
     <dependency>
       <groupId>io.frinx.openconfig</groupId>
       <artifactId>openconfig-interfaces</artifactId>
       <version>${openconfig.version}</version>
+    </dependency>
+
+    <!-- for JUnit -->
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

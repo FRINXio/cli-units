@@ -37,6 +37,7 @@ public final class InterfaceReader extends CompositeListReader<Interface, Interf
     public InterfaceReader(Cli cli) {
         super(new ArrayList<ListReaderCustomizer<Interface, InterfaceKey, InterfaceBuilder>>() {
             {
+                add(new PhysicalPortInterfaceReader(cli));
             }
         });
     }
