@@ -33,7 +33,6 @@
 
   <modules>
     <module>init</module>
-    <module>essential</module>
     <module>interface</module>
     <module>cdp</module>
     <module>network-instance</module>
