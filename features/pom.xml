@@ -31,7 +31,6 @@
     <module>frinx-cli-unit-ios</module>
     <module>frinx-cli-unit-ios-initializer</module>
     <module>frinx-cli-unit-ios-common-handlers</module>
-    <module>frinx-cli-unit-ios-common-models</module>
     <module>frinx-cli-unit-ios-utils</module>
     <module>frinx-cli-unit-ios-xr</module>
     <module>frinx-cli-unit-ios-xr-initializer</module>

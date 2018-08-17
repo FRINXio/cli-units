@@ -60,10 +60,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>brocade-essential-unit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>brocade-interface-unit</artifactId>
         </dependency>
         <dependency>
@@ -92,12 +88,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>frinx-cli-unit-ios-initializer</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-ios-common-models</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
