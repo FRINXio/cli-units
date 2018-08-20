@@ -29,12 +29,14 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.dasan.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.dasan.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.dasan.network.instance.handler.NetworkInstanceReader;
+import io.frinx.cli.unit.dasan.network.instance.handler.vlan.VlanReader;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.VlansBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -89,6 +91,10 @@ public class NosNetworkInstanceUnit implements TranslateUnit {
         readRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli)));
+
+        // VLAN(L3)
+        readRegistry.addStructuralReader(IIDs.NE_NE_VLANS, VlansBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_VL_VLAN, new VlanReader(cli)));
     }
 
     @Override
