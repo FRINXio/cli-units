@@ -18,9 +18,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.frinx.distribution</groupId>
-    <artifactId>karaf-parent</artifactId>
-    <version>4.1.0.rc1-frinx-SNAPSHOT</version>
+    <groupId>org.opendaylight.odlparent</groupId>
+    <artifactId>karaf4-parent-frinx</artifactId>
+    <version>3.1.1-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
@@ -35,8 +35,7 @@
   </prerequisites>
 
   <properties>
-    <restconf.version>1.4.2-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</restconf.version>
-    <netconf.version>1.4.2-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</netconf.version>
+    <restconf.version>1.7.2-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</restconf.version>
     <cli.version>4.1.0.rc1-frinx-SNAPSHOT</cli.version>
     <openconfig.version>4.1.0.rc1-frinx-SNAPSHOT</openconfig.version>
   </properties>
@@ -59,7 +58,7 @@
     </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
-      <artifactId>cli-southbound-features</artifactId>
+      <artifactId>cli-features</artifactId>
       <version>${cli.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
