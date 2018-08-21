@@ -32,6 +32,8 @@
     <modules>
         <!--<module>essential</module>-->
         <module>init</module>
+        <module>lldp</module>
+        <module>utils</module>
     </modules>
 
     <build>

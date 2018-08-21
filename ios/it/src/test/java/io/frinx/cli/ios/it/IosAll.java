@@ -145,7 +145,7 @@ public class IosAll {
         }
 
         @Override
-        public void onReconnecting(Throwable throwable, int reconnectCount) {
+        public void onReconnecting(Throwable throwable, int reconnectCounter) {
             throw new RuntimeException("Disconnected !");
         }
     };

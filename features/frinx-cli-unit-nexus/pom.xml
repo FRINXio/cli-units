@@ -54,6 +54,14 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>nexus-cli-init-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nexus-lldp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nexus-utils</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
