@@ -92,6 +92,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-ospfv3-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-xr-qos-unit</artifactId>
         </dependency>
         <dependency>
