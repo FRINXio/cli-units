@@ -34,6 +34,8 @@ import io.frinx.cli.iosxr.mpls.handler.P2pAttributesConfigWriter;
 import io.frinx.cli.iosxr.mpls.handler.RsvpInterfaceConfigReader;
 import io.frinx.cli.iosxr.mpls.handler.RsvpInterfaceConfigWriter;
 import io.frinx.cli.iosxr.mpls.handler.RsvpInterfaceReader;
+import io.frinx.cli.iosxr.mpls.handler.TeConfigReader;
+import io.frinx.cli.iosxr.mpls.handler.TeConfigWriter;
 import io.frinx.cli.iosxr.mpls.handler.TeInterfaceConfigReader;
 import io.frinx.cli.iosxr.mpls.handler.TeInterfaceConfigWriter;
 import io.frinx.cli.iosxr.mpls.handler.TeInterfaceReader;
@@ -49,6 +51,8 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.TeGlobalAttributes1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.TeGlobalAttributes1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.CiscoMplsTeExtension;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.CiscoMplsTeExtensionBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.Config;
@@ -57,6 +61,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev17082
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.MplsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.LspsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.SignalingProtocolsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeGlobalAttributesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.lsps.ConstrainedPathBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnel.p2p_top.P2pTunnelAttributesBuilder;
@@ -123,8 +128,13 @@ public class MplsUnit implements TranslateUnit {
                 IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG);
 
         // TE
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TEGLOBALATTRIBUTES, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TEGLOBALATTRIBUTES.augmentation(TeGlobalAttributes1.class),
+                new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(TeConfigWriter.TE_CONFIG_IID, new TeConfigWriter(cli)));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TE_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigWriter(cli)));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigWriter(cli)),
+                TeConfigWriter.TE_CONFIG_IID);
 
         // Tunnel
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LSPS, new NoopCliWriter<>()));
@@ -152,6 +162,10 @@ public class MplsUnit implements TranslateUnit {
                 .augmentation(NiMplsRsvpIfSubscripAug.class), new NiMplsRsvpIfSubscripAugReader(cli)));
 
         // TE
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_TEGLOBALATTRIBUTES, TeGlobalAttributesBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_TEGLOBALATTRIBUTES.augmentation(TeGlobalAttributes1.class),
+                TeGlobalAttributes1Builder.class);
+        readRegistry.add(new GenericConfigReader<>(TeConfigReader.TE_CONFIG_IID, new TeConfigReader(cli)));
         readRegistry.addStructuralReader(IIDs.NE_NE_MP_TEINTERFACEATTRIBUTES, TeInterfaceAttributesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_TE_INTERFACE, new TeInterfaceReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_TE_IN_CONFIG, new TeInterfaceConfigReader()));
