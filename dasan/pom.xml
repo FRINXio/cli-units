@@ -23,6 +23,7 @@
     <module>init</module>
     <module>utils</module>
     <module>network-instance</module>
+    <module>interface</module>
   </modules>
 
   <parent>
