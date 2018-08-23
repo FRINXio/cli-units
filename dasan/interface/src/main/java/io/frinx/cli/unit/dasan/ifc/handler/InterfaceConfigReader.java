@@ -35,6 +35,7 @@ public final class InterfaceConfigReader extends CompositeReader<Config, ConfigB
     public InterfaceConfigReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {
             {
+                add(new PhysicalPortInterfaceConfigReader(cli));
             }
         });
     }
