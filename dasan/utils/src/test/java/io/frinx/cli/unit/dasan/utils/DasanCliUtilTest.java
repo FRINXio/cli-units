@@ -16,29 +16,23 @@
 
 package io.frinx.cli.unit.dasan.utils;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -55,6 +49,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class DasanCliUtilTest {
 
     private static String SHOW_ALL_PORTS;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -102,7 +99,7 @@ public class DasanCliUtilTest {
         List<String> result = DasanCliUtil.getPhysicalPorts(cli, cliReader, id, readContext);
 
 
-        assertThat(result, sameInstance(physportids));
+        Assert.assertThat(result, CoreMatchers.sameInstance(physportids));
 
 
         Mockito.verify(cliReader).blockingRead(SHOW_ALL_PORTS, cli, id, readContext);
@@ -141,17 +138,13 @@ public class DasanCliUtilTest {
         PowerMockito.mockStatic(DasanCliUtil.class, Mockito.CALLS_REAL_METHODS);
         PowerMockito.doReturn(physportids).when(DasanCliUtil.class, "parsePhysicalPorts", showportsStr);
 
+        thrown.expect(CoreMatchers.sameInstance(exception));
 
-        try {
-            DasanCliUtil.getPhysicalPorts(cli, cliReader, id, readContext);
-            fail("Expected exception was not occurred.");
-        } catch (ReadFailedException e) {
-            assertThat(e, sameInstance(exception));
-        }
+        DasanCliUtil.getPhysicalPorts(cli, cliReader, id, readContext);
 
 
         Mockito.verify(cliReader).blockingRead(SHOW_ALL_PORTS, cli, id, readContext);
-        PowerMockito.verifyStatic(never());
+        PowerMockito.verifyStatic(Mockito.never());
         DasanCliUtil.parsePhysicalPorts(showportsStr);
     }
 
@@ -176,15 +169,15 @@ public class DasanCliUtilTest {
 
         List<String> result = DasanCliUtil.parsePhysicalPorts(showportsStr);
 
-        assertThat(result.size(), is(8));
-        assertThat(result.get(0), equalTo("1/1"));
-        assertThat(result.get(1), equalTo("1/2"));
-        assertThat(result.get(2), equalTo("2/1"));
-        assertThat(result.get(3), equalTo("2/2"));
-        assertThat(result.get(4), equalTo("3/1"));
-        assertThat(result.get(5), equalTo("3/2"));
-        assertThat(result.get(6), equalTo("t/11"));
-        assertThat(result.get(7), equalTo("t/12"));
+        Assert.assertThat(result.size(), CoreMatchers.is(8));
+        Assert.assertThat(result.get(0), CoreMatchers.equalTo("1/1"));
+        Assert.assertThat(result.get(1), CoreMatchers.equalTo("1/2"));
+        Assert.assertThat(result.get(2), CoreMatchers.equalTo("2/1"));
+        Assert.assertThat(result.get(3), CoreMatchers.equalTo("2/2"));
+        Assert.assertThat(result.get(4), CoreMatchers.equalTo("3/1"));
+        Assert.assertThat(result.get(5), CoreMatchers.equalTo("3/2"));
+        Assert.assertThat(result.get(6), CoreMatchers.equalTo("t/11"));
+        Assert.assertThat(result.get(7), CoreMatchers.equalTo("t/12"));
 
     }
 
@@ -193,21 +186,16 @@ public class DasanCliUtilTest {
     public void testContainsPort_001() throws Exception {
         final List<String> ports = new ArrayList<>();
         final String ranges = "1/1";
-        final Set<String> parsedPort = new HashSet<String>() {
-            {
-                add("1/1");
-                add("1/3");
-            }
-        };
+        final Set<String> parsedPort = Sets.newSet("1/1", "1/3");
 
         PowerMockito.mockStatic(DasanCliUtil.class, Mockito.CALLS_REAL_METHODS);
         PowerMockito.doReturn(parsedPort).when(DasanCliUtil.class, "parsePortRanges", ports, ranges);
 
-        assertThat(DasanCliUtil.containsPort(ports, ranges, "1/0"), is(false));
-        assertThat(DasanCliUtil.containsPort(ports, ranges, "1/1"), is(true));
-        assertThat(DasanCliUtil.containsPort(ports, ranges, "1/2"), is(false));
-        assertThat(DasanCliUtil.containsPort(ports, ranges, "1/3"), is(true));
-        assertThat(DasanCliUtil.containsPort(ports, ranges, "1/4"), is(false));
+        Assert.assertThat(DasanCliUtil.containsPort(ports, ranges, "1/0"), CoreMatchers.is(false));
+        Assert.assertThat(DasanCliUtil.containsPort(ports, ranges, "1/1"), CoreMatchers.is(true));
+        Assert.assertThat(DasanCliUtil.containsPort(ports, ranges, "1/2"), CoreMatchers.is(false));
+        Assert.assertThat(DasanCliUtil.containsPort(ports, ranges, "1/3"), CoreMatchers.is(true));
+        Assert.assertThat(DasanCliUtil.containsPort(ports, ranges, "1/4"), CoreMatchers.is(false));
 
         PowerMockito.verifyStatic(Mockito.times(5));
         DasanCliUtil.parsePortRanges(ports, ranges);
@@ -221,16 +209,26 @@ public class DasanCliUtilTest {
             "2/1", "2/2",
             "t/1", "t/2", "t/3");
 
-        assertThat(DasanCliUtil.parsePortRanges(ports, "1/0"), equalTo(Collections.emptySet()));
-        assertThat(DasanCliUtil.parsePortRanges(ports, "1/1"), equalTo(Collections.singleton("1/1")));
-        assertThat(DasanCliUtil.parsePortRanges(ports, "1/2"), equalTo(Collections.singleton("1/2")));
-        assertThat(DasanCliUtil.parsePortRanges(ports, "1/3"), equalTo(Collections.emptySet()));
+        Assert.assertThat(DasanCliUtil.parsePortRanges(ports, "1/0"),
+            CoreMatchers.equalTo(Sets.newSet()));
 
-        assertThat(DasanCliUtil.parsePortRanges(ports, "1/1,2/2"), equalTo(Sets.newSet("1/1", "2/2")));
-        assertThat(DasanCliUtil.parsePortRanges(ports, "1/2-t/1"), equalTo(Sets.newSet("1/2", "2/1", "2/2", "t/1")));
+        Assert.assertThat(DasanCliUtil.parsePortRanges(ports, "1/1"),
+            CoreMatchers.equalTo(Sets.newSet("1/1")));
 
-        assertThat(DasanCliUtil.parsePortRanges(ports, "1/1,2/2-t/1,t/3"), equalTo(
-            Sets.newSet("1/1", "2/2", "t/1", "t/3")));
+        Assert.assertThat(DasanCliUtil.parsePortRanges(ports, "1/2"),
+            CoreMatchers.equalTo(Sets.newSet("1/2")));
+
+        Assert.assertThat(DasanCliUtil.parsePortRanges(ports, "1/3"),
+            CoreMatchers.equalTo(Sets.newSet()));
+
+        Assert.assertThat(DasanCliUtil.parsePortRanges(ports, "1/1,2/2"),
+            CoreMatchers.equalTo(Sets.newSet("1/1", "2/2")));
+
+        Assert.assertThat(DasanCliUtil.parsePortRanges(ports, "1/2-t/1"),
+            CoreMatchers.equalTo(Sets.newSet("1/2", "2/1", "2/2", "t/1")));
+
+        Assert.assertThat(DasanCliUtil.parsePortRanges(ports, "1/1,2/2-t/1,t/3"),
+            CoreMatchers.equalTo(Sets.newSet("1/1", "2/2", "t/1", "t/3")));
     }
 
     @Test
@@ -244,22 +242,22 @@ public class DasanCliUtilTest {
         PowerMockito.doReturn(parsedIds).when(DasanCliUtil.class, "parseIdRanges", ranges);
 
 
-        assertThat(DasanCliUtil.containsId(ranges, "1"), is(false));
-        assertThat(DasanCliUtil.containsId(ranges, "2"), is(true));
+        Assert.assertThat(DasanCliUtil.containsId(ranges, "1"), CoreMatchers.is(false));
+        Assert.assertThat(DasanCliUtil.containsId(ranges, "2"), CoreMatchers.is(true));
 
 
-        PowerMockito.verifyStatic(times(2));
+        PowerMockito.verifyStatic(Mockito.times(2));
         DasanCliUtil.parseIdRanges(ranges);
     }
 
     @Test
     public void testParseIdRanges_001() throws Exception {
 
-        assertThat(DasanCliUtil.parseIdRanges("2"), equalTo(Sets.newSet("2")));
-        assertThat(DasanCliUtil.parseIdRanges("4,6"), equalTo(Sets.newSet("4", "6")));
-        assertThat(DasanCliUtil.parseIdRanges("8-10"), equalTo(Sets.newSet("8", "9", "10")));
-        assertThat(DasanCliUtil.parseIdRanges("2,4-6,8-10"), equalTo(Sets.newSet("2", "4", "5", "6", "8", "9", "10")));
-
+        Assert.assertThat(DasanCliUtil.parseIdRanges("2"), CoreMatchers.equalTo(Sets.newSet("2")));
+        Assert.assertThat(DasanCliUtil.parseIdRanges("4,6"), CoreMatchers.equalTo(Sets.newSet("4", "6")));
+        Assert.assertThat(DasanCliUtil.parseIdRanges("8-10"), CoreMatchers.equalTo(Sets.newSet("8", "9", "10")));
+        Assert.assertThat(DasanCliUtil.parseIdRanges("2,4-6,8-10"),
+            CoreMatchers.equalTo(Sets.newSet("2", "4", "5", "6", "8", "9", "10")));
     }
 
     static class Config implements DataObject {
@@ -276,6 +274,4 @@ public class DasanCliUtilTest {
             return null;
         }
     }
-
-
 }
