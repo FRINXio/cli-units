@@ -41,7 +41,7 @@ public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, C
         this.cli = cli;
     }
 
-    static final String SH_OSPF = "show running-config router ospf %s | include ^ router-id";
+    static final String SH_OSPF = "show running-config router ospf %s %s | include ^%srouter-id";
     private static final Pattern ROUTER_ID = Pattern.compile("router-id (?<routerId>[\\S]+)");
 
     @Override
@@ -50,8 +50,11 @@ public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, C
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String ospfId = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
-        parseRouterId(blockingRead(String.format(SH_OSPF, ospfId), cli, instanceIdentifier, readContext),
-                configBuilder);
+        final String nwInsName = OspfProtocolReader.resolveVrfWithName(instanceIdentifier);
+        //indent is 1 when reading default config, otherwise it is 2.
+        final String indent = nwInsName.isEmpty() ? " " : "  ";
+        parseRouterId(blockingRead(String.format(SH_OSPF, ospfId, nwInsName, indent),
+                cli, instanceIdentifier, readContext), configBuilder);
     }
 
     @VisibleForTesting

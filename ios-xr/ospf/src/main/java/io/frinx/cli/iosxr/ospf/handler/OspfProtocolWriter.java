@@ -16,7 +16,6 @@
 
 package io.frinx.cli.iosxr.ospf.handler;
 
-import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.ospf.OspfWriter;
@@ -40,13 +39,17 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
             throws WriteFailedException {
         String vrfId = id.firstKeyOf(NetworkInstance.class)
                 .getName();
-        Preconditions.checkArgument(NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfId),
-                "VRF-aware OSPF is not supported");
         final String processName = id.firstKeyOf(Protocol.class)
                 .getName();
-        blockingWriteAndRead(cli, id, data,
-                f("router ospf %s", processName),
-                "root");
+        if (NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfId)) {
+            blockingWriteAndRead(cli, id, data,
+                    f("router ospf %s", processName),
+                    "root");
+        } else {
+            blockingWriteAndRead(cli, id, data,
+                    f("router ospf %s vrf %s", processName, vrfId),
+                    "root");
+        }
     }
 
     @Override
@@ -60,7 +63,8 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
             throws WriteFailedException {
         final String processName = id.firstKeyOf(Protocol.class)
                 .getName();
+        final String vrfName = OspfProtocolReader.resolveVrfWithName(id);
         blockingWriteAndRead(cli, id, data,
-                f("no router ospf %s", processName));
+                f("no router ospf %s %s", processName, vrfName));
     }
 }

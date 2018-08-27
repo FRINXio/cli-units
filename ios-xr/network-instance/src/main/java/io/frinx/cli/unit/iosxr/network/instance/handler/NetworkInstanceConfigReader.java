@@ -18,7 +18,9 @@ package io.frinx.cli.unit.iosxr.network.instance.handler;
 
 import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.handlers.def.DefaultConfigReader;
+import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeReader;
+import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.L3VrfConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import java.util.ArrayList;
 import javax.annotation.Nonnull;
@@ -31,9 +33,10 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigBuilder>
         implements CliConfigReader<Config, ConfigBuilder> {
 
-    public NetworkInstanceConfigReader() {
+    public NetworkInstanceConfigReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {{
                 add(new DefaultConfigReader());
+                add(new L3VrfConfigReader(cli));
             }
         });
     }

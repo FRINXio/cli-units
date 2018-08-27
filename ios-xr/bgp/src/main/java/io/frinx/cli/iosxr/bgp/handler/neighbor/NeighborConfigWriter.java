@@ -43,7 +43,7 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
         this.cli = cli;
     }
 
-    static final String NEIGHBOR_GLOBAL = "router bgp {$as} {$instance}\n"
+    static final String NEIGHBOR_GLOBAL = "router bgp {$as} {$instance} {$vrf}\n"
             + "neighbor {$address}\n"
             + "{% if ($config.peer_as) %}"
             + "remote-as {$config.peer_as.value}\n"
@@ -101,12 +101,14 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
                     .map(afiSafi -> GlobalAfiSafiReader.transformAfiToString(afiSafi.getAfiSafiName()))
                     .collect(Collectors.toList());
         }
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
 
         blockingWriteAndRead(fT(NEIGHBOR_GLOBAL,
                 "as", g.getConfig()
                         .getAs()
                         .getValue(),
                 "instance", instName,
+                "vrf", nwInsName,
                 "address", new String(id.firstKeyOf(Neighbor.class)
                         .getNeighborAddress()
                         .getValue()),
@@ -135,12 +137,14 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
                     .map(afiSafi -> GlobalAfiSafiReader.transformAfiToString(afiSafi.getAfiSafiName()))
                     .collect(Collectors.toList());
         }
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
 
         blockingWriteAndRead(fT(NEIGHBOR_GLOBAL,
                 "as", g.getConfig()
                         .getAs()
                         .getValue(),
                 "instance", instName,
+                "vrf", nwInsName,
                 "address", new String(id.firstKeyOf(Neighbor.class)
                         .getNeighborAddress()
                         .getValue()),
@@ -161,10 +165,11 @@ public class NeighborConfigWriter implements BgpWriter<Config> {
         final Global g = bgpOptional.get()
                 .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         blockingDeleteAndRead(cli, id,
-                f("router bgp %s %s", g.getConfig()
+                f("router bgp %s %s %s", g.getConfig()
                         .getAs()
-                        .getValue(), instName),
+                        .getValue(), instName, nwInsName),
                 f("no neighbor %s", new String(id.firstKeyOf(Neighbor.class)
                         .getNeighborAddress()
                         .getValue())),

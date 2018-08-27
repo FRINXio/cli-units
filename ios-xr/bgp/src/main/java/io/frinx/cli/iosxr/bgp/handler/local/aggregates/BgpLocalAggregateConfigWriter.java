@@ -37,7 +37,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
 
     private Cli cli;
 
-    static final String LOCAL_AGGREGATE_CONFIG = "router bgp {$as} {$instance}\n"
+    static final String LOCAL_AGGREGATE_CONFIG = "router bgp {$as} {$instance} {$vrf}\n"
             + "{% loop in $oldAfiSafis as $afiSafi}\n"
             + "{% if ($afiSafi == ipv4unicast) && ($configOld.prefix.ipv4_prefix|default(nonIpv4) != nonIpv4) %}"
             + "address-family ipv4 unicast\n"
@@ -80,6 +80,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                         .getAfiSafi() != null,
                 "Address-family for network doesn't exist");
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         String policy = null;
         if (config.getAugmentation(NiProtAggAug.class) != null) {
             policy = config.getAugmentation(NiProtAggAug.class)
@@ -90,6 +91,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                         .getAs()
                         .getValue(),
                 "instance", instName,
+                "vrf", nwInsName,
                 "newAfiSafis", g.getAfiSafis()
                         .getAfiSafi()
                         .stream()
@@ -116,6 +118,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                         .getAfiSafi() != null,
                 "Address-family for network doesn't exist");
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         String oldPolicy = null;
         if (dataBefore.getAugmentation(NiProtAggAug.class) != null) {
             oldPolicy = dataBefore.getAugmentation(NiProtAggAug.class)
@@ -131,6 +134,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                         .getAs()
                         .getValue(),
                 "instance", instName,
+                "vrf", nwInsName,
                 "newAfiSafis", g.getAfiSafis()
                         .getAfiSafi()
                         .stream()
@@ -160,6 +164,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
             return;
         }
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         String policy = null;
         if (config.getAugmentation(NiProtAggAug.class) != null) {
             policy = config.getAugmentation(NiProtAggAug.class)
@@ -170,6 +175,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
                         .getAs()
                         .getValue(),
                 "instance", instName,
+                "vrf", nwInsName,
                 "newAfiSafis", Collections.EMPTY_LIST,
                 "oldAfiSafis", g.getAfiSafis()
                         .getAfiSafi()

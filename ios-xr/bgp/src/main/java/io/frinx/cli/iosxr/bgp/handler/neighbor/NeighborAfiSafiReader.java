@@ -22,7 +22,9 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
+import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
@@ -52,8 +54,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
-    private static final String SH_AFI = "show running-config router bgp %s %s neighbor %s | include address-family";
-    private static final String SH_AFI_SECTION = "show running-config router bgp %s %s neighbor %s address-family %s";
+    private static final String SH_AFI = "show running-config router bgp %s %s %s neighbor %s | include address-family";
+    private static final String SH_AFI_SECTION = "show running-config router bgp %s %s %s "
+            + "neighbor %s address-family %s";
     private static final Pattern FAMILY_LINE = Pattern.compile("(.*)address-family (?<family>[^\\n].*)");
     private static final Pattern SOFT_RECONFIGURATION_LINE = Pattern.compile("soft-reconfiguration inbound(?<always> "
             + "always)*");
@@ -75,17 +78,22 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
         if (globalConfig == null) {
             return Collections.EMPTY_LIST;
         }
+
         String insName = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName()
-                .equals(NetworInstance.DEFAULT_NETWORK_NAME)
+                .equals(BgpProtocolReader.DEFAULT_BGP_INSTANCE)
                 ?
                 "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
+
+        String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
+
         String neighborIp = new String(instanceIdentifier.firstKeyOf(Neighbor.class)
                 .getNeighborAddress()
                 .getValue());
+
         return getAfiKeys(blockingRead(String.format(SH_AFI, globalConfig.getAs()
-                .getValue(), insName, neighborIp), cli, instanceIdentifier, readContext));
+                .getValue(), insName, nwInsName, neighborIp), cli, instanceIdentifier, readContext));
     }
 
     @Override
@@ -107,6 +115,8 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
                 ?
                 "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
+        String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
+
         String neighborIp = new String(instanceIdentifier.firstKeyOf(Neighbor.class)
                 .getNeighborAddress()
                 .getValue());
@@ -114,7 +124,7 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
                 .getAfiSafiName();
 
         String output = blockingRead(String.format(SH_AFI_SECTION, globalConfig.getAs()
-                        .getValue(), insName, neighborIp,
+                        .getValue(), insName, nwInsName, neighborIp,
                 GlobalAfiSafiReader.transformAfiToString(name)), cli, instanceIdentifier, readContext);
         Optional<Matcher> reconfigMatch = ParsingUtils.NEWLINE.splitAsStream(output.trim())
                 .map(SOFT_RECONFIGURATION_LINE::matcher)

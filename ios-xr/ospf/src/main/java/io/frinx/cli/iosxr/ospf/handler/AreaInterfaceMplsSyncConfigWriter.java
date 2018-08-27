@@ -47,8 +47,8 @@ public class AreaInterfaceMplsSyncConfigWriter implements OspfWriter<Config> {
                         .getIdentifier();
         final InterfaceKey intfId = instanceIdentifier.firstKeyOf(Interface.class);
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class)
-                        .getName()),
+                f("router ospf %s %s", instanceIdentifier.firstKeyOf(Protocol.class)
+                        .getName(), OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 data.isEnabled() != null ? (data.isEnabled() ? "mpls ldp sync" : "mpls ldp sync disable") : "",
@@ -64,8 +64,8 @@ public class AreaInterfaceMplsSyncConfigWriter implements OspfWriter<Config> {
                         .getIdentifier();
         final InterfaceKey intfId = id.firstKeyOf(Interface.class);
         blockingWriteAndRead(cli, id, dataAfter,
-                f("router ospf %s", id.firstKeyOf(Protocol.class)
-                        .getName()),
+                f("router ospf %s %s", id.firstKeyOf(Protocol.class)
+                        .getName(), OspfProtocolReader.resolveVrfWithName(id)),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 dataAfter.isEnabled() != null ? (dataAfter.isEnabled() ? "mpls ldp sync" : "mpls ldp sync disable") :

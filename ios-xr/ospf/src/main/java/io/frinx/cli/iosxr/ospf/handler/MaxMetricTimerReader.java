@@ -49,7 +49,7 @@ public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader
             + "(?<summaryLsa> summary-lsa)*"
             + "(?<externalLsa> external-lsa)*");
 
-    public static final String SH_RUN_OSPF_MAX_METRIC = "show running-config router ospf %s | include ^ max-metric";
+    public static final String SH_RUN_OSPF_MAX_METRIC = "show running-config router ospf %s %s | include ^%smax-metric";
 
     private Cli cli;
 
@@ -62,8 +62,12 @@ public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader
                                                     @Nonnull ReadContext readContext) throws ReadFailedException {
         String ospfId = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
-        return parseTimerKeys(blockingRead(String.format(SH_RUN_OSPF_MAX_METRIC, ospfId), cli, instanceIdentifier,
-                readContext));
+        final String nwInsName = OspfProtocolReader.resolveVrfWithName(instanceIdentifier);
+        //indent is 1 when reading default config, otherwise it is 2.
+        final String indent = nwInsName.isEmpty() ? " " : "  ";
+
+        return parseTimerKeys(blockingRead(String.format(SH_RUN_OSPF_MAX_METRIC, ospfId, nwInsName, indent),
+                cli, instanceIdentifier, readContext));
     }
 
     @Override

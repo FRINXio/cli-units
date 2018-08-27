@@ -17,13 +17,11 @@
 package io.frinx.cli.iosxr.bgp;
 
 import com.google.common.collect.Lists;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader;
+import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader.AsAndInsName;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 
 public class BgpProtocolReaderTest {
 
@@ -32,25 +30,16 @@ public class BgpProtocolReaderTest {
             + "router bgp 65505 instance test\n"
             + "router bgp 1\n";
 
-    private static final String OUTPUT_WITHOUT_DEFAULT = "Fri Feb 23 06:27:50.700 UTC\n"
-            + "router bgp 1 instance inst\n"
-            + "router bgp 65505 instance test\n";
-
-    private static final List<ProtocolKey> EXPECTED_KEYS = Lists.newArrayList("inst", "test", "default")
-            .stream()
-            .map(instance -> new ProtocolKey(BgpReader.TYPE, instance))
-            .collect(Collectors.toList());
-
-    private static final List<ProtocolKey> EXPECTED_KEYS_WITHOUT_DEFAULT = Lists.newArrayList("inst", "test")
-            .stream()
-            .map(instance -> new ProtocolKey(BgpReader.TYPE, instance))
-            .collect(Collectors.toList());
+    private static final List<String> EXPECTED_INSTANCES = Lists.newArrayList("inst", "test", "default");
+    private static final List<String> EXPECTED_ASNUMBER = Lists.newArrayList("1", "65505");
 
     @Test
     public void testParseBgpProtocolKeys() {
-        Assert.assertEquals(EXPECTED_KEYS, BgpProtocolReader.parseGbpProtocolKeys(OUTPUT));
-
-        Assert.assertEquals(EXPECTED_KEYS_WITHOUT_DEFAULT, BgpProtocolReader
-                .parseGbpProtocolKeys(OUTPUT_WITHOUT_DEFAULT));
+        List<AsAndInsName> aais = BgpProtocolReader.parseGbpProtocolKeys(OUTPUT);
+        for (AsAndInsName aai : aais) {
+            Assert.assertTrue(EXPECTED_INSTANCES.contains(aai.getKey().getName()));
+            Assert.assertTrue(EXPECTED_ASNUMBER.contains(aai.getAsNumber()));
+        }
+        Assert.assertEquals(3, aais.size());
     }
 }

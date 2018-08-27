@@ -47,7 +47,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReader<Aggregate, AggregateKey,
         AggregateBuilder> {
 
-    private static final String SH_BGP = "show running-config router bgp %s %s";
+    private static final String SH_BGP = "show running-config router bgp %s %s %s";
     private static final Pattern NETWORK_LINE = Pattern.compile("network (?<prefix>\\S+)(?<policy> route-policy "
             + "(?<policyName>\\S+))*");
 
@@ -78,10 +78,11 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
             return Collections.EMPTY_LIST;
         }
 
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
         final String instName = GlobalConfigWriter.getProtoInstanceName(instanceIdentifier);
         String output = blockingRead(String.format(SH_BGP, globalConfig.getAs()
                 .getValue()
-                .intValue(), instName), cli, instanceIdentifier, readContext);
+                .intValue(), instName, nwInsName), cli, instanceIdentifier, readContext);
 
         return ParsingUtils.NEWLINE.splitAsStream(output.trim())
                 .map(NETWORK_LINE::matcher)
@@ -102,10 +103,11 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
                         .Config.class))
                 .orNull();
         final String instName = GlobalConfigWriter.getProtoInstanceName(instanceIdentifier);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
         AggregateKey key = instanceIdentifier.firstKeyOf(Aggregate.class);
         String output = blockingRead(String.format(SH_BGP, globalConfig.getAs()
                 .getValue()
-                .intValue(), instName), cli, instanceIdentifier, readContext);
+                .intValue(), instName, nwInsName), cli, instanceIdentifier, readContext);
 
         Optional<String> policies = ParsingUtils.NEWLINE.splitAsStream(output.trim())
                 .map(NETWORK_LINE::matcher)

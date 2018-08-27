@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AreaInterfaceEnableBfdConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_OSPF_INT = "show running-config router ospf %s area %s interface %s";
+    private static final String SHOW_OSPF_INT = "show running-config router ospf %s %s area %s interface %s";
     private static final Pattern ENABLE_BFD_LINE = Pattern.compile("bfd fast-detect(?<disable> disable)*");
     private final Cli cli;
 
@@ -58,7 +58,9 @@ public class AreaInterfaceEnableBfdConfigReader implements OspfReader.OspfConfig
                 .getName();
         final String areaId = AreaInterfaceReader.areaIdToString(instanceIdentifier.firstKeyOf(Area.class)
                 .getIdentifier());
-        String output = blockingRead(String.format(SHOW_OSPF_INT, ospfId, areaId, interfaceId), cli,
+        final String nwInsName = OspfProtocolReader.resolveVrfWithName(instanceIdentifier);
+
+        String output = blockingRead(String.format(SHOW_OSPF_INT, ospfId, nwInsName, areaId, interfaceId), cli,
                 instanceIdentifier, readContext);
         parseBfd(output, configBuilder);
     }

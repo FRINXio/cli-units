@@ -17,7 +17,6 @@
 package io.frinx.cli.iosxr.ospf.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.ospf.OspfReader;
@@ -26,9 +25,11 @@ import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
@@ -46,6 +47,7 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
     }
 
     private static final String SH_RUN_OSPF = "show running-config router ospf | include ^router ospf";
+    private static final String SH_RUN_OSPF_PER_VRF = "show running-config router ospf %s %s";
     private static final Pattern ROUTER_OSPF_LINE = Pattern.compile("router ospf (?<ospfName>\\S+)");
 
     @Nonnull
@@ -56,13 +58,23 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
         String vrfId = instanceIdentifier.firstKeyOf(NetworkInstance.class)
                 .getName();
 
-        // TODO We should add this check in all descendant readers
-        Preconditions.checkArgument(NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfId),
-                "VRF-aware OSPF is not supported");
-
         String output = blockingRead(SH_RUN_OSPF, cli, instanceIdentifier, readContext);
 
-        return parseOspfIds(output);
+        List<ProtocolKey> keys = parseOspfIds(output);
+        List<ProtocolKey> rtn = new ArrayList<>();
+
+        for (ProtocolKey key : keys) {
+            if (NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfId)) {
+                rtn.add(key);
+            } else {
+                String detailShow = String.format(SH_RUN_OSPF_PER_VRF, key.getName(), "vrf " + vrfId);
+                output = blockingRead(detailShow, cli, instanceIdentifier, readContext);
+                if (StringUtils.isNotEmpty(output)) {
+                    rtn.add(key);
+                }
+            }
+        }
+        return rtn;
     }
 
     @VisibleForTesting
@@ -82,4 +94,12 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
         protocolBuilder.setIdentifier(key.getIdentifier());
     }
 
+    public static String resolveVrfWithName(InstanceIdentifier<?> iid) {
+        String vrfId = iid.firstKeyOf(NetworkInstance.class).getName();
+
+        String rtn = NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfId)
+                ?
+                "" : " vrf " + vrfId;
+        return rtn;
+    }
 }

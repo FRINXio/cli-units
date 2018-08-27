@@ -55,28 +55,28 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class NeighborConfigWriterTest {
 
-    private static final String WRITE_INPUT = "router bgp 65505 instance test\n"
+    private static final String WRITE_INPUT = "router bgp 65505 instance test \n"
             + "neighbor 192.168.1.1\n"
             + "remote-as 65500\n"
             + "use neighbor-group ibgp\n"
             + "no shutdown\n"
             + "root\n";
 
-    private static final String UPDATE_INPUT = "router bgp 65505 instance test\n"
+    private static final String UPDATE_INPUT = "router bgp 65505 instance test \n"
             + "neighbor 192.168.1.1\n"
             + "remote-as 65501\n"
             + "use neighbor-group ebgp\n"
             + "shutdown\n"
             + "root\n";
 
-    private static final String UPDATE_CLEAN_INPUT = "router bgp 65505 instance test\n"
+    private static final String UPDATE_CLEAN_INPUT = "router bgp 65505 instance test \n"
             + "neighbor 192.168.1.1\n"
             + "no remote-as\n"
             + "no use neighbor-group\n"
             + "shutdown\n"
             + "root\n";
 
-    private static final String DELETE_INPUT = "router bgp 65505 instance test\n"
+    private static final String DELETE_INPUT = "router bgp 65505 instance test \n"
             + "no neighbor 192.168.1.1\n"
             + "root\n";
 

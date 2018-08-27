@@ -17,9 +17,11 @@
 package io.frinx.cli.iosxr.bgp;
 
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigReader;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 
 public class GlobalConfigReaderTest {
 
@@ -31,15 +33,15 @@ public class GlobalConfigReaderTest {
     @Test
     public void testGlobal() {
         ConfigBuilder builder = new ConfigBuilder();
-        GlobalConfigReader.parseAs(output, "inst", builder);
-        Assert.assertEquals(Long.valueOf(1), builder.getAs().getValue());
+        Optional<AsNumber> op = GlobalConfigReader.parseAs(output, "inst");
+        Assert.assertEquals(Long.valueOf(1), op.get().getValue());
 
         builder = new ConfigBuilder();
-        GlobalConfigReader.parseDefaultAs(output,  builder);
-        Assert.assertEquals(Long.valueOf(1), builder.getAs().getValue());
+        op = GlobalConfigReader.parseDefaultAs(output);
+        Assert.assertEquals(Long.valueOf(1), op.get().getValue());
 
         builder = new ConfigBuilder();
-        GlobalConfigReader.parseAs(output, "test", builder);
-        Assert.assertEquals(Long.valueOf(65505), builder.getAs().getValue());
+        op = GlobalConfigReader.parseAs(output, "test");
+        Assert.assertEquals(Long.valueOf(65505), op.get().getValue());
     }
 }

@@ -37,7 +37,7 @@ public class AreaConfigWriter implements OspfWriter<Config> {
                                               WriteContext writeContext) throws WriteFailedException {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", processName),
+                f("router ospf %s %s", processName, OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 f("area %s", AreaInterfaceReader.areaIdToString(data.getIdentifier())),
                 "root");
     }
@@ -54,7 +54,7 @@ public class AreaConfigWriter implements OspfWriter<Config> {
                                                WriteContext writeContext) throws WriteFailedException {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", processName),
+                f("router ospf %s %s", processName, OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 f("no area %s", AreaInterfaceReader.areaIdToString(data.getIdentifier())),
                 "root");
     }

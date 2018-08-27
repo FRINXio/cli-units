@@ -50,8 +50,8 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                         .get()
                         .getKey();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class)
-                        .getName()),
+                f("router ospf %s %s", instanceIdentifier.firstKeyOf(Protocol.class)
+                        .getName(), OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 data.getMetric() != null ? f("cost %s", data.getMetric()
@@ -69,7 +69,8 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
         final InterfaceKey intfId =
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Interface.class)).get().getKey();
         blockingWriteAndRead(cli, instanceIdentifier, dataAfter,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class).getName()),
+                f("router ospf %s %s", instanceIdentifier.firstKeyOf(Protocol.class).getName(),
+                        OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("interface %s", intfId.getId()),
                 dataAfter.getMetric() != null ? f("cost %s", dataAfter.getMetric().getValue())
@@ -91,8 +92,8 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                         .get()
                         .getKey();
         blockingDeleteAndRead(cli, instanceIdentifier,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class)
-                        .getName()),
+                f("router ospf %s %s", instanceIdentifier.firstKeyOf(Protocol.class)
+                        .getName(), OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
                 f("no interface %s", intfId.getId()),
                 "root");

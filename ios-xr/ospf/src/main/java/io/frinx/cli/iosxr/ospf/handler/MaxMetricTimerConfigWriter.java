@@ -42,8 +42,8 @@ public class MaxMetricTimerConfigWriter implements OspfWriter<Config> {
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class)
-                        .getName()),
+                f("router ospf %s %s", instanceIdentifier.firstKeyOf(Protocol.class)
+                        .getName(), OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 getMaxMetricCommands(data, false),
                 "root");
     }
@@ -60,8 +60,8 @@ public class MaxMetricTimerConfigWriter implements OspfWriter<Config> {
                                                WriteContext writeContext) throws WriteFailedException {
 
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", instanceIdentifier.firstKeyOf(Protocol.class)
-                        .getName()),
+                f("router ospf %s %s", instanceIdentifier.firstKeyOf(Protocol.class)
+                        .getName(), OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 getMaxMetricCommands(data, true),
                 "root");
     }

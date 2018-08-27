@@ -48,10 +48,12 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
         final Global g = Preconditions.checkNotNull(bgpOptional.get()
                 .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
+
         blockingWriteAndRead(cli, id, config,
-                f("router bgp %s %s", g.getConfig()
+                f("router bgp %s %s %s", g.getConfig()
                         .getAs()
-                        .getValue(), instName),
+                        .getValue(), instName, nwInsName),
                 f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
                         .getNeighborAddress()
                         .getValue())),
@@ -68,6 +70,8 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
         final Global g = Preconditions.checkNotNull(bgpOptional.get()
                 .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
+
         Config reconfig = dataAfter;
         boolean delete = false;
         if ((dataBefore.getAugmentation(BgpNeAfAug.class)
@@ -84,9 +88,9 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
             reconfig = dataBefore;
         }
         blockingWriteAndRead(cli, id, dataAfter,
-                f("router bgp %s %s", g.getConfig()
+                f("router bgp %s %s %s", g.getConfig()
                         .getAs()
-                        .getValue(), instName),
+                        .getValue(), instName, nwInsName),
                 f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
                         .getNeighborAddress()
                         .getValue())),
@@ -105,10 +109,12 @@ public class NeighborAfiSafiConfigWriter implements BgpWriter<Config> {
         final Global g = bgpOptional.get()
                 .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
+
         blockingDeleteAndRead(cli, id,
-                f("router bgp %s %s", g.getConfig()
+                f("router bgp %s %s %s", g.getConfig()
                         .getAs()
-                        .getValue(), instName),
+                        .getValue(), instName, nwInsName),
                 f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
                         .getNeighborAddress()
                         .getValue())),
