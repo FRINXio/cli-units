@@ -25,8 +25,13 @@ import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.IosXrDevices;
+import io.frinx.cli.iosxr.mpls.handler.LdpInterfaceConfigReader;
+import io.frinx.cli.iosxr.mpls.handler.LdpInterfaceConfigWriter;
+import io.frinx.cli.iosxr.mpls.handler.LdpInterfaceReader;
 import io.frinx.cli.iosxr.mpls.handler.LoadShareConfigReader;
 import io.frinx.cli.iosxr.mpls.handler.LoadShareConfigWriter;
+import io.frinx.cli.iosxr.mpls.handler.NiMplsLdpGlobalAugReader;
+import io.frinx.cli.iosxr.mpls.handler.NiMplsLdpGlobalAugWriter;
 import io.frinx.cli.iosxr.mpls.handler.NiMplsRsvpIfSubscripAugReader;
 import io.frinx.cli.iosxr.mpls.handler.NiMplsRsvpIfSubscripAugWriter;
 import io.frinx.cli.iosxr.mpls.handler.P2pAttributesConfigReader;
@@ -49,6 +54,10 @@ import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.LdpBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.ldp.GlobalBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top._interface.attributes.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeTunnelCiscoAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.TeGlobalAttributes1;
@@ -97,8 +106,12 @@ public class MplsUnit implements TranslateUnit {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension
                         .rev171024.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.$YangModuleInfoImpl
-                        .getInstance());
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco
+                        .rev171024.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp
+                        .rev180702.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension
+                        .rev180822.$YangModuleInfoImpl.getInstance());
     }
 
     @Override
@@ -126,6 +139,19 @@ public class MplsUnit implements TranslateUnit {
         writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG
                         .augmentation(NiMplsRsvpIfSubscripAug.class), new NiMplsRsvpIfSubscripAugWriter(cli)),
                 IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG);
+
+        // LDP
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_LDP, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_LD_GLOBAL, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_LD_GL_CONFIG, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_LD_GL_CONFIG.augmentation(NiMplsLdpGlobalAug.class),
+                new NiMplsLdpGlobalAugWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_LD_INTERFACEATTRIBUTES, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_LD_IN_INTERFACES, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_LD_IN_IN_INTERFACE, new NoopCliWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_MP_SI_LD_IN_IN_IN_CONFIG,
+                new LdpInterfaceConfigWriter(cli)),IIDs.NE_NE_MP_SI_LD_GL_CONFIG
+                .augmentation(NiMplsLdpGlobalAug.class));
 
         // TE
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_TEGLOBALATTRIBUTES, new NoopCliWriter<>()));
@@ -160,6 +186,23 @@ public class MplsUnit implements TranslateUnit {
         readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, ConfigBuilder.class);
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG
                 .augmentation(NiMplsRsvpIfSubscripAug.class), new NiMplsRsvpIfSubscripAugReader(cli)));
+
+        // LDP
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_LDP, LdpBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_LD_GLOBAL, GlobalBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_LD_GL_CONFIG,
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp.global
+                .ConfigBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_LD_GL_CONFIG
+                .augmentation(NiMplsLdpGlobalAug.class), new NiMplsLdpGlobalAugReader(cli)));
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_LD_INTERFACEATTRIBUTES,
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface
+                .attributes.top.InterfaceAttributesBuilder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_LD_IN_INTERFACES, InterfacesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_SI_LD_IN_IN_INTERFACE,
+                new LdpInterfaceReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_LD_IN_IN_IN_CONFIG,
+                new LdpInterfaceConfigReader()));
 
         // TE
         readRegistry.addStructuralReader(IIDs.NE_NE_MP_TEGLOBALATTRIBUTES, TeGlobalAttributesBuilder.class);
