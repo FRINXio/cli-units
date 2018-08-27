@@ -38,7 +38,7 @@ public class NeighborEbgpConfigWriter implements BgpWriter<Config> {
         this.cli = cli;
     }
 
-    static final String NEIGHBOR_EBGP = "router bgp {$as} {$instance}\n"
+    static final String NEIGHBOR_EBGP = "router bgp {$as} {$instance} {$vrf}\n"
             + "neighbor {$address}\n"
             + "{% if ($enabled == TRUE) %}"
             + "{% if ($config.multihop_ttl) %}"
@@ -59,9 +59,11 @@ public class NeighborEbgpConfigWriter implements BgpWriter<Config> {
         final Global g = Preconditions.checkNotNull(bgpOptional.get()
                 .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         blockingWriteAndRead(fT(NEIGHBOR_EBGP, "as", g.getConfig()
                 .getAs()
-                .getValue(), "instance", instName, "address", new String(id.firstKeyOf(Neighbor.class)
+                .getValue(), "instance", instName, "vrf", nwInsName, "address",
+                new String(id.firstKeyOf(Neighbor.class)
                 .getNeighborAddress()
                 .getValue()), "enabled", config.isEnabled(), "config", config), cli, id, config);
     }
@@ -82,9 +84,11 @@ public class NeighborEbgpConfigWriter implements BgpWriter<Config> {
         final Global g = bgpOptional.get()
                 .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         blockingDeleteAndRead(fT(NEIGHBOR_EBGP, "as", g.getConfig()
                 .getAs()
-                .getValue(), "instance", instName, "address", new String(id.firstKeyOf(Neighbor.class)
+                .getValue(), "instance", instName, "vrf", nwInsName, "address",
+                new String(id.firstKeyOf(Neighbor.class)
                 .getNeighborAddress()
                 .getValue()), "enabled", false), cli, id);
     }

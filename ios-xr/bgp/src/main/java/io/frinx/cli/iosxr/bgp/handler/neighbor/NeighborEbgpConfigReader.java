@@ -21,6 +21,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.regex.Pattern;
@@ -39,7 +40,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborEbgpConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_NEI = "show running-config router bgp %s %s neighbor %s";
+    private static final String SH_NEI = "show running-config router bgp %s %s %s neighbor %s";
     private static final Pattern EBGP_MULTIHOP_LINE = Pattern.compile("ebgp-multihop (?<hopCount>.+)");
 
     private Cli cli;
@@ -78,9 +79,11 @@ public class NeighborEbgpConfigReader implements BgpReader.BgpConfigReader<Confi
                 "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
 
+        String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
+
         String output = blockingRead(String.format(SH_NEI, globalConfig.getAs()
                 .getValue()
-                .intValue(), insName, address), cli, instanceIdentifier, readContext);
+                .intValue(), insName, nwInsName, address), cli, instanceIdentifier, readContext);
 
         ParsingUtils.parseField(output.trim(), 0,
                 EBGP_MULTIHOP_LINE::matcher,

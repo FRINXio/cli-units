@@ -51,7 +51,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
-    private static final String SH_AFI = "show running-config router bgp %s %s | include ^ address-family";
+    private static final String SH_AFI = "show running-config router bgp %s %s %s | include ^%saddress-family";
     private static final Pattern FAMILY_LINE = Pattern.compile("(.*)address-family (?<family>[^\\n].*)");
     private Cli cli;
 
@@ -79,8 +79,13 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
                 ?
                 "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
+
+        String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
+        //indent is 1 when reading default config, otherwise it is 2.
+        final String indent = nwInsName.isEmpty() ? " " : "  ";
+
         return getAfiKeys(blockingRead(String.format(SH_AFI, globalConfig.getAs()
-                .getValue(), insName), cli, instanceIdentifier, readContext));
+                .getValue(), insName, nwInsName, indent), cli, instanceIdentifier, readContext));
     }
 
     @Override

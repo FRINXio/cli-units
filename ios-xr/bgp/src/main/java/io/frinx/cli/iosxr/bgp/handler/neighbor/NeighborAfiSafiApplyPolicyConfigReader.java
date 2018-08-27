@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class NeighborAfiSafiApplyPolicyConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
     public static final String NEXTHOPSELF_POLICY_NAME = "nexthopself";
-    private static final String SH_NEI = "show running-config router bgp %s %s neighbor %s address-family %s";
+    private static final String SH_NEI = "show running-config router bgp %s %s %s neighbor %s address-family %s";
     private static final Pattern ROUTE_POLICY_IN_LINE = Pattern.compile("route-policy (?<policyName>.+) in");
     private static final Pattern ROUTE_POLICY_OUT_LINE = Pattern.compile("route-policy (?<policyName>.+) out");
     private static final Pattern NEXT_HOP_SELF_LINE = Pattern.compile("next-hop-self");
@@ -79,12 +79,13 @@ public class NeighborAfiSafiApplyPolicyConfigReader implements BgpReader.BgpConf
                 .getNeighborAddress();
         String address = new String(neighborIp.getValue());
         final String instName = GlobalConfigWriter.getProtoInstanceName(instanceIdentifier);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
         String afiName = GlobalAfiSafiReader.transformAfiToString(instanceIdentifier.firstKeyOf(AfiSafi.class)
                 .getAfiSafiName());
 
         String output = blockingRead(String.format(SH_NEI, globalConfig.getAs()
                 .getValue()
-                .intValue(), instName, address, afiName), cli, instanceIdentifier, readContext);
+                .intValue(), instName, nwInsName, address, afiName), cli, instanceIdentifier, readContext);
 
         List<String> importPolicy = ParsingUtils.NEWLINE.splitAsStream(output.trim())
                 .map(ROUTE_POLICY_IN_LINE::matcher)

@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
+import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.regex.Matcher;
@@ -42,7 +43,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public abstract class NeighborAfiSafiIpvConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_NEI = "show running-config router bgp %s %s neighbor %s address-family %s";
+    private static final String SH_NEI = "show running-config router bgp %s %s %s neighbor %s address-family %s";
     private static final Pattern DEFAULT_ORIGINATE_LINE = Pattern.compile("default-originate");
 
     private Cli cli;
@@ -86,12 +87,13 @@ public abstract class NeighborAfiSafiIpvConfigReader implements BgpReader.BgpCon
                 ?
                 "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
+        String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
         String afiName = GlobalAfiSafiReader.transformAfiToString(afiClass);
 
 
         String output = blockingRead(String.format(SH_NEI, globalConfig.getAs()
                 .getValue()
-                .intValue(), insName, address, afiName), cli, instanceIdentifier, readContext);
+                .intValue(), insName, nwInsName, address, afiName), cli, instanceIdentifier, readContext);
 
         // default is disabled
         configBuilder.setSendDefaultRoute(false);

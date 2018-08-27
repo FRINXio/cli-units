@@ -43,8 +43,10 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         Preconditions.checkArgument(bgpOptional.isPresent());
         final Global g = Preconditions.checkNotNull(bgpOptional.get().getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
+
         blockingWriteAndRead(cli, id, config,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
+                f("router bgp %s %s %s", g.getConfig().getAs().getValue(), instName, nwInsName),
                 f("address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
                 "root");
     }
@@ -64,8 +66,9 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
         }
         final Global g = bgpOptional.get().getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         blockingWriteAndRead(cli, id, config,
-                f("router bgp %s %s", g.getConfig().getAs().getValue(), instName),
+                f("router bgp %s %s %s", g.getConfig().getAs().getValue(), instName, nwInsName),
                 f("no address-family %s", GlobalAfiSafiReader.transformAfiToString(config.getAfiSafiName())),
                 "root");
     }

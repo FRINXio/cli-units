@@ -23,11 +23,14 @@ import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliListReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.apache.commons.lang3.StringUtils;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
@@ -41,9 +44,11 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
     public static final String DEFAULT_BGP_INSTANCE = "default";
 
     private static final String SHOW_RUN_ROUTER_BGP = "show running-config router bgp | include ^router bgp";
-    private static final Pattern INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9.]+) instance "
+    private static final Pattern BGP_INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9.]+) instance "
             + "(?<instance>[\\S]+)");
-    private static final Pattern DEFAULT_INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9]+)");
+    private static final Pattern DEFAULT_BGP_INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9]+)");
+    private static final String SH_RUN_BGP_PER_VRF = "show running-config router bgp %s %s %s";
+
     private final Cli cli;
 
     public BgpProtocolReader(final Cli cli) {
@@ -52,30 +57,74 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
 
     @Nonnull
     @Override
-    public List<ProtocolKey> getAllIds(@Nonnull InstanceIdentifier<Protocol> iid,
-                                       @Nonnull ReadContext context) throws ReadFailedException {
+    public List<ProtocolKey> getAllIds(@Nonnull InstanceIdentifier<Protocol> iid, @Nonnull ReadContext context)
+            throws ReadFailedException {
+        String nwInsName = iid.firstKeyOf(NetworkInstance.class).getName();
+
         String output = blockingRead(SHOW_RUN_ROUTER_BGP, cli, iid, context);
 
-        return parseGbpProtocolKeys(output);
+        List<AsAndInsName> aais = parseGbpProtocolKeys(output);
+        List<ProtocolKey> rtn = new ArrayList<>();
+
+        // grouping keys by network instance name
+        for (AsAndInsName aai : aais) {
+            String keyName = aai.key.getName();
+            keyName = DEFAULT_BGP_INSTANCE.equals(keyName)
+                    ? "" : "instance " + keyName;
+            if (NetworInstance.DEFAULT_NETWORK_NAME.equals(nwInsName)) {
+                rtn.add(aai.key); //adding all bgp instance to "default"
+            } else {
+                output = blockingRead(String.format(SH_RUN_BGP_PER_VRF, aai.asNumber, keyName, "vrf " + nwInsName),
+                        cli,
+                        iid, context);
+                if (StringUtils.isNotEmpty(output)) {
+                    rtn.add(aai.key);
+                    break;
+                }
+            }
+        }
+        return rtn;
     }
 
     @VisibleForTesting
-    public static List<ProtocolKey> parseGbpProtocolKeys(String output) {
-        List<ProtocolKey> bgpProtocolKeys = ParsingUtils.parseFields(output, 0,
-                INSTANCE_PATTERN::matcher,
-            matcher -> matcher.group("instance"),
-            v -> new ProtocolKey(TYPE, v));
+    public static class AsAndInsName {
+        private String asNumber;
+        private ProtocolKey key;
 
-        boolean isDefaultInstanceConfigured = ParsingUtils.NEWLINE.splitAsStream(output)
-                .map(String::trim)
-                .map(DEFAULT_INSTANCE_PATTERN::matcher)
-                .anyMatch(Matcher::matches);
-
-        if (isDefaultInstanceConfigured) {
-            bgpProtocolKeys.add(new ProtocolKey(TYPE, DEFAULT_BGP_INSTANCE));
+        public AsAndInsName(String asNumber, ProtocolKey key) {
+            this.asNumber = asNumber;
+            this.key = key;
         }
 
-        return bgpProtocolKeys;
+        public String getAsNumber() {
+            return asNumber;
+        }
+
+        public ProtocolKey getKey() {
+            return key;
+        }
+    }
+
+    @VisibleForTesting
+    public static List<AsAndInsName> parseGbpProtocolKeys(String output) {
+        List<AsAndInsName> rtn = new ArrayList<>();
+        String[] lines = output.split("\\r?\\n");
+        for (String s : lines) {
+            Matcher matche = BGP_INSTANCE_PATTERN.matcher(s);
+            if (matche.find()) {
+                AsAndInsName asAndInsName = new AsAndInsName(matche.group("as"),
+                        new ProtocolKey(TYPE, matche.group("instance")));
+                rtn.add(asAndInsName);
+            } else {
+                matche = DEFAULT_BGP_INSTANCE_PATTERN.matcher(s);
+                if (matche.find()) {
+                    AsAndInsName asAndInsName = new AsAndInsName(matche.group("as"),
+                            new ProtocolKey(TYPE, DEFAULT_BGP_INSTANCE));
+                    rtn.add(asAndInsName);
+                }
+            }
+        }
+        return rtn;
     }
 
     @Override

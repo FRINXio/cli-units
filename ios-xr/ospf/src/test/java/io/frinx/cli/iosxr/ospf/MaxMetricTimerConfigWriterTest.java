@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.iosxr.ospf.handler.MaxMetricTimerConfigWriter;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.math.BigInteger;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
@@ -31,6 +32,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstances;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Protocols;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
@@ -46,23 +50,23 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class MaxMetricTimerConfigWriterTest {
 
-    private static final String WRITE_INPUT = "router ospf default\n"
+    private static final String WRITE_INPUT = "router ospf default \n"
             + "max-metric router-lsa summary-lsa include-stub external-lsa \n"
             + "root\n";
 
-    private static final String WRITE_NO_INCLUDE_INPUT = "router ospf default\n"
+    private static final String WRITE_NO_INCLUDE_INPUT = "router ospf default \n"
             + "max-metric router-lsa \n"
             + "root\n";
 
-    private static final String UPDATE_INPUT = "router ospf default\n"
+    private static final String UPDATE_INPUT = "router ospf default \n"
             + "max-metric router-lsa summary-lsa include-stub \n"
             + "root\n";
 
-    private static final String REMOVE_TIMEOUT_INPUT = "router ospf default\n"
+    private static final String REMOVE_TIMEOUT_INPUT = "router ospf default \n"
             + "max-metric router-lsa summary-lsa include-stub external-lsa \n"
             + "root\n";
 
-    private static final String DELETE_INPUT = "router ospf default\n"
+    private static final String DELETE_INPUT = "router ospf default \n"
             + "no max-metric router-lsa summary-lsa include-stub external-lsa \n"
             + "root\n";
 
@@ -76,7 +80,9 @@ public class MaxMetricTimerConfigWriterTest {
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
-    private InstanceIdentifier piid = KeyedInstanceIdentifier.create(Protocols.class)
+    private InstanceIdentifier piid = KeyedInstanceIdentifier.create(NetworkInstances.class)
+            .child(NetworkInstance.class, new NetworkInstanceKey(NetworInstance.DEFAULT_NETWORK))
+            .child(Protocols.class)
             .child(Protocol.class, new ProtocolKey(OSPF.class, "default"));
 
     // test data

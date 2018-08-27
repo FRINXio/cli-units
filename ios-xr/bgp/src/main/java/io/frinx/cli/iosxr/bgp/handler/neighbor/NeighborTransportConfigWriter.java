@@ -59,9 +59,11 @@ public class NeighborTransportConfigWriter implements BgpWriter<Config> {
         if (!matcher.matches()) {
             return;
         }
-        blockingWriteAndRead(cli, id, config, f("router bgp %s %s", g.getConfig()
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
+        blockingWriteAndRead(cli, id, config, f("router bgp %s %s %s", g.getConfig()
                 .getAs()
-                .getValue(), instName), f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
+                .getValue(), instName, nwInsName),
+                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
                 .getNeighborAddress()
                 .getValue())), f("update-source loopback %s", matcher.group("index")), "root");
     }
@@ -84,9 +86,11 @@ public class NeighborTransportConfigWriter implements BgpWriter<Config> {
                 isLoopback = true;
             }
         }
-        blockingWriteAndRead(cli, id, dataAfter, f("router bgp %s %s", g.getConfig()
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
+        blockingWriteAndRead(cli, id, dataAfter, f("router bgp %s %s %s", g.getConfig()
                 .getAs()
-                .getValue(), instName), f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
+                .getValue(), instName, nwInsName),
+                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
                 .getNeighborAddress()
                 .getValue())), isLoopback ? f("update-source loopback %s", matcher.group("index")) : "no "
                 + "update-source", "root");
@@ -102,9 +106,11 @@ public class NeighborTransportConfigWriter implements BgpWriter<Config> {
         final Global g = bgpOptional.get()
                 .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
-        blockingDeleteAndRead(cli, id, f("router bgp %s %s", g.getConfig()
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
+        blockingDeleteAndRead(cli, id, f("router bgp %s %s %s", g.getConfig()
                 .getAs()
-                .getValue(), instName), f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
+                .getValue(), instName, nwInsName),
+                f("neighbor %s", new String(id.firstKeyOf(Neighbor.class)
                 .getNeighborAddress()
                 .getValue())), "no update-source", "root");
     }

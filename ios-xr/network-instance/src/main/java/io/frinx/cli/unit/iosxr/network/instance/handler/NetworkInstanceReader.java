@@ -20,6 +20,7 @@ import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
 import io.frinx.cli.handlers.def.DefaultReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.common.CompositeListReader;
+import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.L3VrfReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, NetworkInstanceKey,
         NetworkInstanceBuilder>
@@ -38,6 +40,7 @@ public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, 
     public NetworkInstanceReader(Cli cli) {
         super(new ArrayList<ListReaderCustomizer<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {{
                 add(new DefaultReader());
+                add(new L3VrfReader(cli));
             }
         });
     }
@@ -45,5 +48,11 @@ public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, 
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<NetworkInstance> list) {
         ((NetworkInstancesBuilder) builder).setNetworkInstance(list);
+    }
+
+    @Nonnull
+    @Override
+    public NetworkInstanceBuilder getBuilder(@Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier) {
+        return new NetworkInstanceBuilder();
     }
 }

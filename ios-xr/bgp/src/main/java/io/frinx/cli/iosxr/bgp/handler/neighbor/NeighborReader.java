@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader;
+import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +44,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
-    private static final String SH_NEI = "show running-config router bgp %s %s | include ^ neighbor";
+    private static final String SH_NEI = "show running-config router bgp %s %s %s | include ^%sneighbor";
     private static final Pattern NEIGHBOR_LINE = Pattern.compile("neighbor (?<neighborIp>.+)");
 
     private Cli cli;
@@ -83,8 +84,12 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
         Long as = globalConfig.getAs()
                 .getValue();
 
-        return getNeighborKeys(blockingRead(String.format(SH_NEI, as.intValue(), instance), cli, instanceIdentifier,
-                readContext));
+        String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
+        //indent is 1 when reading default config, otherwise it is 2.
+        final String indent = nwInsName.isEmpty() ? " " : "  ";
+
+        return getNeighborKeys(blockingRead(String.format(SH_NEI, as.intValue(), instance, nwInsName, indent), cli,
+                instanceIdentifier, readContext));
     }
 
     @Override

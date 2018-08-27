@@ -40,7 +40,7 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
         this.cli = cli;
     }
 
-    static final String WRITE_NEIGHBOR_AFI_APPLY_POLICY = "router bgp {$as} {$instance}\n"
+    static final String WRITE_NEIGHBOR_AFI_APPLY_POLICY = "router bgp {$as} {$instance} {$vrf}\n"
             + "neighbor {$address}\n"
             + "address-family {$afiSafi}\n"
             + "{% loop in $config.import_policy as $inPolicy}\n"
@@ -65,11 +65,13 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
         final Global g = Preconditions.checkNotNull(bgpOptional.get()
                 .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         blockingWriteAndRead(fT(WRITE_NEIGHBOR_AFI_APPLY_POLICY,
                 "as", g.getConfig()
                         .getAs()
                         .getValue(),
                 "instance", instName,
+                "vrf", nwInsName,
                 "address", new String(id.firstKeyOf(Neighbor.class)
                         .getNeighborAddress()
                         .getValue()),
@@ -97,11 +99,13 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
         final Global g = bgpOptional.get()
                 .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         blockingWriteAndRead(fT(WRITE_NEIGHBOR_AFI_APPLY_POLICY,
                 "as", g.getConfig()
                         .getAs()
                         .getValue(),
                 "instance", instName,
+                "vrf", nwInsName,
                 "address", new String(id.firstKeyOf(Neighbor.class)
                         .getNeighborAddress()
                         .getValue()),

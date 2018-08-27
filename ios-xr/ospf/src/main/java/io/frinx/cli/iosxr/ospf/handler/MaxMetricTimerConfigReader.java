@@ -66,7 +66,11 @@ public class MaxMetricTimerConfigReader implements OspfReader.OspfConfigReader<C
                 .getName();
         MaxMetricTimerKey timerKey = instanceIdentifier.firstKeyOf(MaxMetricTimer.class);
         configBuilder.setTrigger(timerKey.getTrigger());
-        parseTimers(blockingRead(String.format(MaxMetricTimerReader.SH_RUN_OSPF_MAX_METRIC, ospfId),
+        final String nwInsName = OspfProtocolReader.resolveVrfWithName(instanceIdentifier);
+        //indent is 1 when reading default config, otherwise it is 2.
+        final String indent = nwInsName.isEmpty() ? " " : "  ";
+
+        parseTimers(blockingRead(String.format(MaxMetricTimerReader.SH_RUN_OSPF_MAX_METRIC, ospfId, nwInsName, indent),
                 cli, instanceIdentifier, readContext), configBuilder);
     }
 

@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area, AreaKey, AreaBuilder> {
 
-    private static final String SH_RUN_OSPF_AREA = "show running-config router ospf %s | include ^ area";
+    private static final String SH_RUN_OSPF_AREA = "show running-config router ospf %s %s | include ^%sarea";
 
     private static final Pattern AREA_ID = Pattern.compile("area (?<areaId>[0-9.]+)");
 
@@ -53,7 +53,12 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
                                           @Nonnull ReadContext readContext) throws ReadFailedException {
         String id = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
-        return parseAreasIds(blockingRead(String.format(SH_RUN_OSPF_AREA, id), cli, instanceIdentifier, readContext));
+        final String nwInsName = OspfProtocolReader.resolveVrfWithName(instanceIdentifier);
+        //indent is 1 when reading default config, otherwise it is 2.
+        final String indent = nwInsName.isEmpty() ? " " : "  ";
+
+        return parseAreasIds(blockingRead(String.format(SH_RUN_OSPF_AREA, id, nwInsName, indent),
+                cli, instanceIdentifier, readContext));
     }
 
     private static List<AreaKey> parseAreasIds(String output) {

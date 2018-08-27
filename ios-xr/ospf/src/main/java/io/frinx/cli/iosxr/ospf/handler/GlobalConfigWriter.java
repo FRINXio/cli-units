@@ -38,7 +38,7 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("router ospf %s", processName),
+                f("router ospf %s %s", processName, OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 "root");
     }
 
@@ -54,6 +54,6 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("no router ospf %s", processName));
+                f("no router ospf %s %s", processName, OspfProtocolReader.resolveVrfWithName(instanceIdentifier)));
     }
 }

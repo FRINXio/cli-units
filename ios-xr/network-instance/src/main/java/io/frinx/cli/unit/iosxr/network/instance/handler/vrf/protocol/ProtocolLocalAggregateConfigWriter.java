@@ -20,8 +20,9 @@ import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.local.aggregates.BgpLocalAggregateConfigWriter;
 import io.frinx.cli.registry.common.CompositeWriter;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config;
 
-public class ProtocolLocalAggregateConfigWriter extends CompositeWriter {
+public class ProtocolLocalAggregateConfigWriter extends CompositeWriter<Config> {
 
     public ProtocolLocalAggregateConfigWriter(final Cli cli) {
         super(Lists.newArrayList(

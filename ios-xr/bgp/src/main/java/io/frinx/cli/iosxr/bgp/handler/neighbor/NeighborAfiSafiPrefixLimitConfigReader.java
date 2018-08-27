@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
+import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.regex.Pattern;
@@ -95,12 +96,13 @@ public class NeighborAfiSafiPrefixLimitConfigReader implements BgpReader.BgpConf
                 ?
                 "" : "instance " + instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
+        String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
         String afiName = GlobalAfiSafiReader.transformAfiToString(instanceIdentifier.firstKeyOf(AfiSafi.class)
                 .getAfiSafiName());
 
         String output = blockingRead(String.format(SH_NEI, globalConfig.getAs()
                 .getValue()
-                .intValue(), insName, address, afiName), cli, instanceIdentifier, readContext);
+                .intValue(), insName, nwInsName, address, afiName), cli, instanceIdentifier, readContext);
         parsePrefixLimit(output, configBuilder);
 
     }

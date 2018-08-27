@@ -39,7 +39,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_OSPF_INT = "show running-config router ospf %s area %s interface %s";
+    private static final String SHOW_OSPF_INT = "show running-config router ospf %s %s area %s interface %s";
     private static final Pattern COST_LINE = Pattern.compile("cost (?<cost>.+)");
     private static final Pattern PASSIVE_LINE = Pattern.compile("passive (?<passive>.+)");
     private final Cli cli;
@@ -57,7 +57,9 @@ public class AreaInterfaceConfigReader implements OspfReader.OspfConfigReader<Co
         final String areaId = AreaInterfaceReader.areaIdToString(instanceIdentifier.firstKeyOf(Area.class)
                 .getIdentifier());
         configBuilder.setId(key.getId());
-        String output = blockingRead(String.format(SHOW_OSPF_INT, ospfId, areaId, key.getId()), cli,
+        final String nwInsName = OspfProtocolReader.resolveVrfWithName(instanceIdentifier);
+
+        String output = blockingRead(String.format(SHOW_OSPF_INT, ospfId, nwInsName, areaId, key.getId()), cli,
                 instanceIdentifier, readContext);
         parseCost(output, configBuilder);
         parsePassive(output, configBuilder);

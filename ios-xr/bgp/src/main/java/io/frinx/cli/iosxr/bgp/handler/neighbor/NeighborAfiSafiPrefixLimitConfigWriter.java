@@ -40,7 +40,7 @@ public class NeighborAfiSafiPrefixLimitConfigWriter implements BgpWriter<Config>
         this.cli = cli;
     }
 
-    static final String NEIGHBOR_AFI_PREFIX_LIMIT = "router bgp {$as} {$instance}\n"
+    static final String NEIGHBOR_AFI_PREFIX_LIMIT = "router bgp {$as} {$instance} {$vrf}\n"
             + "neighbor {$address}\n"
             + "address-family {$afiSafi}\n"
             + "{.if ($config.max_prefixes) }maximum-prefix {$config.max_prefixes}{.else}no maximum-prefix{/if}"
@@ -62,11 +62,13 @@ public class NeighborAfiSafiPrefixLimitConfigWriter implements BgpWriter<Config>
         final Global g = Preconditions.checkNotNull(bgpOptional.get()
                 .getGlobal());
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         blockingWriteAndRead(fT(NEIGHBOR_AFI_PREFIX_LIMIT,
                 "as", g.getConfig()
                         .getAs()
                         .getValue(),
                 "instance", instName,
+                "vrf", nwInsName,
                 "address", new String(id.firstKeyOf(Neighbor.class)
                         .getNeighborAddress()
                         .getValue()),
@@ -92,11 +94,13 @@ public class NeighborAfiSafiPrefixLimitConfigWriter implements BgpWriter<Config>
         final Global g = bgpOptional.get()
                 .getGlobal();
         final String instName = GlobalConfigWriter.getProtoInstanceName(id);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(id);
         blockingDeleteAndRead(fT(DELETE_NEIGHBOR_AFI_PREFIX_LIMIT,
                 "as", g.getConfig()
                         .getAs()
                         .getValue(),
                 "instance", instName,
+                "vrf", nwInsName,
                 "address", new String(id.firstKeyOf(Neighbor.class)
                         .getNeighborAddress()
                         .getValue()),
