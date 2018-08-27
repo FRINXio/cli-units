@@ -49,7 +49,7 @@ public class DocsUnitCollector implements TranslationUnitCollector {
         return REGISTRATION;
     }
 
-    public Set<Device> getDevicesId() {
+    public Set<Device> getDevicesIds() {
         return ids;
     }
 

@@ -92,25 +92,26 @@ public class TranslationUnitMetadata {
     }
 
     public List<String> getDevicesVersion() {
-        return getUnitCollector().getDevicesId().stream()
+        return getUnitCollector().getDevicesIds().stream()
                 .map(Device::getDeviceVersion)
+                .sorted()
                 .collect(Collectors.toList());
     }
 
-    public List<String> getDeviceType() {
-        return getUnitCollector().getDevicesId().stream()
+    public String getDeviceType() {
+        return getUnitCollector().getDevicesIds().stream()
                 .map(Device::getDeviceType)
                 .distinct()
                 .map(type -> type.replace(" ", "-"))
-                .collect(Collectors.toList());
+                .collect(Collectors.joining("-"));
     }
 
     public String getName() {
-        return classObject.getName();
+        return classObject.getName().toLowerCase();
     }
 
     public String getSimpleName() {
-        return classObject.getSimpleName();
+        return classObject.getSimpleName().toLowerCase();
     }
 
     public DocsUnitCollector getUnitCollector() {

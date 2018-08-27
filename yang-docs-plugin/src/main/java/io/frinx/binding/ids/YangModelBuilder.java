@@ -41,30 +41,49 @@ public final class YangModelBuilder {
     private static final String YANG_TEMPLATE = "module frinx-openconfig-{% $class_name %}-docs {\n"
             + "  yang-version \"1\";\n"
             + "  namespace \"http://frinx.openconfig.net/yang/{% $class_name %}:docs\";\n"
-            + "  prefix \"frinx-oc-{% $devicetype|join(-) %}-docs\";\n"
-            + "  import frinx-openconfig-docs { prefix oc-docs; } \n"
+            + "  prefix \"{% $prefix %}\";\n"
             + "  {% loop in $imports as $import %}\n"
             + "  {$import}                         \n"
             + "  {% onEmpty %}\n"
             + "  {% endonEmpty%}\n"
             + "  {% endloop %}\n"
             + "  description \"frinx {% $class_name %} documentation module\";\n"
-            + "  revision \"{% $date %}\" {\n"
-            + "    description \"Fixes to Ethernet interfaces model\";\n"
+            + "  \n"
+            + "  extension frinx-documentation {\n"
+            + "   argument \"name\";\n"
             + "  }\n"
+            + "  extension frinx-docs-reader {\n"
+            + "    argument \"name\";\n"
+            + "  }\n"
+            + "  extension frinx-docs-reader-detail {\n"
+            + "    argument \"name\";\n"
+            + "  }\n"
+            + "  extension frinx-docs-writer-detail {\n"
+            + "    argument \"name\";\n"
+            + "  }\n"
+            + "  extension frinx-docs-writer {\n"
+            + "    argument \"name\";\n"
+            + "  }\n"
+            + "  extension frinx-docs-device-version {\n"
+            + "    argument \"name\";\n"
+            + "  }\n"
+            + "  extension frinx-docs-device-type {\n"
+            + "    argument \"name\";\n"
+            + "  }\n"
+            + "  \n"
             + "  {% loop in $augment as $aug %}\n"
             + "  augment \"{% $aug.key %}\" {\n"
-            + "    container frinx-documentation {\n"
-            + "    oc-docs:frinx-docs-deviceType \"{% $devicetype|join(-) %}\";\n"
-            + "    oc-docs:frinx-docs-deviceVersion \"{% $deviceversions|join(,) %}\";\n"
-            + "    {% if ($aug.value.reader != \"\") %} \toc-docs:frinx-docs-reader \"{% $aug.value.reader %}\"; \n"
-            + "    {% if ($aug.value.rdetails != \"\") %} \t\t oc-docs:frinx-docs-reader-detail "
-            + "\"{% $aug.value.rdetails %}\"; \n {% endif %}\n"
+            + "  container frinx-documentation {\n"
+            + "    {% $prefix %}:frinx-docs-device-type \"{% $devicetype|join(-) %}\";\n"
+            + "    {% $prefix %}:frinx-docs-device-version \"{% $deviceversions|join(,) %}\";\n"
+            + "    {% if ($aug.value.reader != \"\") %} {% $prefix %}:frinx-docs-reader \"{% $aug.value.reader %}\"; \n"
+            + "      {% if ($aug.value.rdetails != \"\") %}    {% $prefix %}:frinx-docs-reader-detail "
+            + "\"{% $aug.value.rdetails %}\";{% endif %}\n"
             + "      {% endif %}\n"
-            + "    {% if ($aug.value.writer != \"\") %} \toc-docs:frinx-docs-writer \"{% $aug.value.writer %}\"; \n"
-            + "    {% if ($aug.value.wdetails != \"\") %} \t\t oc-docs:frinx-docs-writer-detail "
-            + "\"{% $aug.value.wdetails %}\"; \n {% endif %}\n"
-            + " {% endif %}"
+            + "    {% if ($aug.value.writer != \"\") %} {% $prefix %}:frinx-docs-writer \"{% $aug.value.writer %}\"; \n"
+            + "        {% if ($aug.value.wdetails != \"\") %}   {% $prefix %}:frinx-docs-writer-detail "
+            + "\"{% $aug.value.wdetails %}\";{% endif %}\n"
+            + "      {% endif %}\n"
             + "   }\n"
             + "  }\n"
             + "  {% onEmpty %}\n"
@@ -74,14 +93,18 @@ public final class YangModelBuilder {
 
     private static final String IMPORT_SUBSTRING = "import %s { prefix %s; }";
 
+    private static final String PREFIX = "frinx-oc-{% $devicetype %}-docs";
+
     public YangModelBuilder() {}
 
     public String getYangModel(TranslationUnitMetadataHandler dataStoreHandler, SchemaContext context) {
+
 
         Chunk yangChunk;
         Theme theme = new Theme();
         yangChunk = theme.makeChunk();
         yangChunk.append(YANG_TEMPLATE);
+        yangChunk.set("prefix", getPrefix(dataStoreHandler.getDataStore().getDeviceType()));
         yangChunk.set("imports", getImports(dataStoreHandler, context));
         yangChunk.set("augment", new ArrayList<>(getMapForAugmentation(dataStoreHandler).entrySet()));
         yangChunk.set("class_name", dataStoreHandler.getDataStore().getSimpleName().toLowerCase());
@@ -141,6 +164,17 @@ public final class YangModelBuilder {
             resultMap.put(key, dataHandler);
         }
         return resultMap;
+    }
+
+    private String getPrefix(String deviceType) {
+
+        Chunk prefixChunk;
+        Theme theme = new Theme();
+        prefixChunk = theme.makeChunk();
+        prefixChunk.append(PREFIX);
+        prefixChunk.set("devicetype", deviceType);
+
+        return prefixChunk.toString();
     }
 
     public static final class ChunkDataHandler implements java.io.Serializable {

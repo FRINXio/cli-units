@@ -124,7 +124,7 @@
                 </dependencies>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>process-classes</phase>
                         <id>yang-docs</id>
                         <goals>
                             <goal>generate-sources</goal>

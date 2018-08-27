@@ -31,8 +31,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public final class YangDocsWriter {
 
     private static final String DIR = "/yang/META-INF/yang";
-    private static final String FILE_SUFFIX = "-docs.yang";
-    private static final String FILE_PREFIX = "frinx-openconfig-";
+    private static final String FILE_NAME = "frinx-openconfig-%s-%s.yang";
     private final Log log = new SystemStreamLog();
 
     YangDocsWriter() {
@@ -50,7 +49,8 @@ public final class YangDocsWriter {
         }
 
         File outPutFile = new File(outputDir,
-                 FILE_PREFIX + dataStoreHandler.getDataStore().getSimpleName().toLowerCase() + FILE_SUFFIX);
+                 String.format(FILE_NAME, dataStoreHandler.getDataStore().getDeviceType(),
+                         dataStoreHandler.getDataStore().getSimpleName()));
 
         YangModelBuilder yangModelBuilder = new YangModelBuilder();
 
