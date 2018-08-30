@@ -38,12 +38,12 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 public final class YangModelBuilder {
 
-    private static final String YANG_TEMPLATE = "module frinx-openconfig-{% $class_name %}-docs {\n"
+    private static final String YANG_TEMPLATE = "module frinx-openconfig-{% $devicetype %}-{% $class_name %} {\n"
             + "  yang-version \"1\";\n"
-            + "  namespace \"http://frinx.openconfig.net/yang/{% $class_name %}:docs\";\n"
+            + "  namespace \"http://frinx.openconfig.net/yang/{% $devicetype %}-{% $class_name %}:docs\";\n"
             + "  prefix \"{% $prefix %}\";\n"
             + "  {% loop in $imports as $import %}\n"
-            + "  {$import}                         \n"
+            + "  {$import}\n"
             + "  {% onEmpty %}\n"
             + "  {% endonEmpty%}\n"
             + "  {% endloop %}\n"
@@ -74,7 +74,7 @@ public final class YangModelBuilder {
             + "  {% loop in $augment as $aug %}\n"
             + "  augment \"{% $aug.key %}\" {\n"
             + "  container frinx-documentation {\n"
-            + "    {% $prefix %}:frinx-docs-device-type \"{% $devicetype|join(-) %}\";\n"
+            + "    {% $prefix %}:frinx-docs-device-type \"{% $devicetype %}\";\n"
             + "    {% $prefix %}:frinx-docs-device-version \"{% $deviceversions|join(,) %}\";\n"
             + "    {% if ($aug.value.reader != \"\") %} {% $prefix %}:frinx-docs-reader \"{% $aug.value.reader %}\"; \n"
             + "      {% if ($aug.value.rdetails != \"\") %}    {% $prefix %}:frinx-docs-reader-detail "
