@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.BgpNeAfAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.BgpNeAfAugBuilder;
@@ -138,9 +139,12 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
     @VisibleForTesting
     public static List<AfiSafiKey> getAfiKeys(String output) {
         return ParsingUtils.parseFields(output, 0,
-                FAMILY_LINE::matcher,
-            matcher -> matcher.group("family"),
-            value -> new AfiSafiKey(GlobalAfiSafiReader.transformAfiFromString(value.trim())));
+            FAMILY_LINE::matcher, matcher -> matcher.group("family"),
+            value -> GlobalAfiSafiReader.transformAfiFromString(value.trim()).map(AfiSafiKey::new))
+            .stream()
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
     }
 
 }
