@@ -34,7 +34,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PhysicalPortInterfaceConfigWriter implements CliWriter<Config> {
 
-    private static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES =
+    public static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES =
         Collections.singleton(EthernetCsmacd.class);
 
     private Cli cli;
