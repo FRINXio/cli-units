@@ -26,7 +26,9 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafiBuilder;
@@ -36,7 +38,9 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV4LABELEDUNICAST;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV4UNICAST;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV6LABELEDUNICAST;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV6UNICAST;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.L3VPNIPV4UNICAST;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.L3VPNIPV6UNICAST;
@@ -97,25 +101,35 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     @VisibleForTesting
     public static List<AfiSafiKey> getAfiKeys(String output) {
         return ParsingUtils.parseFields(output, 0,
-                FAMILY_LINE::matcher,
+            FAMILY_LINE::matcher,
             matcher -> matcher.group("family"),
-            value -> new AfiSafiKey(transformAfiFromString(value.trim())));
+            value -> transformAfiFromString(value.trim()).map(AfiSafiKey::new))
+                .stream()
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+
     }
 
-    public static Class<? extends AFISAFITYPE> transformAfiFromString(String afi) {
+    public static Optional<Class<? extends AFISAFITYPE>> transformAfiFromString(String afi) {
         // FIXME: add more if necessary
         switch (afi) {
             case "ipv4 unicast":
-                return IPV4UNICAST.class;
+                return Optional.of(IPV4UNICAST.class);
             case "vpnv4 unicast":
-                return L3VPNIPV4UNICAST.class;
+                return Optional.of(L3VPNIPV4UNICAST.class);
             case "ipv6 unicast":
-                return IPV6UNICAST.class;
+                return Optional.of(IPV6UNICAST.class);
             case "vpnv6 unicast":
-                return L3VPNIPV6UNICAST.class;
+                return Optional.of(L3VPNIPV6UNICAST.class);
+            case "ipv6 labeled-unicast":
+                return Optional.of(IPV6LABELEDUNICAST.class);
+            case "ipv4 labeled-unicast":
+                return Optional.of(IPV4LABELEDUNICAST.class);
             default: break;
+
         }
-        throw new IllegalArgumentException("Unknown AFI/SAFI type " + afi);
+        return Optional.empty();
     }
 
     public static String transformAfiToString(Class<? extends AFISAFITYPE> afi) {
@@ -128,7 +142,12 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
             return "ipv6 unicast";
         } else if (L3VPNIPV6UNICAST.class.equals(afi)) {
             return "vpnv6 unicast";
+        } else if (IPV4LABELEDUNICAST.class.equals(afi)) {
+            return "ipv6 labeled-unicast";
+        } else if (IPV6LABELEDUNICAST.class.equals(afi)) {
+            return "ipv4 labeled-unicast";
         }
+
         throw new IllegalArgumentException("Unknown AFI/SAFI type " + afi);
     }
 }
