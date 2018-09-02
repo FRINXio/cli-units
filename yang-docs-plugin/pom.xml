@@ -22,7 +22,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>yang-docs-plugin</artifactId>
-    <version>3.1.6.rc7-frinx</version>
+    <version>3.1.6.rc8-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencyManagement>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry-api</artifactId>
-            <version>3.1.6.rc7-frinx</version>
+            <version>3.1.6.rc8-frinx-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
@@ -110,7 +110,7 @@
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>io-api</artifactId>
-            <version>3.1.6.rc7-frinx</version>
+            <version>3.1.6.rc8-frinx-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
