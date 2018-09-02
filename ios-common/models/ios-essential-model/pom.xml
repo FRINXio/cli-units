@@ -28,7 +28,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>ios-essential-model</artifactId>
-    <version>3.1.6.rc7-frinx-SNAPSHOT</version>
+    <version>3.1.6.rc7-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
