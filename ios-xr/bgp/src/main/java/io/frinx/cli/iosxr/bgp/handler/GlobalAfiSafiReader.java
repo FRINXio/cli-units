@@ -148,9 +148,9 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
         } else if (L3VPNIPV6UNICAST.class.equals(afi)) {
             return "vpnv6 unicast";
         } else if (IPV4LABELEDUNICAST.class.equals(afi)) {
-            return "ipv6 labeled-unicast";
-        } else if (IPV6LABELEDUNICAST.class.equals(afi)) {
             return "ipv4 labeled-unicast";
+        } else if (IPV6LABELEDUNICAST.class.equals(afi)) {
+            return "ipv6 labeled-unicast";
         }
 
         throw new IllegalArgumentException("Unknown AFI/SAFI type " + afi);
