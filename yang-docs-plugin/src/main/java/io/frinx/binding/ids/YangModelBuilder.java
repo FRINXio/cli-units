@@ -125,9 +125,7 @@ public final class YangModelBuilder {
 
         for (Module module : context.getModules()) {
             for (String oneReaderWriter : unitedReadersWriters) {
-
                 if (oneReaderWriter.contains(module.getPrefix())) {
-
                     usedImports.add(String.format(IMPORT_SUBSTRING, module.getName(), module.getPrefix()));
                 }
             }
@@ -147,9 +145,7 @@ public final class YangModelBuilder {
         Map<String, String> writersMap = dataStoreHandler.getWritersCustomizerMap();
 
         Map<String, Map<String, String>> writersDetails = dataStoreHandler.getWriterConstantsMap();
-        Map<String, Map<String, String>> readersDetails = dataStoreHandler.getReaderConstantsMap();
-
-        readersDetails.putAll(dataStoreHandler.getReaderPatternsMap());
+        Map<String, Map<String, String>> readersDetails = dataStoreHandler.getReaderPatternAndConstantsMap();
 
         Set<String> keySet = new HashSet<>();
         keySet.addAll(readersMap.keySet());

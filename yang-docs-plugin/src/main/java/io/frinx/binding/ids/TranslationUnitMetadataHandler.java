@@ -53,34 +53,6 @@ public final class TranslationUnitMetadataHandler {
         return dataStore;
     }
 
-    public Map<String, Map<String, String>> getReaderConstantsMap() {
-
-        Map<String, Map<String, String>> resultMap = new HashMap<>();
-
-        for (Reader<? extends DataObject, ? extends Builder<?>> reader : dataStore.getReaderRegistryBuilder()
-                .getReadersMap().values()) {
-
-            Map<String, String> valuesMap = new HashMap<>();
-            Field[] fields = getCustomizerFields(reader, GenericReader.class);
-
-            for (Field field : fields) {
-                field.setAccessible(true);
-
-                if (field.getType() == String.class) {
-                    try {
-                        valuesMap.put(field.getName(), field.get(null).toString());
-                    } catch (IllegalAccessException | NullPointerException e) {
-                        log.warn("Could not access pattern for this unit. Ignoring this writer and resuming build");
-                    }
-                }
-            }
-            if (valuesMap.size() > 0) {
-                resultMap.put(getReaderCustomizerName(reader), valuesMap);
-            }
-        }
-        return resultMap;
-    }
-
     public Map<String, Map<String, String>> getWriterConstantsMap() {
 
         Map<String, Map<String, String>> resultMap = new HashMap<>();
@@ -100,11 +72,11 @@ public final class TranslationUnitMetadataHandler {
 
                 if (field.getType() == String.class) {
                     try {
-                        /*Replace is used to "escape" chunk template in string as it interferes with parent template
-                         when creating YangModel.*/
+                        /*Replace is used to "escape" chunk template which is contained in string as it interferes with
+                         parent template when creating YangModel.*/
                         valuesMap.put(field.getName(), field.get(null).toString().replace("%", "/%/"));
                     } catch (IllegalAccessException e) {
-                        log.warn("Could not access pattern for this unit. Ignoring this reader and resuming");
+                        log.warn("Could not access constant strings for this unit. Ignoring this reader and resuming");
                     }
                 }
             }
@@ -115,7 +87,7 @@ public final class TranslationUnitMetadataHandler {
         return resultMap;
     }
 
-    public Map<String, Map<String, String>> getReaderPatternsMap() {
+    public Map<String, Map<String, String>> getReaderPatternAndConstantsMap() {
 
         Map<String, Map<String, String>> resultMap = new HashMap<>();
 
@@ -128,7 +100,7 @@ public final class TranslationUnitMetadataHandler {
             for (Field field : fields) {
                 field.setAccessible(true);
 
-                if (field.getType() == Pattern.class) {
+                if (field.getType() == Pattern.class || field.getType() == String.class) {
                     try {
                         valuesMap.put(field.getName(), field.get(null).toString());
                     } catch (IllegalAccessException e) {
@@ -173,10 +145,10 @@ public final class TranslationUnitMetadataHandler {
             } catch (IllegalAccessException | NoSuchFieldException e) {
 
                 log.warn("Could not get customizer field. Using simple name.");
-                return null;
+                return new Field[]{};
             }
         }
-        return null;
+        return new Field[]{};
     }
 
     private String getWriterCustomizerName(Writer<? extends DataObject> name) {
@@ -190,14 +162,12 @@ public final class TranslationUnitMetadataHandler {
     private Map<String, String> combineIntoMap(Stream<String> paths, Stream<String> names) {
 
         Map<String, String> resultMap = new HashMap<>();
-
         List<String> listPaths = paths.collect(Collectors.toList());
         List<String> listNames = names.collect(Collectors.toList());
 
         for (int i = 0; i < listPaths.size(); i++) {
             resultMap.put(listPaths.get(i), listNames.get(i));
         }
-
         return resultMap;
     }
 
