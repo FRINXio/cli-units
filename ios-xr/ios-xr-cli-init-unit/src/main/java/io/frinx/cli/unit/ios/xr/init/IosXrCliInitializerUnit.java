@@ -201,15 +201,18 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
     @Override
     public Set<Pattern> getErrorPatterns(MountPointContext mpCtx) {
         return Sets.newLinkedHashSet(Arrays.asList(
-                Pattern.compile("^\\s+\\^.*", Pattern.DOTALL),
-                Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL),
-                Pattern.compile("\\% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
+                Pattern.compile("(^|\\n)\\s+\\^.*", Pattern.DOTALL),
+                Pattern.compile("(^|\\n)% (?i)invalid input(?-i).*", Pattern.DOTALL),
+                Pattern.compile("(^|\\n)% (?i)Incomplete command(?-i).*", Pattern.DOTALL),
+                Pattern.compile("(^|\\n)% (?i)Ambiguous command(?-i).*", Pattern.DOTALL)
         ));
     }
 
     @Override
     public Set<Pattern> getCommitErrorPatterns(MountPointContext mpCtx) {
-        return Sets.newLinkedHashSet(Collections.singletonList(Pattern.compile("\\% (?i)Failed(?-i).*")));
+        return Sets.newLinkedHashSet(Collections.singletonList(
+                Pattern.compile("(^|\\n)% (?i)Failed(?-i).*")
+        ));
     }
 
     @Override

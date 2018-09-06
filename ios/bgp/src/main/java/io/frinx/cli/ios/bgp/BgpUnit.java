@@ -57,7 +57,7 @@ import io.frinx.cli.registry.spi.MountPointContext;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -118,7 +118,10 @@ public class BgpUnit implements TranslateUnit {
 
     @Override
     public Set<Pattern> getErrorPatterns(MountPointContext mpCtx) {
-        return Collections.singleton(Pattern.compile("% Configure the peer-group .+ first", Pattern.DOTALL));
+        return Sets.newLinkedHashSet(Arrays.asList(
+                Pattern.compile("% Configure the peer-group .+ first", Pattern.DOTALL),
+                Pattern.compile("(^|\\n)% (?i)BGP(?-i).*", Pattern.DOTALL)
+        ));
     }
 
     private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
