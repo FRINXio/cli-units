@@ -16,6 +16,8 @@
 
 package io.frinx.cli.iosxr.mpls.handler;
 
+import com.google.common.base.Preconditions;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -24,6 +26,8 @@ import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeEnabledCiscoAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.global.config.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.Mpls;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributes;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class TeConfigWriter implements CliWriter<Config> {
@@ -61,6 +65,10 @@ public class TeConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
+        final TeInterfaceAttributes ifaces = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Mpls.class))
+                .get().getTeInterfaceAttributes();
+        Preconditions.checkArgument(ifaces == null,
+                "Invalid request, interfaces cannot be present when mpls is disabled.");
         blockingDeleteAndRead(cli, instanceIdentifier, NO_MPLS_COMMAND);
     }
 }

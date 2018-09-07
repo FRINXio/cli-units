@@ -16,11 +16,16 @@
 
 package io.frinx.cli.iosxr.mpls.handler;
 
+import com.google.common.base.Preconditions;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeEnabledCiscoAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.Mpls;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeGlobalAttributes;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top._interface.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -36,6 +41,19 @@ public class TeInterfaceConfigWriter  implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
             WriteContext writeContext) throws WriteFailedException {
+        final Mpls mpls = writeContext.readAfter(RWUtils.cutId(id, Mpls.class))
+                .get();
+        Preconditions.checkArgument(mpls.getTeGlobalAttributes() != null,
+                "Invalid value, mpls-te needs to be enabled.");
+        TeGlobalAttributes attrs = mpls.getTeGlobalAttributes();
+        Preconditions.checkArgument(attrs.getAugmentation(NiMplsTeEnabledCiscoAug.class) != null,
+                "Invalid value, mpls-te needs to be enabled.");
+        NiMplsTeEnabledCiscoAug aug = attrs.getAugmentation(NiMplsTeEnabledCiscoAug.class);
+        Preconditions.checkArgument(aug.getConfig() != null,
+                "Invalid value, mpls-te needs to be enabled.");
+        Boolean enabled = aug.getConfig().isEnabled();
+        Preconditions.checkArgument(enabled != null && enabled,
+                "Invalid value, mpls-te needs to be enabled.");
         final String name = id.firstKeyOf(Interface.class)
                 .getInterfaceId()
                 .getValue();
