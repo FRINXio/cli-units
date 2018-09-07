@@ -40,6 +40,12 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>translation-registry-common</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+
         <!-- Openconfig models -->
         <dependency>
             <groupId>io.frinx.openconfig</groupId>
