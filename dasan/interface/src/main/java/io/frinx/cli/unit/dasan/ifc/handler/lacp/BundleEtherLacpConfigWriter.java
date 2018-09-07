@@ -14,57 +14,69 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.dasan.ifc.handler.l3ipvlan;
+package io.frinx.cli.unit.dasan.ifc.handler.lacp;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.dasan.ifc.handler.VlanInterfaceReader;
+import io.frinx.cli.unit.dasan.ifc.handler.BundleEtherInterfaceReader;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.regex.Matcher;
 import javax.annotation.Nonnull;
-import org.apache.commons.lang3.BooleanUtils;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan._interface.top.l3ipvlan.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.AggregationType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.aggregation.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L3ipvlanConfigWriter implements CliWriter<Config> {
+public final class BundleEtherLacpConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
-    public L3ipvlanConfigWriter(Cli cli) {
+    public BundleEtherLacpConfigWriter(Cli cli) {
         this.cli = cli;
     }
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
-        writeOrUpdateInterface(id, data);
+
+        String ifName = id.firstKeyOf(Interface.class).getName();
+        Matcher matcher = BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PATTERN.matcher(ifName);
+        if (!matcher.matches()) {
+            return;
+        }
+
+        try {
+            Preconditions.checkArgument(AggregationType.LACP.equals(data.getLagType()), "unsupported lag type. : %s",
+                    data.getLagType());
+        } catch (IllegalArgumentException e) {
+            throw new WriteFailedException.CreateFailedException(id, data, e);
+        }
     }
 
     @Override
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
             @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        writeOrUpdateInterface(id, dataAfter);
+
+        String ifName = id.firstKeyOf(Interface.class).getName();
+        Matcher matcher = BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PATTERN.matcher(ifName);
+        if (!matcher.matches()) {
+            return;
+        }
+
+        try {
+            Preconditions.checkArgument(dataBefore.getLagType().equals(dataAfter.getLagType()),
+                    "Changing lag type is not permitted. Before: %s, After: %s", dataBefore.getLagType(),
+                    dataAfter.getLagType());
+        } catch (IllegalArgumentException e) {
+            throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter, e);
+        }
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        String ifName = id.firstKeyOf(Interface.class).getName();
-        blockingWriteAndRead(cli, id, dataBefore, "configure terminal", f("interface %s", ifName.replace("Vlan", "br")),
-             "ip redirect", "end");
     }
 
-    private void writeOrUpdateInterface(InstanceIdentifier<Config> id, Config data)
-            throws WriteFailedException.CreateFailedException {
-        String ifName = id.firstKeyOf(Interface.class).getName();
-        Matcher matcher = VlanInterfaceReader.INTERFACE_NAME_PATTERN.matcher(ifName);
-        if (!matcher.matches()) {
-            return;
-        }
-        blockingWriteAndRead(cli, id, data, "configure terminal", f("interface %s", ifName.replace("Vlan", "br")),
-                BooleanUtils.isNotFalse(data.isIpRedirects()) ? "ip redirect" : "no ip redirect", "end");
-    }
 }
