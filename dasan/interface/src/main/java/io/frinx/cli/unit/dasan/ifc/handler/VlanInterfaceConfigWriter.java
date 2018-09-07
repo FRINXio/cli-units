@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.dasan.ifc.handler;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -51,15 +52,8 @@ public class VlanInterfaceConfigWriter implements CliWriter<Config> {
         writeOrUpdateInterface(id, data, matcher.group("id"));
     }
 
-    private void writeOrUpdateInterface(InstanceIdentifier<Config> id, Config data, String vlanId)
-            throws WriteFailedException.CreateFailedException {
-
-        blockingWriteAndRead(cli, id, data, "configure terminal", f("interface br%s", vlanId),
-                Optional.ofNullable(data.isEnabled()).orElse(Boolean.FALSE) ? "shutdown" : "no shutdown",
-                data.getMtu() == null ? "no mtu" : f("mtu %d", data.getMtu()), "end");
-    }
-
-    private static void validateIfcNameAgainstType(Config data) {
+    @VisibleForTesting
+    static void validateIfcNameAgainstType(Config data) {
 
         Preconditions.checkArgument(data.getType() == L3ipvlan.class,
                 "Cannot create interface of type: " + data.getType());
@@ -74,13 +68,12 @@ public class VlanInterfaceConfigWriter implements CliWriter<Config> {
         if (!matcher.matches()) {
             return;
         }
-
         Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
                 "Changing interface type is not permitted. Before: %s, After: %s", dataBefore.getType(),
                 dataAfter.getType());
 
         validateIfcNameAgainstType(dataAfter);
-        writeOrUpdateInterface(id, dataAfter, matcher.group("id"));
+        writeOrUpdateInterface(id, dataAfter, name);
     }
 
     @Override
@@ -88,17 +81,22 @@ public class VlanInterfaceConfigWriter implements CliWriter<Config> {
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String name = id.firstKeyOf(Interface.class).getName();
-        Matcher matcher = VlanInterfaceReader.INTERFACE_NAME_PATTERN.matcher(name);
-        if (!matcher.matches()) {
-            return;
-        }
-
         validateIfcNameAgainstType(dataBefore);
-        deleteInterface(id, dataBefore, matcher.group("id"));
+        deleteInterface(id, dataBefore, name);
     }
 
     private void deleteInterface(InstanceIdentifier<Config> id, Config data, String vlanId)
             throws WriteFailedException.DeleteFailedException {
-        blockingDeleteAndRead(cli, id, "configure terminal", f("no interface br%s", vlanId), "end");
+        blockingDeleteAndRead(cli, id, "configure terminal", f("no interface %s", vlanId.replace("Vlan", "br")), "end");
+    }
+
+    @VisibleForTesting
+    void writeOrUpdateInterface(InstanceIdentifier<Config> id, Config data, String vlanId)
+            throws WriteFailedException.CreateFailedException {
+        String ifcName = id.firstKeyOf(Interface.class).getName();
+        blockingWriteAndRead(cli, id, data, "configure terminal",
+                f("interface %s", ifcName.replace("Vlan", "br")),
+                Optional.ofNullable(data.isEnabled()).orElse(Boolean.FALSE) ? "shutdown" : "no shutdown",
+                data.getMtu() == null ? "no mtu" : f("mtu %d", data.getMtu()), "end");
     }
 }

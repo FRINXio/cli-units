@@ -27,13 +27,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L3ipvlan;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class InterfaceReader extends CompositeListReader<Interface, InterfaceKey, InterfaceBuilder>
+public class InterfaceReader extends CompositeListReader<Interface, InterfaceKey, InterfaceBuilder>
         implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     @SuppressWarnings("serial")
@@ -41,6 +43,8 @@ public final class InterfaceReader extends CompositeListReader<Interface, Interf
         super(new ArrayList<ListReaderCustomizer<Interface, InterfaceKey, InterfaceBuilder>>() {
             {
                 add(new PhysicalPortInterfaceReader(cli));
+                add(new BundleEtherInterfaceReader(cli));
+                add(new VlanInterfaceReader(cli));
             }
         });
     }
@@ -60,6 +64,12 @@ public final class InterfaceReader extends CompositeListReader<Interface, Interf
 
         if (name.startsWith(PhysicalPortInterfaceReader.PHYSICAL_PORT_NAME_PREFIX)) {
             return EthernetCsmacd.class;
+        }
+        if (name.startsWith(VlanInterfaceReader.INTERFACE_NAME_PREFIX)) {
+            return L3ipvlan.class;
+        }
+        if (name.startsWith(BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PREFIX)) {
+            return Ieee8023adLag.class;
         }
         return Other.class;
     }

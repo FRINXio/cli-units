@@ -16,14 +16,10 @@
 
 package io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpmember;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.dasan.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -90,12 +86,10 @@ public class BundleEtherLacpMemberConfigReaderTest {
                 .child(Config.class);
 
         final ReadContext ctx = Mockito.mock(ReadContext.class);
-        final String name = "Ethernet3/4";
 
-        final String outputSingleInterface = StringUtils.join(new String[] { " lacp port 3/4 aggregator 8", //
+        final String outputSingleInterface = StringUtils.join(new String[] { " lacp port 3/4 aggregator 8",
             " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
-        final List<String> ports = new ArrayList<>();
-        //
+
         PowerMockito.mockStatic(DasanCliUtil.class);
         PowerMockito.doReturn(ALL_PORTS).when(DasanCliUtil.class, "getPhysicalPorts", cli, target, instanceIdentifier,
                 ctx);
@@ -122,12 +116,10 @@ public class BundleEtherLacpMemberConfigReaderTest {
                 .child(Config.class);
 
         final ReadContext ctx = Mockito.mock(ReadContext.class);
-        final String name = "AAEthernet3/4";
 
-        final String outputSingleInterface = StringUtils.join(new String[] { " lacp port 3/4 aggregator 8", //
+        final String outputSingleInterface = StringUtils.join(new String[] { " lacp port 3/4 aggregator 8",
             " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
-        final List<String> ports = new ArrayList<>();
-        //
+
         PowerMockito.mockStatic(DasanCliUtil.class);
         PowerMockito.doReturn(ALL_PORTS).when(DasanCliUtil.class, "getPhysicalPorts", cli, target, instanceIdentifier,
                 ctx);
@@ -154,12 +146,10 @@ public class BundleEtherLacpMemberConfigReaderTest {
                 .child(Config.class);
 
         final ReadContext ctx = Mockito.mock(ReadContext.class);
-        final String name = "aEthernet3/4";
 
-        final String outputSingleInterface = StringUtils.join(new String[] { " lacp portAA 3/4 aggregator 8", //
+        final String outputSingleInterface = StringUtils.join(new String[] { " lacp portAA 3/4 aggregator 8",
             " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
-        final List<String> ports = new ArrayList<>();
-        //
+
         PowerMockito.mockStatic(InterfaceReader.class);
         PowerMockito.doReturn(null).when(InterfaceReader.class, "parseTypeByName", interfaceName);
         Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
@@ -176,27 +166,18 @@ public class BundleEtherLacpMemberConfigReaderTest {
     @Test
     public void testParseInterface_001() throws Exception {
 
-        // final String output = "1/1 Ethernet 1 Up/Up
-        // Force/Full/1000 Off/ Off Y";
-        final String output = StringUtils.join(new String[] { " lacp aggregator 8 ", // target
-            " lacp port 3/4,4/4 aggregator 8", //
-            " lacp port 4/10 aggregator 10 ", " lacp aggregator 9 ", // target
-            " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
+        final String output = StringUtils.join(new String[] { " lacp port 3/4,4/4 aggregator 8",
+            " lacp port 4/10-4/11 aggregator 10", " lacp port admin-key 4/10 2 ", }, "\n");
 
-        // ConfigBuilder builder =
-        // Mockito.mock(ConfigBuilder.class);
         final String name = "Bundle-Ether8";
         final String id = "3/4";
         List<String> portList = new ArrayList<>();
         portList.add("3/4");
         portList.add("4/10");
 
-        Method method = BundleEtherLacpMemberConfigReader.class.getDeclaredMethod("parseEthernetConfig", String.class,
-                ConfigBuilder.class, List.class, String.class);
-        method.setAccessible(true);
         ConfigBuilder builder = new ConfigBuilder();
         // test
-        method.invoke(null, output, builder, portList, id);
+        BundleEtherLacpMemberConfigReader.parseEthernetConfig(output, builder, portList, id);
 
         Assert.assertEquals(builder.getAugmentation(Config1.class).getAggregateId(), name);
     }
@@ -204,36 +185,27 @@ public class BundleEtherLacpMemberConfigReaderTest {
     @Test
     public void testParseInterface_002() throws Exception {
 
-        // final String output = "1/1 Ethernet 1 Up/Up
-        // Force/Full/1000 Off/ Off Y";
-        final String output = StringUtils.join(new String[] { " lacp aggregator 8 ", // target
-            " lacp port 3/4,4/4 aggregator 8", //
-            " lacp port 4/10 aggregator 10 ", " lacp aggregator 9 ", // target
-            " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
+        final String output = StringUtils.join(new String[] {
+            " lacp aggregator 8 ", " lacp port 3/4,4/4 aggregator 8",
+            " lacp port 4/10 aggregator 10 ", " lacp aggregator 9 ", " lacp port admin-key 4/10 2 ", }, "\n");
 
-        // ConfigBuilder builder =
-        // Mockito.mock(ConfigBuilder.class);
-        final String name = "Bundle-Ether8";
         final String id = "6/4";
         List<String> portList = new ArrayList<>();
         portList.add("3/4");
         portList.add("4/10");
 
-        Method method = BundleEtherLacpMemberConfigReader.class.getDeclaredMethod("parseEthernetConfig", String.class,
-                ConfigBuilder.class, List.class, String.class);
-        method.setAccessible(true);
         ConfigBuilder builder = new ConfigBuilder();
         // test
-        method.invoke(null, output, builder, portList, id);
+        BundleEtherLacpMemberConfigReader.parseEthernetConfig(output, builder, portList, id);
 
         Assert.assertNull(builder.getAugmentation(Config1.class));
     }
 
     @Test
     public void testMerge_004() throws Exception {
-        EthernetBuilder parentBuilder = mock(EthernetBuilder.class);
-        final Config readValue = mock(Config.class);
-        when(parentBuilder.setConfig(readValue)).thenReturn(parentBuilder);
+        EthernetBuilder parentBuilder = Mockito.mock(EthernetBuilder.class);
+        final Config readValue = Mockito.mock(Config.class);
+        Mockito.when(parentBuilder.setConfig(readValue)).thenReturn(parentBuilder);
 
         target.merge(parentBuilder, readValue);
         Mockito.verify(parentBuilder).setConfig(readValue);

@@ -16,14 +16,13 @@
 
 package io.frinx.cli.unit.dasan.ifc.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -41,8 +40,8 @@ public class BundleEtherInterfaceReader implements CliConfigListReader<Interface
     public static final String SHOW_BUNDLE_ETHER_LIST = "show running-config bridge | include ^ lacp aggregator";
     public static final Pattern LACP_INTERFACE_LINE = Pattern.compile("lacp aggregator\\s+(?<ids>.*)$");
     public static final String BUNDLE_ETHER_IF_NAME_PREFIX = "Bundle-Ether";
-    public static final Pattern BUNDLE_ETHER_IF_NAME_PATTERN =
-            Pattern.compile(BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PREFIX + "(?<number>[0-9]+)");
+    public static final Pattern BUNDLE_ETHER_IF_NAME_PATTERN = Pattern
+            .compile(BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PREFIX + "(?<number>[0-9]+)");
     private Cli cli;
 
     public BundleEtherInterfaceReader(Cli cli) {
@@ -61,17 +60,11 @@ public class BundleEtherInterfaceReader implements CliConfigListReader<Interface
         return parseAllInterfaceIds(output);
     }
 
-
     static List<InterfaceKey> parseAllInterfaceIds(String output) {
-        return NEWLINE.splitAsStream(output)
-                .map(String::trim)
-                .map(LACP_INTERFACE_LINE::matcher)
-                .filter(Matcher::matches)
-                .map(m -> m.group("ids"))
-                .flatMap(ids -> DasanCliUtil.parseIdRanges(ids).stream())
-                .map(id -> "Bundle-Ether" + id)
-                .map(InterfaceKey::new)
-                .collect(Collectors.toList());
+        return ParsingUtils.NEWLINE.splitAsStream(output).map(String::trim).map(LACP_INTERFACE_LINE::matcher)
+                .filter(Matcher::matches).map(m -> m.group("ids"))
+                .flatMap(ids -> DasanCliUtil.parseIdRanges(ids).stream()).map(id -> "Bundle-Ether" + id)
+                .map(InterfaceKey::new).collect(Collectors.toList());
     }
 
     @Override
