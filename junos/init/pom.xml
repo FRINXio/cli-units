@@ -29,20 +29,11 @@
     <packaging>bundle</packaging>
 
     <dependencies>
+        <!-- for JUnit -->
         <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>topology-api</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-model</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>io-impl</artifactId>
-            <version>${cli.version}</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
