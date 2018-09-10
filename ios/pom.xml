@@ -32,7 +32,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <!--<module>essential</module>-->
     <module>ios-cli-init-unit</module>
     <module>interface</module>
     <module>bgp</module>
