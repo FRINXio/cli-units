@@ -56,7 +56,7 @@ public class CodecTranslator {
 
     }
 
-    static BindingToNormalizedNodeCodec getCodec(ModuleInfoBackedContext mibCtx, SchemaContext schemaContext) {
+    public static BindingToNormalizedNodeCodec getCodec(ModuleInfoBackedContext mibCtx, SchemaContext schemaContext) {
         BindingRuntimeContext ctx = BindingRuntimeContext.create(mibCtx, schemaContext);
         DataObjectSerializerGenerator gener = StreamWriterGenerator.create(UTILS);
         BindingNormalizedNodeCodecRegistry cr = new BindingNormalizedNodeCodecRegistry(gener);
@@ -66,7 +66,7 @@ public class CodecTranslator {
         return codec;
     }
 
-    static ModuleInfoBackedContext getModuleInfoBackedContext(Set<YangModuleInfo> yangModuleInfos) {
+    public static ModuleInfoBackedContext getModuleInfoBackedContext(Set<YangModuleInfo> yangModuleInfos) {
         ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.addModuleInfos(yangModuleInfos);
         return moduleInfoBackedContext;

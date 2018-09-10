@@ -38,22 +38,40 @@ public class TranslationUnitMetadata {
     private final Set<InstanceIdentifier<?>> writersSet;
     private final Set<InstanceIdentifier<?>> readersSet;
     private final Class<?> classObject;
-    private final DocsUnitCollector unitCollector;
+    private final UnitCollectorHandler unitCollectorHandler;
     private final CapturingReaderRegistryBuilder readerRegistryBuilder;
     private final CapturingWriterRegistryBuilder writerRegistryBuilder;
     private final CodecTranslator codecTranslator;
 
-    TranslationUnitMetadata(DocsUnitCollector unitCollector, Set<InstanceIdentifier<?>> writersSet,
-                            Set<InstanceIdentifier<?>> readersSet, Class<?> classObject, SchemaContext context,
-                            BindingToNormalizedNodeCodec bindingCodec,
-                            CapturingReaderRegistryBuilder readerRegistryBuilder,
-                            CapturingWriterRegistryBuilder writerRegistryBuilder
+    public TranslationUnitMetadata(CliUnitCollector cliUnitCollector, Set<InstanceIdentifier<?>> writersSet,
+                                   Set<InstanceIdentifier<?>> readersSet, Class<?> classObject, SchemaContext context,
+                                   BindingToNormalizedNodeCodec bindingCodec,
+                                   CapturingReaderRegistryBuilder readerRegistryBuilder,
+                                   CapturingWriterRegistryBuilder writerRegistryBuilder
     ) {
 
         this.classObject = classObject;
         this.readersSet = readersSet;
         this.writersSet = writersSet;
-        this.unitCollector = unitCollector;
+        this.unitCollectorHandler = new UnitCollectorHandler(cliUnitCollector);
+        this.readerRegistryBuilder = readerRegistryBuilder;
+        this.writerRegistryBuilder = writerRegistryBuilder;
+        this.codecTranslator = new CodecTranslator(bindingCodec, context);
+
+    }
+
+    public TranslationUnitMetadata(UnitopoTranslationUnitCollector unitopoTranslationUnitCollector,
+                                   Set<InstanceIdentifier<?>> writersSet,
+                                   Set<InstanceIdentifier<?>> readersSet,
+                                   Class<?> classObject, SchemaContext context,
+                                   BindingToNormalizedNodeCodec bindingCodec,
+                                   CapturingReaderRegistryBuilder readerRegistryBuilder,
+                                   CapturingWriterRegistryBuilder writerRegistryBuilder
+    ) {
+        this.classObject = classObject;
+        this.readersSet = readersSet;
+        this.writersSet = writersSet;
+        this.unitCollectorHandler = new UnitCollectorHandler(unitopoTranslationUnitCollector);
         this.readerRegistryBuilder = readerRegistryBuilder;
         this.writerRegistryBuilder = writerRegistryBuilder;
         this.codecTranslator = new CodecTranslator(bindingCodec, context);
@@ -92,18 +110,32 @@ public class TranslationUnitMetadata {
     }
 
     public List<String> getDevicesVersion() {
-        return getUnitCollector().getDevicesIds().stream()
-                .map(Device::getDeviceVersion)
-                .sorted()
-                .collect(Collectors.toList());
+        if (unitCollectorHandler.isUnitopo()) {
+            return Stream.of(parseUnitopoUnitDeviceVersion()).collect(Collectors.toList());
+        } else {
+            return unitCollectorHandler
+                    .getCliUnitCollector()
+                    .getDevicesIds()
+                    .stream()
+                    .map(Device::getDeviceVersion)
+                    .sorted()
+                    .collect(Collectors.toList());
+        }
     }
 
     public String getDeviceType() {
-        return getUnitCollector().getDevicesIds().stream()
-                .map(Device::getDeviceType)
-                .distinct()
-                .map(type -> type.replace(" ", "-"))
-                .collect(Collectors.joining("-"));
+        if (unitCollectorHandler.isUnitopo()) {
+            return parseUnitopoUnitDeviceType();
+        } else {
+            return unitCollectorHandler
+                    .getCliUnitCollector()
+                    .getDevicesIds()
+                    .stream()
+                    .map(Device::getDeviceType)
+                    .distinct()
+                    .map(type -> type.replace(" ", "-"))
+                    .collect(Collectors.joining("-"));
+        }
     }
 
     public String getName() {
@@ -111,11 +143,34 @@ public class TranslationUnitMetadata {
     }
 
     public String getSimpleName() {
+        if (unitCollectorHandler.isUnitopo()) {
+            return parseUnitopoUnitSimpleName().toLowerCase();
+        }
         return classObject.getSimpleName().toLowerCase();
     }
 
-    public DocsUnitCollector getUnitCollector() {
-        return unitCollector;
+    private String parseUnitopoUnitDeviceType() {
+        return classObject
+                .getName()
+                .replace("io.frinx.unitopo.unit.", "")
+                .replace(".Unit", "")
+                .split("\\.")[0]
+                .split("[0-9]+", 2)[0];
     }
 
+    private String parseUnitopoUnitSimpleName() {
+        return classObject
+                .getName()
+                .replace("io.frinx.unitopo.unit.", "")
+                .replace(".Unit", "")
+                .split("\\.")[1]
+                .concat("unit");
+    }
+
+    private String parseUnitopoUnitDeviceVersion() {
+        return unitCollectorHandler.getUnitopoUnitCollector()
+                .getUnit()
+                .toString()
+                .split(" ")[1];
+    }
 }

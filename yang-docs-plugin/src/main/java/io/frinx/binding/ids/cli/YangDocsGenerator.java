@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-package io.frinx.binding.ids;
+package io.frinx.binding.ids.cli;
 
 
+import io.frinx.binding.ids.CliUnitCollector;
+import io.frinx.binding.ids.CodecTranslator;
+import io.frinx.binding.ids.TranslationUnitMetadata;
+import io.frinx.binding.ids.TranslationUnitMetadataHandler;
+import io.frinx.binding.ids.YangDocsWriter;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.registry.spi.TranslateUnit.Context;
 import io.frinx.cli.utils.CapturingReaderRegistryBuilder;
@@ -67,7 +72,7 @@ public final class YangDocsGenerator implements BasicCodeGenerator, BuildContext
             throws IOException {
 
 
-        DocsUnitCollector unitCollector = new DocsUnitCollector();
+        CliUnitCollector unitCollector = new CliUnitCollector();
         UnitLoader unitLoader = new UnitLoader(project);
         try {
             reflectionObject = unitLoader.getReflectionObject(unitCollector);
@@ -103,7 +108,7 @@ public final class YangDocsGenerator implements BasicCodeGenerator, BuildContext
      * It calls provideHandlers on the reflection and prepares the codec for CodecTranslator.
      */
     private TranslationUnitMetadata provideMetadataObject(SchemaContext context,
-                                                          DocsUnitCollector unitCollector) {
+                                                          CliUnitCollector unitCollector) {
 
         TranslateUnit translateUnitObject = (TranslateUnit) reflectionObject;
 
