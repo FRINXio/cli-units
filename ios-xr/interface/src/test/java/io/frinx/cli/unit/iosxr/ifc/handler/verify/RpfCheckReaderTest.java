@@ -72,15 +72,13 @@ public class RpfCheckReaderTest {
         final VerifyUnicastSourceReachableViaBuilder builder = new VerifyUnicastSourceReachableViaBuilder();
         reader.readCurrentAttributes(RPF_IID, builder, context);
 
-        Assert.assertTrue(builder.getIpv4()
-                .getRpfCheck()
-                .equals(RpfCheck.ANY));
+        Assert.assertEquals(builder.getIpv4()
+                .getRpfCheck(), RpfCheck.ANY);
         Assert.assertTrue(builder.getIpv4()
                 .getAllowConfig()
                 .isEmpty());
-        Assert.assertTrue(builder.getIpv6()
-                .getRpfCheck()
-                .equals(RpfCheck.RX));
+        Assert.assertEquals(builder.getIpv6()
+                .getRpfCheck(), RpfCheck.RX);
         Assert.assertTrue(builder.getIpv6()
                 .getAllowConfig()
                 .isEmpty());
@@ -107,9 +105,9 @@ public class RpfCheckReaderTest {
                 .isEmpty());
         Assert.assertEquals(builder.getIpv6()
                 .getRpfCheck(), RpfCheck.ANY);
-        Assert.assertTrue(builder.getIpv6()
+        Assert.assertEquals(1, builder.getIpv6()
                 .getAllowConfig()
-                .size() == 1);
+                .size());
         Assert.assertEquals(builder.getIpv6()
                 .getAllowConfig()
                 .get(0), RPFALLOWSELFPING.class);
@@ -131,9 +129,9 @@ public class RpfCheckReaderTest {
 
         Assert.assertEquals(builder.getIpv4()
                 .getRpfCheck(), RpfCheck.ANY);
-        Assert.assertTrue(builder.getIpv4()
+        Assert.assertEquals(1, builder.getIpv4()
                 .getAllowConfig()
-                .size() == 1);
+                .size());
         Assert.assertEquals(builder.getIpv4()
                 .getAllowConfig()
                 .get(0), RPFALLOWDEFAULT.class);
@@ -160,17 +158,17 @@ public class RpfCheckReaderTest {
 
         Assert.assertEquals(builder.getIpv4()
                 .getRpfCheck(), RpfCheck.ANY);
-        Assert.assertTrue(builder.getIpv4()
+        Assert.assertEquals(1, builder.getIpv4()
                 .getAllowConfig()
-                .size() == 1);
+                .size());
         Assert.assertEquals(builder.getIpv4()
                 .getAllowConfig()
                 .get(0), RPFALLOWDEFAULT.class);
         Assert.assertEquals(builder.getIpv6()
                 .getRpfCheck(), RpfCheck.ANY);
-        Assert.assertTrue(builder.getIpv6()
+        Assert.assertEquals(1, builder.getIpv6()
                 .getAllowConfig()
-                .size() == 1);
+                .size());
         Assert.assertEquals(builder.getIpv6()
                 .getAllowConfig()
                 .get(0), RPFALLOWSELFPING.class);
@@ -192,9 +190,9 @@ public class RpfCheckReaderTest {
 
         Assert.assertEquals(builder.getIpv4()
                 .getRpfCheck(), RpfCheck.ANY);
-        Assert.assertTrue(builder.getIpv4()
+        Assert.assertEquals(2, builder.getIpv4()
                 .getAllowConfig()
-                .size() == 2);
+                .size());
         Assert.assertTrue(builder.getIpv4()
                 .getAllowConfig()
                 .contains(RPFALLOWDEFAULT.class));
@@ -203,9 +201,9 @@ public class RpfCheckReaderTest {
                 .contains(RPFALLOWSELFPING.class));
         Assert.assertEquals(builder.getIpv6()
                 .getRpfCheck(), RpfCheck.ANY);
-        Assert.assertTrue(builder.getIpv6()
+        Assert.assertEquals(1, builder.getIpv6()
                 .getAllowConfig()
-                .size() == 1);
+                .size());
         Assert.assertEquals(builder.getIpv6()
                 .getAllowConfig()
                 .get(0), RPFALLOWSELFPING.class);
@@ -227,9 +225,9 @@ public class RpfCheckReaderTest {
 
         Assert.assertEquals(builder.getIpv4()
                 .getRpfCheck(), RpfCheck.ANY);
-        Assert.assertTrue(builder.getIpv4()
+        Assert.assertEquals(2, builder.getIpv4()
                 .getAllowConfig()
-                .size() == 2);
+                .size());
         Assert.assertTrue(builder.getIpv4()
                 .getAllowConfig()
                 .contains(RPFALLOWDEFAULT.class));
@@ -238,9 +236,9 @@ public class RpfCheckReaderTest {
                 .contains(RPFALLOWSELFPING.class));
         Assert.assertEquals(builder.getIpv6()
                 .getRpfCheck(), RpfCheck.ANY);
-        Assert.assertTrue(builder.getIpv6()
+        Assert.assertEquals(2, builder.getIpv6()
                 .getAllowConfig()
-                .size() == 2);
+                .size());
         Assert.assertTrue(builder.getIpv6()
                 .getAllowConfig()
                 .contains(RPFALLOWDEFAULT.class));
