@@ -187,7 +187,7 @@ public class BundleEtherLacpMemberConfigReaderTest {
         // Mockito.mock(ConfigBuilder.class);
         final String name = "Bundle-Ether8";
         final String id = "3/4";
-        List<String> portList = new ArrayList<String>();
+        List<String> portList = new ArrayList<>();
         portList.add("3/4");
         portList.add("4/10");
 
@@ -215,7 +215,7 @@ public class BundleEtherLacpMemberConfigReaderTest {
         // Mockito.mock(ConfigBuilder.class);
         final String name = "Bundle-Ether8";
         final String id = "6/4";
-        List<String> portList = new ArrayList<String>();
+        List<String> portList = new ArrayList<>();
         portList.add("3/4");
         portList.add("4/10");
 
