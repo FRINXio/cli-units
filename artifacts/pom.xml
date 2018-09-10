@@ -48,11 +48,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>brocade-essential-unit</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>nexus-lldp-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -182,11 +177,6 @@
                 <artifactId>common-handlers</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>ios-essential-model</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
             <!-- IOS XR -->
             <dependency>
@@ -288,13 +278,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>frinx-cli-unit-ios-initializer</artifactId>
-                <type>xml</type>
-                <classifier>features</classifier>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>frinx-cli-unit-ios-common-models</artifactId>
                 <type>xml</type>
                 <classifier>features</classifier>
                 <version>${project.version}</version>
