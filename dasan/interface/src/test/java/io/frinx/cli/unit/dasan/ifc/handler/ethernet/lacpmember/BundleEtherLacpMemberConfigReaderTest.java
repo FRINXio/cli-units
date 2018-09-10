@@ -106,7 +106,7 @@ public class BundleEtherLacpMemberConfigReaderTest {
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
 
-        Assert.assertEquals(builder.getAugmentation(Config1.class), null);
+        Assert.assertNull(builder.getAugmentation(Config1.class));
 
     }
 
@@ -138,7 +138,7 @@ public class BundleEtherLacpMemberConfigReaderTest {
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
 
-        Assert.assertEquals(builder.getAugmentation(Config1.class), null);
+        Assert.assertNull(builder.getAugmentation(Config1.class));
 
     }
 
@@ -169,7 +169,7 @@ public class BundleEtherLacpMemberConfigReaderTest {
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
 
-        Assert.assertEquals(builder.getAugmentation(Config1.class), null);
+        Assert.assertNull(builder.getAugmentation(Config1.class));
 
     }
 
@@ -226,7 +226,7 @@ public class BundleEtherLacpMemberConfigReaderTest {
         // test
         method.invoke(null, output, builder, portList, id);
 
-        Assert.assertEquals(builder.getAugmentation(Config1.class), null);
+        Assert.assertNull(builder.getAugmentation(Config1.class));
     }
 
     @Test
