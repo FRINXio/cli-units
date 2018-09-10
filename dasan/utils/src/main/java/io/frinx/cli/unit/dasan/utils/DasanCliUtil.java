@@ -107,7 +107,7 @@ public final class DasanCliUtil {
         Map<String, Integer> portIndex = new HashMap<>();
         int count = 0;
         for (String name : ports) {
-            portIndex.put(name, Integer.valueOf(count));
+            portIndex.put(name, count);
             count ++;
         }
 
@@ -138,7 +138,7 @@ public final class DasanCliUtil {
             Integer start = portIndex.get(rangeMatcher.group("start"));
             Integer end   = portIndex.get(rangeMatcher.group("end"));
 
-            ret.addAll(ports.subList(start.intValue(), end.intValue() + 1));
+            ret.addAll(ports.subList(start, end + 1));
 
         } else if (portIndex.containsKey(ranges)) {
             ret.add(ranges);
