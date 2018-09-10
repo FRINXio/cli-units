@@ -30,7 +30,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <!--<module>essential</module>-->
     <module>ios-xr-cli-init-unit</module>
     <module>network-instance</module>
     <module>bgp</module>

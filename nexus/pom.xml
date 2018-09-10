@@ -30,7 +30,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <!--<module>essential</module>-->
         <module>init</module>
         <module>lldp</module>
         <module>utils</module>
