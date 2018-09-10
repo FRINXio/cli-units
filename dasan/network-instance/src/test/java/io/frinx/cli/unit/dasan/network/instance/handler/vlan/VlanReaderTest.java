@@ -98,7 +98,7 @@ public class VlanReaderTest {
                 InstanceIdentifier.create(NetworkInstances.class)
                 .child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
                 .child(Vlans.class)
-                .child(Vlan.class, new VlanKey(new VlanId(Integer.valueOf(100))));
+                .child(Vlan.class, new VlanKey(new VlanId(100)));
         final ReadContext readContext = mock(ReadContext.class);
         List<VlanKey> vlanKeys = new ArrayList<>();
 
@@ -123,12 +123,12 @@ public class VlanReaderTest {
                 KeyedInstanceIdentifier.create(NetworkInstances.class)
                 .child(NetworkInstance.class, new NetworkInstanceKey("not-default"))
                 .child(Vlans.class)
-                .child(Vlan.class, new VlanKey(new VlanId(Integer.valueOf(100))));
+                .child(Vlan.class, new VlanKey(new VlanId(100)));
         final ReadContext readContext = mock(ReadContext.class);
         List<VlanKey> vlanKeys = new LinkedList<VlanKey>() {
             {
-                add(new VlanKey(new VlanId(Integer.valueOf(1))));
-                add(new VlanKey(new VlanId(Integer.valueOf(2))));
+                add(new VlanKey(new VlanId(1)));
+                add(new VlanKey(new VlanId(2)));
             }
         };
 
@@ -226,11 +226,11 @@ public class VlanReaderTest {
         assertThat(result.stream()
             .map(m -> m.getVlanId().getValue()).collect(Collectors.toList()),
             is(containsInAnyOrder(
-                Integer.valueOf(1129),
-                Integer.valueOf(1133),
-                Integer.valueOf(10),
-                Integer.valueOf(20),Integer.valueOf(21),
-                Integer.valueOf(33),Integer.valueOf(34),Integer.valueOf(35)
+                    1129,
+                    1133,
+                    10,
+                    20, 21,
+                    33, 34, 35
                 )));
     }
 
@@ -247,7 +247,7 @@ public class VlanReaderTest {
 
     @Test
     public void testReadCurrentAttributes_001() throws Exception {
-        final VlanId vlanId = new VlanId(Integer.valueOf(100));
+        final VlanId vlanId = new VlanId(100);
         final InstanceIdentifier<Vlan> instanceIdentifier =
                 KeyedInstanceIdentifier.create(NetworkInstances.class)
                 .child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)

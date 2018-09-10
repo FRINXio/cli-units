@@ -92,7 +92,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
             .setEnabled(Boolean.TRUE)
             .setName(ifName)
             .setType(ifType)
-            .setMtu(Integer.valueOf(1000))
+            .setMtu(1000)
             .build();
     }
 
