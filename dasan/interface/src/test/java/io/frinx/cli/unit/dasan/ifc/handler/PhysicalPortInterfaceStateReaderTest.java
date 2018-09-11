@@ -249,17 +249,17 @@ public class PhysicalPortInterfaceStateReaderTest {
         name = "1/1";
         builder = new StateBuilder();
         PhysicalPortInterfaceStateReader.parseJumboFrame(output, ports, name, builder);
-        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(Integer.valueOf(2000)));
+        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(2000));
 
         name = "7/2";
         builder = new StateBuilder();
         PhysicalPortInterfaceStateReader.parseJumboFrame(output, ports, name, builder);
-        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(Integer.valueOf(2000)));
+        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(2000));
 
         name = "1/2";
         builder = new StateBuilder();
         PhysicalPortInterfaceStateReader.parseJumboFrame(output, ports, name, builder);
-        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(Integer.valueOf(3000)));
+        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(3000));
 
         //not found
         name = "2/1";
@@ -270,24 +270,24 @@ public class PhysicalPortInterfaceStateReaderTest {
         name = "2/2";
         builder = new StateBuilder();
         PhysicalPortInterfaceStateReader.parseJumboFrame(output, ports, name, builder);
-        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(Integer.valueOf(3000)));
+        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(3000));
 
         // in range(8/1-t/1)
         name = "8/1";
         builder = new StateBuilder();
         PhysicalPortInterfaceStateReader.parseJumboFrame(output, ports, name, builder);
-        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(Integer.valueOf(3000)));
+        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(3000));
 
         // range
         name = "8/2";
         builder = new StateBuilder();
         PhysicalPortInterfaceStateReader.parseJumboFrame(output, ports, name, builder);
-        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(Integer.valueOf(3000)));
+        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(3000));
 
         name = "t/1";
         builder = new StateBuilder();
         PhysicalPortInterfaceStateReader.parseJumboFrame(output, ports, name, builder);
-        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(Integer.valueOf(3000)));
+        Assert.assertThat(builder.getMtu(), CoreMatchers.equalTo(3000));
 
         name = "t/2";
         builder = new StateBuilder();
