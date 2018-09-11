@@ -93,7 +93,7 @@ public class VlanInterfaceConfigReaderTest {
 
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
-        Assert.assertEquals(builder.getName(), null);
+        Assert.assertNull(builder.getName());
     }
 
     @Test
