@@ -114,9 +114,9 @@ public class IosCliInitializerUnit  implements TranslateUnit {
     @Override
     public Set<Pattern> getErrorPatterns(MountPointContext mpCtx) {
         return Sets.newLinkedHashSet(Arrays.asList(
-                Pattern.compile("^\\s+\\^.*", Pattern.DOTALL),
-                Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL),
-                Pattern.compile("\\% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
+                Pattern.compile("(^|\\n)^\\s+\\^.*", Pattern.DOTALL),
+                Pattern.compile("(^|\\n)% (?i)invalid input(?-i).*", Pattern.DOTALL),
+                Pattern.compile("(^|\\n)% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
         ));
     }
 
