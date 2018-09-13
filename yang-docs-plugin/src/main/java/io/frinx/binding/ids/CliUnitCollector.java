@@ -28,7 +28,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.tran
 /**
  * This class records all ids we have registered.
  */
-public class DocsUnitCollector implements TranslationUnitCollector {
+public class CliUnitCollector implements TranslationUnitCollector {
 
     private static final Registration REGISTRATION = () -> { };
     private Set<Device> ids;

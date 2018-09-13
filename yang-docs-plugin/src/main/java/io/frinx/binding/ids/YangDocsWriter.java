@@ -34,7 +34,7 @@ public final class YangDocsWriter {
     private static final String FILE_NAME = "frinx-openconfig-%s-%s.yang";
     private final Log log = new SystemStreamLog();
 
-    YangDocsWriter() {
+    public YangDocsWriter() {
 
     }
 

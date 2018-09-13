@@ -123,6 +123,11 @@
             <artifactId>plexus-build-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.unitopo</groupId>
+            <artifactId>translation-registry-api</artifactId>
+            <version>3.1.6.rc9-frinx-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

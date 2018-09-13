@@ -47,7 +47,7 @@ public final class YangModelBuilder {
             + "  {% onEmpty %}\n"
             + "  {% endonEmpty%}\n"
             + "  {% endloop %}\n"
-            + "  description \"frinx {% $class_name %} documentation module\";\n"
+            + "  description \"A set of FRINX augmentations for {% $class_name %} \";\n"
             + "  \n"
             + "  extension frinx-documentation {\n"
             + "   argument \"name\";\n"
@@ -203,8 +203,12 @@ public final class YangModelBuilder {
             if (readerDetailsMap == null) {
                 return "";
             } else {
-                return readerDetailsMap.keySet().stream().map(x -> StringEscapeUtils.escapeJava(
-                        String.format(" %s:\n %s\n", x, readerDetailsMap.get(x)))).collect(Collectors.joining());
+                return readerDetailsMap.keySet()
+                        .stream()
+                        .map(x -> StringEscapeUtils
+                                .escapeJava(String.format(" %s:\n %s\n", x, readerDetailsMap.get(x))))
+                        .sorted()
+                        .collect(Collectors.joining());
             }
         }
 
@@ -212,8 +216,12 @@ public final class YangModelBuilder {
             if (writerDetailsMap == null) {
                 return "";
             } else {
-                return writerDetailsMap.keySet().stream().map(x -> StringEscapeUtils.escapeJava(
-                        String.format(" %s:\n %s\n", x, writerDetailsMap.get(x)))).collect(Collectors.joining());
+                return writerDetailsMap.keySet()
+                        .stream()
+                        .map(x -> StringEscapeUtils
+                                .escapeJava(String.format(" %s:\n %s\n", x, writerDetailsMap.get(x))))
+                        .sorted()
+                        .collect(Collectors.joining());
             }
         }
     }

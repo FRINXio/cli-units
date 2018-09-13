@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package io.frinx.binding.ids;
+package io.frinx.binding.ids.cli;
 
+import io.frinx.binding.ids.CliUnitCollector;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -55,11 +56,9 @@ public class UnitLoader {
         this.project = project;
     }
 
-    public Object getReflectionObject(DocsUnitCollector unitCollector) throws ClassNotFoundException {
-
+    public Object getReflectionObject(CliUnitCollector unitCollector) throws ClassNotFoundException {
         Object[] intArgs = new Object[]{unitCollector};
         return createObject(tryGetConstructor(), intArgs);
-
     }
 
     public Set<YangModuleInfo> getYangModuleInfos() {
@@ -131,8 +130,7 @@ public class UnitLoader {
         return listPaths.iterator().next();
     }
 
-    private Object createObject(@Nonnull Constructor constructor, Object[] arguments) {
-
+    private Object createObject(@Nonnull Constructor constructor, @Nonnull Object[] arguments) {
         Object object = null;
         try {
             object = constructor.newInstance(arguments);
@@ -144,7 +142,7 @@ public class UnitLoader {
         return object;
     }
 
-    public void callInit(Object reflectionObject) {
+    public void callInit(@Nonnull Object reflectionObject) {
 
         try {
             Method method = reflectionObject.getClass().getMethod(
@@ -155,6 +153,4 @@ public class UnitLoader {
                     + "yang docs wont be generated for this unit", e);
         }
     }
-
-
 }
