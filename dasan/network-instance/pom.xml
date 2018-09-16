@@ -24,13 +24,13 @@
   <parent>
     <groupId>io.frinx.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>3.1.6.rc9-frinx</version>
+    <version>3.1.6.rc10-frinx-SNAPSHOT</version>
     <relativePath>../../unit-parent</relativePath>
   </parent>
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>dasan-network-instance-unit</artifactId>
-  <version>3.1.6.rc9-frinx</version>
+  <version>3.1.6.rc10-frinx-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <dependencies>
