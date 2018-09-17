@@ -28,13 +28,16 @@ import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
+import io.frinx.cli.registry.spi.MountPointContext;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.PrivilegedModeCredentials;
@@ -105,6 +108,18 @@ public class NosCliInitializerUnit  implements TranslateUnit {
     @Override
     public String toString() {
         return "NOS cli init (FRINX) translate unit";
+    }
+
+    @Override
+    public Set<Pattern> getErrorPatterns(MountPointContext mpCtx) {
+        return Sets.newLinkedHashSet(Arrays.asList(
+                Pattern.compile("(^|\\n)\\s+\\^.*", Pattern.DOTALL),
+                Pattern.compile("% (?i)Invalid input detected at (?-i).*", Pattern.DOTALL),
+                Pattern.compile("% (?i)Incomplete command\\.(?-i).*", Pattern.DOTALL),
+                Pattern.compile("% (?i)Ambiguous command:(?-i).*", Pattern.DOTALL),
+                Pattern.compile("%(?i)Interface is still up(?-i).*", Pattern.DOTALL),
+                Pattern.compile("%(?i)Invalid(?-i).*", Pattern.DOTALL)
+       ));
     }
 
     /**
