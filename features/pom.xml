@@ -268,6 +268,11 @@
     </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
+      <artifactId>ios-xr-hsrp-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
       <artifactId>ios-ospf-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
