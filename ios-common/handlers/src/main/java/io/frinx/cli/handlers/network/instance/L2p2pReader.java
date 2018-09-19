@@ -17,9 +17,9 @@
 package io.frinx.cli.handlers.network.instance;
 
 import io.fd.honeycomb.translate.util.RWUtils;
-import io.frinx.cli.registry.common.TypedReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.CliOperReader;
+import io.frinx.translate.unit.commons.registry.common.TypedReader;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.function.Function;

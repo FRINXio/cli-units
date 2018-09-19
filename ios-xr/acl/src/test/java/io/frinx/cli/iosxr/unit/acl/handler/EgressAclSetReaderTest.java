@@ -23,10 +23,8 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
 import io.frinx.openconfig.openconfig.acl.IIDs;
-
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;

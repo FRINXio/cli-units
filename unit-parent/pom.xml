@@ -22,9 +22,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.opendaylight.mdsal</groupId>
-        <artifactId>binding-parent</artifactId>
-        <version>0.10.1-Carbon-SR1.3_1_6_rc11-frinxodl-SNAPSHOT</version>
+        <groupId>io.frinx.translate.unit.commons</groupId>
+        <artifactId>checkstyle-parent</artifactId>
+        <version>3.1.6.rc11-frinx-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -116,6 +116,12 @@
                 <version>${yangtools.version}</version>
                 <dependencies>
                     <dependency>
+                        <groupId>io.frinx.translate.unit.commons</groupId>
+                        <artifactId>yang-docs-plugin-common</artifactId>
+                        <version>3.1.6.rc11-frinx-SNAPSHOT</version>
+                        <type>jar</type>
+                    </dependency>
+                    <dependency>
                         <groupId>io.frinx.cli</groupId>
                         <artifactId>yang-docs-plugin</artifactId>
                         <version>3.1.6.rc11-frinx-SNAPSHOT</version>
@@ -141,24 +147,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>check-license</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <headerLocation>Regex.txt</headerLocation>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <propertyExpansion>checkstyle.violationSeverity=error</propertyExpansion>
-                </configuration>
             </plugin>
         </plugins>
     </build>

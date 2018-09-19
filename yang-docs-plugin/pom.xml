@@ -14,9 +14,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.opendaylight.mdsal</groupId>
-        <artifactId>binding-parent</artifactId>
-        <version>0.10.1-Carbon-SR1.3_1_6_rc11-frinxodl-SNAPSHOT</version>
+        <groupId>io.frinx.translate.unit.commons</groupId>
+        <artifactId>checkstyle-parent</artifactId>
+        <version>3.1.6.rc11-frinx-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -108,11 +108,6 @@
             <version>1.17.10-Carbon-SR1.3_1_6_rc11-frinxodl-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>io-api</artifactId>
-            <version>3.1.6.rc11-frinx-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
             <version>3.3.3</version>
@@ -124,32 +119,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.unitopo</groupId>
-            <artifactId>translation-registry-api</artifactId>
+            <groupId>io.frinx.translate.unit.commons</groupId>
+            <artifactId>utils</artifactId>
+            <version>3.1.6.rc11-frinx-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.translate.unit.commons</groupId>
+            <artifactId>yang-docs-plugin-common</artifactId>
             <version>3.1.6.rc11-frinx-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>check-license</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <headerLocation>Regex.txt</headerLocation>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <propertyExpansion>checkstyle.violationSeverity=error</propertyExpansion>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

@@ -40,10 +40,8 @@ import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborReader;
 import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-
 import java.util.Set;
 import javax.annotation.Nonnull;
-
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.afi.safi.Config;

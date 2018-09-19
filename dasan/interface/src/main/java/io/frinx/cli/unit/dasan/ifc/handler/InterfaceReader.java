@@ -17,8 +17,8 @@ package io.frinx.cli.unit.dasan.ifc.handler;
 
 import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.registry.common.CompositeListReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.translate.unit.commons.registry.common.CompositeListReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;

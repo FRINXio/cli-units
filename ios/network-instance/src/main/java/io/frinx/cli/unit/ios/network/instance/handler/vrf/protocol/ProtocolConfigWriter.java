@@ -17,11 +17,10 @@
 package io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol;
 
 import com.google.common.collect.Lists;
-
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.BgpProtocolWriter;
 import io.frinx.cli.ospf.handler.OspfProtocolWriter;
-import io.frinx.cli.registry.common.CompositeWriter;
+import io.frinx.translate.unit.commons.registry.common.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 
 public class ProtocolConfigWriter extends CompositeWriter<Config> {

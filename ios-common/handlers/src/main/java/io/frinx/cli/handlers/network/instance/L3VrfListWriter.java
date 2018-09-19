@@ -17,14 +17,12 @@
 package io.frinx.cli.handlers.network.instance;
 
 import io.fd.honeycomb.translate.util.RWUtils;
-import io.frinx.cli.registry.common.TypedWriter;
 import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.registry.common.TypedWriter;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.function.Function;
-
 import javax.annotation.Nullable;
-
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yangtools.yang.binding.DataObject;

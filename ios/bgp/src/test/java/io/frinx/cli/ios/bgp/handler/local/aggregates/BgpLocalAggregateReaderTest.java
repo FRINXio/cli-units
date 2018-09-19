@@ -17,7 +17,6 @@
 package io.frinx.cli.ios.bgp.handler.local.aggregates;
 
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.AggregateKey;
