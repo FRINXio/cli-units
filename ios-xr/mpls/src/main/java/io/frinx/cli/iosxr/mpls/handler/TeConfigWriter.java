@@ -58,8 +58,11 @@ public class TeConfigWriter implements CliWriter<Config> {
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore, @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        // update will only be called when mpls is set to true, to be set to false, so call delete only
-        deleteCurrentAttributes(id, dataBefore, writeContext);
+        if (dataAfter.isEnabled()) {
+            writeCurrentAttributes(id, dataAfter, writeContext);
+        } else {
+            deleteCurrentAttributes(id, dataBefore, writeContext);
+        }
     }
 
     @Override
