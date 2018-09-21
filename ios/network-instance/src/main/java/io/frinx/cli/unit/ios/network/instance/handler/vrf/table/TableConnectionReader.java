@@ -21,7 +21,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.table.BgpTableConnectionReader;
 import io.frinx.cli.ospf.handler.table.OspfTableConnectionReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.translate.unit.commons.registry.common.CompositeListReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;

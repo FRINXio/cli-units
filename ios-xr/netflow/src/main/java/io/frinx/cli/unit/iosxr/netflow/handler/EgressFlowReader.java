@@ -24,7 +24,7 @@ import io.frinx.cli.unit.iosxr.netflow.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.iosxr.netflow.handler.util.NetflowUtils;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.registry.common.TypedListReader;
+import io.frinx.translate.unit.commons.handler.spi.TypedListReader;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;

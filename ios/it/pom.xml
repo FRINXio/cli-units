@@ -66,7 +66,7 @@
             <version>${cli.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>utils</artifactId>
             <version>${cli.version}</version>
         </dependency>

@@ -24,7 +24,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.registry.common.CompositeListReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;

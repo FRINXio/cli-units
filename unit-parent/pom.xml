@@ -42,6 +42,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.frinx.translate.unit.commons</groupId>
+            <artifactId>utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.translate.unit.commons</groupId>
+            <artifactId>handlers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>utils-unit</artifactId>
             <version>${cli.version}</version>

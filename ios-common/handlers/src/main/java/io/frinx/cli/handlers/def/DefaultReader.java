@@ -20,7 +20,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
-import io.frinx.translate.unit.commons.registry.common.CompositeListReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;

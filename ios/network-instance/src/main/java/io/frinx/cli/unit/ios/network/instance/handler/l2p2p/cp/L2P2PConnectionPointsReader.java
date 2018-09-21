@@ -24,7 +24,7 @@ import io.frinx.cli.handlers.network.instance.L2p2pReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.registry.common.CompositeReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;

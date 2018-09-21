@@ -34,7 +34,7 @@ import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.ConnectionPointsReade
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.ConnectionPointsWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import io.frinx.translate.unit.commons.registry.common.CompositeWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;

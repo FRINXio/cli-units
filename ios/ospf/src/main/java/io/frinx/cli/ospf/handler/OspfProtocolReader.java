@@ -23,7 +23,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
-import io.frinx.translate.unit.commons.registry.common.CompositeListReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

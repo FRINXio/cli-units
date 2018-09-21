@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.local.aggregates.BgpLocalAggregateConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.translate.unit.commons.registry.common.CompositeReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.AggregateBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config;

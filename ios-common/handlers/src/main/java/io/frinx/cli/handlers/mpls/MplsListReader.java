@@ -19,7 +19,7 @@ package io.frinx.cli.handlers.mpls;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliOperListReader;
-import io.frinx.translate.unit.commons.registry.common.TypedListReader;
+import io.frinx.translate.unit.commons.handler.spi.TypedListReader;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.function.Function;

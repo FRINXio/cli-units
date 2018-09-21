@@ -24,7 +24,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsReader;
 import io.frinx.cli.unit.ios.network.instance.handler.l2vsi.L2VSIReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.registry.common.CompositeReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

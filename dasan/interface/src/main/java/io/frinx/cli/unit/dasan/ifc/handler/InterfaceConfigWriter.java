@@ -18,7 +18,7 @@ package io.frinx.cli.unit.dasan.ifc.handler;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
-import io.frinx.translate.unit.commons.registry.common.CompositeWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 
 public final class InterfaceConfigWriter extends CompositeWriter<Config> {

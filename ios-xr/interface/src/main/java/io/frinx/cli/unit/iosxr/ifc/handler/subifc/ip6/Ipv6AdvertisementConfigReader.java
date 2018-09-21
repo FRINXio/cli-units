@@ -24,7 +24,7 @@ import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.registry.common.TypedReader;
+import io.frinx.translate.unit.commons.handler.spi.TypedReader;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;

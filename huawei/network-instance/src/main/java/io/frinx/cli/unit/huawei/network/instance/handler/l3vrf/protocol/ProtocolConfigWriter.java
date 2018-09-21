@@ -18,7 +18,7 @@ package io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.protocol;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.unit.huawei.bgp.handler.BgpProtocolWriter;
-import io.frinx.translate.unit.commons.registry.common.CompositeWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 
 public class ProtocolConfigWriter extends CompositeWriter<Config> {

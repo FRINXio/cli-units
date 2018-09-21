@@ -37,7 +37,7 @@
 
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
-            <artifactId>translation-registry-common</artifactId>
+            <artifactId>handlers</artifactId>
             <version>${project.version}</version>
         </dependency>
 

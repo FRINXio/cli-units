@@ -20,7 +20,7 @@ import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.L2P2PConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.translate.unit.commons.registry.common.CompositeReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceBuilder;

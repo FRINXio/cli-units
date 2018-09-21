@@ -42,6 +42,8 @@
         <bundle>mvn:org.jgrapht/jgrapht-ext/{{VERSION}}</bundle>
         <bundle>wrap:mvn:io.fd.honeycomb/translate-utils/${hc.version}</bundle>
         <bundle>wrap:mvn:io.fd.honeycomb/translate-impl/${hc.version}</bundle>
+        <bundle>mvn:io.frinx.translate.unit.commons/utils/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.translate.unit.commons/handlers/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/common-handlers/{{VERSION}}</bundle>
     </feature>
 

@@ -23,7 +23,7 @@ import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader;
 import io.frinx.cli.unit.ios.network.instance.handler.l2vsi.L2VSIReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.VrfReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.translate.unit.commons.registry.common.CompositeListReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;

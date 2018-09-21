@@ -23,7 +23,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.registry.common.CompositeReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -23,7 +23,7 @@ import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.huawei.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.translate.unit.commons.registry.common.CompositeListReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;

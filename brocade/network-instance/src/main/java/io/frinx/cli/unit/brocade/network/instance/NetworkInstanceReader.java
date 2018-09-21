@@ -20,7 +20,7 @@ import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.L2P2PReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.translate.unit.commons.registry.common.CompositeListReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
