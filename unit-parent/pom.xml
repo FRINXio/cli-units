@@ -19,9 +19,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>bundle-parent</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
+        <groupId>io.frinx.translate.unit.commons</groupId>
+        <artifactId>checkstyle-parent</artifactId>
+        <version>4.1.0.rc1-frinx-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
@@ -95,6 +95,16 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>io.frinx.translate.unit.commons</groupId>
+            <artifactId>utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.translate.unit.commons</groupId>
+            <artifactId>handlers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>utils-unit</artifactId>
@@ -179,24 +189,7 @@
 
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>check-license</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <headerLocation>Regex.txt</headerLocation>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <propertyExpansion>checkstyle.violationSeverity=error</propertyExpansion>
-                </configuration>
-            </plugin>
+        <!-- TODO call YANG-docs-plugin -->
         </plugins>
     </build>
 

@@ -30,8 +30,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-common</artifactId>
+            <groupId>io.frinx.translate.unit.commons</groupId>
+            <artifactId>handlers</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Openconfig models -->

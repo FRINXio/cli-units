@@ -21,9 +21,8 @@ import com.google.common.collect.ImmutableMap;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.registry.common.TypedListReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
-
+import io.frinx.translate.unit.commons.handler.spi.TypedListReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

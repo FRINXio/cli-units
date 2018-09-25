@@ -19,7 +19,7 @@ package io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol;
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.local.aggregates.BgpLocalAggregateConfigWriter;
-import io.frinx.cli.registry.common.CompositeWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config;
 
 public class ProtocolLocalAggregateConfigWriter extends CompositeWriter<Config> {

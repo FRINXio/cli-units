@@ -20,7 +20,7 @@ import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.table.BgpTableConnectionWriter;
 import io.frinx.cli.ospf.handler.table.OspfTableConnectionWriter;
-import io.frinx.cli.registry.common.CompositeWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.table.connections.table.connection.Config;
 
 public class TableConnectionConfigWriter extends CompositeWriter<Config> {

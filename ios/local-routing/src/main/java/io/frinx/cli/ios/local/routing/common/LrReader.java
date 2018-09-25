@@ -17,10 +17,10 @@
 package io.frinx.cli.ios.local.routing.common;
 
 import io.frinx.cli.handlers.network.instance.L3VrfReader;
-import io.frinx.cli.registry.common.TypedReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.translate.unit.commons.handler.spi.TypedReader;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.STATIC;
 import org.opendaylight.yangtools.concepts.Builder;

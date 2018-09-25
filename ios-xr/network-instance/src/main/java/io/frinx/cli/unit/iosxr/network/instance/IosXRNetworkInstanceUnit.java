@@ -29,7 +29,6 @@ import io.frinx.cli.handlers.def.DefaultConfigWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.common.CompositeWriter;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceReader;
@@ -46,6 +45,7 @@ import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolSta
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;

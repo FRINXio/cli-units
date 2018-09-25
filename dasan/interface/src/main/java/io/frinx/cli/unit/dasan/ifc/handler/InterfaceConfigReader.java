@@ -18,8 +18,8 @@ package io.frinx.cli.unit.dasan.ifc.handler;
 
 import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.registry.common.CompositeReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;

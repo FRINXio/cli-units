@@ -36,9 +36,9 @@
         </dependency>
 
         <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-common</artifactId>
-            <version>${cli.version}</version>
+            <groupId>io.frinx.translate.unit.commons</groupId>
+            <artifactId>handlers</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Openconfig models -->
