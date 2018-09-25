@@ -70,7 +70,8 @@ public class TeConfigWriter implements CliWriter<Config> {
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         final TeInterfaceAttributes ifaces = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Mpls.class))
                 .get().getTeInterfaceAttributes();
-        Preconditions.checkArgument(ifaces == null,
+        // sometimes the interface list remains empty in the data, this shouldn't happen
+        Preconditions.checkArgument(ifaces == null || ifaces.getInterface() == null || ifaces.getInterface().isEmpty(),
                 "Invalid request, interfaces cannot be present when mpls is disabled.");
         blockingDeleteAndRead(cli, instanceIdentifier, NO_MPLS_COMMAND);
     }
