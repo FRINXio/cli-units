@@ -187,7 +187,6 @@ public class EthernetConfigWriterTest {
     }
 
     @Test
-    @SuppressWarnings("EmptyBlock")
     public void updateLacpMode() throws Exception {
         Config newData = new ConfigBuilder()
                 .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder()
@@ -216,7 +215,8 @@ public class EthernetConfigWriterTest {
         try {
             this.writer.updateCurrentAttributes(iid, data, newDataWithoutBundleId, context);
             Assert.fail("Updating LACP mode without configured bundle-id is not allowed");
-        } catch (NullPointerException ex) {
+        } catch (IllegalArgumentException expected) {
+            // update expected to fail with IAE
         }
 
         // no aggregate augmentation defined, we shouldn't update mode
@@ -229,7 +229,8 @@ public class EthernetConfigWriterTest {
         try {
             this.writer.updateCurrentAttributes(iid, data, newDataWithoutAggregateAug, context);
             Assert.fail("Updating LACP mode without configured bundle-id is not allowed");
-        } catch (NullPointerException ex) {
+        } catch (IllegalArgumentException expected) {
+            // update expected to fail with IAE
         }
     }
 
