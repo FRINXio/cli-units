@@ -41,6 +41,7 @@
     <module>unit-parent</module>
     <module>nexus</module>
     <module>dasan</module>
+    <module>yang-docs-plugin</module>
   </modules>
 
   <build>
