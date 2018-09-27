@@ -140,14 +140,13 @@ public class IosAll {
 
     private static final KeepaliveCli.ReconnectListener RECONNECT_LISTENER = new KeepaliveCli.ReconnectListener() {
         @Override
-        public void onDisconnected(@Nonnull CompletionStage<? extends Cli> init, Throwable throwable,
-                                   int reconnectCount) {
-            throw new RuntimeException("Disconnected !");
+        public void onDisconnected(@Nonnull CompletionStage<? extends Cli> init, Throwable throwable) {
+            throw new RuntimeException("Disconnected: " + throwable);
         }
 
         @Override
-        public void onReconnecting(Throwable throwable, int reconnectCounter) {
-            throw new RuntimeException("Disconnected !");
+        public void onReconnecting(Throwable throwable, long reconnectCounter) {
+            throw new RuntimeException("Reconnecting " + reconnectCounter + " : " + throwable);
         }
     };
 
@@ -304,6 +303,7 @@ public class IosAll {
                     .setKeepaliveExecutor(EXECUTOR)
                     .setCliInitExecutor(ForkJoinPool.commonPool())
                     .setReconnectListener(RECONNECT_LISTENER)
+                    .setPromptResolver(PromptResolutionStrategy.ENTER_AND_READ)
                     .setErrorPatterns(Collections.emptySet());
 
             Cli io = ioConfigurationBuilder.getIO()
