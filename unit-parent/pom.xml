@@ -24,18 +24,18 @@
     <parent>
         <groupId>io.frinx.translate.unit.commons</groupId>
         <artifactId>checkstyle-parent</artifactId>
-        <version>3.1.6.rc13-frinx-SNAPSHOT</version>
+        <version>3.1.6.rc13-frinx</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>3.1.6.rc13-frinx-SNAPSHOT</version>
+    <version>3.1.6.rc13-frinx</version>
     <packaging>pom</packaging>
 
     <properties>
-        <cli.version>3.1.6.rc13-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.6.rc13-frinx-SNAPSHOT</openconfig.version>
+        <cli.version>3.1.6.rc13-frinx</cli.version>
+        <openconfig.version>3.1.6.rc13-frinx</openconfig.version>
         <hc.version>1.17.10-Carbon-SR1.3_1_6_rc13-frinxodl</hc.version>
         <controller.version>1.5.1-Carbon-SR1.3_1_6_rc13-frinxodl</controller.version>
     </properties>
@@ -128,13 +128,13 @@
                     <dependency>
                         <groupId>io.frinx.translate.unit.commons</groupId>
                         <artifactId>yang-docs-plugin-common</artifactId>
-                        <version>3.1.6.rc13-frinx-SNAPSHOT</version>
+                        <version>3.1.6.rc13-frinx</version>
                         <type>jar</type>
                     </dependency>
                     <dependency>
                         <groupId>io.frinx.cli</groupId>
                         <artifactId>yang-docs-plugin</artifactId>
-                        <version>3.1.6.rc13-frinx-SNAPSHOT</version>
+                        <version>3.1.6.rc13-frinx</version>
                         <type>jar</type>
                     </dependency>
                 </dependencies>
