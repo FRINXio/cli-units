@@ -53,7 +53,6 @@ import io.frinx.cli.ios.bgp.handler.peergroup.PeerGroupRouteReflectorConfigReade
 import io.frinx.cli.ios.bgp.handler.peergroup.PeerGroupTransportConfigReader;
 import io.frinx.cli.ios.bgp.handler.peergroup.PeerGroupWriter;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.MountPointContext;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
@@ -117,7 +116,7 @@ public class BgpUnit implements TranslateUnit {
     }
 
     @Override
-    public Set<Pattern> getErrorPatterns(MountPointContext mpCtx) {
+    public Set<Pattern> getErrorPatterns() {
         return Sets.newLinkedHashSet(Arrays.asList(
                 Pattern.compile("% Configure the peer-group .+ first", Pattern.DOTALL),
                 Pattern.compile("(^|\\n)% (?i)BGP(?-i).*", Pattern.DOTALL)
