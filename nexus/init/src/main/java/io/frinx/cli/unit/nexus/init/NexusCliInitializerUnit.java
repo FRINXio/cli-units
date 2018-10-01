@@ -22,7 +22,6 @@ import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.MountPointContext;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import io.frinx.cli.unit.ios.init.IosCliInitializerUnit;
@@ -103,7 +102,7 @@ public class NexusCliInitializerUnit  implements TranslateUnit {
     }
 
     @Override
-    public Set<Pattern> getErrorPatterns(MountPointContext mpCtx) {
+    public Set<Pattern> getErrorPatterns() {
         return Sets.newLinkedHashSet(Arrays.asList(
                 Pattern.compile("^\\s+\\^.*", Pattern.DOTALL),
                 Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL),
