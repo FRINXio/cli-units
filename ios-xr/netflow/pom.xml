@@ -14,12 +14,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.6.frinx</version>
+        <version>3.1.7.rc1-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>ios-xr-netflow-unit</artifactId>
-    <version>3.1.6.frinx</version>
+    <version>3.1.7.rc1-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
