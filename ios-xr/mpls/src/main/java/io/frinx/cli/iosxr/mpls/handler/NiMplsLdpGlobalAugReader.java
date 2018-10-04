@@ -21,6 +21,9 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.mpls.MplsReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAugBuilder;
@@ -35,6 +38,7 @@ public class NiMplsLdpGlobalAugReader implements MplsReader.MplsConfigReader<NiM
     private Cli cli;
 
     private static final String SH_LDP_INT = "show running-config mpls ldp";
+    private static final Pattern MPLS_LINE = Pattern.compile("(.*)mpls ldp(.*)");
 
     public NiMplsLdpGlobalAugReader(Cli cli) {
         this.cli = cli;
@@ -50,7 +54,11 @@ public class NiMplsLdpGlobalAugReader implements MplsReader.MplsConfigReader<NiM
 
     @VisibleForTesting
     public static void parseEnabled(String output, NiMplsLdpGlobalAugBuilder configBuilder) {
-        if (!output.isEmpty()) {
+        boolean isMplsLdp = ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .map(MPLS_LINE::matcher)
+                .anyMatch(Matcher::matches);
+        if (isMplsLdp) {
             configBuilder.setEnabled(true);
         }
     }

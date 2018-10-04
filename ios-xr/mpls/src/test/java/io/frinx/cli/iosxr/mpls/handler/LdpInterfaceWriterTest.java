@@ -16,6 +16,7 @@
 
 package io.frinx.cli.iosxr.mpls.handler;
 
+import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -29,6 +30,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.Ldp;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.LdpBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.ldp.GlobalBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top.InterfaceAttributes;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top._interface.attributes.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top._interface.attributes.interfaces.Interface;
@@ -57,9 +63,12 @@ public class LdpInterfaceWriterTest {
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
-    private InstanceIdentifier iid = KeyedInstanceIdentifier.create(InterfaceAttributes.class)
+    private InstanceIdentifier iid = KeyedInstanceIdentifier.create(Ldp.class)
+            .child(InterfaceAttributes.class)
             .child(Interfaces.class)
-            .child(Interface.class, new InterfaceKey(new InterfaceId("Bundle-Ether 511")));
+            .child(Interface.class, new InterfaceKey(new InterfaceId("Bundle-Ether 511")))
+            .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp
+                    ._interface.attributes.top._interface.attributes.interfaces._interface.Config.class);
 
     // test data
     private Config data;
@@ -76,6 +85,13 @@ public class LdpInterfaceWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
+        Ldp ldp = new LdpBuilder().setGlobal(new GlobalBuilder().setConfig(new org.opendaylight.yang.gen.v1.http
+                .frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp.global.ConfigBuilder()
+                .addAugmentation(NiMplsLdpGlobalAug.class, new NiMplsLdpGlobalAugBuilder().setEnabled(true)
+                        .build()).build()).build()).build();
+
+        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(ldp));
+
         this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli)

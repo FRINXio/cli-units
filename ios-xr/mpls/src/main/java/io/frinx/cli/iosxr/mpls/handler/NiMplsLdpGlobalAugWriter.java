@@ -16,12 +16,16 @@
 
 package io.frinx.cli.iosxr.mpls.handler;
 
+import com.google.common.base.Preconditions;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.Ldp;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top.InterfaceAttributes;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NiMplsLdpGlobalAugWriter implements CliWriter<NiMplsLdpGlobalAug> {
@@ -55,6 +59,13 @@ public class NiMplsLdpGlobalAugWriter implements CliWriter<NiMplsLdpGlobalAug> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsLdpGlobalAug> id, @Nonnull
             NiMplsLdpGlobalAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
+        final InterfaceAttributes ifaces = writeContext.readAfter(RWUtils.cutId(id,Ldp.class))
+                .get().getInterfaceAttributes();
+        Preconditions.checkArgument(ifaces == null
+                || ifaces.getInterfaces() == null
+                || ifaces.getInterfaces().getInterface() == null
+                || ifaces.getInterfaces().getInterface().size() == 0,
+                "Invalid request, interfaces cannot be present when mpls-ldp is disabled.");
         blockingDeleteAndRead(cli, id,
                     "no mpls ldp");
     }
