@@ -16,11 +16,16 @@
 
 package io.frinx.cli.iosxr.mpls.handler;
 
+import com.google.common.base.Preconditions;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.Ldp;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.ldp.Global;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top._interface.attributes.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top._interface.attributes.interfaces._interface.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -36,6 +41,20 @@ public class LdpInterfaceConfigWriter implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
+        final Ldp ldp = writeContext.readAfter(RWUtils.cutId(id,Ldp.class))
+                .get();
+        Preconditions.checkArgument(ldp != null,
+                "Invalid value, mpls-ldp needs to be enabled.");
+        Global global = ldp.getGlobal();
+        Preconditions.checkArgument(global != null && global.getClass() != null,
+                "Invalid value, mpls-ldp needs to be enabled.");
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp.global.Config
+            config = global.getConfig();
+        Preconditions.checkArgument(config != null && config.getAugmentation(NiMplsLdpGlobalAug.class) != null,
+                "Invalid value, mpls-ldp needs to be enabled.");
+        Boolean enabled = config.getAugmentation(NiMplsLdpGlobalAug.class).isEnabled();
+        Preconditions.checkArgument(enabled != null && enabled,
+                "Invalid value, mpls-ldp needs to be enabled.");
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
         blockingWriteAndRead(cli, id, data,
             "mpls ldp",
