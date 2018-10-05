@@ -119,7 +119,8 @@ public class BgpUnit implements TranslateUnit {
     public Set<Pattern> getErrorPatterns() {
         return Sets.newLinkedHashSet(Arrays.asList(
                 Pattern.compile("% Configure the peer-group .+ first", Pattern.DOTALL),
-                Pattern.compile("(^|\\n)% (?i)BGP(?-i).*", Pattern.DOTALL)
+                Pattern.compile("(^|\\n)% (?i)BGP(?-i).*", Pattern.DOTALL),
+                Pattern.compile("(^|\\n)% Topology global(?-i).*", Pattern.DOTALL)
         ));
     }
 
