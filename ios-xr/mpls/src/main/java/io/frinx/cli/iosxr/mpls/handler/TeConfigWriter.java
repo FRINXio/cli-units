@@ -20,8 +20,8 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.handlers.mpls.MplsWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeEnabledCiscoAug;
@@ -30,7 +30,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev17082
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributes;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TeConfigWriter implements CliWriter<Config> {
+public class TeConfigWriter implements MplsWriter<Config> {
 
     // this is here because of checkstyle line length complaint when using fully qualified name
     public static final InstanceIdentifier<Config> TE_CONFIG_IID = IIDs.NE_NE_MP_TEGLOBALATTRIBUTES
@@ -46,7 +46,7 @@ public class TeConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (config.isEnabled()) {
@@ -55,19 +55,20 @@ public class TeConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+    public void updateCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore, @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (dataAfter.isEnabled()) {
-            writeCurrentAttributes(id, dataAfter, writeContext);
+            writeCurrentAttributesForType(id, dataAfter, writeContext);
         } else {
-            deleteCurrentAttributes(id, dataBefore, writeContext);
+            deleteCurrentAttributesForType(id, dataBefore, writeContext);
         }
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                               @Nonnull Config config, @Nonnull WriteContext writeContext)
+            throws WriteFailedException {
         final TeInterfaceAttributes ifaces = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Mpls.class))
                 .get().getTeInterfaceAttributes();
         // sometimes the interface list remains empty in the data, this shouldn't happen

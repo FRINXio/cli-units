@@ -32,11 +32,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.MplsRsvpSubscriptionConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.NiMplsRsvpIfSubscripAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.NiMplsRsvpIfSubscripAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.SignalingProtocols;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.RsvpTe;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te.InterfaceAttributes;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class NiMplsRsvpIfSubscripAugWriterTest {
 
@@ -70,7 +71,9 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
-    private InstanceIdentifier iid = KeyedInstanceIdentifier.create(InterfaceAttributes.class)
+    private InstanceIdentifier iid = LdpInterfaceWriterTest.BASE_IID
+            .child(SignalingProtocols.class).child(RsvpTe.class)
+            .child(InterfaceAttributes.class)
             .child(Interface.class, new InterfaceKey(new InterfaceId("Loopback0")));
 
     // test data
@@ -94,7 +97,7 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        this.writer.writeCurrentAttributes(iid, data, context);
+        this.writer.writeCurrentAttributesForType(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -109,7 +112,7 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
                 .setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(1005L))
                 .build();
 
-        this.writer.updateCurrentAttributes(iid, data, newData, context);
+        this.writer.updateCurrentAttributesForType(iid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -124,7 +127,7 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
                 .setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth("default"))
                 .build();
 
-        this.writer.updateCurrentAttributes(iid, data, newData, context);
+        this.writer.updateCurrentAttributesForType(iid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -134,7 +137,7 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
-        this.writer.deleteCurrentAttributes(iid, data, context);
+        this.writer.deleteCurrentAttributesForType(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());

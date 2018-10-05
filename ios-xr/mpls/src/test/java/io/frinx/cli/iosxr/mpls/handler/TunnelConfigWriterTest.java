@@ -30,6 +30,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.Lsps;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.lsps.ConstrainedPath;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.Tunnels;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.Tunnel;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.TunnelKey;
@@ -38,7 +40,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev17082
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.rev170824.LSPMETRICABSOLUTE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.rev170824.LSPMETRICRELATIVE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class TunnelConfigWriterTest {
 
@@ -75,7 +76,8 @@ public class TunnelConfigWriterTest {
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
-    private InstanceIdentifier iid = KeyedInstanceIdentifier.create(Tunnels.class)
+    private InstanceIdentifier iid = LdpInterfaceWriterTest.BASE_IID
+            .child(Lsps.class).child(ConstrainedPath.class).child(Tunnels.class)
             .child(Tunnel.class, new TunnelKey("55"));
 
     // test data
@@ -101,7 +103,7 @@ public class TunnelConfigWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        this.writer.writeCurrentAttributes(iid, data, context);
+        this.writer.writeCurrentAttributesForType(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -115,7 +117,7 @@ public class TunnelConfigWriterTest {
         Config newData = new ConfigBuilder().setShortcutEligible(true)
                 .build();
 
-        this.writer.updateCurrentAttributes(iid, data, newData, context);
+        this.writer.updateCurrentAttributesForType(iid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -129,7 +131,7 @@ public class TunnelConfigWriterTest {
         Config noMetricData = new ConfigBuilder().setShortcutEligible(true)
                 .build();
 
-        this.writer.updateCurrentAttributes(iid, noMetricData, noMetricData, context);
+        this.writer.updateCurrentAttributesForType(iid, noMetricData, noMetricData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -142,10 +144,10 @@ public class TunnelConfigWriterTest {
         Config noMetricData = new ConfigBuilder().setShortcutEligible(true)
                 .build();
 
-        this.writer.writeCurrentAttributes(iid, data, context);
-        this.writer.updateCurrentAttributes(iid, data, noMetricData, context);
-        this.writer.deleteCurrentAttributes(iid, data, context);
-        this.writer.writeCurrentAttributes(iid, data, context);
+        this.writer.writeCurrentAttributesForType(iid, data, context);
+        this.writer.updateCurrentAttributesForType(iid, data, noMetricData, context);
+        this.writer.deleteCurrentAttributesForType(iid, data, context);
+        this.writer.writeCurrentAttributesForType(iid, data, context);
 
         Mockito.verify(cli, Mockito.atLeastOnce())
                 .executeAndRead(response.capture());
@@ -159,7 +161,7 @@ public class TunnelConfigWriterTest {
         Config newData = new ConfigBuilder().setShortcutEligible(false)
                 .build();
 
-        this.writer.updateCurrentAttributes(iid, data, newData, context);
+        this.writer.updateCurrentAttributesForType(iid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -169,7 +171,7 @@ public class TunnelConfigWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
-        this.writer.deleteCurrentAttributes(iid, data, context);
+        this.writer.deleteCurrentAttributesForType(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());

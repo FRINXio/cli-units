@@ -21,6 +21,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,10 +41,19 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top._interface.attributes.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top._interface.attributes.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top._interface.attributes.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.Mpls;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.SignalingProtocols;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstances;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class LdpInterfaceWriterTest {
+
+    static final InstanceIdentifier BASE_IID = KeyedInstanceIdentifier.create(NetworkInstances.class)
+            .child(NetworkInstance.class, new NetworkInstanceKey(NetworInstance.DEFAULT_NETWORK))
+            .child(Mpls.class);
 
     private static final String WRITE_INTERFACE_INPUT = "mpls ldp\n"
             + "interface Bundle-Ether 511\n"
@@ -63,7 +73,7 @@ public class LdpInterfaceWriterTest {
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
-    private InstanceIdentifier iid = KeyedInstanceIdentifier.create(Ldp.class)
+    private InstanceIdentifier iid = BASE_IID.child(SignalingProtocols.class).child(Ldp.class)
             .child(InterfaceAttributes.class)
             .child(Interfaces.class)
             .child(Interface.class, new InterfaceKey(new InterfaceId("Bundle-Ether 511")))
@@ -92,7 +102,7 @@ public class LdpInterfaceWriterTest {
 
         Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(ldp));
 
-        this.writer.writeCurrentAttributes(iid, data, context);
+        this.writer.writeCurrentAttributesForType(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -102,7 +112,7 @@ public class LdpInterfaceWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
-        this.writer.deleteCurrentAttributes(iid, data, context);
+        this.writer.deleteCurrentAttributesForType(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
