@@ -20,15 +20,15 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.handlers.mpls.MplsWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.Tunnel;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.rev170824.LSPMETRICABSOLUTE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TunnelConfigWriter implements CliWriter<Config> {
+public class TunnelConfigWriter implements MplsWriter<Config> {
 
     private static final String INPUT_T = "{% if ($delete) %}no {% endif %}interface tunnel-te {$name}\n"
             + "{% if (!$delete) %}"
@@ -44,7 +44,7 @@ public class TunnelConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
             WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class)
                 .getName();
@@ -77,7 +77,7 @@ public class TunnelConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id,
+    public void updateCurrentAttributesForType(@Nonnull final InstanceIdentifier<Config> id,
                                         @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
@@ -91,12 +91,12 @@ public class TunnelConfigWriter implements CliWriter<Config> {
                     fT(INPUT_T, "name", name, "autoroute", dataAfter.isShortcutEligible() ? true : null,
                             "metric", "nondefined"));
         } else {
-            this.writeCurrentAttributes(id, dataAfter, writeContext);
+            this.writeCurrentAttributesForType(id, dataAfter, writeContext);
         }
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
             WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class)
                 .getName();

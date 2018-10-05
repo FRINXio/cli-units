@@ -18,14 +18,14 @@ package io.frinx.cli.iosxr.mpls.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.handlers.mpls.MplsWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes._interface.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
+public class RsvpInterfaceConfigWriter implements MplsWriter<Config> {
 
     private Cli cli;
 
@@ -34,7 +34,7 @@ public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
             WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class)
                 .getInterfaceId()
@@ -46,7 +46,7 @@ public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id,
+    public void updateCurrentAttributesForType(@Nonnull final InstanceIdentifier<Config> id,
                                         @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) {
@@ -54,7 +54,7 @@ public class RsvpInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
             WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class)
                 .getInterfaceId()

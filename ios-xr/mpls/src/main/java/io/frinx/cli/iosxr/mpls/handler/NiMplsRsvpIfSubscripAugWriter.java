@@ -18,8 +18,8 @@ package io.frinx.cli.iosxr.mpls.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.handlers.mpls.MplsWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import javax.annotation.Nonnull;
@@ -28,7 +28,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extensio
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubscripAug> {
+public class NiMplsRsvpIfSubscripAugWriter implements MplsWriter<NiMplsRsvpIfSubscripAug> {
 
     private static final String BW_FORMAT = "0.###";
 
@@ -39,7 +39,7 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull
+    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull
             NiMplsRsvpIfSubscripAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class)
                 .getInterfaceId()
@@ -52,7 +52,7 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull
+    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull
             NiMplsRsvpIfSubscripAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class)
                 .getInterfaceId()
@@ -65,13 +65,13 @@ public class NiMplsRsvpIfSubscripAugWriter implements CliWriter<NiMplsRsvpIfSubs
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull
+    public void updateCurrentAttributesForType(@Nonnull InstanceIdentifier<NiMplsRsvpIfSubscripAug> id, @Nonnull
             NiMplsRsvpIfSubscripAug dataBefore, @Nonnull NiMplsRsvpIfSubscripAug dataAfter, @Nonnull WriteContext
             writeContext) throws WriteFailedException {
         if (dataAfter.getBandwidth() == null) {
-            deleteCurrentAttributes(id, dataBefore, writeContext);
+            deleteCurrentAttributesForType(id, dataBefore, writeContext);
         } else {
-            writeCurrentAttributes(id, dataAfter, writeContext);
+            writeCurrentAttributesForType(id, dataAfter, writeContext);
         }
     }
 

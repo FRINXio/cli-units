@@ -35,8 +35,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.LdpBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.ldp.Global;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top.InterfaceAttributesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.SignalingProtocols;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class NiMplsLdpGlobalAugWriterTest {
 
@@ -55,7 +55,9 @@ public class NiMplsLdpGlobalAugWriterTest {
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
-    private InstanceIdentifier iid = KeyedInstanceIdentifier.create(Ldp.class)
+    private InstanceIdentifier iid = LdpInterfaceWriterTest.BASE_IID
+            .child(SignalingProtocols.class)
+            .child(Ldp.class)
             .child(Global.class);
 
     // test data
@@ -78,7 +80,7 @@ public class NiMplsLdpGlobalAugWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        this.writer.writeCurrentAttributes(iid, data, context);
+        this.writer.writeCurrentAttributesForType(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -92,7 +94,7 @@ public class NiMplsLdpGlobalAugWriterTest {
 
         Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(ldp));
 
-        this.writer.deleteCurrentAttributes(iid, data, context);
+        this.writer.deleteCurrentAttributesForType(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
