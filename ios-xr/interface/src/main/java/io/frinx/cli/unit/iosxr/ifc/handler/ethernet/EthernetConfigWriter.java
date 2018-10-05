@@ -81,7 +81,7 @@ public class EthernetConfigWriter implements CliWriter<Config> {
 
         if (lacpAug != null && lacpAug.getLacpMode() != null) {
             Preconditions.checkArgument(bundleId != null,
-                    "Missing aggregate-id, cannot configure LACP mode on non LAG enabled interface %s",  ifcName);
+                    "Missing aggregate-id, cannot configure LACP mode on non LAG enabled interface %s", ifcName);
         }
 
         blockingWriteAndRead(cli, id, dataAfter,
