@@ -38,18 +38,19 @@
         <openconfig.version>3.1.7.rc2-frinx-SNAPSHOT</openconfig.version>
         <hc.version>1.17.10-Carbon-SR1.3_1_7_rc2-frinxodl-SNAPSHOT</hc.version>
         <controller.version>1.5.1-Carbon-SR1.3_1_7_rc2-frinxodl-SNAPSHOT</controller.version>
+        <translate.unit.commons.version>3.1.7.rc2-frinx-SNAPSHOT</translate.unit.commons.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>utils</artifactId>
-            <version>${project.version}</version>
+            <version>${translate.unit.commons.version}</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>handlers</artifactId>
-            <version>${project.version}</version>
+            <version>${translate.unit.commons.version}</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
@@ -128,7 +129,7 @@
                     <dependency>
                         <groupId>io.frinx.translate.unit.commons</groupId>
                         <artifactId>yang-docs-plugin-common</artifactId>
-                        <version>3.1.7.rc2-frinx-SNAPSHOT</version>
+                        <version>${translate.unit.commons.version}</version>
                         <type>jar</type>
                     </dependency>
                     <dependency>

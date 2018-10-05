@@ -68,7 +68,7 @@
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>utils</artifactId>
-            <version>${cli.version}</version>
+            <version>${translate.unit.commons.version}</version>
         </dependency>
 
         <!-- Honeycomb -->
