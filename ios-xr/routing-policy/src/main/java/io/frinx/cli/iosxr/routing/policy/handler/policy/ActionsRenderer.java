@@ -87,6 +87,9 @@ final class ActionsRenderer {
             + "{.endif}"
             + "{.if ($config.config.policy_result.name|lc =~ /accept/)}"
             + ActionsParser.DONE
+            + "{.endif}"
+            + "{.if ($config.config.policy_result.name|lc =~ /pass/)}"
+            + ActionsParser.PASS
             + "{.endif}";
 
     private static final String SET_MED_TEMPLATE = "{.if ($config.config.set_med.uint32 == "
