@@ -16,7 +16,6 @@
 
 package io.frinx.binding.ids.cli;
 
-
 import io.frinx.binding.ids.CliUnitCollector;
 import io.frinx.binding.ids.CodecTranslator;
 import io.frinx.binding.ids.TranslationUnitMetadata;
@@ -27,15 +26,12 @@ import io.frinx.cli.registry.spi.TranslateUnit.Context;
 import io.frinx.translate.unit.commons.utils.CapturingReaderRegistryBuilder;
 import io.frinx.translate.unit.commons.utils.CapturingWriterRegistryBuilder;
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.project.MavenProject;
 import org.opendaylight.controller.md.sal.binding.impl.BindingToNormalizedNodeCodec;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
@@ -46,21 +42,22 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang2sources.spi.BasicCodeGenerator;
 import org.opendaylight.yangtools.yang2sources.spi.BuildContextAware;
 import org.opendaylight.yangtools.yang2sources.spi.MavenProjectAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
  * This is maven-plugin endpoint class which manages the creation of YangDocs.
  */
 public final class YangDocsGenerator implements BasicCodeGenerator, BuildContextAware, MavenProjectAware {
+    private static final Logger LOG = LoggerFactory.getLogger(YangDocsGenerator.class);
 
     private MavenProject project;
-    private final Log log = new SystemStreamLog();
     private Set<YangModuleInfo> yangModuleInfos = Collections.emptySet();
     private Object reflectionObject;
 
     @Override
-    public Collection<File> generateSources(SchemaContext context, File outputBaseDir, Set<Module> currentModules)
-            throws IOException {
+    public Collection<File> generateSources(SchemaContext context, File outputBaseDir, Set<Module> currentModules) {
         throw new UnsupportedOperationException("Deprecated method");
     }
 
@@ -68,8 +65,7 @@ public final class YangDocsGenerator implements BasicCodeGenerator, BuildContext
     public Collection<File> generateSources(SchemaContext context,
                                             File outputBaseDir,
                                             Set<Module> currentModules,
-                                            Function<Module, Optional<String>> moduleResourcePathResolver)
-            throws IOException {
+                                            Function<Module, Optional<String>> moduleResourcePathResolver) {
 
 
         CliUnitCollector unitCollector = new CliUnitCollector();
@@ -78,13 +74,13 @@ public final class YangDocsGenerator implements BasicCodeGenerator, BuildContext
             reflectionObject = unitLoader.getReflectionObject(unitCollector);
             yangModuleInfos = unitLoader.getYangModuleInfos();
         } catch (ClassNotFoundException e) {
-            log.warn("Class has not been found, wont generate documentation for this unit", e);
+            LOG.warn("Class has not been found, will not generate documentation for this unit", e);
             return Collections.emptyList();
         }
 
         unitLoader.callInit(reflectionObject);
 
-        //Creating object to hold all the data we have collected.
+        // Creating object to hold all the data we have collected.
         TranslationUnitMetadata metadata = provideMetadataObject(context, unitCollector);
         TranslationUnitMetadataHandler metadataHandler = new TranslationUnitMetadataHandler(metadata);
 
@@ -95,10 +91,12 @@ public final class YangDocsGenerator implements BasicCodeGenerator, BuildContext
 
     @Override
     public void setAdditionalConfig(Map<String, String> additionalConfiguration) {
+        // no additional config utilized
     }
 
     @Override
     public void setResourceBaseDir(File resourceBaseDir) {
+        // no resource processing necessary
     }
 
     /**
@@ -107,8 +105,7 @@ public final class YangDocsGenerator implements BasicCodeGenerator, BuildContext
      * <p>
      * It calls provideHandlers on the reflection and prepares the codec for CodecTranslator.
      */
-    private TranslationUnitMetadata provideMetadataObject(SchemaContext context,
-                                                          CliUnitCollector unitCollector) {
+    private TranslationUnitMetadata provideMetadataObject(SchemaContext context, CliUnitCollector unitCollector) {
 
         TranslateUnit translateUnitObject = (TranslateUnit) reflectionObject;
 
@@ -124,7 +121,7 @@ public final class YangDocsGenerator implements BasicCodeGenerator, BuildContext
         ModuleInfoBackedContext mib = CodecTranslator.getModuleInfoBackedContext(yangModuleInfos);
         BindingToNormalizedNodeCodec codec = CodecTranslator.getCodec(mib, context);
 
-        //Creating object to hold all the data we have collected.
+        // Creating object to hold all the data we have collected.
         return new TranslationUnitMetadata(unitCollector,
                 implementedWriters,
                 implementedReaders,
@@ -136,12 +133,11 @@ public final class YangDocsGenerator implements BasicCodeGenerator, BuildContext
 
     @Override
     public void setBuildContext(BuildContext buildContext) {
+        // build context is not utilized
     }
 
     @Override
     public void setMavenProject(MavenProject project) {
         this.project = project;
     }
-
-
 }
