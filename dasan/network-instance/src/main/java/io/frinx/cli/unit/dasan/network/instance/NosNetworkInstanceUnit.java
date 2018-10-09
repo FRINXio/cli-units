@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
@@ -41,7 +42,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.VlansBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class NosNetworkInstanceUnit implements TranslateUnit {
@@ -82,15 +82,6 @@ public class NosNetworkInstanceUnit implements TranslateUnit {
         provideWriters(writeRegistry, cli);
     }
 
-    // vlan config augmentation
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config>
-        VLAN_CONFIG_ROOT_ID =
-            InstanceIdentifier
-                .create(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan
-                    .Config.class);
-
     private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         // No handling required on the network instance level
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
@@ -101,10 +92,8 @@ public class NosNetworkInstanceUnit implements TranslateUnit {
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_VLANS, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_VL_VLAN, new NoopCliWriter<>()));
 
-        writeRegistry.subtreeAdd(Sets.newHashSet(
-                VLAN_CONFIG_ROOT_ID.augmentation(
-                        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.dasan.rev180801.Config1.class)
-                ),
+        writeRegistry.subtreeAdd(
+                Sets.newHashSet(RWUtils.cutIdFromStart(IIDs.NE_NE_VL_VL_CO_AUG_CONFIG1, IIDs.NE_NE_VL_VL_CONFIG)),
                 new GenericWriter<>(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli)));
     }
 
@@ -117,10 +106,8 @@ public class NosNetworkInstanceUnit implements TranslateUnit {
         // VLAN(L3)
         readRegistry.addStructuralReader(IIDs.NE_NE_VLANS, VlansBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_VL_VLAN, new VlanReader(cli)));
-        readRegistry.subtreeAddAfter(Sets.newHashSet(
-                VLAN_CONFIG_ROOT_ID.augmentation(
-                        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.dasan.rev180801.Config1.class)
-                ),
+        readRegistry.subtreeAddAfter(
+                Sets.newHashSet(RWUtils.cutIdFromStart(IIDs.NE_NE_VL_VL_CO_AUG_CONFIG1, IIDs.NE_NE_VL_VL_CONFIG)),
                 new GenericConfigReader<>(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli)), IIDs.NE_NE_VL_VLAN);
     }
 
