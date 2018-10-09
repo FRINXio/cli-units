@@ -51,11 +51,20 @@ import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.AggregationBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.EthernetBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.Ipv4Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.AddressesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.IfL3ipvlanAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan._interface.top.L3ipvlanBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Ethernet1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.SwitchedVlanBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class NosCliInterfaceUnit implements TranslateUnit {
@@ -114,185 +123,44 @@ public class NosCliInterfaceUnit implements TranslateUnit {
         provideWriters(writeRegistry, cli);
     }
 
-    // subif-ipv4 IIDs
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1
-        > SUBIFC_IPV4_AUG_ID =
-            IIDs.IN_IN_SU_SUBINTERFACE
-                .augmentation(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip
-                    .rev161222.Subinterface1.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.Ipv4
-        > SUBIFC_IPV4_ID =
-            SUBIFC_IPV4_AUG_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222
-                    .ipv4.top.Ipv4.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.Addresses
-        > SUBIFC_IPV4_ADDRESSES_ID =
-            SUBIFC_IPV4_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4
-                    .Addresses.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses
-        .Address
-        > SUBIFC_IPV4_ADDRESS_ID =
-            SUBIFC_IPV4_ADDRESSES_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4
-                    .addresses.Address.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses
-        .address.Config
-        > SUBIFC_IPV4_CFG_ID =
-            SUBIFC_IPV4_ADDRESS_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4
-                    .addresses.address.Config.class);
-
-    // if-lag IIDs
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1
-        > IFC_AGGREGATE_AUG_ID =
-            IIDs.IN_INTERFACE
-                .augmentation(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222
-                    .Interface1.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical
-        .top.Aggregation
-        > IFC_AGGREGATE_ID =
-            IFC_AGGREGATE_AUG_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222
-                    .aggregation.logical.top.Aggregation.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical
-        .top.aggregation.Config
-        > IFC_AGGREGATE_CFG_ID =
-            IFC_AGGREGATE_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222
-                    .aggregation.logical.top.aggregation.Config.class);
-
-    // if-ethernet IIDs
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.Interface1
-        > IFC_ETH_AUG_ID =
-            IIDs.IN_INTERFACE
-                .augmentation(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222
-                    .Interface1.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.Ethernet
-        > IFC_ETHERNET_ID =
-            IFC_ETH_AUG_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet
-                    .top.Ethernet.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet
-        .Config
-        > IFC_ETHERNET_CONFIG_ID =
-            IFC_ETHERNET_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet
-                    .top.ethernet.Config.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet
-        .Config
-        > IFC_ETH_CONFIG_ROOT_ID =
-            InstanceIdentifier
-                .create(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet
-                    .top.ethernet.Config.class);
-
-    // if-l3ipvlan IIDs
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.IfL3ipvlanAug
-        > IFC_L3IPVLAN_AUG_ID =
-            IIDs.IN_INTERFACE
-                .augmentation(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802
-                    .IfL3ipvlanAug.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan._interface
-        .top.L3ipvlan
-        > IFC_L3IPVLAN_ID =
-            IFC_L3IPVLAN_AUG_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan
-                    ._interface.top.L3ipvlan.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan._interface
-        .top.l3ipvlan.Config
-        > IFC_L3IPVLAN_CONFIG_ID =
-            IFC_L3IPVLAN_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan
-                    ._interface.top.l3ipvlan.Config.class);
-
-    // vlan IIDs
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Ethernet1
-        > IFC_VLAN_ETH_ID =
-            IFC_ETHERNET_ID
-                .augmentation(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Ethernet1.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.SwitchedVlan
-        > IFC_VLAN_ID =
-            IFC_VLAN_ETH_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top
-                    .SwitchedVlan.class);
-    private static final InstanceIdentifier<
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan
-        .Config
-        > IFC_VLAN_CONFIG_ID =
-            IFC_VLAN_ID
-                .child(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top
-                    .switched.vlan.Config.class);
-
     private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
 
-        writeRegistry.addAfter(new GenericWriter<>(IFC_AGGREGATE_AUG_ID, new NoopCliWriter<>()), IIDs.IN_IN_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IFC_AGGREGATE_ID, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IFC_AGGREGATE_CFG_ID, new BundleEtherLacpConfigWriter(cli)));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.INTER_INTER_AUG_INTERFACE1, new NoopCliWriter<>()),
+                IIDs.IN_IN_CONFIG);
+        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_AGGREGATION, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_AG_CONFIG,
+                new BundleEtherLacpConfigWriter(cli)));
 
         // if-ethernet
-        writeRegistry.add(new GenericWriter<>(IFC_ETHERNET_ID, new NoopCliWriter<>()));
-        writeRegistry.subtreeAddAfter(Sets.newHashSet(
-                IFC_ETH_CONFIG_ROOT_ID.augmentation(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222
-                    .Config1.class)
-                ),
-                new GenericWriter<>(IFC_ETHERNET_CONFIG_ID, new EthernetConfigWriter(cli)),
+        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET, new NoopCliWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli)),
                 IIDs.IN_IN_CONFIG);
 
         // if-l3ipvlan
-        writeRegistry.addAfter(new GenericWriter<>(IFC_L3IPVLAN_AUG_ID, new NoopCliWriter<>()), IIDs.IN_IN_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IFC_L3IPVLAN_ID, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IFC_L3IPVLAN_CONFIG_ID, new L3ipvlanConfigWriter(cli)));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_AUG_IFL3IPVLANAUG, new NoopCliWriter<>()),
+                IIDs.IN_IN_CONFIG);
+        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_IFL3IPVLANAUG_L3IPVLAN, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_IFL3IPVLANAUG_L3_CONFIG, new L3ipvlanConfigWriter(cli)));
 
         // vlan
-        writeRegistry.add(new GenericWriter<>(IFC_VLAN_ID, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IFC_VLAN_CONFIG_ID, new PhysicalPortVlanMemberConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(
+                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET2_SWITCHEDVLAN, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET2_SW_CONFIG,
+                new PhysicalPortVlanMemberConfigWriter(cli)));
 
         // subinterface
         writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SUBINTERFACE, new NoopCliListWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SU_CONFIG, new NoopCliWriter<>()));
 
         // ipv4address
-        writeRegistry.add(new GenericWriter<>(SUBIFC_IPV4_ADDRESS_ID, new NoopCliListWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(SUBIFC_IPV4_CFG_ID, new Ipv4AddressConfigWriter(cli)),
-                IIDs.IN_IN_CONFIG);
+        writeRegistry.add(new GenericWriter<>(
+                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
+                new NoopCliListWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(
+                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
+                        new Ipv4AddressConfigWriter(cli)), IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
@@ -301,67 +169,50 @@ public class NosCliInterfaceUnit implements TranslateUnit {
         readRegistry.add(new GenericOperReader<>(IIDs.IN_IN_STATE, new InterfaceStateReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));
 
-        readRegistry.addStructuralReader(IFC_AGGREGATE_AUG_ID,
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222
-            .Interface1Builder.class);
-        readRegistry.addStructuralReader(IFC_AGGREGATE_ID,
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation
-            .logical.top.AggregationBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IFC_AGGREGATE_CFG_ID, new BundleEtherLacpConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.INTER_INTER_AUG_INTERFACE1, Interface1Builder.class);
+        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_INTERFACE1_AGGREGATION, AggregationBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_AUG_INTERFACE1_AG_CONFIG,
+                new BundleEtherLacpConfigReader(cli)));
 
         // if-ethernet
-        readRegistry.addStructuralReader(IFC_ETH_AUG_ID,
+        readRegistry.addStructuralReader(IIDs.INTE_INTE_AUG_INTERFACE1,
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222
             .Interface1Builder.class);
-        readRegistry.addStructuralReader(IFC_ETHERNET_ID,
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top
-            .EthernetBuilder.class);
-        readRegistry.subtreeAdd(Sets.newHashSet(
-                IFC_ETH_CONFIG_ROOT_ID.augmentation(
-                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222
-                    .Config1.class)
-                ),
-                new GenericConfigReader<>(IFC_ETHERNET_CONFIG_ID,
-                    new EthernetConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET, EthernetBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli)));
 
         // if-l3ipvlan
-        readRegistry.addStructuralReader(IFC_L3IPVLAN_AUG_ID,
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802
-            .IfL3ipvlanAugBuilder.class);
-        readRegistry.addStructuralReader(IFC_L3IPVLAN_ID,
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802
-            .l3ipvlan._interface.top.L3ipvlanBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IFC_L3IPVLAN_CONFIG_ID,
+        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_IFL3IPVLANAUG, IfL3ipvlanAugBuilder.class);
+        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_IFL3IPVLANAUG_L3IPVLAN, L3ipvlanBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_AUG_IFL3IPVLANAUG_L3_CONFIG,
             new L3ipvlanConfigReader(cli)));
 
         // vlan
-        readRegistry.addStructuralReader(IFC_VLAN_ETH_ID,
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714
-            .Ethernet1Builder.class);
-        readRegistry.addStructuralReader(IFC_VLAN_ID,
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top
-            .SwitchedVlanBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IFC_VLAN_CONFIG_ID,
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1,
+            Ethernet1Builder.class);
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET2_SWITCHEDVLAN,
+            SwitchedVlanBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(
+                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET2_SW_CONFIG,
             new PhysicalPortVlanMemberConfigReader(cli)));
 
-        readRegistry.addStructuralReader(IIDs.IN_IN_SUBINTERFACES,
-            SubinterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.IN_IN_SU_SUBINTERFACE,
-            new SubinterfaceReader()));
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_SU_SU_CONFIG,
-            new SubinterfaceConfigReader()));
+        readRegistry.addStructuralReader(IIDs.IN_IN_SUBINTERFACES, SubinterfacesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader()));
+        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader()));
 
-        readRegistry.addStructuralReader(SUBIFC_IPV4_AUG_ID,
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222
-            .Subinterface1Builder.class);
-        readRegistry.addStructuralReader(SUBIFC_IPV4_ID,
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top
-            .Ipv4Builder.class);
-        readRegistry.addStructuralReader(SUBIFC_IPV4_ADDRESSES_ID,
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4
-            .AddressesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(SUBIFC_IPV4_ADDRESS_ID, new Ipv4AddressReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(SUBIFC_IPV4_CFG_ID, new Ipv4AddressConfigReader(cli)));
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1,
+            Subinterface1Builder.class);
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IPV4,
+            Ipv4Builder.class);
+        readRegistry.addStructuralReader(
+                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_ADDRESSES,
+            AddressesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(
+                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
+                new Ipv4AddressReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(
+                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
+                new Ipv4AddressConfigReader(cli)));
     }
 
     @Override
