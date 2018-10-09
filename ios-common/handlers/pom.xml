@@ -48,5 +48,10 @@
             <artifactId>openconfig-policy</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-vlan</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
     </dependencies>
 </project>
