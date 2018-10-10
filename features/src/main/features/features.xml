@@ -178,6 +178,7 @@
         <bundle>mvn:io.frinx.cli/dasan-cli-utils/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/dasan-network-instance-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/dasan-interface-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/dasan-configuration-metadata-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-all-units' version='${project.version}'>
