@@ -274,6 +274,28 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- dasan -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>dasan-cli-init-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>dasan-cli-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>dasan-network-instance-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>dasan-interface-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Features -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -355,6 +377,13 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>frinx-cli-unit-nexus</artifactId>
+                <type>xml</type>
+                <classifier>features</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>frinx-cli-unit-dasan</artifactId>
                 <type>xml</type>
                 <classifier>features</classifier>
                 <version>${project.version}</version>

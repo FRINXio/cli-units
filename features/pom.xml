@@ -38,5 +38,6 @@
     <module>frinx-cli-unit-ios-xr-utils</module>
     <module>frinx-cli-unit-junos</module>
     <module>frinx-cli-unit-nexus</module>
+    <module>frinx-cli-unit-dasan</module>
   </modules>
 </project>
