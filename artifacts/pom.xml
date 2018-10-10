@@ -295,6 +295,11 @@
                 <artifactId>dasan-interface-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>dasan-configuration-metadata-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Features -->
             <dependency>

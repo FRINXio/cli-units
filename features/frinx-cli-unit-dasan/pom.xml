@@ -73,6 +73,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>dasan-interface-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>dasan-configuration-metadata-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
