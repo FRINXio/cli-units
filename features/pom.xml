@@ -342,5 +342,26 @@
       <artifactId>nexus-utils</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>dasan-cli-init-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>dasan-cli-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>dasan-network-instance-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>dasan-interface-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>
