@@ -16,18 +16,14 @@
 
 package io.frinx.cli.ios.routing.policy.handlers;
 
-import io.frinx.openconfig.openconfig.policy.IIDs;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.DefinedSets2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.ExtCommunitySetConfig;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.ext.community.set.top.ExtCommunitySets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.ext.community.set.top.ext.community.sets.ExtCommunitySet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.ext.community.set.top.ext.community.sets.ExtCommunitySetKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.routing.policy.defined.sets.BgpDefinedSets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpExtCommunityType;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
@@ -99,16 +95,12 @@ public class ExtCommunitySetReaderTest {
             + ExtCommunitySetReader.ROUTE_TARGET_EXPORT_SET));
     private static final List<ExtCommunitySetKey> VRF3_RESULT = Collections.singletonList(new ExtCommunitySetKey(VRF_3
             + ExtCommunitySetReader.ROUTE_TARGET_IMPORT_SET));
-    private static final KeyedInstanceIdentifier<ExtCommunitySet, ExtCommunitySetKey> EXPORT_IID = IIDs
-            .RO_DEFINEDSETS.augmentation(DefinedSets2.class)
-            .child(BgpDefinedSets.class)
-            .child(ExtCommunitySets.class)
+    private static final KeyedInstanceIdentifier<ExtCommunitySet, ExtCommunitySetKey> EXPORT_IID =
+            io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_EXTCOMMUNITYSETS
             .child(ExtCommunitySet.class, new ExtCommunitySetKey(VRF_1
                     + ExtCommunitySetReader.ROUTE_TARGET_EXPORT_SET));
-    private static final KeyedInstanceIdentifier<ExtCommunitySet, ExtCommunitySetKey> IMPORT_IID = IIDs
-            .RO_DEFINEDSETS.augmentation(DefinedSets2.class)
-            .child(BgpDefinedSets.class)
-            .child(ExtCommunitySets.class)
+    private static final KeyedInstanceIdentifier<ExtCommunitySet, ExtCommunitySetKey> IMPORT_IID =
+            io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_EXTCOMMUNITYSETS
             .child(ExtCommunitySet.class, new ExtCommunitySetKey(VRF_1
                     + ExtCommunitySetReader.ROUTE_TARGET_IMPORT_SET));
     private static final List<ExtCommunitySetConfig.ExtCommunityMember> RT_EXP_RESULT = Arrays.asList(new
