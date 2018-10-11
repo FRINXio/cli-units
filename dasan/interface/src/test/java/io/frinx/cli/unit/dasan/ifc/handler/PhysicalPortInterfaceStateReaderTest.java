@@ -22,7 +22,6 @@ import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,9 +49,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 public class PhysicalPortInterfaceStateReaderTest {
-    private static String SH_SINGLE_INTERFACE_CFG;
-    private static String SHOW_JUMBO_FRAME;
-
+    private static String SH_SINGLE_INTERFACE_CFG = PhysicalPortInterfaceStateReader.SH_SINGLE_INTERFACE_CFG;
+    private static String SHOW_JUMBO_FRAME = PhysicalPortInterfaceStateReader.SHOW_JUMBO_FRAME;
     private static String SHOW_PORT_OUTPUT = StringUtils.join(new String[] {
         "------------------------------------------------------------------------",
         "NO      TYPE     PVID    STATUS        MODE       FLOWCTRL     INSTALLED",
@@ -80,12 +78,6 @@ public class PhysicalPortInterfaceStateReaderTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         ALL_PORTS = DasanCliUtil.parsePhysicalPorts(SHOW_PORT_OUTPUT);
-
-        SH_SINGLE_INTERFACE_CFG = (String) FieldUtils.readStaticField(PhysicalPortInterfaceStateReader.class,
-            "SH_SINGLE_INTERFACE_CFG", true);
-
-        SHOW_JUMBO_FRAME = (String) FieldUtils.readStaticField(PhysicalPortInterfaceStateReader.class,
-            "SHOW_JUMBO_FRAME", true);
     }
 
     @Before
@@ -100,15 +92,12 @@ public class PhysicalPortInterfaceStateReaderTest {
         final String       portId = "100/100";
         final String       interfaceName = "Ethernet" + portId;
         final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
-
         final InstanceIdentifier<State> instanceIdentifier =
             InstanceIdentifier.create(Interfaces.class)
             .child(Interface.class, interfaceKey)
             .child(State.class);
-
         final StateBuilder builder = Mockito.mock(StateBuilder.class);
         final ReadContext ctx = Mockito.mock(ReadContext.class);
-
         final String inputSingleInterface =
             String.format(SH_SINGLE_INTERFACE_CFG, portId, portId);
         final String outputSingleInterface = "outputSingleInterface-001";
@@ -154,7 +143,6 @@ public class PhysicalPortInterfaceStateReaderTest {
 
     @Test
     public void testParseInterfaceState_001() throws Exception {
-
         final String output = "1/1   Ethernet      1     Up/Down  Force/Full/1000 Off/ Off       Y";
         final StateBuilder builder = Mockito.mock(StateBuilder.class);
         final String name = "Ethernet1/1";
@@ -173,7 +161,6 @@ public class PhysicalPortInterfaceStateReaderTest {
         order.verify(builder).setType(Other.class);
 
         order.verify(builder).setType(EthernetCsmacd.class);
-
         order.verify(builder).setAdminStatus(AdminStatus.UP);
         order.verify(builder).setEnabled(Boolean.TRUE);
         order.verify(builder).setOperStatus(OperStatus.DOWN);
@@ -181,7 +168,6 @@ public class PhysicalPortInterfaceStateReaderTest {
 
     @Test
     public void testParseInterfaceState_002() throws Exception {
-
         final String output = "";
         final StateBuilder builder = Mockito.mock(StateBuilder.class);
         final String name = "Ethernet1/1";
@@ -208,8 +194,7 @@ public class PhysicalPortInterfaceStateReaderTest {
 
     @Test
     public void testParseInterfaceState_003() throws Exception {
-
-        final String output = "1/1   TrkGrp00      1   Down/Up    Force/Full/1000 Off/ Off       Y";
+        final String output = "1/1   None      1   Down/Up    Force/Full/1000 Off/ Off       Y";
         final StateBuilder builder = Mockito.mock(StateBuilder.class);
         final String name = "Ethernet1/1";
 
@@ -227,12 +212,12 @@ public class PhysicalPortInterfaceStateReaderTest {
         order.verify(builder).setEnabled(Boolean.FALSE);
         order.verify(builder).setType(Other.class);
 
+        order.verify(builder).setType(EthernetCsmacd.class);
         order.verify(builder).setAdminStatus(AdminStatus.DOWN);
         order.verify(builder).setEnabled(Boolean.FALSE);
         order.verify(builder).setOperStatus(OperStatus.UP);
 
         Mockito.verify(builder, Mockito.never()).setEnabled(Boolean.TRUE);
-        Mockito.verify(builder, Mockito.never()).setType(EthernetCsmacd.class);
     }
 
     @Test

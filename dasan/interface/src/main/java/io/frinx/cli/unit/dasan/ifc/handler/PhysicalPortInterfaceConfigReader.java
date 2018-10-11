@@ -40,13 +40,15 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class PhysicalPortInterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         CompositeReader.Child<Config, ConfigBuilder> {
 
-    private static final String SH_SINGLE_INTERFACE_CFG = "show port %s | include ^%s ";  //Need the last space.
+    @VisibleForTesting
+    static final String SH_SINGLE_INTERFACE_CFG = "show port %s | include ^%s ";  //Need the last space.
 
     private static final Pattern INTERFACE_ID_LINE =
         Pattern.compile(
             "^(?<id>[^\\s]+)\\s+(?<porttype>[^\\s]+)\\s+(?<pvid>[\\d]+)\\s+(?<stateadmin>[^/]+)/(?<stateoper>\\S+).*");
 
-    private static final String SHOW_JUMBO_FRAME = "show running-config bridge | include jumbo-frame ";
+    @VisibleForTesting
+    static final String SHOW_JUMBO_FRAME = "show running-config bridge | include jumbo-frame ";
 
     private static final Pattern JUMBO_FRAME_LINE =
         Pattern.compile("^jumbo-frame (?<ports>[^\\s]+)\\s+(?<size>[\\d]+)$");
@@ -89,9 +91,7 @@ public class PhysicalPortInterfaceConfigReader implements CliConfigReader<Config
             return;
         }
 
-        if (PhysicalPortInterfaceReader.PHYSICAL_PORT_NAME_PREFIX.equals(lineMatcher.group("porttype"))) {
-            builder.setType(EthernetCsmacd.class);
-        }
+        builder.setType(EthernetCsmacd.class);
 
         AdminStatus adminStatus =
             InterfaceCommonState.AdminStatus.valueOf(lineMatcher.group("stateadmin").toUpperCase());
