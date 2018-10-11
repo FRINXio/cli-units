@@ -430,6 +430,18 @@ public class StatementsTest {
             + "  drop\r\n"
             + "end-policy\r\n";
 
+    public static final Statements DATA_PASS = new StatementsBuilder().setStatement(Lists.newArrayList(new
+            StatementBuilder().setName("1")
+            .setConfig(getStatementConfig("1"))
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.PASSROUTE))
+                    .build())
+            .build()))
+            .build();
+
+    private static final String OUTPUT_PASS = "route-policy route_policy_4\n"
+            + "  pass\n"
+            + "end-policy\n";
+
     @Parameterized.Parameters(name = "statement test: {index}: {0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{{"simple", OUTPUT_SIMPLE, DATA_SIMPLE}, {"done", OUTPUT_DONE, DATA_DONE},
@@ -440,7 +452,7 @@ public class StatementsTest {
                 DATA_COMBINED}, {"known and unknown conditions", OUTPUT_KNOWN_AND_UNKNOWN_CONDITIONS,
                 DATA_KNOWN_AND_UNKNOWN_CONDITIONS}, {"big policy 1", BIG_POLICY_1, null}, {"or 1", OUTPUT_OR,
                 DATA_OR1}, {"or 2", OUTPUT_OR_2, DATA_OR2}, {"multiple same conditions",
-                OUTPUT_MULTI_KNOWN_CONDITIONS, DATA_MULTI_KNOWN_CONDITIONS}});
+                OUTPUT_MULTI_KNOWN_CONDITIONS, DATA_MULTI_KNOWN_CONDITIONS}, {"pass", OUTPUT_PASS, DATA_PASS}});
     }
 
     private String name;

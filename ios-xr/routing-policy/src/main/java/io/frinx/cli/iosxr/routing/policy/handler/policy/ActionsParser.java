@@ -289,6 +289,7 @@ final class ActionsParser {
 
     static final Pattern DROP = Pattern.compile("drop");
     static final Pattern DONE = Pattern.compile("done");
+    static final Pattern PASS = Pattern.compile("pass");
 
     @VisibleForTesting
     static void parseGlobalAction(ActionsBuilder actionsBuilder, String line) {
@@ -309,6 +310,12 @@ final class ActionsParser {
             actionsBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy
                     .rev170714.policy.actions.top.actions.ConfigBuilder()
                     .setPolicyResult(PolicyResultType.ACCEPTROUTE)
+                    .build());
+        } else if (PASS.matcher(line)
+                .find()) {
+            actionsBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy
+                    .rev170714.policy.actions.top.actions.ConfigBuilder()
+                    .setPolicyResult(PolicyResultType.PASSROUTE)
                     .build());
         }
     }
