@@ -24,10 +24,8 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -58,21 +56,11 @@ public class PhysicalPortInterfaceConfigWriterTest {
 
     private PhysicalPortInterfaceConfigWriter target;
 
-
-    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
-
-    private InstanceIdentifier<Config> id;
+    private ArgumentCaptor<Command> response;
 
     //test data
+    private InstanceIdentifier<Config> id;
     private Config data;
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -94,6 +82,8 @@ public class PhysicalPortInterfaceConfigWriterTest {
             .setType(ifType)
             .setMtu(1000)
             .build();
+
+        response = ArgumentCaptor.forClass(Command.class);
     }
 
     @After
