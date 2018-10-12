@@ -47,7 +47,7 @@
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>handlers</artifactId>
-            <version>${project.version}</version>
+            <version>${translate.unit.commons.version}</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
