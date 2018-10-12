@@ -22,7 +22,6 @@ import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,9 +47,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 public class PhysicalPortInterfaceConfigReaderTest {
-    private static String SH_SINGLE_INTERFACE_CFG;
-    private static String SHOW_JUMBO_FRAME;
-
+    private static String SH_SINGLE_INTERFACE_CFG = PhysicalPortInterfaceConfigReader.SH_SINGLE_INTERFACE_CFG;
+    private static String SHOW_JUMBO_FRAME = PhysicalPortInterfaceConfigReader.SHOW_JUMBO_FRAME;
     private static String SHOW_PORT_OUTPUT = StringUtils.join(new String[] {
         "------------------------------------------------------------------------",
         "NO      TYPE     PVID    STATUS        MODE       FLOWCTRL     INSTALLED",
@@ -78,12 +76,6 @@ public class PhysicalPortInterfaceConfigReaderTest {
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         ALL_PORTS = DasanCliUtil.parsePhysicalPorts(SHOW_PORT_OUTPUT);
-
-        SH_SINGLE_INTERFACE_CFG = (String) FieldUtils.readStaticField(PhysicalPortInterfaceConfigReader.class,
-            "SH_SINGLE_INTERFACE_CFG", true);
-
-        SHOW_JUMBO_FRAME = (String) FieldUtils.readStaticField(PhysicalPortInterfaceConfigReader.class,
-            "SHOW_JUMBO_FRAME", true);
     }
 
     @Before
@@ -98,15 +90,12 @@ public class PhysicalPortInterfaceConfigReaderTest {
         final String       portId = "100/100";
         final String       interfaceName = "Ethernet" + portId;
         final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
-
         final InstanceIdentifier<Config> instanceIdentifier =
             InstanceIdentifier.create(Interfaces.class)
             .child(Interface.class, interfaceKey)
             .child(Config.class);
-
         final ConfigBuilder builder = Mockito.mock(ConfigBuilder.class);
         final ReadContext ctx = Mockito.mock(ReadContext.class);
-
         final String inputSingleInterface =
             String.format(SH_SINGLE_INTERFACE_CFG, portId, portId);
         final String outputSingleInterface = "outputSingleInterface-001";
@@ -152,7 +141,6 @@ public class PhysicalPortInterfaceConfigReaderTest {
 
     @Test
     public void testParseInterface_001() throws Exception {
-
         final String output = "1/1   Ethernet      1     Up/Up    Force/Full/1000 Off/ Off       Y";
         final ConfigBuilder builder = Mockito.mock(ConfigBuilder.class);
         final String name = "Ethernet1/1";
@@ -176,7 +164,6 @@ public class PhysicalPortInterfaceConfigReaderTest {
 
     @Test
     public void testParseInterface_002() throws Exception {
-
         final String output = "";
         final ConfigBuilder builder = Mockito.mock(ConfigBuilder.class);
         final String name = "Ethernet1/1";
@@ -189,7 +176,7 @@ public class PhysicalPortInterfaceConfigReaderTest {
         PhysicalPortInterfaceConfigReader.parseInterface(output, builder, name);
 
         //verify
-        InOrder order = Mockito.inOrder(builder);
+        final InOrder order = Mockito.inOrder(builder);
 
         order.verify(builder).setName(name);
         order.verify(builder).setEnabled(Boolean.FALSE);
@@ -201,8 +188,7 @@ public class PhysicalPortInterfaceConfigReaderTest {
 
     @Test
     public void testParseInterface_003() throws Exception {
-
-        final String output = "1/1   TrkGrp00      1   Down/Up    Force/Full/1000 Off/ Off       Y";
+        final String output = "1/1   None      1   Down/Up    Force/Full/1000 Off/ Off       Y";
         final ConfigBuilder builder = Mockito.mock(ConfigBuilder.class);
         final String name = "Ethernet1/1";
 
@@ -214,16 +200,16 @@ public class PhysicalPortInterfaceConfigReaderTest {
         PhysicalPortInterfaceConfigReader.parseInterface(output, builder, name);
 
         //verify
-        InOrder order = Mockito.inOrder(builder);
+        final InOrder order = Mockito.inOrder(builder);
 
         order.verify(builder).setName(name);
         order.verify(builder).setEnabled(Boolean.FALSE);
         order.verify(builder).setType(Other.class);
 
+        order.verify(builder).setType(EthernetCsmacd.class);
         order.verify(builder).setEnabled(Boolean.FALSE);
 
         Mockito.verify(builder, Mockito.never()).setEnabled(Boolean.TRUE);
-        Mockito.verify(builder, Mockito.never()).setType(EthernetCsmacd.class);
     }
 
     @Test
@@ -233,6 +219,7 @@ public class PhysicalPortInterfaceConfigReaderTest {
             " jumbo-frame 1/1,7/2 2000",
             " jumbo-frame 1/2,2/2,8/1-t/1 3000"
         }, "\n");
+
         String name;
         ConfigBuilder builder;
 

@@ -35,30 +35,28 @@ public class PhysicalPortInterfaceReader
         implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder>,
         CompositeListReader.Child<Interface, InterfaceKey, InterfaceBuilder> {
 
-    private Cli cli;
-
-    public PhysicalPortInterfaceReader(Cli cli) {
-        this.cli = cli;
-    }
-
-    private static final String SHOW_INSTALLED_ETHER_PORTS = "show port | include Ethernet .*Y$";
+    @VisibleForTesting
+    static final String SHOW_ETHERNET_PORTS = "show port | exclude ^t/";
 
     private static final Pattern ETHER_PORTS_LINE =
-        Pattern.compile("^(?<id>[1-9][0-9]*/[1-9][0-9]*)\\s+Ethernet\\s.*");
+        Pattern.compile("^(?<id>[1-9][0-9]*/[1-9][0-9]*)\\s.*");
 
     public static final String PHYSICAL_PORT_NAME_PREFIX = "Ethernet";
 
     public static final Pattern PHYSICAL_PORT_NAME_PATTERN =
         Pattern.compile(PHYSICAL_PORT_NAME_PREFIX + "(?<portid>[1-9][0-9]*/[1-9][0-9]*)$");
 
-    public static final Pattern PHYSICAL_PORT_SPRITED_NAME_PATTERN =
-        Pattern.compile("^(?<slot>[1-9][0-9]*)/(?<port>[1-9][0-9]*)$");
+    private Cli cli;
+
+    public PhysicalPortInterfaceReader(Cli cli) {
+        this.cli = cli;
+    }
 
     @Nonnull
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
-        return parseInterfaceIds(blockingRead(SHOW_INSTALLED_ETHER_PORTS, cli, instanceIdentifier, readContext));
+        return parseInterfaceIds(blockingRead(SHOW_ETHERNET_PORTS, cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting

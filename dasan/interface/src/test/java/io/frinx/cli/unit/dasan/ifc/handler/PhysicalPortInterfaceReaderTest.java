@@ -22,12 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hamcrest.CoreMatchers;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -45,38 +42,25 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 public class PhysicalPortInterfaceReaderTest {
-    private static String SHOW_INSTALLED_ETHER_PORTS;
+    private static String SHOW_ETHERNET_PORTS = PhysicalPortInterfaceReader.SHOW_ETHERNET_PORTS;
 
     @Mock
     private Cli cli;
 
     private PhysicalPortInterfaceReader target;
 
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        SHOW_INSTALLED_ETHER_PORTS = (String) FieldUtils.readStaticField(PhysicalPortInterfaceReader.class,
-            "SHOW_INSTALLED_ETHER_PORTS", true);
-    }
-
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-
         target = Mockito.spy(new PhysicalPortInterfaceReader(cli));
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @PrepareOnlyThisForTest(PhysicalPortInterfaceReader.class)
     @Test
     public void testGetAllIds_001() throws Exception {
-
         final InstanceIdentifier<Interface> instanceIdentifier =
                 InstanceIdentifier.create(Interfaces.class)
                 .child(Interface.class, new InterfaceKey("Ethernet1/1"));
-
         final ReadContext readContext = Mockito.mock(ReadContext.class);
         final String blockingReadResult = "blocking-read-result-001";
         final List<InterfaceKey> interfaceKeys = new ArrayList<>();
@@ -85,7 +69,7 @@ public class PhysicalPortInterfaceReaderTest {
         PowerMockito.doReturn(interfaceKeys)
             .when(PhysicalPortInterfaceReader.class, "parseInterfaceIds", blockingReadResult);
         Mockito.doReturn(blockingReadResult).when(target)
-            .blockingRead(SHOW_INSTALLED_ETHER_PORTS, cli, instanceIdentifier, readContext);
+            .blockingRead(SHOW_ETHERNET_PORTS, cli, instanceIdentifier, readContext);
 
         //test
         List<InterfaceKey> result = target.getAllIds(instanceIdentifier, readContext);
@@ -93,7 +77,7 @@ public class PhysicalPortInterfaceReaderTest {
         //verify
         Assert.assertThat(result, CoreMatchers.sameInstance(interfaceKeys));
 
-        Mockito.verify(target).blockingRead(SHOW_INSTALLED_ETHER_PORTS, cli, instanceIdentifier, readContext);
+        Mockito.verify(target).blockingRead(SHOW_ETHERNET_PORTS, cli, instanceIdentifier, readContext);
         PowerMockito.verifyStatic();
         PhysicalPortInterfaceReader.parseInterfaceIds(blockingReadResult);
     }
@@ -124,7 +108,6 @@ public class PhysicalPortInterfaceReaderTest {
         final InstanceIdentifier<Interface> instanceIdentifier =
             InstanceIdentifier.create(Interfaces.class)
             .child(Interface.class, interfaceKey);
-
         final InterfaceBuilder builder = Mockito.mock(InterfaceBuilder.class);
         final ReadContext readContext = Mockito.mock(ReadContext.class);
 
