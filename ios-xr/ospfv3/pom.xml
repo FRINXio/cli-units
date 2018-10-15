@@ -14,22 +14,18 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<!-- vi: set et smarttab sw=4 tabstop=4: -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.7.rc3-frinx-SNAPSHOT</version>
+        <version>3.1.7.rc2-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
-    <artifactId>ios-xr-network-instance-unit</artifactId>
-    <version>3.1.7.rc3-frinx-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>ios-xr-ospfv3-unit</artifactId>
+    <version>3.1.7.rc2-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -43,30 +39,11 @@
             <artifactId>ios-xr-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-bgp-unit</artifactId>
+            <artifactId>translation-registry-spi</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-ospf-unit</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-ospfv3-unit</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.translate.unit.commons</groupId>
-            <artifactId>handlers</artifactId>
-            <version>${translate.unit.commons.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.fd.honeycomb</groupId>
-            <artifactId>translate-spi</artifactId>
-            <version>${hc.version}</version>
         </dependency>
 
         <!-- Openconfig models -->
@@ -77,23 +54,12 @@
         </dependency>
         <dependency>
             <groupId>io.frinx.openconfig</groupId>
-            <artifactId>openconfig-policy-forwarding</artifactId>
+            <artifactId>openconfig-ospfv3</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.openconfig</groupId>
-            <artifactId>openconfig-local-routing</artifactId>
-            <version>${openconfig.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.openconfig</groupId>
-            <artifactId>openconfig-policy</artifactId>
-            <version>${openconfig.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.openconfig</groupId>
-            <artifactId>openconfig-interfaces</artifactId>
-            <version>${openconfig.version}</version>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>ietf-yang-types-20130715</artifactId>
         </dependency>
 
         <!-- Testing Dependencies -->

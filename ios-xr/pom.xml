@@ -39,6 +39,7 @@
     <module>mpls</module>
     <module>ospf</module>
     <module>snmp</module>
+    <module>ospfv3</module>
     <module>logging</module>
     <module>acl</module>
     <module>utils</module>

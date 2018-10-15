@@ -109,6 +109,7 @@
         <bundle>mvn:io.frinx.cli/ios-xr-interface-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-mpls-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-ospf-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-ospfv3-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-snmp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-logging-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-acl-unit/{{VERSION}}</bundle>

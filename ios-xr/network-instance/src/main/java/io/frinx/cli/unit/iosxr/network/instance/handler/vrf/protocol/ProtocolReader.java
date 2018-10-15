@@ -23,6 +23,7 @@ import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.iosxr.ospf.handler.OspfProtocolReader;
+import io.frinx.cli.iosxr.ospfv3.handler.OspfV3ProtocolReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
             super(new ArrayList<ListReaderCustomizer<Protocol, ProtocolKey, ProtocolBuilder>>() {{
                     add(new BgpProtocolReader(cli));
                     add(new OspfProtocolReader(cli));
+                    add(new OspfV3ProtocolReader(cli));
                 }
             });
         }
