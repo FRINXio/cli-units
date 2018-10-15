@@ -236,6 +236,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xr-ospfv3-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>ios-xr-qos-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
