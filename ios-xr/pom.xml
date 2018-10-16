@@ -50,6 +50,7 @@
     <module>lldp</module>
     <module>it</module>
     <module>platform</module>
+    <module>hsrp</module>
   </modules>
 
   <build>

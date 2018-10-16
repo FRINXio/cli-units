@@ -118,6 +118,7 @@
         <bundle>mvn:io.frinx.cli/ios-xr-qos-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-platform-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-configuration-metadata-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-hsrp-unit/{{VERSION}}</bundle>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-lldp</feature>
     </feature>
 
