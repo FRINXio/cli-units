@@ -143,7 +143,16 @@
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
         <feature version='${cli.version}'>cli-southbound-io</feature>
+        <feature version='${openconfig.version}'>openconfig-models</feature>
+        <bundle>wrap:mvn:org.tinyjee.jgraphx/jgraphx/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-core/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-ext/{{VERSION}}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-utils/${hc.version}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-impl/${hc.version}</bundle>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/junos-utils/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-cli-init-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/junos-configuration-metadata-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-huawei' version='${project.version}'>
