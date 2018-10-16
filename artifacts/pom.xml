@@ -276,6 +276,16 @@
                 <artifactId>junos-cli-init-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>junos-configuration-metadata-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>junos-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- nexus -->
             <dependency>

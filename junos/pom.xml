@@ -31,6 +31,8 @@
 
   <modules>
     <module>init</module>
+    <module>utils</module>
+    <module>configuration-metadata</module>
   </modules>
 
   <build>
