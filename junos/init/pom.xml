@@ -31,6 +31,12 @@
     <packaging>bundle</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>junos-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- for JUnit -->
         <dependency>
             <groupId>org.mockito</groupId>
