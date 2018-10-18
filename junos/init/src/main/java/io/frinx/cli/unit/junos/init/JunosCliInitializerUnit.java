@@ -30,6 +30,7 @@ import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.SessionInitializationStrategy;
+import io.frinx.cli.junos.JunosDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
@@ -43,8 +44,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +51,6 @@ import org.slf4j.LoggerFactory;
 public class JunosCliInitializerUnit implements TranslateUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(JunosCliInitializerUnit.class);
-
-    private static final Device JUNOS = new DeviceIdBuilder()
-            .setDeviceType("junos")
-            .setDeviceVersion("*")
-            .build();
 
     private static final PromptResolutionStrategy PROMPT_RESOLUTION_STRATEGY =
         JunosPromptResolutionStrategy.getInstance();
@@ -71,7 +65,7 @@ public class JunosCliInitializerUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = registry.registerTranslateUnit(JUNOS, this);
+        reg = registry.registerTranslateUnit(JunosDevices.JUNOS_GENERIC, this);
     }
 
     public void close() {
