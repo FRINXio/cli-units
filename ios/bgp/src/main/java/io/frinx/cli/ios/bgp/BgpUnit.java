@@ -191,7 +191,7 @@ public class BgpUnit implements TranslateUnit {
                         RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, InstanceIdentifier
                                 .create(Neighbor.class))),
                 new GenericListWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborWriter(cli)),
-                Sets.newHashSet(IIDs.NE_NE_PR_PR_BG_PE_PE_CONFIG));
+                Sets.newHashSet(IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP));
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
