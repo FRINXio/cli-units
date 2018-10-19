@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.frinx.cli.unit.dasan.ifc.handler;
+package io.frinx.cli.unit.dasan.ifc.handler.l3ipvlan;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
@@ -21,31 +21,30 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.Interface1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan._interface.top.L3ipvlan;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan._interface.top.L3ipvlanBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan._interface.top.l3ipvlan.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan._interface.top.l3ipvlan.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L3ipvlan;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-public class VlanInterfaceConfigReaderTest {
+public class L3ipvlanConfigReaderTest {
 
     @Mock
     private Cli cli;
 
-    private VlanInterfaceConfigReader target;
+    private L3ipvlanConfigReader target;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        target = Mockito.spy(new VlanInterfaceConfigReader(cli));
+        target = Mockito.spy(new L3ipvlanConfigReader(cli));
     }
 
     @Test
@@ -55,23 +54,20 @@ public class VlanInterfaceConfigReaderTest {
         final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
 
         final InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-                .child(Interface.class, interfaceKey).child(Config.class);
+                .child(Interface.class, interfaceKey).augmentation(Interface1.class).child(L3ipvlan.class)
+                .child(Config.class);
 
         ConfigBuilder builder = new ConfigBuilder();
         final ReadContext ctx = Mockito.mock(ReadContext.class);
-        final String name = "Vlan100";
-        final String outputSingleInterface = StringUtils.join(new String[] { " interface Vlan100 ",
-            " l no ip redirects", }, "\n");
+        final String outputSingleInterface = StringUtils
+                .join(new String[] { " interface Vlan100 ", " l no ip AAredirects", }, "\n");
 
         Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
                 Mockito.eq(instanceIdentifier), Mockito.eq(ctx));
 
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
-
-        Assert.assertEquals(builder.getName(), name);
-        Assert.assertEquals(builder.isEnabled(), Boolean.FALSE);
-        Assert.assertEquals(builder.getType(), L3ipvlan.class);
+        Assert.assertNull(builder.isIpRedirects());
     }
 
     @Test
@@ -81,19 +77,22 @@ public class VlanInterfaceConfigReaderTest {
         final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
 
         final InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-                .child(Interface.class, interfaceKey).child(Config.class);
+                .child(Interface.class, interfaceKey).augmentation(Interface1.class).child(L3ipvlan.class)
+                .child(Config.class);
 
         ConfigBuilder builder = new ConfigBuilder();
         final ReadContext ctx = Mockito.mock(ReadContext.class);
-        final String outputSingleInterface = StringUtils.join(new String[] { " interface Vlan100 ",
-            " l no ip redirects", }, "\n");
+        final String outputSingleInterface = StringUtils
+                .join(new String[] { " interface Vlan100 ", " l no ip redirects10", }, "\n");
 
         Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
                 Mockito.eq(instanceIdentifier), Mockito.eq(ctx));
 
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
-        Assert.assertNull(builder.getName());
+
+        Assert.assertNull(builder.isIpRedirects());
+
     }
 
     @Test
@@ -103,13 +102,13 @@ public class VlanInterfaceConfigReaderTest {
         final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
 
         final InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-                .child(Interface.class, interfaceKey).child(Config.class);
+                .child(Interface.class, interfaceKey).augmentation(Interface1.class).child(L3ipvlan.class)
+                .child(Config.class);
 
         ConfigBuilder builder = new ConfigBuilder();
         final ReadContext ctx = Mockito.mock(ReadContext.class);
-        final String name = "Vlan100";
-        final String outputSingleInterface = StringUtils.join(new String[] { " interface Vlan100 ",
-            " no shutdown", }, "\n");
+        final String outputSingleInterface = StringUtils
+                .join(new String[] { " interface Vlan100 ", " l no ip redirects", }, "\n");
 
         Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
                 Mockito.eq(instanceIdentifier), Mockito.eq(ctx));
@@ -117,9 +116,7 @@ public class VlanInterfaceConfigReaderTest {
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
 
-        Assert.assertEquals(builder.getName(), name);
-        Assert.assertEquals(builder.isEnabled(), Boolean.TRUE);
-        Assert.assertEquals(builder.getType(), L3ipvlan.class);
+        Assert.assertNull(builder.isIpRedirects());
     }
 
     @Test
@@ -129,13 +126,13 @@ public class VlanInterfaceConfigReaderTest {
         final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
 
         final InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-                .child(Interface.class, interfaceKey).child(Config.class);
+                .child(Interface.class, interfaceKey).augmentation(Interface1.class).child(L3ipvlan.class)
+                .child(Config.class);
 
         ConfigBuilder builder = new ConfigBuilder();
         final ReadContext ctx = Mockito.mock(ReadContext.class);
-        final String name = "Vlan100";
-        final String outputSingleInterface = StringUtils.join(new String[] { " interface Vlan100 ",
-            " mtu 2000", }, "\n");
+        final String outputSingleInterface = StringUtils
+                .join(new String[] { " interface Vlan100 ", "  no ip redirects", }, "\n");
 
         Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
                 Mockito.eq(instanceIdentifier), Mockito.eq(ctx));
@@ -143,8 +140,30 @@ public class VlanInterfaceConfigReaderTest {
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
 
-        Assert.assertEquals(builder.getName(), name);
-        Assert.assertEquals(builder.isEnabled(), Boolean.FALSE);
-        Assert.assertEquals(builder.getType(), L3ipvlan.class);
+        Assert.assertFalse(builder.isIpRedirects());
+    }
+
+    @Test
+    public void testMerge_001() throws Exception {
+        L3ipvlanBuilder parentBuilder = Mockito.mock(L3ipvlanBuilder.class);
+        final Config readValue = Mockito.mock(Config.class);
+        Mockito.when(parentBuilder.setConfig(readValue)).thenReturn(parentBuilder);
+
+        target.merge(parentBuilder, readValue);
+        Mockito.verify(parentBuilder).setConfig(readValue);
+    }
+
+    @Test
+    public void testGetBuilder_001() throws Exception {
+
+        final String portId = "100";
+        final String interfaceName = "Vlan" + portId;
+        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
+
+        final InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
+                .child(Interface.class, interfaceKey).augmentation(Interface1.class).child(L3ipvlan.class)
+                .child(Config.class);
+
+        Assert.assertNotNull(target.getBuilder(instanceIdentifier));
     }
 }

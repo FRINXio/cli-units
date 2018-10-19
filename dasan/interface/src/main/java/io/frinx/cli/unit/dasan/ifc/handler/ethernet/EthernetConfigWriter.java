@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.dasan.ifc.handler;
+package io.frinx.cli.unit.dasan.ifc.handler.ethernet;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpmember.BundleEtherLacpMemberConfigWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 
-public  class InterfaceConfigWriter extends CompositeWriter<Config> {
+public final class EthernetConfigWriter extends CompositeWriter<Config> {
 
-    public InterfaceConfigWriter(Cli cli) {
-        super(Lists.newArrayList(
-                new PhysicalPortInterfaceConfigWriter(cli),
-                new BundleEtherInterfaceConfigWriter(cli),
-                new VlanInterfaceConfigWriter(cli)
-        ));
+    public EthernetConfigWriter(Cli cli) {
+        super(Lists.newArrayList(new BundleEtherLacpMemberConfigWriter(cli)));
     }
 }

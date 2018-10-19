@@ -18,16 +18,14 @@ package io.frinx.cli.unit.dasan.ifc.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.frinx.cli.io.Cli;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import io.frinx.cli.io.Command;
 import java.util.concurrent.CompletableFuture;
-import org.junit.After;
-import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -42,25 +40,33 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class VlanInterfaceConfigWriterTest {
+
+    private static final String EXPECT_INPUT = "configure terminal\n"
+            + "interface br100\n"
+            + "no shutdown\n"
+            + "no mtu\n"
+            + "end\n";
+    private static final String DELETE_INPUT = "configure terminal\n"
+            + "no interface br100\n"
+            + "end\n";
+    private static final String UPDATE_INPUT = "configure terminal\n"
+            + "interface br100\n"
+            + "shutdown\n"
+            + "mtu 100\n"
+            + "end\n";
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Mock
     private Cli cli;
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     @Mock
     private WriteContext context;
     private VlanInterfaceConfigWriter target;
     private InstanceIdentifier<Config> id;
     private Config data;
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -75,28 +81,22 @@ public class VlanInterfaceConfigWriterTest {
                 .child(Config.class);
 
         data = new ConfigBuilder().setEnabled(Boolean.TRUE).setName(ifName).setType(ifType)
-                .setMtu(Integer.valueOf(1000)).build();
-    }
-
-    @After
-    public void tearDown() throws Exception {
+                .setMtu(Integer.valueOf(100)).build();
     }
 
     @Test
     public void testWriteCurrentAttributes_001() throws Exception {
         prepare(L3ipvlan.class, "Vlan100");
-
         target.writeCurrentAttributes(id, data, context);
-
-        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(Mockito.any());
+        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void testWriteCurrentAttributes_002() throws Exception {
-        prepare(L3ipvlan.class, "Bundle8");
-
+        prepare(L3ipvlan.class, "100");
         target.writeCurrentAttributes(id, data, context);
-
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
 
@@ -104,10 +104,10 @@ public class VlanInterfaceConfigWriterTest {
     public void testUpdateCurrentAttributes_001() throws Exception {
         prepare(L3ipvlan.class, "Vlan100");
         Config newData = new ConfigBuilder(data).build();
-
         target.updateCurrentAttributes(id, data, newData, context);
-
-        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(Mockito.any());
+        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
@@ -115,21 +115,8 @@ public class VlanInterfaceConfigWriterTest {
         prepare(EthernetCsmacd.class, "Vlan100");
 
         Config newData = new ConfigBuilder(data).setEnabled(Boolean.TRUE).setType(null).build();
-
         thrown.expect(IllegalArgumentException.class);
-
         target.updateCurrentAttributes(id, data, newData, context);
-
-        Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
-    }
-
-    @Test
-    public void testUpdateCurrentAttributes_003() throws Exception {
-        prepare(L3ipvlan.class, "Bundle8");
-        Config newData = new ConfigBuilder(data).build();
-
-        target.updateCurrentAttributes(id, data, newData, context);
-
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
 
@@ -139,28 +126,18 @@ public class VlanInterfaceConfigWriterTest {
 
         target.deleteCurrentAttributes(id, data, context);
 
-        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(Mockito.any());
-    }
-
-    @Test
-    public void testDeleteCurrentAttributes_002() throws Exception {
-        prepare(L3ipvlan.class, "Bundle8");
-
-        target.deleteCurrentAttributes(id, data, context);
-
-        Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
+        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test
     public void testValidateIfcNameAgainstType_001() throws Exception {
 
         prepare(EthernetCsmacd.class, "Vlan100");
-        thrown.expect(InvocationTargetException.class);
+        thrown.expect(IllegalArgumentException.class);
 
-        Method method = VlanInterfaceConfigWriter.class.getDeclaredMethod("validateIfcNameAgainstType", Config.class);
-        method.setAccessible(true);
-        method.invoke(null, data);
-
+        VlanInterfaceConfigWriter.validateIfcNameAgainstType(data);
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
 
@@ -168,14 +145,12 @@ public class VlanInterfaceConfigWriterTest {
     public void testWriteOrUpdateInterface_001() throws Exception {
 
         prepare(EthernetCsmacd.class, "Vlan100");
-
-        Method method = VlanInterfaceConfigWriter.class.getDeclaredMethod("writeOrUpdateInterface", id.getClass(),
-                Config.class, String.class);
-        method.setAccessible(true);
         // test
         data = new ConfigBuilder().setEnabled(Boolean.FALSE).setName("Vlan100").build();
-        method.invoke(target, id, data, "100");
+        target.writeOrUpdateInterface(id, data, "100");
 
-        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(Mockito.any());
+        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
+        Assert.assertEquals(EXPECT_INPUT, response.getValue()
+                .getContent());
     }
 }

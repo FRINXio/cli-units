@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.dasan.ifc.handler;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -34,10 +33,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public  class VlanInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> ,
+public class VlanInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder>,
         CompositeListReader.Child<Interface, InterfaceKey, InterfaceBuilder> {
 
-    //command to get configurations of VLAN Interface
+    //command for get configurations of VLAN Interface
     private static final String SHOW_VLAN_INTERFACE = "show running-config | include ^interface br[1-9][0-9]*";
     private static final Pattern VLAN_INTERFACE_LINE = Pattern.compile("^interface br(?<id>[1-9][0-9]*)$");
     public static final String INTERFACE_NAME_PREFIX = "Vlan";
@@ -49,21 +48,24 @@ public  class VlanInterfaceReader implements CliConfigListReader<Interface, Inte
         this.cli = cli;
     }
 
+
     @Nonnull
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
-        return parseAllInterfaceIds(blockingRead(SHOW_VLAN_INTERFACE, cli, instanceIdentifier, readContext));
+
+        return parseInterfaceIds(blockingRead(SHOW_VLAN_INTERFACE, cli, instanceIdentifier, readContext));
+    }
+
+    @VisibleForTesting
+    static List<InterfaceKey> parseInterfaceIds(String output) {
+        return parseAllInterfaceIds(output);
     }
 
     @VisibleForTesting
     static List<InterfaceKey> parseAllInterfaceIds(String output) {
-        return NEWLINE.splitAsStream(output)
-                .map(String::trim)
-                .map(VLAN_INTERFACE_LINE::matcher)
-                .filter(Matcher::matches)
-                .map(m -> INTERFACE_NAME_PREFIX + m.group("id"))
-                .map(InterfaceKey::new)
+        return ParsingUtils.NEWLINE.splitAsStream(output).map(String::trim).map(VLAN_INTERFACE_LINE::matcher)
+                .filter(Matcher::matches).map(m -> INTERFACE_NAME_PREFIX + m.group("id")).map(InterfaceKey::new)
                 .collect(Collectors.toList());
     }
 
@@ -71,6 +73,7 @@ public  class VlanInterfaceReader implements CliConfigListReader<Interface, Inte
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                       @Nonnull InterfaceBuilder builder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
+
         builder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
     }
 }

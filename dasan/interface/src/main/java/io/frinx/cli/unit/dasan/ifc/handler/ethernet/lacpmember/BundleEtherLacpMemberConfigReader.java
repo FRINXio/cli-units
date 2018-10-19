@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpmember;
 
-import static io.frinx.cli.unit.utils.ParsingUtils.NEWLINE;
-
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -27,6 +25,7 @@ import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceConfigWriter;
 import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceReader;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,9 +43,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class BundleEtherLacpMemberConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String AGGREGATE_IFC_NAME = "Bundle-Ether";
-
     private static final String SHOW_LACP_PORT = "show running-config bridge | include ^ lacp port";
-
     private static final Pattern LACP_PORT_LINE_PATTERN = Pattern
             .compile("lacp port (?<ports>[^\\s]+)\\s+aggregator\\s+(?<id>[0-9]+)$");
 
@@ -65,10 +62,10 @@ public class BundleEtherLacpMemberConfigReader implements CliConfigReader<Config
         if (!matcher.matches()) {
             return;
         }
+
         String portId = matcher.group("portid");
 
         if (!PhysicalPortInterfaceConfigWriter.PHYS_IFC_TYPES.contains(InterfaceReader.parseTypeByName(ifcName))) {
-            // we should parse ethernet configuration just for ethernet interfaces
             return;
         }
         List<String> ports = DasanCliUtil.getPhysicalPorts(cli, this, id, ctx);
@@ -80,14 +77,12 @@ public class BundleEtherLacpMemberConfigReader implements CliConfigReader<Config
 
         Config1Builder ethIfAggregationConfigBuilder = new Config1Builder();
 
-        NEWLINE.splitAsStream(output).map(String::trim).map(LACP_PORT_LINE_PATTERN::matcher).filter(Matcher::matches)
-                .filter(m -> DasanCliUtil.containsPort(ports, m.group("ports"), portId))
+        ParsingUtils.NEWLINE.splitAsStream(output).map(String::trim).map(LACP_PORT_LINE_PATTERN::matcher)
+                .filter(Matcher::matches).filter(m -> DasanCliUtil.containsPort(ports, m.group("ports"), portId))
                 .map(m -> getLAGInterfaceId(m.group("id"))).findFirst()
                 .ifPresent(ethIfAggregationConfigBuilder::setAggregateId);
 
         if (ethIfAggregationConfigBuilder.getAggregateId() == null) {
-            // TODO We should check also Period Type and log that it is not supported
-            // to have period type configured but bundle-id not
             return;
         }
 
