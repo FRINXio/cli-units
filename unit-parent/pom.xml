@@ -38,6 +38,7 @@
         <yangtools.version>2.0.5-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</yangtools.version>
         <mdsal.model.version>0.12.2-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</mdsal.model.version>
         <mdsal.version>2.4.2-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</mdsal.version>
+        <translate.unit.commons.version>4.1.0.rc1-frinx-SNAPSHOT</translate.unit.commons.version>
     </properties>
 
     <dependencyManagement>
@@ -98,12 +99,12 @@
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>utils</artifactId>
-            <version>${project.version}</version>
+            <version>${translate.unit.commons.version}</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>handlers</artifactId>
-            <version>${project.version}</version>
+            <version>${translate.unit.commons.version}</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
@@ -197,7 +198,7 @@
                     <dependency>
                         <groupId>io.frinx.translate.unit.commons</groupId>
                         <artifactId>yang-docs-plugin-common</artifactId>
-                        <version>${project.version}</version>
+                        <version>${translate.unit.commons.version}</version>
                         <type>jar</type>
                     </dependency>
                     <dependency>
