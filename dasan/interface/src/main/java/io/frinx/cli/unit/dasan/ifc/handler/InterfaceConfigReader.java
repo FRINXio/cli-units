@@ -29,13 +29,15 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class InterfaceConfigReader extends CompositeReader<Config, ConfigBuilder>
+public class InterfaceConfigReader extends CompositeReader<Config, ConfigBuilder>
         implements CliConfigReader<Config, ConfigBuilder> {
 
     public InterfaceConfigReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {
             {
                 add(new PhysicalPortInterfaceConfigReader(cli));
+                add(new BundleEtherInterfaceConfigReader(cli));
+                add(new VlanInterfaceConfigReader(cli));
             }
         });
     }

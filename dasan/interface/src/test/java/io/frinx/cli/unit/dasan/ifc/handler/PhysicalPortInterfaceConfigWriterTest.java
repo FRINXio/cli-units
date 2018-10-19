@@ -23,7 +23,6 @@ import io.frinx.cli.io.Command;
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,11 +52,8 @@ public class PhysicalPortInterfaceConfigWriterTest {
 
     @Mock
     private WriteContext context;
-
     private PhysicalPortInterfaceConfigWriter target;
-
     private ArgumentCaptor<Command> response;
-
     //test data
     private InstanceIdentifier<Config> id;
     private Config data;
@@ -84,10 +80,6 @@ public class PhysicalPortInterfaceConfigWriterTest {
             .build();
 
         response = ArgumentCaptor.forClass(Command.class);
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test
