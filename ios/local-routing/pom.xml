@@ -21,13 +21,13 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.7.rc3-frinx-SNAPSHOT</version>
+        <version>3.1.7.rc3-frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-local-routing-unit</artifactId>
-    <version>3.1.7.rc3-frinx-SNAPSHOT</version>
+    <version>3.1.7.rc3-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
