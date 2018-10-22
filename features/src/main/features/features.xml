@@ -185,6 +185,7 @@
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
+        <bundle>mvn:commons-codec/commons-codec/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/dasan-cli-init-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/dasan-cli-utils/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/dasan-network-instance-unit/{{VERSION}}</bundle>
