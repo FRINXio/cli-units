@@ -20,14 +20,14 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>single-feature-parent</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
+        <version>3.1.1-Oxygen-SR2.4_2_0_rc1-frinxodl-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-unit-brocade</artifactId>
     <packaging>feature</packaging>
-    <version>4.1.0.rc1-frinx-SNAPSHOT</version>
+    <version>4.2.0.rc1-frinx-SNAPSHOT</version>
     <name>Frinx :: Cli :: Unit :: Brocade</name>
 
     <dependencyManagement>
@@ -43,7 +43,7 @@
                 <groupId>io.frinx.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.1.0.rc1-frinx-SNAPSHOT</version>
+                <version>4.2.0.rc1-frinx-SNAPSHOT</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>

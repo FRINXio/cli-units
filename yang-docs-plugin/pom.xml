@@ -16,13 +16,13 @@
     <parent>
         <groupId>io.frinx.translate.unit.commons</groupId>
         <artifactId>checkstyle-parent</artifactId>
-        <version>4.1.0.rc1-frinx-SNAPSHOT</version>
+        <version>4.2.0.rc1-frinx-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>yang-docs-plugin</artifactId>
-    <version>4.1.0.rc1-frinx-SNAPSHOT</version>
+    <version>4.2.0.rc1-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencyManagement>
@@ -30,14 +30,14 @@
             <dependency>
                 <groupId>org.opendaylight.mdsal</groupId>
                 <artifactId>mdsal-artifacts</artifactId>
-                <version>2.4.2-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
+                <version>2.4.2-Oxygen-SR2.4_2_0_rc1-frinxodl-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.yangtools</groupId>
                 <artifactId>yangtools-artifacts</artifactId>
-                <version>2.0.5-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
+                <version>2.0.5-Oxygen-SR2.4_2_0_rc1-frinxodl-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -95,17 +95,17 @@
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry-api</artifactId>
-            <version>4.1.0.rc1-frinx-SNAPSHOT</version>
+            <version>4.2.0.rc1-frinx-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>translate-utils</artifactId>
-            <version>1.18.04-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
+            <version>1.18.04-Oxygen-SR2.4_2_0_rc1-frinxodl-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>translate-impl</artifactId>
-            <version>1.18.04-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
+            <version>1.18.04-Oxygen-SR2.4_2_0_rc1-frinxodl-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -121,12 +121,12 @@
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>utils</artifactId>
-            <version>4.1.0.rc1-frinx-SNAPSHOT</version>
+            <version>4.2.0.rc1-frinx-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>yang-docs-plugin-common</artifactId>
-            <version>4.1.0.rc1-frinx-SNAPSHOT</version>
+            <version>4.2.0.rc1-frinx-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

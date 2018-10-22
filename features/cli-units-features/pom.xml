@@ -12,13 +12,13 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>feature-repo-parent</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
+        <version>3.1.1-Oxygen-SR2.4_2_0_rc1-frinxodl-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-features</artifactId>
-    <version>4.1.0.rc1-frinx-SNAPSHOT</version>
+    <version>4.2.0.rc1-frinx-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <packaging>feature</packaging>
 

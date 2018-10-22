@@ -20,13 +20,13 @@
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>karaf4-parent</artifactId>
-    <version>3.1.1-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</version>
+    <version>3.1.1-Oxygen-SR2.4_2_0_rc1-frinxodl-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-karaf</artifactId>
-  <version>4.1.0.rc1-frinx-SNAPSHOT</version>
+  <version>4.2.0.rc1-frinx-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>pom</packaging>
 
@@ -35,9 +35,9 @@
   </prerequisites>
 
   <properties>
-    <restconf.version>1.7.2-Oxygen-SR2.4_1_0_rc1-frinxodl-SNAPSHOT</restconf.version>
-    <cli.version>4.1.0.rc1-frinx-SNAPSHOT</cli.version>
-    <openconfig.version>4.1.0.rc1-frinx-SNAPSHOT</openconfig.version>
+    <restconf.version>1.7.2-Oxygen-SR2.4_2_0_rc1-frinxodl-SNAPSHOT</restconf.version>
+    <cli.version>4.2.0.rc1-frinx-SNAPSHOT</cli.version>
+    <openconfig.version>4.2.0.rc1-frinx-SNAPSHOT</openconfig.version>
   </properties>
 
   <dependencies>
