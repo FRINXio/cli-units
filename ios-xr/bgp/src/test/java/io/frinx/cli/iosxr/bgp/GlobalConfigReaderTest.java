@@ -25,23 +25,35 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 
 public class GlobalConfigReaderTest {
 
-    private final String output = "Thu Feb 22 22:59:47.601 UTC\n"
+    private static final String OUTPUT_1 = "Thu Feb 22 22:59:47.601 UTC\n"
             + "router bgp 1 instance inst\n"
             + "router bgp 65505 instance test\n"
             + "router bgp 1";
 
+    private static final String OUTPUT_2 = "Thu Feb 22 22:59:47.601 UTC\n"
+            + "router bgp 1.100 instance next\n"
+            + "router bgp 1.169031";
+
     @Test
     public void testGlobal() {
         ConfigBuilder builder = new ConfigBuilder();
-        Optional<AsNumber> op = GlobalConfigReader.parseAs(output, "inst");
+        Optional<AsNumber> op = GlobalConfigReader.parseAs(OUTPUT_1, "inst");
         Assert.assertEquals(Long.valueOf(1), op.get().getValue());
 
         builder = new ConfigBuilder();
-        op = GlobalConfigReader.parseDefaultAs(output);
+        op = GlobalConfigReader.parseDefaultAs(OUTPUT_1);
         Assert.assertEquals(Long.valueOf(1), op.get().getValue());
 
         builder = new ConfigBuilder();
-        op = GlobalConfigReader.parseAs(output, "test");
+        op = GlobalConfigReader.parseAs(OUTPUT_1, "test");
         Assert.assertEquals(Long.valueOf(65505), op.get().getValue());
+
+        builder = new ConfigBuilder();
+        op = GlobalConfigReader.parseAs(OUTPUT_2, "next");
+        Assert.assertEquals(Long.valueOf(65636), op.get().getValue());
+
+        builder = new ConfigBuilder();
+        op = GlobalConfigReader.parseDefaultAs(OUTPUT_2);
+        Assert.assertEquals(Long.valueOf(234567), op.get().getValue());
     }
 }

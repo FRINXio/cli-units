@@ -39,7 +39,9 @@ public class NeighborConfigReaderTest {
             + "  description test desc\n"
             + "  password encrypted GCHKNJDJSADNKLSAND\n"
             + "  send-community-ebgp\n"
-            + "  remove-private-AS\n";
+            + "  remove-private-AS\n"
+            + " neighbor 1.2.3.4\n"
+            + "  remote-as 1.111\n";
 
     @Test
     public void test() {
@@ -70,5 +72,9 @@ public class NeighborConfigReaderTest {
         Assert.assertEquals("GCHKNJDJSADNKLSAND", builder.getAuthPassword().getValue());
         Assert.assertNotNull(builder.getSendCommunity());
         Assert.assertNotNull(builder.getRemovePrivateAs());
+
+        builder = new ConfigBuilder();
+        NeighborConfigReader.readNeighbor(OUTPUT, builder, "1.2.3.4");
+        Assert.assertEquals(65647, builder.getPeerAs().getValue().longValue());
     }
 }
