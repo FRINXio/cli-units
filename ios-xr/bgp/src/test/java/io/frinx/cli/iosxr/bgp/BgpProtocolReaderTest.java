@@ -28,10 +28,14 @@ public class BgpProtocolReaderTest {
     private static final String OUTPUT = "Fri Feb 23 06:27:50.700 UTC\n"
             + "router bgp 1 instance inst\n"
             + "router bgp 65505 instance test\n"
-            + "router bgp 1\n";
+            + "router bgp 1\n"
+            + "router bgp 2.1 instance next\n"
+            + "router bgp 2.2";
 
-    private static final List<String> EXPECTED_INSTANCES = Lists.newArrayList("inst", "test", "default");
-    private static final List<String> EXPECTED_ASNUMBER = Lists.newArrayList("1", "65505");
+    private static final List<String> EXPECTED_INSTANCES
+            = Lists.newArrayList("inst", "test", "default", "next");
+    private static final List<String> EXPECTED_ASNUMBER
+            = Lists.newArrayList("1", "65505", "131073", "131074");
 
     @Test
     public void testParseBgpProtocolKeys() {
@@ -40,6 +44,6 @@ public class BgpProtocolReaderTest {
             Assert.assertTrue(EXPECTED_INSTANCES.contains(aai.getKey().getName()));
             Assert.assertTrue(EXPECTED_ASNUMBER.contains(aai.getAsNumber()));
         }
-        Assert.assertEquals(3, aais.size());
+        Assert.assertEquals(5, aais.size());
     }
 }

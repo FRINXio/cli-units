@@ -40,6 +40,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
 
     private static final String SH_RUN_BGP = "show running-config router bgp";
     private static final String SH_RUN_BGP_PER_NWINS = "show running-config router bgp %s %s %s";
+    private static final Pattern AS_DOT_FORMAT_PATTERN = Pattern.compile("([0-9]+)\\.([0-9]+)");
     private static final Pattern CONFIG_LINE = Pattern.compile(".*router bgp (?<as>\\S+).*");
     private static final Pattern ROUTER_ID_LINE = Pattern.compile(".*bgp router-id (?<id>\\S+).*");
 
@@ -91,7 +92,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
                 .map(CONFIG_LINE::matcher)
                 .filter(Matcher::matches)
                 .map(matcher -> matcher.group("as"))
-                .map(Long::valueOf)
+                .map(GlobalConfigReader::readASNumber)
                 .map(AsNumber::new)
                 .findFirst();
     }
@@ -104,7 +105,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
                 .map(CONFIG_LINE::matcher)
                 .filter(Matcher::matches)
                 .map(matcher -> matcher.group("as"))
-                .map(Long::valueOf)
+                .map(GlobalConfigReader::readASNumber)
                 .map(AsNumber::new)
                 .findFirst();
     }
@@ -119,5 +120,16 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
                 .map(DottedQuad::new)
                 .findFirst()
                 .ifPresent(configBuilder::setRouterId);
+    }
+
+    public static Long readASNumber(String asNumber) {
+        final Matcher matcher = AS_DOT_FORMAT_PATTERN.matcher(asNumber);
+        if (matcher.matches()) {
+            final Long firstPart = Long.valueOf(matcher.group(1));
+            final Long secondPart = Long.valueOf(matcher.group(2));
+            return (firstPart << 16) + secondPart;
+        } else {
+            return Long.valueOf(asNumber);
+        }
     }
 }
