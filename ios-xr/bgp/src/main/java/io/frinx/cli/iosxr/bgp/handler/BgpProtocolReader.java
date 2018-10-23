@@ -44,9 +44,10 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
     public static final String DEFAULT_BGP_INSTANCE = "default";
 
     private static final String SHOW_RUN_ROUTER_BGP = "show running-config router bgp | include ^router bgp";
-    private static final Pattern BGP_INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9.]+) instance "
-            + "(?<instance>[\\S]+)");
-    private static final Pattern DEFAULT_BGP_INSTANCE_PATTERN = Pattern.compile("router bgp (?<as>[0-9]+)");
+    private static final Pattern BGP_INSTANCE_PATTERN
+            = Pattern.compile("router bgp (?<as>[0-9]+(\\.([0-9]+))?) instance (?<instance>[\\S]+)");
+    private static final Pattern DEFAULT_BGP_INSTANCE_PATTERN
+            = Pattern.compile("router bgp (?<as>[0-9]+(\\.([0-9]+))?)");
     private static final String SH_RUN_BGP_PER_VRF = "show running-config router bgp %s %s %s";
 
     private final Cli cli;
@@ -112,13 +113,15 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
         for (String s : lines) {
             Matcher matche = BGP_INSTANCE_PATTERN.matcher(s);
             if (matche.find()) {
-                AsAndInsName asAndInsName = new AsAndInsName(matche.group("as"),
+                AsAndInsName asAndInsName = new AsAndInsName(
+                        GlobalConfigReader.readASNumber(matche.group("as")).toString(),
                         new ProtocolKey(TYPE, matche.group("instance")));
                 rtn.add(asAndInsName);
             } else {
                 matche = DEFAULT_BGP_INSTANCE_PATTERN.matcher(s);
                 if (matche.find()) {
-                    AsAndInsName asAndInsName = new AsAndInsName(matche.group("as"),
+                    AsAndInsName asAndInsName = new AsAndInsName(
+                            GlobalConfigReader.readASNumber(matche.group("as")).toString(),
                             new ProtocolKey(TYPE, DEFAULT_BGP_INSTANCE));
                     rtn.add(asAndInsName);
                 }

@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.bgp.handler.GlobalConfigReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
@@ -116,7 +117,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
         ParsingUtils.parseField(neighbor.trim(), 0,
                 REMOTE_AS_LINE::matcher,
             matcher -> matcher.group("remoteAs"),
-            value -> configBuilder.setPeerAs(new AsNumber(Long.parseLong(value.trim()))));
+            value -> configBuilder.setPeerAs(new AsNumber(GlobalConfigReader.readASNumber(value.trim()))));
 
         // shutdown (reverse the result, if we DO find the match, set to FALSE)
         ParsingUtils.findMatch(neighbor, SHUTDOWN_LINE, configBuilder::setEnabled);
