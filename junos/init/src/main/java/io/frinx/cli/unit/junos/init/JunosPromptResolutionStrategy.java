@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class JunosPromptResolutionStrategy implements PromptResolutionStrategy {
+public final class JunosPromptResolutionStrategy implements PromptResolutionStrategy {
 
     private static final int DEFAULT_TIME_TO_WAIT = 1;
     private static final int MAX_TIME_TO_WAIT = 10;

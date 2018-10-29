@@ -21,7 +21,11 @@ import java.util.Set;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 
-public class NexusDevices {
+public final class NexusDevices {
+
+    private NexusDevices() {
+
+    }
 
     private static final Device NEXUS = new DeviceIdBuilder()
         .setDeviceType("nexus")

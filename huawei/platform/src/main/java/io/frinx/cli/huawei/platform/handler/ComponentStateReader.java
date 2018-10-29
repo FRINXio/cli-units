@@ -15,9 +15,6 @@
  */
 package io.frinx.cli.huawei.platform.handler;
 
-import static io.frinx.cli.huawei.platform.handler.ComponentReader.LINE;
-import static io.frinx.cli.huawei.platform.handler.ComponentReader.SH_MODULE;
-
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -65,7 +62,7 @@ public class ComponentStateReader implements CliOperReader<State, StateBuilder> 
         if (name.equals(OsComponent.OS_KEY.getName())) {
             parseOSVersions(stateBuilder, blockingRead(f(SH_VERSION), cli, instanceIdentifier, readContext));
         } else {
-            parseFields(stateBuilder, name, blockingRead(f(SH_MODULE, name), cli, instanceIdentifier,
+            parseFields(stateBuilder, name, blockingRead(f(ComponentReader.SH_MODULE, name), cli, instanceIdentifier,
                     readContext));
         }
     }
@@ -82,7 +79,7 @@ public class ComponentStateReader implements CliOperReader<State, StateBuilder> 
     }
 
     static void parseFields(@Nonnull StateBuilder stateBuilder, String name, String output) {
-        Matcher matcher = LINE.matcher(output);
+        Matcher matcher = ComponentReader.LINE.matcher(output);
 
         while (matcher.find()) {
             String sn = matcher.group("sn").trim();

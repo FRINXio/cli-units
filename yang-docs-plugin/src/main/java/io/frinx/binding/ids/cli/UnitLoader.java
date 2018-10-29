@@ -63,6 +63,8 @@ public class UnitLoader {
         return yangModuleInfos;
     }
 
+    @SuppressWarnings("AvoidHidingCauseException")
+    //Can not handle the cause exception
     private Constructor<?> tryGetConstructor() throws ClassNotFoundException {
 
         Class<?> classReflection;

@@ -16,8 +16,7 @@
 
 package io.frinx.cli.iosxr.platform.handler;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.PlatformComponentState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.component.StateBuilder;
@@ -116,7 +115,7 @@ public class XrOsComponentStateReaderTest {
     public void testParse() throws Exception {
         StateBuilder stateBuilder = new StateBuilder();
         XrOsComponentStateReader.parseOSVersions(stateBuilder, OUTPUT2);
-        assertEquals(new StateBuilder()
+        Assert.assertEquals(new StateBuilder()
                 .setId("IOS XR")
                 .setName("OS")
                 .setSoftwareVersion("6.1.2[Default]")
@@ -130,7 +129,7 @@ public class XrOsComponentStateReaderTest {
         StateBuilder stateBuilder = new StateBuilder();
         XrOsComponentStateReader.parseFields(stateBuilder, "fan0 0/FT0/SP", XrOsComponentReaderTest.OUTPUT_INVENTORY);
 
-        assertEquals(new StateBuilder()
+        Assert.assertEquals(new StateBuilder()
                 .setId("fan0 0/FT0/SP")
                 .setName("fan0 0/FT0/SP")
                 .setDescription("ASR9K Generic Fan")

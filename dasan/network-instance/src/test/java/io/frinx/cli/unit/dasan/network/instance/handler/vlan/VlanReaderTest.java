@@ -16,15 +16,6 @@
 
 package io.frinx.cli.unit.dasan.network.instance.handler.vlan;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
@@ -37,8 +28,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -83,7 +77,7 @@ public class VlanReaderTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        target = spy(new VlanReader(cli));
+        target = Mockito.spy(new VlanReader(cli));
     }
 
     @After
@@ -99,7 +93,7 @@ public class VlanReaderTest {
                 .child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
                 .child(Vlans.class)
                 .child(Vlan.class, new VlanKey(new VlanId(100)));
-        final ReadContext readContext = mock(ReadContext.class);
+        final ReadContext readContext = Mockito.mock(ReadContext.class);
         List<VlanKey> vlanKeys = new ArrayList<>();
 
         PowerMockito.mockStatic(VlanReader.class);
@@ -109,7 +103,7 @@ public class VlanReaderTest {
         List<VlanKey> result = target.getAllIds(instanceIdentifier, readContext);
 
 
-        assertThat(result, sameInstance(vlanKeys));
+        Assert.assertThat(result, CoreMatchers.sameInstance(vlanKeys));
 
         PowerMockito.verifyStatic();
         VlanReader.getAllIds(cli, target, instanceIdentifier, readContext);
@@ -124,7 +118,7 @@ public class VlanReaderTest {
                 .child(NetworkInstance.class, new NetworkInstanceKey("not-default"))
                 .child(Vlans.class)
                 .child(Vlan.class, new VlanKey(new VlanId(100)));
-        final ReadContext readContext = mock(ReadContext.class);
+        final ReadContext readContext = Mockito.mock(ReadContext.class);
         List<VlanKey> vlanKeys = new LinkedList<VlanKey>() {
             {
                 add(new VlanKey(new VlanId(1)));
@@ -139,19 +133,19 @@ public class VlanReaderTest {
         List<VlanKey> result = target.getAllIds(instanceIdentifier, readContext);
 
 
-        assertThat(result, equalTo(Collections.emptyList()));
+        Assert.assertThat(result, CoreMatchers.equalTo(Collections.emptyList()));
 
-        PowerMockito.verifyStatic(never());
+        PowerMockito.verifyStatic(Mockito.never());
         VlanReader.getAllIds(cli, target, instanceIdentifier, readContext);
     }
 
     @PrepareOnlyThisForTest({RWUtils.class, VlanReader.class})
     @Test
     public void testGetAllIds_B_001() throws Exception {
-        final VlanReader cliReader = mock(VlanReader.class);
+        final VlanReader cliReader = Mockito.mock(VlanReader.class);
         final InstanceIdentifier<Vlan> instanceIdentifier = InstanceIdentifier.create(Vlan.class);
         final InstanceIdentifier<Vlan> cuttedIid = InstanceIdentifier.create(Vlan.class);
-        final ReadContext readContext = mock(ReadContext.class);
+        final ReadContext readContext = Mockito.mock(ReadContext.class);
         final String cliOutput = StringUtils.join(new String[] {
             "vlan create 1,200,3 eline",
             "vlan create 101,201,301",
@@ -169,7 +163,7 @@ public class VlanReaderTest {
         List<VlanKey> result = VlanReader.getAllIds(cli, cliReader, instanceIdentifier, readContext);
 
 
-        assertThat(result, sameInstance(vlanKeys));
+        Assert.assertThat(result, CoreMatchers.sameInstance(vlanKeys));
 
         Mockito.verify(cliReader).blockingRead(SHOW_VLAN_CREATE, cli, instanceIdentifier, readContext);
 
@@ -180,11 +174,11 @@ public class VlanReaderTest {
     @PrepareOnlyThisForTest({RWUtils.class, VlanReader.class})
     @Test
     public void testGetAllIds_B_002() throws Exception {
-        final CliReader cliReader = mock(VlanReader.class);
+        final CliReader cliReader = Mockito.mock(VlanReader.class);
         final InstanceIdentifier<?> instanceIdentifier = InstanceIdentifier.create(
                     org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan
                     .top.vlans.vlan.Config.class);
-        final ReadContext readContext = mock(ReadContext.class);
+        final ReadContext readContext = Mockito.mock(ReadContext.class);
 
         final String cliOutput = StringUtils.join(new String[] {
             "vlan create 1,200,3 eline",
@@ -204,7 +198,7 @@ public class VlanReaderTest {
         List<VlanKey> result = VlanReader.getAllIds(cli, cliReader, instanceIdentifier, readContext);
 
 
-        assertThat(result, sameInstance(vlanKeys));
+        Assert.assertThat(result, CoreMatchers.sameInstance(vlanKeys));
 
         Mockito.verify(cliReader).blockingRead(SHOW_VLAN_CREATE, cli, instanceIdentifier, readContext);
 
@@ -223,9 +217,9 @@ public class VlanReaderTest {
         List<VlanKey> result = VlanReader.parseVlanIds(output);
 
         //verify
-        assertThat(result.stream()
+        Assert.assertThat(result.stream()
             .map(m -> m.getVlanId().getValue()).collect(Collectors.toList()),
-            is(containsInAnyOrder(
+                CoreMatchers.is(IsIterableContainingInAnyOrder.containsInAnyOrder(
                     1129,
                     1133,
                     10,
@@ -242,7 +236,7 @@ public class VlanReaderTest {
         List<VlanKey> result = VlanReader.parseVlanIds(output);
 
         //verify
-        assertThat(result.size(), is(0));
+        Assert.assertThat(result.size(), CoreMatchers.is(0));
     }
 
     @Test
@@ -253,8 +247,8 @@ public class VlanReaderTest {
                 .child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
                 .child(Vlans.class)
                 .child(Vlan.class, new VlanKey(vlanId));
-        final VlanBuilder vlanBuilder = mock(VlanBuilder.class);
-        final ReadContext readContext = mock(ReadContext.class);
+        final VlanBuilder vlanBuilder = Mockito.mock(VlanBuilder.class);
+        final ReadContext readContext = Mockito.mock(ReadContext.class);
 
         Mockito.doReturn(vlanBuilder).when(vlanBuilder).setVlanId(vlanId);
 
@@ -268,7 +262,7 @@ public class VlanReaderTest {
     @Test
     public void testMerge_001() throws Exception {
 
-        VlansBuilder builder = mock(VlansBuilder.class);
+        VlansBuilder builder = Mockito.mock(VlansBuilder.class);
         List<Vlan> vlans = new ArrayList<>();
 
 
