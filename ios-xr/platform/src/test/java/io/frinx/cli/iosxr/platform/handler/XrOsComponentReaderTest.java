@@ -16,9 +16,8 @@
 
 package io.frinx.cli.iosxr.platform.handler;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.List;
+import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.ComponentKey;
 
@@ -321,6 +320,6 @@ public class XrOsComponentReaderTest {
     public void testParseComponents() throws Exception {
         List<ComponentKey> componentKeys = XrOsComponentReader.parseComponents(OUTPUT_INVENTORY);
 
-        assertEquals(97, componentKeys.size());
+        Assert.assertEquals(97, componentKeys.size());
     }
 }
