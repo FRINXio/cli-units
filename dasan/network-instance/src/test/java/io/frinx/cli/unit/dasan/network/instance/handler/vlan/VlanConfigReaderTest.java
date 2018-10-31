@@ -300,7 +300,7 @@ public class VlanConfigReaderTest {
         return new InputHolder4ParseVlanConfig(cliOutput, vlanIdIntValue).initMockBehaviors();
     }
 
-    private static class InputHolder4ParseVlanConfig {
+    private static final class InputHolder4ParseVlanConfig {
         final String cliOutput;
         final ConfigBuilder builder = Mockito.mock(ConfigBuilder.class);
         final Integer vlanIdValue;  //another id

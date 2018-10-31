@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.dasan.init;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
@@ -219,7 +217,7 @@ public class NosCliInitializerUnit  implements TranslateUnit {
 
             LOG.debug("{}: Secret not set, using session password as enable password", id);
 
-            checkArgument(context.getCredentials() instanceof LoginPassword,
+            Preconditions.checkArgument(context.getCredentials() instanceof LoginPassword,
                     "%s: Unable to handle credentials type of: %s",
                     id, context.getCredentials());
 
