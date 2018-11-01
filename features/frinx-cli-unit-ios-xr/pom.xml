@@ -114,6 +114,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>ios-xr-lacp-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-bfd-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
