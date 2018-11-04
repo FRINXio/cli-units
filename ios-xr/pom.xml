@@ -51,6 +51,7 @@
     <module>it</module>
     <module>platform</module>
     <module>hsrp</module>
+    <module>lacp</module>
   </modules>
 
   <build>
