@@ -269,6 +269,11 @@
                 <artifactId>ios-xr-utils</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xr-lacp-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- junos -->
             <dependency>
