@@ -15,7 +15,6 @@
  */
 
 package io.frinx.cli.unit.iosxr.network.instance.handler.vrf;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -50,7 +49,7 @@ public class L3VrfReaderTest {
     public void testGetAllIds_001() throws Exception {
         final InstanceIdentifier<NetworkInstance> iid =
                 InstanceIdentifier.create(NetworkInstance.class);
-        final ReadContext readContext = mock(ReadContext.class);
+        final ReadContext readContext = Mockito.mock(ReadContext.class);
         L3VrfReader target = Mockito.spy(new L3VrfReader(cli));
         Mockito.doReturn(OUTPUT).when(target).blockingRead(Mockito.anyString(),
                 Mockito.any(), Mockito.any(), Mockito.any());

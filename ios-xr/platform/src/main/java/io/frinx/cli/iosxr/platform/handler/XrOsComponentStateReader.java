@@ -16,8 +16,6 @@
 
 package io.frinx.cli.iosxr.platform.handler;
 
-import static io.frinx.cli.iosxr.platform.handler.XrOsComponentReader.preprocessOutput;
-
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -87,7 +85,7 @@ public class XrOsComponentStateReader implements CliOperReader<State, StateBuild
     }
 
     static void parseFields(@Nonnull StateBuilder stateBuilder, String name, String output) {
-        output = ParsingUtils.NEWLINE.splitAsStream(preprocessOutput(output))
+        output = ParsingUtils.NEWLINE.splitAsStream(XrOsComponentReader.preprocessOutput(output))
             .filter(line -> line.contains(name))
             .findFirst()
             .orElse("");
