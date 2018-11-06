@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.IosXrDevices;
@@ -45,14 +46,6 @@ import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.acl.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.DestinationAddressWildcarded;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.AclEntriesBuilder;
@@ -60,10 +53,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.top.AclBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.action.top.Actions;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.Ipv4;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.Ipv6;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.Transport;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.$YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -72,6 +61,8 @@ public class AclUnit implements TranslateUnit {
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
+
+    private static final InstanceIdentifier<AclEntry> ACL_ENTRY_TREE_BASE = InstanceIdentifier.create(AclEntry.class);
 
     public AclUnit(@Nonnull final TranslationUnitCollector registry) {
         this.registry = registry;
@@ -129,97 +120,42 @@ public class AclUnit implements TranslateUnit {
         writeRegistry.add(new GenericWriter<>(IIDs.AC_AC_AC_CONFIG, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.AC_AC_AC_ACLENTRIES, new NoopCliWriter<>()));
         writeRegistry.subtreeAdd(Sets.newHashSet(
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
-                                .acl.rev170526.access.list.entries.top.acl.entries.acl.entry.Config.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv4.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv4.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv4.protocol.fields.top.ipv4.Config.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv4.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv4.protocol.fields.top.ipv4.Config.class)
-                        .augmentation(Config1.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv4.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv4.protocol.fields.top.ipv4.Config.class)
-                        .augmentation(AclSetAclEntryIpv4WildcardedAug.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv4.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv4.protocol.fields.top.ipv4.Config.class)
-                        .augmentation(AclSetAclEntryIpv4WildcardedAug.class)
-                        .child(SourceAddressWildcarded.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv4.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv4.protocol.fields.top.ipv4.Config.class)
-                        .augmentation(AclSetAclEntryIpv4WildcardedAug.class)
-                        .child(DestinationAddressWildcarded.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv6.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv6.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv6.protocol.fields.top.ipv6.Config.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv6.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv6.protocol.fields.top.ipv6.Config.class)
-                        .augmentation(Config2.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv6.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv6.protocol.fields.top.ipv6.Config.class)
-                        .augmentation(AclSetAclEntryIpv6WildcardedAug.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv6.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv6.protocol.fields.top.ipv6.Config.class)
-                        .augmentation(AclSetAclEntryIpv6WildcardedAug.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst
-                                .ipv6.address.wildcarded.SourceAddressWildcarded.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Ipv6.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv6.protocol.fields.top.ipv6.Config.class)
-                        .augmentation(AclSetAclEntryIpv6WildcardedAug.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst
-                                .ipv6.address.wildcarded.DestinationAddressWildcarded.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Transport.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Transport.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .transport.fields.top.transport.Config.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Transport.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .transport.fields.top.transport.Config.class)
-                        .augmentation(AclSetAclEntryTransportPortNamedAug.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Actions.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .child(Actions.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
-                                .action.top.actions.Config.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .augmentation(AclEntry1.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .augmentation(AclEntry1.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
-                                .acl.icmp.type.Icmp.class),
-                InstanceIdentifier.create(AclEntry.class)
-                        .augmentation(AclEntry1.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
-                                .acl.icmp.type.Icmp.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
-                                .acl.icmp.type.icmp.Config.class)
-                ),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_CONFIG, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV4, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CONFIG, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG1, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV4WILDCARDEDAUG,
+                        ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(
+                        IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV4WILDCARDEDAUG_SOURCEADDRESSWILDCARDED,
+                        ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(
+                        IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV4WILDCARDEDAUG_DESTINATIONADDRESSWILDCARDED,
+                        ACL_ENTRY_TREE_BASE),
+
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV6, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.ACL_ACL_ACL_ACL_ACL_IPV_CONFIG, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG2 , ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.NE_TO_NO_CO_AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV6WILDCARDEDAUG,
+                        ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(
+                    IIDs.NE_TO_NO_CO_AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV6WILDCARDEDAUG_SOURCEADDRESSWILDCARDED,
+                    ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(
+                IIDs.NE_TO_NO_CO_AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV6WILDCARDEDAUG_DESTINATIONADDRESSWILDCARDED,
+                        ACL_ENTRY_TREE_BASE),
+
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TRANSPORT, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CONFIG, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CONFIG, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CO_AUG_ACLSETACLENTRYTRANSPORTPORTNAMEDAUG,
+                        ACL_ENTRY_TREE_BASE),
+
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_ACTIONS, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AC_CONFIG, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_ICMP, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG, ACL_ENTRY_TREE_BASE)),
                 new GenericWriter<>(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryWriter(cli)));
     }
 
@@ -249,57 +185,28 @@ public class AclUnit implements TranslateUnit {
         readRegistry.addStructuralReader(IIDs.AC_AC_AC_ACLENTRIES, AclEntriesBuilder.class);
 
         // ACL Entry subtree
-        final InstanceIdentifier<AclEntry> ACL_ENTRY_TREE_BASE = InstanceIdentifier.create(AclEntry.class);
         readRegistry.subtreeAdd(Sets.newHashSet(
-                ACL_ENTRY_TREE_BASE
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
-                                .access.list.entries.top.acl.entries.acl.entry.Config.class),
-                ACL_ENTRY_TREE_BASE.child(Actions.class),
-                ACL_ENTRY_TREE_BASE
-                        .child(Actions.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
-                                .action.top.actions.Config.class),
-                ACL_ENTRY_TREE_BASE.child(Ipv4.class),
-                ACL_ENTRY_TREE_BASE
-                        .child(Ipv4.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv4.protocol.fields.top.ipv4.Config.class),
-                ACL_ENTRY_TREE_BASE
-                        .child(Ipv4.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv4.protocol.fields.top.ipv4.Config.class)
-                        .augmentation(Config1.class),
-                ACL_ENTRY_TREE_BASE.child(Ipv6.class),
-                ACL_ENTRY_TREE_BASE
-                        .child(Ipv6.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv6.protocol.fields.top.ipv6.Config.class),
-                ACL_ENTRY_TREE_BASE
-                        .child(Ipv6.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .ipv6.protocol.fields.top.ipv6.Config.class)
-                        .augmentation(Config2.class),
-                ACL_ENTRY_TREE_BASE.child(Transport.class),
-                ACL_ENTRY_TREE_BASE
-                        .child(Transport.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .transport.fields.top.transport.Config.class),
-                ACL_ENTRY_TREE_BASE
-                        .child(Transport.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
-                                .transport.fields.top.transport.Config.class)
-                        .augmentation(AclSetAclEntryTransportPortNamedAug.class),
-                ACL_ENTRY_TREE_BASE.augmentation(AclEntry1.class),
-                ACL_ENTRY_TREE_BASE
-                        .augmentation(AclEntry1.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
-                                .acl.icmp.type.Icmp.class),
-                ACL_ENTRY_TREE_BASE
-                        .augmentation(AclEntry1.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
-                                .acl.icmp.type.Icmp.class)
-                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
-                                .acl.icmp.type.icmp.Config.class)
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_CONFIG, ACL_ENTRY_TREE_BASE),
+
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_ACTIONS, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AC_CONFIG, ACL_ENTRY_TREE_BASE),
+
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV4, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CONFIG, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG1, ACL_ENTRY_TREE_BASE),
+
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV6, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.ACL_ACL_ACL_ACL_ACL_IPV_CONFIG, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG2 , ACL_ENTRY_TREE_BASE),
+
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TRANSPORT, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CONFIG, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CO_AUG_ACLSETACLENTRYTRANSPORTPORTNAMEDAUG,
+                        ACL_ENTRY_TREE_BASE),
+
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_ICMP, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG, ACL_ENTRY_TREE_BASE)
         ), new GenericConfigListReader<>(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryReader(cli)));
     }
 

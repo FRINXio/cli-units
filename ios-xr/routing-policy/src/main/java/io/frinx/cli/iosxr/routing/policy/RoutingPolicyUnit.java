@@ -48,32 +48,14 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
-import io.frinx.openconfig.openconfig.policy.IIDs;
+import io.frinx.openconfig.openconfig.bgp.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Conditions2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.DefinedSets2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.DefinedSets2Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.length.top.AsPathLength;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.SetAsPathPrepend;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.AsPathSets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.AsPathSetsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.as.path.sets.AsPathSet;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.BgpActions;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.conditions.top.BgpConditions;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.community.set.top.CommunitySets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.community.set.top.CommunitySetsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.community.set.top.community.sets.CommunitySet;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.community.set.top.community.sets.community.set.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.match.as.path.top.MatchAsPathSet;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.match.community.top.MatchCommunitySet;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.routing.policy.defined.sets.BgpDefinedSets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.routing.policy.defined.sets.BgpDefinedSetsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.SetCommunity;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.Inline;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.reference.top.Reference;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.defined.sets.top.DefinedSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.definitions.top.PolicyDefinitionsBuilder;
@@ -87,141 +69,61 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class RoutingPolicyUnit implements TranslateUnit {
 
-    public static final InstanceIdentifier<DefinedSets2> IIDS_DS_BGP_AUG
-            = IIDs.RO_DEFINEDSETS.augmentation(DefinedSets2.class);
-    public static final InstanceIdentifier<BgpDefinedSets> IIDS_BGP_DEF_SETS = IIDS_DS_BGP_AUG.child(BgpDefinedSets
-            .class);
-    public static final InstanceIdentifier<CommunitySets> IIDS_BGP_COMM_SETS = IIDS_BGP_DEF_SETS.child(CommunitySets
-            .class);
-    public static final InstanceIdentifier<CommunitySet> IIDS_BGP_COMM_SET = IIDS_BGP_COMM_SETS.child(CommunitySet
-            .class);
-    public static final InstanceIdentifier<Config> IIDS_BGP_COMM_SET_CFG = IIDS_BGP_COMM_SET.child(Config.class);
-
-    public static final InstanceIdentifier<AsPathSets> IIDS_AS_PATH_SETS = IIDS_BGP_DEF_SETS.child(AsPathSets.class);
-    public static final InstanceIdentifier<AsPathSet> IIDS_AS_PATH_SET = IIDS_AS_PATH_SETS.child(AsPathSet.class);
-    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-            .rev170730.as.path.set.top.as.path.sets.as.path.set.Config> IIDS_AS_PATH_SET_CFG =
-            IIDS_AS_PATH_SET.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-                    .rev170730.as.path.set.top.as.path.sets.as.path.set.Config.class);
-
     public static final InstanceIdentifier<Statements> STATEMENTS_ID = InstanceIdentifier.create(Statements.class);
 
-    // Conditions
-    public static final InstanceIdentifier<Conditions2> BGP_CONDITIONS_AUG_ID = IIDs.RO_PO_PO_ST_ST_CONDITIONS
-            .augmentation(Conditions2.class);
-    public static final InstanceIdentifier<BgpConditions> BGP_CONDITIONS_ID
-            = BGP_CONDITIONS_AUG_ID.child(BgpConditions.class);
-    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-            .rev170730.bgp.conditions.top.bgp.conditions.Config> BGP_CONDITIONS_CFG_ID =
-            BGP_CONDITIONS_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-                    .rev170730.bgp.conditions.top.bgp.conditions.Config.class);
-
-    public static final InstanceIdentifier<AsPathLength> AS_PATH_COND_ID = BGP_CONDITIONS_ID.child(AsPathLength.class);
-    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-            .rev170730.as.path.length.top.as.path.length.Config> AS_PATH_COND_CFG_ID =
-            AS_PATH_COND_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as
-                    .path.length.top.as.path.length.Config.class);
-
-    public static final InstanceIdentifier<MatchAsPathSet> MATCH_AS_PATH_COND_ID
-            = BGP_CONDITIONS_ID.child(MatchAsPathSet.class);
-    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-            .rev170730.match.as.path.top.match.as.path.set.Config> MATCH_AS_PATH_COND_CFG_ID =
-            MATCH_AS_PATH_COND_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-                    .rev170730.match.as.path.top.match.as.path.set.Config.class);
-
-    public static final InstanceIdentifier<MatchCommunitySet> MATCH_COMMUNITY_COND_ID
-            = BGP_CONDITIONS_ID.child(MatchCommunitySet.class);
-    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-            .rev170730.match.community.top.match.community.set.Config> MATCH_COMMUNITY_COND_CFG_ID =
-            MATCH_COMMUNITY_COND_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-                    .rev170730.match.community.top.match.community.set.Config.class);
-
     public static final Set<InstanceIdentifier<?>> STATEMENTS_CONDITIONS_SUBTREES = Sets.newHashSet(
-            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CONDITIONS, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CO_CONFIG, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_ST_ST_CONDITIONS, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_ST_ST_CO_CONFIG, STATEMENTS_ID),
 
-            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CO_MATCHPREFIXSET, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(IIDs.ROUT_POLI_POLI_STAT_STAT_COND_MATC_CONFIG, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_ST_ST_CO_MATCHPREFIXSET,
+                    STATEMENTS_ID),
+            RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.ROUT_POLI_POLI_STAT_STAT_COND_MATC_CONFIG,
+                    STATEMENTS_ID),
 
-            RWUtils.cutIdFromStart(BGP_CONDITIONS_AUG_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(BGP_CONDITIONS_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(BGP_CONDITIONS_CFG_ID, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CO_AUG_CONDITIONS2, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CO_AUG_CONDITIONS2_BGPCONDITIONS, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CO_AUG_CONDITIONS2_BG_CONFIG, STATEMENTS_ID),
 
             // As path length
-            RWUtils.cutIdFromStart(AS_PATH_COND_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(AS_PATH_COND_CFG_ID, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CO_AUG_CONDITIONS2_BG_ASPATHLENGTH, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CO_AUG_CONDITIONS2_BG_AS_CONFIG, STATEMENTS_ID),
 
             // Match As path set
-            RWUtils.cutIdFromStart(MATCH_AS_PATH_COND_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(MATCH_AS_PATH_COND_CFG_ID, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CO_AUG_CONDITIONS2_BG_MATCHASPATHSET, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CO_AUG_CONDITIONS2_BG_MA_CONFIG, STATEMENTS_ID),
 
             // Match community set
-            RWUtils.cutIdFromStart(MATCH_COMMUNITY_COND_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(MATCH_COMMUNITY_COND_CFG_ID, STATEMENTS_ID)
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CO_AUG_CONDITIONS2_BG_MATCHCOMMUNITYSET, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.ROU_POL_POL_STA_STA_CON_AUG_CONDITIONS2_BGP_MAT_CONFIG, STATEMENTS_ID)
     );
 
-    // Actions
-    public static final InstanceIdentifier<Actions2> BGP_ACTIONS_AUG_ID
-            = IIDs.RO_PO_PO_ST_ST_ACTIONS.augmentation(Actions2.class);
-    public static final InstanceIdentifier<BgpActions> BGP_ACTIONS_ID = BGP_ACTIONS_AUG_ID.child(BgpActions.class);
-    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-            .rev170730.bgp.actions.top.bgp.actions.Config> BGP_ACTIONS_CFG_ID =
-            BGP_ACTIONS_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp
-                    .actions.top.bgp.actions.Config.class);
-
-    public static final InstanceIdentifier<SetAsPathPrepend> AS_PATH_PREPEND_ACT_ID
-            = BGP_ACTIONS_ID.child(SetAsPathPrepend.class);
-    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-            .rev170730.as.path.prepend.top.set.as.path.prepend.Config> AS_PATH_PREPAND_ACT_CFG_ID =
-            AS_PATH_PREPEND_ACT_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-                    .rev170730.as.path.prepend.top.set.as.path.prepend.Config.class);
-
-    public static final InstanceIdentifier<SetCommunity> SET_COMMUNITY_ACT_ID = BGP_ACTIONS_ID.child(SetCommunity
-            .class);
-    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-            .rev170730.set.community.action.top.set.community.Config> SET_COMMUNITY_ACT_CFG_ID =
-            SET_COMMUNITY_ACT_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-                    .rev170730.set.community.action.top.set.community.Config.class);
-    public static final InstanceIdentifier<Reference> SET_COMMUNITY_ACT_REF_ID = SET_COMMUNITY_ACT_ID.child(Reference
-            .class);
-    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-            .rev170730.set.community.reference.top.reference.Config> SET_COMMUNITY_ACT_REF_CFG_ID =
-            SET_COMMUNITY_ACT_REF_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-                    .rev170730.set.community.reference.top.reference.Config.class);
-    public static final InstanceIdentifier<Inline> SET_COMMUNITY_ACT_INLINE_ID = SET_COMMUNITY_ACT_ID.child(Inline
-            .class);
-    public static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-            .rev170730.set.community.inline.top.inline.Config> SET_COMMUNITY_ACT_INLINE_CFG_ID =
-            SET_COMMUNITY_ACT_INLINE_ID.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
-                    .rev170730.set.community.inline.top.inline.Config.class);
-
     public static final Set<InstanceIdentifier<?>> STATEMENTS_ACTIONS_SUBTREES = Sets.newHashSet(
-            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_ACTIONS, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_CONFIG, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_ST_ST_ACTIONS, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_ST_ST_AC_CONFIG, STATEMENTS_ID),
 
-            RWUtils.cutIdFromStart(BGP_ACTIONS_AUG_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(BGP_ACTIONS_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(BGP_ACTIONS_CFG_ID, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BGPACTIONS, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_CONFIG, STATEMENTS_ID),
 
             // As path prepend
-            RWUtils.cutIdFromStart(AS_PATH_PREPEND_ACT_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(AS_PATH_PREPAND_ACT_CFG_ID, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SETASPATHPREPEND, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_CONFIG, STATEMENTS_ID),
 
             // Community set
-            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_CFG_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_REF_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_REF_CFG_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_INLINE_ID, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(SET_COMMUNITY_ACT_INLINE_CFG_ID, STATEMENTS_ID)
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SETCOMMUNITY, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.ROU_POL_POL_STA_STA_ACT_AUG_ACTIONS2_BGP_SET_CONFIG, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_REFERENCE, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_RE_CONFIG, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_INLINE, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_IN_CONFIG, STATEMENTS_ID)
     );
 
     // Statements
     public static final Set<InstanceIdentifier<?>> STATEMENTS_SUBTREES = Sets.newHashSet(
-            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_CONFIG, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_ACTIONS, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_ST_AC_CONFIG, STATEMENTS_ID),
-            RWUtils.cutIdFromStart(IIDs.RO_PO_PO_ST_STATEMENT, STATEMENTS_ID));
+            RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_ST_ST_CONFIG, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_ST_ST_ACTIONS, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_ST_ST_AC_CONFIG, STATEMENTS_ID),
+            RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_ST_STATEMENT, STATEMENTS_ID));
 
     static {
         STATEMENTS_SUBTREES.addAll(STATEMENTS_CONDITIONS_SUBTREES);
@@ -261,70 +163,99 @@ public class RoutingPolicyUnit implements TranslateUnit {
 
     private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         // Prefix sets
-        writeRegistry.add(new GenericWriter<>(IIDs.RO_DE_PREFIXSETS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericListWriter<>(IIDs.RO_DE_PR_PREFIXSET, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.RO_DE_PR_PR_CONFIG, new PrefixSetConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PREFIXSETS,
+                new NoopCliWriter<>()));
+        writeRegistry.add(new GenericListWriter<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PREFIXSET,
+                new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_CONFIG,
+                new PrefixSetConfigWriter(cli)));
         // Handle all prefixes at once
         writeRegistry.subtreeAddAfter(
                 Sets.newHashSet(
-                        RWUtils.cutIdFromStart(IIDs.RO_DE_PR_PR_PR_PREFIX, InstanceIdentifier.create(Prefixes.class)),
-                        RWUtils.cutIdFromStart(IIDs.RO_DE_PR_PR_PR_PR_CONFIG,
+                        RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_PR_PREFIX,
+                                InstanceIdentifier.create(Prefixes.class)),
+                        RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_PR_PR_CONFIG,
                                 InstanceIdentifier.create(Prefixes.class))),
-                new GenericWriter<>(IIDs.RO_DE_PR_PR_PREFIXES, new PrefixesWriter(cli)),
-                IIDs.RO_DE_PR_PR_CONFIG);
+                new GenericWriter<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_PREFIXES,
+                        new PrefixesWriter(cli)),
+                io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_CONFIG);
 
         // Community sets
-        writeRegistry.add(new GenericWriter<>(IIDS_DS_BGP_AUG, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDS_BGP_DEF_SETS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDS_BGP_COMM_SETS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericListWriter<>(IIDS_BGP_COMM_SET, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDS_BGP_COMM_SET_CFG, new CommunitySetConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.RO_DE_AUG_DEFINEDSETS2, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BGPDEFINEDSETS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_COMMUNITYSETS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericListWriter<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_CO_COMMUNITYSET,
+                new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_CO_CO_CONFIG,
+                new CommunitySetConfigWriter(cli)));
 
         // As path sets
-        writeRegistry.add(new GenericWriter<>(IIDS_AS_PATH_SETS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericListWriter<>(IIDS_AS_PATH_SET, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDS_AS_PATH_SET_CFG, new AsPathSetConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_ASPATHSETS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericListWriter<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_AS_ASPATHSET,
+                new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_AS_AS_CONFIG,
+                new AsPathSetConfigWriter(cli)));
 
         // Policy definition
-        writeRegistry.add(new GenericListWriter<>(IIDs.RO_PO_POLICYDEFINITION, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericListWriter<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_POLICYDEFINITION,
+                new NoopCliListWriter<>()));
         writeRegistry.addAfter(
-                new GenericWriter<>(IIDs.RO_PO_PO_CONFIG, new PolicyConfigWriter(cli)),
-                Sets.newHashSet(IIDs.RO_DE_PR_PR_CONFIG, IIDS_AS_PATH_SET_CFG, IIDS_BGP_COMM_SET_CFG));
+                new GenericWriter<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_CONFIG,
+                        new PolicyConfigWriter(cli)),
+                Sets.newHashSet(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_CONFIG,
+                        IIDs.RO_DE_AUG_DEFINEDSETS2_BG_AS_AS_CONFIG,
+                        IIDs.RO_DE_AUG_DEFINEDSETS2_BG_CO_CO_CONFIG));
         writeRegistry.subtreeAddAfter(STATEMENTS_SUBTREES,
-                new GenericWriter<>(IIDs.RO_PO_PO_STATEMENTS, new StatementsWriter(cli)),
-                IIDs.RO_PO_POLICYDEFINITION);
+                new GenericWriter<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_STATEMENTS,
+                        new StatementsWriter(cli)), io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_POLICYDEFINITION);
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.ROUTINGPOLICY, RoutingPolicyBuilder.class);
-        readRegistry.addStructuralReader(IIDs.RO_DEFINEDSETS, DefinedSetsBuilder.class);
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.policy.IIDs.ROUTINGPOLICY,
+                RoutingPolicyBuilder.class);
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.policy.IIDs.RO_DEFINEDSETS,
+                DefinedSetsBuilder.class);
 
         // Prefix sets
-        readRegistry.addStructuralReader(IIDs.RO_DE_PREFIXSETS, PrefixSetsBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.RO_DE_PR_PREFIXSET, new PrefixSetReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.RO_DE_PR_PR_CONFIG, new PrefixSetConfigReader()));
-        readRegistry.addStructuralReader(IIDs.RO_DE_PR_PR_PREFIXES, PrefixesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.RO_DE_PR_PR_PR_PREFIX, new PrefixReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.RO_DE_PR_PR_PR_PR_CONFIG, new PrefixConfigReader()));
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PREFIXSETS,
+                PrefixSetsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PREFIXSET,
+                new PrefixSetReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_CONFIG,
+                new PrefixSetConfigReader()));
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_PREFIXES,
+                PrefixesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_PR_PREFIX,
+                new PrefixReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_PR_PR_CONFIG,
+                new PrefixConfigReader()));
 
         // Community sets
-        readRegistry.addStructuralReader(IIDS_DS_BGP_AUG, DefinedSets2Builder.class);
-        readRegistry.addStructuralReader(IIDS_BGP_DEF_SETS, BgpDefinedSetsBuilder.class);
-        readRegistry.addStructuralReader(IIDS_BGP_COMM_SETS, CommunitySetsBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDS_BGP_COMM_SET, new CommunitySetReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDS_BGP_COMM_SET_CFG, new CommunitySetConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.RO_DE_AUG_DEFINEDSETS2, DefinedSets2Builder.class);
+        readRegistry.addStructuralReader(IIDs.RO_DE_AUG_DEFINEDSETS2_BGPDEFINEDSETS, BgpDefinedSetsBuilder.class);
+        readRegistry.addStructuralReader(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_COMMUNITYSETS, CommunitySetsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_CO_COMMUNITYSET,
+                new CommunitySetReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_CO_CO_CONFIG,
+                new CommunitySetConfigReader(cli)));
 
         // As path sets
-        readRegistry.addStructuralReader(IIDS_AS_PATH_SETS, AsPathSetsBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDS_AS_PATH_SET, new AsPathSetReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDS_AS_PATH_SET_CFG, new AsPathSetConfigReader(cli)));
+        readRegistry.addStructuralReader(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_ASPATHSETS, AsPathSetsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_AS_ASPATHSET,
+                new AsPathSetReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.RO_DE_AUG_DEFINEDSETS2_BG_AS_AS_CONFIG,
+                new AsPathSetConfigReader(cli)));
 
         // Policy definition
-        readRegistry.addStructuralReader(IIDs.RO_POLICYDEFINITIONS, PolicyDefinitionsBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.RO_PO_POLICYDEFINITION, new PolicyReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.RO_PO_PO_CONFIG, new PolicyConfigReader()));
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.policy.IIDs.RO_POLICYDEFINITIONS,
+                PolicyDefinitionsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(
+                io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_POLICYDEFINITION, new PolicyReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_CONFIG,
+                new PolicyConfigReader()));
         readRegistry.subtreeAdd(STATEMENTS_SUBTREES,
-                new GenericConfigReader<>(IIDs.RO_PO_PO_STATEMENTS, new StatementsReader(cli)));
+                new GenericConfigReader<>(io.frinx.openconfig.openconfig.policy.IIDs.RO_PO_PO_STATEMENTS,
+                        new StatementsReader(cli)));
     }
 
     @Override

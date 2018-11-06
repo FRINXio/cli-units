@@ -21,11 +21,9 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.mpls.MplsReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.TeGlobalAttributes1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.TeGlobalAttributes1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.global.config.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.global.config.ConfigBuilder;
@@ -37,10 +35,6 @@ public class TeConfigReader implements MplsReader.MplsConfigReader<Config, Confi
 
     private static final String SHOW_RUN_MPLS = "show running-config mpls traffic-eng";
     private static final Pattern MPLS_LINE = Pattern.compile("(.*)mpls traffic-eng(.*)");
-
-    // this is here because of checkstyle line length complaint when using fully qualified name
-    public static final InstanceIdentifier<Config> TE_CONFIG_IID = IIDs.NE_NE_MP_TEGLOBALATTRIBUTES
-            .augmentation(TeGlobalAttributes1.class).child(Config.class);
 
     private Cli cli;
 
