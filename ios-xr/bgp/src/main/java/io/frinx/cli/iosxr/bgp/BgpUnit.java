@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.IosXrDevices;
@@ -52,8 +53,6 @@ import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.BgpNeAfAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.soft.reconfiguration.group.SoftReconfiguration;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.all.afi.safi.common.PrefixLimitBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.ipv4.unicast.group.Ipv4UnicastBuilder;
@@ -71,6 +70,13 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class BgpUnit implements TranslateUnit {
+
+    private static final InstanceIdentifier<Config> CONFIG_IID = InstanceIdentifier.create(Config.class);
+    private static final InstanceIdentifier<AfiSafi> NE_AFISAFI_IID = InstanceIdentifier.create(AfiSafi.class);
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx
+            .openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafi> GL_AFISAFI_IID =
+            InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx
+                    .openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafi.class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -126,10 +132,10 @@ public class BgpUnit implements TranslateUnit {
                 new NeighborEbgpConfigWriter(cli)), IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG);
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, new NoopCliListWriter<>()));
-        writeRegistry.subtreeAddAfter(Sets.newHashSet(InstanceIdentifier.create(Config.class)
-                .augmentation(BgpNeAfAug.class), InstanceIdentifier.create(Config.class)
-                .augmentation(BgpNeAfAug.class)
-                .child(SoftReconfiguration.class)), new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG, new
+        writeRegistry.subtreeAddAfter(Sets.newHashSet(
+            RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CO_AUG_BGPNEAFAUG, CONFIG_IID),
+            RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CO_AUG_BGPNEAFAUG_SOFTRECONFIGURATION, CONFIG_IID)),
+                new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG, new
                 NeighborAfiSafiConfigWriter(cli)), IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG);
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY, new NoopCliWriter<>()));
         writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, new
@@ -157,11 +163,9 @@ public class BgpUnit implements TranslateUnit {
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigReader(cli)));
         readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_GL_AFISAFIS, org.opendaylight.yang.gen.v1.http.frinx
                 .openconfig.net.yang.bgp.rev170202.bgp.global.base.AfiSafisBuilder.class);
-        readRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx
-                .openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafi.class)
-                .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi
-                        .list.afi.safi.Config.class)), new GenericConfigListReader<>(IIDs
-                .NE_NE_PR_PR_BG_GL_AF_AFISAFI, new GlobalAfiSafiReader(cli)));
+        readRegistry.subtreeAdd(Sets.newHashSet(
+                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, GL_AFISAFI_IID)),
+                new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI, new GlobalAfiSafiReader(cli)));
         readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NEIGHBORS, NeighborsBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader(cli)));
@@ -172,13 +176,11 @@ public class BgpUnit implements TranslateUnit {
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_EB_CONFIG,
                 new NeighborEbgpConfigReader(cli)));
         readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS, AfiSafisBuilder.class);
-        readRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(AfiSafi.class)
-                .child(Config.class), InstanceIdentifier.create(AfiSafi.class)
-                .child(Config.class)
-                .augmentation(BgpNeAfAug.class), InstanceIdentifier.create(AfiSafi.class)
-                .child(Config.class)
-                .augmentation(BgpNeAfAug.class)
-                .child(SoftReconfiguration.class)), new GenericConfigListReader<>(IIDs
+        readRegistry.subtreeAdd(Sets.newHashSet(
+                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG, NE_AFISAFI_IID),
+                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CO_AUG_BGPNEAFAUG, NE_AFISAFI_IID),
+                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CO_AUG_BGPNEAFAUG_SOFTRECONFIGURATION,
+                        NE_AFISAFI_IID)), new GenericConfigListReader<>(IIDs
                 .NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, new NeighborAfiSafiReader(cli)));
         readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY, ApplyPolicyBuilder.class);
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, new

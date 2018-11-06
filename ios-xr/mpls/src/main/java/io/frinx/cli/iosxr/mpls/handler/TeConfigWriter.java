@@ -22,9 +22,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.mpls.MplsWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.NiMplsTeEnabledCiscoAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.global.config.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.Mpls;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributes;
@@ -32,9 +30,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class TeConfigWriter implements MplsWriter<Config> {
 
-    // this is here because of checkstyle line length complaint when using fully qualified name
-    public static final InstanceIdentifier<Config> TE_CONFIG_IID = IIDs.NE_NE_MP_TEGLOBALATTRIBUTES
-            .augmentation(NiMplsTeEnabledCiscoAug.class).child(Config.class);
     private static final String MPLS_COMMAND = "mpls traffic-eng\n"
                                                 + "root";
     private static final String NO_MPLS_COMMAND = "no mpls traffic-eng";
