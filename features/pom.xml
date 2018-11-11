@@ -27,7 +27,7 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-features</artifactId>
-  <version>3.1.7.rc6-frinx</version>
+  <version>3.1.7.rc7-frinx-SNAPSHOT</version>
   <name>${project.artifactId}</name>
 
   <properties>
@@ -38,9 +38,9 @@
     <configfile.directory>etc/opendaylight/karaf</configfile.directory>
     <hc.version>1.17.10-Carbon-SR1.3_1_7_rc7-frinxodl-SNAPSHOT</hc.version>
     <jgraph.version>0.9.2</jgraph.version>
-    <cli.version>3.1.7.rc6-frinx</cli.version>
-    <openconfig.version>3.1.7.rc6-frinx</openconfig.version>
-    <translate.unit.commons.version>3.1.7.rc6-frinx</translate.unit.commons.version>
+    <cli.version>3.1.7.rc7-frinx-SNAPSHOT</cli.version>
+    <openconfig.version>3.1.7.rc7-frinx-SNAPSHOT</openconfig.version>
+    <translate.unit.commons.version>3.1.7.rc7-frinx-SNAPSHOT</translate.unit.commons.version>
   </properties>
 
   <dependencyManagement>
