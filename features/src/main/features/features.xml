@@ -155,6 +155,7 @@
         <bundle>mvn:io.frinx.cli/junos-utils/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-cli-init-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-configuration-metadata-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/junos-interface-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-huawei' version='${project.version}'>
