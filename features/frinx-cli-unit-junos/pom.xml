@@ -62,7 +62,10 @@
             <groupId>io.frinx.cli</groupId>
             <artifactId>junos-utils</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>junos-interface-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>

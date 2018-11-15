@@ -33,6 +33,7 @@
     <module>init</module>
     <module>utils</module>
     <module>configuration-metadata</module>
+    <module>interface</module>
   </modules>
 
   <build>
