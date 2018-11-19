@@ -223,7 +223,7 @@
                                     <resourceBaseDir>${project.build.directory}/generated-sources/spi</resourceBaseDir>
                                 </generator>
                             </codeGenerators>
-                            <inspectDependencies>true</inspectDependencies>
+                            <inspectOnlyDependencies>true</inspectOnlyDependencies>
                         </configuration>
                     </execution>
                 </executions>
