@@ -159,7 +159,7 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
                         .rev170621.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension
                         .cisco.rev171109.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.cisco.rev180323.$YangModuleInfoImpl
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.$YangModuleInfoImpl
                         .getInstance());
     }
 
