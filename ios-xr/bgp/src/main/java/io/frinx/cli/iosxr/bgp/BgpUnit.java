@@ -99,7 +99,7 @@ public class BgpUnit implements TranslateUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(), org.opendaylight.yang.gen.v1.http.frinx.openconfig
-                .net.yang.bgp.cisco.rev180323.$YangModuleInfoImpl.getInstance());
+                .net.yang.bgp.extension.rev180323.$YangModuleInfoImpl.getInstance());
     }
 
     @Override
