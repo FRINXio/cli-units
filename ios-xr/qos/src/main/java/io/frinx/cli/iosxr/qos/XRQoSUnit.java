@@ -117,8 +117,8 @@ public class XRQoSUnit implements TranslateUnit {
                 RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TERM, CLASSIFIER_ID),
                 RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CONFIG, CLASSIFIER_ID),
                 RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CONDITIONS, CLASSIFIER_ID),
-                RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_AUG_CONDITIONS1,
-                        CLASSIFIER_ID),
+                RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG, CLASSIFIER_ID),
+
                 RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_MPLS, CLASSIFIER_ID),
                 RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_MP_CONFIG, CLASSIFIER_ID),
                 RWUtils.cutIdFromStart(IIDs.QO_CL_CL_TE_TE_CO_IPV4, CLASSIFIER_ID),
