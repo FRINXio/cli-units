@@ -223,7 +223,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         // if-ethernet
         writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET, new NoopCliWriter<>()));
         writeRegistry.subtreeAddAfter(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.IN_IN_ET_CO_AUG_CONFIG1, IFC_ETH_CONFIG_ROOT_ID),
+                RWUtils.cutIdFromStart(IIDs.INT_INT_ETH_CON_AUG_CONFIG1, IFC_ETH_CONFIG_ROOT_ID),
                 RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG,
                         IFC_ETH_CONFIG_ROOT_ID)),
                 new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli)),
@@ -324,7 +324,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                         .rev161222.Interface1Builder.class);
         readRegistry.addStructuralReader(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET, EthernetBuilder.class);
         readRegistry.subtreeAdd(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.IN_IN_ET_CO_AUG_CONFIG1, IFC_ETH_CONFIG_ROOT_ID),
+                RWUtils.cutIdFromStart(IIDs.INT_INT_ETH_CON_AUG_CONFIG1, IFC_ETH_CONFIG_ROOT_ID),
                 RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG,
                         IFC_ETH_CONFIG_ROOT_ID)),
                 new GenericConfigReader<>(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli)));
