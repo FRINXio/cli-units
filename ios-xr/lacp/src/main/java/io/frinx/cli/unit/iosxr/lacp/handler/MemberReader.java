@@ -24,7 +24,6 @@ import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,9 +40,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class MemberReader implements CliConfigListReader<Member, MemberKey, MemberBuilder> {
 
+    private static final String SHOW_ALL_INTERFACES_CONFIG = "show running-config interface";
     private static final Pattern INTERFACE_LINE_SEPARATOR = Pattern.compile("(?=interface (?<id>[\\S]{0,128}))");
     private static final Pattern LAG_ID_IN_INTERFACE_LINE = Pattern.compile("\\s*Bundle-Ether(?<id>\\d+).*");
-    private static final String SHOW_ALL_INTERFACES_CONFIG = "show running-config interface";
 
     private final Cli cli;
 
@@ -65,27 +64,27 @@ public class MemberReader implements CliConfigListReader<Member, MemberKey, Memb
         final Pattern specificBundlePattern = Pattern.compile("\\s*bundle id " + bundleId
                 + "( mode (?<mode>active|passive))?.*");
         return INTERFACE_LINE_SEPARATOR.splitAsStream(commandOutput)
-                .map(interfaceConfiguration -> parseInterfaceName(specificBundlePattern, interfaceConfiguration))
-                .filter(Objects::nonNull)
+                .filter(interfaceConfig -> isItIsInterfaceOfBundle(specificBundlePattern, interfaceConfig))
+                .map(MemberReader::parseInterfaceName)
                 .map(MemberKey::new)
                 .collect(Collectors.toList());
     }
 
-    private static String parseInterfaceName(@Nonnull Pattern specificBundlePattern,
-                                             @Nonnull String interfaceConfiguration) {
-        final boolean itIsInterfaceOfBundle = Arrays.stream(ParsingUtils.NEWLINE.split(interfaceConfiguration))
+    private static String parseInterfaceName(@Nonnull String interfaceConfiguration) {
+        final AtomicReference<String> interfaceName = new AtomicReference<>();
+        ParsingUtils.parseField(
+                interfaceConfiguration,
+                BundleReader.INTERFACE_LINE::matcher,
+            matcher -> matcher.group("id"),
+                interfaceName::set);
+        return interfaceName.get();
+    }
+
+    private static boolean isItIsInterfaceOfBundle(@Nonnull Pattern specificBundlePattern,
+                                                   @Nonnull String interfaceConfiguration) {
+        return Arrays.stream(ParsingUtils.NEWLINE.split(interfaceConfiguration))
                 .map(specificBundlePattern::matcher)
                 .anyMatch(Matcher::matches);
-        if (itIsInterfaceOfBundle) {
-            final AtomicReference<String> interfaceName = new AtomicReference<>();
-            ParsingUtils.parseField(
-                    interfaceConfiguration,
-                    BundleReader.INTERFACE_LINE::matcher,
-                matcher -> matcher.group("id"),
-                    interfaceName::set);
-            return interfaceName.get();
-        }
-        return null;
     }
 
     static String parseBundleIdFromBundleName(@Nonnull String bundleName) {

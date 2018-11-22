@@ -43,7 +43,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String AGGREGATE_IFC_NAME = "Bundle-Ether";
+    public static final String AGGREGATE_IFC_NAME = "Bundle-Ether";
 
     private final Cli cli;
 

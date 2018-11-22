@@ -20,9 +20,13 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.ethernet.EthernetConfigReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -37,7 +41,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class BundleReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private static final String SHOW_ALL_INTERFACES = "show running-config interface | include ^interface";
-    static final Pattern INTERFACE_LINE = Pattern.compile("interface (?<id>[\\S]+)");
+    private static final String SHOW_ALL_BUNDLE_IDS = "show running-config interface | include ^ *bundle id [0-9]+.*";
+    static final Pattern INTERFACE_LINE = Pattern.compile("\\s*interface (?<id>[\\S]+).*");
 
     private final Cli cli;
 
@@ -49,20 +54,40 @@ public class BundleReader implements CliConfigListReader<Interface, InterfaceKey
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String commandOutput = blockingRead(SHOW_ALL_INTERFACES, cli, instanceIdentifier, readContext);
-        return parseBundleIds(commandOutput);
+        final String listOfInterfaces = blockingRead(SHOW_ALL_INTERFACES, cli, instanceIdentifier, readContext);
+        final String listOfBundleIds = blockingRead(SHOW_ALL_BUNDLE_IDS, cli, instanceIdentifier, readContext);
+        return parseBundleIds(listOfInterfaces, listOfBundleIds);
     }
 
-    static List<InterfaceKey> parseBundleIds(@Nonnull String commandOutput) {
-        List<String> extractedInterfaceIds = ParsingUtils.parseFields(
+    static List<InterfaceKey> parseBundleIds(@Nonnull String listOfInterfaces, @Nonnull String listOfBundleIds) {
+        final Set<InterfaceKey> interfaceKeysFromBundleInterfaces = parseIdsFromBundleInterfaces(listOfInterfaces);
+        final Set<InterfaceKey> interfaceKeysFromInterfacesConfig = parseIdsFromInterfaceConfiguration(listOfBundleIds);
+        final Set<InterfaceKey> union = new HashSet<>(interfaceKeysFromBundleInterfaces);
+        union.addAll(interfaceKeysFromInterfacesConfig);
+        return new ArrayList<>(union);
+    }
+
+    private static Set<InterfaceKey> parseIdsFromBundleInterfaces(String commandOutput) {
+        return ParsingUtils.parseFields(
                 commandOutput,
                 0,
-                INTERFACE_LINE::matcher, matcher -> matcher.group("id"),
-                String::new);
-        return extractedInterfaceIds.stream()
+            INTERFACE_LINE::matcher,
+            matcher -> matcher.group("id"),
+            String::new
+        ).stream()
                 .filter(AggregateConfigReader::isLAGInterface)
                 .map(InterfaceKey::new)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    private static Set<InterfaceKey> parseIdsFromInterfaceConfiguration(String commandOutput) {
+        return new HashSet<>(ParsingUtils.parseFields(
+                commandOutput,
+                0,
+            MemberConfigReader.LACP_BUNDLE_AND_MODE_LINE::matcher,
+                matcher -> matcher.group("id"),
+                id -> new InterfaceKey(EthernetConfigReader.AGGREGATE_IFC_NAME + id)
+        ));
     }
 
     @Override
