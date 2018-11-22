@@ -25,7 +25,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev17050
 
 public class BundleReaderTest {
 
-    private static final String SHOW_RUN_IN = "Wed Oct 31 16:37:56.954 UTC\n"
+    private static final String SHOW_RUN_INTERFACES_LIST = "Wed Oct 31 16:37:56.954 UTC\n"
             + "interface Bundle-Ether1\n"
             + "interface Bundle-Ether100\n"
             + "interface MgmtEth0/0/CPU0/0\n"
@@ -36,15 +36,21 @@ public class BundleReaderTest {
             + "interface GigabitEthernet0/0/0/4\n"
             + "interface GigabitEthernet0/0/0/5\n";
 
+    private static final String SHOW_RUN_BUNDLES_LIST = "Mon Nov 26 09:41:54.916 UTC\n"
+            + " bundle id 100 mode on\n"
+            + " bundle id 200 mode active\n";
+
     private static final List<InterfaceKey> EXPECTED_IDS =
-            Lists.newArrayList("Bundle-Ether1", "Bundle-Ether100")
+            Lists.newArrayList("Bundle-Ether1", "Bundle-Ether100", "Bundle-Ether200")
                     .stream()
                     .map(InterfaceKey::new)
                     .collect(Collectors.toList());
 
     @Test
     public void parseInterfaceIdsTest() {
-        final List<InterfaceKey> actualKeys = BundleReader.parseBundleIds(SHOW_RUN_IN);
+        final List<InterfaceKey> actualKeys = BundleReader.parseBundleIds(
+                SHOW_RUN_INTERFACES_LIST,
+                SHOW_RUN_BUNDLES_LIST);
         Assert.assertEquals(EXPECTED_IDS, actualKeys);
     }
 }

@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class MemberConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     static final String SH_SINGLE_INTERFACE = "show running-config interface %s";
-    private static final Pattern LACP_BUNDLE_AND_MODE_LINE = Pattern.compile("\\s*bundle id (?<id>\\d+)( mode "
+    static final Pattern LACP_BUNDLE_AND_MODE_LINE = Pattern.compile("\\s*bundle id (?<id>\\d+)( mode "
             + "(?<mode>active|passive))?.*");
     private static final Pattern LACP_PERIOD_LINE = Pattern.compile("\\s*lacp period short.*");
 

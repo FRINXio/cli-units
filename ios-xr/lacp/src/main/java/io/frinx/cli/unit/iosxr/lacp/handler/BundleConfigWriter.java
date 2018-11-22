@@ -34,7 +34,7 @@ public class BundleConfigWriter implements CliWriter<Config> {
 
     private static final String BUNDLE_MODE_TEMPLATE = "{% if ($lacp_mode) %}lacp mode"
             + "{% if ($lacp_mode == ACTIVE) %} active"
-            + "{% else %} passive"
+            + "{% elseIf ($lacp_mode == PASSIVE) %} passive"
             + "{% endif %}\n"
             + "{% endif %}";
     private static final String BUNDLE_ADD_CONFIG_TEMPLATE = "interface {$ifc_name}\n"
@@ -42,8 +42,10 @@ public class BundleConfigWriter implements CliWriter<Config> {
             + MemberConfigWriter.LACP_PERIOD_TEMPLATE
             + "root";
     private static final String BUNDLE_DELETE_CONFIG_TEMPLATE = "interface {$ifc_name}\n"
-            + "no lacp mode\n"
-            + "no lacp period short\n"
+            + "{% if ($lacp_mode) %}no lacp mode\n"
+            + "{% endif %}"
+            + "{% if ($lacp_interval) %}no lacp period short\n"
+            + "{% endif %}"
             + "root";
 
     private final Cli cli;
@@ -87,7 +89,10 @@ public class BundleConfigWriter implements CliWriter<Config> {
     void removeBundleConfig(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config)
             throws WriteFailedException.CreateFailedException {
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                fT(BUNDLE_DELETE_CONFIG_TEMPLATE, "ifc_name", config.getName()));
+                fT(BUNDLE_DELETE_CONFIG_TEMPLATE,
+                        "ifc_name", config.getName(),
+                        "lacp_mode", config.getLacpMode(),
+                        "lacp_interval", config.getInterval()));
     }
 
     private static void checkInterface(@Nonnull String ifcName, WriteContext writeContext) {
