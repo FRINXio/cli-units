@@ -46,6 +46,11 @@ public class BundleConfigWriterTest {
             .setName("Bundle-Ether200")
             .build();
 
+    private static final Config WRITE_DATA_3 = new ConfigBuilder()
+            .setName("Bundle-Ether300")
+            .setInterval(LacpPeriodType.FAST)
+            .build();
+
     private static final String WRITTEN_DATA_1 = "interface Bundle-Ether100\n"
             + "lacp mode active\n"
             + "lacp period short\n"
@@ -55,9 +60,17 @@ public class BundleConfigWriterTest {
             + "no lacp period short\n"
             + "root\n";
 
+    private static final String WRITTEN_DATA_3 = "interface Bundle-Ether300\n"
+            + "no lacp mode\n"
+            + "lacp period short\n"
+            + "root\n";
+
     private static final String REMOVED_DATA_1 = "interface Bundle-Ether100\n"
             + "no lacp mode\n"
             + "no lacp period short\n"
+            + "root\n";
+
+    private static final String REMOVED_DATA_2 = "interface Bundle-Ether200\n"
             + "root\n";
 
     @Mock
@@ -76,16 +89,23 @@ public class BundleConfigWriterTest {
 
     @Test
     public void writeCurrentAttributesTest1() throws WriteFailedException {
-        bundleConfigWriter.writeBundleConfig(iid, WRITE_DATA_1);
+        bundleConfigWriter.writeBundleConfig(iid, WRITE_DATA_1, false);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(WRITTEN_DATA_1, response.getValue().getContent());
     }
 
     @Test
     public void writeCurrentAttributesTest2() throws WriteFailedException {
-        bundleConfigWriter.writeBundleConfig(iid, WRITE_DATA_2);
+        bundleConfigWriter.writeBundleConfig(iid, WRITE_DATA_2, false);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(WRITTEN_DATA_2, response.getValue().getContent());
+    }
+
+    @Test
+    public void writeCurrentAttributesTest3() throws WriteFailedException {
+        bundleConfigWriter.writeBundleConfig(iid, WRITE_DATA_3, true);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(WRITTEN_DATA_3, response.getValue().getContent());
     }
 
     @Test
@@ -93,5 +113,12 @@ public class BundleConfigWriterTest {
         bundleConfigWriter.removeBundleConfig(iid, WRITE_DATA_1);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(REMOVED_DATA_1, response.getValue().getContent());
+    }
+
+    @Test
+    public void deleteCurrentAttributesTest2() throws WriteFailedException.CreateFailedException {
+        bundleConfigWriter.removeBundleConfig(iid, WRITE_DATA_2);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(REMOVED_DATA_2, response.getValue().getContent());
     }
 }
