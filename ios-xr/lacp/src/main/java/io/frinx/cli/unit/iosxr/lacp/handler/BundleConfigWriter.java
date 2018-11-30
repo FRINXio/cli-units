@@ -24,6 +24,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigReader;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
@@ -36,6 +37,7 @@ public class BundleConfigWriter implements CliWriter<Config> {
             + "{% if ($lacp_mode == ACTIVE) %} active"
             + "{% elseIf ($lacp_mode == PASSIVE) %} passive"
             + "{% endif %}\n"
+            + "{% elseIf ($supported_bundle_mode == TRUE) %}no lacp mode\n"
             + "{% endif %}";
     private static final String BUNDLE_ADD_CONFIG_TEMPLATE = "interface {$ifc_name}\n"
             + BUNDLE_MODE_TEMPLATE
@@ -58,23 +60,34 @@ public class BundleConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         checkInterface(config.getName(), writeContext);
-        writeBundleConfig(instanceIdentifier, config);
+        writeBundleConfig(instanceIdentifier, config, false);
     }
 
-    void writeBundleConfig(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config)
+    void writeBundleConfig(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                           @Nonnull Config config,
+                           boolean supportedBundleMode)
             throws WriteFailedException.CreateFailedException {
         blockingWriteAndRead(cli, instanceIdentifier, config,
                 fT(BUNDLE_ADD_CONFIG_TEMPLATE,
                         "ifc_name", config.getName(),
                         "lacp_mode", config.getLacpMode(),
-                        "lacp_interval", config.getInterval()));
+                        "lacp_interval", config.getInterval(),
+                        "supported_bundle_mode", supportedBundleMode));
     }
 
     @Override
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
-        writeCurrentAttributes(id, dataAfter, writeContext);
+        checkInterface(dataAfter.getName(), writeContext);
+        if (Objects.isNull(dataBefore.getLacpMode())) {
+            // lacp hasn't been set to active or passive mode - the command "no lacp mode" won't be send to device (XR5
+            // doesn't support it)
+            writeBundleConfig(id, dataAfter, false);
+        } else {
+            // lacp is already set to non-default value - then device also supports "no lacp mode" command
+            writeBundleConfig(id, dataAfter, true);
+        }
     }
 
     @Override
