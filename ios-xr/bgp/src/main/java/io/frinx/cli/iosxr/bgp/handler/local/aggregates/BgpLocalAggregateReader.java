@@ -16,6 +16,7 @@
 
 package io.frinx.cli.iosxr.bgp.handler.local.aggregates;
 
+import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.handlers.bgp.BgpListReader;
@@ -123,7 +124,8 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
         builder.setPrefix(key.getPrefix());
         ConfigBuilder configBuilder = new ConfigBuilder().setPrefix(key.getPrefix());
         if (policies.isPresent()) {
-            configBuilder.addAugmentation(NiProtAggAug.class, new NiProtAggAugBuilder().setApplyPolicy(policies.get())
+            configBuilder.addAugmentation(NiProtAggAug.class, new NiProtAggAugBuilder()
+                    .setApplyPolicy(Lists.newArrayList(policies.get()))
                     .build());
         }
         builder.setConfig(configBuilder.build());
