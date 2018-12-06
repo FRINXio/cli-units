@@ -295,7 +295,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_HO_CONFIG, new HoldTimeConfigReader(cli)));
 
         // if-aggregation
-        readRegistry.addStructuralReader(IIDs.INTER_INTER_AUG_INTERFACE1, Interface1Builder.class);
+        readRegistry.addStructuralReader(IIDs.INT_INT_AUG_INTERFACE1, Interface1Builder.class);
         readRegistry.addStructuralReader(IIDs.IN_IN_AUG_INTERFACE1_AGGREGATION, AggregationBuilder.class);
         readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_AUG_INTERFACE1_AG_CONFIG,
                 new AggregateConfigReader(cli)));
@@ -319,7 +319,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                 new InterfaceStatisticsConfigReader(cli)));
 
         // if-ethernet
-        readRegistry.addStructuralReader(IIDs.INTE_INTE_AUG_INTERFACE1,
+        readRegistry.addStructuralReader(IIDs.INTER_INTER_AUG_INTERFACE1,
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet
                         .rev161222.Interface1Builder.class);
         readRegistry.addStructuralReader(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET, EthernetBuilder.class);
@@ -330,7 +330,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                 new GenericConfigReader<>(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli)));
 
         // RPF check
-        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_INTERFACE1,
+        readRegistry.addStructuralReader(IIDs.INTE_INTE_AUG_INTERFACE1,
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco
                         .rev171024.Interface1Builder.class);
         readRegistry.subtreeAdd(
