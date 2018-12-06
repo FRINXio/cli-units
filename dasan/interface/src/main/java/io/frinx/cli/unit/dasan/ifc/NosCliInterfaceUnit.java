@@ -169,13 +169,13 @@ public class NosCliInterfaceUnit implements TranslateUnit {
         readRegistry.add(new GenericOperReader<>(IIDs.IN_IN_STATE, new InterfaceStateReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));
 
-        readRegistry.addStructuralReader(IIDs.INTER_INTER_AUG_INTERFACE1, Interface1Builder.class);
+        readRegistry.addStructuralReader(IIDs.INT_INT_AUG_INTERFACE1, Interface1Builder.class);
         readRegistry.addStructuralReader(IIDs.IN_IN_AUG_INTERFACE1_AGGREGATION, AggregationBuilder.class);
         readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_AUG_INTERFACE1_AG_CONFIG,
                 new BundleEtherLacpConfigReader(cli)));
 
         // if-ethernet
-        readRegistry.addStructuralReader(IIDs.INTERF_INTERF_AUG_INTERFACE1,
+        readRegistry.addStructuralReader(IIDs.INTER_INTER_AUG_INTERFACE1,
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222
             .Interface1Builder.class);
         readRegistry.addStructuralReader(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET, EthernetBuilder.class);
