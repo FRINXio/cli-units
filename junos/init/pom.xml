@@ -20,12 +20,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.0.rc8-frinx</version>
+        <version>4.2.0.rc9-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>junos-cli-init-unit</artifactId>
-    <version>4.2.0.rc8-frinx</version>
+    <version>4.2.0.rc9-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>

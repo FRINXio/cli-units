@@ -26,7 +26,7 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-karaf</artifactId>
-  <version>4.2.0.rc8-frinx</version>
+  <version>4.2.0.rc9-frinx-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>pom</packaging>
 
@@ -36,8 +36,8 @@
 
   <properties>
     <restconf.version>1.7.2-Oxygen-SR2.4_2_0_rc9-frinxodl-SNAPSHOT</restconf.version>
-    <cli.version>4.2.0.rc8-frinx</cli.version>
-    <openconfig.version>4.2.0.rc8-frinx</openconfig.version>
+    <cli.version>4.2.0.rc9-frinx-SNAPSHOT</cli.version>
+    <openconfig.version>4.2.0.rc9-frinx-SNAPSHOT</openconfig.version>
   </properties>
 
   <dependencies>
