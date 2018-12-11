@@ -36,7 +36,7 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
 
     private static final String SHOW_LAST_COMMIT_TIME = "show history all | include Configured from";
     private static final String DATE_REGEX = "\\*(?<time>.+): (?<config>.+) Configured from (?<device>.+) by (?<user>"
-            + ".+) on (?<line>.+) \\((?<ipv>.+)\\)";
+            + ".+).*";
     private static final Pattern PATTERN = Pattern.compile(DATE_REGEX);
     private final Cli cli;
 
