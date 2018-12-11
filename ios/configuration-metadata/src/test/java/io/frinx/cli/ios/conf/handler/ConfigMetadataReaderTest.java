@@ -35,11 +35,27 @@ public class ConfigMetadataReaderTest {
             + "*Apr 23 11:24:18.169: %SYS-5-CONFIG_I: Configured from console by cisco on vty0 (192.168.1.41)\n"
             + "*Apr 23 11:24:18.617: %SYS-5-CONFIG_I: Configured from console by cisco on vty0 (192.168.1.41)\n"
             + "*Apr 23 11:33:52.247: %SYS-5-CONFIG_I: Configured from console by cisco on vty1 (192.168.1.41)\n"
+            + "CMD: 'show history all | include Configured from' 12:44:48 UTC Tue Apr 24 2018\n"
             + "*Apr 23 14:00:01.896: %SYS-5-CONFIG_I: Configured from console by cisco on vty1 (192.168.1.43)\n"
             + "CMD: 'show history all | include Configured from' 08:58:03 UTC Tue Apr 24 2018\n"
             + "CMD: 'show history all | include Configured from | LINE 2' 09:03:05 UTC Tue Apr 24 2018\n"
             + "CMD: 'show history all | include Configured from |' 09:05:36 UTC Tue Apr 24 2018\n"
             + "CMD: 'show history all | include \"Configured from\"' 09:06:04 UTC Tue Apr 24 2018\n"
+            + "CMD: 'show history all | include Configured from' 09:12:48 UTC Tue Apr 24 2018\n";
+
+    private static final String OUTPUT2 = "**Apr 23 11:20:43.936: %SYS-5-CONFIG_I: Configured from console by cisco on"
+            + " vty0 (192.168.1.41)\n"
+            + "*Apr 23 11:20:44.089: %SYS-5-CONFIG_I: Configured from console by cisco on vty0 (192.168.1.41)\n"
+            + "*Apr 23 11:20:44.993: %SYS-5-CONFIG_I: Configured from console by cisco on vty0 (192.168.1.41)\n"
+            + "*Apr 23 11:20:45.457: %SYS-5-CONFIG_I: Configured from console by console\n"
+            + "*Apr 23 11:24:18.169: %SYS-5-CONFIG_I: Configured from console by cisco on vty0 (192.168.1.41)\n"
+            + "*Apr 23 11:24:18.617: %SYS-5-CONFIG_I: Configured from console by cisco on vty0 (192.168.1.41)\n"
+            + "*Apr 23 11:33:52.247: %SYS-5-CONFIG_I: Configured from console by cisco on vty1 (192.168.1.41)\n"
+            + "CMD: 'show history all | include Configured from' 08:58:03 UTC Tue Apr 24 2018\n"
+            + "CMD: 'show history all | include Configured from | LINE 2' 09:03:05 UTC Tue Apr 24 2018\n"
+            + "CMD: 'show history all | include Configured from |' 09:05:36 UTC Tue Apr 24 2018\n"
+            + "CMD: 'show history all | include \"Configured from\"' 09:06:04 UTC Tue Apr 24 2018\n"
+            + "*Apr 23 14:00:01.896: %SYS-5-CONFIG_I: Configured from console by console\n"
             + "CMD: 'show history all | include Configured from' 09:12:48 UTC Tue Apr 24 2018\n"
             + "CMD: 'show history all | include Configured from' 10:49:48 UTC Tue Apr 24 2018\n";
 
@@ -47,8 +63,17 @@ public class ConfigMetadataReaderTest {
 
     @Test
     public void testParse() {
-
         Optional<String> date1 = ConfigMetadataReader.getLastConfigurationFingerprint(OUTPUT);
+        Assert.assertTrue(date1.isPresent());
+        Assert.assertEquals(EXPECTED, date1.get());
+
+        Optional<String> date2 = (ConfigMetadataReader.getLastConfigurationFingerprint(""));
+        Assert.assertFalse(date2.isPresent());
+    }
+
+    @Test
+    public void testParse2() {
+        Optional<String> date1 = ConfigMetadataReader.getLastConfigurationFingerprint(OUTPUT2);
         Assert.assertTrue(date1.isPresent());
         Assert.assertEquals(EXPECTED, date1.get());
 
