@@ -313,6 +313,21 @@
                 <artifactId>nexus-cli-init-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>nexus-interface-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>nexus-lldp-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>nexus-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- dasan -->
             <dependency>
