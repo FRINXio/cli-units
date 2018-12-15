@@ -45,12 +45,12 @@ public class L3ipvlanConfigWriterTest {
 
     private static final String EXPECT_INPUT = "configure terminal\n"
             + "interface br105\n"
-            + "ip redirect\n"
+            + "ip redirects\n"
             + "end\n";
 
     private static final String UPDATE_INPUT = "configure terminal\n"
             + "interface br100\n"
-            + "no ip redirect\n"
+            + "no ip redirects\n"
             + "end\n";
 
     @Rule
