@@ -20,9 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.dasan.ifc.handler.InterfaceReader;
-import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceConfigWriter;
-import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceReader;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -44,14 +41,16 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class PhysicalPortVlanMemberConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public class TrunkPortVlanMemberConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SHOW_VLAN_ADD = "show running-config bridge | include ^ vlan add ";
     private static final Pattern VLAN_ADD_LINE_PATTERN = Pattern
             .compile("vlan add (?<ids>\\S+)\\s+(?<ports>\\S+)\\s+(?<vlanmode>(un)?tagged)");
+    public static final Pattern PORT_NAME_PATTERN = Pattern.compile("Trunk(?<portid>.*)$");
+
     private final Cli cli;
 
-    public PhysicalPortVlanMemberConfigReader(Cli cli) {
+    public TrunkPortVlanMemberConfigReader(Cli cli) {
         this.cli = cli;
     }
 
@@ -59,22 +58,18 @@ public class PhysicalPortVlanMemberConfigReader implements CliConfigReader<Confi
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
             @Nonnull ReadContext ctx) throws ReadFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
-        Matcher matcher = PhysicalPortInterfaceReader.PHYSICAL_PORT_NAME_PATTERN.matcher(ifcName);
+        Matcher matcher = PORT_NAME_PATTERN.matcher(ifcName);
 
         if (!matcher.matches()) {
             return;
         }
-        String portId = matcher.group("portid");
-
-        if (!PhysicalPortInterfaceConfigWriter.PHYS_IFC_TYPES.contains(InterfaceReader.parseTypeByName(ifcName))) {
-            return;
-        }
+        String portId = "t/" + matcher.group("portid");
         List<String> ports = DasanCliUtil.getPhysicalPorts(cli, this, id, ctx);
-        parseEthernetConfig(blockingRead(SHOW_VLAN_ADD, cli, id, ctx), builder, ports, portId);
+        parseTrunkConfig(blockingRead(SHOW_VLAN_ADD, cli, id, ctx), builder, ports, portId);
     }
 
     @VisibleForTesting
-    static void parseEthernetConfig(String output, ConfigBuilder builder, List<String> ports, String portId) {
+    static void parseTrunkConfig(String output, ConfigBuilder builder, List<String> ports, String portId) {
         Map<String, List<String>> vlansmap = ParsingUtils.NEWLINE
                 .splitAsStream(output)
                 .map(String::trim)

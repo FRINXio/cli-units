@@ -54,7 +54,7 @@ public class L3ipvlanConfigWriter implements CliWriter<Config> {
 
         String ifName = id.firstKeyOf(Interface.class).getName();
         blockingWriteAndRead(cli, id, dataBefore, "configure terminal", f("interface %s", ifName.replace("Vlan", "br")),
-             "ip redirect", "end");
+             "ip redirects", "end");
     }
 
     private void writeOrUpdateInterface(InstanceIdentifier<Config> id, Config data)
@@ -65,6 +65,6 @@ public class L3ipvlanConfigWriter implements CliWriter<Config> {
             return;
         }
         blockingWriteAndRead(cli, id, data, "configure terminal", f("interface %s", ifName.replace("Vlan", "br")),
-                BooleanUtils.isNotFalse(data.isIpRedirects()) ? "ip redirect" : "no ip redirect", "end");
+                BooleanUtils.isNotFalse(data.isIpRedirects()) ? "ip redirects" : "no ip redirects", "end");
     }
 }

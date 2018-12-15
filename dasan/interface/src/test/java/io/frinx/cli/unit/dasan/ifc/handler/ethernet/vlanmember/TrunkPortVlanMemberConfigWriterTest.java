@@ -20,17 +20,14 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.Interface1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.Ethernet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
@@ -45,15 +42,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanModeType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class PhysicalPortVlanMemberConfigWriterTest {
+public class TrunkPortVlanMemberConfigWriterTest {
 
     private static final String WRITE_INPUT_001 = "configure terminal\n"
             + "bridge\n"
-            + "vlan add 1,2,3 3/4 tagged\n"
+            + "vlan add br4089 t/1 tagged\n"
             + "end\n";
     private static final String WRITE_INPUT_002 = "configure terminal\n"
             + "bridge\n"
-            + "vlan add 3 3/4 untagged\n"
+            + "vlan add br4089 t/1 untagged\n"
             + "end\n";
 
     @Mock
@@ -62,7 +59,7 @@ public class PhysicalPortVlanMemberConfigWriterTest {
 
     @Mock
     private WriteContext context;
-    private PhysicalPortVlanMemberConfigWriter target;
+    private TrunkPortVlanMemberConfigWriter target;
     private InstanceIdentifier<Config> id;
     private ConfigBuilder builder = new ConfigBuilder();
     // test data
@@ -72,14 +69,12 @@ public class PhysicalPortVlanMemberConfigWriterTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        target = Mockito.spy(new PhysicalPortVlanMemberConfigWriter(cli));
+        target = Mockito.spy(new TrunkPortVlanMemberConfigWriter(cli));
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("Ethernet3/4"))
+        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("Trunk1"))
                 .augmentation(Interface1.class).child(Ethernet.class).augmentation(Ethernet1.class)
                 .child(SwitchedVlan.class).child(Config.class);
 
-        Config1Builder ethIfAggregationConfigBuilder = new Config1Builder();
-        ethIfAggregationConfigBuilder.setAggregateId("Bundle-Ether8");
         lst = new ArrayList<>();
         TrunkVlans trunkVlans1 = new TrunkVlans(new VlanId(1));
         TrunkVlans trunkVlans2 = new TrunkVlans(new VlanId(2));
@@ -91,25 +86,6 @@ public class PhysicalPortVlanMemberConfigWriterTest {
     }
 
     @Test
-    public void testWriteCurrentAttributes_001() throws Exception {
-        data = builder.setInterfaceMode(VlanModeType.TRUNK).setTrunkVlans(lst).build();
-        target.writeCurrentAttributes(id, data, context);
-        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT_001, response.getValue()
-                .getContent());
-    }
-
-    @Test
-    public void testWriteCurrentAttributes_002() throws Exception {
-        VlanId vlanId = new VlanId(3);
-        data = builder.setInterfaceMode(VlanModeType.TRUNK).setNativeVlan(vlanId).build();
-        target.writeCurrentAttributes(id, data, context);
-        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT_002, response.getValue()
-                .getContent());
-    }
-
-    @Test
     public void testDeleteCurrentAttributes_001() throws Exception {
         data = builder.setInterfaceMode(VlanModeType.TRUNK).setTrunkVlans(lst).build();
         target.deleteCurrentAttributes(id, data, context);
@@ -118,7 +94,7 @@ public class PhysicalPortVlanMemberConfigWriterTest {
 
     @Test
     public void testDeleteCurrentAttributes_002() throws Exception {
-        VlanId vlanId = new VlanId(3);
+        VlanId vlanId = new VlanId(4089);
         data = builder.setInterfaceMode(VlanModeType.TRUNK).setNativeVlan(vlanId).build();
         target.deleteCurrentAttributes(id, data, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(Mockito.any());
@@ -126,27 +102,10 @@ public class PhysicalPortVlanMemberConfigWriterTest {
 
     @Test
     public void testUpdateCurrentAttributes_001() throws Exception {
-        List<TrunkVlans> lstBefore = Arrays.asList(
-            new TrunkVlans(new VlanId(1)),
-            new TrunkVlans(new VlanId(2))
-        );
-        List<TrunkVlans> lstAfter = Arrays.asList(
-                new TrunkVlans(new VlanId(1)),
-                new TrunkVlans(new VlanId(2)),
-                new TrunkVlans(new VlanId(3))
-            );
-
-        Config dataBefore = builder.setTrunkVlans(lstBefore).build();
-        Config dataAfter = builder.setTrunkVlans(lstAfter).build();
-        target.updateCurrentAttributes(id, dataBefore, dataAfter, context);
-        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(Mockito.any());
-    }
-
-    @Test
-    public void testUpdateCurrentAttributes_002() throws Exception {
         data = builder.setInterfaceMode(VlanModeType.TRUNK).setTrunkVlans(lst).build();
-        Config newData = builder.setInterfaceMode(VlanModeType.TRUNK).setTrunkVlans(lst).build();
+        VlanId vlanId = new VlanId(4089);
+        Config newData = builder.setInterfaceMode(VlanModeType.TRUNK).setNativeVlan(vlanId).build();
         target.updateCurrentAttributes(id, data, newData, context);
-        Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
+        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(Mockito.any());
     }
 }

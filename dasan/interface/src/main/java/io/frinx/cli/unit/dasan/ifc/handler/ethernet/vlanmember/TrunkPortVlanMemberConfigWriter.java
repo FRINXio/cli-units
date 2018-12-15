@@ -19,7 +19,6 @@ package io.frinx.cli.unit.dasan.ifc.handler.ethernet.vlanmember;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceReader;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,14 +34,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev17071
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class PhysicalPortVlanMemberConfigWriter implements CliWriter<Config> {
+public class TrunkPortVlanMemberConfigWriter implements CliWriter<Config> {
 
     private final Cli cli;
-    private static final String DELETE_CMD_FORMAT =  "vlan del %s %s";
-    private static final String ADD_TRUNK_CMD_FORMAT =  "vlan add %s %s tagged";
-    private static final String ADD_NATIVE_CMD_FORMAT =  "vlan add %s %s untagged";
 
-    public PhysicalPortVlanMemberConfigWriter(Cli cli) {
+    private static final String DELETE_CMD_FORMAT =  "vlan del %s t/%s";
+    private static final String ADD_TRUNK_CMD_FORMAT =  "vlan add %s t/%s tagged";
+    private static final String ADD_NATIVE_CMD_FORMAT =  "vlan add %s t/%s untagged";
+
+    public TrunkPortVlanMemberConfigWriter(Cli cli) {
         this.cli = cli;
     }
 
@@ -52,12 +52,12 @@ public class PhysicalPortVlanMemberConfigWriter implements CliWriter<Config> {
             throws WriteFailedException {
 
         String ifcName = id.firstKeyOf(Interface.class).getName();
-        Matcher matcher = PhysicalPortInterfaceReader.PHYSICAL_PORT_NAME_PATTERN.matcher(ifcName);
+        Matcher matcher = TrunkPortVlanMemberConfigReader.PORT_NAME_PATTERN.matcher(ifcName);
         if (!matcher.matches()) {
             return;
         }
-
         String portId = matcher.group("portid");
+
         VlanId vlBefore = dataBefore.getNativeVlan();
         VlanId vlAfter = dataAfter.getNativeVlan();
         List<Integer> vlanIdAddTrunk = new ArrayList<>();
@@ -119,11 +119,10 @@ public class PhysicalPortVlanMemberConfigWriter implements CliWriter<Config> {
         @Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
-        Matcher matcher = PhysicalPortInterfaceReader.PHYSICAL_PORT_NAME_PATTERN.matcher(ifcName);
+        Matcher matcher = TrunkPortVlanMemberConfigReader.PORT_NAME_PATTERN.matcher(ifcName);
         if (!matcher.matches()) {
             return;
         }
-
         String portId = matcher.group("portid");
         // add trunk ports
         List<TrunkVlans> list = data.getTrunkVlans();
@@ -150,11 +149,10 @@ public class PhysicalPortVlanMemberConfigWriter implements CliWriter<Config> {
             throws WriteFailedException {
 
         String ifcName = id.firstKeyOf(Interface.class).getName();
-        Matcher matcher = PhysicalPortInterfaceReader.PHYSICAL_PORT_NAME_PATTERN.matcher(ifcName);
+        Matcher matcher = TrunkPortVlanMemberConfigReader.PORT_NAME_PATTERN.matcher(ifcName);
         if (!matcher.matches()) {
             return;
         }
-
         List<Integer> delList = new ArrayList<>();
         // add trunk ports
         List<TrunkVlans> list = dataBefore.getTrunkVlans();
@@ -171,7 +169,6 @@ public class PhysicalPortVlanMemberConfigWriter implements CliWriter<Config> {
         if (delSet.isEmpty()) {
             return;
         }
-
         String portId = matcher.group("portid");
         blockingWriteAndRead(cli, id, dataBefore, "configure terminal", "bridge",
                 f(DELETE_CMD_FORMAT, StringUtils.join(delSet, ","), portId), "end");

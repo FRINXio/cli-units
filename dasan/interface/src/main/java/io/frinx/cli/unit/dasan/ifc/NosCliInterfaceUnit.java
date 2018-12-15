@@ -24,6 +24,7 @@ import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
@@ -36,6 +37,8 @@ import io.frinx.cli.unit.dasan.ifc.handler.ethernet.EthernetConfigReader;
 import io.frinx.cli.unit.dasan.ifc.handler.ethernet.EthernetConfigWriter;
 import io.frinx.cli.unit.dasan.ifc.handler.ethernet.vlanmember.PhysicalPortVlanMemberConfigReader;
 import io.frinx.cli.unit.dasan.ifc.handler.ethernet.vlanmember.PhysicalPortVlanMemberConfigWriter;
+import io.frinx.cli.unit.dasan.ifc.handler.ethernet.vlanmember.TrunkPortVlanMemberConfigReader;
+import io.frinx.cli.unit.dasan.ifc.handler.ethernet.vlanmember.TrunkPortVlanMemberConfigWriter;
 import io.frinx.cli.unit.dasan.ifc.handler.l3ipvlan.L3ipvlanConfigReader;
 import io.frinx.cli.unit.dasan.ifc.handler.l3ipvlan.L3ipvlanConfigWriter;
 import io.frinx.cli.unit.dasan.ifc.handler.lacp.BundleEtherLacpConfigReader;
@@ -51,6 +54,7 @@ import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.ext.rev180926.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.AggregationBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.EthernetBuilder;
@@ -61,10 +65,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan._interface.top.L3ipvlanBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Aggregation1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Ethernet1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.SwitchedVlanBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class NosCliInterfaceUnit implements TranslateUnit {
@@ -105,7 +111,9 @@ public class NosCliInterfaceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan
                 .rev170714.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan
-                .rev180802.$YangModuleInfoImpl.getInstance()
+                .rev180802.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.ext
+                .rev180926.$YangModuleInfoImpl.getInstance()
                 );
     }
 
@@ -135,7 +143,19 @@ public class NosCliInterfaceUnit implements TranslateUnit {
 
         // if-ethernet
         writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli)),
+        InstanceIdentifier<Config1> iidd = InstanceIdentifier.create(Config1.class);
+        writeRegistry.subtreeAddAfter(
+                Sets.newHashSet(
+                        RWUtils.cutIdFromStart(IIDs.IN_IN_ET_CO_AUG_CONFIG1,
+                                InstanceIdentifier.create(
+                                        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                        .interfaces.ethernet.rev161222.ethernet.top.ethernet.Config.class)),
+                        RWUtils.cutIdFromStart(IIDs.INT_INT_ETH_CON_AUG_CONFIG1,
+                                InstanceIdentifier.create(
+                                        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                        .interfaces.ethernet.rev161222.ethernet.top.ethernet.Config.class))
+                        ),
+                new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli)),
                 IIDs.IN_IN_CONFIG);
 
         // if-l3ipvlan
@@ -146,9 +166,17 @@ public class NosCliInterfaceUnit implements TranslateUnit {
 
         // vlan
         writeRegistry.add(new GenericWriter<>(
-                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET2_SWITCHEDVLAN, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET2_SW_CONFIG,
+                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SWITCHEDVLAN,
+                new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(
+                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
                 new PhysicalPortVlanMemberConfigWriter(cli)));
+        writeRegistry.add(new GenericWriter<>(
+                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_AG_AUG_AGGREGATION1_SWITCHEDVLAN,
+                new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(
+                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_AG_AUG_AGGREGATION1_SW_CONFIG,
+                new TrunkPortVlanMemberConfigWriter(cli)));
 
         // subinterface
         writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SUBINTERFACE, new NoopCliListWriter<>()));
@@ -190,11 +218,19 @@ public class NosCliInterfaceUnit implements TranslateUnit {
         // vlan
         readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1,
             Ethernet1Builder.class);
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET2_SWITCHEDVLAN,
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SWITCHEDVLAN,
             SwitchedVlanBuilder.class);
         readRegistry.add(new GenericConfigReader<>(
-                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET2_SW_CONFIG,
+                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
             new PhysicalPortVlanMemberConfigReader(cli)));
+        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_AG_AUG_AGGREGATION1,
+                Aggregation1Builder.class);
+        readRegistry.addStructuralReader(
+                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_AG_AUG_AGGREGATION1_SWITCHEDVLAN,
+                SwitchedVlanBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(
+                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_AG_AUG_AGGREGATION1_SW_CONFIG,
+            new TrunkPortVlanMemberConfigReader(cli)));
 
         readRegistry.addStructuralReader(IIDs.IN_IN_SUBINTERFACES, SubinterfacesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader()));
