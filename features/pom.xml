@@ -332,6 +332,11 @@
       <artifactId>junos-interface-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>junos-network-instance-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>io.frinx.cli</groupId>

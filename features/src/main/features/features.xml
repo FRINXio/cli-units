@@ -152,10 +152,12 @@
         <bundle>wrap:mvn:io.fd.honeycomb/translate-utils/${hc.version}</bundle>
         <bundle>wrap:mvn:io.fd.honeycomb/translate-impl/${hc.version}</bundle>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/common-handlers/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-utils/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-cli-init-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-configuration-metadata-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-interface-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/junos-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-huawei' version='${project.version}'>
