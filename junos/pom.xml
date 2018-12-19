@@ -34,6 +34,7 @@
     <module>utils</module>
     <module>configuration-metadata</module>
     <module>interface</module>
+    <module>network-instance</module>
   </modules>
 
   <build>

@@ -297,6 +297,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.frinx.cli</groupId>
+                <artifactId>junos-network-instance-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>junos-utils</artifactId>
                 <version>${project.version}</version>
