@@ -46,7 +46,7 @@ public class HsrpGroupConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, data,
                 "router hsrp",
                 f("interface %s", interfaceKey.getInterfaceId()),
-                f("address family %s", HsrpUtil.getStringType(hsrpGroupKey.getAddressFamily())),
+                f("address-family %s", HsrpUtil.getStringType(hsrpGroupKey.getAddressFamily())),
                 data.getVirtualRouterId() == null
                         ? "" : f("hsrp %s version %s", data.getVirtualRouterId(), data.getVersion()),
                 data.getPriority() == null ? "" : f("priority %s", data.getPriority()),
@@ -60,9 +60,9 @@ public class HsrpGroupConfigWriter implements CliWriter<Config> {
         HsrpGroupKey hsrpGroupKey = id.firstKeyOf(HsrpGroup.class);
 
         blockingWriteAndRead(cli, id, dataAfter, "router hsrp", f("interface %s", interfaceKey.getInterfaceId()),
-                f("address family %s", HsrpUtil.getStringType(hsrpGroupKey.getAddressFamily())),
+                f("address-family %s", HsrpUtil.getStringType(hsrpGroupKey.getAddressFamily())),
                 dataAfter.getVirtualRouterId() == null
-                        ? f("no hsrp %s version %s", dataAfter.getVirtualRouterId(), dataAfter.getVersion())
+                        ? f("no hsrp %s version %s", dataBefore.getVirtualRouterId(), dataBefore.getVersion())
                         : f("hsrp %s version %s", dataAfter.getVirtualRouterId(), dataAfter.getVersion()),
                 dataAfter.getPriority() == null
                         ? dataAfter.getVirtualRouterId() != null && dataBefore.getPriority() != null ? "no priority"
@@ -81,7 +81,7 @@ public class HsrpGroupConfigWriter implements CliWriter<Config> {
         blockingDeleteAndRead(cli, id,
                 "router hsrp",
                 f("interface %s", interfaceKey.getInterfaceId()),
-                f("address family %s", HsrpUtil.getStringType(hsrpGroupKey.getAddressFamily())),
+                f("address-family %s", HsrpUtil.getStringType(hsrpGroupKey.getAddressFamily())),
                 f("no hsrp %s version %s", data.getVirtualRouterId(), data.getVersion()),
                 "root");
     }
