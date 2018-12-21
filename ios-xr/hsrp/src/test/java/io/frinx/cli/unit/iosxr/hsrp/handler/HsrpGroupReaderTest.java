@@ -128,7 +128,7 @@ public class HsrpGroupReaderTest {
 
     @Test
     public void testMerge_001() throws Exception {
-        final List<HsrpGroup> groupList = new ArrayList<HsrpGroup>();
+        final List<HsrpGroup> groupList = new ArrayList<>();
         final InterfaceBuilder hsrpGroupBuilderIn = new InterfaceBuilder();
 
         target.merge(hsrpGroupBuilderIn, groupList);

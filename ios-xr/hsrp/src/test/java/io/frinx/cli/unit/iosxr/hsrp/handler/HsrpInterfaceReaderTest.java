@@ -114,7 +114,7 @@ public class HsrpInterfaceReaderTest {
 
     @Test
     public void testMerge_001() throws Exception {
-        final List<Interface> interfaceList = new ArrayList<Interface>();
+        final List<Interface> interfaceList = new ArrayList<>();
         final InterfacesBuilder interfaceBuilderIn = new InterfacesBuilder();
 
         target.merge(interfaceBuilderIn, interfaceList);

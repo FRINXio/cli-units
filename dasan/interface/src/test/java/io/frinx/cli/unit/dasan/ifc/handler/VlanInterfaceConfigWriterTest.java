@@ -81,7 +81,7 @@ public class VlanInterfaceConfigWriterTest {
                 .child(Config.class);
 
         data = new ConfigBuilder().setEnabled(Boolean.TRUE).setName(ifName).setType(ifType)
-                .setMtu(Integer.valueOf(100)).build();
+                .setMtu(100).build();
     }
 
     @Test

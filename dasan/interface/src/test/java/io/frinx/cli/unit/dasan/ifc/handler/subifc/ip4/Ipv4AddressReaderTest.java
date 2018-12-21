@@ -134,7 +134,7 @@ public class Ipv4AddressReaderTest {
 
     @Test
     public void testMerge_001() throws Exception {
-        List<Address> addressList = new ArrayList<Address>();
+        List<Address> addressList = new ArrayList<>();
         AddressBuilder addressesBuilder = new AddressBuilder();
         Address addresses1 = addressesBuilder.setIp(new Ipv4AddressNoZone("10.187.100.49")).build();
         addressList.add(addresses1);
