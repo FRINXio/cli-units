@@ -149,7 +149,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
     }
 
     private static String realignOutput(String output) {
-        String withoutNewlines = output.replaceAll("\r|\n", "");
+        String withoutNewlines = output.replaceAll("[\r\n]", "");
         return withoutNewlines.replace("neighbor ", "\n");
     }
 }
