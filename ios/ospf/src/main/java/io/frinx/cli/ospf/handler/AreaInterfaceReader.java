@@ -98,7 +98,7 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     }
 
     private static String realignOSPFInterfaces(String output) {
-        String withoutNewlines = output.replaceAll("\\n|\\r", "");
+        String withoutNewlines = output.replaceAll("[\\n\\r]", "");
         return withoutNewlines.replace("interface", "\ninterface");
     }
 }

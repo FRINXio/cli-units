@@ -59,7 +59,7 @@ public class IosXrCliInitializerUnitTest {
             + "RP/0/0/CPU0:XR-5(config)#\n";
 
     private static final Set<Pattern> COMMIT_ERROR_PATTERNS = Sets.newLinkedHashSet(Collections.singletonList(
-            Pattern.compile("\\% (?i)Failed(?-i).*", Pattern.DOTALL)
+            Pattern.compile("% (?i)Failed(?-i).*", Pattern.DOTALL)
     ));
 
     private IosXrCliInitializerUnit unit;
@@ -85,7 +85,7 @@ public class IosXrCliInitializerUnitTest {
                 .thenAnswer(invocation -> CompletableFuture.completedFuture(delegateCli));
 
         final Set<Pattern> errorPatterns = Sets.newLinkedHashSet(Collections.singletonList(
-                Pattern.compile("\\% (?i)invalid input(?-i).*", Pattern.DOTALL)
+                Pattern.compile("% (?i)invalid input(?-i).*", Pattern.DOTALL)
         ));
 
         final CompletionStage<? extends Cli> cliStage =

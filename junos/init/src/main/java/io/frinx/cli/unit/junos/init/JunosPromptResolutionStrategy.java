@@ -29,7 +29,7 @@ public final class JunosPromptResolutionStrategy implements PromptResolutionStra
     private static final int DEFAULT_TIME_TO_WAIT = 1;
     private static final int MAX_TIME_TO_WAIT = 10;
 
-    private static final Pattern JUNOS_GUIDANCE_PATTERN = Pattern.compile("^\\[edit.*\\]$");
+    private static final Pattern JUNOS_GUIDANCE_PATTERN = Pattern.compile("^\\[edit.*]$");
 
     private static final PromptResolutionStrategy DEFAULT_INSTANCE = new JunosPromptResolutionStrategy();
 

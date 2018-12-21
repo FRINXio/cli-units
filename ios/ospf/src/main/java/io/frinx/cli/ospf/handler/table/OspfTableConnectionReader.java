@@ -149,7 +149,7 @@ public class OspfTableConnectionReader implements
     }
 
     private static String realignOutput(String output) {
-        output = output.replaceAll("\\n|\\r", "");
+        output = output.replaceAll("[\\n\\r]", "");
         output = output.replace("router ospf ", "\nrouter ospf ");
         output = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
