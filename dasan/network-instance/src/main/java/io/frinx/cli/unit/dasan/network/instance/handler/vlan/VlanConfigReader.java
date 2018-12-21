@@ -101,18 +101,16 @@ public class VlanConfigReader implements CliConfigReader<Config, ConfigBuilder>,
                 .map(String::trim)
                 .map(VLAN_CREATE_LINE_PATTERN::matcher)
                 .filter(Matcher::matches)
-                .filter(m -> {
-                    return DasanCliUtil.parseIdRanges(m.group("ids")).stream()
-                    .map(Integer::valueOf)
-                    .filter(vlanIdValue::equals)
-                    .findFirst().isPresent();
-                })
+                .filter(m -> DasanCliUtil.parseIdRanges(m.group("ids")).stream()
+                .map(Integer::valueOf)
+                .filter(vlanIdValue::equals)
+                .findFirst().isPresent())
                 .findFirst()
                 .ifPresent(m -> {
                     builder.setVlanId(vlanId);
 
                     boolean eline = "eline".equals(m.group("eline"));
-                    LOG.debug("VlanId:{} -> eline = {}", vlanIdValue, Boolean.valueOf(eline));
+                    LOG.debug("VlanId:{} -> eline = {}", vlanIdValue, eline);
 
                     if (eline) {
                         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.dasan.rev180801.Config1Builder

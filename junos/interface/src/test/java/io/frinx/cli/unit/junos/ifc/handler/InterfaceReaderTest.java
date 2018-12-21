@@ -102,7 +102,7 @@ public class InterfaceReaderTest {
 
     @Test
     public void testMerge() {
-        final List<Interface> interfaceList = new ArrayList<Interface>();
+        final List<Interface> interfaceList = new ArrayList<>();
         final InterfaceBuilder interfaceBuilder = new InterfaceBuilder();
 
         final Interface interface1 = interfaceBuilder.setName("ge-0/0/3").build();

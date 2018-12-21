@@ -89,7 +89,7 @@ public class Ipv4AddressReaderTest {
     @Test
     public void testMerge() {
 
-        final List<Address> addressList = new ArrayList<Address>();
+        final List<Address> addressList = new ArrayList<>();
 
         final AddressBuilder addressesBuilder = new AddressBuilder();
         final Address addresses1 = addressesBuilder.setIp(new Ipv4AddressNoZone("10.11.12.13")).build();

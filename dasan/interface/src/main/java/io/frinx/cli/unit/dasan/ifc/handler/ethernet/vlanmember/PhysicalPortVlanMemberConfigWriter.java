@@ -32,7 +32,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanSwitchedConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanModeType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -72,7 +74,9 @@ public class PhysicalPortVlanMemberConfigWriter implements CliWriter<Config> {
         if (VlanModeType.ACCESS.equals(data.getInterfaceMode())) {
             vlans.add(data.getAccessVlan().getValue());
         } else if (VlanModeType.TRUNK.equals(data.getInterfaceMode())) {
-            vlans = data.getTrunkVlans().stream().map(v -> v.getVlanId()).map(v -> v.getValue())
+            vlans = data.getTrunkVlans().stream()
+                    .map(VlanSwitchedConfig.TrunkVlans::getVlanId)
+                    .map(VlanId::getValue)
                     .collect(Collectors.toSet());
         }
         return vlans;

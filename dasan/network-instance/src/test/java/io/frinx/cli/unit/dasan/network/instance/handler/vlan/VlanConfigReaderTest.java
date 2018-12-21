@@ -83,7 +83,7 @@ public class VlanConfigReaderTest {
     @PrepareOnlyThisForTest({VlanConfigReader.class})
     @Test
     public void testReadCurrentAttributes_001() throws Exception {
-        final Integer vlanIdValue = Integer.valueOf(100);
+        final Integer vlanIdValue = 100;
         final VlanId vlanId = new VlanId(vlanIdValue);
         final VlanKey vlanKey = new VlanKey(vlanId);
 
@@ -115,7 +115,7 @@ public class VlanConfigReaderTest {
     @PrepareOnlyThisForTest({VlanConfigReader.class})
     @Test
     public void testReadCurrentAttributes_002() throws Exception {
-        final Integer vlanIdValue = Integer.valueOf(100);
+        final Integer vlanIdValue = 100;
         final VlanId vlanId = new VlanId(vlanIdValue);
         final VlanKey vlanKey = new VlanKey(vlanId);
 
@@ -147,7 +147,7 @@ public class VlanConfigReaderTest {
     @PrepareOnlyThisForTest({VlanConfigReader.class})
     @Test
     public void testReadCurrentAttributes_003() throws Exception {
-        final Integer vlanIdValue = Integer.valueOf(100);
+        final Integer vlanIdValue = 100;
         final VlanId vlanId = new VlanId(vlanIdValue);
         final VlanKey vlanKey = new VlanKey(vlanId);
 
@@ -183,7 +183,7 @@ public class VlanConfigReaderTest {
         final InstanceIdentifier id = Mockito.mock(InstanceIdentifier.class);
         final ReadContext readContext = Mockito.mock(ReadContext.class);
 
-        final Integer vlanIdValue = Integer.valueOf(1000);
+        final Integer vlanIdValue = 1000;
         final VlanId vlanId = new VlanId(vlanIdValue);
 
         final List<VlanKey> vlanKeys = new ArrayList<VlanKey>() {
@@ -212,10 +212,10 @@ public class VlanConfigReaderTest {
         final InstanceIdentifier id = Mockito.mock(InstanceIdentifier.class);
         final ReadContext readContext = Mockito.mock(ReadContext.class);
 
-        final Integer vlanIdValue = Integer.valueOf(1000);
+        final Integer vlanIdValue = 1000;
         final VlanId vlanId = new VlanId(vlanIdValue);
 
-        final Integer anotherVlanIdValue = Integer.valueOf(100);
+        final Integer anotherVlanIdValue = 100;
         final VlanId anotherVlanId = new VlanId(anotherVlanIdValue);
 
         final List<VlanKey> vlanKeys = new ArrayList<VlanKey>() {
@@ -315,7 +315,7 @@ public class VlanConfigReaderTest {
 
         private InputHolder4ParseVlanConfig(String cliOutput, int vlanIdIntValue) {
             this.cliOutput = cliOutput;
-            this.vlanIdValue = Integer.valueOf(vlanIdIntValue);
+            this.vlanIdValue = vlanIdIntValue;
             this.vlanId = new VlanId(vlanIdValue);
         }
 

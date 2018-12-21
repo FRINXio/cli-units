@@ -85,7 +85,7 @@ public class SubinterfaceReaderTest {
         Assert.assertThat(result.size(), CoreMatchers.is(2));
         Assert.assertThat(
             result.stream().map(SubinterfaceKey::getIndex).collect(Collectors.toSet()),
-            CoreMatchers.equalTo(Sets.newSet(Long.valueOf(0), Long.valueOf(1))));
+            CoreMatchers.equalTo(Sets.newSet(0L, 1L)));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class SubinterfaceReaderTest {
     public void testMerge() {
 
         final SubinterfacesBuilder subinterfacesBuilder = new SubinterfacesBuilder();
-        final List<Subinterface> interfaceList = new ArrayList<Subinterface>();
+        final List<Subinterface> interfaceList = new ArrayList<>();
 
         final SubinterfaceBuilder subinterfaceBuilder = new SubinterfaceBuilder();
         final Subinterface subinterface1 = subinterfaceBuilder.setKey(new SubinterfaceKey(Long.valueOf(0))).build();
@@ -122,7 +122,7 @@ public class SubinterfaceReaderTest {
         Assert.assertThat(subinterfacesBuilder.getSubinterface().size(), CoreMatchers.is(2));
         Assert.assertThat(
             subinterfacesBuilder.getSubinterface().stream().map(Subinterface::getIndex).collect(Collectors.toSet()),
-            CoreMatchers.equalTo(Sets.newSet(Long.valueOf(0), Long.valueOf(1))));
+            CoreMatchers.equalTo(Sets.newSet(0L, 1L)));
     }
 
     @Test

@@ -70,7 +70,7 @@ public class Ipv4AddressConfigReaderTest {
         final InterfaceKey interfaceKey = new InterfaceKey("br10");
         final InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
                 .child(Interface.class, interfaceKey).child(Subinterfaces.class)
-                .child(Subinterface.class, new SubinterfaceKey(Long.valueOf(0L))).augmentation(Subinterface1.class)
+                .child(Subinterface.class, new SubinterfaceKey(0L)).augmentation(Subinterface1.class)
                 .child(Ipv4.class).child(Addresses.class).child(Address.class).child(Config.class);
 
         ConfigBuilder builder = new ConfigBuilder();
