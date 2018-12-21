@@ -72,7 +72,7 @@ public class HsrpGroupConfigWriterTest {
 
         final String command = String.format("router hsrp\n"
                 + "interface %s\n"
-                + "address family %s\n"
+                + "address-family %s\n"
                 + "hsrp %s version %s\n"
                 + "\n"
                 + "root\n",
@@ -101,7 +101,7 @@ public class HsrpGroupConfigWriterTest {
 
         final String command = String.format("router hsrp\n"
                 + "interface %s\n"
-                + "address family %s\n"
+                + "address-family %s\n"
                 + "hsrp %s version %s\n"
                 + "priority %s\n"
                 + "root\n",
@@ -130,7 +130,7 @@ public class HsrpGroupConfigWriterTest {
 
         final String command = String.format("router hsrp\n"
                 + "interface %s\n"
-                + "address family %s\n"
+                + "address-family %s\n"
                 + "hsrp %s version %s\n"
                 + "priority %s\n"
                 + "root\n",
@@ -160,7 +160,7 @@ public class HsrpGroupConfigWriterTest {
 
         final String command = String.format("router hsrp\n"
                 + "interface %s\n"
-                + "address family %s\n"
+                + "address-family %s\n"
                 + "no hsrp %s version %s\n"
                 + "root\n",
                 interfaceName, familyType, virtualRouterId, version);
@@ -188,7 +188,7 @@ public class HsrpGroupConfigWriterTest {
 
         final String command = String.format("router hsrp\n"
                 + "interface %s\n"
-                + "address family %s\n"
+                + "address-family %s\n"
                 + "no hsrp %s version %s\n"
                 + "root\n",
                 interfaceName, familyType, virtualRouterId, version);
