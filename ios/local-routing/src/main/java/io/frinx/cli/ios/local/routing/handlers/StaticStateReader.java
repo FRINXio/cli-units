@@ -42,9 +42,9 @@ public class StaticStateReader implements LrReader.LrOperReader<State, StateBuil
 
     private static final Pattern STATIC_IP_ROUTE =
             Pattern.compile("(?<state>[A-Z]+)\\s*(?<net>[\\d.]+)\\s*\\["
-                    + "(?<metric>[\\d/]+)\\]\\s*via\\s*(?<ip>[\\d.]+).*");
+                    + "(?<metric>[\\d/]+)]\\s*via\\s*(?<ip>[\\d.]+).*");
     private static final Pattern STATIC_IPV6_ROUTE =
-            Pattern.compile("(?<state>[A-Z]+)\\s*(?<net>[\\d:/A-F]+)\\s*\\[(?<metric>[\\d/]+)\\].*");
+            Pattern.compile("(?<state>[A-Z]+)\\s*(?<net>[\\d:/A-F]+)\\s*\\[(?<metric>[\\d/]+)].*");
     private static final Pattern IP_ROUTE = Pattern.compile("(?<address>[\\d.]+)/(?<mask>[\\d.]+)");
 
     private Cli cli;

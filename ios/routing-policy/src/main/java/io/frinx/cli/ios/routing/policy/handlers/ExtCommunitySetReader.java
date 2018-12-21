@@ -86,7 +86,7 @@ public class ExtCommunitySetReader implements CliConfigListReader<ExtCommunitySe
     }
 
     private static String realignOutput(String output, String vrfName) {
-        output = output.replaceAll("\\n|\\r", "");
+        output = output.replaceAll("[\\n\\r]", "");
         output = output.replaceAll("ip vrf", "\nip vrf");
 
         output = ParsingUtils.NEWLINE.splitAsStream(output)
