@@ -85,7 +85,7 @@ public class VrfConfigWriter implements CliWriter<Config> {
                 .filter(i -> i.getConfig()
                         .getRouteDistinguisher() != null)
                 .map(NetworkInstance::getConfig)
-                .collect(HashMultiset::<String>create, (set, config) -> set.add(config.getRouteDistinguisher()
+                .collect(HashMultiset::create, (set, config) -> set.add(config.getRouteDistinguisher()
                         .getString()), (configs, configs2) -> configs.addAll(configs2));
 
         Preconditions.checkArgument(rds.count(routeDistinguisher.getString()) == 1,
