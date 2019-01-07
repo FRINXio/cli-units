@@ -55,7 +55,7 @@ public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, C
 
     @VisibleForTesting
     static void parseGlobal(String output, ConfigBuilder builder, String ospfId) {
-        output = output.replaceAll("\\n|\\r", "");
+        output = output.replaceAll("[\\n\\r]", "");
 
         output = output.replace("router ospf", "\nrouter ospf");
 

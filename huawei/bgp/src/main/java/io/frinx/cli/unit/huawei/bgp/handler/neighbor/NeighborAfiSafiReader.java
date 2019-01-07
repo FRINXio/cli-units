@@ -79,7 +79,7 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
 
     @VisibleForTesting
     static List<AfiSafiKey> getAfiKeys(String output, NetworkInstanceKey vrfKey) {
-        output = output.replaceAll("\\n|\\r", "");
+        output = output.replaceAll("[\\n\\r]", "");
         output = output.replaceAll("ipv4-family", "\nipv4-family");
 
         String vrfName = vrfKey.getName();

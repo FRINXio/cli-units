@@ -70,7 +70,7 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
     @VisibleForTesting
     public static List<AfiSafiKey> getAfiKeys(String output, NetworkInstanceKey vrfKey, Predicate<String>
             filterActiveFamilies) {
-        output = output.replaceAll("\\n|\\r", "");
+        output = output.replaceAll("[\\n\\r]", "");
         output = output.replaceAll("address-family", "\naddress-family");
 
         String vrfName = vrfKey.getName();

@@ -41,8 +41,8 @@ public class Ipv4RoutesReader implements CliOperListReader<Route, RouteKey, Rout
 
     private static final String SH_IP_BGP = "show ip bgp";
     private static final String SH_IP_BGP_PREFIX = "show ip bgp | section %s";
-    private static final Pattern ROUTE_LINE = Pattern.compile("(?<statusCodes>[sdh\\*>irSmbfxac\\s]+) "
-            + "(?<prefix>[\\S]+) (?<nextHop>.+) (?:.*) (?<origin>[ie\\?])");
+    private static final Pattern ROUTE_LINE = Pattern.compile("(?<statusCodes>[sdh*>irSmbfxac\\s]+) "
+            + "(?<prefix>[\\S]+) (?<nextHop>.+) (?:.*) (?<origin>[ie?])");
     private static final String PATH_ID = "0";
 
     private Cli cli;

@@ -73,7 +73,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     }
 
     private static String realignOutput(String output) {
-        output = output.replaceAll("\\n|\\r", "");
+        output = output.replaceAll("[\\n\\r]", "");
         output = output.replace("router bgp ", "\nrouter bgp");
         output = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)

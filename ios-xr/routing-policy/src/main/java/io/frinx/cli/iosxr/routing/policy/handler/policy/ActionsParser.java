@@ -251,7 +251,7 @@ final class ActionsParser {
     }
 
     private static final Pattern MED = Pattern.compile("set med (?<value>\\S+)");
-    private static final Pattern MED_TYPE1 = Pattern.compile("(\\+|-)[0-9]+");
+    private static final Pattern MED_TYPE1 = Pattern.compile("([+\\-])[0-9]+");
     private static final Pattern MED_TYPE2 = Pattern.compile("[0-9]+");
     private static final Pattern MED_TYPE3 = Pattern.compile("igp-cost");
     private static final Pattern MED_TYPE4 = Pattern.compile("max-reachable");
