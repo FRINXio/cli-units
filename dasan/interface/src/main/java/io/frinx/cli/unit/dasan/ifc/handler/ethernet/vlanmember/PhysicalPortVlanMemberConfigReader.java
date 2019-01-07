@@ -26,6 +26,7 @@ import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceReader;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -85,9 +86,13 @@ public class PhysicalPortVlanMemberConfigReader implements CliConfigReader<Confi
             return;
         }
 
-        List<TrunkVlans> vlans = vlansmap.values().stream().flatMap(s -> s.stream())
-                .map(s -> StringUtils.removeAll(s, "br")).filter(s -> !"default".equals(s))
-                .flatMap(s -> DasanCliUtil.parseIdRanges(s).stream()).map(Integer::valueOf).map(VlanId::new)
+        List<TrunkVlans> vlans = vlansmap.values().stream()
+                .flatMap(Collection::stream)
+                .map(s -> StringUtils.removeAll(s, "br"))
+                .filter(s -> !"default".equals(s))
+                .flatMap(s -> DasanCliUtil.parseIdRanges(s).stream())
+                .map(Integer::valueOf)
+                .map(VlanId::new)
                 .map(TrunkVlans::new).collect(Collectors.toList());
 
         if (vlansmap.containsKey("tagged")) {

@@ -61,7 +61,7 @@ public class VlanConfigWriterTest {
 
     @Test
     public void testWriteCurrentAttributes_001() throws Exception {
-        final VlanId vlanId = new VlanId(Integer.valueOf(100));
+        final VlanId vlanId = new VlanId(100);
         final InstanceIdentifier<Config> instanceIdentifier =
                 KeyedInstanceIdentifier.create(NetworkInstances.class)
                 .child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
@@ -75,7 +75,7 @@ public class VlanConfigWriterTest {
 
         Mockito.doReturn(augmentConfig).when(config).getAugmentation(Config1.class);
         Mockito.doReturn(Boolean.TRUE).when(augmentConfig).isEline();
-        Mockito.when(config.getVlanId().getValue()).thenReturn(Integer.valueOf(100));
+        Mockito.when(config.getVlanId().getValue()).thenReturn(100);
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
 
         target.writeCurrentAttributes(instanceIdentifier, config, writeContext);
@@ -96,7 +96,7 @@ public class VlanConfigWriterTest {
 
     @Test
     public void testWriteCurrentAttributes_002() throws Exception {
-        final VlanId vlanId = new VlanId(Integer.valueOf(100));
+        final VlanId vlanId = new VlanId(100);
         final InstanceIdentifier<Config> instanceIdentifier =
                 KeyedInstanceIdentifier.create(NetworkInstances.class)
                 .child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
@@ -110,7 +110,7 @@ public class VlanConfigWriterTest {
 
         Mockito.doReturn(augmentConfig).when(config).getAugmentation(Config1.class);
         Mockito.doReturn(Boolean.FALSE).when(augmentConfig).isEline();
-        Mockito.when(config.getVlanId().getValue()).thenReturn(Integer.valueOf(100));
+        Mockito.when(config.getVlanId().getValue()).thenReturn(100);
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
 
         target.writeCurrentAttributes(instanceIdentifier, config, writeContext);
@@ -131,7 +131,7 @@ public class VlanConfigWriterTest {
 
     @Test
     public void testWriteCurrentAttributes_003() throws Exception {
-        final VlanId vlanId = new VlanId(Integer.valueOf(100));
+        final VlanId vlanId = new VlanId(100);
         final InstanceIdentifier<Config> instanceIdentifier =
                 KeyedInstanceIdentifier.create(NetworkInstances.class)
                 .child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
@@ -145,7 +145,7 @@ public class VlanConfigWriterTest {
 
         Mockito.doReturn(null).when(config).getAugmentation(Config1.class);
         Mockito.doReturn(Boolean.FALSE).when(augmentConfig).isEline();
-        Mockito.when(config.getVlanId().getValue()).thenReturn(Integer.valueOf(100));
+        Mockito.when(config.getVlanId().getValue()).thenReturn(100);
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
 
         target.writeCurrentAttributes(instanceIdentifier, config, writeContext);
@@ -166,7 +166,7 @@ public class VlanConfigWriterTest {
 
     @Test
     public void testWriteCurrentAttributes_004() throws Exception {
-        final VlanId vlanId = new VlanId(Integer.valueOf(100));
+        final VlanId vlanId = new VlanId(100);
         final InstanceIdentifier<Config> instanceIdentifier =
                 KeyedInstanceIdentifier.create(NetworkInstances.class)
                 .child(NetworkInstance.class, new NetworkInstanceKey("not-default"))
@@ -188,14 +188,14 @@ public class VlanConfigWriterTest {
 
     @Test
     public void testDeleteCurrentAttributes_001() throws Exception {
-        final VlanId vlanId = new VlanId(Integer.valueOf(100));
+        final VlanId vlanId = new VlanId(100);
         final InstanceIdentifier<Config> instanceIdentifier =
                 KeyedInstanceIdentifier.create(NetworkInstances.class)
                 .child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
                 .child(Vlans.class)
                 .child(Vlan.class, new VlanKey(vlanId))
                 .child(Config.class);
-        final VlanId retVlanId = new VlanId(Integer.valueOf(100));
+        final VlanId retVlanId = new VlanId(100);
         final Config config = Mockito.mock(Config.class);
         final WriteContext writeContext = Mockito.mock(WriteContext.class);
         final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);

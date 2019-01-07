@@ -231,7 +231,7 @@ public class PhysicalPortVlanMemberConfigReaderTest {
             " lacp port 4/10 aggregator 10 ", " lacp aggregator 9 ",
             " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
         final String id = "3/4";
-        List<String> portList = new ArrayList<String>();
+        List<String> portList = new ArrayList<>();
         portList.add("3/4");
         portList.add("4/10");
 
@@ -249,7 +249,7 @@ public class PhysicalPortVlanMemberConfigReaderTest {
             " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
 
         final String id = "6/4";
-        List<String> portList = new ArrayList<String>();
+        List<String> portList = new ArrayList<>();
         portList.add("3/4");
         portList.add("4/10");
 
