@@ -23,6 +23,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.hsrp.handler.util.HsrpUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.Interface;
@@ -40,10 +41,11 @@ public class HsrpGroupConfigReader implements CliConfigReader<Config, ConfigBuil
     private Cli cli;
 
     public static final String SH_GROUPS =
-            "show running-config router hsrp interface %s address-family %s | include ^   hsrp %s";
+            "show running-config router hsrp interface %s address-family %s | include ^ *hsrp %s";
     public static final String SH_GROUP = "show running-config router hsrp interface %s address-family %s %s";
     private static final Pattern GROUP_LINE =
             Pattern.compile("\\s*hsrp (?<groupNumber>[0-9]+) version (?<version>[0-9]+)");
+    private static final Pattern HSRP_LINE = Pattern.compile("\\s*hsrp (?<hsrp>[0-9]+)");
     private static final Pattern PRIORITY_LINE = Pattern.compile("\\s*priority (?<priority>[0-9]+)");
     public static final Short DEFAULT_VERSION = 1;
 
@@ -79,9 +81,16 @@ public class HsrpGroupConfigReader implements CliConfigReader<Config, ConfigBuil
         configBuilder.setAddressFamily(family);
         configBuilder.setVirtualRouterId(virtualRouterId);
 
-        String groupNumber = blockingRead(String.format(SH_GROUPS, interfaceId, familyType, virtualRouterId), cli,
+        String outputGroups = blockingRead(String.format(SH_GROUPS, interfaceId, familyType, virtualRouterId), cli,
                 instanceIdentifier, readContext).trim();
-        parseGroupConfig(configBuilder, blockingRead(String.format(SH_GROUP, interfaceId, familyType, groupNumber), cli,
-                instanceIdentifier, readContext));
+
+        Optional<String> groupNumber =
+            ParsingUtils.parseField(outputGroups, 0, HSRP_LINE::matcher, matcher -> matcher.group());
+
+        if (groupNumber.isPresent()) {
+            parseGroupConfig(configBuilder,
+                    blockingRead(String.format(SH_GROUP, interfaceId, familyType, groupNumber.get()), cli,
+                    instanceIdentifier, readContext));
+        }
     }
 }
