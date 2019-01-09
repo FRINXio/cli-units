@@ -60,7 +60,7 @@ public class HsrpGroupConfigReaderTest {
         final InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
                 .child(Interface.class, interfaceKey).child(HsrpGroup.class, hsrpgroupKey).child(Config.class);
         final String inputCommand =
-                String.format("show running-config router hsrp interface %s address-family %s | include ^   hsrp %s",
+                String.format("show running-config router hsrp interface %s address-family %s | include ^ *hsrp %s",
                         interfaceName, familyType, virtualRouterId.toString());
         final ConfigBuilder builder = new ConfigBuilder();
         final ReadContext readContext = Mockito.mock(ReadContext.class);
