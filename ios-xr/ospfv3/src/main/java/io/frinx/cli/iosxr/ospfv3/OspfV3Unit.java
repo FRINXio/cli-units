@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.ProtocolOspfv3ExtAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.ospfv3.global.structural.GlobalBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.ospfv3.global.structural.global.config.StubRouterBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.ospfv3.top.Ospfv3Builder;
@@ -72,21 +73,25 @@ public class OspfV3Unit implements TranslateUnit {
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rreg, Cli cli) {
-        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOL1_OSPFV3, Ospfv3Builder.class);
-        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOL1_OS_GLOBAL, GlobalBuilder.class);
-        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOL1_OS_GL_CONFIG,
+        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG, ProtocolOspfv3ExtAugBuilder.class);
+        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OSPFV3, Ospfv3Builder.class);
+        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GLOBAL, GlobalBuilder.class);
+        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CONFIG,
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
                 .ospfv3.rev180817.ospfv3.global.structural.global.ConfigBuilder.class);
-        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOL1_OS_GL_CO_STUBROUTER, StubRouterBuilder.class);
-        rreg.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOL1_OS_GL_CO_ST_CONFIG,
+        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_STUBROUTER,
+                StubRouterBuilder.class);
+        rreg.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_ST_CONFIG,
                 new StubRouterConfigReader(cli)));
     }
 
     private void provideWriters(ModifiableWriterRegistryBuilder wreg, Cli cli) {
-        wreg.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOL1_OS_GL_CONFIG, new NoopCliWriter<>()),
+        wreg.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CONFIG,
+                new NoopCliWriter<>()),
                 io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_PR_PR_CONFIG);
-        wreg.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOL1_OS_GL_CO_STUBROUTER, new NoopCliWriter<>()));
-        wreg.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOL1_OS_GL_CO_ST_CONFIG,
+        wreg.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_STUBROUTER,
+                new NoopCliWriter<>()));
+        wreg.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_ST_CONFIG,
                 new StubRouterConfigWriter(cli)));
     }
 
