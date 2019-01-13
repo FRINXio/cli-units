@@ -30,14 +30,14 @@
             <dependency>
                 <groupId>org.opendaylight.mdsal</groupId>
                 <artifactId>mdsal-artifacts</artifactId>
-                <version>2.4.2-Oxygen-SR2.4_2_0_rc10-frinxodl-SNAPSHOT</version>
+                <version>2.4.2-Oxygen-SR2.4_2_0_rc10-frinxodl</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.yangtools</groupId>
                 <artifactId>yangtools-artifacts</artifactId>
-                <version>2.0.5-Oxygen-SR2.4_2_0_rc10-frinxodl-SNAPSHOT</version>
+                <version>2.0.5-Oxygen-SR2.4_2_0_rc10-frinxodl</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -100,12 +100,12 @@
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>translate-utils</artifactId>
-            <version>1.18.04-Oxygen-SR2.4_2_0_rc10-frinxodl-SNAPSHOT</version>
+            <version>1.18.04-Oxygen-SR2.4_2_0_rc10-frinxodl</version>
         </dependency>
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>translate-impl</artifactId>
-            <version>1.18.04-Oxygen-SR2.4_2_0_rc10-frinxodl-SNAPSHOT</version>
+            <version>1.18.04-Oxygen-SR2.4_2_0_rc10-frinxodl</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
