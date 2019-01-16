@@ -73,7 +73,6 @@ public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceK
     public void updateCurrentAttributesForType(InstanceIdentifier<Interface> id, Interface dataBefore,
                                                Interface dataAfter, WriteContext writeContext) throws
             WriteFailedException {
-        deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
