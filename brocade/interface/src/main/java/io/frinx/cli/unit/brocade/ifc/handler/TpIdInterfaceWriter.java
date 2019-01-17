@@ -62,6 +62,14 @@ public final class TpIdInterfaceWriter implements CliWriter<Config1> {
     }
 
     @Override
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config1> id, @Nonnull Config1 dataBefore,
+                                        @Nonnull Config1 dataAfter, @Nonnull WriteContext writeContext)
+            throws WriteFailedException {
+        writeCurrentAttributes(id, dataAfter, writeContext);
+    }
+
+
+    @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config1> id,
                                         @Nonnull Config1 dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {

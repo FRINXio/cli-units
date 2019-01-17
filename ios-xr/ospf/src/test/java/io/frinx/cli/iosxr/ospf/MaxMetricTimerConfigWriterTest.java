@@ -145,7 +145,7 @@ public class MaxMetricTimerConfigWriterTest {
 
         this.writer.updateCurrentAttributesForType(piid, data, newData, context);
 
-        Mockito.verify(cli, Mockito.times(2))
+        Mockito.verify(cli, Mockito.times(1))
                 .executeAndRead(response.capture());
         Assert.assertEquals(UPDATE_INPUT, response.getValue()
                 .getContent());
@@ -162,7 +162,7 @@ public class MaxMetricTimerConfigWriterTest {
 
         this.writer.updateCurrentAttributesForType(piid, data, newData, context);
 
-        Mockito.verify(cli, Mockito.times(2))
+        Mockito.verify(cli, Mockito.times(1))
                 .executeAndRead(response.capture());
         Assert.assertEquals(REMOVE_TIMEOUT_INPUT, response.getValue()
                 .getContent());

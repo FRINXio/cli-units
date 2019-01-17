@@ -86,7 +86,6 @@ public class Ipv4ConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config after,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         try {
-            deleteCurrentAttributes(instanceIdentifier, before, writeContext);
             writeCurrentAttributes(instanceIdentifier, after, writeContext);
         } catch (WriteFailedException e) {
             throw new WriteFailedException.UpdateFailedException(instanceIdentifier, before, after, e);
