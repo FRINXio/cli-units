@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
+import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
@@ -30,12 +31,17 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.junos.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.junos.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.junos.network.instance.handler.NetworkInstanceReader;
+import io.frinx.cli.unit.junos.network.instance.handler.vrf.ifc.VrfInterfaceConfigReader;
+import io.frinx.cli.unit.junos.network.instance.handler.vrf.ifc.VrfInterfaceConfigWriter;
+import io.frinx.cli.unit.junos.network.instance.handler.vrf.ifc.VrfInterfaceReader;
+import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.InterfacesBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class JunosNetworkInstanceUnit implements TranslateUnit {
@@ -76,6 +82,11 @@ public class JunosNetworkInstanceUnit implements TranslateUnit {
         readRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli)));
+
+        // Interface
+        readRegistry.addStructuralReader(IIDs.NE_NE_INTERFACES, InterfacesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_IN_INTERFACE, new VrfInterfaceReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_IN_IN_CONFIG, new VrfInterfaceConfigReader()));
     }
 
     private void provideWriters(@Nonnull ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
@@ -84,6 +95,11 @@ public class JunosNetworkInstanceUnit implements TranslateUnit {
 
         writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli)),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
+
+        // Interface
+        writeRegistry.addAfter(new GenericListWriter<>(IIDs.NE_NE_IN_INTERFACE, new NoopCliListWriter<>()),
+            /*handle after sub ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_IN_CONFIG, new VrfInterfaceConfigWriter(cli)));
     }
 
     @Override
@@ -91,7 +107,7 @@ public class JunosNetworkInstanceUnit implements TranslateUnit {
         return Sets.newHashSet(
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance
                         .rev170228.$YangModuleInfoImpl.getInstance(),
-                        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types
                         .rev170228.$YangModuleInfoImpl.getInstance()
             );
     }
