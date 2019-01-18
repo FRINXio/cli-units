@@ -150,7 +150,8 @@ public class BundleEtherInterfaceConfigWriter implements CliWriter<Config> {
         Matcher matcher = BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PATTERN.matcher(ifcName);
 
         if (matcher.matches()) {
-            blockingDeleteAndRead(cli, id, "configure terminal", "bridge", f("no lacp %s", matcher.group("number")),
+            blockingDeleteAndRead(cli, id, "configure terminal",
+                    "bridge", f("no lacp aggregator %s", matcher.group("number")),
                     "end");
         }
     }

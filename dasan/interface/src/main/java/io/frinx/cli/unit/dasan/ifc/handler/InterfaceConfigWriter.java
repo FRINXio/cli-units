@@ -26,6 +26,7 @@ public  class InterfaceConfigWriter extends CompositeWriter<Config> {
     public InterfaceConfigWriter(Cli cli) {
         super(Lists.newArrayList(
                 new PhysicalPortInterfaceConfigWriter(cli),
+                new TrunkPortInterfaceConfigWriter(cli),
                 new BundleEtherInterfaceConfigWriter(cli),
                 new VlanInterfaceConfigWriter(cli)
         ));

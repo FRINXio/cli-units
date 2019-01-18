@@ -43,6 +43,7 @@ public class InterfaceReader extends CompositeListReader<Interface, InterfaceKey
         super(new ArrayList<ListReaderCustomizer<Interface, InterfaceKey, InterfaceBuilder>>() {
             {
                 add(new PhysicalPortInterfaceReader(cli));
+                add(new TrunkPortInterfaceReader(cli));
                 add(new BundleEtherInterfaceReader(cli));
                 add(new VlanInterfaceReader(cli));
             }
@@ -68,7 +69,8 @@ public class InterfaceReader extends CompositeListReader<Interface, InterfaceKey
         if (name.startsWith(VlanInterfaceReader.INTERFACE_NAME_PREFIX)) {
             return L3ipvlan.class;
         }
-        if (name.startsWith(BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PREFIX)) {
+        if (name.startsWith(BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PREFIX)
+            || name.startsWith(TrunkPortInterfaceReader.TRUNK_IF_NAME_PREFIX)) {
             return Ieee8023adLag.class;
         }
         return Other.class;

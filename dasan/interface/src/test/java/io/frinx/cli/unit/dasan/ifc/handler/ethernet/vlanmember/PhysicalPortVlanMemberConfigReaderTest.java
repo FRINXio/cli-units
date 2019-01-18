@@ -20,6 +20,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.dasan.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -36,11 +37,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Ethernet1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanSwitchedConfig.TrunkVlans;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.SwitchedVlan;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.SwitchedVlanBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanModeType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
@@ -100,7 +102,7 @@ public class PhysicalPortVlanMemberConfigReaderTest {
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
 
-        Assert.assertEquals(builder.getInterfaceMode(), VlanModeType.TRUNK);
+        Assert.assertEquals(Arrays.asList(new TrunkVlans(new VlanId(10))), builder.build().getTrunkVlans());
     }
 
     @PrepareOnlyThisForTest({ DasanCliUtil.class })
@@ -152,7 +154,7 @@ public class PhysicalPortVlanMemberConfigReaderTest {
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
 
-        Assert.assertEquals(builder.getInterfaceMode(), VlanModeType.ACCESS);
+        Assert.assertEquals(new VlanId(10), builder.build().getNativeVlan());
     }
 
     @PrepareOnlyThisForTest({ DasanCliUtil.class })
@@ -226,19 +228,24 @@ public class PhysicalPortVlanMemberConfigReaderTest {
 
     @Test
     public void testParseInterface_001() throws Exception {
-
-        final String output = StringUtils.join(new String[] { " lacp aggregator 8 ", " lacp port 3/4,4/4 aggregator 8",
-            " lacp port 4/10 aggregator 10 ", " lacp aggregator 9 ",
-            " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
-        final String id = "3/4";
-        List<String> portList = new ArrayList<>();
-        portList.add("3/4");
-        portList.add("4/10");
-
+        final String output = StringUtils.join(new String[] {
+            " vlan add br22 3/7-3/8,4/11 untagged ",
+            " vlan add br31 3/3,4/3,4/11 tagged ",
+            " vlan add br32 4/11 tagged  "
+        }, "\n");
+        final String id = "4/11";
+        List<String> portList = new ArrayList<String>();
+        portList.add("3/3");
+        portList.add("3/7");
+        portList.add("3/8");
+        portList.add("4/3");
+        portList.add("4/11");
         // test
         PhysicalPortVlanMemberConfigReader.parseEthernetConfig(output, builder, portList, id);
-
-        Assert.assertEquals(builder.getAccessVlan(), null);
+        Assert.assertEquals(builder.getNativeVlan(), new VlanId(22));
+        Assert.assertEquals(builder.getTrunkVlans(),
+                Arrays.asList(new TrunkVlans(new VlanId(31)),
+                        new TrunkVlans(new VlanId(32))));
     }
 
     @Test
@@ -256,7 +263,7 @@ public class PhysicalPortVlanMemberConfigReaderTest {
         // test
         PhysicalPortVlanMemberConfigReader.parseEthernetConfig(output, builder, portList, id);
 
-        Assert.assertEquals(builder.getAccessVlan(), null);
+        Assert.assertEquals(builder.getNativeVlan(), null);
     }
 
     @Test

@@ -36,6 +36,7 @@ public class InterfaceConfigReader extends CompositeReader<Config, ConfigBuilder
         super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {
             {
                 add(new PhysicalPortInterfaceConfigReader(cli));
+                add(new TrunkPortInterfaceConfigReader(cli));
                 add(new BundleEtherInterfaceConfigReader(cli));
                 add(new VlanInterfaceConfigReader(cli));
             }

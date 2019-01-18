@@ -44,11 +44,9 @@ public class VlanInterfaceConfigWriter implements CliWriter<Config> {
 
         String name = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = VlanInterfaceReader.INTERFACE_NAME_PATTERN.matcher(name);
-        if (!matcher.matches()) {
+        if (!matcher.matches() || data.getType() != L3ipvlan.class) {
             return;
         }
-
-        validateIfcNameAgainstType(data);
         writeOrUpdateInterface(id, data, matcher.group("id"));
     }
 
@@ -65,13 +63,9 @@ public class VlanInterfaceConfigWriter implements CliWriter<Config> {
 
         String name = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = VlanInterfaceReader.INTERFACE_NAME_PATTERN.matcher(name);
-        if (!matcher.matches()) {
+        if (!matcher.matches() || dataAfter.getType() != L3ipvlan.class) {
             return;
         }
-        Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
-                "Changing interface type is not permitted. Before: %s, After: %s", dataBefore.getType(),
-                dataAfter.getType());
-
         validateIfcNameAgainstType(dataAfter);
         writeOrUpdateInterface(id, dataAfter, name);
     }
@@ -81,7 +75,10 @@ public class VlanInterfaceConfigWriter implements CliWriter<Config> {
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String name = id.firstKeyOf(Interface.class).getName();
-        validateIfcNameAgainstType(dataBefore);
+        Matcher matcher = VlanInterfaceReader.INTERFACE_NAME_PATTERN.matcher(name);
+        if (!matcher.matches() || dataBefore.getType() != L3ipvlan.class) {
+            return;
+        }
         deleteInterface(id, dataBefore, name);
     }
 
@@ -96,7 +93,7 @@ public class VlanInterfaceConfigWriter implements CliWriter<Config> {
         String ifcName = id.firstKeyOf(Interface.class).getName();
         blockingWriteAndRead(cli, id, data, "configure terminal",
                 f("interface %s", ifcName.replace("Vlan", "br")),
-                Optional.ofNullable(data.isEnabled()).orElse(Boolean.FALSE) ? "shutdown" : "no shutdown",
+                Optional.ofNullable(data.isEnabled()).orElse(Boolean.FALSE) ? "no shutdown" : "shutdown",
                 data.getMtu() == null ? "no mtu" : f("mtu %d", data.getMtu()), "end");
     }
 }
