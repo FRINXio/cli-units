@@ -36,8 +36,8 @@
     <properties>
         <cli.version>3.1.7.rc13-frinx</cli.version>
         <openconfig.version>3.1.7.rc13-frinx</openconfig.version>
-        <hc.version>1.17.10-Carbon-SR1.3_1_7_rc13-frinxodl</hc.version>
-        <controller.version>1.5.1-Carbon-SR1.3_1_7_rc13-frinxodl</controller.version>
+        <hc.version>1.17.10-Carbon-SR1.3_1_7_rc14-frinxodl-SNAPSHOT</hc.version>
+        <controller.version>1.5.1-Carbon-SR1.3_1_7_rc14-frinxodl-SNAPSHOT</controller.version>
         <translate.unit.commons.version>3.1.7.rc13-frinx</translate.unit.commons.version>
     </properties>
 
