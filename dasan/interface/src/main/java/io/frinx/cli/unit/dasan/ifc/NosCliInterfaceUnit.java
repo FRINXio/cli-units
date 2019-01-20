@@ -54,10 +54,10 @@ import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.ext.rev180926.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.AggregationBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.EthernetBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.Ipv4Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.AddressesBuilder;
@@ -65,6 +65,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan.rev180802.l3ipvlan._interface.top.L3ipvlanBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.aggregation.lacp.top.Lacp;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.aggregation.lacp.top.LacpBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.routing.policy.top.RoutingPolicy;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.routing.policy.top.RoutingPolicyBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Aggregation1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Ethernet1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.SwitchedVlanBuilder;
@@ -113,7 +117,11 @@ public class NosCliInterfaceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.l3ipvlan
                 .rev180802.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.ext
-                .rev180926.$YangModuleInfoImpl.getInstance()
+                .rev180926.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member
+                .rev171109.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp
+                .rev170505.$YangModuleInfoImpl.getInstance()
                 );
     }
 
@@ -143,17 +151,16 @@ public class NosCliInterfaceUnit implements TranslateUnit {
 
         // if-ethernet
         writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET, new NoopCliWriter<>()));
-        InstanceIdentifier<Config1> iidd = InstanceIdentifier.create(Config1.class);
+        InstanceIdentifier<Config> iidEhernetConfig = InstanceIdentifier.create(Config.class);
+
+        // LacpEthConfigAug
         writeRegistry.subtreeAddAfter(
                 Sets.newHashSet(
-                        RWUtils.cutIdFromStart(IIDs.IN_IN_ET_CO_AUG_CONFIG1,
-                                InstanceIdentifier.create(
-                                        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
-                                        .interfaces.ethernet.rev161222.ethernet.top.ethernet.Config.class)),
-                        RWUtils.cutIdFromStart(IIDs.INT_INT_ETH_CON_AUG_CONFIG1,
-                                InstanceIdentifier.create(
-                                        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
-                                        .interfaces.ethernet.rev161222.ethernet.top.ethernet.Config.class))
+                        RWUtils.cutIdFromStart(IIDs.IN_IN_ET_CO_AUG_CONFIG1, iidEhernetConfig),
+                        RWUtils.cutIdFromStart(IIDs.INT_INT_ETH_CON_AUG_CONFIG1, iidEhernetConfig),
+                        RWUtils.cutIdFromStart(
+                            io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG,
+                            iidEhernetConfig)
                         ),
                 new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli)),
                 IIDs.IN_IN_CONFIG);
@@ -249,6 +256,11 @@ public class NosCliInterfaceUnit implements TranslateUnit {
         readRegistry.add(new GenericConfigReader<>(
                 io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
                 new Ipv4AddressConfigReader(cli)));
+
+        InstanceIdentifier<Lacp> lacpDummyIID = InstanceIdentifier.create(Lacp.class);
+        readRegistry.addStructuralReader(lacpDummyIID, LacpBuilder.class);
+        InstanceIdentifier<RoutingPolicy> routingPolicyIID = InstanceIdentifier.create(RoutingPolicy.class);
+        readRegistry.addStructuralReader(routingPolicyIID, RoutingPolicyBuilder.class);
     }
 
     @Override

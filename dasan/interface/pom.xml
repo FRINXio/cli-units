@@ -56,7 +56,16 @@
       <artifactId>openconfig-vlan</artifactId>
       <version>${openconfig.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.frinx.openconfig</groupId>
+      <artifactId>openconfig-lacp</artifactId>
+      <version>${openconfig.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.openconfig</groupId>
+      <artifactId>openconfig-policy</artifactId>
+      <version>${openconfig.version}</version>
+    </dependency>
     <!-- for JUnit -->
     <dependency>
       <groupId>org.hamcrest</groupId>
