@@ -136,6 +136,7 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
+        // this is fine, we manipulate with networks and masks only, and there can be multiple masks
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }

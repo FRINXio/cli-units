@@ -232,6 +232,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
                                                @Nonnull ConnectionPoints dataBefore,
                                                @Nonnull ConnectionPoints dataAfter, @Nonnull WriteContext
                                                            writeContext) throws WriteFailedException {
+        // this is fine, for each cpid there is new command
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
