@@ -369,6 +369,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                                                @Nonnull ConnectionPoints dataBefore,
                                                @Nonnull ConnectionPoints dataAfter, @Nonnull WriteContext
                                                        writeContext) throws WriteFailedException {
+        // there may be more xconnects (check tests), it is necessary to first delete existing
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }

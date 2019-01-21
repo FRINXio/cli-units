@@ -99,7 +99,7 @@ public class EgressFlowConfigWriter implements CliWriter<Config> {
     public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id, @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter, @Nonnull final WriteContext writeContext)
             throws WriteFailedException {
-
+        // this is fine, the delete and write commands will be within one transaction
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }

@@ -85,6 +85,7 @@ public class NeighborAfiSafiApplyPolicyConfigWriter implements BgpWriter<Config>
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
+        // this is fine, there is no update for policy, either the policy is configured or it is not
         deleteCurrentAttributesForType(id, dataBefore, writeContext);
         writeCurrentAttributesForType(id, dataAfter, writeContext);
     }

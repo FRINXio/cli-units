@@ -88,6 +88,9 @@ public class ExtCommunitySetConfigWriter implements CliWriter<Config> {
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws
             WriteFailedException {
+        // this is correct procedure here, there is no 'update' of route-target
+        // Any route-target previously not in config will be added, any route-target missing from config will be
+        // deleted.
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
