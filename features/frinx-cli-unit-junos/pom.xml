@@ -51,6 +51,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>junos-acl-unit</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>junos-cli-init-unit</artifactId>
         </dependency>

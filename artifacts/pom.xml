@@ -283,6 +283,11 @@
             <!-- junos -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>junos-acl-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>junos-cli-init-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
