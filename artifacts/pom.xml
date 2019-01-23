@@ -333,6 +333,11 @@
                 <artifactId>nexus-utils</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>nexus-configuration-metadata-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- dasan -->
             <dependency>
