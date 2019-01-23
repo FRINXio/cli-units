@@ -37,6 +37,7 @@
     <module>configuration-metadata</module>
     <module>interface</module>
     <module>network-instance</module>
+    <module>acl</module>
   </modules>
 
   <build>

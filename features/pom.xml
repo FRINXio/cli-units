@@ -337,6 +337,11 @@
       <artifactId>junos-network-instance-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>junos-acl-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>io.frinx.cli</groupId>
