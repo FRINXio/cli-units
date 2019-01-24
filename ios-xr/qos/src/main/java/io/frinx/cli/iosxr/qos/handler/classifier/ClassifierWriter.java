@@ -181,6 +181,8 @@ public class ClassifierWriter implements CliWriter<Classifier> {
     public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Classifier> id, @Nonnull Classifier dataBefore,
                                         @Nonnull Classifier dataAfter, @Nonnull WriteContext writeContext) throws
             WriteFailedException {
+        //delete method has to be there in order to prevent semantic errors.
+        deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
