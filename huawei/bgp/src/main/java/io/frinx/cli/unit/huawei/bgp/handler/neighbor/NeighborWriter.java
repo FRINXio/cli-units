@@ -211,6 +211,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Neighbor> id, Neighbor dataBefore, Neighbor dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
+        // FI-789
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }

@@ -135,6 +135,7 @@ public class OspfTableConnectionWriter implements
                                                Config dataBefore,
                                                Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
+        // this is fine, route-maps cannot be overwritten, you can add and delete
         deleteCurrentAttributesForType(id, dataBefore, writeContext);
         writeCurrentAttributesForType(id, dataAfter, writeContext);
     }
