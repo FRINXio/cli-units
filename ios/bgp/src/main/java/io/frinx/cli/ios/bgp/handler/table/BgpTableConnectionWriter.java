@@ -143,8 +143,9 @@ public class BgpTableConnectionWriter implements
                                                Config dataBefore,
                                                Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
+        // this is fine, since there is no update, just adding new route-maps or deleting old
         deleteCurrentAttributesForType(id, dataBefore, writeContext);
-        deleteCurrentAttributesForType(id, dataBefore, writeContext);
+        writeCurrentAttributesForType(id, dataAfter, writeContext);
     }
 
     @Override

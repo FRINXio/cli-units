@@ -100,6 +100,7 @@ public class IngressFlowConfigWriter implements CliWriter<Config> {
                                         @Nonnull final Config dataAfter, @Nonnull final WriteContext writeContext)
             throws WriteFailedException {
 
+        // this is fine, the delete and write commands will be within one transaction
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
