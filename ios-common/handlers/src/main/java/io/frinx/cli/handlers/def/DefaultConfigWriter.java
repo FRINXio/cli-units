@@ -19,18 +19,19 @@ package io.frinx.cli.handlers.def;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeChildWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.DEFAULTINSTANCE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class DefaultConfigWriter implements CliWriter<Config> {
+public class DefaultConfigWriter implements CliWriter<Config>, CompositeChildWriter<Config> {
 
     private static final IllegalArgumentException EX = new IllegalArgumentException("Default network instance cannot "
             + "be manipulated");
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
             config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
 
@@ -38,27 +39,30 @@ public class DefaultConfigWriter implements CliWriter<Config> {
                 .equals(DEFAULTINSTANCE.class)) {
             throw new WriteFailedException.CreateFailedException(instanceIdentifier, config, EX);
         }
+        return true;
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull
-            Config dataAfter, @Nonnull WriteContext writeContext)
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
 
         if (dataAfter.getType()
                 .equals(DEFAULTINSTANCE.class)) {
             throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter, EX);
         }
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
-            config, @Nonnull WriteContext writeContext)
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                  @Nonnull Config config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.DeleteFailedException {
 
         if (config.getType()
                 .equals(DEFAULTINSTANCE.class)) {
             throw new WriteFailedException.DeleteFailedException(instanceIdentifier, EX);
         }
+        return true;
     }
 }

@@ -21,6 +21,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeChildWriter;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
@@ -28,7 +29,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.RouteDistinguisher;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L3VrfConfigWriter implements CliWriter<Config> {
+public class L3VrfConfigWriter implements CliWriter<Config>, CompositeChildWriter<Config> {
 
     private final Cli cli;
 
@@ -37,8 +38,8 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
-                                       @Nonnull WriteContext writeContext)
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                 @Nonnull Config config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
         if (config.getType().equals(L3VRF.class)) {
             blockingWriteAndRead(cli, instanceIdentifier, config,
@@ -50,11 +51,13 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
                             : f("route-distinguisher %s", config.getRouteDistinguisher().getString()),
                     "commit",
                     "return");
+            return true;
         }
+        return false;
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
 
@@ -72,12 +75,14 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
                             .getDescription()),
                     "commit",
                     "return");
+            return true;
         }
+        return false;
     }
 
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.DeleteFailedException {
 
@@ -88,6 +93,8 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
                     f("undo ip vpn-instance %s", config.getName()),
                     "commit",
                     "return");
+            return true;
         }
+        return false;
     }
 }

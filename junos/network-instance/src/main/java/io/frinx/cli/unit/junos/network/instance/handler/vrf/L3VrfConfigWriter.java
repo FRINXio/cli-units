@@ -22,13 +22,14 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeChildWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L3VrfConfigWriter implements CliWriter<Config> {
+public class L3VrfConfigWriter implements CliWriter<Config>, CompositeChildWriter<Config> {
 
     private Cli cli;
 
@@ -37,27 +38,28 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(
+    public boolean writeCurrentAttributesWResult(
             @Nonnull InstanceIdentifier<Config> id,
             @Nonnull Config data,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
-        if (isSupportedType(data)) {
-            return;
+        if (!isSupportedType(data)) {
+            return false;
         }
 
         createOrUpdateCurrentAttributes(id, data);
+        return true;
     }
 
     @Override
-    public void updateCurrentAttributes(
+    public boolean updateCurrentAttributesWResult(
             @Nonnull InstanceIdentifier<Config> id,
             @Nonnull Config dataBefore,
             @Nonnull Config dataAfter,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
-        if (dataAfter.getType() != L3VRF.class) {
-            return;
+        if (!isSupportedType(dataAfter)) {
+            return false;
         }
 
         Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
@@ -65,21 +67,23 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
             dataBefore.getType(), dataAfter.getType());
 
         createOrUpdateCurrentAttributes(id, dataAfter);
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributes(
+    public boolean deleteCurrentAttributesWResult(
         @Nonnull InstanceIdentifier<Config> id,
         @Nonnull Config dataBefore,
         @Nonnull WriteContext writeContext) throws WriteFailedException {
 
-        if (isSupportedType(dataBefore)) {
-            return;
+        if (!isSupportedType(dataBefore)) {
+            return false;
         }
 
         String name = id.firstKeyOf(NetworkInstance.class).getName();
 
         blockingDeleteAndRead(cli, id, f("delete routing-instances %s", name));
+        return true;
     }
 
     @VisibleForTesting
@@ -92,6 +96,6 @@ public class L3VrfConfigWriter implements CliWriter<Config> {
     }
 
     private boolean isSupportedType(Config data) {
-        return data.getType() != L3VRF.class;
+        return data.getType() == L3VRF.class;
     }
 }

@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.CompositeChildWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
@@ -30,7 +31,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.RouteDistinguisher;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VrfConfigWriter implements CliWriter<Config> {
+public class VrfConfigWriter implements CliWriter<Config>, CompositeChildWriter<Config> {
 
     private final Cli cli;
 
@@ -47,17 +48,17 @@ public class VrfConfigWriter implements CliWriter<Config> {
             + "end";
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
             config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
 
-        renderCurrentAttributes(instanceIdentifier, config, null, writeContext);
+        return renderCurrentAttributes(instanceIdentifier, config, null, writeContext);
     }
 
-    public void renderCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                        @Nonnull Config config, @Nonnull Config before,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException
-            .CreateFailedException {
+    public boolean renderCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                           @Nonnull Config config, @Nonnull Config before,
+                                           @Nonnull WriteContext writeContext)
+            throws WriteFailedException.CreateFailedException {
         if (config.getType()
                 .equals(L3VRF.class)) {
 
@@ -68,7 +69,9 @@ public class VrfConfigWriter implements CliWriter<Config> {
                             "vrf", config.getName(),
                             "before", before,
                             "config", config));
+            return true;
         }
+        return false;
     }
 
     private static void checkUniqueRd(WriteContext writeContext, String name, RouteDistinguisher routeDistinguisher) {
@@ -94,14 +97,15 @@ public class VrfConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore, @Nonnull
-            Config dataAfter, @Nonnull WriteContext writeContext)
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config dataBefore, @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext)
             throws WriteFailedException {
         // Not using trivial update. Write template supports update as well
         // The problem with updating VRF by delete+write is that on IOS, VRF deletion happens in background after
         // delete command has been issued. While this is happening a VRF cannot be created. So to avoid that, do not
         // delete VRF during update
-        renderCurrentAttributes(id, dataAfter, dataBefore, writeContext);
+        return renderCurrentAttributes(id, dataAfter, dataBefore, writeContext);
     }
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
@@ -109,8 +113,8 @@ public class VrfConfigWriter implements CliWriter<Config> {
             + "end";
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
-            config, @Nonnull WriteContext writeContext)
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                  @Nonnull Config config, @Nonnull WriteContext writeContext)
             throws WriteFailedException.DeleteFailedException {
 
         if (config.getType()
@@ -119,6 +123,8 @@ public class VrfConfigWriter implements CliWriter<Config> {
             blockingDeleteAndRead(cli, instanceIdentifier,
                     fT(DELETE_TEMPLATE,
                             "config", config));
+            return true;
         }
+        return false;
     }
 }

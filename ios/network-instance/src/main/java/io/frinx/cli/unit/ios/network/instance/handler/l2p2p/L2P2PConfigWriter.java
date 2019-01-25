@@ -20,10 +20,11 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeChildWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L2P2PConfigWriter implements CliWriter<Config> {
+public class L2P2PConfigWriter implements CliWriter<Config>, CompositeChildWriter<Config> {
 
     private final Cli cli;
 
@@ -32,23 +33,26 @@ public class L2P2PConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config config, WriteContext
-            writeContext)
+    public boolean writeCurrentAttributesWResult(InstanceIdentifier<Config> instanceIdentifier, Config config,
+                                                 WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
         // NOOP at this level
+        return true;
     }
 
     @Override
-    public void updateCurrentAttributes(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+    public boolean updateCurrentAttributesWResult(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                         WriteContext writeContext)
             throws WriteFailedException {
         // NOOP at this level
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config config, WriteContext
-            writeContext)
+    public boolean deleteCurrentAttributesWResult(InstanceIdentifier<Config> instanceIdentifier, Config config,
+                                                  WriteContext writeContext)
             throws WriteFailedException.DeleteFailedException {
         // NOOP at this level
+        return true;
     }
 }

@@ -21,6 +21,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeChildWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -30,7 +31,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.et
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config> {
+public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config>, CompositeChildWriter<Config> {
 
     private final Cli cli;
     private static Pattern AGGREGATE_IFC_NAME = Pattern.compile("Bundle-Ether(?<id>\\d+)");
@@ -40,25 +41,24 @@ public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(
+    public boolean writeCurrentAttributesWResult(
             @Nonnull InstanceIdentifier<Config> id,
             @Nonnull Config dataAfter,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        writeOrUpdateBundleEtherLacpMember(id, null, dataAfter);
+        return writeOrUpdateBundleEtherLacpMember(id, null, dataAfter);
     }
 
     @Override
-    public void updateCurrentAttributes(
+    public boolean updateCurrentAttributesWResult(
             @Nonnull InstanceIdentifier<Config> id,
             @Nonnull Config dataBefore,
             @Nonnull Config dataAfter,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
-        writeOrUpdateBundleEtherLacpMember(id, dataBefore, dataAfter);
+        return writeOrUpdateBundleEtherLacpMember(id, dataBefore, dataAfter);
     }
 
-    private void writeOrUpdateBundleEtherLacpMember(
+    private boolean writeOrUpdateBundleEtherLacpMember(
             InstanceIdentifier<Config> id,
             Config dataBefore,
             Config dataAfter) throws WriteFailedException {
@@ -69,7 +69,7 @@ public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config> {
 
         // If both of bundleId have the same value, we can skip the update.
         if (StringUtils.equals(bundleIdBefore, bundleIdAfter)) {
-            return;
+            return false;
         }
 
         // Dasan does not allow to update assignment of lag interface,
@@ -82,6 +82,7 @@ public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config> {
                 bundleIdAfter != null
                         ? f("lacp port %s aggregator %s", portId, bundleIdAfter) : "",
                 "end");
+        return true;
     }
 
     private static String getBundleId(Config config) {
@@ -105,7 +106,7 @@ public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributes(
+    public boolean deleteCurrentAttributesWResult(
             @Nonnull InstanceIdentifier<Config> id,
             @Nonnull Config dataBefore,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
@@ -114,7 +115,7 @@ public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config> {
         String bundleIdBefore = getBundleId(dataBefore);
 
         if (bundleIdBefore == null) {
-            return;
+            return false;
         }
 
         String bundleId = getBundleId(dataBefore);
@@ -123,5 +124,6 @@ public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config> {
                 "bridge",
                 f("no lacp port %s aggregator %s", portId, bundleId),
                 "end");
+        return true;
     }
 }

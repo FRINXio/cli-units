@@ -20,6 +20,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeChildWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -27,7 +28,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.memb
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.LacpPeriodType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BundleEtherLacpIntervalConfigWriter implements CliWriter<Config> {
+public class BundleEtherLacpIntervalConfigWriter implements CliWriter<Config>, CompositeChildWriter<Config> {
 
     private final Cli cli;
 
@@ -36,7 +37,7 @@ public class BundleEtherLacpIntervalConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
         LacpEthConfigAug cfg1 = dataAfter.getAugmentation(LacpEthConfigAug.class);
@@ -44,25 +45,34 @@ public class BundleEtherLacpIntervalConfigWriter implements CliWriter<Config> {
         if (cfg1 == null
                 || cfg1.getInterval() == null
                 || !cfg1.getInterval().equals(LacpPeriodType.FAST)) { //only support FAST know
-            return;
+            return false;
         }
 
         blockingWriteAndRead(cli, id, dataAfter, "configure terminal", "bridge",
                 f("lacp port timeout %s short", ifcName.replace("Ethernet", "")), "end");
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String ifcName = id.firstKeyOf(Interface.class).getName();
         LacpEthConfigAug cfg1 = dataBefore.getAugmentation(LacpEthConfigAug.class);
 
         if (cfg1 == null || cfg1.getInterval() == null) {
-            return;
+            return false;
         }
 
         blockingDeleteAndRead(cli, id, "configure terminal", "bridge",
                 f("no lacp port timeout %s", ifcName.replace("Ethernet", "")), "end");
+        return true;
+    }
+
+    @Override
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
+            throws WriteFailedException {
+        return writeCurrentAttributesWResult(id, dataAfter, writeContext);
     }
 }
