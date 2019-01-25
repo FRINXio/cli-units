@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.NiMplsRsvpIfSubscripAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.InterfaceKey;
 
 public class RsvpInterfaceReaderTest {
@@ -63,20 +62,4 @@ public class RsvpInterfaceReaderTest {
                         .collect(Collectors.toList()));
     }
 
-    @Test
-    public void testBandwidth() {
-        NiMplsRsvpIfSubscripAugBuilder cb = new NiMplsRsvpIfSubscripAugBuilder();
-        NiMplsRsvpIfSubscripAugReader.parseConfig(OUTPUT, cb);
-        Assert.assertEquals(Long.valueOf(500000), cb.getBandwidth()
-                .getUint32());
-
-        NiMplsRsvpIfSubscripAugBuilder cb1 = new NiMplsRsvpIfSubscripAugBuilder();
-        NiMplsRsvpIfSubscripAugReader.parseConfig(ZERO_BW_OUTPUT, cb1);
-        Assert.assertEquals(NiMplsRsvpIfSubscripAugReader.DEFAULT, cb1.getBandwidth()
-                .getString());
-
-        NiMplsRsvpIfSubscripAugBuilder cb2 = new NiMplsRsvpIfSubscripAugBuilder();
-        NiMplsRsvpIfSubscripAugReader.parseConfig(NO_BW_OUTPUT, cb2);
-        Assert.assertNull(cb2.getBandwidth());
-    }
 }

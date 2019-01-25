@@ -32,8 +32,8 @@ import io.frinx.cli.iosxr.mpls.handler.LoadShareConfigReader;
 import io.frinx.cli.iosxr.mpls.handler.LoadShareConfigWriter;
 import io.frinx.cli.iosxr.mpls.handler.NiMplsLdpGlobalAugReader;
 import io.frinx.cli.iosxr.mpls.handler.NiMplsLdpGlobalAugWriter;
-import io.frinx.cli.iosxr.mpls.handler.NiMplsRsvpIfSubscripAugReader;
-import io.frinx.cli.iosxr.mpls.handler.NiMplsRsvpIfSubscripAugWriter;
+import io.frinx.cli.iosxr.mpls.handler.NiMplsRsvpIfSubscripConfigReader;
+import io.frinx.cli.iosxr.mpls.handler.NiMplsRsvpIfSubscripConfigWriter;
 import io.frinx.cli.iosxr.mpls.handler.P2pAttributesConfigReader;
 import io.frinx.cli.iosxr.mpls.handler.P2pAttributesConfigWriter;
 import io.frinx.cli.iosxr.mpls.handler.RsvpInterfaceConfigReader;
@@ -70,7 +70,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev17082
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnel.p2p_top.P2pTunnelAttributesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.TunnelsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.SubscriptionBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.subscription.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.RsvpTeBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te.InterfaceAttributesBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -128,9 +127,8 @@ public class MplsUnit implements TranslateUnit {
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RSVPTE, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE, new NoopCliListWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG, new RsvpInterfaceConfigWriter(cli)));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CO_AUG_NIMPLSRSVPIFSUBSCRIPAUG,
-                        new NiMplsRsvpIfSubscripAugWriter(cli)), IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG);
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG,
+                new NiMplsRsvpIfSubscripConfigWriter(cli)), IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG);
 
         // LDP
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_LDP, new NoopCliWriter<>()));
@@ -175,9 +173,8 @@ public class MplsUnit implements TranslateUnit {
         readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE, new RsvpInterfaceReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG, new RsvpInterfaceConfigReader()));
         readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_IN_IN_SUBSCRIPTION, SubscriptionBuilder.class);
-        readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, ConfigBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CO_AUG_NIMPLSRSVPIFSUBSCRIPAUG,
-                new NiMplsRsvpIfSubscripAugReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG,
+                new NiMplsRsvpIfSubscripConfigReader(cli)));
 
         // LDP
         readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_LDP, LdpBuilder.class);
