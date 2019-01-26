@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.mpls.header.top.MplsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.mpls.header.top.mpls.ConfigBuilder;
@@ -131,7 +132,7 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
         ConfigBuilder mplsCfgBuilder = new ConfigBuilder();
         ParsingUtils.parseField(output, MPLS_LINE::matcher,
             matcher -> matcher.group("mpls"),
-            v -> mplsCfgBuilder.setTrafficClass(Short.valueOf(v)));
+            v -> mplsCfgBuilder.setTrafficClass(parseTrafficClass(v)));
 
         if (mplsCfgBuilder.getTrafficClass() != null) {
             builder.setConfig(mplsCfgBuilder.build());
@@ -150,6 +151,10 @@ public class ConditionsReader implements CliConfigReader<Conditions, ConditionsB
         Arrays.stream(precs)
                 .forEach(p -> parsedPrecs.add(PrecedenceBuilder.getDefaultInstance(p)));
         return parsedPrecs;
+    }
+
+    private static List<Short> parseTrafficClass(String trafficList) {
+        return Arrays.stream(trafficList.split(" ")).map(x -> new Short(x)).collect(Collectors.toList());
     }
 
     @Override
