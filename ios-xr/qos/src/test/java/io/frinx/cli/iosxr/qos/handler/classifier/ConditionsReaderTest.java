@@ -41,6 +41,17 @@ public class ConditionsReaderTest {
             + " match qos-group 10 1-2\n"
             + " end-class-map\n";
 
+    private static final String TOPMOST = "Mon Mar 19 12:26:57.492 UTC\n"
+            + "class-map match-any map1\n"
+            + " match access-group ipv4 inacl222 \n"
+            + " match access-group ipv6 ahojgroup \n"
+            + " match precedence ipv4 1 5 \n"
+            + " match precedence ipv6 1 \n"
+            + " match precedence priority 4 network \n"
+            + " match mpls experimental topmost 6 7 \n"
+            + " match qos-group 10 1-2\n"
+            + " end-class-map\n";
+
     @Test
     public void testConditionsReaderAll() {
         ConditionsBuilder builder = new ConditionsBuilder();
@@ -65,7 +76,39 @@ public class ConditionsReaderTest {
         Assert.assertEquals(6, builder.getMpls()
                 .getConfig()
                 .getTrafficClass()
-                .shortValue());
+                .get(0).shortValue());
+    }
+
+    @Test
+    public void testConditionsReaderTopMost() {
+        ConditionsBuilder builder = new ConditionsBuilder();
+        ConditionsReader.filterParsing(TOPMOST, "all", builder);
+
+        QosConditionAug qos = builder.getAugmentation(QosConditionAug.class);
+        Assert.assertEquals(new QosGroup(10L), qos.getQosGroup()
+                .get(0));
+        Assert.assertEquals(new QosGroup(new QosGroupRange("1..2")), qos.getQosGroup()
+                .get(1));
+
+        QosIpv6ConditionAug aug4 = builder.getIpv6()
+                .getConfig()
+                .getAugmentation(QosIpv6ConditionAug.class);
+        Assert.assertEquals("ahojgroup", aug4.getAclRef());
+
+        QosIpv4ConditionAug aug6 = builder.getIpv4()
+                .getConfig()
+                .getAugmentation(QosIpv4ConditionAug.class);
+        Assert.assertEquals("inacl222", aug6.getAclRef());
+
+        Assert.assertEquals(6, builder.getMpls()
+                .getConfig()
+                .getTrafficClass()
+                .get(0).shortValue());
+
+        Assert.assertEquals(7, builder.getMpls()
+                .getConfig()
+                .getTrafficClass()
+                .get(1).shortValue());
     }
 
     @Test
@@ -155,7 +198,7 @@ public class ConditionsReaderTest {
         Assert.assertEquals(6, builder.getMpls()
                 .getConfig()
                 .getTrafficClass()
-                .shortValue());
+                .get(0).shortValue());
     }
 
     @Test

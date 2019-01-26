@@ -16,6 +16,7 @@
 
 package io.frinx.cli.iosxr.qos.handler.classifier;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -58,7 +59,7 @@ public class ClassifierWriterTest {
     private static final String WRITE_INPUT_ALL = "class-map match-all map1\n"
             + "match qos-group 10 1-5\n"
             + "match precedence 2 3 network\n"
-            + "match mpls experimental topmost 1\n"
+            + "match mpls experimental topmost 1 2\n"
             + "match access-group ipv4 acl4\n"
             + "match access-group ipv6 acl6\n"
             + "match precedence ipv4 0 7 network\n"
@@ -67,7 +68,8 @@ public class ClassifierWriterTest {
 
     private static final String WRITE_QOS_ANY = "class-map match-any map1\nmatch qos-group 10 1-5\nroot\n";
     private static final String WRITE_PREC_ANY = "class-map match-any map1\nmatch precedence 2 3 network\nroot\n";
-    private static final String WRITE_MPLS_ANY = "class-map match-any map1\nmatch mpls experimental topmost 1\nroot\n";
+    private static final String WRITE_MPLS_ANY = "class-map match-any map1\nmatch mpls experimental "
+            + "topmost 1 2\nroot\n";
     private static final String WRITE_ACG_IPV4_ANY = "class-map match-any map1\nmatch access-group ipv4 acl4\nroot\n";
     private static final String WRITE_PREC_IPV4_ANY = "class-map match-any map1\nmatch precedence ipv4 0 7 "
             + "network\nroot\n";
@@ -132,7 +134,7 @@ public class ClassifierWriterTest {
                 .setMpls(new MplsBuilder()
                         .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields
                                 .rev171215.mpls.header.top.mpls.ConfigBuilder()
-                                .setTrafficClass((short) 1)
+                                .setTrafficClass(ImmutableList.of((short) 1,(short) 2))
                                 .build())
                         .build())
                 .build());
@@ -194,7 +196,7 @@ public class ClassifierWriterTest {
                         .setMpls(new MplsBuilder()
                                 .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header
                                         .fields.rev171215.mpls.header.top.mpls.ConfigBuilder()
-                                        .setTrafficClass((short) 1)
+                                        .setTrafficClass(ImmutableList.of((short) 1,(short) 2))
                                         .build())
                                 .build())
                         .build())

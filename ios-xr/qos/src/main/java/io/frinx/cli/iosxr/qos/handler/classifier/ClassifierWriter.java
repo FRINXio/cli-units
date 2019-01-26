@@ -65,7 +65,8 @@ public class ClassifierWriter implements CliWriter<Classifier> {
             + "{% endif %}";
 
     private static final String MATCH_MPLS_T = "{% if ($conditions.mpls) %}"
-            + "match mpls experimental topmost {$conditions.mpls.config.traffic_class}\n{% endif %}";
+            + "match mpls experimental topmost{% loop in $conditions.mpls.config.traffic_class as $val %} {$val}"
+            + "{% endloop %}\n{% endif %}";
 
     private static final String MATCH_IPV4_ACL_T = "{% if ($v4Aug) %}"
             + "{% if ($v4Aug.acl_ref) %}match access-group ipv4 {$v4Aug.acl_ref}\n{% endif %}{% endif %}";
