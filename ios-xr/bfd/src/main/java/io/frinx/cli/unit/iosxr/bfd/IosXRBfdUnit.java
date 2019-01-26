@@ -57,7 +57,7 @@ public class IosXRBfdUnit implements TranslateUnit {
     }
 
     public void init() {
-        reg = translationRegistry.registerTranslateUnit(IosXrDevices.IOS_5, this);
+        reg = translationRegistry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
     }
 
     public void close() {
