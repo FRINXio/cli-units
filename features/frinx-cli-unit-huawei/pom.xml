@@ -27,7 +27,7 @@
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-unit-huawei</artifactId>
     <packaging>feature</packaging>
-    <version>4.2.0.rc12-frinx-SNAPSHOT</version>
+    <version>4.2.0.rc12-frinx</version>
     <name>Frinx :: Cli :: Unit :: Huawei</name>
 
     <dependencyManagement>
@@ -43,13 +43,13 @@
                 <groupId>io.frinx.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.0.rc12-frinx-SNAPSHOT</version>
+                <version>4.2.0.rc12-frinx</version>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.frinx.openconfig</groupId>
                 <artifactId>openconfig-artifacts</artifactId>
-                <version>4.2.0.rc12-frinx-SNAPSHOT</version>
+                <version>4.2.0.rc12-frinx</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
