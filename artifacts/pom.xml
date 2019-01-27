@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent-lite</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_2_0_rc12-frinxodl</version>
+        <version>3.1.1-Oxygen-SR2.4_2_0_rc13-frinxodl-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
