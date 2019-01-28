@@ -37,10 +37,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config3;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config3Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config4;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config4Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.HopRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.IcmpMsgType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv4AddressWildcarded;
@@ -239,7 +239,7 @@ public final class AclEntryLineParser {
         final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words, true);
 
         // ttl
-        Config1Builder hopRangeAugment = new Config1Builder();
+        Config3Builder hopRangeAugment = new Config3Builder();
         //noinspection Duplicates
         if (!words.isEmpty() && "ttl".equals(words.peek())) {
             Entry<Integer, Integer> ttlRange = parseTTLRange(words);
@@ -248,7 +248,7 @@ public final class AclEntryLineParser {
             hopRangeAugment.setHopRange(new HopRange(lowerEndpoint + ".." + upperEndpoint));
         }
         if (hopRangeAugment.getHopRange() != null) {
-            ipv4ProtocolFieldsConfigBuilder.addAugmentation(Config1.class, hopRangeAugment.build());
+            ipv4ProtocolFieldsConfigBuilder.addAugmentation(Config3.class, hopRangeAugment.build());
         }
 
         return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);
@@ -350,7 +350,7 @@ public final class AclEntryLineParser {
         final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words, false);
 
         // ttl
-        Config2Builder hopRangeAugment = new Config2Builder();
+        Config4Builder hopRangeAugment = new Config4Builder();
         //noinspection Duplicates
         if (!words.isEmpty() && "ttl".equals(words.peek())) {
             Entry<Integer, Integer> ttlRange = parseTTLRange(words);
@@ -359,7 +359,7 @@ public final class AclEntryLineParser {
             hopRangeAugment.setHopRange(new HopRange(lowerEndpoint + ".." + upperEndpoint));
         }
         if (hopRangeAugment.getHopRange() != null) {
-            ipv6ProtocolFieldsConfigBuilder.addAugmentation(Config2.class, hopRangeAugment.build());
+            ipv6ProtocolFieldsConfigBuilder.addAugmentation(Config4.class, hopRangeAugment.build());
         }
 
         return new ParseIpv6LineResult(ipv6ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);

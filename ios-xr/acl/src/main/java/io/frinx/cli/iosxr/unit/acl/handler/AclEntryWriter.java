@@ -34,8 +34,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config3;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv4AddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv6AddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
@@ -208,10 +208,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     }
 
     private void processIpv4(AclEntry entry, MaxMetricCommandDTO commandVars) {
-        if (entry.getIpv4().getConfig().getAugmentation(Config1.class) != null
-                && entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange() != null) {
+        if (entry.getIpv4().getConfig().getAugmentation(Config3.class) != null
+                && entry.getIpv4().getConfig().getAugmentation(Config3.class).getHopRange() != null) {
             commandVars.aclTtl =
-                    formatTTL(entry.getIpv4().getConfig().getAugmentation(Config1.class).getHopRange().getValue());
+                    formatTTL(entry.getIpv4().getConfig().getAugmentation(Config3.class).getHopRange().getValue());
         }
         if (entry.getAugmentation(AclEntry1.class) != null
                 && entry.getAugmentation(AclEntry1.class).getIcmp() != null) {
@@ -277,10 +277,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     }
 
     private void processIpv6(AclEntry entry, MaxMetricCommandDTO commandVars) {
-        if (entry.getIpv6().getConfig().getAugmentation(Config2.class) != null
-                && entry.getIpv6().getConfig().getAugmentation(Config2.class).getHopRange() != null) {
+        if (entry.getIpv6().getConfig().getAugmentation(Config4.class) != null
+                && entry.getIpv6().getConfig().getAugmentation(Config4.class).getHopRange() != null) {
             commandVars.aclTtl =
-                    formatTTL(entry.getIpv6().getConfig().getAugmentation(Config2.class).getHopRange().getValue());
+                    formatTTL(entry.getIpv6().getConfig().getAugmentation(Config4.class).getHopRange().getValue());
         }
         if (entry.getAugmentation(AclEntry1.class) != null
                 && entry.getAugmentation(AclEntry1.class).getIcmp() != null) {
