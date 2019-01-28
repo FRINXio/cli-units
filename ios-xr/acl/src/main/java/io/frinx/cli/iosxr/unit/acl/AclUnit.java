@@ -123,7 +123,7 @@ public class AclUnit implements TranslateUnit {
                 RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_CONFIG, ACL_ENTRY_TREE_BASE),
                 RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV4, ACL_ENTRY_TREE_BASE),
                 RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG1, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG3, ACL_ENTRY_TREE_BASE),
                 RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV4WILDCARDEDAUG,
                         ACL_ENTRY_TREE_BASE),
                 RWUtils.cutIdFromStart(
@@ -135,7 +135,7 @@ public class AclUnit implements TranslateUnit {
 
                 RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV6, ACL_ENTRY_TREE_BASE),
                 RWUtils.cutIdFromStart(IIDs.ACL_ACL_ACL_ACL_ACL_IPV_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG2 , ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG4, ACL_ENTRY_TREE_BASE),
                 RWUtils.cutIdFromStart(IIDs.NE_TO_NO_CO_AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV6WILDCARDEDAUG,
                         ACL_ENTRY_TREE_BASE),
                 RWUtils.cutIdFromStart(
@@ -193,11 +193,11 @@ public class AclUnit implements TranslateUnit {
 
                 RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV4, ACL_ENTRY_TREE_BASE),
                 RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG1, ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG3, ACL_ENTRY_TREE_BASE),
 
                 RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV6, ACL_ENTRY_TREE_BASE),
                 RWUtils.cutIdFromStart(IIDs.ACL_ACL_ACL_ACL_ACL_IPV_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG2 , ACL_ENTRY_TREE_BASE),
+                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG4 , ACL_ENTRY_TREE_BASE),
 
                 RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TRANSPORT, ACL_ENTRY_TREE_BASE),
                 RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CONFIG, ACL_ENTRY_TREE_BASE),

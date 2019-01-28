@@ -28,10 +28,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config1Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config3;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config3Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config4;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config4Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.HopRange;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.IcmpMsgType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.acl.icmp.type.IcmpBuilder;
@@ -212,7 +212,7 @@ public class AclEntryLineParserTest {
             configBuilder.setProtocol(new IpProtocolType(IPICMP.class));
             configBuilder.setSourceAddress(new Ipv4Prefix("1.1.1.1/32"));
             configBuilder.setDestinationAddress(new Ipv4Prefix("2.2.2.2/32"));
-            configBuilder.addAugmentation(Config1.class, new Config1Builder().setHopRange(new HopRange("0..10"))
+            configBuilder.addAugmentation(Config3.class, new Config3Builder().setHopRange(new HopRange("0..10"))
                     .build());
             long sequenceId = 5;
             expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(), null));
@@ -321,7 +321,7 @@ public class AclEntryLineParserTest {
                     .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
             configBuilder.setSourceAddress(AclEntryLineParser.IPV4_HOST_ANY);
             configBuilder.setDestinationAddress(AclEntryLineParser.IPV4_HOST_ANY);
-            configBuilder.addAugmentation(Config1.class, new Config1Builder().setHopRange(new HopRange("13..255"))
+            configBuilder.addAugmentation(Config3.class, new Config3Builder().setHopRange(new HopRange("13..255"))
                     .build());
             long sequenceId = 14;
             expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null));
@@ -334,7 +334,7 @@ public class AclEntryLineParserTest {
             configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
             configBuilder.setSourceAddress(AclEntryLineParser.IPV4_HOST_ANY);
             configBuilder.setDestinationAddress(AclEntryLineParser.IPV4_HOST_ANY);
-            configBuilder.addAugmentation(Config1.class, new Config1Builder().setHopRange(new HopRange("11..9"))
+            configBuilder.addAugmentation(Config3.class, new Config3Builder().setHopRange(new HopRange("11..9"))
                     .build());
             TransportBuilder transportBuilder = new TransportBuilder();
             transportBuilder.setConfig(
@@ -459,7 +459,7 @@ public class AclEntryLineParserTest {
             configBuilder.setSourceAddress(new Ipv6Prefix("::1/128"));
             configBuilder.setDestinationAddress(new Ipv6Prefix("::1/128"));
 
-            configBuilder.addAugmentation(Config2.class, new Config2Builder().setHopRange(new HopRange("10..10"))
+            configBuilder.addAugmentation(Config4.class, new Config4Builder().setHopRange(new HopRange("10..10"))
                     .build());
 
             TransportBuilder transportBuilder = new TransportBuilder();
@@ -484,7 +484,7 @@ public class AclEntryLineParserTest {
             configBuilder.setProtocol(new IpProtocolType(IPICMP.class));
             configBuilder.setSourceAddress(AclEntryLineParser.IPV6_HOST_ANY);
             configBuilder.setDestinationAddress(new Ipv6Prefix("::1/128"));
-            configBuilder.addAugmentation(Config2.class, new Config2Builder()
+            configBuilder.addAugmentation(Config4.class, new Config4Builder()
                     .setHopRange(new HopRange("11..9"))
                     .build());
             long sequenceId = 7;
