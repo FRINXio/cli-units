@@ -184,6 +184,8 @@
         <bundle>mvn:io.frinx.cli/nexus-utils/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/nexus-cli-init-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/nexus-lldp-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/nexus-interface-unit/{{VERSION}}</bundle>
+
     </feature>
 
     <feature name='cli-southbound-unit-dasan' version='${project.version}'>
