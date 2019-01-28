@@ -160,6 +160,7 @@
         <bundle>mvn:io.frinx.cli/junos-network-instance-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-acl-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-ospf-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/junos-routing-policy-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-huawei' version='${project.version}'>
