@@ -127,6 +127,29 @@ public class HsrpGroupReaderTest {
     }
 
     @Test
+    public void testReadCurrentAttributes_002() throws Exception {
+        final String interfaceName = "GigabitEthernet0/0/0/0.0";
+        final String familyType = "ipv6";
+        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
+        final Class<? extends ADDRESSFAMILY> family = HsrpUtil.getType(familyType);
+        final HsrpGroupKey hsrpGroupKey = new HsrpGroupKey(family, 1L);
+
+        final InstanceIdentifier<HsrpGroup> instanceIdentifier =
+                InstanceIdentifier.create(Interfaces.class).child(Interface.class, interfaceKey)
+                        .child(HsrpGroup.class, hsrpGroupKey);
+
+        final HsrpGroupBuilder builder = new HsrpGroupBuilder();
+        final ReadContext readContext = Mockito.mock(ReadContext.class);
+
+        // test
+        target.readCurrentAttributes(instanceIdentifier, builder, readContext);
+
+        // verify
+        Assert.assertEquals(builder.getAddressFamily(), family);
+        Assert.assertEquals(builder.getVirtualRouterId(), Long.valueOf(1L));
+    }
+
+    @Test
     public void testMerge_001() throws Exception {
         final List<HsrpGroup> groupList = new ArrayList<>();
         final InterfaceBuilder hsrpGroupBuilderIn = new InterfaceBuilder();
