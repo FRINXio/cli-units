@@ -18,12 +18,16 @@ package io.frinx.cli.iosxr.hsrp.handler.util;
 
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.ADDRESSFAMILY;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.IPV4;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.IPV6;
 
 public abstract class HsrpUtil {
 
     public static Class<? extends ADDRESSFAMILY> getType(final String type) {
         if ("ipv4".equals(type)) {
             return IPV4.class;
+        }
+        if ("ipv6".equals(type)) {
+            return IPV6.class;
         }
 
         throw new TypeNotPresentException(type, null);
@@ -33,7 +37,10 @@ public abstract class HsrpUtil {
         if (IPV4.class == type) {
             return "ipv4";
         }
+        if (IPV6.class == type) {
+            return "ipv6";
+        }
 
-        throw new IllegalArgumentException(String.format("accepts types %s", IPV4.class.getSimpleName()));
+        throw new IllegalArgumentException(String.format("unknown type %s", type));
     }
 }
