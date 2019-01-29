@@ -62,6 +62,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>nexus-utils</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nexus-interface-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
