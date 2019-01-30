@@ -18,20 +18,39 @@ package io.frinx.cli.unit.junos.ospf;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
+import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
+import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.junos.JunosDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.junos.ospf.handler.AreaConfigReader;
+import io.frinx.cli.unit.junos.ospf.handler.AreaConfigWriter;
+import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceBfdConfigReader;
+import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceBfdConfigWriter;
+import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceConfigReader;
+import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceConfigWriter;
+import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceReader;
+import io.frinx.cli.unit.junos.ospf.handler.OspfAreaReader;
+import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.ext.rev180211.OspfAreaIfBfdConfAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd.rev171024.bfd.top.BfdBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222._interface.ref.InterfaceRefBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.InterfacesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.Ospfv2Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.AreasBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class OspfUnit implements TranslateUnit {
@@ -67,12 +86,60 @@ public class OspfUnit implements TranslateUnit {
         provideWriters(writeRegistry, cli);
     }
 
+    private static final InstanceIdentifier<Config> IN_IN_CONFIG_SUBTREE_ROOT =
+            InstanceIdentifier.create(Config.class);
+
     private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new NoopCliListWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigWriter(cli)),
+                IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
+
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.subtreeAddAfter(Sets.newHashSet(
+                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CO_AUG_OSPFAREAIFCONFAUG,
+                        IN_IN_CONFIG_SUBTREE_ROOT)),
+                new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG, new AreaInterfaceConfigWriter(cli)),
+                IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG);
+
+        writeRegistry.add(new GenericWriter<>(
+                io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDCONFAUG,
+                new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(
+                io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDCONFAUG_BFD,
+                new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(
+                io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDCONFAUG_BF_CONFIG,
+                new AreaInterfaceBfdConfigWriter(cli)));
+
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_IN_CONFIG, new NoopCliWriter<>()));
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OSPFV2, Ospfv2Builder.class);
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AREAS, AreasBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new OspfAreaReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigReader()));
+        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_INTERFACES, InterfacesBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE,
+                new AreaInterfaceReader(cli)));
+        readRegistry.subtreeAdd(Sets.newHashSet(
+                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CO_AUG_OSPFAREAIFCONFAUG,
+                        IN_IN_CONFIG_SUBTREE_ROOT)),
+                new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG,
+                new AreaInterfaceConfigReader(cli)));
+        readRegistry.addStructuralReader(
+                io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDCONFAUG,
+                OspfAreaIfBfdConfAugBuilder.class);
+        readRegistry.addStructuralReader(
+                io.frinx.openconfig.openconfig.bfd
+                        .IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDCONFAUG_BFD,
+                BfdBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(
+                io.frinx.openconfig.openconfig.bfd
+                        .IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDCONFAUG_BF_CONFIG,
+                new AreaInterfaceBfdConfigReader(cli)));
+
         readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, InterfaceRefBuilder.class);
     }
 
