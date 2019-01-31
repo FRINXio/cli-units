@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.junos.JunosDevices;
@@ -31,6 +32,9 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.junos.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.junos.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.junos.network.instance.handler.NetworkInstanceReader;
+import io.frinx.cli.unit.junos.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceConfigReader;
+import io.frinx.cli.unit.junos.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceConfigWriter;
+import io.frinx.cli.unit.junos.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceReader;
 import io.frinx.cli.unit.junos.network.instance.handler.vrf.applypolicy.ApplyPolicyConfigReader;
 import io.frinx.cli.unit.junos.network.instance.handler.vrf.applypolicy.ApplyPolicyConfigWriter;
 import io.frinx.cli.unit.junos.network.instance.handler.vrf.ifc.VrfInterfaceConfigReader;
@@ -45,10 +49,26 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.InterInstancePoliciesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.InterfacesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.policy.forwarding.top.PolicyForwardingBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.ApplyPolicyBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class JunosNetworkInstanceUnit implements TranslateUnit {
+
+    // IIDs.NE_NE_PO_IN_IN_CONFIG subtree
+    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy
+        .forwarding.rev170621.pf.interfaces.structural.interfaces._interface.Config> NE_NE_PO_IN_IN_CONFIG_ROOT =
+            InstanceIdentifier.create(
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621
+                .pf.interfaces.structural.interfaces._interface.Config.class);
+
+    private static final Set<InstanceIdentifier<?>> NE_NE_PO_IN_IN_CONFIG_SUBTREE = Sets.newHashSet(
+        RWUtils.cutIdFromStart(IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFJUNIPERAUG, NE_NE_PO_IN_IN_CONFIG_ROOT),
+        RWUtils.cutIdFromStart(IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFJUNIPERAUG_CLASSIFIERS, NE_NE_PO_IN_IN_CONFIG_ROOT),
+        RWUtils.cutIdFromStart(
+            IIDs.NE_TO_NO_CO_NE_NE_PO_IN_IN_CO_AUG_NIPFIFJUNIPERAUG_CL_INETPRECEDENCE,
+            NE_NE_PO_IN_IN_CONFIG_ROOT));
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -96,6 +116,18 @@ public class JunosNetworkInstanceUnit implements TranslateUnit {
         readRegistry.addStructuralReader(IIDs.NE_NE_INTERINSTANCEPOLICIES, InterInstancePoliciesBuilder.class);
         readRegistry.addStructuralReader(IIDs.NE_NE_IN_APPLYPOLICY, ApplyPolicyBuilder.class);
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_IN_AP_CONFIG, new ApplyPolicyConfigReader(cli)));
+
+        // Policy-Forwarding
+        readRegistry.addStructuralReader(IIDs.NE_NE_POLICYFORWARDING, PolicyForwardingBuilder.class);
+        readRegistry.addStructuralReader(
+            IIDs.NE_NE_PO_INTERFACES,
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621
+            .pf.interfaces.structural.InterfacesBuilder.class);
+        readRegistry.add(
+            new GenericConfigListReader<>(IIDs.NE_NE_PO_IN_INTERFACE, new PolicyForwardingInterfaceReader(cli)));
+        readRegistry.subtreeAdd(
+            NE_NE_PO_IN_IN_CONFIG_SUBTREE,
+            new GenericConfigReader<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli)));
     }
 
     private void provideWriters(@Nonnull ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
@@ -112,6 +144,13 @@ public class JunosNetworkInstanceUnit implements TranslateUnit {
 
         // Apply-Policy
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_IN_AP_CONFIG, new ApplyPolicyConfigWriter(cli)));
+
+        // Policy-Forwarding
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PO_IN_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.subtreeAdd(
+            NE_NE_PO_IN_IN_CONFIG_SUBTREE,
+            new GenericWriter<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigWriter(cli)));
+
     }
 
     @Override
@@ -122,7 +161,11 @@ public class JunosNetworkInstanceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types
                         .rev170228.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy
-                        .rev170714.$YangModuleInfoImpl.getInstance()
+                        .rev170714.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding
+                        .rev170621.$YangModuleInfoImpl.getInstance(),
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension
+                        .juniper.rev171109.$YangModuleInfoImpl.getInstance()
             );
     }
 
