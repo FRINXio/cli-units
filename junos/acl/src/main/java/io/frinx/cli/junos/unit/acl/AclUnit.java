@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
+import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
@@ -60,8 +61,6 @@ public class AclUnit implements TranslateUnit {
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
-                        .$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
                         .$YangModuleInfoImpl.getInstance()
         );
     }
@@ -82,13 +81,17 @@ public class AclUnit implements TranslateUnit {
 
     private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.add(new GenericWriter<>(IIDs.ACL, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_CONFIG, new NoopCliWriter<>()));
+
+        // interface
+        writeRegistry.add(new GenericListWriter<>(IIDs.AC_IN_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.AC_IN_IN_CONFIG, new NoopCliWriter<>()),
+            io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.ACL, AclBuilder.class);
 
+        // interface
         readRegistry.addStructuralReader(IIDs.AC_INTERFACES, InterfacesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_CONFIG, new AclInterfaceConfigReader()));

@@ -76,7 +76,7 @@ public class AclInterfaceReaderTest {
     @Test
     public void testReadCurrentAttributes() throws Exception {
         final String interfaceId = "interface-id-001";
-        InstanceIdentifier<Interface> iid = IIDs.AC_INTERFACES
+        final InstanceIdentifier<Interface> iid = IIDs.AC_INTERFACES
             .child(Interface.class, new InterfaceKey(new InterfaceId(interfaceId)));
         final InterfaceBuilder interfaceBuilder = new InterfaceBuilder();
 
