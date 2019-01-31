@@ -16,6 +16,7 @@
 package io.frinx.cli.iosxr.unit.acl.handler;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Optional;
 
@@ -581,6 +582,23 @@ public class AclEntryLineParserTest {
             AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV6.class);
             Assert.assertEquals(entry.getValue(), resultBuilder.build());
         }
+    }
+
+    @Test
+    public void parseIpv6PrefixTest() throws Exception {
+        LinkedList<String> ips = new LinkedList<>();
+        ips.add("::ffff:192.0.2.1/96");
+        Optional<Ipv6Prefix> ipv6Prefix = AclEntryLineParser.parseIpv6Prefix(ips);
+        Assert.assertTrue(ipv6Prefix.isPresent());
+        Assert.assertEquals(new Ipv6Prefix("::ffff:c000:0201/96"), ipv6Prefix.get());
+        ips.add("0:0:0:0:0:ffff:c000:0201/96");
+        ipv6Prefix = AclEntryLineParser.parseIpv6Prefix(ips);
+        Assert.assertTrue(ipv6Prefix.isPresent());
+        Assert.assertEquals(new Ipv6Prefix("0:0:0:0:0:ffff:c000:0201/96"), ipv6Prefix.get());
+        ips.add("FE80:0000:0000:0000:0202:B3FF:FE1E:8329/96");
+        ipv6Prefix = AclEntryLineParser.parseIpv6Prefix(ips);
+        Assert.assertTrue(ipv6Prefix.isPresent());
+        Assert.assertEquals(new Ipv6Prefix("FE80:0000:0000:0000:0202:B3FF:FE1E:8329/96"), ipv6Prefix.get());
     }
 
 }
