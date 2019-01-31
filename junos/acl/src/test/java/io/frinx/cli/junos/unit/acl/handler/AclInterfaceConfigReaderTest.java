@@ -50,7 +50,7 @@ public class AclInterfaceConfigReaderTest {
     @Test
     public void testReadCurrentAttributes() throws Exception {
         final String interfaceId = "interface-id-001";
-        InstanceIdentifier<Config> iid = IIDs.AC_INTERFACES
+        final InstanceIdentifier<Config> iid = IIDs.AC_INTERFACES
             .child(Interface.class, new InterfaceKey(new InterfaceId(interfaceId)))
             .child(Config.class);
         final ConfigBuilder builder = new ConfigBuilder();
