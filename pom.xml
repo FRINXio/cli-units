@@ -26,7 +26,7 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-aggregator</artifactId>
-  <version>4.2.0.rc13-frinx-SNAPSHOT</version>
+  <version>4.2.0.rc13-frinx</version>
   <packaging>pom</packaging>
 
   <modules>
