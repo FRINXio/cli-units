@@ -26,7 +26,7 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-brocade</artifactId>
-  <version>4.2.0.rc13-frinx</version>
+  <version>4.2.0.rc14-frinx-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
