@@ -26,8 +26,7 @@ import java.util.stream.Collectors;
 
 public final class JunosPromptResolutionStrategy implements PromptResolutionStrategy {
 
-    private static final int DEFAULT_TIME_TO_WAIT = 1;
-    private static final int MAX_TIME_TO_WAIT = 10;
+    private static final int INITIAL_TIME_TO_WAIT = 1;
 
     private static final Pattern JUNOS_GUIDANCE_PATTERN = Pattern.compile("^\\[edit.*]$");
 
@@ -47,11 +46,11 @@ public final class JunosPromptResolutionStrategy implements PromptResolutionStra
     @Override
     @SuppressWarnings({"IllegalCatch", "ConstantName"})
     public String resolvePrompt(Session session, String newline) {
-        try {
-            int waitTime = DEFAULT_TIME_TO_WAIT;
-            String lastRead = "";
+        int waitTime = INITIAL_TIME_TO_WAIT;
+        String lastRead = "";
 
-            while (waitTime < MAX_TIME_TO_WAIT) {
+        try {
+            while (true) {
                 session.write(newline + newline).toCompletableFuture().get();
                 lastRead = session.readUntilTimeout(waitTime);
                 List<String> split = Arrays.stream(lastRead.split(newline))
@@ -67,14 +66,15 @@ public final class JunosPromptResolutionStrategy implements PromptResolutionStra
                 waitTime++;
             }
 
-            throw new IllegalStateException("Unable to parse prompt in " + MAX_TIME_TO_WAIT + " attempts, last output"
-                    + " from device: " + lastRead);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException | RuntimeException e) {
-            LOG.warn("{}: Unable to perform prompt resolution", session, e);
-            throw new IllegalStateException(session + ": Unable to perform prompt resolution", e);
+            LOG.warn("{}: Unable to perform prompt resolution in {} attempts, last output from device: {}",
+                session, waitTime, lastRead, e);
+
+            throw new IllegalStateException(session + ": Unable to parse prompt in " + waitTime
+                + " attempts, last output from device: " + lastRead, e);
         }
     }
 }
