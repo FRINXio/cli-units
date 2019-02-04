@@ -15,10 +15,12 @@
  */
 package io.frinx.cli.iosxr.unit.acl.handler;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
+import com.google.common.net.InetAddresses;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -26,7 +28,6 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
@@ -624,7 +625,8 @@ public final class AclEntryLineParser {
                 .build();
     }
 
-    private static Optional<Ipv6Prefix> parseIpv6Prefix(Queue<String> words) {
+    @VisibleForTesting
+    static Optional<Ipv6Prefix> parseIpv6Prefix(Queue<String> words) {
         String first = words.peek();
         if ("any".equals(first)) {
             // remove "any" from queue
@@ -639,9 +641,26 @@ public final class AclEntryLineParser {
         } else if (first.contains("/")) {
             // remove "x:x:x:x:x:x:x:x/x" from queue
             words.remove();
+            if (first.contains(".")) {
+                first = translateIpv4InIpv6ToIpv6(first);
+            }
             return Optional.of(new Ipv6Prefix(first));
         }
         return Optional.empty();
+    }
+
+    @VisibleForTesting
+    static String translateIpv4InIpv6ToIpv6(String ipv4InIpv6) {
+        String ipv4String = ipv4InIpv6.substring(ipv4InIpv6.lastIndexOf(":") + 1, ipv4InIpv6.indexOf("/"));
+        InetAddress ia = InetAddresses.forString(ipv4String);
+        byte[] address = ia.getAddress();
+        String zeroOne = joinBytes(address[0], address[1]);
+        String twoThree = joinBytes(address[2], address[3]);
+        return ipv4InIpv6.replace(ipv4String, zeroOne + ":" + twoThree);
+    }
+
+    private static String joinBytes(byte first, byte second) {
+        return String.format("%02x%02x", first, second);
     }
 
     private static Ipv6AddressWildcarded parseIpv6Wildcarded(Queue<String> words) {
