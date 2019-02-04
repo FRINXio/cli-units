@@ -16,7 +16,9 @@
 
 package io.frinx.cli.iosxr.unit.acl.handler;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.net.InetAddresses;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -97,6 +99,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             + "root\n";
     private static final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
     private static final Pattern PORT_RANGE_NAMED_PATTERN = Pattern.compile("(?<from>\\S*)\\.\\.(?<to>\\S*)");
+    private static final Pattern IPV4_IN_IPV6_PATTERN =
+            Pattern.compile("^(?<ipv6Part>.+:(ffff|FFFF):)(?<ipv4Part>[0-9a-fA-F]{1,4}:[0-9a-fA-F]{1,4})$");
 
     private final Cli cli;
 
@@ -274,7 +278,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 .map(mapper);
     }
 
-    private void processIpv6(AclEntry entry, MaxMetricCommandDTO commandVars) {
+    @VisibleForTesting
+    static void processIpv6(AclEntry entry, MaxMetricCommandDTO commandVars) {
         if (entry.getIpv6().getConfig().getAugmentation(Config4.class) != null
                 && entry.getIpv6().getConfig().getAugmentation(Config4.class).getHopRange() != null) {
             commandVars.aclTtl =
@@ -292,7 +297,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         if (ipv6PrefixOpt.isPresent()) {
             Preconditions.checkArgument(!ipv6WildcardedOpt.isPresent(),
                     SOURCE_ADDRESS_AND_SOURCE_ADDRESS_WILDCARDED_TOGETHER_ERROR);
-            commandVars.aclSrcAddr = ipv6PrefixOpt.get();
+            commandVars.aclSrcAddr = tryTranslateIpv6ToIpv4InIpv6(ipv6PrefixOpt.get());
         } else {
             Preconditions.checkArgument(ipv6WildcardedOpt.isPresent(),
                     NONE_SOURCE_ADDRESS_OR_SOURCE_ADDRESS_WILDCARDED_ERROR);
@@ -308,7 +313,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         if (ipv6PrefixOpt.isPresent()) {
             Preconditions.checkArgument(!ipv6WildcardedOpt.isPresent(),
                     DESTINATION_ADDRESS_AND_DESTINATION_ADDRESS_WILDCARDED_TOGETHER_ERROR);
-            commandVars.aclDstAddr = ipv6PrefixOpt.get();
+            commandVars.aclDstAddr = tryTranslateIpv6ToIpv4InIpv6(ipv6PrefixOpt.get());
         } else {
             Preconditions.checkArgument(ipv6WildcardedOpt.isPresent(),
                     NONE_DESTINATION_ADDRESS_OR_DESTINATION_ADDRESS_WILDCARDED_ERROR);
@@ -325,7 +330,27 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         commandVars.aclProtocol = formatProtocol(ipProtocolType, commandVars.type);
     }
 
-    private Optional<String> getIpv6Prefix(AclEntry entry, Function<Ipv6ProtocolFieldsConfig, Ipv6Prefix> mapper) {
+    private static String tryTranslateIpv6ToIpv4InIpv6(String ipv6Prefix) {
+        Pattern ipv6Pattern = Pattern.compile(Ipv6Prefix.PATTERN_CONSTANTS.get(0));
+        Matcher ipv6PrefixMatcher = ipv6Pattern.matcher(ipv6Prefix);
+        Preconditions.checkArgument(ipv6PrefixMatcher.matches(), "unknown IPv6 with prefix: " + ipv6Prefix);
+        String ipv6 = ipv6PrefixMatcher.group(1);
+        String prefix = ipv6PrefixMatcher.group(17);
+        Matcher ipv6Matcher = IPV4_IN_IPV6_PATTERN.matcher(ipv6);
+        // ipv4 in ipv6 must have prefix 96 and must match the pattern
+        if (!"96".equals(prefix) || !ipv6Matcher.matches()) {
+            return ipv6Prefix;
+        }
+
+        String ipv4PartFromIpv6 = ipv6Matcher.group("ipv4Part");
+        String ipv4 = InetAddresses.forString("::ffff:" + ipv4PartFromIpv6).toString().substring(1);
+        String ipv6PartFromIpv6 = ipv6Matcher.group("ipv6Part");
+
+        return ipv6PartFromIpv6 + ipv4 + "/" + prefix;
+    }
+
+    private static Optional<String> getIpv6Prefix(AclEntry entry,
+                                                  Function<Ipv6ProtocolFieldsConfig, Ipv6Prefix> mapper) {
         return Optional.ofNullable(entry)
                 .map(AclEntry::getIpv6)
                 .map(Ipv6::getConfig)
@@ -333,7 +358,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 .map(Ipv6Prefix::getValue);
     }
 
-    private Optional<Ipv6AddressWildcarded> getIpv6Wildcarded(AclEntry entry,
+    private static Optional<Ipv6AddressWildcarded> getIpv6Wildcarded(AclEntry entry,
                                                               Function<AclSetAclEntryIpv6WildcardedAug,
                                                                       Ipv6AddressWildcarded> mapper) {
         return Optional.ofNullable(entry)
@@ -472,7 +497,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         }
     }
 
-    private String formatTTL(final String rangeString) {
+    private static String formatTTL(final String rangeString) {
         Preconditions.checkArgument(rangeString.contains(RANGE_SEPARATOR), "incorrect range format %s", rangeString);
         final String[] rangeParams = rangeString.split("\\.\\.");
         Preconditions.checkArgument(rangeParams.length == 2, WRONG_RANGE_FORMAT_MSG.apply(rangeString));
@@ -510,18 +535,19 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         return ttlString;
     }
 
-    private class MaxMetricCommandDTO {
+    @VisibleForTesting
+    static class MaxMetricCommandDTO {
 
-        private String type = "";
-        private String aclName = "";
-        private String aclSeqId = "";
-        private String aclFwdAction = "";
-        private String aclProtocol = "";
-        private String aclSrcAddr = "";
-        private String aclSrcPort = "";
-        private String aclDstAddr = "";
-        private String aclDstPort = "";
-        private String aclIcmpMsgType = "";
-        private String aclTtl = "";
+        String type = "";
+        String aclName = "";
+        String aclSeqId = "";
+        String aclFwdAction = "";
+        String aclProtocol = "";
+        String aclSrcAddr = "";
+        String aclSrcPort = "";
+        String aclDstAddr = "";
+        String aclDstPort = "";
+        String aclIcmpMsgType = "";
+        String aclTtl = "";
     }
 }

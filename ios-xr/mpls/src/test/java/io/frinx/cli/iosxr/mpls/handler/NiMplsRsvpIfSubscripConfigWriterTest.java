@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Frinx and others.
+ * Copyright © 2019 Frinx and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@
 package io.frinx.cli.iosxr.mpls.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
-import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -33,17 +34,25 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extensio
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.NiMplsRsvpIfSubscripAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.NiMplsRsvpIfSubscripAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.SignalingProtocols;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.Percentage;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.subscription.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.mpls.rsvp.subscription.subscription.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.RsvpTe;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te.InterfaceAttributes;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NiMplsRsvpIfSubscripAugWriterTest {
+public class NiMplsRsvpIfSubscripConfigWriterTest {
 
     private static final String WRITE_INPUT = "rsvp\n"
             + "interface Loopback0\n"
             + "bandwidth 5\n"
+            + "root\n";
+
+    private static final String WRITE_INPUT_PERCENTAGE = "rsvp\n"
+            + "interface Loopback0\n"
+            + "bandwidth percentage 45\n"
             + "root\n";
 
     private static final String UPDATE_INPUT = "rsvp\n"
@@ -61,13 +70,16 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
             + "no bandwidth\n"
             + "root\n";
 
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
     @Mock
     private Cli cli;
 
     @Mock
     private WriteContext context;
 
-    private NiMplsRsvpIfSubscripAugWriter writer;
+    private NiMplsRsvpIfSubscripConfigWriter writer;
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
@@ -76,9 +88,6 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
             .child(InterfaceAttributes.class)
             .child(Interface.class, new InterfaceKey(new InterfaceId("Loopback0")));
 
-    // test data
-    private NiMplsRsvpIfSubscripAug data;
-
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -86,30 +95,51 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
         Mockito.when(cli.executeAndRead(Mockito.any()))
                 .then(invocation -> CompletableFuture.completedFuture(""));
 
-        this.writer = new NiMplsRsvpIfSubscripAugWriter(this.cli);
-        initializeData();
-    }
-
-    private void initializeData() {
-        data = new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(5000L))
-                .build();
+        this.writer = new NiMplsRsvpIfSubscripConfigWriter(this.cli);
     }
 
     @Test
-    public void write() throws WriteFailedException {
+    public void write() throws Exception {
+        Config data = new ConfigBuilder().addAugmentation(NiMplsRsvpIfSubscripAug.class,
+                new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(5000L))
+                        .build())
+                .build();
         this.writer.writeCurrentAttributesForType(iid, data, context);
 
-        Mockito.verify(cli)
-                .executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue()
-                .getContent());
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
-    public void update() throws WriteFailedException {
+    public void writePercentage() throws Exception {
+        Config data = new ConfigBuilder().setSubscription(new Percentage((short) 45)).build();
+        this.writer.writeCurrentAttributesForType(iid, data, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT_PERCENTAGE, response.getValue().getContent());
+    }
+
+    @Test
+    public void writeFail() throws Exception {
+        Config data = new ConfigBuilder().addAugmentation(NiMplsRsvpIfSubscripAug.class,
+                new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(5000L))
+                        .build())
+                .setSubscription(new Percentage((short) 45))
+                .build();
+        exception.expect(IllegalArgumentException.class);
+        this.writer.writeCurrentAttributesForType(iid, data, context);
+    }
+
+    @Test
+    public void update() throws Exception {
+        Config data = new ConfigBuilder().addAugmentation(NiMplsRsvpIfSubscripAug.class,
+                new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(5000L))
+                        .build())
+                .build();
         // change bandwidth to different number
-        NiMplsRsvpIfSubscripAug newData = new NiMplsRsvpIfSubscripAugBuilder()
-                .setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(1005L))
+        Config newData = new ConfigBuilder().addAugmentation(NiMplsRsvpIfSubscripAug.class,
+                new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(1005L))
+                        .build())
                 .build();
 
         this.writer.updateCurrentAttributesForType(iid, data, newData, context);
@@ -121,10 +151,17 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
     }
 
     @Test
-    public void updateDefault() throws WriteFailedException {
+    public void updateDefault() throws Exception {
+        Config data = new ConfigBuilder().addAugmentation(NiMplsRsvpIfSubscripAug.class,
+                new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(5000L))
+                        .build())
+                .build();
         // change badwidth to default
-        NiMplsRsvpIfSubscripAug newData = new NiMplsRsvpIfSubscripAugBuilder()
-                .setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth("default"))
+        Config newData = new ConfigBuilder().addAugmentation(NiMplsRsvpIfSubscripAug.class,
+                new NiMplsRsvpIfSubscripAugBuilder()
+                        .setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(
+                                new MplsRsvpSubscriptionConfig.Bandwidth("default")))
+                        .build())
                 .build();
 
         this.writer.updateCurrentAttributesForType(iid, data, newData, context);
@@ -136,7 +173,11 @@ public class NiMplsRsvpIfSubscripAugWriterTest {
     }
 
     @Test
-    public void delete() throws WriteFailedException {
+    public void delete() throws Exception {
+        Config data = new ConfigBuilder().addAugmentation(NiMplsRsvpIfSubscripAug.class,
+                new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(5000L))
+                        .build())
+                .build();
         this.writer.deleteCurrentAttributesForType(iid, data, context);
 
         Mockito.verify(cli)
