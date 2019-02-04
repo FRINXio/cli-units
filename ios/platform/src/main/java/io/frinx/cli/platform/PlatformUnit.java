@@ -17,7 +17,6 @@
 package io.frinx.cli.platform;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
@@ -28,37 +27,29 @@ import io.frinx.cli.platform.handler.ComponentConfigReader;
 import io.frinx.cli.platform.handler.ComponentReader;
 import io.frinx.cli.platform.handler.ComponentStateReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.platform.IIDs;
-import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.ComponentsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class PlatformUnit implements TranslateUnit {
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class PlatformUnit extends AbstractUnit {
 
     public PlatformUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(IosDevices.IOS_ALL, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+        super(registry);
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
+    protected Set<Device> getSupportedVersions() {
+        return IosDevices.IOS_ALL;
+    }
+
+    @Override
+    protected String getUnitName() {
+        return "IOS Platform unit";
     }
 
     @Override
@@ -81,8 +72,4 @@ public class PlatformUnit implements TranslateUnit {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance());
     }
 
-    @Override
-    public String toString() {
-        return "IOS Platform unit";
-    }
 }

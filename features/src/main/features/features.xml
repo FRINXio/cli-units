@@ -29,8 +29,8 @@
     <repository>mvn:io.frinx.openconfig/openconfig-features/{{VERSION}}/xml/features</repository>
 
     <feature name='cli-southbound-unit-ios-common-cli-initializer' version='${project.version}'>
-        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
         <feature version='${cli.version}'>cli-southbound-io</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-utils</feature>
         <bundle>mvn:io.frinx.cli/ios-cli-init-unit/{{VERSION}}</bundle>
     </feature>
 

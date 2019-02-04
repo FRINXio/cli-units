@@ -25,14 +25,9 @@ import io.frinx.cli.unit.ios.network.instance.handler.vrf.VrfReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 
 public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, NetworkInstanceKey,
         NetworkInstanceBuilder>
@@ -46,10 +41,5 @@ public class NetworkInstanceReader extends CompositeListReader<NetworkInstance, 
                 add(new L2VSIReader(cli));
             }
         });
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<NetworkInstance> list) {
-        ((NetworkInstancesBuilder) builder).setNetworkInstance(list);
     }
 }

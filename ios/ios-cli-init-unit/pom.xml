@@ -33,6 +33,11 @@
     <dependencies>
         <dependency>
             <groupId>io.frinx.cli</groupId>
+            <artifactId>ios-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry-model</artifactId>
             <version>${cli.version}</version>
         </dependency>

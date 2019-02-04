@@ -25,12 +25,8 @@ import io.frinx.cli.unit.ios.network.instance.handler.vrf.VrfConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.ArrayList;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 
 public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigBuilder>
     implements CliConfigReader<Config, ConfigBuilder> {
@@ -47,8 +43,4 @@ public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigB
         });
     }
 
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((NetworkInstanceBuilder) builder).setConfig(config);
-    }
 }

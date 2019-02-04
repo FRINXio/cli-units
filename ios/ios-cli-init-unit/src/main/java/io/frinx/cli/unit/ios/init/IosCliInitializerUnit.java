@@ -18,16 +18,17 @@ package io.frinx.cli.unit.ios.init;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
 import io.frinx.cli.io.SessionInitializationStrategy;
+import io.frinx.cli.ios.IosDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -41,7 +42,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topo
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.credentials.LoginPassword;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.privileged.mode.credentials.IosEnablePassword;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,34 +57,22 @@ import org.slf4j.LoggerFactory;
 // the privileged mode already), refactor this into abstract class implementing
 // TranslateLogicProvider interface. Let other units extend this interface,
 // instead of creating a standalone unit just for cli initialization purposes.
-public class IosCliInitializerUnit  implements TranslateUnit {
+public class IosCliInitializerUnit  extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(IosCliInitializerUnit.class);
 
-    // TODO This is reused all over the units. Move this to som Util class so
-    // we can reuse it.
-
-    private static final Device IOS = new DeviceIdBuilder()
-            .setDeviceType("ios")
-            .setDeviceVersion("*")
-            .build();
-
-    private TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration iosReg;
-
-
     public IosCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        iosReg = registry.registerTranslateUnit(IOS, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(IosDevices.IOS_GENERIC);
     }
 
-    public void close() {
-        if (iosReg != null) {
-            iosReg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS cli init (FRINX) translate unit";
     }
 
     @Override
@@ -96,11 +84,6 @@ public class IosCliInitializerUnit  implements TranslateUnit {
     public SessionInitializationStrategy getInitializer(@Nonnull final RemoteDeviceId id,
                                                         @Nonnull final CliNode cliNodeConfiguration) {
         return new IosCliInitializer(cliNodeConfiguration, id);
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final TranslateUnit.Context context) {
-        return Sets.newHashSet();
     }
 
     @Override
@@ -117,11 +100,6 @@ public class IosCliInitializerUnit  implements TranslateUnit {
                 Pattern.compile("(^|\\n)% (?i)invalid input(?-i).*", Pattern.DOTALL),
                 Pattern.compile("(^|\\n)% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
         ));
-    }
-
-    @Override
-    public String toString() {
-        return "IOS cli init (FRINX) translate unit";
     }
 
     /**

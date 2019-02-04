@@ -26,11 +26,8 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceCommonState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.StateBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class InterfaceStateReader implements CliOperReader<State, StateBuilder> {
@@ -39,11 +36,6 @@ public final class InterfaceStateReader implements CliOperReader<State, StateBui
 
     public InterfaceStateReader(Cli cli) {
         this.cli = cli;
-    }
-
-    @Override
-    public void merge(@Nonnull final Builder<? extends DataObject> builder, @Nonnull final State value) {
-        ((InterfaceBuilder) builder).setState(value);
     }
 
     @Override

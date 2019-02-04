@@ -23,9 +23,6 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.structure.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.structure.StateBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.Area;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.AreaBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AreaStateReader implements OspfReader.OspfOperReader<State, StateBuilder> {
@@ -39,8 +36,4 @@ public class AreaStateReader implements OspfReader.OspfOperReader<State, StateBu
                 .getIdentifier());
     }
 
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State config) {
-        ((AreaBuilder) builder).setState(config);
-    }
 }

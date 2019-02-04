@@ -32,6 +32,11 @@ public final class IosDevices {
             .setDeviceVersion("12.*")
             .build();
 
+    public static final Device IOS_GENERIC = new DeviceIdBuilder()
+            .setDeviceType("ios")
+            .setDeviceVersion("*")
+            .build();
+
     public static final Device IOS_15 = new DeviceIdBuilder()
             .setDeviceType("ios")
             .setDeviceVersion("15.*")

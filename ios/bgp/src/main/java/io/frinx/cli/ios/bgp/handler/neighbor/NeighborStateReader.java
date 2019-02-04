@@ -28,9 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpNeighborState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.StateBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborStateReader implements BgpReader.BgpOperReader<State, StateBuilder> {
@@ -52,11 +49,6 @@ public class NeighborStateReader implements BgpReader.BgpOperReader<State, State
         String neighborIp = NeighborWriter.getNeighborIp(instanceIdentifier);
         String output = blockingRead(SH_SUMM, cli, instanceIdentifier, ctx);
         readState(neighborIp, stateBuilder, output);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State config) {
-        ((NeighborBuilder) builder).setState(config);
     }
 
     @VisibleForTesting

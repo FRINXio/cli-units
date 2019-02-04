@@ -24,13 +24,10 @@ import io.frinx.cli.io.Cli;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.afi.safi.StateBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.state.Prefixes;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.state.PrefixesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV4UNICAST;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixesReader implements BgpReader.BgpOperReader<Prefixes, PrefixesBuilder> {
@@ -53,11 +50,6 @@ public class PrefixesReader implements BgpReader.BgpOperReader<Prefixes, Prefixe
         String command = afiKey.equals(IPV4UNICAST.class) ? String.format(SH_IPV4, neighborIp) : String.format(
                 SH_VPNV4, neighborIp);
         parsePrefixes(blockingRead(command, cli, instanceIdentifier, readContext), prefixesBuilder, neighborIp);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Prefixes prefixes) {
-        ((StateBuilder) builder).setPrefixes(prefixes);
     }
 
     @VisibleForTesting

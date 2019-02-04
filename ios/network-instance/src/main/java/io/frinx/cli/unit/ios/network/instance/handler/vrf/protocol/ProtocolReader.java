@@ -29,12 +29,9 @@ import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ProtocolsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Protocol, ProtocolKey, ProtocolBuilder> {
@@ -50,11 +47,6 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
     public List<ProtocolKey> getAllIdsForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull
             ReadContext readContext) throws ReadFailedException {
         return delegate.getAllIds(instanceIdentifier, readContext);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Protocol> readData) {
-        delegate.merge(builder, readData);
     }
 
     @Override
@@ -74,11 +66,6 @@ public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Pro
                     add(new StaticLocalRoutingProtocolReader());
                 }
             });
-        }
-
-        @Override
-        public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Protocol> list) {
-            ((ProtocolsBuilder) builder).setProtocol(list);
         }
     }
 }

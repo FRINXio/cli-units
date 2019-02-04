@@ -24,13 +24,10 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborConfigReader;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborTransportConfigReader;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.TransportBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.transport.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.transport.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.list.PeerGroup;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PeerGroupTransportConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
@@ -39,11 +36,6 @@ public class PeerGroupTransportConfigReader implements BgpReader.BgpConfigReader
 
     public PeerGroupTransportConfigReader(Cli cli) {
         this.cli = cli;
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((TransportBuilder) builder).setConfig(config);
     }
 
     @Override
