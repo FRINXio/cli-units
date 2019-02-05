@@ -28,6 +28,10 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.junos.JunosDevices;
 import io.frinx.cli.junos.unit.acl.handler.AclInterfaceConfigReader;
 import io.frinx.cli.junos.unit.acl.handler.AclInterfaceReader;
+import io.frinx.cli.junos.unit.acl.handler.AclInterfaceWriter;
+import io.frinx.cli.junos.unit.acl.handler.IngressAclSetConfigReader;
+import io.frinx.cli.junos.unit.acl.handler.IngressAclSetConfigWriter;
+import io.frinx.cli.junos.unit.acl.handler.IngressAclSetReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
@@ -35,6 +39,7 @@ import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.acl.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.top.AclBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -83,9 +88,15 @@ public class AclUnit implements TranslateUnit {
         writeRegistry.add(new GenericWriter<>(IIDs.ACL, new NoopCliWriter<>()));
 
         // interface
-        writeRegistry.add(new GenericListWriter<>(IIDs.AC_IN_INTERFACE, new NoopCliListWriter<>()));
+        writeRegistry.add(new GenericListWriter<>(IIDs.AC_IN_INTERFACE, new AclInterfaceWriter()));
         writeRegistry.addAfter(new GenericWriter<>(IIDs.AC_IN_IN_CONFIG, new NoopCliWriter<>()),
             io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
+
+        // ingress
+        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_INGRESSACLSETS, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericListWriter<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new NoopCliListWriter<>()));
+        writeRegistry.addAfter(new GenericWriter<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli)),
+            IIDs.AC_IN_IN_CONFIG);
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
@@ -95,6 +106,11 @@ public class AclUnit implements TranslateUnit {
         readRegistry.addStructuralReader(IIDs.AC_INTERFACES, InterfacesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_CONFIG, new AclInterfaceConfigReader()));
+
+        // ingress
+        readRegistry.addStructuralReader(IIDs.AC_IN_IN_INGRESSACLSETS, IngressAclSetsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli)));
+        readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigReader()));
     }
 
     @Override
