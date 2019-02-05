@@ -35,30 +35,71 @@ public class BundleEtherLacpAdminkeyConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
+    public void writeCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> id,
+            @Nonnull Config dataAfter,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
-        Config1 adminkeyAug = dataAfter.getAugmentation(Config1.class);
 
-        if (adminkeyAug == null || adminkeyAug.getAdminKey() == null) {
-            return;
-        }
-        blockingWriteAndRead(cli, id, dataAfter, "configure terminal", "bridge",
-                f("lacp port admin-key %s %d", ifcName.replace("Ethernet", ""), adminkeyAug.getAdminKey()), "end");
+        writeOrUpdateBundleEtherLacpAdminkey(id, dataAfter, false);
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+    public void updateCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> id,
+            @Nonnull Config dataBefore,
+            @Nonnull Config dataAfter,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
-        String ifcName = id.firstKeyOf(Interface.class).getName();
+        writeOrUpdateBundleEtherLacpAdminkey(id, dataAfter, true);
+    }
+
+    private void writeOrUpdateBundleEtherLacpAdminkey(
+            InstanceIdentifier<Config> id,
+            Config dataAfter,
+            boolean isPresent) throws WriteFailedException {
+
+        String portId = id.firstKeyOf(Interface.class).getName().replace("Ethernet", "");
+        Integer adminKey = getAdminKey(dataAfter);
+
+        if (!isPresent && adminKey == null) {
+            return;
+        }
+
+        blockingWriteAndRead(cli, id, dataAfter,
+                "configure terminal",
+                "bridge",
+                adminKey == null
+                    ? f("no lacp port admin-key %s", portId)
+                    : f("lacp port admin-key %s %d", portId, adminKey),
+                "end");
+    }
+
+    @Override
+    public void deleteCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> id,
+            @Nonnull Config dataBefore,
+            @Nonnull WriteContext writeContext) throws WriteFailedException {
+
+        String portId = id.firstKeyOf(Interface.class).getName().replace("Ethernet", "");
         Config1 adminkeyAug = dataBefore.getAugmentation(Config1.class);
 
         if (adminkeyAug == null || adminkeyAug.getAdminKey() == null) {
             return;
         }
 
-        blockingDeleteAndRead(cli, id, "configure terminal", "bridge",
-                f("no lacp port admin-key %s", ifcName.replace("Ethernet", "")), "end");
+        blockingDeleteAndRead(cli, id,
+                "configure terminal",
+                "bridge",
+                f("no lacp port admin-key %s", portId),
+                "end");
+    }
+
+    private static Integer getAdminKey(Config config) {
+        Config1 adminkeyAug = config.getAugmentation(Config1.class);
+        if (adminkeyAug == null) {
+            return null;
+        }
+
+        return adminkeyAug.getAdminKey();
     }
 }

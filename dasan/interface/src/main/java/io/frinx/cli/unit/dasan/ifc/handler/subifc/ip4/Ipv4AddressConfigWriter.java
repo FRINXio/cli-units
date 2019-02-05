@@ -16,6 +16,8 @@
 
 package io.frinx.cli.unit.dasan.ifc.handler.subifc.ip4;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -36,32 +38,62 @@ public class Ipv4AddressConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
+    public void writeCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> instanceIdentifier,
+            @Nonnull Config dataAfter,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (!Ipv4AddressConfigReader.checkSubId(instanceIdentifier)) {
-            throw new IllegalArgumentException("Unable to manage IP for subinterface: "
-                + instanceIdentifier.firstKeyOf(Subinterface.class).getIndex());
-        }
 
-        String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
-
-        blockingWriteAndRead(cli, instanceIdentifier, config, "configure terminal",
-                f("interface %s", ifcName.replace("Vlan", "br")),
-                f("ip address %s/%d", config.getIp().getValue(), config.getPrefixLength()), "end");
+        writeOrUpdateIpv4Address(instanceIdentifier, dataAfter, false);
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
+    public void updateCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> instanceIdentifier,
+            @Nonnull Config dataBefore,
+            @Nonnull Config dataAfter,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
+
+        writeOrUpdateIpv4Address(instanceIdentifier, dataAfter, true);
+    }
+
+    @Override
+    public void deleteCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> instanceIdentifier,
+            @Nonnull Config dataBefore,
+            @Nonnull WriteContext writeContext) throws WriteFailedException {
+
+        String vlanId = instanceIdentifier.firstKeyOf(Interface.class).getName().replace("Vlan", "br");
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        if (subId != SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            throw new IllegalArgumentException("Unable to manage IP for subinterface: " + subId);
-        }
+        Preconditions.checkArgument(subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID,
+                "Unable to manage IP for subinterface: %s", subId);
 
-        String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        blockingDeleteAndRead(cli, instanceIdentifier,
+                "configure terminal",
+                f("interface %s", vlanId),
+                "no ip address",
+                "end");
+    }
 
-        blockingWriteAndRead(cli, instanceIdentifier, config, "configure terminal",
-                f("interface %s", ifcName.replace("Vlan", "br")), "no ip address", "end");
+    @VisibleForTesting
+    void writeOrUpdateIpv4Address(
+            InstanceIdentifier<Config> instanceIdentifier,
+            Config config,
+            boolean isPresent) throws WriteFailedException {
+
+        String vlanId = instanceIdentifier.firstKeyOf(Interface.class).getName().replace("Vlan", "br");
+
+        Preconditions.checkArgument(Ipv4AddressConfigReader.checkSubId(instanceIdentifier),
+                "Unable to manage IP for subinterface: %s",
+                instanceIdentifier.firstKeyOf(Subinterface.class).getIndex());
+
+        // Dasan does not allow to update IP address,
+        // so we need to delete the existing data and put new data.
+        blockingWriteAndRead(cli, instanceIdentifier, config,
+                "configure terminal",
+                f("interface %s", vlanId),
+                isPresent ? "no ip address" : "",
+                f("ip address %s/%d", config.getIp().getValue(), config.getPrefixLength()),
+                "end");
     }
 }

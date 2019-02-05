@@ -88,6 +88,7 @@ public class VlanConfigWriterTest {
         Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(new String[] {
             "configure terminal",
             "bridge",
+            "",
             "vlan create 100 eline",
             "end",
             ""
@@ -123,6 +124,7 @@ public class VlanConfigWriterTest {
         Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(new String[] {
             "configure terminal",
             "bridge",
+            "",
             "vlan create 100 ",
             "end",
             ""
@@ -158,6 +160,7 @@ public class VlanConfigWriterTest {
         Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(new String[] {
             "configure terminal",
             "bridge",
+            "",
             "vlan create 100 ",
             "end",
             ""
@@ -184,6 +187,44 @@ public class VlanConfigWriterTest {
         target.writeCurrentAttributes(instanceIdentifier, config, writeContext);
 
         //target method throws exception, so verification process is skipped.
+    }
+
+
+    @Test
+    public void testUpdateCurrentAttributes_001() throws Exception {
+        final VlanId vlanId = new VlanId(100);
+        final InstanceIdentifier<Config> instanceIdentifier =
+                KeyedInstanceIdentifier.create(NetworkInstances.class)
+                .child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
+                .child(Vlans.class)
+                .child(Vlan.class, new VlanKey(vlanId))
+                .child(Config.class);
+        final Config dataBefore = Mockito.mock(Config.class);
+        final Config dataAfter = Mockito.mock(Config.class, Mockito.RETURNS_DEEP_STUBS);
+        final WriteContext writeContext = Mockito.mock(WriteContext.class);
+        final Config1 augmentConfig = Mockito.mock(Config1.class);
+        final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
+
+        Mockito.doReturn(augmentConfig).when(dataAfter).getAugmentation(Config1.class);
+        Mockito.doReturn(Boolean.TRUE).when(augmentConfig).isEline();
+        Mockito.when(dataAfter.getVlanId().getValue()).thenReturn(100);
+        Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
+
+        target.updateCurrentAttributes(instanceIdentifier, dataBefore, dataAfter, writeContext);
+
+        Mockito.verify(dataAfter).getAugmentation(Config1.class);
+        Mockito.verify(augmentConfig).isEline();
+        Mockito.verify(dataAfter.getVlanId()).getValue();
+        Mockito.verify(cli).executeAndRead(commands.capture());
+
+        Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(new String[] {
+            "configure terminal",
+            "bridge",
+            "no vlan 100",
+            "vlan create 100 eline",
+            "end",
+            ""
+        }, "\n")));
     }
 
     @Test
