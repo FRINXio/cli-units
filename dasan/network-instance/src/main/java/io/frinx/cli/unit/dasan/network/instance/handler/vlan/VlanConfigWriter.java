@@ -36,33 +36,70 @@ public class VlanConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
-                                       @Nonnull WriteContext writeContext)
-            throws WriteFailedException.CreateFailedException {
+    public void writeCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> instanceIdentifier,
+            @Nonnull Config config,
+            @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         Preconditions.checkArgument(
             NetworInstance.DEFAULT_NETWORK.equals(instanceIdentifier.firstKeyOf(NetworkInstance.class)),
             "vlan must be configured in default network instance");
 
-        Config1 augmentConfig = config.getAugmentation(Config1.class);
-        String elineOpt = (augmentConfig != null && Boolean.TRUE.equals(augmentConfig.isEline())) ? "eline" : "";
+        writeOrUpdateVlanCreate(instanceIdentifier, config, false);
+    }
 
-        blockingWriteAndRead(cli, instanceIdentifier, config,
-                "configure terminal",
-                "bridge",
-                f("vlan create %d %s", config.getVlanId().getValue(), elineOpt),
-                "end");
+
+    @Override
+    public void updateCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> instanceIdentifier,
+            @Nonnull Config dataBefore,
+            @Nonnull Config dataAfter,
+            @Nonnull WriteContext writeContext) throws WriteFailedException {
+
+        writeOrUpdateVlanCreate(instanceIdentifier, dataAfter, true);
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                        @Nonnull Config config, @Nonnull WriteContext writeContext)
-            throws WriteFailedException.DeleteFailedException {
+    public void deleteCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> instanceIdentifier,
+            @Nonnull Config config,
+            @Nonnull WriteContext writeContext) throws WriteFailedException.DeleteFailedException {
 
         blockingDeleteAndRead(cli, instanceIdentifier,
                 "configure terminal",
                 "bridge",
                 f("no vlan %d", config.getVlanId().getValue()),
                 "end");
+    }
+
+    private void writeOrUpdateVlanCreate(
+            InstanceIdentifier<Config> instanceIdentifier,
+            Config config,
+            boolean isPresent) throws WriteFailedException {
+
+        Integer vlanId = config.getVlanId().getValue();
+        String elineOpt = hasElineOption(config) ? "eline" : "";
+
+        // Dasan does not allow to update vlan config,
+        // so we need to delete the existing data and put new data.
+        blockingWriteAndRead(cli, instanceIdentifier, config,
+                "configure terminal",
+                "bridge",
+                isPresent ? f("no vlan %d", vlanId) : "",
+                f("vlan create %d %s", vlanId, elineOpt),
+                "end");
+    }
+
+    private static boolean hasElineOption(Config config) {
+        if (config == null) {
+            return false;
+        }
+
+        Config1 augmentConfig = config.getAugmentation(Config1.class);
+        if (augmentConfig == null) {
+            return false;
+        }
+
+        return Boolean.TRUE.equals(augmentConfig.isEline());
     }
 }

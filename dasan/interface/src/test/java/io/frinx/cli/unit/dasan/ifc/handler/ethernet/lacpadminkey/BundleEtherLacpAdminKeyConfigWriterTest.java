@@ -77,7 +77,13 @@ public class BundleEtherLacpAdminKeyConfigWriterTest {
 
         Config1Builder ethIfAggregationConfigBuilder = new Config1Builder();
         ethIfAggregationConfigBuilder.setAdminKey(adminkey);
-        data = new ConfigBuilder()
+        data = createConfig(ifType, ifName, adminkey);
+    }
+
+    private Config createConfig(Class<? extends IanaInterfaceType> ifType, String ifName, Integer adminkey) {
+        Config1Builder ethIfAggregationConfigBuilder = new Config1Builder();
+        ethIfAggregationConfigBuilder.setAdminKey(adminkey);
+        return new ConfigBuilder()
                  .addAugmentation(Config1.class, ethIfAggregationConfigBuilder.build())
                  .build();
     }
@@ -105,6 +111,16 @@ public class BundleEtherLacpAdminKeyConfigWriterTest {
         data = builder.build();
         target.writeCurrentAttributes(id, data, context);
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
+    }
+
+    @Test
+    public void testUpdateCurrentAttributes_001() throws Exception {
+        prepare(Ieee8023adLag.class, "Ethernet4/10", 2);
+        Config dataBefore = createConfig(Ieee8023adLag.class, "Ethernet4/10", 1);
+        target.updateCurrentAttributes(id, dataBefore, data, context);
+        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue()
+                .getContent());
     }
 
     @Test

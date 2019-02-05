@@ -86,7 +86,10 @@ public class Ipv4AddressConfigWriterTest {
                 .child(Config.class);
 
         ConfigBuilder builder = new ConfigBuilder();
-        data = builder.setPrefixLength(Short.valueOf("10")).build();
+        data = builder
+            .setPrefixLength(Short.valueOf("10"))
+            .setIp(new Ipv4AddressNoZone("10.187.100.49"))
+            .build();
     }
 
     private void prepare1(Class<? extends IanaInterfaceType> ifType, String ifName) {
@@ -99,7 +102,46 @@ public class Ipv4AddressConfigWriterTest {
                 .child(Config.class);
 
         ConfigBuilder builder = new ConfigBuilder();
-        data = builder.setPrefixLength(Short.valueOf("10")).build();
+        data = builder
+            .setPrefixLength(Short.valueOf("10"))
+            .setIp(new Ipv4AddressNoZone("10.187.100.49"))
+            .build();
+    }
+
+    @Test
+    public void testWriteOrUpdateIpv4Address_001() throws Exception {
+        prepare(Ieee8023adLag.class, "Vlan100");
+
+        target.writeOrUpdateIpv4Address(id, data, true);
+
+        Mockito.verify(cli, Mockito.times(1)).executeAndRead(response.capture());
+
+        Assert.assertEquals(1, response.getAllValues().size());
+        Assert.assertEquals(
+            "configure terminal\n"
+                + "interface br100\n"
+                + "no ip address\n"
+                + "ip address 10.187.100.49/10\n"
+                + "end\n",
+            response.getAllValues().get(0).getContent());
+    }
+
+    @Test
+    public void testWriteOrUpdateIpv4Address_002() throws Exception {
+        prepare(Ieee8023adLag.class, "Vlan100");
+
+        target.writeOrUpdateIpv4Address(id, data, false);
+
+        Mockito.verify(cli, Mockito.times(1)).executeAndRead(response.capture());
+
+        Assert.assertEquals(1, response.getAllValues().size());
+        Assert.assertEquals(
+            "configure terminal\n"
+                + "interface br100\n"
+                + "\n"
+                + "ip address 10.187.100.49/10\n"
+                + "end\n",
+            response.getAllValues().get(0).getContent());
     }
 
     @Test

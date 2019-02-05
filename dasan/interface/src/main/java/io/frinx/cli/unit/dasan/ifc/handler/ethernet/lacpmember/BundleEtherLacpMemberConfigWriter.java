@@ -24,6 +24,7 @@ import io.frinx.cli.unit.utils.CliWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -39,21 +40,63 @@ public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
+    public void writeCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> id,
+            @Nonnull Config dataAfter,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
-        Config1 aggregationAug = dataAfter.getAugmentation(Config1.class);
 
-        if (aggregationAug == null || aggregationAug.getAggregateId() == null) {
+        writeOrUpdateBundleEtherLacpMember(id, null, dataAfter);
+    }
+
+    @Override
+    public void updateCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> id,
+            @Nonnull Config dataBefore,
+            @Nonnull Config dataAfter,
+            @Nonnull WriteContext writeContext) throws WriteFailedException {
+
+        writeOrUpdateBundleEtherLacpMember(id, dataBefore, dataAfter);
+    }
+
+    private void writeOrUpdateBundleEtherLacpMember(
+            InstanceIdentifier<Config> id,
+            Config dataBefore,
+            Config dataAfter) throws WriteFailedException {
+
+        String portId = id.firstKeyOf(Interface.class).getName().replace("Ethernet", "");
+        String bundleIdBefore = getBundleId(dataBefore);
+        String bundleIdAfter = getBundleId(dataAfter);
+
+        // If both of bundleId have the same value, we can skip the update.
+        if (StringUtils.equals(bundleIdBefore, bundleIdAfter)) {
             return;
         }
 
-        int bundleId = Integer.parseInt(getBundleId(aggregationAug.getAggregateId()));
-        blockingWriteAndRead(cli, id, dataAfter, "configure terminal", "bridge",
-                f("lacp port %s aggregator %d", ifcName.replace("Ethernet", ""), bundleId), "end");
+        // Dasan does not allow to update assignment of lag interface,
+        // so we need to delete the existing data and put new data.
+        blockingWriteAndRead(cli, id, dataAfter,
+                "configure terminal",
+                "bridge",
+                bundleIdBefore != null
+                        ? f("no lacp port %s aggregator %s", portId, bundleIdBefore) : "",
+                bundleIdAfter != null
+                        ? f("lacp port %s aggregator %s", portId, bundleIdAfter) : "",
+                "end");
     }
 
-    private static String getBundleId(String aggregateIfcName) {
+    private static String getBundleId(Config config) {
+        if (config == null) {
+            return null;
+        }
+        Config1 aggregationAugAfter = config.getAugmentation(Config1.class);
+        if (aggregationAugAfter == null) {
+            return null;
+        }
+        String aggregateIfcName = aggregationAugAfter.getAggregateId();
+        if (aggregateIfcName == null) {
+            return null;
+        }
+
         Matcher aggregateIfcNameMatcher = AGGREGATE_IFC_NAME.matcher(aggregateIfcName.trim());
 
         Preconditions.checkArgument(aggregateIfcNameMatcher.matches(), "aggregate-id %s should reference LAG interface",
@@ -62,18 +105,23 @@ public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+    public void deleteCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> id,
+            @Nonnull Config dataBefore,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
-        String ifcName = id.firstKeyOf(Interface.class).getName();
-        Config1 aggregationAug = dataBefore.getAugmentation(Config1.class);
+        String portId = id.firstKeyOf(Interface.class).getName().replace("Ethernet", "");
+        String bundleIdBefore = getBundleId(dataBefore);
 
-        if (aggregationAug == null || aggregationAug.getAggregateId() == null) {
+        if (bundleIdBefore == null) {
             return;
         }
 
-        int bundleId = Integer.parseInt(getBundleId(aggregationAug.getAggregateId()));
-        blockingDeleteAndRead(cli, id, "configure terminal", "bridge",
-                f("no lacp port %s aggregator %s", ifcName.replace("Ethernet", ""), bundleId), "end");
+        String bundleId = getBundleId(dataBefore);
+        blockingDeleteAndRead(cli, id,
+                "configure terminal",
+                "bridge",
+                f("no lacp port %s aggregator %s", portId, bundleId),
+                "end");
     }
 }
