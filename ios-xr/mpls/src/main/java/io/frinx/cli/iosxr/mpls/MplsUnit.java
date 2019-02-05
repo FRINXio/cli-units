@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.IosXrDevices;
@@ -127,8 +128,14 @@ public class MplsUnit implements TranslateUnit {
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RSVPTE, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE, new NoopCliListWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG, new RsvpInterfaceConfigWriter(cli)));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG,
-                new NiMplsRsvpIfSubscripConfigWriter(cli)), IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG);
+        writeRegistry.subtreeAddAfter(
+                Sets.newHashSet(
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CO_AUG_NIMPLSRSVPIFSUBSCRIPAUG,
+                                IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG)
+                ),
+                new GenericWriter<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, new NiMplsRsvpIfSubscripConfigWriter(cli)),
+                IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG
+        );
 
         // LDP
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_SI_LDP, new NoopCliWriter<>()));
@@ -173,8 +180,14 @@ public class MplsUnit implements TranslateUnit {
         readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE, new RsvpInterfaceReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG, new RsvpInterfaceConfigReader()));
         readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_RS_IN_IN_SUBSCRIPTION, SubscriptionBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG,
-                new NiMplsRsvpIfSubscripConfigReader(cli)));
+        readRegistry.subtreeAdd(
+                Sets.newHashSet(
+                        RWUtils.cutIdFromStart(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CO_AUG_NIMPLSRSVPIFSUBSCRIPAUG,
+                                IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG)
+                ),
+                new GenericConfigReader<>(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG,
+                        new NiMplsRsvpIfSubscripConfigReader(cli))
+        );
 
         // LDP
         readRegistry.addStructuralReader(IIDs.NE_NE_MP_SI_LDP, LdpBuilder.class);
