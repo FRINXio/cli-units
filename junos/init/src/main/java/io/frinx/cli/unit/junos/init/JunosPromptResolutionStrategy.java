@@ -23,12 +23,15 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class JunosPromptResolutionStrategy implements PromptResolutionStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(JunosPromptResolutionStrategy.class);
 
     private static final int INITIAL_TIME_TO_WAIT = 1;
 
-    private static final Pattern JUNOS_GUIDANCE_PATTERN = Pattern.compile("^\\[edit.*]$");
+    private static final Pattern JUNOS_GUIDANCE_PATTERN = Pattern.compile("^(\\{master:\\d})?(\\[edit.*])?$");
 
     private static final PromptResolutionStrategy DEFAULT_INSTANCE = new JunosPromptResolutionStrategy();
 
@@ -55,7 +58,6 @@ public final class JunosPromptResolutionStrategy implements PromptResolutionStra
                 lastRead = session.readUntilTimeout(waitTime);
                 List<String> split = Arrays.stream(lastRead.split(newline))
                         .map(String::trim)
-                        .filter(line -> !"".equals(line))
                         .filter(line -> !JUNOS_GUIDANCE_PATTERN.matcher(line).matches())
                         .collect(Collectors.toList());
 
