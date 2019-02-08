@@ -40,6 +40,9 @@ import io.frinx.cli.unit.junos.network.instance.handler.vrf.applypolicy.ApplyPol
 import io.frinx.cli.unit.junos.network.instance.handler.vrf.ifc.VrfInterfaceConfigReader;
 import io.frinx.cli.unit.junos.network.instance.handler.vrf.ifc.VrfInterfaceConfigWriter;
 import io.frinx.cli.unit.junos.network.instance.handler.vrf.ifc.VrfInterfaceReader;
+import io.frinx.cli.unit.junos.network.instance.handler.vrf.protocol.ProtocolConfigReader;
+import io.frinx.cli.unit.junos.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
+import io.frinx.cli.unit.junos.network.instance.handler.vrf.protocol.ProtocolReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
@@ -49,6 +52,8 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.InterInstancePoliciesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.InterfacesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ProtocolsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.policy.forwarding.top.PolicyForwardingBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.ApplyPolicyBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -92,6 +97,9 @@ public class JunosNetworkInstanceUnit implements TranslateUnit {
         return Collections.emptySet();
     }
 
+    private static final InstanceIdentifier<Config> NE_NE_PR_PR_CONFIG_SUBTREE_ROOT =
+            InstanceIdentifier.create(Config.class);
+
     @Override
     public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
                                 @Nonnull ModifiableWriterRegistryBuilder writeRegistry,
@@ -128,6 +136,14 @@ public class JunosNetworkInstanceUnit implements TranslateUnit {
         readRegistry.subtreeAdd(
             NE_NE_PO_IN_IN_CONFIG_SUBTREE,
             new GenericConfigReader<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli)));
+
+        // Protocol
+        readRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
+        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
+        readRegistry.subtreeAdd(Sets.newHashSet(
+                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_CO_AUG_PROTOCOLCONFAUG, NE_NE_PR_PR_CONFIG_SUBTREE_ROOT)),
+                new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG,
+                new ProtocolConfigReader(cli)));
     }
 
     private void provideWriters(@Nonnull ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
@@ -151,6 +167,12 @@ public class JunosNetworkInstanceUnit implements TranslateUnit {
             NE_NE_PO_IN_IN_CONFIG_SUBTREE,
             new GenericWriter<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigWriter(cli)));
 
+        // Protocol
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
+        writeRegistry.subtreeAddAfter(Sets.newHashSet(
+                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_CO_AUG_PROTOCOLCONFAUG, NE_NE_PR_PR_CONFIG_SUBTREE_ROOT)),
+                new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)),
+                IIDs.NE_NE_CONFIG);
     }
 
     @Override

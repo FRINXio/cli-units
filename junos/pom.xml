@@ -36,6 +36,7 @@
     <module>interface</module>
     <module>network-instance</module>
     <module>acl</module>
+    <module>ospf</module>
   </modules>
 
   <build>

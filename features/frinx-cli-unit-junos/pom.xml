@@ -74,6 +74,10 @@
             <groupId>io.frinx.cli</groupId>
             <artifactId>junos-network-instance-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>junos-ospf-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
