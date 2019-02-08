@@ -44,6 +44,9 @@ public class JunosPromptResolutionStrategyTest {
         + "\n"                              //ignore empty line
         + "[edit]\n"                        //ignore guidance line
         + "[edit interfaces ge-0/0/3]\n"    //ignore guidance line
+        + "{master:0}\n"                    //ignore guidance line
+        + "{master:0}[edit]\n"              //ignore guidance line
+        + "{master:0}[edit interfaces ge-0/0/3]\n" //ignore guidance line
         + EXPECTED_PROMPT;
 
     @Mock
@@ -75,6 +78,7 @@ public class JunosPromptResolutionStrategyTest {
             .doReturn(OUTPUT_NOT_TWO_LINES)
             .doReturn(OUTPUT_UNMATCHED)
             .doReturn(OUTPUT_EXPECTED)
+            .doThrow(new RuntimeException("the number of executions exceeded the assumed times.")) // never executed.
             .when(session).readUntilTimeout(Mockito.anyInt());
 
         // test
