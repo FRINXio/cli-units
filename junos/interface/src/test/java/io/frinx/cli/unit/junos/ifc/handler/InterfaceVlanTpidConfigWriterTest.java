@@ -40,9 +40,20 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev17071
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8100;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8A88;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPIDTYPES;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceVlanTpidConfigWriterTest {
+    private static final String INTERFACE_NAME = "ge-0/0/4";
+    private static final InterfaceKey INTERFACE_KEY = new InterfaceKey(INTERFACE_NAME);
+    private static final Class<? extends TPIDTYPES> SUPPORTED_TPID = TPID0X8100.class;
+    private static final Class<? extends TPIDTYPES> UNSUPPORTED_TPID = TPID0X8A88.class;
+    private static final Config1 SUPPORTED_CONFIG = new Config1Builder().setTpid(SUPPORTED_TPID).build();
+    private static final Config1 UNSUPPORTED_CONFIG = new Config1Builder().setTpid(UNSUPPORTED_TPID).build();
+    private static final InstanceIdentifier<Config1> ID = InstanceIdentifier.create(Interfaces.class)
+        .child(Interface.class, INTERFACE_KEY)
+        .child(Config.class)
+        .augmentation(Config1.class);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -55,17 +66,12 @@ public class InterfaceVlanTpidConfigWriterTest {
 
     private InterfaceVlanTpidConfigWriter target;
 
-    private InstanceIdentifier<Config1> id;
-
-    // test data
-    private Config1 data;
-
     private ArgumentCaptor<Command> response;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        target = Mockito.spy(new InterfaceVlanTpidConfigWriter(cli));
+        target = new InterfaceVlanTpidConfigWriter(cli);
 
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
         response = ArgumentCaptor.forClass(Command.class);
@@ -73,15 +79,7 @@ public class InterfaceVlanTpidConfigWriterTest {
 
     @Test
     public void testWriteCurrentAttributes_001() throws Exception {
-
-        final String interfaceName = "ge-0/0/4";
-        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, interfaceKey).child(Config.class)
-            .augmentation(Config1.class);
-
-        data = new Config1Builder().setTpid(TPID0X8100.class).build();
-
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributes(ID, SUPPORTED_CONFIG, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
@@ -92,28 +90,13 @@ public class InterfaceVlanTpidConfigWriterTest {
 
     @Test
     public void testWriteCurrentAttributes_002() throws Exception {
-
-        final String interfaceName = "ge-0/0/4";
-        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, interfaceKey).child(Config.class)
-            .augmentation(Config1.class);
-
-        data = new Config1Builder().setTpid(TPID0X8A88.class).build();
-
         thrown.expect(IllegalArgumentException.class);
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributes(ID, UNSUPPORTED_CONFIG, context);
     }
 
     @Test
     public void testDeleteCurrentAttributes_001() throws Exception {
-        final String interfaceName = "ge-0/0/4";
-        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, interfaceKey).child(Config.class)
-            .augmentation(Config1.class);
-
-        data = new Config1Builder().setTpid(TPID0X8100.class).build();
-
-        target.deleteCurrentAttributes(id, data, context);
+        target.deleteCurrentAttributes(ID, SUPPORTED_CONFIG, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
@@ -124,14 +107,26 @@ public class InterfaceVlanTpidConfigWriterTest {
 
     @Test
     public void testDeleteCurrentAttributes_002() throws Exception {
-        final String interfaceName = "ge-0/0/4";
-        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, interfaceKey).child(Config.class)
-            .augmentation(Config1.class);
-
-        data = new Config1Builder().setTpid(TPID0X8A88.class).build();
-
         thrown.expect(IllegalArgumentException.class);
-        target.deleteCurrentAttributes(id, data, context);
+        target.deleteCurrentAttributes(ID, UNSUPPORTED_CONFIG, context);
+    }
+
+    @Test
+    public void testUpdateCurrentAttributes_001() throws Exception {
+        final Config1 dataBefore = Mockito.mock(Config1.class);
+        target.updateCurrentAttributes(ID, dataBefore, SUPPORTED_CONFIG, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
+            "set interfaces ge-0/0/4 vlan-tagging",
+            ""
+            ), "\n")));
+    }
+
+    @Test
+    public void testUpdateCurrentAttributes_002() throws Exception {
+        final Config1 dataBefore = Mockito.mock(Config1.class);
+        thrown.expect(IllegalArgumentException.class);
+        target.updateCurrentAttributes(ID, dataBefore, UNSUPPORTED_CONFIG, context);
     }
 }
