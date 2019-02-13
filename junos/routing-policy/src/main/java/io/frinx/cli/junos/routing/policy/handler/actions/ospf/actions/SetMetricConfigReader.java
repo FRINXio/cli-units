@@ -56,7 +56,7 @@ public class SetMetricConfigReader implements CliConfigReader<Config, ConfigBuil
         ParsingUtils.parseField(output, 0,
             ACTION_METRIC_PARTEN::matcher,
             m -> m.group("value"),
-            arg-> builder.setMetric(new OspfMetric(Integer.valueOf(arg))));
+            arg -> builder.setMetric(new OspfMetric(Integer.valueOf(arg))));
     }
 
     @Override

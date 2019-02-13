@@ -57,7 +57,7 @@ public class ActionsConfigReader implements CliConfigReader<Config, ConfigBuilde
         ParsingUtils.parseField(output, 0,
             ACTION_PARTEN::matcher,
             m -> m.group("action"),
-            arg-> setResultType(builder, arg));
+            arg -> setResultType(builder, arg));
     }
 
     @Override

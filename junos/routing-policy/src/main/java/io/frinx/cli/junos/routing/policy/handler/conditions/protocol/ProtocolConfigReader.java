@@ -60,7 +60,7 @@ public class ProtocolConfigReader implements CliConfigReader<Config, ConfigBuild
         ParsingUtils.parseField(output, 0,
             PROTOCOL_TYPE_PARTEN::matcher,
             m -> m.group("type"),
-            arg-> setProtocolType(builder, arg));
+            arg -> setProtocolType(builder, arg));
 
         // read protocol instance name
         cmd = f(SH_INSTANCE_NAME, statementName, termId);
@@ -68,7 +68,7 @@ public class ProtocolConfigReader implements CliConfigReader<Config, ConfigBuild
         ParsingUtils.parseField(output, 0,
             INSTANCE_NAME_PARTEN::matcher,
             m -> m.group("name"),
-            arg-> builder.setProtocolName(arg));
+            arg -> builder.setProtocolName(arg));
     }
 
     @Override
