@@ -44,7 +44,18 @@ public class BundleEtherLacpMemberConfigWriterTest {
 
     private static final String WRITE_INPUT = "configure terminal\n"
             + "bridge\n"
+            + "\n"
             + "lacp port 3/4 aggregator 8\n"
+            + "end\n";
+    private static final String UPDATE_INPUT = "configure terminal\n"
+            + "bridge\n"
+            + "no lacp port 3/4 aggregator 9\n"
+            + "lacp port 3/4 aggregator 8\n"
+            + "end\n";
+    private static final String UPDATE_INPUT_NONASSIGN = "configure terminal\n"
+            + "bridge\n"
+            + "no lacp port 3/4 aggregator 9\n"
+            + "\n"
             + "end\n";
     private static final String DELETE_INPUT = "configure terminal\n"
             + "bridge\n"
@@ -66,7 +77,14 @@ public class BundleEtherLacpMemberConfigWriterTest {
         MockitoAnnotations.initMocks(this);
         target = Mockito.spy(new BundleEtherLacpMemberConfigWriter(cli));
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+    }
 
+    private Config generateConfig(Class<? extends IanaInterfaceType> ifType, String ifName, String aggregateId) {
+        Config1Builder ethIfAggregationConfigBuilder = new Config1Builder();
+        ethIfAggregationConfigBuilder.setAggregateId(aggregateId);
+        return new ConfigBuilder()
+                 .addAugmentation(Config1.class, ethIfAggregationConfigBuilder.build())
+                 .build();
     }
 
     private void prepare(Class<? extends IanaInterfaceType> ifType, String ifName, String aggregateId) {
@@ -75,11 +93,7 @@ public class BundleEtherLacpMemberConfigWriterTest {
         Mockito.when(cli.executeAndRead(Mockito.any()))
                 .then(invocation -> CompletableFuture.completedFuture(""));
 
-        Config1Builder ethIfAggregationConfigBuilder = new Config1Builder();
-        ethIfAggregationConfigBuilder.setAggregateId(aggregateId);
-        data = new ConfigBuilder()
-                 .addAugmentation(Config1.class, ethIfAggregationConfigBuilder.build())
-                 .build();
+        data = generateConfig(ifType, ifName, aggregateId);
     }
 
     @Test
@@ -105,6 +119,26 @@ public class BundleEtherLacpMemberConfigWriterTest {
         data = builder.build();
         target.writeCurrentAttributes(id, data, context);
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
+    }
+
+    @Test
+    public void testUpdateCurrentAttributes_001() throws Exception {
+        prepare(Ieee8023adLag.class, "Ethernet3/4", "Bundle-Ether8");
+        Config dataBefore = generateConfig(Ieee8023adLag.class, "Ethernet3/4", "Bundle-Ether9");
+        target.updateCurrentAttributes(id, dataBefore, data, context);
+        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue()
+                .getContent());
+    }
+
+    @Test
+    public void testUpdateCurrentAttributes_002() throws Exception {
+        prepare(Ieee8023adLag.class, "Ethernet3/4", null);
+        Config dataBefore = generateConfig(Ieee8023adLag.class, "Ethernet3/4", "Bundle-Ether9");
+        target.updateCurrentAttributes(id, dataBefore, data, context);
+        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT_NONASSIGN, response.getValue()
+                .getContent());
     }
 
     @Test
