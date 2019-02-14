@@ -35,6 +35,8 @@ import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceBfdConfigWriter;
 import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceConfigReader;
 import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceConfigWriter;
 import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceReader;
+import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceTimersConfigReader;
+import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceTimersConfigWriter;
 import io.frinx.cli.unit.junos.ospf.handler.OspfAreaReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
@@ -48,6 +50,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.TimersBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.Ospfv2Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.AreasBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -110,7 +113,8 @@ public class OspfUnit implements TranslateUnit {
         writeRegistry.add(new GenericWriter<>(
                 io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDCONFAUG_BF_CONFIG,
                 new AreaInterfaceBfdConfigWriter(cli)));
-
+        writeRegistry.add(new GenericWriter<>(IIDs
+                .NE_NE_PR_PR_OS_AR_AR_IN_IN_TI_CONFIG, new AreaInterfaceTimersConfigWriter(cli)));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_IN_CONFIG, new NoopCliWriter<>()));
     }
@@ -139,7 +143,12 @@ public class OspfUnit implements TranslateUnit {
                 io.frinx.openconfig.openconfig.bfd
                         .IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDCONFAUG_BF_CONFIG,
                 new AreaInterfaceBfdConfigReader(cli)));
-
+        readRegistry.addStructuralReader(
+               IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_TIMERS,
+               TimersBuilder.class);
+        readRegistry.add(new GenericConfigReader<>(
+                        IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_TI_CONFIG,
+                new AreaInterfaceTimersConfigReader(cli)));
         readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, InterfaceRefBuilder.class);
     }
 

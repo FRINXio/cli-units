@@ -21,19 +21,18 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd.rev171024.bfd.top.bfd.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.OspfAreaIdentifier;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.InterfaceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.timers.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.Area;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-
-public class AreaInterfaceBfdConfigWriter implements OspfWriter<Config> {
+public class AreaInterfaceTimersConfigWriter implements OspfWriter<Config> {
 
     private final Cli cli;
 
-    public AreaInterfaceBfdConfigWriter(final Cli cli) {
+    public AreaInterfaceTimersConfigWriter(final Cli cli) {
         this.cli = cli;
     }
 
@@ -48,23 +47,10 @@ public class AreaInterfaceBfdConfigWriter implements OspfWriter<Config> {
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Interface.class))
                         .get()
                         .getKey();
-        String cmd = f("set%s protocols ospf area %s interface %s bfd-liveness-detection",
-                OspfProtocolReader.resolveVrfWithName(instanceIdentifier),
-                AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
-
-        if (data.getMinInterval() != null) {
-            blockingWriteAndRead(cli, instanceIdentifier, data,
-                    f("%s minimum-interval %s", cmd, data.getMinInterval()));
-        }
-
-        if (data.getMinReceiveInterval() != null) {
-            blockingWriteAndRead(cli, instanceIdentifier, data,
-                    f("%s minimum-receive-interval %s", cmd, data.getMinReceiveInterval()));
-        }
-
-        if (data.getMultiplier() != null) {
-            blockingWriteAndRead(cli, instanceIdentifier, data,
-                    f("%s multiplier %s", cmd, data.getMultiplier()));
+        if (data.getRetransmissionInterval() != null) {
+            String cmd = f("set protocols ospf area %s interface %s retransmit-interval %s",
+                    AreaInterfaceReader.areaIdToString(areaId), intfId.getId(), data.getRetransmissionInterval());
+            blockingWriteAndRead(cli, instanceIdentifier, data, cmd);
         }
     }
 
@@ -76,30 +62,14 @@ public class AreaInterfaceBfdConfigWriter implements OspfWriter<Config> {
         final InterfaceKey intfId =
                 writeContext.readAfter(RWUtils.cutId(id, Interface.class)).get().getKey();
 
-        String cmd = f("set%s protocols ospf area %s interface %s bfd-liveness-detection",
-                OspfProtocolReader.resolveVrfWithName(id),
-                AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
-        String delcmd = f("delete%s protocols ospf area %s interface %s bfd-liveness-detection",
-                OspfProtocolReader.resolveVrfWithName(id),
-                AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
-
-        if (dataAfter.getMinInterval() != null) {
-            blockingWriteAndRead(cli, id, dataAfter, f("%s minimum-interval %s", cmd, dataAfter.getMinInterval()));
-        } else if (dataBefore.getMinInterval() != null) {
-            blockingWriteAndRead(cli, id, dataBefore, f("%s minimum-interval", delcmd));
-        }
-
-        if (dataAfter.getMinReceiveInterval() != null) {
-            blockingWriteAndRead(cli, id, dataAfter,
-                    f("%s minimum-receive-interval %s", cmd, dataAfter.getMinReceiveInterval()));
-        } else if (dataBefore.getMinReceiveInterval() != null) {
-            blockingWriteAndRead(cli, id, dataBefore, f("%s minimum-receive-interval", delcmd));
-        }
-
-        if (dataAfter.getMultiplier() != null) {
-            blockingWriteAndRead(cli, id, dataAfter, f("%s multiplier %s", cmd, dataAfter.getMultiplier()));
-        } else if (dataBefore.getMultiplier() != null) {
-            blockingWriteAndRead(cli, id, dataBefore, f("%s multiplier", delcmd));
+        if (dataAfter.getRetransmissionInterval() != null) {
+            String cmd = f("set protocols ospf area %s interface %s retransmit-interval %s",
+                    AreaInterfaceReader.areaIdToString(areaId), intfId.getId(), dataAfter.getRetransmissionInterval());
+            blockingWriteAndRead(cli, id, dataAfter, cmd);
+        } else if (dataBefore.getRetransmissionInterval() != null) {
+            String delcmd = f("delete protocols ospf area %s interface %s retransmit-interval",
+                    AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
+            blockingWriteAndRead(cli, id, dataBefore, delcmd);
         }
     }
 
@@ -115,8 +85,7 @@ public class AreaInterfaceBfdConfigWriter implements OspfWriter<Config> {
                         .get()
                         .getKey();
         blockingDeleteAndRead(cli, instanceIdentifier,
-                f("delete%s protocols ospf area %s interface %s bfd-liveness-detection",
-                        OspfProtocolReader.resolveVrfWithName(instanceIdentifier),
+                f("delete protocols ospf area %s interface %s retransmit-interval",
                         AreaInterfaceReader.areaIdToString(areaId), intfId.getId()));
     }
 }

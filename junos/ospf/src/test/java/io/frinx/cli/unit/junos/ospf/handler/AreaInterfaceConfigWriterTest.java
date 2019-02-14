@@ -163,6 +163,6 @@ public class AreaInterfaceConfigWriterTest {
         Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
 
         Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(
-            "delete routing-instances APTN protcols ospf area 10.51.246.21 interface xe-0/0/34.0\n"));
+            "delete routing-instances APTN protocols ospf area 10.51.246.21 interface xe-0/0/34.0\n"));
     }
 }
