@@ -40,7 +40,7 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
     @VisibleForTesting
     static final String SH_RUN_OSPF_AREA = "show configuration%s protocols ospf | display set | match area";
 
-    private static final Pattern AREA_ID = Pattern.compile("set.*protocols ospf area (?<areaId>\\S+) .*");
+    private static final Pattern AREA_ID = Pattern.compile("set.*protocols ospf area (?<areaId>\\S+).*");
 
     private final Cli cli;
 

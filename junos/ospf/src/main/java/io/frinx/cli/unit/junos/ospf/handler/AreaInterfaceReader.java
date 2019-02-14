@@ -42,7 +42,7 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     @VisibleForTesting
     static final String SHOW_OSPF_INT = "show configuration%s protocols ospf area %s | display set";
     private static final Pattern INTERFACE_NAME_LINE =
-            Pattern.compile("set.* protocols ospf area \\S+ interface (?<name>\\S+) .*");
+            Pattern.compile("set.* protocols ospf area \\S+ interface (?<name>\\S+).*");
 
     private Cli cli;
 

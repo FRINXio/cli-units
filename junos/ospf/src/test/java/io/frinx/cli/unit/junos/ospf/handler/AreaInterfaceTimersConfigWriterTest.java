@@ -31,9 +31,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.ext.rev180211.OspfAreaIfBfdConfAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd.rev171024.bfd.top.Bfd;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd.rev171024.bfd.top.bfd.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Protocols;
@@ -44,6 +41,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.InterfaceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.Timers;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.timers.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.Ospfv2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.Areas;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.Area;
@@ -53,14 +52,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DottedQuad;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AreaInterfaceBfdConfigWriterTest {
+public class AreaInterfaceTimersConfigWriterTest {
     private static final String VRF_NAME = "APTN";
     private static final String AREA_NAME = "10.51.246.21";
     private static final String IF_NAME = "xe-0/0/34.0";
-
     private static final Long MIN_INTERVAL = 150L;
-    private static final Long MIN_RECIEVE = 15L;
-    private static final Long MULTIPLIER = 3L;
 
     private static final InstanceIdentifier<Config> INSTANCE_IDENTIFIER = IIDs.NETWORKINSTANCES
             .child(NetworkInstance.class, new NetworkInstanceKey(VRF_NAME))
@@ -71,8 +67,7 @@ public class AreaInterfaceBfdConfigWriterTest {
             .child(Area.class, new AreaKey(new OspfAreaIdentifier(new DottedQuad(AREA_NAME))))
             .child(Interfaces.class)
             .child(Interface.class, new InterfaceKey(IF_NAME))
-            .augmentation(OspfAreaIfBfdConfAug.class)
-            .child(Bfd.class)
+            .child(Timers.class)
             .child(Config.class);
 
     @Mock
@@ -80,12 +75,12 @@ public class AreaInterfaceBfdConfigWriterTest {
     @Mock
     private WriteContext writeContext;
 
-    private AreaInterfaceBfdConfigWriter target;
+    private AreaInterfaceTimersConfigWriter target;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        target = new AreaInterfaceBfdConfigWriter(cli);
+        target = new AreaInterfaceTimersConfigWriter(cli);
     }
 
     @Test
@@ -94,9 +89,7 @@ public class AreaInterfaceBfdConfigWriterTest {
         final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
 
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
-        Mockito.doReturn(MIN_INTERVAL).when(data).getMinInterval();
-        Mockito.doReturn(MIN_RECIEVE).when(data).getMinReceiveInterval();
-        Mockito.doReturn(MULTIPLIER).when(data).getMultiplier();
+        Mockito.doReturn(MIN_INTERVAL).when(data).getRetransmissionInterval();
 
         Area areaData = new AreaBuilder().setKey(
                 new AreaKey(new OspfAreaIdentifier(new DottedQuad(AREA_NAME)))).build();
@@ -108,21 +101,11 @@ public class AreaInterfaceBfdConfigWriterTest {
 
         target.writeCurrentAttributesForType(INSTANCE_IDENTIFIER, data, writeContext);
 
-        Mockito.verify(data, Mockito.times(2)).getMinInterval();
-        Mockito.verify(data, Mockito.times(2)).getMinReceiveInterval();
-        Mockito.verify(data, Mockito.times(2)).getMultiplier();
-        Mockito.verify(cli, Mockito.times(3)).executeAndRead(commands.capture());
+        Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
 
-        Assert.assertThat(commands.getAllValues().size(), CoreMatchers.is(3));
-        Assert.assertThat(commands.getAllValues().get(0).getContent(), CoreMatchers.equalTo(
-                "set routing-instances APTN protocols ospf area 10.51.246.21 interface xe-0/0/34.0"
-                + " bfd-liveness-detection minimum-interval 150\n"));
-        Assert.assertThat(commands.getAllValues().get(1).getContent(), CoreMatchers.equalTo(
-                "set routing-instances APTN protocols ospf area 10.51.246.21 interface xe-0/0/34.0"
-                + " bfd-liveness-detection minimum-receive-interval 15\n"));
-        Assert.assertThat(commands.getAllValues().get(2).getContent(), CoreMatchers.equalTo(
-                "set routing-instances APTN protocols ospf area 10.51.246.21 interface xe-0/0/34.0"
-                + " bfd-liveness-detection multiplier 3\n"));
+        Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(
+            "set protocols ospf area 10.51.246.21 interface xe-0/0/34.0"
+            + " retransmit-interval 150\n"));
     }
 
     @Test
@@ -131,10 +114,7 @@ public class AreaInterfaceBfdConfigWriterTest {
         final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
 
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
-        Mockito.doReturn(MIN_INTERVAL).when(data).getMinInterval();
-        Mockito.doReturn(MIN_RECIEVE).when(data).getMinReceiveInterval();
-        Mockito.doReturn(MULTIPLIER).when(data).getMultiplier();
-
+        Mockito.doReturn(MIN_INTERVAL).when(data).getRetransmissionInterval();
         Area areaData = new AreaBuilder().setKey(
                 new AreaKey(new OspfAreaIdentifier(new DottedQuad(AREA_NAME)))).build();
         Mockito.doReturn(Optional.of(areaData)).when(writeContext)
@@ -148,7 +128,7 @@ public class AreaInterfaceBfdConfigWriterTest {
         Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
 
         Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(
-            "delete routing-instances APTN protocols ospf area 10.51.246.21 interface xe-0/0/34.0"
-            + " bfd-liveness-detection\n"));
+            "delete protocols ospf area 10.51.246.21 interface xe-0/0/34.0"
+            + " retransmit-interval\n"));
     }
 }
