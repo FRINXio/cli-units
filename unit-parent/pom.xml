@@ -21,24 +21,24 @@
     <parent>
         <groupId>io.frinx.translate.unit.commons</groupId>
         <artifactId>checkstyle-parent</artifactId>
-        <version>4.2.0.rc15-frinx</version>
+        <version>4.2.0.rc16-frinx-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>4.2.0.rc15-frinx</version>
+    <version>4.2.0.rc16-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
-        <cli.version>4.2.0.rc15-frinx</cli.version>
-        <openconfig.version>4.2.0.rc15-frinx</openconfig.version>
+        <cli.version>4.2.0.rc16-frinx-SNAPSHOT</cli.version>
+        <openconfig.version>4.2.0.rc16-frinx-SNAPSHOT</openconfig.version>
         <hc.version>1.18.04-Oxygen-SR2.4_2_0_rc16-frinxodl-SNAPSHOT</hc.version>
         <controller.version>1.7.2-Oxygen-SR2.4_2_0_rc16-frinxodl-SNAPSHOT</controller.version>
         <yangtools.version>2.0.5-Oxygen-SR2.4_2_0_rc16-frinxodl-SNAPSHOT</yangtools.version>
         <mdsal.model.version>0.12.2-Oxygen-SR2.4_2_0_rc16-frinxodl-SNAPSHOT</mdsal.model.version>
         <mdsal.version>2.4.2-Oxygen-SR2.4_2_0_rc16-frinxodl-SNAPSHOT</mdsal.version>
-        <translate.unit.commons.version>4.2.0.rc15-frinx</translate.unit.commons.version>
+        <translate.unit.commons.version>4.2.0.rc16-frinx-SNAPSHOT</translate.unit.commons.version>
     </properties>
 
     <dependencyManagement>
@@ -204,7 +204,7 @@
                     <dependency>
                         <groupId>io.frinx.cli</groupId>
                         <artifactId>yang-docs-plugin</artifactId>
-                        <version>4.2.0.rc15-frinx</version>
+                        <version>4.2.0.rc16-frinx-SNAPSHOT</version>
                         <type>jar</type>
                     </dependency>
                 </dependencies>
