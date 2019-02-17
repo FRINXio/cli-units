@@ -28,7 +28,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-nexus</artifactId>
-    <version>3.1.7.rc17-frinx</version>
+    <version>3.1.7.rc18-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
