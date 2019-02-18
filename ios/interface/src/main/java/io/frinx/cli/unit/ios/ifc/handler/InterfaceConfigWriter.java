@@ -22,19 +22,36 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class InterfaceConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
+
+    private static final String WRITE_TEMPLATE = "configure terminal\n"
+            + "interface {$data.name}\n"
+            + "{% if ($data.description) %} description {$data.description}\n{% endif %}"
+            + "{% if ($data.mtu) %} mtu {$data.mtu}\n{% endif %}"
+            + "{% if ($data.enabled) %} no shutdown\n{% endif %}"
+            + "end";
+
+    private static final String TO_DELETE_TEMPLATE = "configure terminal\n"
+            + "interface {$data.name}\n"
+            + "{% if ($data.description) %} no description\n{% endif %}"
+            + "{% if ($data.mtu) %} no mtu\n{% endif %}"
+            + "{% if ($data.enabled) %} shutdown\n{% endif %}"
+            + "end";
+
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
+            + "no interface {$data.name}\n"
+            + "end";
 
     public InterfaceConfigWriter(Cli cli) {
         this.cli = cli;
@@ -44,34 +61,17 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config data,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (data.getType() == SoftwareLoopback.class) {
-            writeLoopbackInterface(id, data, writeContext);
+        if (!isPhysicalInterface(data)) {
+            writeInterface(id, data);
         } else {
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Cannot create interface of type: " + data.getType()));
         }
     }
 
-    private static final Pattern LOOPBACK_NAME_PATTERN = Pattern.compile("Loopback(?<number>[0-9]+)");
-
-    @SuppressWarnings("IllegalCatch")
-    private void writeLoopbackInterface(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
+    private void writeInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.CreateFailedException {
-
-        Matcher matcher = LOOPBACK_NAME_PATTERN.matcher(data.getName());
-        try {
-            Preconditions.checkArgument(matcher.matches(),
-                    "Loopback name must be in format: Loopback45, not: %s", data.getName());
-        } catch (RuntimeException e) {
-            throw new WriteFailedException.CreateFailedException(id, data, e);
-        }
-
-        blockingWriteAndRead(cli, id, data,
-                "configure terminal",
-                f("interface loopback %s", matcher.group("number")),
-                data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
-                data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
-                "end");
+        blockingWriteAndRead(cli, id, data, fT(WRITE_TEMPLATE, "data", data));
     }
 
     public static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES = Collections.singleton(EthernetCsmacd
@@ -95,27 +95,36 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
         } catch (RuntimeException e) {
             throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter, e);
         }
-
-        if (isPhysicalInterface(dataAfter)) {
-            updatePhysicalInterface(id, dataAfter, writeContext);
-        } else if (dataAfter.getType() == SoftwareLoopback.class) {
-            writeLoopbackInterface(id, dataAfter, writeContext);
-        } else {
-            throw new WriteFailedException.CreateFailedException(id, dataAfter,
-                    new IllegalArgumentException("Unknown interface type: " + dataAfter.getType()));
+        ConfigBuilder toDelete = new ConfigBuilder().setName(dataAfter.getName());
+        ConfigBuilder toUpdate = new ConfigBuilder().setName(dataAfter.getName());
+        if (!Objects.equals(dataBefore.getDescription(), dataAfter.getDescription())) {
+            if (dataAfter.getDescription() == null) {
+                toDelete.setDescription(dataBefore.getDescription());
+            } else {
+                toUpdate.setDescription(dataAfter.getDescription());
+            }
         }
+        if (!Objects.equals(dataBefore.getMtu(), dataAfter.getMtu())) {
+            if (dataAfter.getMtu() == null) {
+                toDelete.setMtu(dataBefore.getMtu());
+            } else {
+                toUpdate.setMtu(dataAfter.getMtu());
+            }
+        }
+        if (!Objects.equals(dataBefore.isEnabled(), dataAfter.isEnabled())) {
+            if (dataAfter.isEnabled() == null) {
+                toDelete.setEnabled(dataBefore.isEnabled());
+            } else {
+                toUpdate.setEnabled(dataAfter.isEnabled());
+            }
+        }
+        writeInterface(id, toUpdate.build());
+        updateInterface(id, toDelete.build());
     }
 
-    private void updatePhysicalInterface(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
+    private void updateInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.CreateFailedException {
-
-        blockingWriteAndRead(cli, id, data,
-                "configure terminal",
-                f("interface %s", data.getName()),
-                data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
-                data.getMtu() == null ? "no mtu" : f("mtu %s", data.getMtu()),
-                data.isEnabled() ? "no shutdown" : "shutdown",
-                "end");
+        blockingWriteAndRead(cli, id, data, fT(TO_DELETE_TEMPLATE, "data", data));
     }
 
     @Override
@@ -125,28 +134,12 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
         if (isPhysicalInterface(dataBefore)) {
             throw new WriteFailedException.DeleteFailedException(id,
                     new IllegalArgumentException("Physical interface cannot be deleted"));
-        } else if (dataBefore.getType() == SoftwareLoopback.class) {
-            deleteLoopbackInterface(id, dataBefore, writeContext);
-        } else {
-            throw new WriteFailedException.CreateFailedException(id, dataBefore,
-                    new IllegalArgumentException("Unknown interface type: " + dataBefore.getType()));
         }
+        deleteInterface(id, dataBefore);
     }
 
-    @SuppressWarnings("IllegalCatch")
-    private void deleteLoopbackInterface(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
+    private void deleteInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.DeleteFailedException {
-        Matcher matcher = LOOPBACK_NAME_PATTERN.matcher(data.getName());
-        try {
-            Preconditions.checkArgument(matcher.matches(),
-                    "Loopback name must be in format: Loopback45, not: %s", data.getName());
-        } catch (RuntimeException e) {
-            throw new WriteFailedException.DeleteFailedException(id, e);
-        }
-
-        blockingDeleteAndRead(cli, id,
-                "configure terminal",
-                f("no interface loopback %s", matcher.group("number")),
-                "end");
+        blockingDeleteAndRead(cli, id, fT(DELETE_TEMPLATE, data));
     }
 }
