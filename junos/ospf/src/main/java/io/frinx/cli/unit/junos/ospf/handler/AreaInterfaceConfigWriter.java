@@ -55,22 +55,21 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
         String cmd = f("set%s protocols ospf area %s interface %s",
                 OspfProtocolReader.resolveVrfWithName(instanceIdentifier),
                 AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
-        String delcmd = f("delete%s protocols ospf area %s interface %s",
-                OspfProtocolReader.resolveVrfWithName(instanceIdentifier),
-                AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
-
-        Preconditions.checkArgument(parseNwType(data.getNetworkType()) != null,
-                "Unknown Network Type is specified %s.", data.getNetworkType());
-
         blockingWriteAndRead(cli, instanceIdentifier, data, cmd);
 
         if (data.getAugmentation(OspfAreaIfConfAug.class).isEnabled()) {
+            String delcmd = f("delete%s protocols ospf area %s interface %s",
+                    OspfProtocolReader.resolveVrfWithName(instanceIdentifier),
+                    AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
             blockingWriteAndRead(cli, instanceIdentifier, data, f("%s disable", delcmd));
         } else {
             blockingWriteAndRead(cli, instanceIdentifier, data, f("%s disable", cmd));
         }
 
         if (data.getNetworkType() != null) {
+
+            Preconditions.checkArgument(parseNwType(data.getNetworkType()) != null,
+                    "Unknown Network Type is specified %s.", data.getNetworkType());
             blockingWriteAndRead(cli, instanceIdentifier, data,
                     f("%s interface-type %s", cmd, parseNwType(data.getNetworkType())));
         }
@@ -101,9 +100,6 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                 OspfProtocolReader.resolveVrfWithName(instanceIdentifier),
                 AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
 
-        Preconditions.checkArgument(parseNwType(dataAfter.getNetworkType()) != null,
-                "Unknown Network Type is specified %s.", dataAfter.getNetworkType());
-
         if (dataAfter.getAugmentation(OspfAreaIfConfAug.class).isEnabled()) {
             blockingWriteAndRead(cli, instanceIdentifier, dataAfter, f("%s disable", delcmd));
         } else {
@@ -111,6 +107,8 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
         }
 
         if (dataAfter.getNetworkType() != null) {
+            Preconditions.checkArgument(parseNwType(dataAfter.getNetworkType()) != null,
+                     "Unknown Network Type is specified %s.", dataAfter.getNetworkType());
             blockingWriteAndRead(cli, instanceIdentifier, dataAfter,
                     f("%s interface-type %s", cmd, parseNwType(dataAfter.getNetworkType())));
         } else if (dataBefore.getNetworkType() != null) {
@@ -145,7 +143,7 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
                         .get()
                         .getKey();
         blockingDeleteAndRead(cli, instanceIdentifier,
-                f("delete%s protcols ospf area %s interface %s",
+                f("delete%s protocols ospf area %s interface %s",
                         OspfProtocolReader.resolveVrfWithName(instanceIdentifier),
                         AreaInterfaceReader.areaIdToString(areaId), intfId.getId()));
     }
