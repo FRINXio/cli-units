@@ -43,8 +43,8 @@
     <module>yang-docs-plugin</module>
     <module>nexus</module>
     <module>dasan</module>
-
     <module>network-instance-base</module>
+    <module>interface-base</module>
   </modules>
 
   <build>

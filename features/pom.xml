@@ -134,6 +134,11 @@
       <artifactId>handlers</artifactId>
       <version>${translate.unit.commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>interface-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
