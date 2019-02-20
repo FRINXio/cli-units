@@ -99,6 +99,12 @@ public class EgressFlowConfigWriter implements CliWriter<Config> {
     public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id, @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter, @Nonnull final WriteContext writeContext)
             throws WriteFailedException {
+        // this is a MUST, when attempting direct update:
+
+        // interface Bundle-Ether7029
+        // flow ipv6 monitor IPV6_FLOWMONITOR_EXAMPLE sampler SAMPLER_EXAMPLE2 egress
+        //!!% 'nfma' detected the 'warning' condition 'Attempt to apply a duplicate flow monitor to the interface'
+        deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 }
