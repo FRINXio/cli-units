@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpmember.BundleEtherLacpMemberConfigReader;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -42,8 +43,8 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class TrunkPortVlanMemberConfigReader implements CliConfigReader<Config, ConfigBuilder> {
-
-    private static final String SHOW_VLAN_ADD = "show running-config bridge | include ^ vlan add ";
+    @VisibleForTesting
+    static final String SHOW_VLAN_ADD = "show running-config bridge | include ^ vlan add ";
     private static final Pattern VLAN_ADD_LINE_PATTERN = Pattern
             .compile("vlan add (?<ids>\\S+)\\s+(?<ports>\\S+)\\s+(?<vlanmode>(un)?tagged)");
     public static final Pattern PORT_NAME_PATTERN = Pattern.compile("Trunk(?<portid>.*)$");
@@ -64,6 +65,15 @@ public class TrunkPortVlanMemberConfigReader implements CliConfigReader<Config, 
             return;
         }
         String portId = "t/" + matcher.group("portid");
+
+        // If the target trunk port is configured as lacp,
+        // you need to check the assignment to the VLAN using any lacp member's physical port.
+        String lacpId = convertTrunkIdToLacpId(matcher.group("portid"));
+        List<String> lacpMembers = BundleEtherLacpMemberConfigReader.getPortMembers(lacpId, this, cli, id, ctx);
+        if (lacpMembers != null && !lacpMembers.isEmpty()) {
+            portId = lacpMembers.get(0);
+        }
+
         List<String> ports = DasanCliUtil.getPhysicalPorts(cli, this, id, ctx);
         parseTrunkConfig(blockingRead(SHOW_VLAN_ADD, cli, id, ctx), builder, ports, portId);
     }
@@ -84,18 +94,21 @@ public class TrunkPortVlanMemberConfigReader implements CliConfigReader<Config, 
         List<String> nativeIds = vlansmap.get("untagged");
         List<String> trunkIds = vlansmap.get("tagged");
         if (nativeIds != null) {
-            List<TrunkVlans> natives = vlansmap.get("untagged").stream()
+            List<TrunkVlans> natives = nativeIds.stream()
                     .map(s -> StringUtils.removeAll(s, "br"))
                     .filter(s -> !"default".equals(s))
-                    .flatMap(s -> DasanCliUtil.parseIdRanges(s).stream()).map(Integer::valueOf).map(VlanId::new)
-                    .map(TrunkVlans::new).collect(Collectors.toList());
+                    .flatMap(s -> DasanCliUtil.parseIdRanges(s).stream())
+                    .map(Integer::valueOf)
+                    .map(VlanId::new)
+                    .map(TrunkVlans::new)
+                    .collect(Collectors.toList());
 
             if (!natives.isEmpty()) {
                 builder.setNativeVlan(natives.get(0).getVlanId());
             }
         }
         if (trunkIds != null) {
-            List<TrunkVlans> trunks = vlansmap.get("tagged").stream()
+            List<TrunkVlans> trunks = trunkIds.stream()
                     .map(s -> StringUtils.removeAll(s, "br"))
                     .filter(s -> !"default".equals(s))
                     .flatMap(s -> DasanCliUtil.parseIdRanges(s).stream())
@@ -114,5 +127,9 @@ public class TrunkPortVlanMemberConfigReader implements CliConfigReader<Config, 
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
         ((SwitchedVlanBuilder) parentBuilder).setConfig(readValue);
+    }
+
+    private static String convertTrunkIdToLacpId(String trunkId) {
+        return String.valueOf(Integer.parseInt(trunkId) - 1);
     }
 }

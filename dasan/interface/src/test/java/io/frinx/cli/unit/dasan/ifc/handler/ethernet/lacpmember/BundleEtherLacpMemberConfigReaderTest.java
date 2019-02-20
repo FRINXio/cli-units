@@ -18,16 +18,12 @@ package io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpmember;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.dasan.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -41,40 +37,37 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
 public class BundleEtherLacpMemberConfigReaderTest {
 
-    private static String SHOW_PORT_OUTPUT = StringUtils
-            .join(new String[] {"------------------------------------------------------------------------",
-                "NO      TYPE     PVID    STATUS        MODE       FLOWCTRL     INSTALLED",
-                "                      (ADMIN/OPER)              (ADMIN/OPER)",
-                "------------------------------------------------------------------------",
-                "3/4   Ethernet      1     Up/Down  Auto/Full/0     Off/ Off       Y", }, "\n");
-
-    private static List<String> ALL_PORTS;
+    private static String SHOW_PORT_OUTPUT = StringUtils.join(
+        new String[] {
+            "------------------------------------------------------------------------",
+            "NO      TYPE     PVID    STATUS        MODE       FLOWCTRL     INSTALLED",
+            "                      (ADMIN/OPER)              (ADMIN/OPER)",
+            "------------------------------------------------------------------------",
+            "3/4   Ethernet      1     Up/Down  Auto/Full/0     Off/ Off       Y",
+        }, "\n");
 
     @Mock
     private Cli cli;
+    @Mock
+    private ReadContext ctx;
 
     private BundleEtherLacpMemberConfigReader target;
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-
-        ALL_PORTS = DasanCliUtil.parsePhysicalPorts(SHOW_PORT_OUTPUT);
-    }
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         target = Mockito.spy(new BundleEtherLacpMemberConfigReader(cli));
+
+        Mockito.doReturn(SHOW_PORT_OUTPUT).when(target).blockingRead(
+            Mockito.eq(DasanCliUtil.SHOW_ALL_PORTS),
+            Mockito.eq(cli),
+            Mockito.any(),
+            Mockito.eq(ctx));
     }
 
-    @PrepareOnlyThisForTest({ DasanCliUtil.class })
     @Test
     public void testReadCurrentAttributes_001() throws Exception {
         final String portId = "3/4";
@@ -82,59 +75,55 @@ public class BundleEtherLacpMemberConfigReaderTest {
         final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
 
         InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-                .child(Interface.class, interfaceKey).augmentation(Interface1.class).child(Ethernet.class)
-                .child(Config.class);
+            .child(Interface.class, interfaceKey)
+            .augmentation(Interface1.class)
+            .child(Ethernet.class)
+            .child(Config.class);
 
-        final ReadContext ctx = Mockito.mock(ReadContext.class);
+        final String outputSingleInterface = " lacp port 3/4 aggregator 8\n";
 
-        final String outputSingleInterface = StringUtils.join(new String[] { " lacp port 3/4 aggregator 8",
-            " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
-
-        PowerMockito.mockStatic(DasanCliUtil.class);
-        PowerMockito.doReturn(ALL_PORTS).when(DasanCliUtil.class, "getPhysicalPorts", cli, target, instanceIdentifier,
-                ctx);
-        Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
-                Mockito.eq(instanceIdentifier), Mockito.eq(ctx));
+        Mockito.doReturn(outputSingleInterface).when(target).blockingRead(
+            Mockito.eq(BundleEtherLacpMemberConfigReader.SHOW_LACP_PORT),
+            Mockito.eq(cli),
+            Mockito.eq(instanceIdentifier),
+            Mockito.eq(ctx));
 
         ConfigBuilder builder = new ConfigBuilder();
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
 
-        Assert.assertNull(builder.getAugmentation(Config1.class));
-
+        Assert.assertThat(
+            builder.getAugmentation(Config1.class).getAggregateId(),
+            CoreMatchers.equalTo("Bundle-Ether8"));
     }
 
-    @PrepareOnlyThisForTest({ DasanCliUtil.class })
     @Test
     public void testReadCurrentAttributes_002() throws Exception {
         final String portId = "3/4";
-        final String interfaceName = "AAEthernet" + portId;
+        final String interfaceName = "NOT-Ethernet" + portId;
         final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
 
         InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-                .child(Interface.class, interfaceKey).augmentation(Interface1.class).child(Ethernet.class)
-                .child(Config.class);
+            .child(Interface.class, interfaceKey)
+            .augmentation(Interface1.class)
+            .child(Ethernet.class)
+            .child(Config.class);
 
-        final ReadContext ctx = Mockito.mock(ReadContext.class);
+        final String outputSingleInterface = " lacp port 3/4 aggregator 8\n";
 
-        final String outputSingleInterface = StringUtils.join(new String[] { " lacp port 3/4 aggregator 8",
-            " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
-
-        PowerMockito.mockStatic(DasanCliUtil.class);
-        PowerMockito.doReturn(ALL_PORTS).when(DasanCliUtil.class, "getPhysicalPorts", cli, target, instanceIdentifier,
-                ctx);
-        Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
-                Mockito.eq(instanceIdentifier), Mockito.eq(ctx));
+        Mockito.doReturn(outputSingleInterface).when(target).blockingRead(
+            Mockito.eq(BundleEtherLacpMemberConfigReader.SHOW_LACP_PORT),
+            Mockito.eq(cli),
+            Mockito.eq(instanceIdentifier),
+            Mockito.eq(ctx));
 
         ConfigBuilder builder = new ConfigBuilder();
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
 
-        Assert.assertNull(builder.getAugmentation(Config1.class));
-
+        Assert.assertThat(builder.getAugmentation(Config1.class), CoreMatchers.nullValue());
     }
 
-    @PrepareOnlyThisForTest({ InterfaceReader.class })
     @Test
     public void testReadCurrentAttributes_003() throws Exception {
         final String portId = "3/4";
@@ -142,63 +131,24 @@ public class BundleEtherLacpMemberConfigReaderTest {
         final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
 
         InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-                .child(Interface.class, interfaceKey).augmentation(Interface1.class).child(Ethernet.class)
-                .child(Config.class);
+            .child(Interface.class, interfaceKey)
+            .augmentation(Interface1.class)
+            .child(Ethernet.class)
+            .child(Config.class);
 
-        final ReadContext ctx = Mockito.mock(ReadContext.class);
+        final String outputSingleInterface = " lacp port 9/9 aggregator 8\n";
 
-        final String outputSingleInterface = StringUtils.join(new String[] { " lacp portAA 3/4 aggregator 8",
-            " Ethernet  1  Up/Up    Force/Full/1000 Off/ Off       Y", }, "\n");
-
-        PowerMockito.mockStatic(InterfaceReader.class);
-        PowerMockito.doReturn(null).when(InterfaceReader.class, "parseTypeByName", interfaceName);
-        Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
-                Mockito.eq(instanceIdentifier), Mockito.eq(ctx));
+        Mockito.doReturn(outputSingleInterface).when(target).blockingRead(
+            Mockito.eq(BundleEtherLacpMemberConfigReader.SHOW_LACP_PORT),
+            Mockito.eq(cli),
+            Mockito.eq(instanceIdentifier),
+            Mockito.eq(ctx));
 
         ConfigBuilder builder = new ConfigBuilder();
         // test
         target.readCurrentAttributes(instanceIdentifier, builder, ctx);
 
-        Assert.assertNull(builder.getAugmentation(Config1.class));
-
-    }
-
-    @Test
-    public void testParseInterface_001() throws Exception {
-
-        final String output = StringUtils.join(new String[] { " lacp port 3/4,4/4 aggregator 8",
-            " lacp port 4/10-4/11 aggregator 10", " lacp port admin-key 4/10 2 ", }, "\n");
-
-        final String name = "Bundle-Ether8";
-        final String id = "3/4";
-        List<String> portList = new ArrayList<>();
-        portList.add("3/4");
-        portList.add("4/10");
-
-        ConfigBuilder builder = new ConfigBuilder();
-        // test
-        BundleEtherLacpMemberConfigReader.parseEthernetConfig(output, builder, portList, id);
-
-        Assert.assertEquals(builder.getAugmentation(Config1.class).getAggregateId(), name);
-    }
-
-    @Test
-    public void testParseInterface_002() throws Exception {
-
-        final String output = StringUtils.join(new String[] {
-            " lacp aggregator 8 ", " lacp port 3/4,4/4 aggregator 8",
-            " lacp port 4/10 aggregator 10 ", " lacp aggregator 9 ", " lacp port admin-key 4/10 2 ", }, "\n");
-
-        final String id = "6/4";
-        List<String> portList = new ArrayList<>();
-        portList.add("3/4");
-        portList.add("4/10");
-
-        ConfigBuilder builder = new ConfigBuilder();
-        // test
-        BundleEtherLacpMemberConfigReader.parseEthernetConfig(output, builder, portList, id);
-
-        Assert.assertNull(builder.getAugmentation(Config1.class));
+        Assert.assertThat(builder.getAugmentation(Config1.class), CoreMatchers.nullValue());
     }
 
     @Test

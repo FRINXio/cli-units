@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.dasan.utils;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -45,8 +46,8 @@ public final class DasanCliUtil {
     private static final Pattern RANGE_PATTERN = Pattern.compile("^(?<start>[^-]+)-(?<end>.*)");
 
     private static final Pattern PHYS_PORT_ID_LINE = Pattern.compile("^(?<id>[^\\s]+)\\s+.*");
-
-    private static final String SHOW_ALL_PORTS = "show port";
+    @VisibleForTesting
+    public static final String SHOW_ALL_PORTS = "show port";
 
     /**
      * Execute "show port" command to obtain the list of physical ports.
