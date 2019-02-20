@@ -34,6 +34,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topo
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNodeConnectionParameters;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.keepalive.keepalive.strategy.KeepaliveBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 
@@ -58,9 +59,11 @@ public class IosAll extends io.frinx.cli.ios.it.IosAll {
                     .setUsername("cisco")
                     .setPassword("cisco")
                     .build())
-            .setKeepaliveDelay(30)
-            .setKeepaliveTimeout(30)
-            .setKeepaliveInitialDelay(30)
+            .setKeepaliveStrategy(new KeepaliveBuilder()
+                    .setKeepaliveDelay(30)
+                    .setKeepaliveTimeout(30)
+                    .setKeepaliveInitialDelay(30)
+                    .build())
             .build();
 
 
