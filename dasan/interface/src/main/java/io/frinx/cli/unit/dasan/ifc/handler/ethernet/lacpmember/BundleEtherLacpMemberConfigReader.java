@@ -25,10 +25,13 @@ import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceConfigWriter;
 import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceReader;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1Builder;
@@ -43,7 +46,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class BundleEtherLacpMemberConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String AGGREGATE_IFC_NAME = "Bundle-Ether";
-    private static final String SHOW_LACP_PORT = "show running-config bridge | include ^ lacp port";
+    @VisibleForTesting
+    public static final String SHOW_LACP_PORT = "show running-config bridge | include ^ lacp port";
     private static final Pattern LACP_PORT_LINE_PATTERN = Pattern
             .compile("lacp port (?<ports>[^\\s]+)\\s+aggregator\\s+(?<id>[0-9]+)$");
 
@@ -54,8 +58,11 @@ public class BundleEtherLacpMemberConfigReader implements CliConfigReader<Config
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
+    public void readCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> id,
+            @Nonnull ConfigBuilder builder,
             @Nonnull ReadContext ctx) throws ReadFailedException {
+
         String ifcName = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = PhysicalPortInterfaceReader.PHYSICAL_PORT_NAME_PATTERN.matcher(ifcName);
 
@@ -63,30 +70,79 @@ public class BundleEtherLacpMemberConfigReader implements CliConfigReader<Config
             return;
         }
 
-        String portId = matcher.group("portid");
-
         if (!PhysicalPortInterfaceConfigWriter.PHYS_IFC_TYPES.contains(InterfaceReader.parseTypeByName(ifcName))) {
             return;
         }
-        List<String> ports = DasanCliUtil.getPhysicalPorts(cli, this, id, ctx);
-        parseEthernetConfig(blockingRead(SHOW_LACP_PORT, cli, id, ctx), builder, ports, portId);
+        String portId = matcher.group("portid");
+        Optional<String> lacpId = getAssignedLacpId(portId, this, cli, id, ctx);
+
+        lacpId.ifPresent(s -> {
+            Config1Builder ethIfAggregationConfigBuilder = new Config1Builder();
+            ethIfAggregationConfigBuilder.setAggregateId(getLAGInterfaceId(s));
+            builder.addAugmentation(Config1.class, ethIfAggregationConfigBuilder.build());
+        });
     }
 
-    @VisibleForTesting
-    static void parseEthernetConfig(String output, ConfigBuilder builder, List<String> ports, String portId) {
+    public static <O extends DataObject> Optional<String> getAssignedLacpId(
+            String portId,
+            CliReader<O, ? extends Builder<O>> cliReader,
+            Cli cli,
+            InstanceIdentifier<O> id,
+            ReadContext ctx) throws ReadFailedException {
 
-        Config1Builder ethIfAggregationConfigBuilder = new Config1Builder();
+        List<String> ports = DasanCliUtil.getPhysicalPorts(cli, cliReader, id, ctx);
 
-        ParsingUtils.NEWLINE.splitAsStream(output).map(String::trim).map(LACP_PORT_LINE_PATTERN::matcher)
-                .filter(Matcher::matches).filter(m -> DasanCliUtil.containsPort(ports, m.group("ports"), portId))
-                .map(m -> getLAGInterfaceId(m.group("id"))).findFirst()
-                .ifPresent(ethIfAggregationConfigBuilder::setAggregateId);
+        return getAssignedLacpId(portId, ports, cliReader, cli, id, ctx);
+    }
 
-        if (ethIfAggregationConfigBuilder.getAggregateId() == null) {
-            return;
-        }
+    public static <O extends DataObject> Optional<String> getAssignedLacpId(
+            String portId,
+            List<String> ports,
+            CliReader<O, ? extends Builder<O>> cliReader,
+            Cli cli,
+            InstanceIdentifier<O> id,
+            ReadContext ctx) throws ReadFailedException {
 
-        builder.addAugmentation(Config1.class, ethIfAggregationConfigBuilder.build());
+        String output = cliReader.blockingRead(SHOW_LACP_PORT, cli, id, ctx);
+
+        return ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .map(LACP_PORT_LINE_PATTERN::matcher)
+                .filter(Matcher::matches)
+                .filter(m -> DasanCliUtil.containsPort(ports, m.group("ports"), portId))
+                .map(m -> m.group("id"))
+                .findFirst();
+    }
+
+    public static <O extends DataObject> List<String> getPortMembers(
+        String lacpId,
+        CliReader<O, ? extends Builder<O>> cliReader,
+        Cli cli,
+        InstanceIdentifier<O> id,
+        ReadContext ctx) throws ReadFailedException {
+
+        List<String> ports = DasanCliUtil.getPhysicalPorts(cli, cliReader, id, ctx);
+
+        return getPortMembers(lacpId, ports, cliReader, cli, id,ctx);
+    }
+
+    public static <O extends DataObject> List<String> getPortMembers(
+        String lacpId,
+        List<String> ports,
+        CliReader<O, ? extends Builder<O>> cliReader,
+        Cli cli,
+        InstanceIdentifier<O> id,
+        ReadContext ctx) throws ReadFailedException {
+
+        String output = cliReader.blockingRead(SHOW_LACP_PORT, cli, id, ctx);
+
+        return ParsingUtils.NEWLINE.splitAsStream(output)
+            .map(String::trim)
+            .map(LACP_PORT_LINE_PATTERN::matcher)
+            .filter(Matcher::matches)
+            .filter(m -> lacpId.equals(m.group("id")))
+            .flatMap(m -> DasanCliUtil.parsePortRanges(ports, m.group("ports")).stream())
+            .collect(Collectors.toList());
     }
 
     private static String getLAGInterfaceId(String bundleId) {

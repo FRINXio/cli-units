@@ -17,15 +17,15 @@ package io.frinx.cli.unit.dasan.ifc.handler.ethernet.vlanmember;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpmember.BundleEtherLacpMemberConfigReader;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -35,71 +35,134 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Ethernet1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanSwitchedConfig.TrunkVlans;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.SwitchedVlan;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanModeType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareOnlyThisForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
 public class TrunkPortVlanMemberConfigReaderTest {
+    private static String SHOW_PORT_OUTPUT = StringUtils.join(
+        new String[] {
+            "------------------------------------------------------------------------",
+            "NO      TYPE     PVID    STATUS        MODE       FLOWCTRL     INSTALLED",
+            "                      (ADMIN/OPER)              (ADMIN/OPER)",
+            "------------------------------------------------------------------------",
+            "3/4   Ethernet      1     Up/Down  Auto/Full/0     Off/ Off       Y",
+            "3/5   Ethernet      1     Up/Down  Auto/Full/0     Off/ Off       Y",
+            "t/5   TRUNK      1     Up/Down  Auto/Full/0     Off/ Off       Y",
+            "t/9   TRUNK      1     Up/Down  Auto/Full/0     Off/ Off       Y",
+        }, "\n");
 
-    private static String SHOW_PORT_OUTPUT = StringUtils
-            .join(new String[] { "------------------------------------------------------------------------",
-                "NO      TYPE     PVID    STATUS        MODE       FLOWCTRL     INSTALLED",
-                "                      (ADMIN/OPER)              (ADMIN/OPER)",
-                "------------------------------------------------------------------------",
-                "t/5   TRUNK      1     Up/Down  Auto/Full/0     Off/ Off       Y", }, "\n");
+    private static String LACP_PORT_OUTPUT = "lacp port 3/4 aggregator 8";
 
-    private static List<String> ALL_PORTS;
+    private static String VLAN_ADD_OUTPUT = StringUtils.join(
+        new String[] {
+            "vlan add default 3/4,t/5,t/9 untagged",
+            "vlan add br10 t/5,t/9 tagged",
+            "vlan add br11 t/5,t/9 untagged",
+            "vlan add br12 t/5,t/9 tagged",
+            "vlan add br20 3/4 tagged",
+            "vlan add br21 3/4 untagged",
+            "vlan add br22 3/4 tagged",
+        }, "\n");
 
-    ConfigBuilder builder = new ConfigBuilder();
+    private static final String TRUNK_PORT_ID = "5";
+    private static final InstanceIdentifier<Config> ID = InstanceIdentifier.create(Interfaces.class)
+        .child(Interface.class, new InterfaceKey("Trunk" + TRUNK_PORT_ID))
+        .augmentation(Interface1.class)
+        .child(Ethernet.class)
+        .augmentation(Ethernet1.class)
+        .child(SwitchedVlan.class)
+        .child(Config.class);
+    private static final String TRUNK_PORT_ID_WITH_LACP = "9";
+    private static final InstanceIdentifier<Config> ID_WITH_LACP = InstanceIdentifier.create(Interfaces.class)
+        .child(Interface.class, new InterfaceKey("Trunk" + TRUNK_PORT_ID_WITH_LACP))
+        .augmentation(Interface1.class)
+        .child(Ethernet.class)
+        .augmentation(Ethernet1.class)
+        .child(SwitchedVlan.class)
+        .child(Config.class);
+    private static final InstanceIdentifier<Config> ID_TYPE_MISMATCH = InstanceIdentifier.create(Interfaces.class)
+        .child(Interface.class, new InterfaceKey("Bundle-Ether" + TRUNK_PORT_ID))
+        .augmentation(Interface1.class)
+        .child(Ethernet.class)
+        .augmentation(Ethernet1.class)
+        .child(SwitchedVlan.class)
+        .child(Config.class);
+
+    private ConfigBuilder builder;
     @Mock
     private Cli cli;
-
+    @Mock
+    private ReadContext ctx;
     private TrunkPortVlanMemberConfigReader target;
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-
-        ALL_PORTS = DasanCliUtil.parsePhysicalPorts(SHOW_PORT_OUTPUT);
-    }
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         target = Mockito.spy(new TrunkPortVlanMemberConfigReader(cli));
+        builder = new ConfigBuilder();
+        Mockito.doReturn(SHOW_PORT_OUTPUT).when(target).blockingRead(
+            Mockito.eq(DasanCliUtil.SHOW_ALL_PORTS),
+            Mockito.eq(cli),
+            Mockito.any(),
+            Mockito.eq(ctx));
     }
 
-    @PrepareOnlyThisForTest({ DasanCliUtil.class })
     @Test
-    public void testReadCurrentAttributes_003() throws Exception {
-        final String portId = "5";
-        final String interfaceName = "Trunk" + portId;
-        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
+    public void testReadCurrentAttributes_001() throws Exception {
+        final Config expected = new ConfigBuilder()
+            .setTrunkVlans(Arrays.asList(
+                new TrunkVlans(new VlanId(Integer.valueOf(10))),
+                new TrunkVlans(new VlanId(Integer.valueOf(12)))))
+            .setNativeVlan(new VlanId(Integer.valueOf(11)))
+            .setInterfaceMode(VlanModeType.TRUNK)
+            .build();
+        Mockito.doReturn(LACP_PORT_OUTPUT).when(target).blockingRead(
+            BundleEtherLacpMemberConfigReader.SHOW_LACP_PORT, cli, ID, ctx);
 
-        InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-                .child(Interface.class, interfaceKey).augmentation(Interface1.class).child(Ethernet.class)
-                .augmentation(Ethernet1.class).child(SwitchedVlan.class).child(Config.class);
-
-        final ReadContext ctx = Mockito.mock(ReadContext.class);
-
-        final String outputSingleInterface = StringUtils.join(new String[] { "vlan add br10 3/4 untagged", }, "\n");
-        PowerMockito.mockStatic(DasanCliUtil.class, Mockito.CALLS_REAL_METHODS);
-        PowerMockito.doReturn(ALL_PORTS).when(DasanCliUtil.class, "getPhysicalPorts", cli, target, instanceIdentifier,
-                ctx);
-        Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
-                Mockito.eq(instanceIdentifier), Mockito.eq(ctx));
+        Mockito.doReturn(VLAN_ADD_OUTPUT).when(target).blockingRead(
+            TrunkPortVlanMemberConfigReader.SHOW_VLAN_ADD, cli, ID, ctx);
 
         // test
-        target.readCurrentAttributes(instanceIdentifier, builder, ctx);
+        target.readCurrentAttributes(ID, builder, ctx);
 
-        Assert.assertEquals(builder.getInterfaceMode(), null);
+        Assert.assertEquals(expected, builder.build());
     }
 
-    @PrepareOnlyThisForTest({ DasanCliUtil.class })
+    @Test
+    public void testReadCurrentAttributes_002() throws Exception {
+        final Config expected = new ConfigBuilder()
+            .setTrunkVlans(Arrays.asList(
+                new TrunkVlans(new VlanId(Integer.valueOf(20))),
+                new TrunkVlans(new VlanId(Integer.valueOf(22)))))
+            .setNativeVlan(new VlanId(Integer.valueOf(21)))
+            .setInterfaceMode(VlanModeType.TRUNK)
+            .build();
+        Mockito.doReturn(LACP_PORT_OUTPUT).when(target).blockingRead(
+            BundleEtherLacpMemberConfigReader.SHOW_LACP_PORT, cli, ID_WITH_LACP, ctx);
+
+        Mockito.doReturn(VLAN_ADD_OUTPUT).when(target).blockingRead(
+            TrunkPortVlanMemberConfigReader.SHOW_VLAN_ADD, cli, ID_WITH_LACP, ctx);
+
+        // test
+        target.readCurrentAttributes(ID_WITH_LACP, builder, ctx);
+
+        Assert.assertEquals(expected, builder.build());
+    }
+
+    @Test
+    public void testReadCurrentAttributes_003() throws Exception {
+        final Config emptyConfig = new ConfigBuilder().build();
+        // test
+        target.readCurrentAttributes(ID_TYPE_MISMATCH, builder, ctx);
+
+        Assert.assertEquals(emptyConfig, builder.build());
+    }
+
     @Test
     public void testParseTrunkConfig_001() throws Exception {
 
@@ -124,8 +187,8 @@ public class TrunkPortVlanMemberConfigReaderTest {
 
         // test
         TrunkPortVlanMemberConfigReader.parseTrunkConfig(output, builder, portList, id);
-        Assert.assertEquals(builder.getTrunkVlans().get(0).getVlanId().getValue(), Integer.valueOf(255));
-        Assert.assertEquals(builder.getTrunkVlans().get(1).getVlanId().getValue(), Integer.valueOf(4089));
+        Assert.assertEquals(Integer.valueOf(255), builder.getTrunkVlans().get(0).getVlanId().getValue());
+        Assert.assertEquals(Integer.valueOf(4089), builder.getTrunkVlans().get(1).getVlanId().getValue());
     }
 
     @Test
@@ -151,7 +214,6 @@ public class TrunkPortVlanMemberConfigReaderTest {
 
         // test
         TrunkPortVlanMemberConfigReader.parseTrunkConfig(output, builder, portList, id);
-        Assert.assertEquals(builder.getNativeVlan().getValue(), Integer.valueOf(4089));
+        Assert.assertEquals(Integer.valueOf(4089), builder.getNativeVlan().getValue());
     }
-
 }
