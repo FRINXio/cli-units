@@ -58,7 +58,7 @@ public class OspfProtocolConfigWriter implements OspfWriter<Config> {
 
             blockingWriteAndRead(cli, id, dataAfter, f("%s export %s", cmd, augAftData.getExportPolicy()));
         } else if (augBfrData != null && augBfrData.getExportPolicy() != null) {
-            String cmd = f("set%s protocols ospf",
+            String cmd = f("delete%s protocols ospf",
                     OspfProtocolReader.resolveVrfWithName(id),
                     augBfrData.getExportPolicy());
 
