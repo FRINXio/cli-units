@@ -23,6 +23,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.dasan.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceConfigWriter;
 import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceReader;
+import io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpmember.BundleEtherLacpMemberConfigReader;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -45,8 +46,8 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PhysicalPortVlanMemberConfigReader implements CliConfigReader<Config, ConfigBuilder> {
-
-    private static final String SHOW_VLAN_ADD = "show running-config bridge | include ^ vlan add ";
+    @VisibleForTesting
+    static final String SHOW_VLAN_ADD = "show running-config bridge | include ^ vlan add ";
     private static final Pattern VLAN_ADD_LINE_PATTERN = Pattern
             .compile("vlan add (?<ids>\\S+)\\s+(?<ports>\\S+)\\s+(?<vlanmode>(un)?tagged)");
     private final Cli cli;
@@ -56,8 +57,11 @@ public class PhysicalPortVlanMemberConfigReader implements CliConfigReader<Confi
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
+    public void readCurrentAttributes(
+            @Nonnull InstanceIdentifier<Config> id,
+            @Nonnull ConfigBuilder builder,
             @Nonnull ReadContext ctx) throws ReadFailedException {
+
         String ifcName = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = PhysicalPortInterfaceReader.PHYSICAL_PORT_NAME_PATTERN.matcher(ifcName);
 
@@ -69,7 +73,14 @@ public class PhysicalPortVlanMemberConfigReader implements CliConfigReader<Confi
         if (!PhysicalPortInterfaceConfigWriter.PHYS_IFC_TYPES.contains(InterfaceReader.parseTypeByName(ifcName))) {
             return;
         }
+
         List<String> ports = DasanCliUtil.getPhysicalPorts(cli, this, id, ctx);
+
+        // If the target physical port is assigned to lacp, you should skip to check the VLAN assignment.
+        // It is checked by TrunkPortVlanMemberConfigReader.
+        if (BundleEtherLacpMemberConfigReader.getAssignedLacpId(portId, ports, this, cli, id, ctx).isPresent()) {
+            return;
+        }
         parseEthernetConfig(blockingRead(SHOW_VLAN_ADD, cli, id, ctx), builder, ports, portId);
     }
 
