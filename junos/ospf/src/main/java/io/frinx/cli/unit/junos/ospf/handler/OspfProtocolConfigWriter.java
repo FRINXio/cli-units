@@ -20,6 +20,8 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
+import java.util.Collections;
+import java.util.List;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.extension.rev190117.ProtocolConfAug;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -35,42 +37,70 @@ public class OspfProtocolConfigWriter implements OspfWriter<Config> {
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException {
-        ProtocolConfAug augData = data.getAugmentation(ProtocolConfAug.class);
-        if (augData != null && augData.getExportPolicy() != null) {
-            String cmd = f("set%s protocols ospf",
-                    OspfProtocolReader.resolveVrfWithName(id),
-                    augData.getExportPolicy());
-
-            blockingWriteAndRead(cli, id, data, f("%s export %s", cmd, augData.getExportPolicy()));
-        }
+        writeExportPolicy(id, data);
     }
 
     @Override
     public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
-        ProtocolConfAug augAftData = dataAfter.getAugmentation(ProtocolConfAug.class);
-        ProtocolConfAug augBfrData = dataAfter.getAugmentation(ProtocolConfAug.class);
 
-        if (augAftData != null && augAftData.getExportPolicy() != null) {
-            String cmd = f("set%s protocols ospf",
-                    OspfProtocolReader.resolveVrfWithName(id),
-                    augAftData.getExportPolicy());
-
-            blockingWriteAndRead(cli, id, dataAfter, f("%s export %s", cmd, augAftData.getExportPolicy()));
-        } else if (augBfrData != null && augBfrData.getExportPolicy() != null) {
-            String cmd = f("delete%s protocols ospf",
-                    OspfProtocolReader.resolveVrfWithName(id),
-                    augBfrData.getExportPolicy());
-
-            blockingWriteAndRead(cli, id, augBfrData, f("%s export %s", cmd, augBfrData.getExportPolicy()));
+        // This is correct procedure here, if we register multiple values
+        // in export-policy (this type is leaf-list), Junos also remembers their registering order.
+        // So, when we update export-policy, we should delete all previous policies
+        // and regiester all following policies rather than just addding or deleting differences.
+        if (!isEqualPolicy(dataBefore, dataAfter)) {
+            deleteExportPolicy(id, dataBefore);
+            writeExportPolicy(id, dataAfter);
         }
     }
 
     @Override
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException {
-        final String vrfName = OspfProtocolReader.resolveVrfWithName(id);
-        blockingWriteAndRead(cli, id, data,
-                f("delete%s protocols ospf", vrfName));
+        deleteExportPolicy(id, data);
+    }
+
+    private void writeExportPolicy(
+        InstanceIdentifier<Config> id,
+        Config data) throws WriteFailedException {
+
+        if (data != null && data.getAugmentation(ProtocolConfAug.class) != null
+                && data.getAugmentation(ProtocolConfAug.class).getExportPolicy() != null) {
+            String cmd = f("set%s protocols ospf", OspfProtocolReader.resolveVrfWithName(id));
+
+            for (String policy : data.getAugmentation(ProtocolConfAug.class).getExportPolicy()) {
+                blockingWriteAndRead(cli, id, data, f("%s export %s", cmd, policy));
+            }
+        }
+    }
+
+    private void deleteExportPolicy(
+        InstanceIdentifier<Config> id,
+        Config data) throws WriteFailedException {
+
+        if (data != null && data.getAugmentation(ProtocolConfAug.class) != null
+                && data.getAugmentation(ProtocolConfAug.class).getExportPolicy() != null) {
+            String cmd = f("delete%s protocols ospf", OspfProtocolReader.resolveVrfWithName(id));
+
+            for (String policy : data.getAugmentation(ProtocolConfAug.class).getExportPolicy()) {
+                blockingDeleteAndRead(cli, id, f("%s export %s", cmd, policy));
+            }
+        }
+    }
+
+    private static boolean isEqualPolicy(Config beforeData, Config afterData) {
+        List<String> bfrList = Collections.emptyList();
+        List<String> aftList = Collections.emptyList();
+
+        if (beforeData != null && beforeData.getAugmentation(ProtocolConfAug.class) != null
+                && beforeData.getAugmentation(ProtocolConfAug.class).getExportPolicy() != null) {
+            bfrList = beforeData.getAugmentation(ProtocolConfAug.class).getExportPolicy();
+        }
+        if (afterData != null && afterData.getAugmentation(ProtocolConfAug.class) != null
+                && afterData.getAugmentation(ProtocolConfAug.class).getExportPolicy() != null) {
+            aftList = afterData.getAugmentation(ProtocolConfAug.class).getExportPolicy();
+        }
+
+        return bfrList.equals(aftList);
     }
 }

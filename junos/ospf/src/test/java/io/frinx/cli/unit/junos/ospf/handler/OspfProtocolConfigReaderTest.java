@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.junos.ospf.handler;
 
+import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
@@ -93,6 +94,6 @@ public class OspfProtocolConfigReaderTest {
         target.readCurrentAttributesForType(iid, builder, readContext);
 
         Assert.assertThat(builder.getAugmentation(ProtocolConfAug.class).getExportPolicy(),
-                CoreMatchers.equalTo("OUT-FIL"));
+                CoreMatchers.equalTo(Lists.newArrayList("OUT-FIL")));
     }
 }

@@ -16,10 +16,12 @@
 
 package io.frinx.cli.unit.junos.ospf.handler;
 
+import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -66,7 +68,8 @@ public class OspfProtocolConfigWriterTest {
         final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
 
         ProtocolConfAugBuilder augData = new ProtocolConfAugBuilder();
-        augData.setExportPolicy("OUT-FIL");
+        List<String> list = Lists.newArrayList("OUT-FIL");
+        augData.setExportPolicy(list);
 
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
         Mockito.doReturn(augData.build()).when(data).getAugmentation(ProtocolConfAug.class);
@@ -86,7 +89,8 @@ public class OspfProtocolConfigWriterTest {
         final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
 
         ProtocolConfAugBuilder augData = new ProtocolConfAugBuilder();
-        augData.setExportPolicy("OUT-FIL");
+        List<String> list = Lists.newArrayList("OUT-FIL");
+        augData.setExportPolicy(list);
 
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
         Mockito.doReturn(augData.build()).when(data).getAugmentation(ProtocolConfAug.class);
@@ -96,6 +100,6 @@ public class OspfProtocolConfigWriterTest {
         Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
 
         Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(
-            "delete routing-instances APTN protocols ospf\n"));
+            "delete routing-instances APTN protocols ospf export OUT-FIL\n"));
     }
 }
