@@ -24,6 +24,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
+import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
@@ -67,9 +68,14 @@ public class OspfProtocolConfigReader implements CliReader<Config, ConfigBuilder
 
     @VisibleForTesting
     private void parseExportPolicy(String output, ProtocolConfAugBuilder builder) {
-        ParsingUtils.parseField(output,
-                POLICY_LINE::matcher,
-            matcher -> matcher.group("export"),
-            value -> builder.setExportPolicy(value));
+
+        List<String> policyList = ParsingUtils.parseFields(output, 0,
+            POLICY_LINE::matcher,
+            m -> m.group("export"),
+            v -> v);
+
+        if (policyList != null && !policyList.isEmpty()) {
+            builder.setExportPolicy(policyList);
+        }
     }
 }
