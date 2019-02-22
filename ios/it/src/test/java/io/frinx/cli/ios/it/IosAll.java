@@ -172,6 +172,8 @@ public class IosAll {
     private SchemaContext schemaCtx;
     private Cli cli;
 
+    protected boolean failFast = true;
+
     @Before
     public void setUp() throws Exception {
         Security.addProvider(new BouncyCastleProvider());
@@ -193,7 +195,7 @@ public class IosAll {
                 .setKeepaliveExecutor(EXECUTOR)
                 .setCliInitExecutor(ForkJoinPool.commonPool())
                 .setReconnectListener(RECONNECT_LISTENER)
-                .setErrorPatterns(Collections.emptySet());
+                .setErrorPatterns(translateContext.getErrorPatterns());
 
         cli = ioConfigurationBuilder.getIO()
                 .toCompletableFuture()
@@ -208,6 +210,7 @@ public class IosAll {
         TranslateUnit.Context transportContext = () -> cli;
 
         translateContext.provideHandlers(readerRegistryBuilder, writerRegistryBuilder, transportContext);
+        readerRegistryBuilder.setFailFast(failFast);
         ReaderRegistry readerRegistry = readerRegistryBuilder.build();
         WriterRegistry writerRegistry = writerRegistryBuilder.build();
 
@@ -346,7 +349,7 @@ public class IosAll {
         CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read =
                 readOnlyTransaction.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.EMPTY);
         NormalizedNode<?, ?> root = read.checkedGet().get();
-
+        // print(toJson(root));
     }
 
     @Ignore
@@ -380,7 +383,7 @@ public class IosAll {
 
     }
 
-    private String toJson(NormalizedNode<?, ?> root) throws Exception {
+    protected String toJson(NormalizedNode<?, ?> root) throws Exception {
         JSONCodecFactory codecFac = JSONCodecFactory.getShared(schemaCtx);
         StringWriter out = new StringWriter();
 

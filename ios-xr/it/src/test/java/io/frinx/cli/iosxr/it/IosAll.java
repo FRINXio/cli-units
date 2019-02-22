@@ -16,12 +16,26 @@
 package io.frinx.cli.iosxr.it;
 
 import io.frinx.cli.iosxr.bgp.BgpUnit;
+import io.frinx.cli.iosxr.conf.ConfigurationUnit;
+import io.frinx.cli.iosxr.hsrp.HsrpUnit;
+import io.frinx.cli.iosxr.logging.LoggingUnit;
+import io.frinx.cli.iosxr.mpls.MplsUnit;
 import io.frinx.cli.iosxr.ospf.OspfUnit;
+import io.frinx.cli.iosxr.ospfv3.OspfV3Unit;
+import io.frinx.cli.iosxr.platform.XrPlatformUnit;
+import io.frinx.cli.iosxr.qos.XRQoSUnit;
+import io.frinx.cli.iosxr.routing.policy.RoutingPolicyUnit;
+import io.frinx.cli.iosxr.unit.acl.AclUnit;
 import io.frinx.cli.registry.impl.TranslateRegistryImpl;
 import io.frinx.cli.unit.generic.GenericTranslateUnit;
 import io.frinx.cli.unit.ios.xr.init.IosXrCliInitializerUnit;
+import io.frinx.cli.unit.iosxr.bfd.IosXRBfdUnit;
 import io.frinx.cli.unit.iosxr.ifc.IosXRInterfaceUnit;
+import io.frinx.cli.unit.iosxr.lacp.IosXRLacpUnit;
+import io.frinx.cli.unit.iosxr.lldp.LldpUnit;
+import io.frinx.cli.unit.iosxr.netflow.IosXRNetflowUnit;
 import io.frinx.cli.unit.iosxr.network.instance.IosXRNetworkInstanceUnit;
+import io.frinx.cli.unit.iosxr.snmp.SnmpUnit;
 import java.net.InetSocketAddress;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -48,6 +62,11 @@ public class IosAll extends io.frinx.cli.ios.it.IosAll {
     private static final int PORT = 22;
     private static final String HOST = "192.168.1.211";
     private static final InetSocketAddress IOS_ADDR = new InetSocketAddress(HOST, PORT);
+
+    public IosAll() {
+        // Set false to not fail immediately when a read exception occurs
+        this.failFast = false;
+    }
 
     private static final CliNode CLI_CFG = new CliNodeBuilder()
             .setPort(new PortNumber(PORT))
@@ -86,12 +105,27 @@ public class IosAll extends io.frinx.cli.ios.it.IosAll {
         TranslateRegistryImpl reg = new TranslateRegistryImpl(mockBroker);
 
         new GenericTranslateUnit(reg).init();
+        new IosXrCliInitializerUnit(reg).init();
+        new ConfigurationUnit(reg).init();
+
         new IosXRInterfaceUnit(reg).init();
         new BgpUnit(reg).init();
         new OspfUnit(reg).init();
+        new OspfV3Unit(reg).init();
         new IosXRNetworkInstanceUnit(reg).init();
-        new io.frinx.cli.unit.iosxr.lldp.LldpUnit(reg).init();
-        new IosXrCliInitializerUnit(reg).init();
+        new AclUnit(reg).init();
+        new IosXRBfdUnit(reg).init();
+        new HsrpUnit(reg).init();
+        new IosXRLacpUnit(reg).init();
+        new LoggingUnit(reg).init();
+        new MplsUnit(reg).init();
+        new IosXRNetflowUnit(reg).init();
+        new XrPlatformUnit(reg).init();
+        new XRQoSUnit(reg).init();
+        new RoutingPolicyUnit(reg).init();
+        new SnmpUnit(reg).init();
+        new LldpUnit(reg).init();
+
         return reg;
     }
 

@@ -17,36 +17,105 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>io.frinx.cli</groupId>
-        <artifactId>unit-parent</artifactId>
-        <version>4.2.0.rc17-frinx-SNAPSHOT</version>
-        <relativePath>../../unit-parent</relativePath>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>bundle-parent</artifactId>
+        <version>3.1.1-Oxygen-SR2.4_2_0_rc17-frinxodl-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
+    <groupId>io.frinx.cli</groupId>
     <artifactId>ios-xr-it</artifactId>
     <version>4.2.0.rc17-frinx-SNAPSHOT</version>
+
+    <properties>
+        <cli.version>4.2.0.rc16-frinx-SNAPSHOT</cli.version>
+        <openconfig.version>4.2.0.rc16-frinx-SNAPSHOT</openconfig.version>
+        <hc.version>1.18.04-Oxygen-SR2.4_2_0_rc16-frinxodl-SNAPSHOT</hc.version>
+        <controller.version>1.7.2-Oxygen-SR2.4_2_0_rc16-frinxodl-SNAPSHOT</controller.version>
+        <yangtools.version>2.0.5-Oxygen-SR2.4_2_0_rc16-frinxodl-SNAPSHOT</yangtools.version>
+        <mdsal.model.version>0.12.2-Oxygen-SR2.4_2_0_rc16-frinxodl-SNAPSHOT</mdsal.model.version>
+        <mdsal.version>2.4.2-Oxygen-SR2.4_2_0_rc16-frinxodl-SNAPSHOT</mdsal.version>
+        <translate.unit.commons.version>4.2.0.rc16-frinx-SNAPSHOT</translate.unit.commons.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.opendaylight.yangtools</groupId>
+                <artifactId>yangtools-artifacts</artifactId>
+                <type>pom</type>
+                <version>${yangtools.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.mdsal.model</groupId>
+                <artifactId>mdsal-model-artifacts</artifactId>
+                <type>pom</type>
+                <version>${mdsal.model.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.mdsal</groupId>
+                <artifactId>mdsal-artifacts</artifactId>
+                <type>pom</type>
+                <version>${mdsal.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.controller</groupId>
+                <artifactId>mdsal-artifacts</artifactId>
+                <type>pom</type>
+                <version>${controller.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.frinx.openconfig</groupId>
+                <artifactId>openconfig-artifacts</artifactId>
+                <type>pom</type>
+                <version>${openconfig.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.frinx.cli</groupId>
+                <artifactId>cli-artifacts</artifactId>
+                <type>pom</type>
+                <version>${cli.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>cli-units-artifacts</artifactId>
+                <type>pom</type>
+                <version>${project.version}</version>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>io-impl</artifactId>
             <version>${cli.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>topology-impl</artifactId>
             <version>${cli.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry</artifactId>
             <version>${cli.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
@@ -58,6 +127,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>ios-xr-cli-init-unit</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -85,7 +155,85 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-acl-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-bfd-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-configuration-metadata-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-hsrp-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-lacp-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-xr-lldp-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-logging-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-mpls-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-netflow-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-ospfv3-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-platform-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-qos-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-routing-policy-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-snmp-unit</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -96,6 +244,32 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <!-- Honeycomb -->
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>data-api</artifactId>
+            <version>${hc.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>data-impl</artifactId>
+            <version>${hc.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>translate-utils</artifactId>
+            <version>${hc.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>rpc-impl</artifactId>
+            <version>${hc.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -113,4 +287,38 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <configuration>
+                        <propertyExpansion>checkstyle.violationSeverity=error</propertyExpansion>
+                        <configLocation>odl_checks.xml</configLocation>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>check-license</id>
+                            <phase>process-sources</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <headerLocation>Regex.txt</headerLocation>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>io.frinx.translate.unit.commons</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
