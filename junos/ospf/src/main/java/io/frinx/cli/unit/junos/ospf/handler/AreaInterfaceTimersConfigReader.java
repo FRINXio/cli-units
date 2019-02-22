@@ -37,7 +37,7 @@ public class AreaInterfaceTimersConfigReader implements OspfReader.OspfConfigRea
 
     @VisibleForTesting
     static final String SHOW_OSPF_INT =
-            "show configuration protocols ospf area %s interface %s retransmit-interval";
+            "show configuration protocols ospf area %s interface %s retransmit-interval | display set";
     private static final Pattern RETRANSMIT_LINE = Pattern.compile(
             "set.* protocols ospf area \\S+ interface \\S+ "
             + "retransmit-interval (?<retransmission>.+)");
