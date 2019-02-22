@@ -99,4 +99,9 @@ public final class LoggingUnit implements TranslateUnit {
                 new GenericConfigReader<>(IIDs.LO_INTERFACES, new LoggingInterfacesReader(cli)));
     }
 
+    @Override
+    public String toString() {
+        return "IOS XR Logging (Openconfig) translate unit";
+    }
+
 }

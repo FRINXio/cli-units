@@ -17,15 +17,52 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>io.frinx.cli</groupId>
-        <artifactId>unit-parent</artifactId>
-        <version>3.1.8.rc2-frinx-SNAPSHOT</version>
-        <relativePath>../../unit-parent</relativePath>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>bundle-parent</artifactId>
+        <version>1.8.1-Carbon-SR1.3_1_8_rc2-frinxodl-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
+    <groupId>io.frinx.cli</groupId>
     <artifactId>ios-it</artifactId>
     <version>3.1.8.rc2-frinx-SNAPSHOT</version>
+
+    <properties>
+        <cli.version>3.1.8.rc2-frinx-SNAPSHOT</cli.version>
+        <openconfig.version>3.1.8.rc2-frinx-SNAPSHOT</openconfig.version>
+        <hc.version>1.17.10-Carbon-SR1.3_1_8_rc2-frinxodl-SNAPSHOT</hc.version>
+        <controller.version>1.5.1-Carbon-SR1.3_1_8_rc2-frinxodl-SNAPSHOT</controller.version>
+        <translate.unit.commons.version>3.1.8.rc2-frinx-SNAPSHOT</translate.unit.commons.version>
+        <yangtools.version>1.1.1-Carbon-SR1.3_1_8_rc2-frinxodl-SNAPSHOT</yangtools.version>
+        <mdsal.version>2.2.1-Carbon-SR1.3_1_8_rc2-frinxodl-SNAPSHOT</mdsal.version>
+        <mdsalmodel.version>0.10.1-Carbon-SR1.3_1_8_rc2-frinxodl-SNAPSHOT</mdsalmodel.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.opendaylight.yangtools</groupId>
+                <artifactId>yangtools-artifacts</artifactId>
+                <version>${yangtools.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.mdsal</groupId>
+                <artifactId>mdsal-artifacts</artifactId>
+                <version>${mdsal.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.mdsal.model</groupId>
+                <artifactId>mdsal-model-artifacts</artifactId>
+                <version>${mdsalmodel.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
@@ -40,6 +77,33 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <propertyExpansion>checkstyle.violationSeverity=error</propertyExpansion>
+                    <configLocation>odl_checks.xml</configLocation>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-license</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <headerLocation>Regex.txt</headerLocation>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.frinx.translate.unit.commons</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 
@@ -49,26 +113,31 @@
             <groupId>io.frinx.cli</groupId>
             <artifactId>io-impl</artifactId>
             <version>${cli.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>topology-api</artifactId>
             <version>${cli.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry</artifactId>
             <version>${cli.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry-model</artifactId>
             <version>${cli.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>utils</artifactId>
             <version>${translate.unit.commons.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Honeycomb -->
@@ -76,11 +145,19 @@
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>data-api</artifactId>
             <version>${hc.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>data-impl</artifactId>
             <version>${hc.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.fd.honeycomb</groupId>
+            <artifactId>translate-utils</artifactId>
+            <version>${hc.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
@@ -96,60 +173,73 @@
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>rpc-impl</artifactId>
             <version>${hc.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-data-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-data-impl</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-data-codec-gson</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-model-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
             <artifactId>ietf-topology</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
             <artifactId>ietf-inet-types-2013-07-15</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>sal-binding-api</artifactId>
             <version>${controller.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>sal-binding-broker-impl</artifactId>
             <version>${controller.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>sal-common-api</artifactId>
             <version>${controller.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>sal-core-api</artifactId>
             <version>${controller.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-binding-dom-codec</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- Testing Dependencies -->
@@ -163,6 +253,7 @@
             <groupId>io.frinx.cli</groupId>
             <artifactId>ios-cli-init-unit</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.frinx.cli</groupId>
