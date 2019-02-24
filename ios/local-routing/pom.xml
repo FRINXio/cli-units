@@ -19,13 +19,13 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.0.rc16-frinx</version>
+        <version>4.2.0.rc17-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-local-routing-unit</artifactId>
-    <version>4.2.0.rc16-frinx</version>
+    <version>4.2.0.rc17-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
