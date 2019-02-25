@@ -17,8 +17,8 @@
 package io.frinx.cli.unit.iosxr.lldp;
 
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
@@ -64,8 +64,8 @@ public class LldpUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder writeRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder readRegistry,
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder writeRegistry,
+                                @Nonnull CustomizerAwareWriteRegistryBuilder readRegistry,
                                 @Nonnull Context context) {
         delegate.provideHandlers(writeRegistry, readRegistry, context);
     }

@@ -22,7 +22,6 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.nexus.ifc.handler.InterfaceReader;
-//TODO ipv4 and 6 reader
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +35,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+
+//TODO ipv4 and 6 reader
 
 public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey,
         SubinterfaceBuilder> {

@@ -20,8 +20,8 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.IosDevices;
 import io.frinx.cli.ios.routing.policy.handlers.ExtCommunitySetConfigWriter;
@@ -66,15 +66,15 @@ public class RoutingPolicyUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readerRegistryBuilder,
-                                @Nonnull ModifiableWriterRegistryBuilder writerRegistryBuilder,
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readerRegistryBuilder,
+                                @Nonnull CustomizerAwareWriteRegistryBuilder writerRegistryBuilder,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
         provideReaders(readerRegistryBuilder, cli);
         provideWriters(writerRegistryBuilder, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder writerRegistryBuilder, Cli cli) {
+    private void provideWriters(CustomizerAwareWriteRegistryBuilder writerRegistryBuilder, Cli cli) {
         // provide writers
         writerRegistryBuilder.add(new GenericWriter<>(IIDs.ROUTINGPOLICY, new NoopCliWriter<>()));
         writerRegistryBuilder.add(new GenericWriter<>(IIDs.RO_DEFINEDSETS, new NoopCliWriter<>()));
@@ -96,7 +96,7 @@ public class RoutingPolicyUnit implements TranslateUnit {
                 io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readerRegistryBuilder, Cli cli) {
+    private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readerRegistryBuilder, Cli cli) {
         // provide readers
         readerRegistryBuilder.addStructuralReader(IIDs.ROUTINGPOLICY, RoutingPolicyBuilder.class);
         readerRegistryBuilder.addStructuralReader(IIDs.RO_DEFINEDSETS, DefinedSetsBuilder.class);

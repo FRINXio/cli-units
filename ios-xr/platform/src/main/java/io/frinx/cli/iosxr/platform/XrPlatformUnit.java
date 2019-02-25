@@ -20,8 +20,8 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.iosxr.platform.handler.XrOsComponentConfigReader;
@@ -62,19 +62,19 @@ public class XrPlatformUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry,
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
         provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+    private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         //noop
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.COMPONENTS, ComponentsBuilder.class);
         readRegistry.add(new GenericOperListReader<>(IIDs.CO_COMPONENT, new XrOsComponentReader(cli)));
         readRegistry.add(new GenericOperReader<>(IIDs.CO_CO_CONFIG, new XrOsComponentConfigReader()));

@@ -19,8 +19,8 @@ package io.frinx.cli.ios.rib;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.IosDevices;
 import io.frinx.cli.ios.rib.handler.AfiSafiReader;
@@ -72,14 +72,14 @@ public class RibUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
+    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         // FIXME: add ipv6 support?
         readRegistry.addStructuralReader(IIDs.BGPRIB, BgpRibBuilder.class);
         readRegistry.addStructuralReader(IIDs.BG_AFISAFIS, AfiSafisBuilder.class);

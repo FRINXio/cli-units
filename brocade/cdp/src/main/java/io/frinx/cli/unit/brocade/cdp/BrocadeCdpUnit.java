@@ -21,8 +21,8 @@ import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
@@ -74,14 +74,14 @@ public final class BrocadeCdpUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
+    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
     }
 
-    private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.CDP, CdpBuilder.class);
         readRegistry.addStructuralReader(IIDs.CD_INTERFACES, InterfacesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.CD_IN_INTERFACE, new InterfaceReader(cli)));

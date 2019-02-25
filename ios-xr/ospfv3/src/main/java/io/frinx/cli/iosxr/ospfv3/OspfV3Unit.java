@@ -20,8 +20,8 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.iosxr.ospfv3.handler.StubRouterConfigReader;
@@ -65,14 +65,14 @@ public class OspfV3Unit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
-            @Nonnull ModifiableWriterRegistryBuilder writeRegistry, @Nonnull Context context) {
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
+            @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry, @Nonnull Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
         provideWriters(writeRegistry, cli);
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rreg, Cli cli) {
+    private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder rreg, Cli cli) {
         rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG, ProtocolOspfv3ExtAugBuilder.class);
         rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OSPFV3, Ospfv3Builder.class);
         rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GLOBAL, GlobalBuilder.class);
@@ -85,7 +85,7 @@ public class OspfV3Unit implements TranslateUnit {
                 new StubRouterConfigReader(cli)));
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wreg, Cli cli) {
+    private void provideWriters(CustomizerAwareWriteRegistryBuilder wreg, Cli cli) {
         wreg.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CONFIG,
                 new NoopCliWriter<>()),
                 io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_PR_PR_CONFIG);

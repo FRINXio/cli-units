@@ -20,12 +20,12 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.spi.write.CommitFailedException;
 import io.fd.honeycomb.translate.spi.write.PostCommitHook;
 import io.fd.honeycomb.translate.spi.write.PostFailedHook;
 import io.fd.honeycomb.translate.spi.write.PreCommitHook;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
@@ -112,8 +112,8 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
+    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
         // NO-OP
     }

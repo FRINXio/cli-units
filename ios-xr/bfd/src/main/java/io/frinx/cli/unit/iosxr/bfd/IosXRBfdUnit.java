@@ -22,8 +22,8 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
@@ -82,14 +82,14 @@ public class IosXRBfdUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry, @Nonnull Context context) {
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry, @Nonnull Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
         provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+    private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.add(new GenericWriter<>(IIDs.BFD, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.BF_INTERFACES, new NoopCliWriter<>()));
         writeRegistry.add(new GenericListWriter<>(IIDs.BF_IN_INTERFACE, new NoopCliListWriter<>()));
@@ -98,7 +98,7 @@ public class IosXRBfdUnit implements TranslateUnit {
         ), new GenericWriter<>(IIDs.BF_IN_IN_CONFIG, new ConfigWriter(cli)));
     }
 
-    private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.BFD, BfdBuilder.class);
         readRegistry.addStructuralReader(IIDs.BF_INTERFACES, InterfacesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.BF_IN_INTERFACE, new InterfaceReader(cli)));

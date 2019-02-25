@@ -20,8 +20,8 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.ios.IosDevices;
@@ -72,13 +72,13 @@ public class LldpUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry, @Nonnull Context context) {
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry, @Nonnull Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
     }
 
-    private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         // TODO CDP and LLDP are almost identical, reuse code, DRY
         readRegistry.addStructuralReader(IIDs.LLDP, LldpBuilder.class);
         readRegistry.add(new GenericOperReader<>(IIDs.LL_CONFIG, new LldpConfigReader(cli, getShowHostnameCommand())));

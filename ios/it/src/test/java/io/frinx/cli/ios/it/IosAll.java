@@ -28,6 +28,8 @@ import io.fd.honeycomb.data.impl.ModifiableDataTreeDelegator;
 import io.fd.honeycomb.data.impl.ReadableDataTreeDelegator;
 import io.fd.honeycomb.rpc.RpcRegistryBuilder;
 import io.fd.honeycomb.translate.impl.read.registry.CompositeReaderRegistryBuilder;
+import io.fd.honeycomb.translate.impl.read.registry.CustomizerReadReadersBuilder;
+import io.fd.honeycomb.translate.impl.read.registry.CustomizerWriterRegistryBuilder;
 import io.fd.honeycomb.translate.impl.write.registry.FlatWriterRegistryBuilder;
 import io.fd.honeycomb.translate.read.registry.ReaderRegistry;
 import io.fd.honeycomb.translate.util.YangDAG;
@@ -51,6 +53,7 @@ import io.frinx.cli.unit.ios.init.IosCliInitializerUnit;
 import io.frinx.cli.unit.ios.lldp.LldpUnit;
 import io.frinx.cli.unit.ios.network.instance.IosNetworkInstanceUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import io.frinx.translate.unit.commons.utils.NoopDataBroker;
 import java.io.StringWriter;
 import java.net.InetSocketAddress;
@@ -197,8 +200,8 @@ public class IosAll {
         BindingToNormalizedNodeCodec codec = translateContext.getCodec();
 
         // Get & register CRUD handlers
-        CompositeReaderRegistryBuilder readerRegistryBuilder = new CompositeReaderRegistryBuilder(new YangDAG());
-        FlatWriterRegistryBuilder writerRegistryBuilder = new FlatWriterRegistryBuilder(new YangDAG());
+        CustomizerReadReadersBuilder readerRegistryBuilder = new CustomizerReadReadersBuilder(new YangDAG());
+        CustomizerWriterRegistryBuilder writerRegistryBuilder = new CustomizerWriterRegistryBuilder(new YangDAG());
         TranslateUnit.Context transportContext = () -> cli;
 
         translateContext.provideHandlers(readerRegistryBuilder, writerRegistryBuilder, transportContext);

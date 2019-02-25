@@ -23,9 +23,9 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.IosDevices;
 import io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigReader;
@@ -107,8 +107,8 @@ public class BgpUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
+    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
@@ -124,7 +124,7 @@ public class BgpUnit implements TranslateUnit {
         ));
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+    private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigWriter(cli)),
                 IIDs.NE_NE_CONFIG);
 
@@ -194,7 +194,7 @@ public class BgpUnit implements TranslateUnit {
                 Sets.newHashSet(IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP));
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BGP, BgpBuilder.class);
 
         readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_GLOBAL, GlobalBuilder.class);
@@ -211,7 +211,7 @@ public class BgpUnit implements TranslateUnit {
         providePeerGroupReaders(readRegistry, cli);
     }
 
-    private void provideNeighborReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void provideNeighborReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NEIGHBORS, NeighborsBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborReader(cli)));
 
@@ -241,7 +241,7 @@ public class BgpUnit implements TranslateUnit {
                 NeighborRouteReflectorConfigReader(cli)));
     }
 
-    private void providePeerGroupReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void providePeerGroupReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_PEERGROUPS, PeerGroupsBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP, new PeerGroupReader(cli)));
 
