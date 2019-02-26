@@ -140,6 +140,6 @@ public final class InterfaceConfigWriter implements CliWriter<Config> {
 
     private void deleteInterface(InstanceIdentifier<Config> id, Config data)
             throws WriteFailedException.DeleteFailedException {
-        blockingDeleteAndRead(cli, id, fT(DELETE_TEMPLATE, data));
+        blockingDeleteAndRead(cli, id, fT(DELETE_TEMPLATE, "data", data));
     }
 }
