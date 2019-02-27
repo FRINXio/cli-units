@@ -57,7 +57,9 @@ public class OspfProtocolConfigWriter implements OspfWriter<Config> {
     @Override
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
             throws WriteFailedException {
-        deleteExportPolicy(id, data);
+        final String vrfName = OspfProtocolReader.resolveVrfWithName(id);
+        blockingWriteAndRead(cli, id, data,
+                f("delete%s protocols ospf", vrfName));
     }
 
     private void writeExportPolicy(
