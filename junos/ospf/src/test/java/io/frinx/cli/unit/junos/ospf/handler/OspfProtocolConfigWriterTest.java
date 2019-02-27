@@ -100,6 +100,6 @@ public class OspfProtocolConfigWriterTest {
         Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
 
         Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(
-            "delete routing-instances APTN protocols ospf export OUT-FIL\n"));
+            "delete routing-instances APTN protocols ospf\n"));
     }
 }

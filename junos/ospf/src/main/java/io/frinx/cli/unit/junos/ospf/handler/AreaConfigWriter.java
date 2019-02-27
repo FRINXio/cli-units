@@ -47,7 +47,7 @@ public class AreaConfigWriter implements OspfWriter<Config> {
     public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
         blockingWriteAndRead(cli, instanceIdentifier, data,
-                f("delete%s protocols ospf area %s", OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
-                AreaInterfaceReader.areaIdToString(data.getIdentifier()));
+                f("delete%s protocols ospf area %s", OspfProtocolReader.resolveVrfWithName(instanceIdentifier),
+                AreaInterfaceReader.areaIdToString(data.getIdentifier())));
     }
 }
