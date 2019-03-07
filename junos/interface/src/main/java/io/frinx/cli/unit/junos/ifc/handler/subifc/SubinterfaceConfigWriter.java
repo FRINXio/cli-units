@@ -53,6 +53,11 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
             data.getDescription() == null
                 ? f("delete interfaces %s description", sbif)
                 : f("set interfaces %s description %s", sbif, data.getDescription()));
+
+        blockingWriteAndRead(cli, id, data,
+                data.isEnabled()
+                    ? f("delete interfaces %s disable", sbif)
+                    : f("set interfaces %s disable", sbif));
     }
 
     @Override
