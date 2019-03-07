@@ -38,6 +38,9 @@ public class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigB
     private static final Pattern SUBIF_DESCRIPTION_LINE = Pattern
         .compile("set interfaces (?<ifcId>\\S+) unit (?<subifcIndex>[0-9]+) description (?<desc>.*)");
 
+    private static final Pattern SUBIF_DISABLE_LINE = Pattern
+            .compile("set interfaces (?<ifcId>\\S+) unit (?<subifcIndex>[0-9]+) disable");
+
     private Cli cli;
 
     public SubinterfaceConfigReader(Cli cli) {
@@ -61,6 +64,11 @@ public class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigB
         ParsingUtils
             .parseField(output, SUBIF_DESCRIPTION_LINE::matcher, matcher -> matcher.group("desc"),
                 builder::setDescription);
+        // "disable"
+        builder.setEnabled(true);
+        ParsingUtils
+            .parseField(output, SUBIF_DISABLE_LINE::matcher, matcher -> false,
+                builder::setEnabled);
     }
 
     @Override

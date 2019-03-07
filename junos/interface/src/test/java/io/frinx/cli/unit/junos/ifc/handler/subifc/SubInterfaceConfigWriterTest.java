@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
@@ -99,7 +100,7 @@ public class SubInterfaceConfigWriterTest {
         Mockito.when(context.readAfter(parentid)).thenReturn(com.google.common.base.Optional.of(parentIfc));
 
         final ConfigBuilder builder = new ConfigBuilder();
-        data = builder.setDescription("TEST-ge-0/0/4").build();
+        data = builder.setDescription("TEST-ge-0/0/4").setEnabled(true).build();
 
         final InstanceIdentifier<Config> id = InstanceIdentifier.create(Interfaces.class)
             .child(Interface.class, interfaceKey)
@@ -107,11 +108,10 @@ public class SubInterfaceConfigWriterTest {
 
         target.writeCurrentAttributes(id, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
-            "set interfaces ge-0/0/4 unit 0 description TEST-ge-0/0/4",
-            ""
-            ), "\n")));
+        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
+        List<Command> list = response.getAllValues();
+        Assert.assertEquals("set interfaces ge-0/0/4 unit 0 description TEST-ge-0/0/4\n", list.get(0).getContent());
+        Assert.assertEquals("delete interfaces ge-0/0/4 unit 0 disable\n", list.get(1).getContent());
     }
 
     @Test
@@ -141,7 +141,7 @@ public class SubInterfaceConfigWriterTest {
         Mockito.when(context.readAfter(parentid)).thenReturn(com.google.common.base.Optional.of(parentIfc));
 
         final ConfigBuilder builder = new ConfigBuilder();
-        data = builder.setDescription(null).build();
+        data = builder.setDescription(null).setEnabled(false).build();
 
         final InstanceIdentifier<Config> id = InstanceIdentifier.create(Interfaces.class)
             .child(Interface.class, interfaceKey)
@@ -149,11 +149,10 @@ public class SubInterfaceConfigWriterTest {
 
         target.writeCurrentAttributes(id, data, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
-            "delete interfaces ge-0/0/4 unit 0 description",
-            ""
-            ), "\n")));
+        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
+        List<Command> list = response.getAllValues();
+        Assert.assertEquals("delete interfaces ge-0/0/4 unit 0 description\n", list.get(0).getContent());
+        Assert.assertEquals("set interfaces ge-0/0/4 unit 0 disable\n", list.get(1).getContent());
     }
 
     @Test
@@ -220,9 +219,9 @@ public class SubInterfaceConfigWriterTest {
         Mockito.when(context.readAfter(parentid)).thenReturn(com.google.common.base.Optional.of(parentIfc));
 
         final ConfigBuilder builder = new ConfigBuilder();
-        data = builder.setDescription("TEST-ge-0/0/4_OLD").build();
+        data = builder.setDescription("TEST-ge-0/0/4_OLD").setEnabled(true).build();
 
-        final Config newData = new ConfigBuilder().setDescription("TEST-ge-0/0/4_NEW").build();
+        final Config newData = new ConfigBuilder().setDescription(null).setEnabled(true).build();
 
         final InstanceIdentifier<Config> id = InstanceIdentifier.create(Interfaces.class)
             .child(Interface.class, interfaceKey)
@@ -230,11 +229,10 @@ public class SubInterfaceConfigWriterTest {
 
         target.updateCurrentAttributes(id, data, newData, context);
 
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
-            "set interfaces ge-0/0/4 unit 0 description TEST-ge-0/0/4_NEW",
-            ""
-            ), "\n")));
+        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
+        List<Command> list = response.getAllValues();
+        Assert.assertEquals("delete interfaces ge-0/0/4 unit 0 description\n", list.get(0).getContent());
+        Assert.assertEquals("delete interfaces ge-0/0/4 unit 0 disable\n", list.get(1).getContent());
     }
 
     @Test
