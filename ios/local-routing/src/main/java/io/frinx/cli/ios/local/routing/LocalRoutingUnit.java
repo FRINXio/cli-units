@@ -27,6 +27,7 @@ import io.frinx.cli.ios.local.routing.handlers.NextHopStateReader;
 import io.frinx.cli.ios.local.routing.handlers.StaticConfigReader;
 import io.frinx.cli.ios.local.routing.handlers.StaticReader;
 import io.frinx.cli.ios.local.routing.handlers.StaticStateReader;
+import io.frinx.cli.ios.local.routing.handlers.StaticWriter;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
@@ -69,6 +70,15 @@ public class LocalRoutingUnit extends AbstractUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LOCALAGGREGATES);
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LO_AGGREGATE);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_STATICROUTES);
+        writeRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_ST_STATIC, new StaticWriter(cli),
+                Sets.newHashSet(
+                        IIDs.NE_NE_PR_PR_ST_ST_CONFIG,
+                        IIDs.NE_NE_PR_PR_ST_ST_NEXTHOPS,
+                        IIDs.NE_NE_PR_PR_ST_ST_NE_NEXTHOP,
+                        IIDs.NE_NE_PR_PR_ST_ST_NE_NE_CONFIG
+                )
+        );
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
