@@ -37,8 +37,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member.rev171109.LacpEthConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member.rev171109.LacpEthConfigAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.LacpPeriodType;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.IanaInterfaceType;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BundleEtherLacpIntervalConfigWriterTest {
@@ -65,15 +63,13 @@ public class BundleEtherLacpIntervalConfigWriterTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        target = Mockito.spy(new BundleEtherLacpIntervalConfigWriter(cli));
+        target = new BundleEtherLacpIntervalConfigWriter(cli);
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
     }
 
-    private void prepare(Class<? extends IanaInterfaceType> ifType, String ifName) {
+    private void prepare(String ifName) {
         id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey(ifName))
                 .augmentation(Interface1.class).child(Ethernet.class).child(Config.class);
-        Mockito.when(cli.executeAndRead(Mockito.any()))
-                .then(invocation -> CompletableFuture.completedFuture(""));
 
         LacpEthConfigAugBuilder lcaB = new LacpEthConfigAugBuilder();
         lcaB.setInterval(LacpPeriodType.FAST);
@@ -84,19 +80,17 @@ public class BundleEtherLacpIntervalConfigWriterTest {
 
     @Test
     public void testWriteCurrentAttributes_001() throws Exception {
-        prepare(Ieee8023adLag.class, "Ethernet4/10");
+        prepare("Ethernet4/10");
         target.writeCurrentAttributes(id, data, context);
-        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue()
-                .getContent());
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
     public void testDeleteCurrentAttributes_001() throws Exception {
-        prepare(Ieee8023adLag.class, "Ethernet4/12");
+        prepare("Ethernet4/12");
         target.deleteCurrentAttributes(id, data, context);
-        Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue()
-                .getContent());
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }
