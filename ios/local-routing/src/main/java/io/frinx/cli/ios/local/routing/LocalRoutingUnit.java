@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.IosDevices;
@@ -32,6 +33,7 @@ import io.frinx.cli.ios.local.routing.handlers.NextHopStateReader;
 import io.frinx.cli.ios.local.routing.handlers.StaticConfigReader;
 import io.frinx.cli.ios.local.routing.handlers.StaticReader;
 import io.frinx.cli.ios.local.routing.handlers.StaticStateReader;
+import io.frinx.cli.ios.local.routing.handlers.StaticWriter;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.utils.NoopCliWriter;
@@ -40,10 +42,14 @@ import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.NextHopsBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class LocalRoutingUnit implements TranslateUnit {
+
+    private static final InstanceIdentifier<Static> STATIC_IID = InstanceIdentifier.create(Static.class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -79,6 +85,14 @@ public class LocalRoutingUnit implements TranslateUnit {
     private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new NoopCliWriter<>()));
+        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_STATICROUTES, new NoopCliWriter<>()));
+        writeRegistry.subtreeAdd(Sets.newHashSet(
+                                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_ST_ST_CONFIG, STATIC_IID),
+                                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_ST_ST_NEXTHOPS, STATIC_IID),
+                                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_ST_ST_NE_NEXTHOP, STATIC_IID),
+                                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_ST_ST_NE_NE_CONFIG, STATIC_IID)
+                ), new GenericWriter<>(IIDs.NE_NE_PR_PR_ST_STATIC, new StaticWriter(cli))
+        );
     }
 
     private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
