@@ -16,8 +16,10 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler;
 
+import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceCommonState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.StateBuilder;
@@ -100,13 +102,13 @@ public class InterfaceStateReaderTest {
     @Test
     public void testParseInterfaceState() {
         StateBuilder actualStateBuilder = new StateBuilder();
-        InterfaceStateReader.parseInterfaceState(
+        new InterfaceStateReader(Mockito.mock(Cli.class)).parseInterfaceState(
                 DISPLAY_INTERFACE, actualStateBuilder, "LoopBack100");
 
         Assert.assertEquals(EXPECTED_STATE, actualStateBuilder.build());
 
         StateBuilder actualState2Builder = new StateBuilder();
-        InterfaceStateReader.parseInterfaceState(
+        new InterfaceStateReader(Mockito.mock(Cli.class)).parseInterfaceState(
                 DISPLAY_INTERFACE2, actualState2Builder, "GigabitEthernet0/0/0");
 
         Assert.assertEquals(EXPECTED_STATE2, actualState2Builder.build());

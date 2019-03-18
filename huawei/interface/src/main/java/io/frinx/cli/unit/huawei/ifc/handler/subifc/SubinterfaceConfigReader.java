@@ -17,30 +17,47 @@
 package io.frinx.cli.unit.huawei.ifc.handler.subifc;
 
 import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceConfigReader;
+import io.frinx.cli.io.Cli;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public final class SubinterfaceConfigReader extends AbstractSubinterfaceConfigReader {
+
+    public SubinterfaceConfigReader(Cli cli) {
+        super(cli);
+    }
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                       @Nonnull ConfigBuilder builder,
-                                      @Nonnull ReadContext ctx) throws ReadFailedException {
+                                      @Nonnull ReadContext ctx) {
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
         builder.setIndex(subKey.getIndex());
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
-        ((SubinterfaceBuilder) parentBuilder).setConfig(readValue);
+    protected String getReadCommand(String subIfcName) {
+        return null;
+    }
+
+    @Override
+    protected String getSubinterfaceName(InstanceIdentifier<Config> instanceIdentifier) {
+        return null;
+    }
+
+    @Override
+    protected Pattern getShutdownLine() {
+        return null;
+    }
+
+    @Override
+    protected Pattern getDescriptionLine() {
+        return null;
     }
 }

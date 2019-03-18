@@ -17,10 +17,12 @@
 package io.frinx.cli.unit.huawei.ifc.handler;
 
 import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 
 public class InterfaceReaderTest {
@@ -58,7 +60,7 @@ public class InterfaceReaderTest {
 
     @Test
     public void testParseAllInterfaceIds() {
-        Assert.assertEquals(EXPECTED_ALL_IDS, InterfaceReader.parseAllInterfaceIds(DISPLAY_IP_INT_BRIE));
+        Assert.assertEquals(EXPECTED_ALL_IDS,
+                new InterfaceReader(Mockito.mock(Cli.class)).parseAllInterfaceIds(DISPLAY_IP_INT_BRIE));
     }
-
 }
