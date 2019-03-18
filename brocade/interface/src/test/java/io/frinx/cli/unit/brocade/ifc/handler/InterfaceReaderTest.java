@@ -16,10 +16,12 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler;
 
+import io.frinx.cli.io.Cli;
 import java.util.List;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 
 public class InterfaceReaderTest {
@@ -36,8 +38,8 @@ public class InterfaceReaderTest {
             + "Loopback2 is up, line protocol is up \n";
 
     @Test
-    public void testAllIds() throws Exception {
-        List<InterfaceKey> interfaceKeys = InterfaceReader.parseAllInterfaceIds(OUTPUT);
+    public void testAllIds() {
+        List<InterfaceKey> interfaceKeys = new InterfaceReader(Mockito.mock(Cli.class)).parseAllInterfaceIds(OUTPUT);
         Assert.assertThat(interfaceKeys, CoreMatchers.hasItem(new InterfaceKey("10GigabitEthernet4/2")));
     }
 }

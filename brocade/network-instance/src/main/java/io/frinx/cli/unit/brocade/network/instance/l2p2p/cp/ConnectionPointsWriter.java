@@ -22,7 +22,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.handlers.network.instance.L2p2pWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader;
+import io.frinx.cli.unit.brocade.ifc.Util;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Collections;
 import java.util.Objects;
@@ -103,8 +103,8 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
         Endpoint remote = getRemote(endpoint1, endpoint2);
 
         Interface interfaceData = getInterfaceData(writeContext, true, ifc1);
-        String ifcType = InterfaceConfigReader.getTypeOnDevice(interfaceData.getConfig().getType());
-        String ifcNumber = InterfaceConfigReader.getIfcNumber(ifc1.toParentIfcString());
+        String ifcType = Util.getTypeOnDevice(interfaceData.getConfig().getType());
+        String ifcNumber = Util.getIfcNumber(ifc1.toParentIfcString());
 
         blockingWriteAndRead(cli, id, dataAfter,
                 "conf t",
@@ -173,8 +173,8 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
         ConnectionPointsReader.InterfaceId ifc = ConnectionPointsReader.InterfaceId.fromEndpoint(endpoint);
 
         Interface interfaceData = getInterfaceData(writeContext, true, ifc);
-        String ifcType = InterfaceConfigReader.getTypeOnDevice(interfaceData.getConfig().getType());
-        String ifcNumber = InterfaceConfigReader.getIfcNumber(ifc.toParentIfcString());
+        String ifcType = Util.getTypeOnDevice(interfaceData.getConfig().getType());
+        String ifcNumber = Util.getIfcNumber(ifc.toParentIfcString());
 
         if (endpoint.getLocal().getConfig().getSubinterface() == null) {
             // With subifc

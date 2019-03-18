@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.brocade.ifc.Util;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Set;
@@ -63,9 +64,9 @@ public class TpIdInterfaceReader implements CliConfigReader<Config1, Config1Buil
                                       @Nonnull Config1Builder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         String name = id.firstKeyOf(Interface.class).getName();
-        Class<? extends InterfaceType> ifcType = InterfaceConfigReader.parseType(name);
-        String typeOnDevice = InterfaceConfigReader.getTypeOnDevice(ifcType);
-        String ifcNumber = InterfaceConfigReader.getIfcNumber(name);
+        Class<? extends InterfaceType> ifcType = Util.parseType(name);
+        String typeOnDevice = Util.getTypeOnDevice(ifcType);
+        String ifcNumber = Util.getIfcNumber(name);
 
         parseTagTypes(blockingRead(SH_IFC_TAG_TYPE, cli, id, ctx), typeOnDevice, ifcNumber, builder);
     }

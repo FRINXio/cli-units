@@ -17,66 +17,42 @@
 package io.frinx.cli.unit.brocade.ifc.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.ifc.base.handler.AbstractInterfaceReader;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
+import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class InterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
+public final class InterfaceReader extends AbstractInterfaceReader {
 
-    private Cli cli;
+    private static final String SH_INTERFACE = "sh interface | include line";
+
+    private static final Pattern STATUS_LINE =
+            Pattern.compile("(?<id>.+)[.\\s]* is (?<admin>[^,]+), line protocol is (?<line>.+)");
 
     public InterfaceReader(Cli cli) {
-        this.cli = cli;
+        super(cli);
     }
 
-    public static final String SH_INTERFACE = "sh interface | include line";
-
-    @Nonnull
     @Override
-    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                        @Nonnull ReadContext readContext) throws ReadFailedException {
-        return parseInterfaceIds(blockingRead(SH_INTERFACE, cli, instanceIdentifier, readContext));
+    protected String getReadCommand() {
+        return SH_INTERFACE;
     }
 
+    @Override
     @VisibleForTesting
-    static List<InterfaceKey> parseInterfaceIds(String output) {
+    public List<InterfaceKey> parseInterfaceIds(String output) {
         return parseAllInterfaceIds(output);
     }
 
-    public static List<InterfaceKey> parseAllInterfaceIds(String output) {
-        return ParsingUtils.parseFields(output, 0,
-            InterfaceStateReader.STATUS_LINE::matcher,
-            matcher -> matcher.group("id").trim(),
-            InterfaceKey::new);
+    @Override
+    protected Pattern getInterfaceIdLine() {
+        return STATUS_LINE;
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Interface> list) {
-        ((InterfacesBuilder) builder).setInterface(list);
+    protected Pattern subinterfaceName() {
+        // no filtering of subinterface
+        return null;
     }
-
-    @Nonnull
-    @Override
-    public InterfaceBuilder getBuilder(@Nonnull InstanceIdentifier<Interface> instanceIdentifier) {
-        return new InterfaceBuilder();
-    }
-
-    @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                      @Nonnull InterfaceBuilder builder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        builder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
-    }
-
 }
