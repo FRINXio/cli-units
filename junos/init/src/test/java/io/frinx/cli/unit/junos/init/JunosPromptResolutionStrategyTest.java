@@ -44,9 +44,18 @@ public class JunosPromptResolutionStrategyTest {
         + "\n"                              //ignore empty line
         + "[edit]\n"                        //ignore guidance line
         + "[edit interfaces ge-0/0/3]\n"    //ignore guidance line
+        + "{master}\n"                      //ignore guidance line
+        + "{master}[edit]\n"                //ignore guidance line
+        + "{master}[edit interfaces ge-0/0/3]\n" //ignore guidance line
         + "{master:0}\n"                    //ignore guidance line
         + "{master:0}[edit]\n"              //ignore guidance line
         + "{master:0}[edit interfaces ge-0/0/3]\n" //ignore guidance line
+        + "{backup}\n"                      //ignore guidance line
+        + "{backup}[edit]\n"                //ignore guidance line
+        + "{backup}[edit interfaces ge-0/0/3]\n" //ignore guidance line
+        + "{backup:0}\n"                    //ignore guidance line
+        + "{backup:0}[edit]\n"              //ignore guidance line
+        + "{backup:0}[edit interfaces ge-0/0/3]\n" //ignore guidance line
         + EXPECTED_PROMPT;
 
     @Mock
