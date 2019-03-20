@@ -16,130 +16,60 @@
 
 package io.frinx.cli.unit.junos.ifc.handler;
 
-import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigReaderTest {
 
-    @Mock
-    private Cli cli;
+    private static final String OUTPUT = "set interfaces ge-0/0/3 vlan-tagging\n"
+            + "set interfaces ge-0/0/3 unit 0 description TEST_ge-0/0/3\n"
+            + "set interfaces ge-0/0/3 unit 0 vlan-id 100\n"
+            + "set interfaces ge-0/0/3 unit 0 family inet address 10.11.12.13/16\n";
 
-    private InterfaceConfigReader target;
+    private static final String OUTPUT_SINGLE = "set interfaces ge-0/0/4 disable\n"
+            + "set interfaces ge-0/0/4 unit 0 description TEST_ge-0/0/4\n";
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+    private static final String OUTPUT_SINGLE1 = "set interfaces fxp0 unit 0 family inet address 192.168.254.254/24\n";
 
-        target = Mockito.spy(new InterfaceConfigReader(cli));
-    }
-
-    @Test
-    public void testMerge() throws Exception {
-        final InterfaceBuilder interfaceBuilder = new InterfaceBuilder();
-        final ConfigBuilder configBuilder = new ConfigBuilder();
-        configBuilder.setName("TEST");
-        configBuilder.setType(EthernetCsmacd.class);
-
-        final Config config = configBuilder.setEnabled(true).build();
-
-        target.merge(interfaceBuilder, config);
-
-        Assert.assertEquals(interfaceBuilder.getConfig().isEnabled(), true);
-        Assert.assertEquals(interfaceBuilder.getConfig().getName(), "TEST");
-        Assert.assertEquals(interfaceBuilder.getConfig().getType(), EthernetCsmacd.class);
-    }
+    private InterfaceConfigReader reader = new InterfaceConfigReader(Mockito.mock(Cli.class));
 
     @Test
-    public void testReadCurrentAttributes_001() throws Exception {
+    public void testParseInterface() {
         final String interfaceName = "ge-0/0/3";
-        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
-        final InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-            .child(Interface.class, interfaceKey).child(Config.class);
-
         final ConfigBuilder builder = new ConfigBuilder();
-        final ReadContext readContext = Mockito.mock(ReadContext.class);
 
-        final String outputSingleInterface = StringUtils.join(new String[] {
-            "set interfaces ge-0/0/3 vlan-tagging",
-            "set interfaces ge-0/0/3 unit 0 description TEST_ge-0/0/3",
-            "set interfaces ge-0/0/3 unit 0 vlan-id 100",
-            "set interfaces ge-0/0/3 unit 0 family inet address 10.11.12.13/16", }, "\n");
+        reader.parseInterface(OUTPUT, builder, interfaceName);
 
-        Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
-            Mockito.eq(instanceIdentifier), Mockito.eq(readContext));
-
-        // test
-        target.readCurrentAttributes(instanceIdentifier, builder, readContext);
-
-        // verify
-        Assert.assertEquals(builder.isEnabled() , true);
+        Assert.assertTrue(builder.isEnabled());
         Assert.assertEquals(builder.getName(), interfaceName);
         Assert.assertEquals(builder.getType(), EthernetCsmacd.class);
     }
 
     @Test
-    public void testReadCurrentAttributes_002() throws Exception {
+    public void testParseSingleInterfaceDisabled() {
         final String interfaceName = "ge-0/0/4";
-        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
-        final InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-            .child(Interface.class, interfaceKey).child(Config.class);
-
         final ConfigBuilder builder = new ConfigBuilder();
-        final ReadContext readContext = Mockito.mock(ReadContext.class);
 
-        final String outputSingleInterface = StringUtils.join(new String[] {
-            "set interfaces ge-0/0/4 disable",
-            "set interfaces ge-0/0/4 unit 0 description TEST_ge-0/0/4", }, "\n");
+        reader.parseInterface(OUTPUT_SINGLE, builder, interfaceName);
 
-        Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
-            Mockito.eq(instanceIdentifier), Mockito.eq(readContext));
-
-        // test
-        target.readCurrentAttributes(instanceIdentifier, builder, readContext);
-
-        // verify
-        Assert.assertEquals(builder.isEnabled() , false);
+        Assert.assertFalse(builder.isEnabled());
         Assert.assertEquals(builder.getName(), interfaceName);
         Assert.assertEquals(builder.getType(), EthernetCsmacd.class);
     }
 
     @Test
-    public void testReadCurrentAttributes_003() throws Exception {
+    public void testParseSingleInterfaceEnabled() {
         final String interfaceName = "fxp0";
-        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
-        final InstanceIdentifier<Config> instanceIdentifier = InstanceIdentifier.create(Interfaces.class)
-            .child(Interface.class, interfaceKey).child(Config.class);
-
         final ConfigBuilder builder = new ConfigBuilder();
-        final ReadContext readContext = Mockito.mock(ReadContext.class);
 
-        final String outputSingleInterface = StringUtils.join(new String[] {
-            "set interfaces fxp0 unit 0 family inet address 192.168.254.254/24\"", }, "\n");
+        reader.parseInterface(OUTPUT_SINGLE1, builder, interfaceName);
 
-        Mockito.doReturn(outputSingleInterface).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
-            Mockito.eq(instanceIdentifier), Mockito.eq(readContext));
-
-        // test
-        target.readCurrentAttributes(instanceIdentifier, builder, readContext);
-
-        // verify
-        Assert.assertEquals(builder.isEnabled() , true);
+        Assert.assertTrue(builder.isEnabled());
         Assert.assertEquals(builder.getName(), interfaceName);
         Assert.assertEquals(builder.getType(), Other.class);
     }

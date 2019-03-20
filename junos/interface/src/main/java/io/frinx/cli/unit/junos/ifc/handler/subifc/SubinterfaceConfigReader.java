@@ -18,22 +18,19 @@ package io.frinx.cli.unit.junos.ifc.handler.subifc;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceConfigReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.junos.ifc.Util;
 import io.frinx.cli.unit.junos.ifc.handler.InterfaceConfigReader;
-import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public final class SubinterfaceConfigReader extends AbstractSubinterfaceConfigReader {
 
     private static final Pattern SUBIF_DESCRIPTION_LINE = Pattern
         .compile("set interfaces (?<ifcId>\\S+) unit (?<subifcIndex>[0-9]+) description (?<desc>.*)");
@@ -44,6 +41,7 @@ public class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigB
     private Cli cli;
 
     public SubinterfaceConfigReader(Cli cli) {
+        super(cli);
         this.cli = cli;
     }
 
@@ -52,27 +50,28 @@ public class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigB
         @Nonnull ReadContext ctx) throws ReadFailedException {
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
 
-        String subIfcName = SubinterfaceReader.getSubinterfaceName(id);
-        String cmd = String.format(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, subIfcName);
-        parseInterface(blockingRead(cmd, cli, id, ctx), builder, subKey.getIndex());
-    }
-
-    private static void parseInterface(final String output, final ConfigBuilder builder, Long subKey) {
-
-        builder.setIndex(subKey);
-
-        ParsingUtils
-            .parseField(output, SUBIF_DESCRIPTION_LINE::matcher, matcher -> matcher.group("desc"),
-                builder::setDescription);
-        // "disable"
-        builder.setEnabled(true);
-        ParsingUtils
-            .parseField(output, SUBIF_DISABLE_LINE::matcher, matcher -> false,
-                builder::setEnabled);
+        String subIfcName = getSubinterfaceName(id);
+        parseSubinterface(blockingRead(getReadCommand(subIfcName), cli, id, ctx),
+            builder, subKey.getIndex(), subIfcName);
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
-        ((SubinterfaceBuilder) parentBuilder).setConfig(readValue);
+    protected String getReadCommand(String subIfcName) {
+        return f(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, subIfcName);
+    }
+
+    @Override
+    protected String getSubinterfaceName(InstanceIdentifier<Config> instanceIdentifier) {
+        return Util.getSubinterfaceName(instanceIdentifier);
+    }
+
+    @Override
+    protected Pattern getShutdownLine() {
+        return SUBIF_DISABLE_LINE;
+    }
+
+    @Override
+    protected Pattern getDescriptionLine() {
+        return SUBIF_DESCRIPTION_LINE;
     }
 }

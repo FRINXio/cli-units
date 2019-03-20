@@ -18,53 +18,51 @@ package io.frinx.cli.unit.junos.ifc.handler.subifc.ip4;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.junos.ifc.handler.subifc.SubinterfaceReader;
-import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class Ipv4ConfigWriter implements CliWriter<Config> {
+public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
 
-    private static final String WRITE_TEMPLATE = "set interfaces %s family inet address %s/%s";
-    private static final String DELETE_TEMPLATE = "delete interfaces %s family inet address %s/%s";
+    private static final String TEMPLATE = "{% if($delete) %}delete{% else %}set{% endif %} "
+            + "interfaces {$name} family inet address {$config.ip.value}/{$config.prefix_length}";
 
     private final Cli cli;
 
     public Ipv4ConfigWriter(Cli cli) {
+        super(cli);
         this.cli = cli;
     }
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
-        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        blockingWriteAndRead(cli, instanceIdentifier, config,
-            f(WRITE_TEMPLATE, getIfcName(instanceIdentifier), config.getIp().getValue(), config.getPrefixLength()));
-    }
-
-    private static String getIfcName(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
+                                       @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        Long subIfcIndex = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
-        return ifcName + SubinterfaceReader.SEPARATOR + subIfcIndex;
+        blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, ifcName));
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config before,
-        @Nonnull Config after, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (after.getIp() == null) {
-            deleteCurrentAttributes(instanceIdentifier, before, writeContext);
-        } else {
-            writeCurrentAttributes(instanceIdentifier, after, writeContext);
-        }
+    protected String writeTemplate(Config config, String ifcName) {
+        return fT(TEMPLATE, "name", junosIfcName(ifcName), "config", config);
+    }
+
+    private static String junosIfcName(String ifcName) {
+        return ifcName + SubinterfaceReader.SEPARATOR + 0;
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
-        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        blockingWriteAndRead(cli, instanceIdentifier, config,
-            f(DELETE_TEMPLATE, getIfcName(instanceIdentifier), config.getIp().getValue(), config.getPrefixLength()));
+                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+        String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        blockingWriteAndRead(cli, instanceIdentifier, config, deleteTemplate(config, ifcName));
+    }
+
+    @Override
+    protected String deleteTemplate(Config config, String ifcName) {
+        return fT(TEMPLATE, "name", junosIfcName(ifcName), "config", config, "delete", true);
     }
 }
