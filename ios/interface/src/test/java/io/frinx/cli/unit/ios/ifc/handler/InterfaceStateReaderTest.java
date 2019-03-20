@@ -16,8 +16,10 @@
 
 package io.frinx.cli.unit.ios.ifc.handler;
 
+import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceCommonState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.StateBuilder;
@@ -175,21 +177,22 @@ public class InterfaceStateReaderTest {
             + "     0 output buffer failures, 0 output buffers swapped out\n\n";
 
     @Test
-    public void testParseInterfaceState() throws Exception {
+    public void testParseInterfaceState() {
+        InterfaceStateReader reader = new InterfaceStateReader(Mockito.mock(Cli.class));
         StateBuilder parsed = new StateBuilder();
-        InterfaceStateReader.parseInterfaceState(SH_INTERFACE, parsed, "FastEthernet0/0");
+        reader.parseInterfaceState(SH_INTERFACE, parsed, "FastEthernet0/0");
         Assert.assertEquals(EXPECTED_INTERFACE_STATE, parsed.build());
 
         parsed = new StateBuilder();
-        InterfaceStateReader.parseInterfaceState(SH_INTERFACE2, parsed, "GigabitEthernet1/0");
+        reader.parseInterfaceState(SH_INTERFACE2, parsed, "GigabitEthernet1/0");
         Assert.assertEquals(EXPECTED_INTERFACE_STATE2, parsed.build());
 
         parsed = new StateBuilder();
-        InterfaceStateReader.parseInterfaceState(SH_INTERFACE3, parsed, "GigabitEthernet0/0");
+        reader.parseInterfaceState(SH_INTERFACE3, parsed, "GigabitEthernet0/0");
         Assert.assertEquals(EXPECTED_INTERFACE_STATE3, parsed.build());
 
         parsed = new StateBuilder();
-        InterfaceStateReader.parseInterfaceState(SH_INTERFACE_FALLBACK, parsed, "GigabitEthernet0/2");
+        reader.parseInterfaceState(SH_INTERFACE_FALLBACK, parsed, "GigabitEthernet0/2");
         Assert.assertEquals(EXPECTED_FALLBACK_INTERFACE_STATE, parsed.build());
     }
 }

@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.ifc.Util;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -30,7 +31,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public final class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private Cli cli;
 
@@ -49,7 +50,7 @@ public class SubinterfaceConfigReader implements CliConfigReader<Config, ConfigB
             return;
         }
 
-        String subIfcName = SubinterfaceReader.getSubinterfaceName(id);
+        String subIfcName = Util.getSubinterfaceName(id);
         String cmd = String.format(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, subIfcName);
         parseInterface(blockingRead(cmd, cli, id, ctx), builder, subKey.getIndex(), subIfcName);
     }

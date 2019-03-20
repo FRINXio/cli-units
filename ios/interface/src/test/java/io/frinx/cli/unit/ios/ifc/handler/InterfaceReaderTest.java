@@ -17,10 +17,12 @@
 package io.frinx.cli.unit.ios.ifc.handler;
 
 import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 
 public class InterfaceReaderTest {
@@ -48,12 +50,14 @@ public class InterfaceReaderTest {
             .collect(Collectors.toList());
 
     @Test
-    public void testParseInterfaceIds() throws Exception {
-        Assert.assertEquals(IDS_EXPECTED, InterfaceReader.parseInterfaceIds(SH_INTERFACE));
+    public void testParseInterfaceIds() {
+        Assert.assertEquals(IDS_EXPECTED,
+                new InterfaceReader(Mockito.mock(Cli.class)).parseInterfaceIds(SH_INTERFACE));
     }
 
     @Test
-    public void testParseAllInterfaceIds() throws Exception {
-        Assert.assertEquals(IDS_ALL_EXPECTED, InterfaceReader.parseAllInterfaceIds(SH_INTERFACE));
+    public void testParseAllInterfaceIds() {
+        Assert.assertEquals(IDS_ALL_EXPECTED,
+                new InterfaceReader(Mockito.mock(Cli.class)).parseAllInterfaceIds(SH_INTERFACE));
     }
 }

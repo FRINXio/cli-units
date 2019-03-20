@@ -16,25 +16,27 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip6;
 
+import io.frinx.cli.io.Cli;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6AddressNoZone;
 
 public class Ipv6AddressReaderTest {
 
-    public static final String OUTPUT = " ipv6 address FE80::C801:7FF:FEBC:1C link-local\n"
+    static final String OUTPUT = " ipv6 address FE80::C801:7FF:FEBC:1C link-local\n"
             + " ipv6 address 2002::1/65\n"
             + " ipv6 address 2003::1/124\n";
 
     @Test
-    public void testParse() throws Exception {
+    public void testParse() {
 
-        List<AddressKey> addressKeys = Ipv6AddressReader.parseAddressIds(OUTPUT);
+        List<AddressKey> addressKeys = new Ipv6AddressReader(Mockito.mock(Cli.class)).parseAddressIds(OUTPUT);
 
         final List<AddressKey> actual = new ArrayList<>();
         actual.addAll(addressKeys);

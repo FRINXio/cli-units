@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.ifc.Util;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.utils.CliOperReader;
@@ -32,7 +33,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.StateBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceStateReader implements CliOperReader<State, StateBuilder> {
+public final class SubinterfaceStateReader implements CliOperReader<State, StateBuilder> {
 
     private final Cli cli;
 
@@ -50,7 +51,7 @@ public class SubinterfaceStateReader implements CliOperReader<State, StateBuilde
             return;
         }
 
-        String subIfcName = SubinterfaceReader.getSubinterfaceName(id);
+        String subIfcName = Util.getSubinterfaceName(id);
 
         String cmd = String.format(InterfaceStateReader.SH_SINGLE_INTERFACE, subIfcName);
         parseInterfaceState(blockingRead(cmd, cli, id, ctx), builder, subKey.getIndex(), subIfcName);

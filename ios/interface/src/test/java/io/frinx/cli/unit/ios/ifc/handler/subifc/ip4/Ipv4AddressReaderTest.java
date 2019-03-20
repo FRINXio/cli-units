@@ -17,18 +17,22 @@
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
 import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.AddressKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
 
 public class Ipv4AddressReaderTest {
 
+    private static final String OUTPUT = " ip address 192.168.1.44 255.255.255.0\n";
+
     @Test
-    public void testParse() throws Exception {
-        List<AddressKey> addressKeys = Ipv4AddressReader.parseAddressIds(" ip address 192.168.1.44 255.255.255.0\n");
+    public void testParse() {
+        List<AddressKey> addressKeys = new Ipv4AddressReader(Mockito.mock(Cli.class)).parseAddressIds(OUTPUT);
         ArrayList<AddressKey> expected = Lists.newArrayList(new AddressKey(new Ipv4AddressNoZone("192.168.1.44")));
         Assert.assertEquals(expected, addressKeys);
     }
