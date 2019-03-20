@@ -100,10 +100,10 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
         return interfaceId.get();
     }
 
-    private static boolean isConfigurationOfBundleInterface(String output) {
+    private boolean isConfigurationOfBundleInterface(String output) {
         final String extractedId = extractInterfaceId(output);
         if (Objects.nonNull(extractedId)) {
-            return AggregateConfigReader.isLAGInterface(extractedId);
+            return new AggregateConfigReader(cli).isLAGInterface(extractedId);
         }
         return false;
     }

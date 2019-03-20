@@ -59,7 +59,7 @@ public class BundleReader implements CliConfigListReader<Interface, InterfaceKey
         return parseBundleIds(listOfInterfaces, listOfBundleIds);
     }
 
-    static List<InterfaceKey> parseBundleIds(@Nonnull String listOfInterfaces, @Nonnull String listOfBundleIds) {
+    List<InterfaceKey> parseBundleIds(@Nonnull String listOfInterfaces, @Nonnull String listOfBundleIds) {
         final Set<InterfaceKey> interfaceKeysFromBundleInterfaces = parseIdsFromBundleInterfaces(listOfInterfaces);
         final Set<InterfaceKey> interfaceKeysFromInterfacesConfig = parseIdsFromInterfaceConfiguration(listOfBundleIds);
         final Set<InterfaceKey> union = new HashSet<>(interfaceKeysFromBundleInterfaces);
@@ -67,7 +67,7 @@ public class BundleReader implements CliConfigListReader<Interface, InterfaceKey
         return new ArrayList<>(union);
     }
 
-    private static Set<InterfaceKey> parseIdsFromBundleInterfaces(String commandOutput) {
+    private Set<InterfaceKey> parseIdsFromBundleInterfaces(String commandOutput) {
         return ParsingUtils.parseFields(
                 commandOutput,
                 0,
@@ -75,7 +75,7 @@ public class BundleReader implements CliConfigListReader<Interface, InterfaceKey
             matcher -> matcher.group("id"),
             String::new
         ).stream()
-                .filter(AggregateConfigReader::isLAGInterface)
+                .filter(new AggregateConfigReader(cli)::isLAGInterface)
                 .map(InterfaceKey::new)
                 .collect(Collectors.toCollection(HashSet::new));
     }
