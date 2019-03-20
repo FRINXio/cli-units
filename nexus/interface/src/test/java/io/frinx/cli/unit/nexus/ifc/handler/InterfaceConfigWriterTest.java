@@ -43,7 +43,6 @@ public class InterfaceConfigWriterTest {
             + "root\n";
 
     private static final String UPDATE_INPUT = "interface Loopback45\n"
-            + "mtu 9216\n"
             + "description updated desc\n"
             + "no shutdown\n"
             + "root\n";

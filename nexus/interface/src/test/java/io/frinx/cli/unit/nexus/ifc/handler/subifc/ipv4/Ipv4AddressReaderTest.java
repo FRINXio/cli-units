@@ -17,31 +17,29 @@
 package io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv4;
 
 import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.AddressKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
 
 public class Ipv4AddressReaderTest {
 
-    private static final String SH_RUN_INT_IP = "Mon Feb 12 12:47:42.025 UTC\n"
+    private static final String OUTPUT = "Mon Feb 12 12:47:42.025 UTC\n"
             + "interface Ethernet1/1.5\n"
             + " ip address 192.168.1.1/16\n";
 
-    private static final String SH_RUN_INT_NO_IP = "Mon Feb 12 12:53:52.860 UTC"
+    private static final String EMPTY_OUTPUT = "Mon Feb 12 12:53:52.860 UTC"
             + "interface Ethernet1/1.5\n";
 
-    private static final List<AddressKey> EXPECTED_ADDRESSES = Lists.newArrayList("192.168.1.1")
-            .stream().map(Ipv4AddressNoZone::new)
-            .map(AddressKey::new)
-            .collect(Collectors.toList());
+    private static final List<AddressKey> EXPECTED_ADDRESS = Lists.newArrayList(
+            new AddressKey(new Ipv4AddressNoZone("192.168.1.1")));
 
     @Test
     public void testparseAddressConfig() {
-        Assert.assertEquals(EXPECTED_ADDRESSES, Ipv4AddressReader.parseAddressIds(SH_RUN_INT_IP));
-        Assert.assertTrue(Ipv4AddressReader.parseAddressIds(SH_RUN_INT_NO_IP).isEmpty());
+        Assert.assertEquals(EXPECTED_ADDRESS, new Ipv4AddressReader(Mockito.mock(Cli.class)).parseAddressIds(OUTPUT));
+        Assert.assertTrue(new Ipv4AddressReader(Mockito.mock(Cli.class)).parseAddressIds(EMPTY_OUTPUT).isEmpty());
     }
-
 }

@@ -16,8 +16,10 @@
 
 package io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv6;
 
+import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6AddressNoZone;
@@ -36,8 +38,8 @@ public class Ipv6ConfigReaderTest {
     @Test
     public void testParseAddressconfig() {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        Ipv6ConfigReader.parseAddressConfig(configBuilder, SH_RUN_INT_IP);
+        new Ipv6ConfigReader(Mockito.mock(Cli.class))
+                .parseAddressConfig(configBuilder, SH_RUN_INT_IP, new Ipv6AddressNoZone("2002::1"));
         Assert.assertEquals(EXPECTED_CONFIG, configBuilder.build());
     }
-
 }

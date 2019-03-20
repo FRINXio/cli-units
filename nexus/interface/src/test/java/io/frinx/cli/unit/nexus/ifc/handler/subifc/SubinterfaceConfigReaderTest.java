@@ -16,43 +16,20 @@
 
 package io.frinx.cli.unit.nexus.ifc.handler.subifc;
 
-import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.Subinterfaces;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.ConfigBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SubinterfaceConfigReaderTest {
 
-    private static final String SH_RUN_INT = "Fri Nov 23 13:18:34.834 UTC\n"
+    private static final String OUTPUT = "Fri Nov 23 13:18:34.834 UTC\n"
             + "interface Ethernet1/1.5\n"
             + " description example\n"
             + " no shutdown\n"
             + "\n";
-
-    private SubinterfaceConfigReader target;
-
-    @Mock
-    private Cli cli;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
-        target = Mockito.spy(new SubinterfaceConfigReader(cli));
-    }
 
     private static final Config EXPECTED_CONFIG = new ConfigBuilder().setName("Ethernet1/1.5")
             .setEnabled(true)
@@ -61,25 +38,11 @@ public class SubinterfaceConfigReaderTest {
             .build();
 
     @Test
-    public void testParseInterface() throws Exception {
-        final String interfaceName = "Ethernet1/1";
-        final InterfaceKey interfaceKey = new InterfaceKey(interfaceName);
-        final SubinterfaceKey subinterfaceKey = new SubinterfaceKey(Long.valueOf(5));
-        final ReadContext readContext = Mockito.mock(ReadContext.class);
-
-
-        final InstanceIdentifier<Config> id = InstanceIdentifier.create(Interfaces.class)
-                .child(Interface.class, interfaceKey)
-                .child(Subinterfaces.class).child(Subinterface.class, subinterfaceKey).child(Config.class);
-
+    public void testParseInterface()  {
+        final String interfaceName = "Ethernet1/1.5";
         final ConfigBuilder actualConfig = new ConfigBuilder();
-
-        Mockito.doReturn(SH_RUN_INT).when(target).blockingRead(Mockito.anyString(), Mockito.eq(cli),
-                Mockito.eq(id), Mockito.eq(readContext));
-
-
-        target.readCurrentAttributes(id, actualConfig, readContext);
+        new SubinterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseSubinterface(OUTPUT, actualConfig, 5L, interfaceName);
         Assert.assertEquals(EXPECTED_CONFIG, actualConfig.build());
-
     }
 }

@@ -16,12 +16,13 @@
 
 package io.frinx.cli.unit.nexus.ifc.handler;
 
+import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-
 
 public class InterfaceConfigReaderTest {
 
@@ -42,7 +43,7 @@ public class InterfaceConfigReaderTest {
     @Test
     public void testParseInterface() {
         ConfigBuilder actualConfig = new ConfigBuilder();
-        InterfaceConfigReader.parseInterface(SH_RUN_INT, actualConfig, "Ethernet1/1");
+        new InterfaceConfigReader(Mockito.mock(Cli.class)).parseInterface(SH_RUN_INT, actualConfig, "Ethernet1/1");
         Assert.assertEquals(EXPECTED_CONFIG, actualConfig.build());
 
     }
