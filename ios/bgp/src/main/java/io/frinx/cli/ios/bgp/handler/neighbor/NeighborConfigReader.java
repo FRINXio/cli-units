@@ -35,7 +35,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.CommunityType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.RoutingPassword;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedPassword;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.PlainString;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
@@ -130,7 +131,8 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
     private static void setPasswd(ConfigBuilder configBuilder, String defaultInstance) {
         ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, PASSWORD_PATTERN::matcher,
             m -> findGroup(m, "password"),
-            groupsHashMap -> configBuilder.setAuthPassword(new RoutingPassword(groupsHashMap.get("password"))));
+            groupsHashMap -> configBuilder.setAuthPassword(
+                    new EncryptedPassword(new PlainString(groupsHashMap.get("password")))));
     }
 
     private static void setPeerGroup(ConfigBuilder configBuilder, String defaultInstance) {

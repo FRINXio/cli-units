@@ -46,6 +46,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedPassword;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedString;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.BGP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
@@ -58,6 +60,7 @@ public class NeighborConfigWriterTest {
     private static final String WRITE_INPUT = "router bgp 65505 instance test \n"
             + "neighbor 192.168.1.1\n"
             + "remote-as 65500\n"
+            + "password encrypted ABCDEFGH\n"
             + "use neighbor-group ibgp\n"
             + "no shutdown\n"
             + "root\n";
@@ -65,6 +68,7 @@ public class NeighborConfigWriterTest {
     private static final String UPDATE_INPUT = "router bgp 65505 instance test \n"
             + "neighbor 192.168.1.1\n"
             + "remote-as 65501\n"
+            + "no password\n"
             + "use neighbor-group ebgp\n"
             + "shutdown\n"
             + "root\n";
@@ -72,6 +76,7 @@ public class NeighborConfigWriterTest {
     private static final String UPDATE_CLEAN_INPUT = "router bgp 65505 instance test \n"
             + "neighbor 192.168.1.1\n"
             + "no remote-as\n"
+            + "no password\n"
             + "no use neighbor-group\n"
             + "shutdown\n"
             + "root\n";
@@ -115,6 +120,7 @@ public class NeighborConfigWriterTest {
     private void initializeData() {
         data = new ConfigBuilder().setPeerAs(new AsNumber(65500L))
                 .setNeighborAddress(new IpAddress(new Ipv4Address("192.168.1.1")))
+                .setAuthPassword(new EncryptedPassword(new EncryptedString("Encrypted[ABCDEFGH]")))
                 .setEnabled(true)
                 .setPeerGroup("ibgp")
                 .build();

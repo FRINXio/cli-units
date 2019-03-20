@@ -38,7 +38,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.CommunityType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.PRIVATEASREMOVEALL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.RoutingPassword;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedPassword;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedString;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
 import org.opendaylight.yangtools.concepts.Builder;
@@ -49,6 +50,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
 
 
     private static final String SH_NEI = "show running-config router bgp %s %s %s neighbor %s";
+    private static final String PASSWORD_FORM = "Encrypted[%s]";
     private static final Pattern REMOTE_AS_LINE = Pattern.compile(".*remote-as (?<remoteAs>\\S+).*");
     private static final Pattern NEIGHBOR_LINE = Pattern.compile(".*use neighbor-group (?<group>\\S+).*");
     private static final Pattern PASSWORD_LINE = Pattern.compile(".*password encrypted (?<password>\\S+).*");
@@ -130,7 +132,8 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
         // password
         ParsingUtils.parseField(output, PASSWORD_LINE::matcher,
             matcher -> matcher.group("password"),
-            password -> configBuilder.setAuthPassword(new RoutingPassword(password)));
+            password -> configBuilder.setAuthPassword(
+                    new EncryptedPassword(new EncryptedString(String.format(PASSWORD_FORM, password)))));
 
         // description
         ParsingUtils.parseField(output, DESCRIPTION_LINE::matcher,

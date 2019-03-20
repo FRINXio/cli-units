@@ -20,7 +20,8 @@ import io.frinx.openconfig.network.instance.NetworInstance;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.RoutingPassword;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedPassword;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.PlainString;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 
 public class PeerGroupConfigReaderTest {
@@ -41,7 +42,7 @@ public class PeerGroupConfigReaderTest {
         PeerGroupConfigReader.parseConfigAttributes(OUTPUT, configBuilder, NetworInstance.DEFAULT_NETWORK_NAME);
         Assert.assertEquals(new ConfigBuilder()
                         .setDescription("description")
-                        .setAuthPassword(new RoutingPassword("passwd"))
+                        .setAuthPassword(new EncryptedPassword(new PlainString("passwd")))
                         .setPeerAs(new AsNumber(45L))
                         .build(),
                 configBuilder.build());

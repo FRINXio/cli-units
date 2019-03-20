@@ -69,7 +69,8 @@ public class NeighborConfigReaderTest {
         Assert.assertTrue(builder.isEnabled());
         Assert.assertEquals("nbrgroup1", builder.getPeerGroup());
         Assert.assertEquals("test desc", builder.getDescription());
-        Assert.assertEquals("GCHKNJDJSADNKLSAND", builder.getAuthPassword().getValue());
+        Assert.assertEquals("Encrypted[GCHKNJDJSADNKLSAND]",
+                builder.getAuthPassword().getEncryptedString().getValue());
         Assert.assertNotNull(builder.getSendCommunity());
         Assert.assertNotNull(builder.getRemovePrivateAs());
 
