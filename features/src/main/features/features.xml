@@ -58,6 +58,7 @@
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/network-instance-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-interface-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-bgp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-rib-unit/{{VERSION}}</bundle>
@@ -104,6 +105,7 @@
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-common-cli-initializer</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-cli-init-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/network-instance-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-network-instance-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-bgp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-interface-unit/{{VERSION}}</bundle>
@@ -138,6 +140,7 @@
         <bundle>mvn:io.frinx.cli/brocade-cli-init-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/brocade-interface-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/brocade-cdp-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/network-instance-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/brocade-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
@@ -157,6 +160,7 @@
         <bundle>mvn:io.frinx.cli/junos-cli-init-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-configuration-metadata-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-interface-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/network-instance-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-network-instance-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-acl-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/junos-ospf-unit/{{VERSION}}</bundle>
@@ -176,6 +180,7 @@
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/huawei-cli-init-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/huawei-interface-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/network-instance-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/huawei-network-instance-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/huawei-bgp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/huawei-routing-policy-unit/{{VERSION}}</bundle>
@@ -187,6 +192,7 @@
         <bundle>mvn:io.frinx.cli/nexus-utils/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/nexus-cli-init-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/nexus-lldp-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/network-instance-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/nexus-interface-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/nexus-configuration-metadata-unit/{{VERSION}}</bundle>
     </feature>

@@ -136,6 +136,11 @@
     </dependency>
 
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>network-instance-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>ios-interface-unit</artifactId>
       <version>${project.version}</version>
