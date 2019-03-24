@@ -18,13 +18,13 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.0.rc20-frinx-SNAPSHOT</version>
+        <version>4.2.0.rc20-frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-xr-lldp-unit</artifactId>
-    <version>4.2.0.rc20-frinx-SNAPSHOT</version>
+    <version>4.2.0.rc20-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
