@@ -28,10 +28,8 @@ import java.util.ArrayList;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.StateBuilder;
 
-public class NetworkInstanceStateReader extends CompositeReader<State, StateBuilder>
-    implements CliOperReader<State, StateBuilder> {
-
-    private Cli cli;
+public final class NetworkInstanceStateReader extends CompositeReader<State, StateBuilder>
+        implements CliOperReader<State, StateBuilder> {
 
     public NetworkInstanceStateReader(Cli cli) {
         super(new ArrayList<ReaderCustomizer<State, StateBuilder>>() {{
@@ -42,5 +40,4 @@ public class NetworkInstanceStateReader extends CompositeReader<State, StateBuil
             }
         });
     }
-
 }

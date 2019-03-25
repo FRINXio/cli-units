@@ -16,14 +16,15 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 
+import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.RouteDistinguisher;
 
-public class VrfConfigReaderTest {
+public class L3VrfConfigReaderTest {
 
     private static final String OUTPUT = "ip vrf TMP\n"
             + "ip vrf TEST\n"
@@ -34,36 +35,34 @@ public class VrfConfigReaderTest {
 
     private static final Config EXPECTED_VRF_TEST = new ConfigBuilder()
             .setRouteDistinguisher(new RouteDistinguisher("65002:1"))
-            .setType(L3VRF.class)
             .setName("TEST")
             .build();
 
     private static final Config EXPECTED_VRF_ANOTHER_TEST = new ConfigBuilder()
             .setRouteDistinguisher(new RouteDistinguisher("2.2.2.2:44"))
-            .setType(L3VRF.class)
             .setName("ANOTHER_TEST")
             .build();
 
     private static final Config EXPECTED_VRF_WITHOUT_VRF = new ConfigBuilder()
-            .setType(L3VRF.class)
             .setName("WITHOUT_RD")
             .build();
 
     @Test
-    public void testRd() throws Exception {
+    public void testRd() {
+        L3VrfConfigReader reader = new L3VrfConfigReader(Mockito.mock(Cli.class));
 
         // route distinguisher set
-        ConfigBuilder actualConfigBuilder = new ConfigBuilder();
-        VrfConfigReader.parseVrfConfig(OUTPUT, actualConfigBuilder, "TEST");
+        ConfigBuilder actualConfigBuilder = new ConfigBuilder().setName("TEST");
+        reader.parseVrfConfig(OUTPUT, actualConfigBuilder);
         Assert.assertEquals(EXPECTED_VRF_TEST, actualConfigBuilder.build());
 
-        actualConfigBuilder = new ConfigBuilder();
-        VrfConfigReader.parseVrfConfig(OUTPUT, actualConfigBuilder, "ANOTHER_TEST");
+        actualConfigBuilder = new ConfigBuilder().setName("ANOTHER_TEST");
+        reader.parseVrfConfig(OUTPUT, actualConfigBuilder);
         Assert.assertEquals(EXPECTED_VRF_ANOTHER_TEST, actualConfigBuilder.build());
 
         // no distinguisher set
-        actualConfigBuilder = new ConfigBuilder();
-        VrfConfigReader.parseVrfConfig(OUTPUT, actualConfigBuilder, "WITHOUT_RD");
+        actualConfigBuilder = new ConfigBuilder().setName("WITHOUT_RD");
+        reader.parseVrfConfig(OUTPUT, actualConfigBuilder);
         Assert.assertEquals(EXPECTED_VRF_WITHOUT_VRF, actualConfigBuilder.build());
 
     }

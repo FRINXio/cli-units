@@ -16,26 +16,15 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.l2p2p;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.cli.ni.base.handler.l2p2p.AbstractL2P2PReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L2P2PReader implements CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>,
-        CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
+public final class L2P2PReader extends AbstractL2P2PReader {
 
     public static final String SH_INTERFACES_XCONNECT = "show running-config | include ^interface|^ *xconnect";
     public static final Pattern XCONNECT_ID_LINE = Pattern.compile("(?<interface>\\S+)\\s+xconnect\\s+(?<ip>\\S+)\\s+"
@@ -46,53 +35,37 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
     public static final Pattern LOCAL_CONNECT_ID_LINE = Pattern.compile("connect (?<network>\\S+)\\s+"
             + "(?<interface1>\\S+)\\s+(?<interface2>\\S+)\\s+interworking ethernet");
 
-    private Cli cli;
-
     public L2P2PReader(Cli cli) {
-        this.cli = cli;
+        super(cli);
     }
 
-    @Nonnull
     @Override
-    public List<NetworkInstanceKey> getAllIds(@Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier,
-                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        return getAllIds(instanceIdentifier, readContext, this.cli, this);
-    }
-
-    static List<NetworkInstanceKey> getAllIds(@Nonnull InstanceIdentifier<?> instanceIdentifier,
-                                              @Nonnull ReadContext readContext,
-                                              @Nonnull Cli cli,
-                                              @Nonnull CliReader reader) throws ReadFailedException {
-        if (!instanceIdentifier.getTargetType()
-                .equals(NetworkInstance.class)) {
-            instanceIdentifier = RWUtils.cutId(instanceIdentifier, NetworkInstance.class);
-        }
-
-        // Parse xconnect based local-remote l2p2p
-        List<NetworkInstanceKey> l2Ids = parseXconnectIds(reader.blockingRead(SH_INTERFACES_XCONNECT, cli,
-                instanceIdentifier, readContext));
-        // Parse xconnect based local-local l2p2p
-        l2Ids.addAll(parseLocalConnectIds(reader.blockingRead(SH_LOCAL_CONNECT, cli, instanceIdentifier, readContext)));
-
-        return l2Ids;
-    }
-
-    @VisibleForTesting
-    static List<NetworkInstanceKey> parseXconnectIds(String output) {
+    protected List<NetworkInstanceKey> parseLocalRemote(String output) {
         String linePerInterface = realignXconnectInterfacesOutput(output);
-
         return ParsingUtils.parseFields(linePerInterface, 0,
-                XCONNECT_ID_LINE::matcher,
-                L2P2PReader::getXconnectId,
-                NetworkInstanceKey::new);
+            XCONNECT_ID_LINE::matcher,
+            this::getXconnectId,
+            NetworkInstanceKey::new);
     }
 
-    @VisibleForTesting
-    static List<NetworkInstanceKey> parseLocalConnectIds(String output) {
-        return ParsingUtils.parseFields(output, 0,
-                LOCAL_CONNECT_ID_LINE::matcher,
-            matcher -> matcher.group("network"),
-                NetworkInstanceKey::new);
+    @Override
+    protected String getReadLocalRemoteCommand() {
+        return SH_INTERFACES_XCONNECT;
+    }
+
+    @Override
+    protected String getReadLocalLocalCommand() {
+        return SH_LOCAL_CONNECT;
+    }
+
+    @Override
+    protected Pattern getLocalLocalLine() {
+        return LOCAL_CONNECT_ID_LINE;
+    }
+
+    @Override
+    protected Pattern getLocalRemoteLine() {
+        return XCONNECT_ID_LINE;
     }
 
     public static String realignXconnectInterfacesOutput(String output) {
@@ -100,7 +73,7 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
         return withoutNewlines.replace("interface ", "\n");
     }
 
-    private static String getXconnectId(Matcher matcher) {
+    private String getXconnectId(Matcher matcher) {
         String ifc = matcher.group("interface");
         String ipRemote = matcher.group("ip");
         String encaps = matcher.group("encaps");
@@ -108,20 +81,8 @@ public class L2P2PReader implements CliConfigListReader<NetworkInstance, Network
         Matcher pwClass = PW_CLASS.matcher(encaps);
 
         // Use pw-class as l2vpn name if possible
-        if (pwClass.matches()) {
-            return pwClass.group("pwclass");
-        } else {
+        return (pwClass.matches()) ? pwClass.group("pwclass") :
             // otherwise use interface + remote IP as name
-            return String.format("%s xconnect %s", ifc, ipRemote);
-        }
-    }
-
-    @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier,
-                                      @Nonnull NetworkInstanceBuilder networkInstanceBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        String name = instanceIdentifier.firstKeyOf(NetworkInstance.class)
-                .getName();
-        networkInstanceBuilder.setName(name);
+            f("%s xconnect %s", ifc, ipRemote);
     }
 }

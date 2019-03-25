@@ -69,6 +69,11 @@
             <artifactId>handlers</artifactId>
             <version>${translate.unit.commons.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>network-instance-base</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
