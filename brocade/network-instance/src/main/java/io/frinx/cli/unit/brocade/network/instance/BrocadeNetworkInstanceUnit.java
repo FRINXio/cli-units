@@ -27,9 +27,9 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ni.base.handler.l2p2p.L2P2PConfigWriter;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
-import io.frinx.cli.unit.brocade.network.instance.l2p2p.L2P2PConfigWriter;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.ConnectionPointsReader;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.ConnectionPointsWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
@@ -87,7 +87,6 @@ public class BrocadeNetworkInstanceUnit implements TranslateUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         // No handling required on the network instance level
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
-
         writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG,
                         new CompositeWriter<>(Lists.newArrayList(
                                 new L2P2PConfigWriter(cli)))),
