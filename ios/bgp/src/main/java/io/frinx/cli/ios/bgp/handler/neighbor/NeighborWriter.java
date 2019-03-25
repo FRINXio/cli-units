@@ -57,9 +57,14 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     public static final String NEIGHBOR_COMMON_CONFIG = "{%if ($neighbor.config.description) %}neighbor "
             + "{$neighbor_id} description {$neighbor.config.description}\n"
             + "{% elseIf ($before.config.description) %}no neighbor {$neighbor_id} description\n{% endif %}"
-            + "{%if ($neighbor.config.auth_password.plain_string.value) %}n"
-            + "eighbor {$neighbor_id} password {$neighbor.config.auth_password.plain_string.value}\n"
-            + "{% elseIf ($before.config.auth_password.plain_string.value) %}"
+            + "{%if ($neighbor.config.auth_password) %}"
+            + "{%if ($neighbor.config.auth_password.encrypted_string) %}"
+            + "neighbor {$neighbor_id} password "
+            + "{$neighbor.config.auth_password.encrypted_string.value|s/^Encrypted\\[|\\]$/ /g|trim}\n"
+            + "{% elseIf ($neighbor.config.auth_password.plain_string) %}"
+            + "neighbor {$neighbor_id} password {$neighbor.config.auth_password.plain_string.value}\n"
+            + "{% endif %}"
+            + "{% elseIf ($before.config.auth_password) %}"
             + "no neighbor {$neighbor_id} password\n{% endif %}";
 
     public static final String NEIGHBOR_RR_CONFIG = "{%if ($route_reflect_client) %}neighbor {$neighbor_id} "
