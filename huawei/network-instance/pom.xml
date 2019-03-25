@@ -43,9 +43,9 @@
     </dependency>
 
     <dependency>
-      <groupId>io.frinx.translate.unit.commons</groupId>
-      <artifactId>handlers</artifactId>
-      <version>${translate.unit.commons.version}</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>network-instance-base</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>

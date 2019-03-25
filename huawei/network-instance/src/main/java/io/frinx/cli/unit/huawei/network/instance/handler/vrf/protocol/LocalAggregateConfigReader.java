@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.protocol;
+package io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;

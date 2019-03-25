@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.huawei.network.instance.handler.l3vrf.ifc;
+package io.frinx.cli.unit.huawei.network.instance.handler.vrf.ifc;
 
 import com.google.common.collect.Lists;
 import java.util.List;
