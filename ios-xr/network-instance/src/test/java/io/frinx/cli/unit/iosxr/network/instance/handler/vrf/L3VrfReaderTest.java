@@ -18,7 +18,9 @@ package io.frinx.cli.unit.iosxr.network.instance.handler.vrf;
 
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliReader;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,8 +33,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L3VrfReaderTest {
-    @Mock
-    private Cli cli;
     private static final String OUTPUT = " vrf iups\r\n vrf iups\r\n vrf icps\r\n vrf iups";
 
     private static final List<NetworkInstanceKey> EXPECTED_NWI_KEYS = Lists.newArrayList(
@@ -40,20 +40,22 @@ public class L3VrfReaderTest {
             new NetworkInstanceKey("icps")
             );
 
+    @Mock
+    CliReader parentReader;
+
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws ReadFailedException {
         MockitoAnnotations.initMocks(this);
+        Mockito.doReturn(OUTPUT).when(parentReader).blockingRead(Mockito.anyString(),
+                Mockito.any(), Mockito.any(), Mockito.any());
     }
 
     @Test
-    public void testGetAllIds_001() throws Exception {
-        final InstanceIdentifier<NetworkInstance> iid =
-                InstanceIdentifier.create(NetworkInstance.class);
-        final ReadContext readContext = Mockito.mock(ReadContext.class);
-        L3VrfReader target = Mockito.spy(new L3VrfReader(cli));
-        Mockito.doReturn(OUTPUT).when(target).blockingRead(Mockito.anyString(),
-                Mockito.any(), Mockito.any(), Mockito.any());
-        List<NetworkInstanceKey> lst = target.getAllIds(iid, readContext);
+    public void testGetAllIds() throws Exception {
+        final InstanceIdentifier<NetworkInstance> iid = InstanceIdentifier.create(NetworkInstance.class);
+        L3VrfReader reader = new L3VrfReader(Mockito.mock(Cli.class));
+
+        List<NetworkInstanceKey> lst = reader.getAllIds(parentReader, iid, Mockito.mock(ReadContext.class));
         Assert.assertEquals(lst, EXPECTED_NWI_KEYS);
     }
 }
