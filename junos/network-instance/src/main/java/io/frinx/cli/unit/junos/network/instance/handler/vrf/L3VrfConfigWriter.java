@@ -16,86 +16,27 @@
 
 package io.frinx.cli.unit.junos.network.instance.handler.vrf;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import io.fd.honeycomb.translate.write.WriteContext;
-import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
-import io.frinx.translate.unit.commons.handler.spi.CompositeChildWriter;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import io.frinx.cli.ni.base.handler.vrf.AbstractL3VrfConfigWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L3VrfConfigWriter implements CliWriter<Config>, CompositeChildWriter<Config> {
+public final class L3VrfConfigWriter extends AbstractL3VrfConfigWriter {
 
-    private Cli cli;
+    private static final String UPDATE_TEMPLATE = "set routing-instances {$data.name} instance-type virtual-router";
+
+    private static final String DELETE_TEMPLATE = "delete routing-instances {$data.name}";
 
     public L3VrfConfigWriter(Cli cli) {
-        this.cli = cli;
+        super(cli);
     }
 
     @Override
-    public boolean writeCurrentAttributesWResult(
-            @Nonnull InstanceIdentifier<Config> id,
-            @Nonnull Config data,
-            @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        if (!isSupportedType(data)) {
-            return false;
-        }
-
-        createOrUpdateCurrentAttributes(id, data);
-        return true;
+    protected String updateTemplate(Config before, Config after) {
+        return fT(UPDATE_TEMPLATE, "data", after);
     }
 
     @Override
-    public boolean updateCurrentAttributesWResult(
-            @Nonnull InstanceIdentifier<Config> id,
-            @Nonnull Config dataBefore,
-            @Nonnull Config dataAfter,
-            @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        if (!isSupportedType(dataAfter)) {
-            return false;
-        }
-
-        Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
-            "Changing interface type is not permitted. Before: %s, After: %s",
-            dataBefore.getType(), dataAfter.getType());
-
-        createOrUpdateCurrentAttributes(id, dataAfter);
-        return true;
-    }
-
-    @Override
-    public boolean deleteCurrentAttributesWResult(
-        @Nonnull InstanceIdentifier<Config> id,
-        @Nonnull Config dataBefore,
-        @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        if (!isSupportedType(dataBefore)) {
-            return false;
-        }
-
-        String name = id.firstKeyOf(NetworkInstance.class).getName();
-
-        blockingDeleteAndRead(cli, id, f("delete routing-instances %s", name));
-        return true;
-    }
-
-    @VisibleForTesting
-    String createOrUpdateCurrentAttributes(
-        @Nonnull InstanceIdentifier<Config> id,
-        @Nonnull Config data) throws WriteFailedException {
-
-        String name = id.firstKeyOf(NetworkInstance.class).getName();
-        return blockingWriteAndRead(cli, id, data, f("set routing-instances %s instance-type virtual-router", name));
-    }
-
-    private boolean isSupportedType(Config data) {
-        return data.getType() == L3VRF.class;
+    protected String deleteTemplate(Config config) {
+        return fT(DELETE_TEMPLATE, "data", config);
     }
 }

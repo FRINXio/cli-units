@@ -49,6 +49,11 @@
             <version>${translate.unit.commons.version}</version>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>network-instance-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>translate-spi</artifactId>
             <version>${hc.version}</version>

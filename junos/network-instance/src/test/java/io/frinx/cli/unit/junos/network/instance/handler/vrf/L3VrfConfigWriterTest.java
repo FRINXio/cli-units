@@ -21,7 +21,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.concurrent.CompletableFuture;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -39,52 +39,43 @@ public class L3VrfConfigWriterTest {
 
     @Mock
     private Cli cli;
+
     @Mock
     private WriteContext writeContext;
 
-    private L3VrfConfigWriter target;
+    private L3VrfConfigWriter writer;
+
+    private final InstanceIdentifier<Config> iid = IIDs.NETWORKINSTANCES
+            .child(NetworkInstance.class, new NetworkInstanceKey("VRF-001"))
+            .child(Config.class);
+
+    private final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
+
+    private Config data = new ConfigBuilder().setType(L3VRF.class).setName("VRF-001").build();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
-        target = new L3VrfConfigWriter(cli);
+        Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
+        writer = new L3VrfConfigWriter(cli);
     }
 
     @Test
-    public void testCreateOfUpdateCurrentAttributes() throws Exception {
-        final String vrfName = "VRF-001";
-        final InstanceIdentifier<Config> iid = IIDs.NETWORKINSTANCES
-            .child(NetworkInstance.class, new NetworkInstanceKey(vrfName))
-            .child(Config.class);
-        final Config data = Mockito.mock(Config.class);
-        final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
-
-        Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
-        target.createOrUpdateCurrentAttributes(iid, data);
+    public void testWrite() throws Exception {
+        writer.writeCurrentAttributesWResult(iid, data, writeContext);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(
-            "set routing-instances VRF-001 instance-type virtual-router\n"));
+        Assert.assertEquals("set routing-instances VRF-001 instance-type virtual-router\n",
+                commands.getValue().getContent());
     }
 
     @Test
-    public void testDeleteCurrentAttributes() throws Exception {
-        final String vrfName = "VRF-001";
-        final InstanceIdentifier<Config> iid = IIDs.NETWORKINSTANCES
-            .child(NetworkInstance.class, new NetworkInstanceKey(vrfName))
-            .child(Config.class);
-        final Config data = Mockito.mock(Config.class);
-        final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
+    public void testDelete() throws Exception {
+        writer.deleteCurrentAttributes(iid, data, writeContext);
 
-        Mockito.doReturn(L3VRF.class).when(data).getType();
-        Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
-        target.deleteCurrentAttributes(iid, data, writeContext);
+        Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
-        Mockito.verify(data, Mockito.times(1)).getType();
-
-        Assert.assertThat(commands.getValue().getContent(), CoreMatchers.equalTo(
-            "delete routing-instances VRF-001\n"));
+        Assert.assertEquals("delete routing-instances VRF-001\n", commands.getValue().getContent());
     }
 }
