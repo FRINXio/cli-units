@@ -35,6 +35,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.CommunityType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedPassword;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedString;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.PlainString;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -55,6 +56,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
             Pattern.compile("neighbor (?<neighborIp>\\S*) description (?<description>.+)");
     private static final Pattern SEND_COMMUNITY_PATTERN =
             Pattern.compile("neighbor (?<neighborIp>\\S*) send-community (?<community>.+)");
+    private static final String REGEX = "^([\\d] )\\S+$";
 
     private final Cli cli;
 
@@ -123,8 +125,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
     private static void setPasswd(ConfigBuilder configBuilder, String defaultInstance) {
         ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, PASSWORD_PATTERN::matcher,
             m -> findGroup(m, "password"),
-            groupsHashMap -> configBuilder.setAuthPassword(
-                    new EncryptedPassword(new PlainString(groupsHashMap.get("password")))));
+            groupsHashMap -> configBuilder.setAuthPassword(getPassword(groupsHashMap.get("password"))));
     }
 
     private static void setPeerGroup(ConfigBuilder configBuilder, String defaultInstance) {
@@ -165,5 +166,12 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
         hashMap.put(group, matcher.group(group));
 
         return hashMap;
+    }
+
+    private static EncryptedPassword getPassword(String password) {
+        if (password.matches(REGEX)) {
+            return new EncryptedPassword(new EncryptedString(password));
+        }
+        return new EncryptedPassword(new PlainString(password));
     }
 }

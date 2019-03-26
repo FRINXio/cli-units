@@ -62,6 +62,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedPassword;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedString;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.PlainString;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.BGP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.ApplyPolicyBuilder;
@@ -114,6 +115,9 @@ public class NeighborWriterTest implements CliFormatter {
                     NetworInstance.DEFAULT_NETWORK_NAME},
                 {"neighbor afi safi remove", N_ALL, N_ALL_ONEAFI, NALL_WRITE, N_ALL_UPDATE_REMOVE_AFI, NALL_DELETE,
                     EMPTY_BGP_CONFIG, NetworInstance.DEFAULT_NETWORK_NAME},
+                {"neighbor encrypted password", N_EMPTY_WITH_ENCRYPTED_PASSWORD, null,
+                    NMIN_WRITE_WITH_ENCRYPTED_PASSWORD, null, NMIN_DELETE_WITH_ENCRYPTED_PASSWORD, EMPTY_BGP_CONFIG,
+                    NetworInstance.DEFAULT_NETWORK_NAME},
         });
     }
 
@@ -219,6 +223,16 @@ public class NeighborWriterTest implements CliFormatter {
             .setConfig(new ConfigBuilder()
                     .setNeighborAddress(new IpAddress(new Ipv4Address("1.2.3.4")))
                     .setPeerAs(new AsNumber(45L))
+                    .build())
+            .build();
+
+    private static final Neighbor N_EMPTY_WITH_ENCRYPTED_PASSWORD = new NeighborBuilder()
+            .setNeighborAddress(new IpAddress(new Ipv4Address("1.2.3.4")))
+            .setConfig(new ConfigBuilder()
+                    .setNeighborAddress(new IpAddress(new Ipv4Address("1.2.3.4")))
+                    .setAuthPassword(new EncryptedPassword(new EncryptedString("Encrypted[7 154032E24A465C]")))
+                    .setPeerAs(new AsNumber(45L))
+                    .setDescription("descr 1")
                     .build())
             .build();
 
@@ -644,6 +658,18 @@ public class NeighborWriterTest implements CliFormatter {
 
     private static final Neighbor N_MINIMAL = new NeighborBuilder(N_ALL).setAfiSafis(null).setTransport(null)
             .setApplyPolicy(null).setRouteReflector(null).build();
+
+    private static final String NMIN_WRITE_WITH_ENCRYPTED_PASSWORD = "configure terminal\n"
+            + "router bgp 484\n"
+            + "neighbor 1.2.3.4 remote-as 45\n"
+            + "neighbor 1.2.3.4 description descr 1\n"
+            + "neighbor 1.2.3.4 password 7 154032E24A465C\n"
+            + "end";
+
+    private static final String NMIN_DELETE_WITH_ENCRYPTED_PASSWORD = "configure terminal\n"
+            + "router bgp 484\n"
+            + "no neighbor 1.2.3.4 remote-as 45\n"
+            + "end";
 
     private static final String NMIN_WRITE = "configure terminal\n"
             + "router bgp 484\n"
