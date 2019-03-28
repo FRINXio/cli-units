@@ -113,9 +113,10 @@ public class AclEntryReader implements TypedListReader<AclEntry, AclEntryKey, Ac
         parseACL(instanceIdentifier, aclEntryBuilder, output);
     }
 
-    private void parseACL(final @Nonnull InstanceIdentifier<AclEntry> instanceIdentifier,
-                          final @Nonnull AclEntryBuilder aclEntryBuilder,
-                          final String output) {
+    @VisibleForTesting
+    public static void parseACL(final @Nonnull InstanceIdentifier<AclEntry> instanceIdentifier,
+                                final @Nonnull AclEntryBuilder aclEntryBuilder,
+                                final String output) {
 
         AclSetKey aclSetKey = instanceIdentifier.firstKeyOf(AclSet.class);
 
