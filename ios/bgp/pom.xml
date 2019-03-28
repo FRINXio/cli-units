@@ -32,7 +32,7 @@
     <dependencies>
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-utils</artifactId>
+            <artifactId>ios-cli-init-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

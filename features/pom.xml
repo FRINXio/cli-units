@@ -170,11 +170,6 @@
       <artifactId>ios-configuration-metadata-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-utils</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>io.frinx.cli</groupId>
@@ -219,11 +214,6 @@
     <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>ios-xr-interface-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-utils</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -324,11 +314,6 @@
 
     <dependency>
       <groupId>io.frinx.cli</groupId>
-      <artifactId>junos-utils</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
       <artifactId>junos-cli-init-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -407,11 +392,6 @@
     <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>nexus-lldp-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>nexus-utils</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

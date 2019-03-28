@@ -26,7 +26,6 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.nexus.NexusDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.nexus.ifc.handler.InterfaceConfigReader;
@@ -51,6 +50,7 @@ import io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv6.Ipv6AdvertisementConfigRe
 import io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv6.Ipv6AdvertisementConfigWriter;
 import io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv6.Ipv6ConfigReader;
 import io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv6.Ipv6ConfigWriter;
+import io.frinx.cli.unit.nexus.init.NexusDevices;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;

@@ -32,7 +32,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>ios-xr-cli-init-unit</module>
+    <module>init</module>
     <module>network-instance</module>
     <module>bgp</module>
     <module>interface</module>
@@ -42,7 +42,6 @@
     <module>ospfv3</module>
     <module>logging</module>
     <module>acl</module>
-    <module>utils</module>
     <module>routing-policy</module>
     <module>netflow</module>
     <module>qos</module>

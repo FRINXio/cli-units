@@ -28,9 +28,9 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.def.DefaultConfigWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceStateReader;

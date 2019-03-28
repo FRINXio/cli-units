@@ -31,7 +31,7 @@
     <dependencies>
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-utils</artifactId>
+            <artifactId>ios-xr-cli-init-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
 

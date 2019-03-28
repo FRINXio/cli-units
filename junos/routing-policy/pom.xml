@@ -33,7 +33,7 @@
     <dependencies>
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>junos-utils</artifactId>
+            <artifactId>junos-cli-init-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
 

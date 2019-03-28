@@ -34,7 +34,6 @@
     <modules>
         <module>init</module>
         <module>lldp</module>
-        <module>utils</module>
         <module>interface</module>
         <module>configuration-metadata</module>
     </modules>

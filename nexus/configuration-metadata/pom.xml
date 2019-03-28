@@ -35,7 +35,7 @@
     <dependencies>
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>nexus-utils</artifactId>
+            <artifactId>nexus-cli-init-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
 

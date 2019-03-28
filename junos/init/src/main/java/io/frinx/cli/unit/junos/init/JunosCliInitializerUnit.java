@@ -29,7 +29,6 @@ import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.SessionInitializationStrategy;
-import io.frinx.cli.junos.JunosDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;

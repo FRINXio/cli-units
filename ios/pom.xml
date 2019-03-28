@@ -32,7 +32,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>ios-cli-init-unit</module>
+    <module>init</module>
     <module>interface</module>
     <module>bgp</module>
     <module>rib</module>
@@ -45,7 +45,6 @@
     <module>lldp</module>
     <module>it</module>
     <module>configuration-metadata</module>
-    <module>utils</module>
   </modules>
 
   <build>
