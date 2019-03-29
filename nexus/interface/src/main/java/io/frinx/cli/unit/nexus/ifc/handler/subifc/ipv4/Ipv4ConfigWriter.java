@@ -16,97 +16,27 @@
 
 package io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv4;
 
-import com.google.common.base.Preconditions;
-import io.fd.honeycomb.translate.write.WriteContext;
-import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.nexus.ifc.handler.subifc.SubinterfaceReader;
-import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class Ipv4ConfigWriter implements CliWriter<Config> {
-
-    private final Cli cli;
+public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
 
     public Ipv4ConfigWriter(Cli cli) {
-        this.cli = cli;
+        super(cli);
     }
 
-    private static final String WRITE_TEMPLATE =
-            "interface %s\n"
-                    + " ip address %s/%s\n"
+    private static final String TEMPLATE = "interface {$name}\n"
+                    + "{% if($delete) %} no{% endif %} ip address {$config.ip.value}/{$config.prefix_length}\n"
                     + "root";
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                       @Nonnull Config config,
-                                       @Nonnull WriteContext writeContext) throws WriteFailedException {
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class)
-                .getIndex();
-
-        if (subId != SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
-                    new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
-        }
-
-        blockingWriteAndRead(cli, instanceIdentifier, config,
-                f(WRITE_TEMPLATE,
-                        getIfcName(instanceIdentifier),
-                        config.getIp()
-                                .getValue(),
-                        config.getPrefixLength()));
-    }
-
-    private static String getIfcName(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        String ifcName = instanceIdentifier.firstKeyOf(Interface.class)
-                .getName();
-        Long subIfcIndex = instanceIdentifier.firstKeyOf(Subinterface.class)
-                .getIndex();
-        Preconditions.checkArgument(subIfcIndex == SubinterfaceReader.ZERO_SUBINTERFACE_ID,
-                "Only subinterface " + SubinterfaceReader.ZERO_SUBINTERFACE_ID + "  can have IP");
-        return ifcName;
+    protected String writeTemplate(Config config, String ifcName) {
+        return fT(TEMPLATE, "name", ifcName, "config", config);
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                        @Nonnull Config before,
-                                        @Nonnull Config after,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        if (after.getIp() == null) {
-            deleteCurrentAttributes(instanceIdentifier, before, writeContext);
-        } else {
-            writeCurrentAttributes(instanceIdentifier, after, writeContext);
-        }
-
-    }
-
-    private static final String DELETE_TEMPLATE =
-            "interface %s\n"
-                    + " no ip address %s/%s\n"
-                    + "root";
-
-    @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                        @Nonnull Config config,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class)
-                .getIndex();
-
-        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            blockingWriteAndRead(cli, instanceIdentifier, config,
-                    f(DELETE_TEMPLATE,
-                            getIfcName(instanceIdentifier),
-                            config.getIp()
-                                    .getValue(),
-                            config.getPrefixLength()));
-        } else {
-            throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
-                    new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
-        }
+    protected String deleteTemplate(Config config, String ifcName) {
+        return fT(TEMPLATE, "name", ifcName, "config", config, "delete", true);
     }
 }

@@ -18,19 +18,23 @@ package io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv6;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import io.frinx.cli.unit.nexus.ifc.handler.InterfaceConfigReader;
+import io.frinx.cli.unit.nexus.ifc.Util;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 
-abstract class Ipv6CheckUtil {
+final class Ipv6CheckUtil {
 
-    static final String CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX = "Parent interface should be ";
-    static final String CHECK_SUBINTERFACE_MSG_PREFIX = "Expected subinterface ";
+    private static final String CHECK_PARENT_INTERFACE_TYPE_MSG_PREFIX = "Parent interface should be ";
+    private static final String CHECK_SUBINTERFACE_MSG_PREFIX = "Expected subinterface ";
+
+    private Ipv6CheckUtil() {
+
+    }
 
     static void checkParentInterfaceTypeWithExeption(final String ifcName, final @Nonnull Class... types) {
-        final Class<? extends InterfaceType> infType = InterfaceConfigReader.parseType(ifcName);
+        final Class<? extends InterfaceType> infType = Util.parseType(ifcName);
 
         final boolean typeIsValid = checkTypes(infType, types);
 

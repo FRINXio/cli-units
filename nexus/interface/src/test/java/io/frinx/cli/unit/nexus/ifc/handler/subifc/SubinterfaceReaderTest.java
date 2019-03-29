@@ -17,10 +17,12 @@
 package io.frinx.cli.unit.nexus.ifc.handler.subifc;
 
 import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 
 public class SubinterfaceReaderTest {
@@ -49,6 +51,7 @@ public class SubinterfaceReaderTest {
     @Test
     public void testParseSubinterfaceIds() {
         Assert.assertEquals(EXPECTED_SUBIFC_IDS,
-                SubinterfaceReader.parseSubinterfaceIds(SH_RUN_INT, "GigabitEthernet0/0/0/3"));
+                new SubinterfaceReader(Mockito.mock(Cli.class))
+                        .parseSubinterfaceIds(SH_RUN_INT, "GigabitEthernet0/0/0/3"));
     }
 }

@@ -47,11 +47,11 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class Ipv6ConfigWriterTest {
 
     private static final String WRITE_INPUT = "interface Ethernet1/1.5\n"
-            + " ipv6 address 2002::1/124\n"
+            + "ipv6 address 2002::1/124\n"
             + "root\n";
 
     private static final String DELETE_INPUT = "interface Ethernet1/1.5\n"
-            + " no ipv6 address 2002::1/124\n"
+            + "no ipv6 address 2002::1/124\n"
             + "root\n";
 
     @Mock

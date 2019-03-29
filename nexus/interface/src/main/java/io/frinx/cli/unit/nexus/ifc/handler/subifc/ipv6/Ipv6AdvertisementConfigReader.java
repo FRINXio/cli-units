@@ -20,7 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.nexus.ifc.handler.InterfaceConfigReader;
+import io.frinx.cli.unit.nexus.ifc.Util;
 import io.frinx.cli.unit.nexus.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -73,7 +73,7 @@ public class Ipv6AdvertisementConfigReader implements TypedReader<Config, Config
                                    final InstanceIdentifier<Config> instanceIdentifier) {
         final InterfaceKey interfaceKey = instanceIdentifier.firstKeyOf(Interface.class);
         final SubinterfaceKey subinterfaceKey = instanceIdentifier.firstKeyOf(Subinterface.class);
-        final Class<? extends InterfaceType> infType = InterfaceConfigReader.parseType(interfaceKey.getName());
+        final Class<? extends InterfaceType> infType = Util.parseType(interfaceKey.getName());
 
         return subinterfaceKey != null && Ipv6CheckUtil.checkTypes(infType, EthernetCsmacd.class, Ieee8023adLag
                 .class) && subinterfaceKey.getIndex() == SubinterfaceReader.ZERO_SUBINTERFACE_ID;
