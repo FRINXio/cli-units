@@ -16,22 +16,20 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
+import io.frinx.cli.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigReaderTest;
+import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
 
 public class Ipv4ConfigReaderTest {
 
     @Test
-    public void testParse() throws Exception {
+    public void testParseConfigAddress() {
         ConfigBuilder actual = new ConfigBuilder();
-        Ipv4ConfigReader.parseAddressConfig(actual, " ip address 192.168.1.44 255.255.255.0\n");
-        Assert.assertEquals(new ConfigBuilder()
-                .setIp(new Ipv4AddressNoZone("192.168.1.44"))
-                .setPrefixLength((short) 24)
-                .build(),
-                actual.build());
+        new Ipv4ConfigReader(Mockito.mock(Cli.class)).parseAddressConfig(actual,
+                " ip address 192.168.1.44 255.255.255.0\n");
+        Assert.assertEquals(AbstractIpv4ConfigReaderTest.buildData("192.168.1.44", "24"), actual.build());
     }
-
 }

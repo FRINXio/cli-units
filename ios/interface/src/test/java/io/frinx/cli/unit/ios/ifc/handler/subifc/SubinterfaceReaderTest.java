@@ -17,13 +17,15 @@
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
 import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 
-public class SubniterfaceReaderTest {
+public class SubinterfaceReaderTest {
 
     private static final String SH_INTERFACE = "interface Loopback0\n"
             + "interface FastEthernet0/0\n"
@@ -41,7 +43,8 @@ public class SubniterfaceReaderTest {
                     .collect(Collectors.toList());
 
     @Test
-    public void testParseInterfaceIds() throws Exception {
-        Assert.assertEquals(IDS_EXPECTED, SubinterfaceReader.parseInterfaceIds(SH_INTERFACE, "FastEthernet4/0"));
+    public void testParseInterfaceIds() {
+        Assert.assertEquals(IDS_EXPECTED,
+                new SubinterfaceReader(Mockito.mock(Cli.class)).parseSubinterfaceIds(SH_INTERFACE, "FastEthernet4/0"));
     }
 }
