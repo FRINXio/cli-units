@@ -54,7 +54,7 @@ public class BfdConfigReader implements CliConfigReader<Config, ConfigBuilder> {
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         String ifcName = id.firstKeyOf(Interface.class)
                 .getName();
-        if (!AggregateConfigReader.isLAGInterface(ifcName)) {
+        if (!new AggregateConfigReader(cli).isLAGInterface(ifcName)) {
             // read bfd configuration just for LAG interfaces
             return;
         }

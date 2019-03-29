@@ -17,35 +17,34 @@
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
+import com.x5.template.Chunk;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceConfigWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
-import java.util.Set;
+import io.frinx.cli.unit.iosxr.ifc.Util;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceConfigWriter implements CliWriter<Config> {
+public class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWriter {
 
-    private Cli cli;
+    private static final String UPDATE_TEMPLATE = "configure terminal\n"
+            + "interface {$name}\n"
+            + "{$data|update(description,description `$data.description`\n,no description\n)}"
+            //  + "{$data|update(is_enabled,shutdown\n,no shutdown\n}"
+            + "{% if ($enabled) %}no shutdown{% else %}shutdown{% endif %}\n"
+            + "end";
 
-    private static final Set<Class<? extends InterfaceType>> SUPPORTED_INTERFACE_TYPES = Sets.newHashSet();
-
-    static {
-        SUPPORTED_INTERFACE_TYPES.add(Ieee8023adLag.class);
-        SUPPORTED_INTERFACE_TYPES.add(EthernetCsmacd.class);
-    }
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
+            + "no interface ${name}\n"
+            + "end";
 
     public SubinterfaceConfigWriter(Cli cli) {
-        this.cli = cli;
+        super(cli);
     }
 
     @Override
@@ -67,44 +66,18 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
                             + "Use 'enabled' under interface/config instead.");
             return;
         }
-
         if (isZeroSubinterface(id)) {
             // do nothing for .0 subinterface because it represents physical interface which config is handled in
             // interface/config
             return;
         }
-
-        Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId)
-                .get()
-                .getConfig()
-                .getType();
-
-        if (isSupportedType(parentIfcType)) {
-            blockingWriteAndRead(cli, id, data,
-                    f("interface %s", SubinterfaceReader.getSubinterfaceName(id)),
-                    data.getDescription() == null ? "no description" : f("description %s", data.getDescription()),
-                    data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
-                    "root");
-        } else {
-            throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Unable to create subinterface for interface of type: "
-                            + parentIfcType));
-        }
-    }
-
-    private static boolean isZeroSubinterface(@Nonnull InstanceIdentifier<?> id) {
-        Long subifcIndex = id.firstKeyOf(Subinterface.class)
-                .getIndex();
-        return subifcIndex == SubinterfaceReader.ZERO_SUBINTERFACE_ID;
-
+        super.writeCurrentAttributes(id, data, writeContext);
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                        @Nonnull Config dataBefore,
-                                        @Nonnull Config dataAfter,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributes(id, dataAfter, writeContext);
+    protected String updateTemplate(Config before, Config after, InstanceIdentifier<Config> id) {
+        return fT(UPDATE_TEMPLATE, "before", before, "data", after, "name", Util.getSubinterfaceName(id),
+                "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null);
     }
 
     @Override
@@ -115,35 +88,26 @@ public class SubinterfaceConfigWriter implements CliWriter<Config> {
         InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
 
         // if deleting parent interface allow deleting also .0 subifc
-        if (!writeContext.readAfter(parentIfcId)
-                .isPresent()
-                && id.firstKeyOf(Subinterface.class)
-                .getIndex() == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (!writeContext.readAfter(parentIfcId).isPresent()
+                && id.firstKeyOf(Subinterface.class).getIndex() == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             return;
         }
-
         if (isZeroSubinterface(id)) {
             // do nothing for .0 subinterface because it represents physical interface which config is handled in
             // interface/config
             return;
         }
-
-        Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId)
-                .get()
-                .getConfig()
-                .getType();
-
-        if (isSupportedType(parentIfcType)) {
-            blockingDeleteAndRead(cli, id,
-                    f("no interface %s", SubinterfaceReader.getSubinterfaceName(id)));
-        } else {
-            throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Unable to create subinterface for interface of type: "
-                            + parentIfcType));
-        }
+        super.deleteCurrentAttributes(id, data, writeContext);
     }
 
-    private static boolean isSupportedType(Class<? extends InterfaceType> parentType) {
-        return SUPPORTED_INTERFACE_TYPES.contains(parentType);
+    @Override
+    protected boolean isPhysicalInterface(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                                                      .rev161222.interfaces.top.interfaces._interface.Config data) {
+        return Util.isPhysicalInterface(data);
+    }
+
+    @Override
+    protected String deleteTemplate(InstanceIdentifier<Config> id) {
+        return f(DELETE_TEMPLATE, "name", Util.getSubinterfaceName(id));
     }
 }

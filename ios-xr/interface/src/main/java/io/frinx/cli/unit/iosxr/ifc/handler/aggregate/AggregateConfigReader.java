@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.iosxr.ifc.Util;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -68,8 +69,8 @@ public class AggregateConfigReader implements CliConfigReader<Config, ConfigBuil
                 builder::setMinLinks);
     }
 
-    public static boolean isLAGInterface(String ifcName) {
-        return InterfaceConfigReader.parseType(ifcName) == Ieee8023adLag.class;
+    public boolean isLAGInterface(String ifcName) {
+        return Util.parseType(ifcName) == Ieee8023adLag.class;
     }
 
     @Override

@@ -61,8 +61,8 @@ public class BfdConfigWriter implements CliWriter<Config> {
                 "root");
     }
 
-    private static void checkIfcType(String ifcName) {
-        Preconditions.checkArgument(AggregateConfigReader.isLAGInterface(ifcName),
+    private void checkIfcType(String ifcName) {
+        Preconditions.checkArgument(new AggregateConfigReader(cli).isLAGInterface(ifcName),
                 "Cannot configure bfd on non-LAG interface %s", ifcName);
     }
 

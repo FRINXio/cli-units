@@ -18,7 +18,7 @@ package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.Util;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -30,7 +30,7 @@ abstract class Ipv6CheckUtil {
     static final String CHECK_SUBINTERFACE_MSG_PREFIX = "Expected subinterface ";
 
     static void checkParentInterfaceTypeWithExeption(final String ifcName, final @Nonnull Class... types) {
-        final Class<? extends InterfaceType> infType = InterfaceConfigReader.parseType(ifcName);
+        final Class<? extends InterfaceType> infType = Util.parseType(ifcName);
 
         final boolean typeIsValid = checkTypes(infType, types);
 

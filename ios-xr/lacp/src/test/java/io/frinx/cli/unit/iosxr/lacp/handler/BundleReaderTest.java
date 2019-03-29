@@ -17,10 +17,12 @@
 package io.frinx.cli.unit.iosxr.lacp.handler;
 
 import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.lacp.interfaces.top.interfaces.InterfaceKey;
 
 public class BundleReaderTest {
@@ -48,7 +50,7 @@ public class BundleReaderTest {
 
     @Test
     public void parseInterfaceIdsTest() {
-        final List<InterfaceKey> actualKeys = BundleReader.parseBundleIds(
+        final List<InterfaceKey> actualKeys = new BundleReader(Mockito.mock(Cli.class)).parseBundleIds(
                 SHOW_RUN_INTERFACES_LIST,
                 SHOW_RUN_BUNDLES_LIST);
         Assert.assertEquals(EXPECTED_IDS, actualKeys);
