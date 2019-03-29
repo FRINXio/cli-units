@@ -18,68 +18,51 @@ package io.frinx.cli.unit.brocade.ifc.handler.subifc;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceReader;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4AddressReader;
-import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6.Ipv6AddressReader;
-import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4ConfigReader;
+import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey,
-        SubinterfaceBuilder> {
+public final class SubinterfaceReader extends AbstractSubinterfaceReader {
 
-    public static final long ZERO_SUBINTERFACE_ID = 0L;
-
-    private Cli cli;
+    private Ipv4ConfigReader v4reader;
+    private Ipv6ConfigReader v6reader;
 
     public SubinterfaceReader(Cli cli) {
-        this.cli = cli;
+        super(cli);
+        v4reader = new Ipv4ConfigReader(cli);
+        v6reader = new Ipv6ConfigReader(cli);
     }
 
     @Nonnull
     @Override
     public List<SubinterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier,
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
+        String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
 
-        boolean hasIpv4Address = !Ipv4AddressReader.parseAddressIds(
-                blockingRead(String.format(Ipv4AddressReader.SH_INTERFACE_IP, instanceIdentifier),
-                        cli, instanceIdentifier, readContext)).isEmpty();
+        boolean hasIpv4Address = v4reader.hasIpAddress(instanceIdentifier, ifcName, readContext);
+        boolean hasIpv6Address = v6reader.hasIpAddress(instanceIdentifier, ifcName, readContext);
 
-        boolean hasIpv6Address = !Ipv6AddressReader.parseAddressIds(
-                blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP, instanceIdentifier),
-                        cli, instanceIdentifier, readContext)).isEmpty();
-
-        if (hasIpv4Address
-                || hasIpv6Address) {
+        if (hasIpv4Address || hasIpv6Address) {
             return Collections.singletonList(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
         }
-
         return Collections.emptyList();
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Subinterface> list) {
-        ((SubinterfacesBuilder) builder).setSubinterface(list);
-    }
-
-    @Nonnull
-    @Override
-    public SubinterfaceBuilder getBuilder(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier) {
-        return new SubinterfaceBuilder();
+    protected String getReadCommand() {
+        return "";
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Subinterface> id,
-                                      @Nonnull SubinterfaceBuilder builder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        builder.setIndex(id.firstKeyOf(Subinterface.class).getIndex());
+    protected List<SubinterfaceKey> parseSubinterfaceIds(String output, String ifcName) {
+        return Collections.emptyList();
     }
 }

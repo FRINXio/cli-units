@@ -16,76 +16,30 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.ip6.AbstractIpv6ConfigReader;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader;
-import io.frinx.cli.unit.brocade.ifc.handler.subifc.SubinterfaceReader;
-import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.Arrays;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6AddressNoZone;
+import io.frinx.cli.unit.brocade.ifc.Util;
+import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public final class Ipv6ConfigReader extends AbstractIpv6ConfigReader {
 
-    private Cli cli;
+    private static final Pattern IPV6_UNICAST_ADDRESS = Pattern.compile(".*?(?<ip>[a-fA-F0-9:]+), subnet is [^/]+.*/"
+            + "(?<prefix>[^\\s]+).*");
 
     public Ipv6ConfigReader(Cli cli) {
-        this.cli = cli;
-    }
-
-    public static final short DEFAULT_PREFIX_LENGHT = (short)64;
-
-    @Nonnull
-    @Override
-    public ConfigBuilder getBuilder(@Nonnull InstanceIdentifier<Config> instanceIdentifier) {
-        return new ConfigBuilder();
+        super(cli);
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                      @Nonnull ConfigBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        String name = id.firstKeyOf(Interface.class).getName();
-        Long subId = id.firstKeyOf(Subinterface.class).getIndex();
-
-        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            Class<? extends InterfaceType> ifcType = InterfaceConfigReader.parseType(name);
-            String ifcNumber = InterfaceConfigReader.getIfcNumber(name);
-            parseAddressConfig(configBuilder, blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP,
-                    InterfaceConfigReader.getTypeOnDevice(ifcType), ifcNumber), cli, id, readContext), id);
-        }
-    }
-
-    @VisibleForTesting
-    static void parseAddressConfig(ConfigBuilder configBuilder, String output, InstanceIdentifier<Config> id) {
-        Ipv6AddressNoZone address = id.firstKeyOf(Address.class).getIp();
-        configBuilder.setIp(address);
-        configBuilder.setPrefixLength(DEFAULT_PREFIX_LENGHT);
-        output = String.valueOf(Arrays.stream(output.split(
-                ParsingUtils.NEWLINE.pattern())).filter(line -> line.contains(address
-                .getValue())).findAny());
-        ParsingUtils.parseField(output,
-            Ipv6AddressReader.IPV6_UNICAST_ADDRESS::matcher,
-            m -> Short.parseShort(m.group("prefix")),
-            configBuilder::setPrefixLength);
+    protected Pattern getIpLine() {
+        return IPV6_UNICAST_ADDRESS;
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((AddressBuilder) builder).setConfig(config);
+    protected String getReadCommand(String ifcName) {
+        Class<? extends InterfaceType> ifcType = Util.parseType(ifcName);
+        String ifcNumber = Util.getIfcNumber(ifcName);
+        return f(Ipv6AddressReader.SH_INTERFACE_IP, Util.getTypeOnDevice(ifcType), ifcNumber);
     }
 }
