@@ -16,89 +16,39 @@
 
 package io.frinx.cli.unit.junos.ifc.handler;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import io.fd.honeycomb.translate.write.WriteContext;
-import io.fd.honeycomb.translate.write.WriteFailedException;
+import com.x5.template.Chunk;
+import io.frinx.cli.ifc.base.handler.AbstractInterfaceConfigWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
-import java.util.Set;
-import javax.annotation.Nonnull;
-import org.apache.commons.lang3.StringUtils;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
+import io.frinx.cli.unit.junos.ifc.Util;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class InterfaceConfigWriter implements CliWriter<Config> {
+public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
 
-    public static final Set<Class<? extends InterfaceType>> SUPPORTED_INTERFACE_TYPES =
-        ImmutableSet.of(EthernetCsmacd.class);
+    private static final String DELETE_TEMPLATE = "delete interfaces {$data.name}";
 
-    private Cli cli;
+    private static final String WRITE_TEMPLATE = "{$data|update(description,"
+            + "set interfaces `$data.name` description `$data.description`\n,"
+            + "delete interfaces `$data.name` description\n)}"
+            + "{% if ($enabled) %}delete interfaces {$data.name} disable"
+            + "{% else %}set interfaces {$data.name} disable{% endif %}";
 
     public InterfaceConfigWriter(Cli cli) {
-        this.cli = cli;
+        super(cli);
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
-        @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        Preconditions.checkArgument(isSupportedType(data.getType()),
-            "Interface %s has unknown type: %s", data.getName(), data.getType().getSimpleName());
-
-        writeInterface(id, data);
-    }
-
-    private void writeInterface(InstanceIdentifier<Config> id, Config data)
-        throws WriteFailedException.CreateFailedException {
-
-        String name = id.firstKeyOf(Interface.class).getName();
-
-        blockingWriteAndRead(cli, id, data,
-              StringUtils.isNotEmpty(data.getDescription())
-                  ? f("set interfaces %s description %s", name, data.getDescription())
-                  : f("delete interfaces %s description", name),
-              data.isEnabled() == null || data.isEnabled()
-                  ? f("delete interfaces %s disable", name) : f("set interfaces %s disable", name));
+    protected String updateTemplate(Config before, Config after) {
+        return fT(WRITE_TEMPLATE, "before", before, "data",
+                after, "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null);
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
-        @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
-            "Changing interface type is not permitted. Before: %s, After: %s", dataBefore.getType(),
-            dataAfter.getType());
-
-        Preconditions.checkArgument(isSupportedType(dataAfter.getType()),
-            "Interface %s has unknown type: %s", dataAfter.getName(), dataAfter.getType().getSimpleName());
-
-        writeInterface(id, dataAfter);
+    protected String deleteTemplate(Config data) {
+        return fT(DELETE_TEMPLATE, "data", data);
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
-        @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        Preconditions.checkArgument(isSupportedType(dataBefore.getType()),
-            "Interface %s has unknown type: %s", dataBefore.getName(), dataBefore.getType().getSimpleName());
-
-        deleteInterface(id);
-    }
-
-    private void deleteInterface(InstanceIdentifier<Config> id)
-        throws WriteFailedException.DeleteFailedException {
-
-        InterfaceKey ifcKey = id.firstKeyOf(Interface.class);
-
-        blockingDeleteAndRead(cli, id, f("delete interfaces %s", ifcKey.getName()));
-    }
-
-    public static boolean isSupportedType(Class<? extends InterfaceType> parentType) {
-        return SUPPORTED_INTERFACE_TYPES.contains(parentType);
+    public boolean isPhysicalInterface(Config data) {
+        return Util.isPhysicalInterface(data);
     }
 }

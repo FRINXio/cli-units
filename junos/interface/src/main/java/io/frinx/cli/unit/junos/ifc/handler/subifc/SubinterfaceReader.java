@@ -16,72 +16,41 @@
 
 package io.frinx.cli.unit.junos.ifc.handler.subifc;
 
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.junos.ifc.Util;
 import io.frinx.cli.unit.junos.ifc.handler.InterfaceReader;
-import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceReader
-    implements CliConfigListReader<Subinterface, SubinterfaceKey, SubinterfaceBuilder> {
+public final class SubinterfaceReader extends AbstractSubinterfaceReader {
 
     public static final String SEPARATOR = " unit ";
 
-    private Cli cli;
+    private InterfaceReader ifaceReader;
 
     public SubinterfaceReader(Cli cli) {
-        this.cli = cli;
+        super(cli);
+        this.ifaceReader = new InterfaceReader(cli);
     }
 
-    @Nonnull
     @Override
-    public List<SubinterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier,
-        @Nonnull ReadContext readContext) throws ReadFailedException {
-        String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
-
-        return parseSubinterfaceIds(
-            blockingRead(InterfaceReader.SHOW_INTERFACES, cli, instanceIdentifier, readContext), id);
+    protected String getReadCommand() {
+        return InterfaceReader.SHOW_INTERFACES;
     }
 
-    private static List<SubinterfaceKey> parseSubinterfaceIds(String output, String ifcName) {
-        return InterfaceReader.parseAllInterfaceIds(output)
+    @Override
+    protected List<SubinterfaceKey> parseSubinterfaceIds(String output, String ifcName) {
+        return ifaceReader.parseAllInterfaceIds(output)
             // Now exclude interfaces
             .stream()
-            .filter(InterfaceReader::isSubinterface)
+            .filter(Util::isSubinterface)
             .map(InterfaceKey::getName)
             .filter(subifcName -> subifcName.startsWith(ifcName))
             .map(name -> name.substring(name.lastIndexOf(SEPARATOR) + SEPARATOR.length()))
             .map(subifcIndex -> new SubinterfaceKey(Long.valueOf(subifcIndex)))
             .collect(Collectors.toList());
-    }
-
-    static String getSubinterfaceName(InstanceIdentifier<?> id) {
-        InterfaceKey ifcKey = id.firstKeyOf(Interface.class);
-        SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
-
-        return ifcKey.getName() + SEPARATOR + subKey.getIndex().toString();
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Subinterface> list) {
-        ((SubinterfacesBuilder) builder).setSubinterface(list);
-    }
-
-    @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Subinterface> id,
-        @Nonnull SubinterfaceBuilder builder, @Nonnull ReadContext readContext) {
-        builder.setIndex(id.firstKeyOf(Subinterface.class).getIndex());
     }
 }
