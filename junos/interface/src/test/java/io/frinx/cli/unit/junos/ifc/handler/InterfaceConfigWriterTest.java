@@ -36,8 +36,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriterTest {
 
-    private static final String WRITE_INPUT = "set interfaces ge-0/0/4 description TEST\n"
-            + "delete interfaces ge-0/0/4 disable\n";
+    private static final String WRITE_INPUT = "set interfaces ge-0/0/4 description TEST\n\n";
 
     private static final String UPDATE_INPUT = "delete interfaces ge-0/0/4 description\n"
             + "set interfaces ge-0/0/4 disable\n";
@@ -101,8 +100,7 @@ public class InterfaceConfigWriterTest {
         writer.updateCurrentAttributes(iid, beforedata, afterdata, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        // FIXME: should be empty
-        Assert.assertEquals("set interfaces ge-0/0/4 disable\n", response.getValue().getContent());
+        Assert.assertEquals("\n", response.getValue().getContent());
     }
 
     @Test

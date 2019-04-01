@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class SubinterfaceConfigWriterTest {
 
     private static final String WRITE_INPUT = "set interfaces ge-0/0/4 unit 0 description TEST-ge-0/0/4\n"
-            + "delete interfaces ge-0/0/4 unit 0 disable\n";
+            + "\n";
 
     private static final String UPDATE_INPUT = "set interfaces ge-0/0/4 unit 0 description TEST-ge-0/0/4_NEW\n"
             + "set interfaces ge-0/0/4 unit 0 disable\n";
@@ -50,7 +50,7 @@ public class SubinterfaceConfigWriterTest {
     private static final String DELETE_DESCR_INPUT = "set interfaces ge-0/0/4 unit 0 disable\n";
 
     private static final String UPDATE_TO_NULL = "delete interfaces ge-0/0/4 unit 0 description\n"
-            + "delete interfaces ge-0/0/4 unit 0 disable\n";
+            + "\n";
 
     private static final String DELETE_INPUT = "delete interfaces ge-0/0/4 unit 0\n";
 

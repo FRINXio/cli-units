@@ -30,8 +30,8 @@ public final class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWr
     private static final String UPDATE_TEMPLATE = "{$data|update(description,"
             + "set interfaces `$name` description `$data.description`\n,"
             + "delete interfaces `$name` description\n)}"
-            + "{% if($enabled) %}delete{% else %}set{% endif %}"
-            + " interfaces {$name} disable";
+            + "{% if ($enabled && $enabled == TRUE) %}delete interfaces {$name} disable"
+            + "{% elseIf (!$enabled) %}set interfaces {$name} disable{% endif %}";
 
     public SubinterfaceConfigWriter(Cli cli) {
         super(cli);
@@ -39,8 +39,19 @@ public final class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWr
 
     @Override
     protected String updateTemplate(Config before, Config after, InstanceIdentifier<Config> id) {
+        // when "disable" is not set, "delete interface disable" will cause a error
+        String enabled = "false";
+        if (before != null && before.isEnabled() != null && !before.isEnabled()) {
+            if (after.isEnabled() != null && after.isEnabled()) {
+                enabled = Chunk.TRUE;
+            }
+        } else {
+            if (after.isEnabled() != null && !after.isEnabled()) {
+                enabled = null;
+            }
+        }
         return fT(UPDATE_TEMPLATE, "before", before, "data", after, "name", Util.getSubinterfaceName(id),
-                "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null);
+                "enabled", enabled);
     }
 
     @Override

@@ -29,8 +29,8 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
     private static final String WRITE_TEMPLATE = "{$data|update(description,"
             + "set interfaces `$data.name` description `$data.description`\n,"
             + "delete interfaces `$data.name` description\n)}"
-            + "{% if ($enabled) %}delete interfaces {$data.name} disable"
-            + "{% else %}set interfaces {$data.name} disable{% endif %}";
+            + "{% if ($enabled && $enabled == TRUE) %}delete interfaces {$data.name} disable"
+            + "{% elseIf (!$enabled) %}set interfaces {$data.name} disable{% endif %}";
 
     public InterfaceConfigWriter(Cli cli) {
         super(cli);
@@ -38,8 +38,18 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
 
     @Override
     protected String updateTemplate(Config before, Config after) {
-        return fT(WRITE_TEMPLATE, "before", before, "data",
-                after, "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null);
+        // when "disable" is not set, "delete interface disable" will cause a error
+        String enabled = "false";
+        if (before != null && before.isEnabled() != null && !before.isEnabled()) {
+            if (after.isEnabled() != null && after.isEnabled()) {
+                enabled = Chunk.TRUE;
+            }
+        } else {
+            if (after.isEnabled() != null && !after.isEnabled()) {
+                enabled = null;
+            }
+        }
+        return fT(WRITE_TEMPLATE, "before", before, "data", after, "enabled", enabled);
     }
 
     @Override
