@@ -52,7 +52,7 @@ public abstract class AbstractIpv4ConfigReader implements CliConfigReader<Config
         // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
         if (subId == AbstractSubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             parseAddressConfig(configBuilder,
-                    blockingRead(getReadCommand(ifcName), cli, instanceIdentifier, readContext));
+                    blockingRead(getReadCommand(ifcName, subId), cli, instanceIdentifier, readContext));
         }
     }
 
@@ -71,11 +71,12 @@ public abstract class AbstractIpv4ConfigReader implements CliConfigReader<Config
 
     protected abstract Pattern getIpLine();
 
-    protected abstract String getReadCommand(String ifcName);
+    protected abstract String getReadCommand(String ifcName, Long subId);
 
     public boolean hasIpAddress(InstanceIdentifier instanceIdentifier, String ifcName, ReadContext ctx)
             throws ReadFailedException {
-        String output = blockingRead(getReadCommand(ifcName), cli, instanceIdentifier, ctx);
+        String output = blockingRead(getReadCommand(ifcName, AbstractSubinterfaceReader.ZERO_SUBINTERFACE_ID),
+                cli, instanceIdentifier, ctx);
         return ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .map(getIpLine()::matcher)
