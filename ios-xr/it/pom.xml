@@ -25,14 +25,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.cli</groupId>
     <artifactId>ios-xr-it</artifactId>
-    <version>3.1.8.rc4-frinx-SNAPSHOT</version>
+    <version>3.1.8.rc4-frinx</version>
 
     <properties>
-        <cli.version>3.1.8.rc4-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.8.rc4-frinx-SNAPSHOT</openconfig.version>
+        <cli.version>3.1.8.rc4-frinx</cli.version>
+        <openconfig.version>3.1.8.rc4-frinx</openconfig.version>
         <hc.version>1.17.10-Carbon-SR1.3_1_8_rc4-frinxodl</hc.version>
         <controller.version>1.5.1-Carbon-SR1.3_1_8_rc4-frinxodl</controller.version>
-        <translate.unit.commons.version>3.1.8.rc4-frinx-SNAPSHOT</translate.unit.commons.version>
+        <translate.unit.commons.version>3.1.8.rc4-frinx</translate.unit.commons.version>
         <yangtools.version>1.1.1-Carbon-SR1.3_1_8_rc4-frinxodl</yangtools.version>
         <mdsal.version>2.2.1-Carbon-SR1.3_1_8_rc4-frinxodl</mdsal.version>
         <mdsalmodel.version>0.10.1-Carbon-SR1.3_1_8_rc4-frinxodl</mdsalmodel.version>
