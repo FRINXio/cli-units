@@ -46,6 +46,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
 
     public static final String SH_SUMM = "show running-config | include ^router bgp|^ *address-family|^ *neighbor %s";
+    private static final String PASSWORD_FORM = "Encrypted[%s]";
 
     private static final Pattern NEIGHBOR_ACTIVATE_PATTERN =
             Pattern.compile("neighbor (?<neighborIp>\\S*) (?<enabled>activate).*");
@@ -59,7 +60,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
             Pattern.compile("neighbor (?<neighborIp>\\S*) description (?<description>.+)");
     private static final Pattern SEND_COMMUNITY_PATTERN =
             Pattern.compile("neighbor (?<neighborIp>\\S*) send-community (?<community>.+)");
-    private static final String REGEX = "^([\\d] )\\S+$";
+    private static final Pattern PASSWORD_REGEX_FORM = Pattern.compile("^([\\d] )\\S+$");
 
     private final Cli cli;
 
@@ -177,8 +178,8 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
     }
 
     private static EncryptedPassword getPassword(String password) {
-        if (password.matches(REGEX)) {
-            return new EncryptedPassword(new EncryptedString(password));
+        if (PASSWORD_REGEX_FORM.matcher(password).matches()) {
+            return new EncryptedPassword(new EncryptedString(String.format(PASSWORD_FORM, password)));
         }
         return new EncryptedPassword(new PlainString(password));
     }
