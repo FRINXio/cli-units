@@ -33,7 +33,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bf
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
@@ -99,7 +98,7 @@ public class BfdConfigWriterTest {
     }
 
     private void initializeData() {
-        data = new ConfigBuilder().setDestinationAddress(new IpAddress(new Ipv4Address("192.168.1.1")))
+        data = new ConfigBuilder().setDestinationAddress(new Ipv4Address("192.168.1.1"))
                 .setMinInterval(1000L)
                 .setMultiplier(5L)
                 .build();
@@ -116,7 +115,7 @@ public class BfdConfigWriterTest {
     @Test
     public void update() throws WriteFailedException {
         // update values
-        Config newData = new ConfigBuilder().setDestinationAddress(new IpAddress(new Ipv4Address("192.168.1.2")))
+        Config newData = new ConfigBuilder().setDestinationAddress(new Ipv4Address("192.168.1.2"))
                 .setMinInterval(2000L)
                 .setMultiplier(10L)
                 .build();
