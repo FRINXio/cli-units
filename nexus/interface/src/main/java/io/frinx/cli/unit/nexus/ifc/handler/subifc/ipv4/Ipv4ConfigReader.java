@@ -32,7 +32,7 @@ public final class Ipv4ConfigReader extends AbstractIpv4ConfigReader {
     }
 
     @Override
-    protected String getReadCommand(String ifcName) {
+    protected String getReadCommand(String ifcName, Long subId) {
         return f(Ipv4AddressReader.SH_RUN_INT_IP, ifcName);
     }
 }

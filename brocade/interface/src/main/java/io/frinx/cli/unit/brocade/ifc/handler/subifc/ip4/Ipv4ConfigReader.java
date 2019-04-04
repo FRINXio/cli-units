@@ -34,7 +34,7 @@ public final class Ipv4ConfigReader extends AbstractIpv4ConfigReader {
     }
 
     @Override
-    protected String getReadCommand(String ifcName) {
+    protected String getReadCommand(String ifcName, Long subId) {
         Class<? extends InterfaceType> ifcType = Util.parseType(ifcName);
         String ifcNumber = Util.getIfcNumber(ifcName);
         return f(Ipv4AddressReader.SH_INTERFACE_IP, Util.getTypeOnDevice(ifcType), ifcNumber);

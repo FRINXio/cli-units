@@ -37,7 +37,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
 
     @Override
     protected String getReadCommand(String ifcName) {
-        return null;
+        return f(SH_SINGLE_INTERFACE_CFG, ifcName);
     }
 
     @Override
