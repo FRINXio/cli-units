@@ -27,7 +27,7 @@
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-unit-junos</artifactId>
     <packaging>feature</packaging>
-    <version>4.2.0.rc22-frinx</version>
+    <version>4.2.0.rc23-frinx-SNAPSHOT</version>
     <name>Frinx :: Cli :: Unit :: Junos</name>
 
     <dependencyManagement>
@@ -43,7 +43,7 @@
                 <groupId>io.frinx.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.0.rc22-frinx</version>
+                <version>4.2.0.rc23-frinx-SNAPSHOT</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
