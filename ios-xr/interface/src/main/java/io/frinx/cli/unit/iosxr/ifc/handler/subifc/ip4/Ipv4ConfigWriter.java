@@ -24,7 +24,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip
 public class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
 
     private static final String TEMPLATE = "interface {$name}\n"
-            + "{% if ($delete) %} no ipv4 address{% elif %} ipv4 address {$ip} {$netmask}{% endif %}\n"
+            + "{% if ($delete) %} no ipv4 address{% else %} ipv4 address {$ip} {$netmask}{% endif %}\n"
             + "root";
 
     public Ipv4ConfigWriter(Cli cli) {
