@@ -25,7 +25,7 @@ public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
 
     private static final String TEMPLATE = "configure terminal\n"
             + "interface {$name}n"
-            + "{% if ($delete) %} no ip address{% elif %} ip address {$ip} {$netmask}{% endif %}\n"
+            + "{% if ($delete) %} no ip address{% else %} ip address {$ip} {$netmask}{% endif %}\n"
             + "end";
 
     public Ipv4ConfigWriter(Cli cli) {
