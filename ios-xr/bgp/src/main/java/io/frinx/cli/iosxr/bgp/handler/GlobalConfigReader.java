@@ -19,8 +19,8 @@ package io.frinx.cli.iosxr.bgp.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
+public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_RUN_BGP = "show running-config router bgp";
     private static final String SH_RUN_BGP_PER_NWINS = "show running-config router bgp %s %s %s";
@@ -56,7 +56,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         final String name = instanceIdentifier.firstKeyOf(Protocol.class).getName();

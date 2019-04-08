@@ -20,8 +20,8 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.extension.rev190117.OspfAreaIfConfAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.OSPFNETWORKTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.OspfAreaIdentifier;
@@ -33,7 +33,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 
-public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
+public class AreaInterfaceConfigWriter implements CliWriter<Config> {
 
     private final Cli cli;
 
@@ -42,7 +42,7 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
+    public void writeCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
         final OspfAreaIdentifier areaId =
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Area.class))
@@ -85,7 +85,7 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config dataBefore,
+    public void updateCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config dataBefore,
                                                Config dataAfter, WriteContext writeContext) throws
             WriteFailedException {
         final OspfAreaIdentifier areaId =
@@ -132,7 +132,7 @@ public class AreaInterfaceConfigWriter implements OspfWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
+    public void deleteCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
         final OspfAreaIdentifier areaId =
                 writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Area.class))

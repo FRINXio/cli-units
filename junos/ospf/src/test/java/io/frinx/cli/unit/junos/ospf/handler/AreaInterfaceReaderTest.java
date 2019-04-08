@@ -101,7 +101,7 @@ public class AreaInterfaceReaderTest {
                 Mockito.eq(iid),
                 Mockito.eq(readContext));
 
-        List<InterfaceKey> result = target.getAllIdsForType(iid, readContext);
+        List<InterfaceKey> result = target.getAllIds(iid, readContext);
 
         Assert.assertThat(result, CoreMatchers.equalTo(EXPECTED_INTERFACE_KEYS));
 
@@ -126,7 +126,7 @@ public class AreaInterfaceReaderTest {
                 .child(Interface.class, new InterfaceKey("xe-0/0/34.0"));
         final InterfaceBuilder builder = new InterfaceBuilder();
 
-        target.readCurrentAttributesForType(iid, builder, readContext);
+        target.readCurrentAttributes(iid, builder, readContext);
 
         Assert.assertEquals(builder.getId(), "xe-0/0/34.0");
     }

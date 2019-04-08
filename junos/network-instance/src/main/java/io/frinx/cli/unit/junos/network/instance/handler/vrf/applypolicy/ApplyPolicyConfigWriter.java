@@ -18,8 +18,8 @@ package io.frinx.cli.unit.junos.network.instance.handler.vrf.applypolicy;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.network.instance.L3VrfWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.apply.policy.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class ApplyPolicyConfigWriter implements L3VrfWriter<Config> {
+public class ApplyPolicyConfigWriter implements CliWriter<Config> {
     private static final String WRITE_INSTANCE_IMPORT_TEMPLATE =
             "set routing-instances %s routing-options instance-import %s";
     private static final String DELETE_INSTANCE_IMPORT_TEMPLATE =
@@ -40,7 +40,7 @@ public class ApplyPolicyConfigWriter implements L3VrfWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(
+    public void writeCurrentAttributes(
         InstanceIdentifier<Config> id,
         Config dataAfter,
         WriteContext writeContext) throws WriteFailedException {
@@ -54,7 +54,7 @@ public class ApplyPolicyConfigWriter implements L3VrfWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(
+    public void updateCurrentAttributes(
         InstanceIdentifier<Config> id,
         Config dataBefore,
         Config dataAfter,
@@ -76,7 +76,7 @@ public class ApplyPolicyConfigWriter implements L3VrfWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributesForType(
+    public void deleteCurrentAttributes(
         InstanceIdentifier<Config> id,
         Config dataBefore,
         WriteContext writeContext) throws WriteFailedException {

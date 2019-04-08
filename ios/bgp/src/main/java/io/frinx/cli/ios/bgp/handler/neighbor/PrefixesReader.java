@@ -19,8 +19,8 @@ package io.frinx.cli.ios.bgp.handler.neighbor;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliOperReader;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
@@ -30,7 +30,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV4UNICAST;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class PrefixesReader implements BgpReader.BgpOperReader<Prefixes, PrefixesBuilder> {
+public class PrefixesReader implements CliOperReader<Prefixes, PrefixesBuilder> {
 
     private static final String SH_IPV4 = "show bgp ipv4 unicast summary | section %s";
     private static final String SH_VPNV4 = "show bgp vpnv4 unicast all summary | section %s";
@@ -42,7 +42,7 @@ public class PrefixesReader implements BgpReader.BgpOperReader<Prefixes, Prefixe
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Prefixes> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Prefixes> instanceIdentifier,
                                              @Nonnull PrefixesBuilder prefixesBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         Class<? extends AFISAFITYPE> afiKey = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();

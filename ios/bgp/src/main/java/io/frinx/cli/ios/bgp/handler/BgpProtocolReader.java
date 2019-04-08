@@ -19,7 +19,6 @@ package io.frinx.cli.ios.bgp.handler;
 import com.google.common.collect.ImmutableList;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
@@ -31,10 +30,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.BGP;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
-        BgpReader.BgpConfigReader<Protocol, ProtocolBuilder>,
         CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     public static final String DEFAULT_BGP_INSTANCE = "default";
@@ -54,11 +53,11 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
         }
 
         // IOS does not support multi-instance BGP therefore there is only default instance
-        return ImmutableList.of(new ProtocolKey(TYPE, DEFAULT_BGP_INSTANCE));
+        return ImmutableList.of(new ProtocolKey(BGP.class, DEFAULT_BGP_INSTANCE));
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> iid,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Protocol> iid,
                                              @Nonnull ProtocolBuilder builder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
 

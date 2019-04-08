@@ -110,7 +110,7 @@ public class MaxMetricTimerConfigWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        this.writer.writeCurrentAttributesForType(piid, data, context);
+        this.writer.writeCurrentAttributes(piid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -126,7 +126,7 @@ public class MaxMetricTimerConfigWriterTest {
                 .setTrigger(MAXMETRICALWAYS.class)
                 .build();
 
-        this.writer.writeCurrentAttributesForType(piid, newData, context);
+        this.writer.writeCurrentAttributes(piid, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -143,7 +143,7 @@ public class MaxMetricTimerConfigWriterTest {
                 .setTrigger(MAXMETRICALWAYS.class)
                 .build();
 
-        this.writer.updateCurrentAttributesForType(piid, data, newData, context);
+        this.writer.updateCurrentAttributes(piid, data, newData, context);
 
         Mockito.verify(cli, Mockito.times(1))
                 .executeAndRead(response.capture());
@@ -160,7 +160,7 @@ public class MaxMetricTimerConfigWriterTest {
                 .setTrigger(MAXMETRICALWAYS.class)
                 .build();
 
-        this.writer.updateCurrentAttributesForType(piid, data, newData, context);
+        this.writer.updateCurrentAttributes(piid, data, newData, context);
 
         Mockito.verify(cli, Mockito.times(1))
                 .executeAndRead(response.capture());
@@ -170,7 +170,7 @@ public class MaxMetricTimerConfigWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
-        this.writer.deleteCurrentAttributesForType(piid, data, context);
+        this.writer.deleteCurrentAttributes(piid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());

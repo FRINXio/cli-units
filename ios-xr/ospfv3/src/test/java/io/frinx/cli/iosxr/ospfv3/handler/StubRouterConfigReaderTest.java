@@ -73,7 +73,7 @@ public class StubRouterConfigReaderTest {
         StubRouterConfigReader target = Mockito.spy(new StubRouterConfigReader(cli));
         // test
         Mockito.doReturn(RESULT_SH_RUN_OSPFV3).when(target).blockingRead(SH_OSPF_V3_STUBRTR, cli, iid, ctx);
-        target.readCurrentAttributesForType(iid, builder, ctx);
+        target.readCurrentAttributes(iid, builder, ctx);
         // verify
         Assert.assertEquals(builder.build().getAdvertiseLsasTypes(), STUBROUTERMAXMETRIC.class);
         Assert.assertTrue(builder.build().isSet());

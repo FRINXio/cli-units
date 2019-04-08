@@ -18,7 +18,6 @@ package io.frinx.cli.iosxr.ospfv3.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.ospfv3.OspfV3Reader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
@@ -32,8 +31,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StubRouterConfigReader implements OspfV3Reader.OspfV3ConfigReader<Config, ConfigBuilder>,
-    CliConfigReader<Config, ConfigBuilder> {
+public class StubRouterConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private Cli cli;
 
@@ -45,7 +43,7 @@ public class StubRouterConfigReader implements OspfV3Reader.OspfV3ConfigReader<C
     }
 
     @Override
-    public void readCurrentAttributesForType(InstanceIdentifier<Config> iid, ConfigBuilder builder,
+    public void readCurrentAttributes(InstanceIdentifier<Config> iid, ConfigBuilder builder,
             ReadContext context) throws ReadFailedException {
         final String ospfId = iid.firstKeyOf(Protocol.class).getName();
         final String nwInsName = OspfV3ProtocolReader.resolveVrfWithName(iid);

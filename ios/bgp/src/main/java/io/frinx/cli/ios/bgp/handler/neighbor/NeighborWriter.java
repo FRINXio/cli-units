@@ -21,9 +21,9 @@ import com.google.common.collect.Maps;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.bgp.BgpListWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter;
+import io.frinx.cli.unit.utils.CliListWriter;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.AbstractMap;
@@ -47,7 +47,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
+public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
     // TODO split this into regular smaller writers if possible. Especially the AFI SAFI handling (update and
     // removal) is
@@ -236,7 +236,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Neighbor> instanceIdentifier, Neighbor neighbor,
+    public void writeCurrentAttributes(InstanceIdentifier<Neighbor> instanceIdentifier, Neighbor neighbor,
                                               WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 
@@ -430,7 +430,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Neighbor> instanceIdentifier,
+    public void updateCurrentAttributes(InstanceIdentifier<Neighbor> instanceIdentifier,
                                                Neighbor before, Neighbor neighbor,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
@@ -463,7 +463,7 @@ public class NeighborWriter implements BgpListWriter<Neighbor, NeighborKey> {
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Neighbor> instanceIdentifier, Neighbor neighbor,
+    public void deleteCurrentAttributes(InstanceIdentifier<Neighbor> instanceIdentifier, Neighbor neighbor,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 

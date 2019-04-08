@@ -18,8 +18,8 @@ package io.frinx.cli.unit.huawei.bgp.handler.neighbor;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Arrays;
@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
+public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     static final String DISPLAY_PEER_CONFIG =
             "display current-configuration configuration bgp | include ^router bgp|^ *ipv4-family|^ *peer %s";
@@ -63,7 +63,7 @@ public class NeighborConfigReader implements BgpReader.BgpConfigReader<Config, C
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();

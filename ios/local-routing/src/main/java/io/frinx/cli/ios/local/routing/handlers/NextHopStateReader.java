@@ -20,7 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.local.routing.common.LrReader;
+import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.regex.Matcher;
@@ -36,7 +36,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NextHopStateReader implements LrReader.LrOperReader<State, StateBuilder> {
+public class NextHopStateReader implements CliOperReader<State, StateBuilder> {
 
     private static final String SHOW_IP_STATIC_ROUTE_NETWORK = "show ip static route %s | include %s";
     private static final String SHOW_IP_STATIC_ROUTE_NETWORK_IP6 = "show ipv6 static %s | include %s";
@@ -53,7 +53,7 @@ public class NextHopStateReader implements LrReader.LrOperReader<State, StateBui
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> id, @Nonnull StateBuilder builder,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> id, @Nonnull StateBuilder builder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
 

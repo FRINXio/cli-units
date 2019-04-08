@@ -80,7 +80,7 @@ public class NiMplsLdpGlobalAugWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        this.writer.writeCurrentAttributesForType(iid, data, context);
+        this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -94,7 +94,7 @@ public class NiMplsLdpGlobalAugWriterTest {
 
         Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(ldp));
 
-        this.writer.deleteCurrentAttributesForType(iid, data, context);
+        this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());

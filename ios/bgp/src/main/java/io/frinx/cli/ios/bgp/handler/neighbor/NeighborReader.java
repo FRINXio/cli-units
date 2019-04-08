@@ -19,9 +19,9 @@ package io.frinx.cli.ios.bgp.handler.neighbor;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.BgpProtocolReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +37,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
+public class NeighborReader implements CliConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
     public static final String SH_SUMM = "show running-config | include ^router bgp|^ address-family|^ *neighbor";
     private static final Pattern NEIGHBOR_LINE = Pattern.compile("neighbor (?<id>[0-9A-F.:]*) (remote-as|peer-group) "
@@ -52,7 +52,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
     }
 
     @Override
-    public List<NeighborKey> getAllIdsForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
+    public List<NeighborKey> getAllIds(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
                                               @Nonnull ReadContext readContext) throws ReadFailedException {
 
         String networkInstanceName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
@@ -73,7 +73,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
                                              @Nonnull NeighborBuilder neighborBuilder, @Nonnull ReadContext
                                                          readContext) throws ReadFailedException {
         neighborBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());

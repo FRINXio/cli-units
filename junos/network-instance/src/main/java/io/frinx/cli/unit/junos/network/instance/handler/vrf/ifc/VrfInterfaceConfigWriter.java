@@ -19,14 +19,14 @@ package io.frinx.cli.unit.junos.network.instance.handler.vrf.ifc;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.network.instance.L3VrfWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces._interface.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VrfInterfaceConfigWriter implements L3VrfWriter<Config> {
+public class VrfInterfaceConfigWriter implements CliWriter<Config> {
     private static final String WRITE_TEMPLATE = "set routing-instances %s interface %s";
     private static final String DELETE_TEMPLATE = "delete routing-instances %s interface %s";
 
@@ -37,26 +37,26 @@ public class VrfInterfaceConfigWriter implements L3VrfWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(
+    public void writeCurrentAttributes(
         InstanceIdentifier<Config> id,
         Config dataAfter,
         WriteContext writeContext) throws WriteFailedException {
 
-        createOrUpdateCurrentAttributesForType(id, dataAfter);
+        createOrUpdateCurrentAttributes(id, dataAfter);
     }
 
     @Override
-    public void updateCurrentAttributesForType(
+    public void updateCurrentAttributes(
         InstanceIdentifier<Config> id,
         Config dataBefore,
         Config dataAfter,
         WriteContext writeContext) throws WriteFailedException {
 
-        createOrUpdateCurrentAttributesForType(id, dataAfter);
+        createOrUpdateCurrentAttributes(id, dataAfter);
     }
 
     @VisibleForTesting
-    void createOrUpdateCurrentAttributesForType(
+    void createOrUpdateCurrentAttributes(
         InstanceIdentifier<Config> id,
         Config dataAfter) throws WriteFailedException {
 
@@ -70,7 +70,7 @@ public class VrfInterfaceConfigWriter implements L3VrfWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributesForType(
+    public void deleteCurrentAttributes(
         InstanceIdentifier<Config> id,
         Config dataBefore,
         WriteContext writeContext) throws WriteFailedException {

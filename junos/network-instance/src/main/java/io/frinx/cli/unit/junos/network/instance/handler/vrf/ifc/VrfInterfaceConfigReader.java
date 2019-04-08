@@ -18,7 +18,7 @@ package io.frinx.cli.unit.junos.network.instance.handler.vrf.ifc;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.network.instance.L3VrfReader;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.InterfaceBuilder;
@@ -28,8 +28,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VrfInterfaceConfigReader
-        implements L3VrfReader.L3VrfConfigReader<Config, ConfigBuilder> {
+public class VrfInterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config data) {
@@ -37,7 +36,7 @@ public class VrfInterfaceConfigReader
     }
 
     @Override
-    public void readCurrentAttributesForType(
+    public void readCurrentAttributes(
         @Nonnull InstanceIdentifier<Config> id,
         @Nonnull ConfigBuilder configBuilder,
         @Nonnull ReadContext ctx) throws ReadFailedException {

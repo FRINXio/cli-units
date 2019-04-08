@@ -19,8 +19,8 @@ package io.frinx.cli.ios.bgp.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.regex.Matcher;
@@ -34,7 +34,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.yang.rev170403.DottedQuad;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
+public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_SUMM = "show running-config | include ^router bgp|^ *address-family|^ *bgp "
             + "router-id";
@@ -51,7 +51,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String output = blockingRead(SH_SUMM, cli, id, readContext);

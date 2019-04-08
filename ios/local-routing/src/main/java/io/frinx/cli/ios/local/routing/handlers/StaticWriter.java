@@ -21,7 +21,7 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.local.routing.common.LrListWriter;
+import io.frinx.cli.unit.utils.CliListWriter;
 import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -33,7 +33,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StaticWriter implements LrListWriter<Static, StaticKey> {
+public class StaticWriter implements CliListWriter<Static, StaticKey> {
 
     private static final String WRITE_TEMPLATE = "configure terminal\n"
             + "ip route {$network} {$netmask} {$nexthop}\n"
@@ -60,7 +60,7 @@ public class StaticWriter implements LrListWriter<Static, StaticKey> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Static> id, Static config,
+    public void writeCurrentAttributes(InstanceIdentifier<Static> id, Static config,
                                               WriteContext writeContext) throws WriteFailedException {
         NextHops nextHops = config.getNextHops();
         doPreconditions(nextHops);
@@ -82,7 +82,7 @@ public class StaticWriter implements LrListWriter<Static, StaticKey> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Static> id, Static dataBefore, Static dataAfter,
+    public void updateCurrentAttributes(InstanceIdentifier<Static> id, Static dataBefore, Static dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
         Set beforeHops = Sets.newHashSet(dataBefore.getNextHops().getNextHop());
         Set afterHops = Sets.newHashSet(dataAfter.getNextHops().getNextHop());
@@ -94,7 +94,7 @@ public class StaticWriter implements LrListWriter<Static, StaticKey> {
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Static> id, Static config,
+    public void deleteCurrentAttributes(InstanceIdentifier<Static> id, Static config,
                                                WriteContext writeContext) throws WriteFailedException {
         NextHops nextHops = config.getNextHops();
         doPreconditions(nextHops);

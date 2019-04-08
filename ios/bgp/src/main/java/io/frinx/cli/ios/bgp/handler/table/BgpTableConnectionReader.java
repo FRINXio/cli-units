@@ -19,8 +19,8 @@ package io.frinx.cli.ios.bgp.handler.table;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
@@ -53,7 +53,7 @@ import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpTableConnectionReader implements
-        L3VrfListReader.L3VrfConfigListReader<TableConnection, TableConnectionKey, TableConnectionBuilder>,
+        CliConfigListReader<TableConnection, TableConnectionKey, TableConnectionBuilder>,
         CompositeListReader.Child<TableConnection, TableConnectionKey, TableConnectionBuilder> {
 
     static final String SH_BGP_REDIS =
@@ -72,7 +72,7 @@ public class BgpTableConnectionReader implements
     }
 
     @Override
-    public List<TableConnectionKey> getAllIdsForType(@Nonnull InstanceIdentifier<TableConnection> id,
+    public List<TableConnectionKey> getAllIds(@Nonnull InstanceIdentifier<TableConnection> id,
                                                      @Nonnull ReadContext readContext) throws ReadFailedException {
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         String output = blockingRead(SH_BGP_REDIS, cli, id, readContext);
@@ -181,7 +181,7 @@ public class BgpTableConnectionReader implements
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<TableConnection> id,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<TableConnection> id,
                                              @Nonnull TableConnectionBuilder tableConnectionBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);

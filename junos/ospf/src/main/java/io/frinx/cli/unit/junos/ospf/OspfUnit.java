@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -43,6 +44,7 @@ import io.frinx.cli.unit.junos.ospf.handler.OspfAreaReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -87,7 +89,10 @@ public class OspfUnit implements TranslateUnit {
                                 @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
+        CheckRegistry checkRegistry = ChecksMap.getOpenconfigCheckRegistry();
+        readRegistry.setCheckRegistry(checkRegistry);
         provideReaders(readRegistry, cli);
+        writeRegistry.setCheckRegistry(checkRegistry);
         provideWriters(writeRegistry, cli);
     }
 

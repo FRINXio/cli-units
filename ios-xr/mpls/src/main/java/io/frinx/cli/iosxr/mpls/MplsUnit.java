@@ -21,6 +21,7 @@ import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
+import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -53,6 +54,7 @@ import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.LdpBuilder;
@@ -113,11 +115,14 @@ public class MplsUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
-                                @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
-                                @Nonnull final TranslateUnit.Context context) {
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
+                                @Nonnull Context context) {
         Cli cli = context.getTransport();
+        CheckRegistry checkRegistry = ChecksMap.getOpenconfigCheckRegistry();
+        readRegistry.setCheckRegistry(checkRegistry);
         provideReaders(readRegistry, cli);
+        writeRegistry.setCheckRegistry(checkRegistry);
         provideWriters(writeRegistry, cli);
     }
 

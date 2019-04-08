@@ -18,8 +18,8 @@ package io.frinx.cli.iosxr.ospf.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.ospf.OspfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area, AreaKey, AreaBuilder> {
+public class OspfAreaReader implements CliConfigListReader<Area, AreaKey, AreaBuilder> {
 
     private static final String SH_RUN_OSPF_AREA = "show running-config router ospf %s %s | include ^%sarea";
 
@@ -49,7 +49,7 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
 
     @Nonnull
     @Override
-    public List<AreaKey> getAllIdsForType(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
+    public List<AreaKey> getAllIds(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
                                           @Nonnull ReadContext readContext) throws ReadFailedException {
         String id = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
@@ -82,7 +82,7 @@ public class OspfAreaReader implements OspfListReader.OspfConfigListReader<Area,
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Area> instanceIdentifier,
                                              @Nonnull AreaBuilder areaBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         areaBuilder.setIdentifier(instanceIdentifier.firstKeyOf(Area.class)

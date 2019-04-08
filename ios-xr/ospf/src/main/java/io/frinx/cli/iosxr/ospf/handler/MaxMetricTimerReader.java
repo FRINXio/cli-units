@@ -18,8 +18,8 @@ package io.frinx.cli.iosxr.ospf.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.ospf.OspfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader<MaxMetricTimer, MaxMetricTimerKey,
+public class MaxMetricTimerReader implements CliConfigListReader<MaxMetricTimer, MaxMetricTimerKey,
         MaxMetricTimerBuilder> {
 
     public static final Pattern MAX_METRIC_LINE = Pattern.compile("max-metric router-lsa(?<trigger>"
@@ -58,7 +58,7 @@ public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader
     }
 
     @Override
-    public List<MaxMetricTimerKey> getAllIdsForType(@Nonnull InstanceIdentifier<MaxMetricTimer> instanceIdentifier,
+    public List<MaxMetricTimerKey> getAllIds(@Nonnull InstanceIdentifier<MaxMetricTimer> instanceIdentifier,
                                                     @Nonnull ReadContext readContext) throws ReadFailedException {
         String ospfId = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
@@ -76,7 +76,7 @@ public class MaxMetricTimerReader implements OspfListReader.OspfConfigListReader
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<MaxMetricTimer> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<MaxMetricTimer> instanceIdentifier, @Nonnull
             MaxMetricTimerBuilder builder, @Nonnull ReadContext readContext) throws ReadFailedException {
         MaxMetricTimerKey timerKey = instanceIdentifier.firstKeyOf(MaxMetricTimer.class);
         builder.setKey(timerKey);

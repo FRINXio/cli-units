@@ -137,7 +137,7 @@ public class AreaInterfaceConfigWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        this.writer.writeCurrentAttributesForType(piid, data, context);
+        this.writer.writeCurrentAttributes(piid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -151,7 +151,7 @@ public class AreaInterfaceConfigWriterTest {
         ConfigBuilder builder = new ConfigBuilder().setMetric(new OspfMetric(500));
         Config newData = builder.setPassive(false).build();
 
-        this.writer.updateCurrentAttributesForType(piid, data, newData, context);
+        this.writer.updateCurrentAttributes(piid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -164,7 +164,7 @@ public class AreaInterfaceConfigWriterTest {
         // removing cost
         Config newData = new ConfigBuilder().build();
 
-        this.writer.updateCurrentAttributesForType(piid, data, newData, context);
+        this.writer.updateCurrentAttributes(piid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -174,7 +174,7 @@ public class AreaInterfaceConfigWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
-        this.writer.deleteCurrentAttributesForType(piid, data, context);
+        this.writer.deleteCurrentAttributes(piid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());

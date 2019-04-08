@@ -20,9 +20,9 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.network.instance.L2p2pWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.ifc.Util;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Collections;
 import java.util.Objects;
@@ -40,7 +40,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.REMOTE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
+public class ConnectionPointsWriter implements CliWriter<ConnectionPoints> {
 
     private Cli cli;
 
@@ -49,7 +49,7 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id, @Nonnull
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<ConnectionPoints> id, @Nonnull
             ConnectionPoints dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
         Preconditions.checkArgument(dataAfter.getConnectionPoint().size()
                 == 2, "L2P2P network only supports 2 endpoints, but were: %s", dataAfter.getConnectionPoint());
@@ -262,7 +262,7 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
     }
 
     @Override
-    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id, @Nonnull
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<ConnectionPoints> id, @Nonnull
             ConnectionPoints dataBefore, @Nonnull WriteContext writeContext) throws WriteFailedException
             .DeleteFailedException {
         ConnectionPoint connectionPoint1 = getCPoint(dataBefore, ConnectionPointsReader.POINT_1);
@@ -279,7 +279,7 @@ public class ConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id, @Nonnull
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<ConnectionPoints> id, @Nonnull
             ConnectionPoints dataBefore, @Nonnull ConnectionPoints dataAfter, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
         deleteCurrentAttributes(id, dataBefore, writeContext);

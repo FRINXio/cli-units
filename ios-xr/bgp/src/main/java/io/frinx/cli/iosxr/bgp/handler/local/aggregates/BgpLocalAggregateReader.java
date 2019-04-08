@@ -19,9 +19,9 @@ package io.frinx.cli.iosxr.bgp.handler.local.aggregates;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
@@ -45,8 +45,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReader<Aggregate, AggregateKey,
-        AggregateBuilder> {
+public class BgpLocalAggregateReader implements CliConfigListReader<Aggregate, AggregateKey, AggregateBuilder> {
 
     private static final String SH_BGP = "show running-config router bgp %s %s %s";
     private static final Pattern NETWORK_LINE = Pattern.compile("network (?<prefix>\\S+)(?<policy> route-policy "
@@ -64,7 +63,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
     }
 
     @Override
-    public List<AggregateKey> getAllIdsForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
+    public List<AggregateKey> getAllIds(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
             ReadContext readContext) throws ReadFailedException {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
                 globalConfig = readContext.read(instanceIdentifier.firstIdentifierOf(Protocol.class)
@@ -94,7 +93,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
             AggregateBuilder builder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
                 globalConfig = readContext.read(instanceIdentifier.firstIdentifierOf(Protocol.class)

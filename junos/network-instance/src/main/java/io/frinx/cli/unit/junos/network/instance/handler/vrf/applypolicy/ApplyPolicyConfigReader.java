@@ -18,8 +18,8 @@ package io.frinx.cli.unit.junos.network.instance.handler.vrf.applypolicy;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.network.instance.L3VrfReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class ApplyPolicyConfigReader implements L3VrfReader.L3VrfConfigReader<Config, ConfigBuilder> {
+public class ApplyPolicyConfigReader implements CliConfigReader<Config, ConfigBuilder> {
     private static final String SH_IMPORT_POLICY_TEMPLATE =
         "show configuration routing-instances %s routing-options instance-import | display set";
     private static final Pattern IMPORT_POLICY_LINE_PATTERN =
@@ -51,7 +51,7 @@ public class ApplyPolicyConfigReader implements L3VrfReader.L3VrfConfigReader<Co
     }
 
     @Override
-    public void readCurrentAttributesForType(
+    public void readCurrentAttributes(
         @Nonnull InstanceIdentifier<Config> id,
         @Nonnull ConfigBuilder configBuilder,
         @Nonnull ReadContext readContext) throws ReadFailedException {

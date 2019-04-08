@@ -19,8 +19,8 @@ package io.frinx.cli.iosxr.mpls.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.mpls.MplsReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,8 +32,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NiMplsLdpGlobalAugReader implements MplsReader.MplsConfigReader<NiMplsLdpGlobalAug,
-    NiMplsLdpGlobalAugBuilder> {
+public class NiMplsLdpGlobalAugReader implements CliConfigReader<NiMplsLdpGlobalAug, NiMplsLdpGlobalAugBuilder> {
 
     private Cli cli;
 
@@ -45,7 +44,7 @@ public class NiMplsLdpGlobalAugReader implements MplsReader.MplsConfigReader<NiM
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<NiMplsLdpGlobalAug> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsLdpGlobalAug> instanceIdentifier,
             @Nonnull NiMplsLdpGlobalAugBuilder builder,
             @Nonnull ReadContext readContext) throws ReadFailedException {
         String output = blockingRead(SH_LDP_INT, cli, instanceIdentifier, readContext);

@@ -33,12 +33,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>common-handlers</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>io.frinx.translate.unit.commons</groupId>
       <artifactId>handlers</artifactId>
       <version>${translate.unit.commons.version}</version>

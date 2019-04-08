@@ -76,7 +76,7 @@ public class VrfInterfaceReaderTest {
                     Mockito.eq(iid),
                     Mockito.eq(readContext));
 
-        List<InterfaceKey> result = target.getAllIdsForType(iid, readContext);
+        List<InterfaceKey> result = target.getAllIds(iid, readContext);
 
         Assert.assertThat(
             result.stream()
@@ -97,7 +97,7 @@ public class VrfInterfaceReaderTest {
         final InstanceIdentifier<Interface> iid = IIDS_INTERFACE;
 
         InterfaceBuilder interfaceBuilder = new InterfaceBuilder();
-        target.readCurrentAttributesForType(iid, interfaceBuilder, readContext);
+        target.readCurrentAttributes(iid, interfaceBuilder, readContext);
 
         Assert.assertThat(interfaceBuilder.getId(), CoreMatchers.sameInstance(IFC_NAME));
     }

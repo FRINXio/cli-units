@@ -20,10 +20,11 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.network.instance.L3VrfWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,8 +44,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.OSPF;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpTableConnectionWriter implements
-        L3VrfWriter<Config> {
+public class BgpTableConnectionWriter implements TypedWriter<Config>, CliWriter<Config> {
 
     private static final String UPDATE_REDIS = "configure terminal\n"
             + "router bgp {$bgp}\n"

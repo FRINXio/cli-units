@@ -19,10 +19,10 @@ package io.frinx.cli.iosxr.bgp.handler.neighbor;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.regex.Matcher;
@@ -41,7 +41,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public abstract class NeighborAfiSafiIpvConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
+public abstract class NeighborAfiSafiIpvConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_NEI = "show running-config router bgp %s %s %s neighbor %s address-family %s";
     private static final Pattern DEFAULT_ORIGINATE_LINE = Pattern.compile("default-originate");
@@ -58,7 +58,7 @@ public abstract class NeighborAfiSafiIpvConfigReader implements BgpReader.BgpCon
     protected abstract boolean isCorrectAfi(Class<? extends AFISAFITYPE> afiClass);
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config

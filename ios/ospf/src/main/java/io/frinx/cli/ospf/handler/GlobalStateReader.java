@@ -20,8 +20,8 @@ import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
-import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.Config;
@@ -29,7 +29,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.StateBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalStateReader implements OspfReader.OspfOperReader<State, StateBuilder> {
+public class GlobalStateReader implements CliOperReader<State, StateBuilder> {
 
     private Cli cli;
 
@@ -38,7 +38,7 @@ public class GlobalStateReader implements OspfReader.OspfOperReader<State, State
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
         // FIXME Set config attributes from operational state e.g. use sh ip vrf here instead of sh run vrf

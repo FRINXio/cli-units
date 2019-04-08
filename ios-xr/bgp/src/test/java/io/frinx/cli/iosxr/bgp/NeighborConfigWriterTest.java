@@ -141,11 +141,9 @@ public class NeighborConfigWriterTest {
                         .build();
 
         Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class)))
-                .thenReturn(Optional.of(config))
                 .thenReturn(Optional.of(build))
                 .thenReturn(Optional.absent());
         Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class)))
-                .thenReturn(Optional.of(config))
                 .thenReturn(Optional.of(build));
     }
 

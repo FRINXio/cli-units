@@ -20,8 +20,8 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.mpls.MplsWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.Ldp;
@@ -30,7 +30,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top._interface.attributes.interfaces._interface.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class LdpInterfaceConfigWriter implements MplsWriter<Config> {
+public class LdpInterfaceConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
@@ -39,7 +39,7 @@ public class LdpInterfaceConfigWriter implements MplsWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
         final Ldp ldp = writeContext.readAfter(RWUtils.cutId(id,Ldp.class))
                 .get();
@@ -63,16 +63,16 @@ public class LdpInterfaceConfigWriter implements MplsWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(@Nonnull final InstanceIdentifier<Config> id,
+    public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id,
                                         @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
 
     @Override
-    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class).getInterfaceId().getValue();
         blockingDeleteAndRead(cli, id,

@@ -18,13 +18,14 @@ package io.frinx.cli.iosxr.ospfv3.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.ospfv3.OspfV3Writer;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class OspfV3ProtocolWriter implements OspfV3Writer<Config> {
+public class OspfV3ProtocolWriter implements CliWriter<Config>, TypedWriter<Config> {
 
     private Cli cli;
 

@@ -102,7 +102,7 @@ public class LdpInterfaceWriterTest {
 
         Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(ldp));
 
-        this.writer.writeCurrentAttributesForType(iid, data, context);
+        this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -112,7 +112,7 @@ public class LdpInterfaceWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
-        this.writer.deleteCurrentAttributesForType(iid, data, context);
+        this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());

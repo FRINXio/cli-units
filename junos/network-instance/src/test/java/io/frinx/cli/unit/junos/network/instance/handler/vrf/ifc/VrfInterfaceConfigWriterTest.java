@@ -67,7 +67,7 @@ public class VrfInterfaceConfigWriterTest {
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
         Mockito.doReturn(IFC_NAME).when(data).getId();
 
-        target.createOrUpdateCurrentAttributesForType(IIDS_INTERFACE_CONFIG, data);
+        target.createOrUpdateCurrentAttributes(IIDS_INTERFACE_CONFIG, data);
 
         Mockito.verify(data, Mockito.times(1)).getId();
         Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
@@ -84,7 +84,7 @@ public class VrfInterfaceConfigWriterTest {
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
         Mockito.doReturn(IFC_NAME).when(data).getId();
 
-        target.deleteCurrentAttributesForType(IIDS_INTERFACE_CONFIG, data, writeContext);
+        target.deleteCurrentAttributes(IIDS_INTERFACE_CONFIG, data, writeContext);
 
         Mockito.verify(data, Mockito.times(1)).getId();
         Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());

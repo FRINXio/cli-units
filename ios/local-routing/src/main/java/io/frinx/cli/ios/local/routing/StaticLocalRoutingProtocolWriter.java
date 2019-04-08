@@ -18,12 +18,12 @@ package io.frinx.cli.ios.local.routing;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.ios.local.routing.common.LrWriter;
-import io.frinx.translate.unit.commons.handler.spi.CompositeChildWriter;
+import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StaticLocalRoutingProtocolWriter implements LrWriter<Config>, CompositeChildWriter<Config> {
+public class StaticLocalRoutingProtocolWriter implements CliWriter<Config>, TypedWriter<Config> {
 
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config object,

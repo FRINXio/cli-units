@@ -19,8 +19,8 @@ package io.frinx.cli.ios.bgp.handler.neighbor;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -30,7 +30,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.StateBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NeighborStateReader implements BgpReader.BgpOperReader<State, StateBuilder> {
+public class NeighborStateReader implements CliOperReader<State, StateBuilder> {
 
     private Cli cli;
 
@@ -43,7 +43,7 @@ public class NeighborStateReader implements BgpReader.BgpOperReader<State, State
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
         String neighborIp = NeighborWriter.getNeighborIp(instanceIdentifier);

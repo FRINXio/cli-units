@@ -19,8 +19,8 @@ package io.frinx.cli.iosxr.mpls.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.mpls.MplsReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TunnelConfigReader implements MplsReader.MplsConfigReader<Config, ConfigBuilder> {
+public class TunnelConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     static final String SH_RUN_TUNNEL = "show running-config interface tunnel-te%s";
     private static final Pattern AUTOROUTE_LINE = Pattern.compile("autoroute announce");
@@ -45,7 +45,7 @@ public class TunnelConfigReader implements MplsReader.MplsConfigReader<Config, C
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
             ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final String name = instanceIdentifier.firstKeyOf(Tunnel.class)
                 .getName();

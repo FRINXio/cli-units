@@ -74,7 +74,7 @@ public class OspfProtocolConfigWriterTest {
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
         Mockito.doReturn(augData.build()).when(data).getAugmentation(ProtocolConfAug.class);
 
-        target.writeCurrentAttributesForType(INSTANCE_IDENTIFIER, data, writeContext);
+        target.writeCurrentAttributes(INSTANCE_IDENTIFIER, data, writeContext);
 
         Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
 
@@ -95,7 +95,7 @@ public class OspfProtocolConfigWriterTest {
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
         Mockito.doReturn(augData.build()).when(data).getAugmentation(ProtocolConfAug.class);
 
-        target.deleteCurrentAttributesForType(INSTANCE_IDENTIFIER, data, writeContext);
+        target.deleteCurrentAttributes(INSTANCE_IDENTIFIER, data, writeContext);
 
         Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
 

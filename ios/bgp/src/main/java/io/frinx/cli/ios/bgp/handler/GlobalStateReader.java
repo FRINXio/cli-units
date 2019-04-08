@@ -19,8 +19,8 @@ package io.frinx.cli.ios.bgp.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -30,8 +30,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.yang.rev170403.DottedQuad;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-
-public class GlobalStateReader implements BgpReader.BgpOperReader<State, StateBuilder> {
+public class GlobalStateReader implements CliOperReader<State, StateBuilder> {
 
     private Cli cli;
     static final String SH_BGP = "show bgp summary";
@@ -42,7 +41,7 @@ public class GlobalStateReader implements BgpReader.BgpOperReader<State, StateBu
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
         parseGlobal(blockingRead(SH_BGP, cli, instanceIdentifier, ctx), stateBuilder);

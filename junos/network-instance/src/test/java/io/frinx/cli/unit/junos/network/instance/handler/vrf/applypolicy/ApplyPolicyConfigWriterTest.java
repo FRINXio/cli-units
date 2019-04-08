@@ -76,8 +76,8 @@ public class ApplyPolicyConfigWriterTest {
     }
 
     @Test
-    public void testWriteCurrentAttributesForType() throws Exception {
-        target.writeCurrentAttributesForType(IIDS_CONFIG, CONFIG_AFTER, writeContext);
+    public void testWriteCurrentAttributes() throws Exception {
+        target.writeCurrentAttributes(IIDS_CONFIG, CONFIG_AFTER, writeContext);
 
         Mockito.verify(cli, Mockito.times(2)).executeAndRead(commands.capture());
 
@@ -89,8 +89,8 @@ public class ApplyPolicyConfigWriterTest {
     }
 
     @Test
-    public void testUpdateCurrentAttributesForType() throws Exception {
-        target.updateCurrentAttributesForType(IIDS_CONFIG, CONFIG_BEFORE, CONFIG_AFTER, writeContext);
+    public void testUpdateCurrentAttributes() throws Exception {
+        target.updateCurrentAttributes(IIDS_CONFIG, CONFIG_BEFORE, CONFIG_AFTER, writeContext);
 
         Mockito.verify(cli, Mockito.times(4)).executeAndRead(commands.capture());
 
@@ -106,8 +106,8 @@ public class ApplyPolicyConfigWriterTest {
     }
 
     @Test
-    public void testDeleteCurrentAttributesForType() throws Exception {
-        target.deleteCurrentAttributesForType(IIDS_CONFIG, CONFIG_BEFORE, writeContext);
+    public void testDeleteCurrentAttributes() throws Exception {
+        target.deleteCurrentAttributes(IIDS_CONFIG, CONFIG_BEFORE, writeContext);
 
         Mockito.verify(cli, Mockito.times(2)).executeAndRead(commands.capture());
 

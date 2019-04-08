@@ -19,8 +19,8 @@ package io.frinx.cli.unit.junos.ospf.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.ospf.OspfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey,
+public class AreaInterfaceReader implements CliConfigListReader<Interface, InterfaceKey,
         InterfaceBuilder> {
 
     @VisibleForTesting
@@ -52,7 +52,7 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
 
     @Nonnull
     @Override
-    public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                                @Nonnull ReadContext readContext) throws ReadFailedException {
         AreaKey areaKey = instanceIdentifier.firstKeyOf(Area.class);
         final String nwInsName = OspfProtocolReader.resolveVrfWithName(instanceIdentifier);
@@ -79,7 +79,7 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                              @Nonnull InterfaceBuilder interfaceBuilder,
                                              @Nonnull ReadContext readContext) {
         interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class).getId());

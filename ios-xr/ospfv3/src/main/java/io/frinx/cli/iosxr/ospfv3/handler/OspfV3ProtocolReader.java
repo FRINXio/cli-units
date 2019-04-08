@@ -19,7 +19,6 @@ package io.frinx.cli.iosxr.ospfv3.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.ospfv3.OspfV3Reader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -38,7 +37,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfV3ProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
-        OspfV3Reader.OspfV3ConfigReader<Protocol, ProtocolBuilder>,
         CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     private static final String SH_RUN_OSPFV3 = "show running-config router ospfv3 | include ^router ospfv3";
@@ -88,7 +86,7 @@ public class OspfV3ProtocolReader implements CliListReader<Protocol, ProtocolKey
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier,
                                              @Nonnull ProtocolBuilder protocolBuilder,
                                              @Nonnull ReadContext readContext) {
         ProtocolKey key = instanceIdentifier.firstKeyOf(Protocol.class);

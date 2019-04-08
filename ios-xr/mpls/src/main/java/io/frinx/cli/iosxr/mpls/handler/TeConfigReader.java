@@ -18,8 +18,8 @@ package io.frinx.cli.iosxr.mpls.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.mpls.MplsReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +31,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TeConfigReader implements MplsReader.MplsConfigReader<Config, ConfigBuilder> {
+public class TeConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SHOW_RUN_MPLS = "show running-config mpls traffic-eng";
     private static final Pattern MPLS_LINE = Pattern.compile("(.*)mpls traffic-eng(.*)");
@@ -43,7 +43,7 @@ public class TeConfigReader implements MplsReader.MplsConfigReader<Config, Confi
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder builder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String output = blockingRead(SHOW_RUN_MPLS, cli, instanceIdentifier, readContext);

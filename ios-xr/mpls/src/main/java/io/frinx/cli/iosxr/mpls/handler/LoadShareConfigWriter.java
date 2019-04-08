@@ -18,14 +18,14 @@ package io.frinx.cli.iosxr.mpls.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.mpls.MplsWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.Tunnel;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class LoadShareConfigWriter implements MplsWriter<Config> {
+public class LoadShareConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
@@ -34,7 +34,7 @@ public class LoadShareConfigWriter implements MplsWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
             WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class)
                 .getName();
@@ -48,20 +48,20 @@ public class LoadShareConfigWriter implements MplsWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(@Nonnull final InstanceIdentifier<Config> id,
+    public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id,
                                         @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
         if (dataAfter.getLoadShare() == null) {
-            this.deleteCurrentAttributesForType(id, dataBefore, writeContext);
+            this.deleteCurrentAttributes(id, dataBefore, writeContext);
         } else {
-            this.writeCurrentAttributesForType(id, dataAfter, writeContext);
+            this.writeCurrentAttributes(id, dataAfter, writeContext);
         }
     }
 
 
     @Override
-    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data, @Nonnull
             WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Tunnel.class)
                 .getName();

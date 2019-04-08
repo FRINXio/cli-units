@@ -72,7 +72,7 @@ public class ApplyPolicyConfigReaderTest {
         Mockito.doReturn(SH_CONFIG_OUTPUT).when(target)
             .blockingRead(Mockito.eq(SH_CONFIG), Mockito.eq(cli), Mockito.eq(IIDS_CONFIG), Mockito.eq(readContext));
 
-        target.readCurrentAttributesForType(IIDS_CONFIG, configBuilder , readContext);
+        target.readCurrentAttributes(IIDS_CONFIG, configBuilder , readContext);
 
         Assert.assertThat(configBuilder.getImportPolicy(), CoreMatchers.equalTo(EXPECTED_IMPORT_POLICY));
     }

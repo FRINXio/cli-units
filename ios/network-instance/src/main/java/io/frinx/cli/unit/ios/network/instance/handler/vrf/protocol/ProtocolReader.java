@@ -16,10 +16,7 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol;
 
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
-import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
@@ -27,45 +24,20 @@ import io.frinx.cli.ospf.handler.OspfProtocolReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class ProtocolReader implements L3VrfListReader.L3VrfConfigListReader<Protocol, ProtocolKey, ProtocolBuilder> {
-
-    private final ProtocolReaderComposite delegate;
+public class ProtocolReader extends CompositeListReader<Protocol, ProtocolKey, ProtocolBuilder>
+        implements CliConfigListReader<Protocol, ProtocolKey, ProtocolBuilder> {
 
     public ProtocolReader(Cli cli) {
-        // Wrapping the composite reader into a typed reader to ensure network instance type first
-        delegate = new ProtocolReaderComposite(cli);
-    }
-
-    @Override
-    public List<ProtocolKey> getAllIdsForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull
-            ReadContext readContext) throws ReadFailedException {
-        return delegate.getAllIds(instanceIdentifier, readContext);
-    }
-
-    @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier, @Nonnull
-            ProtocolBuilder protocolBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
-        delegate.readCurrentAttributes(instanceIdentifier, protocolBuilder, readContext);
-    }
-
-    public static class ProtocolReaderComposite extends CompositeListReader<Protocol, ProtocolKey, ProtocolBuilder>
-            implements CliConfigListReader<Protocol, ProtocolKey, ProtocolBuilder> {
-
-        public ProtocolReaderComposite(Cli cli) {
-            super(new ArrayList<ListReaderCustomizer<Protocol, ProtocolKey, ProtocolBuilder>>() {
-                {
-                    add(new OspfProtocolReader(cli));
-                    add(new BgpProtocolReader(cli));
-                    add(new StaticLocalRoutingProtocolReader());
-                }
-            });
-        }
+        super(new ArrayList<ListReaderCustomizer<Protocol, ProtocolKey, ProtocolBuilder>>() {
+            {
+                add(new OspfProtocolReader(cli));
+                add(new BgpProtocolReader(cli));
+                add(new StaticLocalRoutingProtocolReader());
+            }
+        });
     }
 }

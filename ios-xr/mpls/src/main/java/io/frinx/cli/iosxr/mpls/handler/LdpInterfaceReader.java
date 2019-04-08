@@ -19,8 +19,8 @@ package io.frinx.cli.iosxr.mpls.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.mpls.MplsListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -34,8 +34,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class LdpInterfaceReader implements MplsListReader.MplsConfigListReader<Interface, InterfaceKey,
-                InterfaceBuilder> {
+public class LdpInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private Cli cli;
 
@@ -47,7 +46,7 @@ public class LdpInterfaceReader implements MplsListReader.MplsConfigListReader<I
     }
 
     @Override
-    public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                                @Nonnull ReadContext readContext) throws ReadFailedException {
         String output = blockingRead(SH_LDP_INT, cli, instanceIdentifier, readContext);
         return getInterfaceKeys(output);
@@ -67,7 +66,7 @@ public class LdpInterfaceReader implements MplsListReader.MplsConfigListReader<I
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
             @Nonnull InterfaceBuilder interfaceBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         InterfaceKey key = instanceIdentifier.firstKeyOf(Interface.class);
         interfaceBuilder.setInterfaceId(key.getInterfaceId());

@@ -20,9 +20,10 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.network.instance.L2p2pWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
@@ -50,7 +51,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
-public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints> {
+public class L2P2PConnectionPointsWriter implements CliWriter<ConnectionPoints>, TypedWriter<ConnectionPoints> {
 
     public static final int NET_NAME_LENGTH = 15;
     private Cli cli;
@@ -370,7 +371,7 @@ public class L2P2PConnectionPointsWriter implements L2p2pWriter<ConnectionPoints
                                                @Nonnull ConnectionPoints dataAfter, @Nonnull WriteContext
                                                        writeContext) throws WriteFailedException {
         // there may be more xconnects (check tests), it is necessary to first delete existing
-        deleteCurrentAttributes(id, dataBefore, writeContext);
-        writeCurrentAttributes(id, dataAfter, writeContext);
+        deleteCurrentAttributesForType(id, dataBefore, writeContext);
+        writeCurrentAttributesForType(id, dataAfter, writeContext);
     }
 }

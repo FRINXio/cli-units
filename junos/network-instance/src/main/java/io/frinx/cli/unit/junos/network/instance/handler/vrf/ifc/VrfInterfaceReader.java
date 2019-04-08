@@ -18,8 +18,8 @@ package io.frinx.cli.unit.junos.network.instance.handler.vrf.ifc;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.network.instance.L3VrfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
@@ -35,8 +35,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VrfInterfaceReader
-        implements L3VrfListReader.L3VrfConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
+public class VrfInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private static final String SH_VRF_INTERFACES_TEMPLATE = "show configuration routing-instances %s | display set";
     private static final Pattern VRF_INTERFACE_LINE_PATTERN =
@@ -50,7 +49,7 @@ public class VrfInterfaceReader
 
     @Nonnull
     @Override
-    public List<InterfaceKey> getAllIdsForType(
+    public List<InterfaceKey> getAllIds(
         @Nonnull InstanceIdentifier<Interface> id,
         @Nonnull ReadContext ctx) throws ReadFailedException {
 
@@ -74,7 +73,7 @@ public class VrfInterfaceReader
     }
 
     @Override
-    public void readCurrentAttributesForType(
+    public void readCurrentAttributes(
         @Nonnull InstanceIdentifier<Interface> id,
         @Nonnull InterfaceBuilder interfaceBuilder,
         @Nonnull ReadContext ctx) throws ReadFailedException {

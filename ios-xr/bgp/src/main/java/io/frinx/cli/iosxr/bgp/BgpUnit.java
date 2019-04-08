@@ -18,9 +18,7 @@ package io.frinx.cli.iosxr.bgp;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
+import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -48,24 +46,13 @@ import io.frinx.cli.iosxr.bgp.handler.neighbor.NeighborTransportConfigWriter;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
-import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.all.afi.safi.common.PrefixLimitBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.ipv4.unicast.group.Ipv4UnicastBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.ipv6.unicast.group.Ipv6UnicastBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.ebgp.multihop.EbgpMultihopBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.afi.safi.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.AfiSafisBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.TransportBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.BgpBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.GlobalBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.NeighborsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.ApplyPolicyBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
@@ -108,98 +95,80 @@ public class BgpUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry, @Nonnull final
-        CustomizerAwareWriteRegistryBuilder writeRegistry, @Nonnull final TranslateUnit.Context context) {
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
+                                @Nonnull Context context) {
         Cli cli = context.getTransport();
+        CheckRegistry checkRegistry = ChecksMap.getOpenconfigCheckRegistry();
+        readRegistry.setCheckRegistry(checkRegistry);
         provideReaders(readRegistry, cli);
+        writeRegistry.setCheckRegistry(checkRegistry);
         provideWriters(writeRegistry, cli);
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigWriter(cli)));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_AFISAFIS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, new GlobalAfiSafiConfigWriter(cli)));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NEIGHBORS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NoopCliListWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigWriter(cli)),
+        writeRegistry.add(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigWriter(cli));
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_GL_AFISAFIS);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI);
+        writeRegistry.add(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, new GlobalAfiSafiConfigWriter(cli));
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NEIGHBORS);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigWriter(cli),
                 IIDs.NE_NE_PR_PR_BG_GL_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_TRANSPORT, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_TR_CONFIG, new
-                NeighborTransportConfigWriter(cli)), IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_EBGPMULTIHOP, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_EB_CONFIG,
-                new NeighborEbgpConfigWriter(cli)), IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, new NoopCliListWriter<>()));
-        writeRegistry.subtreeAddAfter(Sets.newHashSet(
-            RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CO_AUG_BGPNEAFAUG, CONFIG_IID),
-            RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CO_AUG_BGPNEAFAUG_SOFTRECONFIGURATION, CONFIG_IID)),
-                new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG, new
-                NeighborAfiSafiConfigWriter(cli)), IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, new
-                NeighborAfiSafiApplyPolicyConfigWriter(cli)), IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IPV4UNICAST, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IP_CONFIG, new
-                NeighborAfiSafiIpvConfigWriter(cli)), IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_PREFIXLIMIT, new
-                NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_PRE_CONFIG, new
-                NeighborAfiSafiPrefixLimitConfigWriter(cli)), IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IPV6UNICAST, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_CONFIG, new
-                NeighborAfiSafiIpvConfigWriter(cli)), IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IIDs
-                .NETWO_NETWO_PROTO_PROTO_BGP_NEIGH_NEIGH_AFISA_AFISA_IPV6U_PREFIXLIMIT, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs
-                .NETWO_NETWO_PROTO_PROTO_BGP_NEIGH_NEIGH_AFISA_AFISA_IPV6U_PREFI_CONFIG, new
-                NeighborAfiSafiPrefixLimitConfigWriter(cli)), IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IP_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NE_TRANSPORT);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_NE_NE_TR_CONFIG, new NeighborTransportConfigWriter(cli),
+                IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NE_EBGPMULTIHOP);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_NE_NE_EB_CONFIG, new NeighborEbgpConfigWriter(cli),
+                IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI);
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG, new NeighborAfiSafiConfigWriter(cli),
+                Sets.newHashSet(
+                    RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CO_AUG_BGPNEAFAUG, CONFIG_IID),
+                    RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CO_AUG_BGPNEAFAUG_SOFTRECONFIGURATION,
+                        CONFIG_IID)),
+                IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, new
+                NeighborAfiSafiApplyPolicyConfigWriter(cli), IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IPV4UNICAST);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IP_CONFIG, new NeighborAfiSafiIpvConfigWriter(cli),
+                IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG);
+        writeRegistry.addNoop(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_PREFIXLIMIT);
+        writeRegistry.addAfter(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_PRE_CONFIG, new
+                NeighborAfiSafiPrefixLimitConfigWriter(cli), IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IPV6UNICAST);
+        writeRegistry.addAfter(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_CONFIG, new
+                NeighborAfiSafiIpvConfigWriter(cli), IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG);
+        writeRegistry.addNoop(IIDs.NETWO_NETWO_PROTO_PROTO_BGP_NEIGH_NEIGH_AFISA_AFISA_IPV6U_PREFIXLIMIT);
+        writeRegistry.addAfter(IIDs.NETWO_NETWO_PROTO_PROTO_BGP_NEIGH_NEIGH_AFISA_AFISA_IPV6U_PREFI_CONFIG, new
+                NeighborAfiSafiPrefixLimitConfigWriter(cli), IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IP_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BGP, BgpBuilder.class);
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_GLOBAL, GlobalBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_GL_AFISAFIS, org.opendaylight.yang.gen.v1.http.frinx
-                .openconfig.net.yang.bgp.rev170202.bgp.global.base.AfiSafisBuilder.class);
-        readRegistry.subtreeAdd(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, GL_AFISAFI_IID)),
-                new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI, new GlobalAfiSafiReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NEIGHBORS, NeighborsBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_TRANSPORT, TransportBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_TR_CONFIG, new
-                NeighborTransportConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_EBGPMULTIHOP, EbgpMultihopBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_EB_CONFIG,
-                new NeighborEbgpConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AFISAFIS, AfiSafisBuilder.class);
-        readRegistry.subtreeAdd(Sets.newHashSet(
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigReader(cli));
+        readRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI, new GlobalAfiSafiReader(cli),
+                Sets.newHashSet(RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, GL_AFISAFI_IID)));
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_TR_CONFIG, new NeighborTransportConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_EB_CONFIG,new NeighborEbgpConfigReader(cli));
+        readRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, new NeighborAfiSafiReader(cli),
+            Sets.newHashSet(
                 RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG, NE_AFISAFI_IID),
                 RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CO_AUG_BGPNEAFAUG, NE_AFISAFI_IID),
                 RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CO_AUG_BGPNEAFAUG_SOFTRECONFIGURATION,
-                        NE_AFISAFI_IID)), new GenericConfigListReader<>(IIDs
-                .NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, new NeighborAfiSafiReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY, ApplyPolicyBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, new
-                NeighborAfiSafiApplyPolicyConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IPV4UNICAST, Ipv4UnicastBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IP_CONFIG, new
-                NeighborAfiSafiIpv4ConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_PREFIXLIMIT, PrefixLimitBuilder
-                .class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_PRE_CONFIG, new
-                NeighborAfiSafiPrefixLimitConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IPV6UNICAST, Ipv6UnicastBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_CONFIG, new
-                NeighborAfiSafiIpv6ConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NETWO_NETWO_PROTO_PROTO_BGP_NEIGH_NEIGH_AFISA_AFISA_IPV6U_PREFIXLIMIT,
-                PrefixLimitBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs
-                .NETWO_NETWO_PROTO_PROTO_BGP_NEIGH_NEIGH_AFISA_AFISA_IPV6U_PREFI_CONFIG, new
-                NeighborAfiSafiPrefixLimitConfigReader(cli)));
+                    NE_AFISAFI_IID)
+            )
+        );
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, new NeighborAfiSafiApplyPolicyConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IP_CONFIG, new NeighborAfiSafiIpv4ConfigReader(cli));
+        readRegistry.add(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_PRE_CONFIG,
+                new NeighborAfiSafiPrefixLimitConfigReader(cli));
+        readRegistry.add(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_CONFIG, new NeighborAfiSafiIpv6ConfigReader(cli));
+        readRegistry.add(IIDs.NETWO_NETWO_PROTO_PROTO_BGP_NEIGH_NEIGH_AFISA_AFISA_IPV6U_PREFI_CONFIG,
+                new NeighborAfiSafiPrefixLimitConfigReader(cli));
     }
 
     @Override

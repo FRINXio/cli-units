@@ -19,8 +19,8 @@ package io.frinx.cli.iosxr.ospf.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AreaInterfaceMplsSyncConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
+public class AreaInterfaceMplsSyncConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SHOW_OSPF_INT = "show running-config router ospf %s %s area %s interface %s";
     private static final Pattern MPLS_SYNC_LINE = Pattern.compile("mpls ldp sync(?<disable> disable)*");
@@ -51,7 +51,7 @@ public class AreaInterfaceMplsSyncConfigReader implements OspfReader.OspfConfigR
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
             ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final String interfaceId = instanceIdentifier.firstKeyOf(Interface.class)
                 .getId();

@@ -19,9 +19,8 @@ package io.frinx.cli.unit.junos.ospf.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.List;
@@ -35,8 +34,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.extensio
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.extension.rev190117.ProtocolConfAugBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class OspfProtocolConfigReader implements CliReader<Config, ConfigBuilder>,
-        OspfReader.OspfConfigReader<Config, ConfigBuilder>,
+public class OspfProtocolConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         CompositeReader.Child<Config, ConfigBuilder> {
 
     private Cli cli;
@@ -52,7 +50,7 @@ public class OspfProtocolConfigReader implements CliReader<Config, ConfigBuilder
             "set.* protocols ospf export (?<export>.+)");
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
             ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
         configBuilder.setIdentifier(protocolKey.getIdentifier());

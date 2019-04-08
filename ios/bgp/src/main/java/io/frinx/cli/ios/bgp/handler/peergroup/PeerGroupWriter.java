@@ -18,10 +18,10 @@ package io.frinx.cli.ios.bgp.handler.peergroup;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.bgp.BgpListWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter;
+import io.frinx.cli.unit.utils.CliListWriter;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +36,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
+public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
 
     private static final String PEER_GROUP_ESSENTIAL_CONFIG = "neighbor {$neighbor_id} peer-group\n"
             + "{.if ($neighbor.config.peer_as.value) }neighbor {$neighbor_id} remote-as {$neighbor.config.peer_as"
@@ -102,7 +102,7 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<PeerGroup> instanceIdentifier, PeerGroup neighbor,
+    public void writeCurrentAttributes(InstanceIdentifier<PeerGroup> instanceIdentifier, PeerGroup neighbor,
                                               WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 
@@ -127,7 +127,7 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<PeerGroup> instanceIdentifier,
+    public void updateCurrentAttributes(InstanceIdentifier<PeerGroup> instanceIdentifier,
                                                PeerGroup before, PeerGroup neighbor,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
@@ -148,7 +148,7 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<PeerGroup> instanceIdentifier, PeerGroup neighbor,
+    public void deleteCurrentAttributes(InstanceIdentifier<PeerGroup> instanceIdentifier, PeerGroup neighbor,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 

@@ -18,12 +18,13 @@ package io.frinx.cli.iosxr.bgp.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.bgp.BgpWriter;
+import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 // TODO We can replace this with NOOP cli writer
-public class BgpProtocolWriter implements BgpWriter<Config> {
+public class BgpProtocolWriter implements CliWriter<Config>, TypedWriter<Config> {
 
     @Override
     public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,

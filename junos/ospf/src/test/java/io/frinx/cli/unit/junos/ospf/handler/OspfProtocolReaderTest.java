@@ -103,7 +103,7 @@ public class OspfProtocolReaderTest {
     }
 
     @Test
-    public void testReadCurrentAttributesForType() throws Exception {
+    public void testReadCurrentAttributes() throws Exception {
         final InstanceIdentifier<Protocol> iid = IIDs.NETWORKINSTANCES
                 .child(NetworkInstance.class, new NetworkInstanceKey("APTN"))
                 .child(Protocols.class)
@@ -111,7 +111,7 @@ public class OspfProtocolReaderTest {
 
         final ProtocolBuilder builder = new ProtocolBuilder();
 
-        target.readCurrentAttributesForType(iid, builder , readContext);
+        target.readCurrentAttributes(iid, builder , readContext);
 
         Assert.assertEquals(builder.getName(), OspfProtocolReader.OSPF_NAME);
     }

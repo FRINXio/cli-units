@@ -17,13 +17,13 @@
 package io.frinx.cli.iosxr.ospf;
 
 import com.google.common.collect.Lists;
-import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.iosxr.ospf.handler.OspfProtocolReader;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.OSPF;
 
 public class OspfProtocolReaderTest {
     private static final String SH_RUN_OSPF = "Mon Feb 12 14:57:11.223 UTC\n"
@@ -32,7 +32,7 @@ public class OspfProtocolReaderTest {
 
     private static final List<ProtocolKey> EXPECTED_KEYES = Lists.newArrayList("97", "EXAMPLE_OSPF")
             .stream()
-            .map(ospfId -> new ProtocolKey(OspfReader.TYPE, ospfId))
+            .map(ospfId -> new ProtocolKey(OSPF.class, ospfId))
             .collect(Collectors.toList());
 
     @Test

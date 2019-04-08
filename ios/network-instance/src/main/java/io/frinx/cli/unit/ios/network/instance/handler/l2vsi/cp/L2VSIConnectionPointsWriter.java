@@ -20,11 +20,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.network.instance.L2vsiWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsReader;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Map;
@@ -41,7 +42,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.REMOTE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints> {
+public class L2VSIConnectionPointsWriter implements CliWriter<ConnectionPoints>, TypedWriter<ConnectionPoints> {
 
     public static final String SH_RUN_INCLUDE_BRIDGE_DOMAIN = "show running-config | include bridge-domain";
     private Cli cli;
@@ -233,7 +234,7 @@ public class L2VSIConnectionPointsWriter implements L2vsiWriter<ConnectionPoints
                                                @Nonnull ConnectionPoints dataAfter, @Nonnull WriteContext
                                                            writeContext) throws WriteFailedException {
         // this is fine, for each cpid there is new command
-        deleteCurrentAttributes(id, dataBefore, writeContext);
-        writeCurrentAttributes(id, dataAfter, writeContext);
+        deleteCurrentAttributesForType(id, dataBefore, writeContext);
+        writeCurrentAttributesForType(id, dataAfter, writeContext);
     }
 }

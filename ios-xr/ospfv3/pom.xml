@@ -31,11 +31,6 @@
     <dependencies>
         <dependency>
             <groupId>io.frinx.cli</groupId>
-            <artifactId>common-handlers</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
             <artifactId>ios-xr-cli-init-unit</artifactId>
             <version>${project.version}</version>
         </dependency>

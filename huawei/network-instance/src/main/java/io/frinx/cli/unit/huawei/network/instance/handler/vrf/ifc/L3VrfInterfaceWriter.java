@@ -18,14 +18,14 @@ package io.frinx.cli.unit.huawei.network.instance.handler.vrf.ifc;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.network.instance.L3VrfListWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliListWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L3VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceKey> {
+public class L3VrfInterfaceWriter implements CliListWriter<Interface, InterfaceKey> {
 
     private final Cli cli;
 
@@ -34,7 +34,7 @@ public class L3VrfInterfaceWriter implements L3VrfListWriter<Interface, Interfac
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Interface> instanceIdentifier, Interface ifc,
+    public void writeCurrentAttributes(InstanceIdentifier<Interface> instanceIdentifier, Interface ifc,
                                               WriteContext writeContext) throws WriteFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String ifcId = ifc.getId();
@@ -48,7 +48,7 @@ public class L3VrfInterfaceWriter implements L3VrfListWriter<Interface, Interfac
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Interface> id, Interface dataBefore,
+    public void updateCurrentAttributes(InstanceIdentifier<Interface> id, Interface dataBefore,
                                                Interface dataAfter, WriteContext writeContext) throws
             WriteFailedException {
         deleteCurrentAttributes(id, dataBefore, writeContext);
@@ -56,7 +56,7 @@ public class L3VrfInterfaceWriter implements L3VrfListWriter<Interface, Interfac
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Interface> instanceIdentifier, Interface ifc,
+    public void deleteCurrentAttributes(InstanceIdentifier<Interface> instanceIdentifier, Interface ifc,
                                                WriteContext writeContext) throws WriteFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String ifcId = ifc.getId();

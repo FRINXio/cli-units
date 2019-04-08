@@ -105,7 +105,7 @@ public class AreaInterfaceBfdConfigReaderTest {
 
         final ConfigBuilder builder = new ConfigBuilder();
 
-        target.readCurrentAttributesForType(iid, builder, readContext);
+        target.readCurrentAttributes(iid, builder, readContext);
 
         Assert.assertThat(builder.getMinInterval(), CoreMatchers.equalTo(150L));
         Assert.assertThat(builder.getMinReceiveInterval(), CoreMatchers.equalTo(15L));
