@@ -27,7 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-artifacts</artifactId>
-    <version>4.2.0.rc23-frinx-SNAPSHOT</version>
+    <version>4.2.0.rc23-frinx</version>
     <packaging>pom</packaging>
 
     <dependencyManagement>
