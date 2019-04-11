@@ -17,10 +17,14 @@
 package io.frinx.cli.unit.junos.ifc.handler;
 
 import com.x5.template.Chunk;
+import io.fd.honeycomb.translate.write.WriteContext;
+import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.ifc.base.handler.AbstractInterfaceConfigWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.junos.ifc.Util;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
 
@@ -32,8 +36,19 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($enabled && $enabled == TRUE) %}delete interfaces {$data.name} disable"
             + "{% elseIf (!$enabled) %}set interfaces {$data.name} disable{% endif %}";
 
+    private Cli cli;
+
     public InterfaceConfigWriter(Cli cli) {
         super(cli);
+        this.cli = cli;
+    }
+
+    @Override
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                       @Nonnull Config data,
+                                       @Nonnull WriteContext writeContext) throws WriteFailedException {
+        // junos allows creating of physical interfaces
+        blockingWriteAndRead(cli, id, data, updateTemplate(null, data));
     }
 
     @Override
@@ -50,6 +65,14 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             }
         }
         return fT(WRITE_TEMPLATE, "before", before, "data", after, "enabled", enabled);
+    }
+
+    @Override
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                        @Nonnull Config dataBefore,
+                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+        // junos allows deleting of physical interfaces
+        blockingDeleteAndRead(cli, id, deleteTemplate(dataBefore));
     }
 
     @Override

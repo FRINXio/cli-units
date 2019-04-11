@@ -33,6 +33,7 @@ public final class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWr
             + "{% if ($enabled && $enabled == TRUE) %}delete interfaces {$name} disable"
             + "{% elseIf (!$enabled) %}set interfaces {$name} disable{% endif %}";
 
+
     public SubinterfaceConfigWriter(Cli cli) {
         super(cli);
     }
@@ -52,12 +53,6 @@ public final class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWr
         }
         return fT(UPDATE_TEMPLATE, "before", before, "data", after, "name", Util.getSubinterfaceName(id),
                 "enabled", enabled);
-    }
-
-    @Override
-    protected boolean isPhysicalInterface(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
-                                                      .rev161222.interfaces.top.interfaces._interface.Config data) {
-        return Util.isPhysicalInterface(data);
     }
 
     @Override

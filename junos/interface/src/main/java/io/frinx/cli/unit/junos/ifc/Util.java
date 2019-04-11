@@ -55,7 +55,7 @@ public final class Util {
     }
 
     public static boolean isPhysicalInterface(Config data) {
-        return !PHYSICAL_INTERFACE_TYPES.contains(data.getType());
+        return PHYSICAL_INTERFACE_TYPES.contains(data.getType());
     }
 
     public static boolean isSubinterface(InterfaceKey ifcName) {

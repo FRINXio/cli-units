@@ -21,9 +21,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -39,9 +37,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AbstractSubinterfaceConfigWriterTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Mock
     private WriteContext context;
@@ -74,47 +69,42 @@ public class AbstractSubinterfaceConfigWriterTest {
     }
 
     @Test
-    public void testWriteCurrentAttributesNonPhysical() throws WriteFailedException {
-        Mockito.when(writer.isPhysicalInterface(Mockito.eq(parentBuilder.build()))).thenReturn(false);
-
-        writer.writeCurrentAttributes(configIID(), data, context);
-        Mockito.verify(writer).blockingWriteAndRead(Mockito.any(Cli.class), Mockito.eq(configIID()),
+    public void testWriteCurrentAttributesNonZero() throws WriteFailedException {
+        writer.writeCurrentAttributes(configIIDNonZero(), data, context);
+        Mockito.verify(writer).blockingWriteAndRead(Mockito.any(Cli.class), Mockito.eq(configIIDNonZero()),
                 Mockito.any(Config.class), Mockito.anyString());
     }
 
     @Test
-    public void testWriteCurrentAttributesPhysical() throws WriteFailedException {
-        Mockito.when(writer.isPhysicalInterface(Mockito.eq(parentBuilder.build()))).thenReturn(true);
-        thrown.expect(WriteFailedException.CreateFailedException.class);
-
-        writer.writeCurrentAttributes(configIID(), data, context);
+    public void testWriteCurrentAttributesZero() throws WriteFailedException {
+        writer.writeCurrentAttributes(configIIDZero(), data, context);
         Mockito.verify(writer, Mockito.never()).blockingWriteAndRead(Mockito.any(Cli.class),
-                Mockito.eq(configIID()), Mockito.any(Config.class), Mockito.anyString());
+                Mockito.eq(configIIDZero()), Mockito.any(Config.class), Mockito.anyString());
     }
 
     @Test
-    public void testDeleteCurrentAttributesNonPhysical() throws WriteFailedException {
-        Mockito.when(writer.isPhysicalInterface(Mockito.eq(parentBuilder.build()))).thenReturn(false);
-
-        writer.deleteCurrentAttributes(configIID(), data, context);
-        Mockito.verify(writer).blockingDeleteAndRead(Mockito.any(Cli.class), Mockito.eq(configIID()),
+    public void testDeleteCurrentAttributesNonZero() throws WriteFailedException {
+        writer.deleteCurrentAttributes(configIIDNonZero(), data, context);
+        Mockito.verify(writer).blockingDeleteAndRead(Mockito.any(Cli.class), Mockito.eq(configIIDNonZero()),
                 Mockito.anyString());
     }
 
     @Test
-    public void testDeleteCurrentAttributesPhysical() throws WriteFailedException {
-        Mockito.when(writer.isPhysicalInterface(Mockito.eq(parentBuilder.build()))).thenReturn(true);
-        thrown.expect(WriteFailedException.DeleteFailedException.class);
-
-        writer.deleteCurrentAttributes(configIID(), data, context);
+    public void testDeleteCurrentAttributesZero() throws WriteFailedException {
+        writer.deleteCurrentAttributes(configIIDZero(), data, context);
         Mockito.verify(writer, Mockito.never()).blockingDeleteAndRead(Mockito.any(Cli.class),
-                Mockito.eq(configIID()), Mockito.anyString());
+                Mockito.eq(configIIDZero()), Mockito.anyString());
     }
 
     // util methods
 
-    private static InstanceIdentifier<Config> configIID() {
+    private static InstanceIdentifier<Config> configIIDZero() {
         return InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("test"))
             .child(Subinterfaces.class).child(Subinterface.class, new SubinterfaceKey(0L)).child(Config.class);
+    }
+
+    private static InstanceIdentifier<Config> configIIDNonZero() {
+        return InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("test"))
+                .child(Subinterfaces.class).child(Subinterface.class, new SubinterfaceKey(5L)).child(Config.class);
     }
 }

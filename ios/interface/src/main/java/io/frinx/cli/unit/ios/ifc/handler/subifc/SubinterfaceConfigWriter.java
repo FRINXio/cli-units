@@ -16,14 +16,10 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
-import com.google.common.base.Preconditions;
 import com.x5.template.Chunk;
-import io.fd.honeycomb.translate.write.WriteContext;
-import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceConfigWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.Util;
-import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -45,47 +41,9 @@ public final class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWr
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                       @Nonnull Config data,
-                                       @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (isZeroSubinterface(id)) {
-            // Check that config is empty for .0 subinterface and do nothing.
-            // .0 subinterface is special auto-generated subinterface
-            // containing just IP configuration of the parent interface.
-            Preconditions.checkArgument(data.getDescription() == null,
-                    "'description' cannot be specified for .0 subinterface."
-                            + "Use 'description' under interface/config instead.");
-            Preconditions.checkArgument(data.getName() == null,
-                    "'name' cannot be specified for .0 subinterface."
-                            + "Use 'name' under interface/config instead.");
-            Preconditions.checkArgument(data.isEnabled() == null,
-                    "'enabled' cannot be specified for .0 subinterface."
-                            + "Use 'name' under interface/config instead.");
-        }
-        super.writeCurrentAttributes(id, data, writeContext);
-    }
-
-    @Override
     protected String updateTemplate(Config before, Config after, InstanceIdentifier<Config> id) {
         return fT(UPDATE_TEMPLATE, "before", before, "data", after, "name", Util.getSubinterfaceName(id),
                 "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null);
-    }
-
-    @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                        @Nonnull Config data,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (isZeroSubinterface(id)) {
-            // do nothing for .0 subinterface
-            return;
-        }
-        super.deleteCurrentAttributes(id, data, writeContext);
-    }
-
-    @Override
-    protected boolean isPhysicalInterface(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
-                                                      .rev161222.interfaces.top.interfaces._interface.Config data) {
-        return Util.isPhysicalInterface(data);
     }
 
     @Override

@@ -16,6 +16,7 @@
 
 package io.frinx.cli.ifc.base.handler.subifc;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -40,12 +41,25 @@ public abstract class AbstractSubinterfaceConfigWriter  implements CliWriter<Con
                                        @Nonnull Config data,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces
-                ._interface.Config parentData = writeContext.readAfter(parentIfcId).get().getConfig();
 
-        if (isPhysicalInterface(parentData)) {
-            throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Physical interface cannot be created"));
+        if (!writeContext.readBefore(parentIfcId).isPresent() && isZeroSubinterface(id)) {
+            // Check that config is empty for .0 subinterface and do nothing.
+            // .0 subinterface is special auto-generated subinterface
+            // containing just IP configuration of the parent interface.
+            Preconditions.checkArgument(data.getDescription() == null,
+                    "'description' cannot be specified for .0 subinterface."
+                            + "Use 'description' under interface/config instead.");
+            Preconditions.checkArgument(data.getName() == null,
+                    "'name' cannot be specified for .0 subinterface."
+                            + "Use 'name' under interface/config instead.");
+            Preconditions.checkArgument(data.isEnabled() == null,
+                    "'enabled' cannot be specified for .0 subinterface."
+                            + "Use 'name' under interface/config instead.");
+        }
+        if (isZeroSubinterface(id)) {
+            // do nothing for .0 subinterface because it represents physical interface which config is handled in
+            // interface/config
+            return;
         }
         blockingWriteAndRead(cli, id, data, updateTemplate(null, data, id));
     }
@@ -68,21 +82,18 @@ public abstract class AbstractSubinterfaceConfigWriter  implements CliWriter<Con
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config data,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-
         InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces
-                ._interface.Config parentData = writeContext.readBefore(parentIfcId).get().getConfig();
 
-        if (isPhysicalInterface(parentData)) {
-            throw new WriteFailedException.DeleteFailedException(id,
-                    new IllegalArgumentException("Physical interface cannot be deleted"));
+        // if deleting parent interface allow deleting also .0 subifc
+        if (!writeContext.readAfter(parentIfcId).isPresent() && isZeroSubinterface(id)) {
+            return;
+        }
+        if (isZeroSubinterface(id)) {
+            // do nothing for .0 subinterface
+            return;
         }
         blockingDeleteAndRead(cli, id, deleteTemplate(id));
     }
-
-    protected abstract boolean isPhysicalInterface(
-            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces
-                    ._interface.Config data);
 
     protected abstract String deleteTemplate(InstanceIdentifier<Config> id);
 

@@ -41,18 +41,18 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SubinterfaceConfigWriterTest {
 
-    private static final String WRITE_INPUT = "set interfaces ge-0/0/4 unit 0 description TEST-ge-0/0/4\n"
+    private static final String WRITE_INPUT = "set interfaces ge-0/0/4 unit 1 description TEST-ge-0/0/4\n"
             + "\n";
 
-    private static final String UPDATE_INPUT = "set interfaces ge-0/0/4 unit 0 description TEST-ge-0/0/4_NEW\n"
-            + "set interfaces ge-0/0/4 unit 0 disable\n";
+    private static final String UPDATE_INPUT = "set interfaces ge-0/0/4 unit 1 description TEST-ge-0/0/4_NEW\n"
+            + "set interfaces ge-0/0/4 unit 1 disable\n";
 
-    private static final String DELETE_DESCR_INPUT = "set interfaces ge-0/0/4 unit 0 disable\n";
+    private static final String DELETE_DESCR_INPUT = "set interfaces ge-0/0/4 unit 1 disable\n";
 
-    private static final String UPDATE_TO_NULL = "delete interfaces ge-0/0/4 unit 0 description\n"
+    private static final String UPDATE_TO_NULL = "delete interfaces ge-0/0/4 unit 1 description\n"
             + "\n";
 
-    private static final String DELETE_INPUT = "delete interfaces ge-0/0/4 unit 0\n";
+    private static final String DELETE_INPUT = "delete interfaces ge-0/0/4 unit 1\n";
 
     @Mock
     private Cli cli;
@@ -65,7 +65,7 @@ public class SubinterfaceConfigWriterTest {
     private final InstanceIdentifier<Config> iid = InstanceIdentifier.create(Interfaces.class)
             .child(Interface.class, new InterfaceKey("ge-0/0/4"))
             .child(Subinterfaces.class)
-            .child(Subinterface.class, new SubinterfaceKey(Long.valueOf(0))).child(Config.class);
+            .child(Subinterface.class, new SubinterfaceKey(Long.valueOf(1))).child(Config.class);
 
     // test data
     private Config data;
