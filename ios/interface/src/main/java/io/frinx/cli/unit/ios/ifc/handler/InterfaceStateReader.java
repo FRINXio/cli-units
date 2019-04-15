@@ -38,7 +38,7 @@ public final class InterfaceStateReader extends AbstractInterfaceStateReader {
 
     @Override
     protected String getReadCommand(String ifcName) {
-        return fT(SH_SINGLE_INTERFACE, ifcName);
+        return f(SH_SINGLE_INTERFACE, ifcName);
     }
 
     @VisibleForTesting
