@@ -29,7 +29,7 @@ public class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWriter {
             + "interface {$name}\n"
             + "{$data|update(description,description `$data.description`\n,no description\n)}"
             //  + "{$data|update(is_enabled,shutdown\n,no shutdown\n}"
-            + "{% if ($enabled) %}no shutdown{% else %}shutdown{% endif %}\n"
+            + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
             + "end";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"

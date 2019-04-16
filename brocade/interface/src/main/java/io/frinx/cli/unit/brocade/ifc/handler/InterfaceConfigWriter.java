@@ -28,11 +28,11 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "interface ${data.name}\n"
             + "{$data|update(mtu,mtu `$data.mtu`\n,no mtu\n)}"
             + "{$data|update(description,port-name `$data.description`\n,no port-name\n)}"
-            + "{% if ($enabled) %}enable{% else %}disable{% endif %}\n"
+            + "{% if ($enabled) %}enable\n{% else %}disable\n{% endif %}"
             + "end";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
-            + "no interface {$data.name}"
+            + "no interface {$data.name}\n"
             + "end";
 
     public InterfaceConfigWriter(Cli cli) {

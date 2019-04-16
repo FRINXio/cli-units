@@ -30,7 +30,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
         + "{$data|update(mtu,mtu `$data.mtu`\n,undo mtu\n)}"
         + "{$data|update(description,description `$data.description`\n,undo description\n)}"
         //  + "{$data|update(is_enabled,shutdown\n,undo shutdown\n}"
-        + "{% if ($enabled) %}no shutdown{% else %}shutdown{% endif %}\n"
+        + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
         + "commit\n"
         + "return";
 

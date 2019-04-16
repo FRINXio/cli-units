@@ -25,7 +25,7 @@ public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
     private static final String TEMPLATE = "system-view\n"
             + "interface {$name}\n"
             + "{% if {$delete} %}undo ip address\n "
-            + "{% else %}ip address {$config.ip.value} {$config.prefix_length}{% endif %}\n"
+            + "{% else %}ip address {$config.ip.value} {$config.prefix_length}\n{% endif %}"
             + "commit\n"
             + "return";
 
