@@ -20,12 +20,12 @@
   <parent>
     <groupId>io.frinx.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>4.2.0.rc26-frinx</version>
+    <version>4.2.0.rc27-frinx-SNAPSHOT</version>
     <relativePath>../../unit-parent</relativePath>
   </parent>
 
   <artifactId>huawei-network-instance-unit</artifactId>
-  <version>4.2.0.rc26-frinx</version>
+  <version>4.2.0.rc27-frinx-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <dependencies>
