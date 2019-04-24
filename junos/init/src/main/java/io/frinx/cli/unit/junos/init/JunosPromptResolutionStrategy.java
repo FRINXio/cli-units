@@ -31,7 +31,8 @@ public final class JunosPromptResolutionStrategy implements PromptResolutionStra
 
     private static final int INITIAL_TIME_TO_WAIT = 1;
 
-    private static final Pattern JUNOS_GUIDANCE_PATTERN = Pattern.compile("^(\\{master:\\d})?(\\[edit.*])?$");
+    private static final Pattern JUNOS_GUIDANCE_PATTERN =
+            Pattern.compile("^(\\{(master|backup)(:\\d)?})?(\\[edit.*])?$");
 
     private static final PromptResolutionStrategy DEFAULT_INSTANCE = new JunosPromptResolutionStrategy();
 
