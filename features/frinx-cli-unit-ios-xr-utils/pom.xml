@@ -27,7 +27,7 @@
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-unit-ios-xr-utils</artifactId>
     <packaging>feature</packaging>
-    <version>4.2.1.rc1-frinx-SNAPSHOT</version>
+    <version>4.2.1.rc1-frinx</version>
     <name>Frinx :: Cli :: Unit :: IOS :: XR :: Utils</name>
 
     <dependencyManagement>
@@ -43,14 +43,14 @@
                 <groupId>io.frinx.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.1.rc1-frinx-SNAPSHOT</version>
+                <version>4.2.1.rc1-frinx</version>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.frinx.openconfig</groupId>
                 <artifactId>openconfig-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.1.rc1-frinx-SNAPSHOT</version>
+                <version>4.2.1.rc1-frinx</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
