@@ -18,7 +18,7 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-features-aggregator</artifactId>
-  <version>4.2.1.rc2-frinx-SNAPSHOT</version>
+  <version>4.2.1.rc2-frinx</version>
   <packaging>pom</packaging>
   <name>${project.artifactId}</name>
 
