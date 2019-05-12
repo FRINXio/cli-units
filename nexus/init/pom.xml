@@ -20,12 +20,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.1.rc3-frinx</version>
+        <version>4.2.1.rc4-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>nexus-cli-init-unit</artifactId>
-    <version>4.2.1.rc3-frinx</version>
+    <version>4.2.1.rc4-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
