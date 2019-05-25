@@ -20,14 +20,14 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
-import io.frinx.translate.unit.commons.handler.spi.CompositeChildWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public abstract class AbstractL3VrfConfigWriter implements CliWriter<Config>, CompositeChildWriter<Config> {
+public abstract class AbstractL3VrfConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
 
     private final Cli cli;
 
@@ -36,8 +36,9 @@ public abstract class AbstractL3VrfConfigWriter implements CliWriter<Config>, Co
     }
 
     @Override
-    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
-            config, @Nonnull WriteContext writeContext)
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                 @Nonnull Config config,
+                                                 @Nonnull WriteContext writeContext)
             throws WriteFailedException.CreateFailedException {
 
         if (config.getType().equals(L3VRF.class)) {
@@ -72,7 +73,8 @@ public abstract class AbstractL3VrfConfigWriter implements CliWriter<Config>, Co
 
     @Override
     public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                                  @Nonnull Config config, @Nonnull WriteContext writeContext)
+                                                  @Nonnull Config config,
+                                                  @Nonnull WriteContext writeContext)
             throws WriteFailedException.DeleteFailedException {
         if (config.getType().equals(L3VRF.class)) {
             blockingDeleteAndRead(cli, instanceIdentifier, deleteTemplate(config));

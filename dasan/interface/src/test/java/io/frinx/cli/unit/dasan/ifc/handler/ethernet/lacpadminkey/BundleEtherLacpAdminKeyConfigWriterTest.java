@@ -117,7 +117,7 @@ public class BundleEtherLacpAdminKeyConfigWriterTest {
     public void testUpdateCurrentAttributes_001() throws Exception {
         prepare(Ieee8023adLag.class, "Ethernet4/10", 2);
         Config dataBefore = createConfig(Ieee8023adLag.class, "Ethernet4/10", 1);
-        target.updateCurrentAttributes(id, dataBefore, data, context);
+        target.updateCurrentAttributesWResult(id, dataBefore, data, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue()
                 .getContent());

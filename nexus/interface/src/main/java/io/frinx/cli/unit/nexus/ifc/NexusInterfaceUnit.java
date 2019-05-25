@@ -22,6 +22,8 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -54,6 +56,7 @@ import io.frinx.cli.unit.nexus.init.NexusDevices;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoStatsAugBuilder;
@@ -68,6 +71,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.RouterAdvertisementBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.VlanBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -115,12 +119,27 @@ public final class NexusInterfaceUnit implements TranslateUnit {
         return Sets.newHashSet();
     }
 
+    private static final CheckRegistry CHECK_REGISTRY;
+
+    static {
+        CheckRegistry.Builder builder = new CheckRegistry.Builder();
+        builder.add(IIDs.IN_IN_SUBINTERFACES,
+                BasicCheck.checkPath(new SubinterfaceKey(SubinterfaceReader.ZERO_SUBINTERFACE_ID)));
+        builder.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_ROUTERADVERTISEMENT,
+                BasicCheck.checkData(ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
+                        ChecksMap.DataCheck.InterfaceConfig.TYPE_ETHERNET_CSMACD)
+                        .or(BasicCheck.checkData(ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
+                                ChecksMap.DataCheck.InterfaceConfig.TYPE_IEEE802AD_LAG)));
+        CHECK_REGISTRY = builder.build();
+    }
+
     @Override
     public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
+        readRegistry.addCheckRegistry(CHECK_REGISTRY);
         provideWriters(writeRegistry, cli);
     }
 

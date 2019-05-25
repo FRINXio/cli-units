@@ -19,7 +19,6 @@ package io.frinx.cli.unit.brocade.network.instance;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -30,7 +29,6 @@ import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.ConnectionPointsReader;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.ConnectionPointsWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.Set;
@@ -76,10 +74,7 @@ public class BrocadeNetworkInstanceUnit implements TranslateUnit {
                                 @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        CheckRegistry checkRegistry = ChecksMap.getOpenconfigCheckRegistry();
-        readRegistry.setCheckRegistry(checkRegistry);
         provideReaders(readRegistry, cli);
-        writeRegistry.setCheckRegistry(checkRegistry);
         provideWriters(writeRegistry, cli);
     }
 

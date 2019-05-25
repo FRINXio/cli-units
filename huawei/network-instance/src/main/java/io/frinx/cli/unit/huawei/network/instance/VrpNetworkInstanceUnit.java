@@ -18,7 +18,6 @@ package io.frinx.cli.unit.huawei.network.instance;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -36,7 +35,6 @@ import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.ProtocolCo
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.ProtocolReader;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -78,10 +76,7 @@ public class VrpNetworkInstanceUnit implements TranslateUnit {
                                 @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        CheckRegistry checkRegistry = ChecksMap.getOpenconfigCheckRegistry();
-        readRegistry.setCheckRegistry(checkRegistry);
         provideReaders(readRegistry, cli);
-        writeRegistry.setCheckRegistry(checkRegistry);
         provideWriters(writeRegistry, cli);
     }
 

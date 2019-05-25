@@ -75,14 +75,14 @@ public class OspfV3ProtocolWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        writer.writeCurrentAttributes(iid, data, context);
+        writer.writeCurrentAttributesWResult(iid, data, context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
-        writer.deleteCurrentAttributes(iid, data, context);
+        writer.deleteCurrentAttributesWResult(iid, data, context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }

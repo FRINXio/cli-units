@@ -18,12 +18,14 @@ package io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
-import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
@@ -51,7 +53,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
-public class L2P2PConnectionPointsWriter implements CliWriter<ConnectionPoints>, TypedWriter<ConnectionPoints> {
+public class L2P2PConnectionPointsWriter implements CliWriterFormatter<ConnectionPoints>,
+        CompositeWriter.Child<ConnectionPoints> {
 
     public static final int NET_NAME_LENGTH = 15;
     private Cli cli;
@@ -61,9 +64,14 @@ public class L2P2PConnectionPointsWriter implements CliWriter<ConnectionPoints>,
     }
 
     @Override
-    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
-                                              @Nonnull ConnectionPoints dataAfter,
-                                              @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<ConnectionPoints> id,
+                                                 @Nonnull ConnectionPoints dataAfter,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!BasicCheck.checkData(ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+                ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2P2P).canProcess(id, writeContext, false)) {
+            return false;
+        }
+
         Preconditions.checkArgument(dataAfter.getConnectionPoint()
                         .size() == 2,
                 "L2P2P network only supports 2 endpoints, but were: %s", dataAfter.getConnectionPoint());
@@ -88,6 +96,7 @@ public class L2P2PConnectionPointsWriter implements CliWriter<ConnectionPoints>,
             throw new IllegalArgumentException("Unable to configure L2P2P with REMOTE only endpoints: " + dataAfter
                     .getConnectionPoint());
         }
+        return true;
     }
 
     public static Set<String> getUsedInterfaces(@Nonnull InstanceIdentifier<ConnectionPoints> id, @Nonnull
@@ -348,10 +357,14 @@ public class L2P2PConnectionPointsWriter implements CliWriter<ConnectionPoints>,
     }
 
     @Override
-    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
-                                               @Nonnull ConnectionPoints dataBefore,
-                                               @Nonnull WriteContext writeContext) throws WriteFailedException
-            .DeleteFailedException {
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<ConnectionPoints> id,
+                                                  @Nonnull ConnectionPoints dataBefore,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!BasicCheck.checkData(ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+                ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2P2P).canProcess(id, writeContext, true)) {
+            return false;
+        }
+
         ConnectionPoint connectionPoint1 = getCPoint(dataBefore, L2P2PConnectionPointsReader.POINT_1);
         Endpoint endpoint1 = getEndpoint(connectionPoint1, writeContext, Collections.emptySet(), false, true);
 
@@ -363,15 +376,21 @@ public class L2P2PConnectionPointsWriter implements CliWriter<ConnectionPoints>,
         } else if (isLocalRemote(endpoint1, endpoint2)) {
             deleteXconnect(id, endpoint1, endpoint2);
         }
+        return true;
     }
 
     @Override
-    public void updateCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
-                                               @Nonnull ConnectionPoints dataBefore,
-                                               @Nonnull ConnectionPoints dataAfter, @Nonnull WriteContext
-                                                       writeContext) throws WriteFailedException {
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<ConnectionPoints> id,
+                                                  @Nonnull ConnectionPoints dataBefore,
+                                                  @Nonnull ConnectionPoints dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!BasicCheck.checkData(ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+                ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2P2P).canProcess(id, writeContext, false)) {
+            return false;
+        }
         // there may be more xconnects (check tests), it is necessary to first delete existing
-        deleteCurrentAttributesForType(id, dataBefore, writeContext);
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+        deleteCurrentAttributesWResult(id, dataBefore, writeContext);
+        writeCurrentAttributesWResult(id, dataAfter, writeContext);
+        return true;
     }
 }

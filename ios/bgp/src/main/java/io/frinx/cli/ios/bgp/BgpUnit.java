@@ -17,7 +17,6 @@
 package io.frinx.cli.ios.bgp;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -49,7 +48,6 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.ios.init.IosDevices;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -84,10 +82,7 @@ public class BgpUnit extends AbstractUnit {
                                 @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        CheckRegistry checkRegistry = ChecksMap.getOpenconfigCheckRegistry();
-        readRegistry.setCheckRegistry(checkRegistry);
         provideReaders(readRegistry, cli);
-        writeRegistry.setCheckRegistry(checkRegistry);
         provideWriters(writeRegistry, cli);
     }
 

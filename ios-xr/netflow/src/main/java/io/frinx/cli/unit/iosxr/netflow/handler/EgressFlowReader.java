@@ -20,14 +20,11 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.iosxr.netflow.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.iosxr.netflow.handler.util.NetflowUtils;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.handler.spi.TypedListReader;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.egress.netflow.top.EgressFlowsBuilder;
@@ -35,15 +32,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.egress.netflow.top.egress.flows.EgressFlowBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.egress.netflow.top.egress.flows.EgressFlowKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class EgressFlowReader implements TypedListReader<EgressFlow, EgressFlowKey, EgressFlowBuilder>,
-        CliConfigListReader<EgressFlow, EgressFlowKey, EgressFlowBuilder> {
+public class EgressFlowReader implements CliConfigListReader<EgressFlow, EgressFlowKey, EgressFlowBuilder> {
 
     private static final String SH_NETFLOW_INTF = "show running-config interface %s | include egress";
     private static final Pattern FLOW_LINE = Pattern.compile("flow (?<type>.+) monitor \\S+( sampler .+)? egress");
@@ -54,15 +47,9 @@ public class EgressFlowReader implements TypedListReader<EgressFlow, EgressFlowK
         this.cli = cli;
     }
 
-    @Override
-    public boolean containsAllKeys(final Stream<? extends Identifier<? extends DataObject>> keys,
-                                   final InstanceIdentifier<EgressFlow> instanceIdentifier) {
-        return InterfaceCheckUtil.checkInterfaceType(instanceIdentifier, EthernetCsmacd.class, Ieee8023adLag.class);
-    }
-
     @Nonnull
     @Override
-    public List<EgressFlowKey> getAllIdsForType(@Nonnull InstanceIdentifier<EgressFlow> instanceIdentifier, @Nonnull
+    public List<EgressFlowKey> getAllIds(@Nonnull InstanceIdentifier<EgressFlow> instanceIdentifier, @Nonnull
             ReadContext readContext) throws ReadFailedException {
         InterfaceId interfaceId = instanceIdentifier.firstKeyOf(Interface.class)
                 .getId();
@@ -85,7 +72,7 @@ public class EgressFlowReader implements TypedListReader<EgressFlow, EgressFlowK
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<EgressFlow> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<EgressFlow> instanceIdentifier, @Nonnull
             EgressFlowBuilder ingressFlowBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final EgressFlowKey key = instanceIdentifier.firstKeyOf(EgressFlow.class);
         ingressFlowBuilder.setNetflowType(key.getNetflowType());

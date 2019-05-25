@@ -18,14 +18,16 @@ package io.frinx.cli.unit.ios.network.instance.handler.l2vsi.cp;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsReader;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsWriter;
-import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Map;
@@ -42,7 +44,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.REMOTE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L2VSIConnectionPointsWriter implements CliWriter<ConnectionPoints>, TypedWriter<ConnectionPoints> {
+public class L2VSIConnectionPointsWriter implements CliWriterFormatter<ConnectionPoints>,
+        CompositeWriter.Child<ConnectionPoints> {
 
     public static final String SH_RUN_INCLUDE_BRIDGE_DOMAIN = "show running-config | include bridge-domain";
     private Cli cli;
@@ -53,9 +56,14 @@ public class L2VSIConnectionPointsWriter implements CliWriter<ConnectionPoints>,
     }
 
     @Override
-    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
-                                              @Nonnull ConnectionPoints dataAfter,
-                                              @Nonnull WriteContext writeContext) throws WriteFailedException {
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<ConnectionPoints> id,
+                                                 @Nonnull ConnectionPoints dataAfter,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!BasicCheck.checkData(ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+                ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2VSI).canProcess(id, writeContext, false)) {
+            return false;
+        }
+
         Preconditions.checkArgument(dataAfter.getConnectionPoint()
                         .size() >= 2,
                 "L2VSI network only supports at least 2 endpoints, but were: %s", dataAfter.getConnectionPoint());
@@ -90,6 +98,7 @@ public class L2VSIConnectionPointsWriter implements CliWriter<ConnectionPoints>,
         for (Map.Entry<String, Endpoint> local : locals.entrySet()) {
             writeLocal(local.getKey(), local.getValue(), id, dataAfter, bdIndex);
         }
+        return true;
     }
 
     public boolean isValidAsBd(String netName) {
@@ -201,10 +210,14 @@ public class L2VSIConnectionPointsWriter implements CliWriter<ConnectionPoints>,
     }
 
     @Override
-    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
-                                               @Nonnull ConnectionPoints dataBefore,
-                                               @Nonnull WriteContext writeContext)
-            throws WriteFailedException {
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<ConnectionPoints> id,
+                                                  @Nonnull ConnectionPoints dataBefore,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!BasicCheck.checkData(ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+                ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2VSI).canProcess(id, writeContext, true)) {
+            return false;
+        }
+
         ConnectionPoint remotePoint = L2P2PConnectionPointsWriter.getCPoint(dataBefore,
                 L2VSIConnectionPointsReader.REMOTE_POINT_ID);
         Endpoint remoteEndpoint = L2P2PConnectionPointsWriter.getEndpoint(remotePoint, writeContext,
@@ -226,15 +239,21 @@ public class L2VSIConnectionPointsWriter implements CliWriter<ConnectionPoints>,
         }
 
         deleteAutodiscovery(remoteEndpoint, id, dataBefore);
+        return true;
     }
 
     @Override
-    public void updateCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
-                                               @Nonnull ConnectionPoints dataBefore,
-                                               @Nonnull ConnectionPoints dataAfter, @Nonnull WriteContext
-                                                           writeContext) throws WriteFailedException {
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<ConnectionPoints> id,
+                                                  @Nonnull ConnectionPoints dataBefore,
+                                                  @Nonnull ConnectionPoints dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!BasicCheck.checkData(ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+                ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2VSI).canProcess(id, writeContext, false)) {
+            return false;
+        }
         // this is fine, for each cpid there is new command
-        deleteCurrentAttributesForType(id, dataBefore, writeContext);
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+        deleteCurrentAttributesWResult(id, dataBefore, writeContext);
+        writeCurrentAttributesWResult(id, dataAfter, writeContext);
+        return true;
     }
 }

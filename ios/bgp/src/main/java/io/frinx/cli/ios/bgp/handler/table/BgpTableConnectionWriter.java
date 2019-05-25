@@ -21,13 +21,14 @@ import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Protocols;
@@ -44,7 +45,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.OSPF;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpTableConnectionWriter implements TypedWriter<Config>, CliWriter<Config> {
+public class BgpTableConnectionWriter implements CompositeWriter.Child<Config>, CliWriterFormatter<Config> {
 
     private static final String UPDATE_REDIS = "configure terminal\n"
             + "router bgp {$bgp}\n"
@@ -65,9 +66,10 @@ public class BgpTableConnectionWriter implements TypedWriter<Config>, CliWriter<
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier,
-                                              Config config,
-                                              WriteContext writeContext) throws WriteFailedException {
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                 @Nonnull Config config,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
+        boolean wasWriting = false;
         if (config.getDstProtocol().equals(BGP.class)) {
             List<Protocol> allProtocols = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, IIDs
                     .NE_NETWORKINSTANCE).child(Protocols.class))
@@ -80,8 +82,10 @@ public class BgpTableConnectionWriter implements TypedWriter<Config>, CliWriter<
 
             for (Protocol dstProtocol : dstProtocols) {
                 writeCurrentAttributesForBgp(instanceIdentifier, dstProtocol, config, allProtocols, true);
+                wasWriting = true;
             }
         }
+        return wasWriting;
     }
 
     private void writeCurrentAttributesForBgp(InstanceIdentifier<Config> id,
@@ -139,19 +143,21 @@ public class BgpTableConnectionWriter implements TypedWriter<Config>, CliWriter<
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id,
-                                               Config dataBefore,
-                                               Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
         // this is fine, since there is no update, just adding new route-maps or deleting old
-        deleteCurrentAttributesForType(id, dataBefore, writeContext);
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+        boolean wasDeleting = deleteCurrentAttributesWResult(id, dataBefore, writeContext);
+        boolean wasWriting = writeCurrentAttributesWResult(id, dataAfter, writeContext);
+        return wasDeleting || wasWriting;
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier,
-                                               Config config,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                  @Nonnull Config config,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        boolean wasDeleting = false;
         if (config.getDstProtocol().equals(BGP.class)) {
             List<Protocol> allProtocols = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, IIDs
                     .NE_NETWORKINSTANCE).child(Protocols.class))
@@ -164,7 +170,10 @@ public class BgpTableConnectionWriter implements TypedWriter<Config>, CliWriter<
 
             for (Protocol dstProtocol : dstProtocols) {
                 writeCurrentAttributesForBgp(instanceIdentifier, dstProtocol, config, allProtocols, false);
+                wasDeleting = true;
             }
         }
+        return wasDeleting;
     }
+
 }

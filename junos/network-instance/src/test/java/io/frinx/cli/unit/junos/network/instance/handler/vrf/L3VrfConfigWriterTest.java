@@ -72,7 +72,7 @@ public class L3VrfConfigWriterTest {
 
     @Test
     public void testDelete() throws Exception {
-        writer.deleteCurrentAttributes(iid, data, writeContext);
+        writer.deleteCurrentAttributesWResult(iid, data, writeContext);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
 

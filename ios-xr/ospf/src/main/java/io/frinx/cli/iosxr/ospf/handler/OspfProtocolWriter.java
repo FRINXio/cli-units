@@ -19,15 +19,17 @@ package io.frinx.cli.iosxr.ospf.handler;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
 import io.frinx.openconfig.network.instance.NetworInstance;
-import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class OspfProtocolWriter implements CliWriter<Config>, TypedWriter<Config> {
+public class OspfProtocolWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
 
     private Cli cli;
 
@@ -36,8 +38,13 @@ public class OspfProtocolWriter implements CliWriter<Config>, TypedWriter<Config
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
-            throws WriteFailedException {
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
+                                                 @Nonnull Config data,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF.canProcess(id, writeContext, false)) {
+            return false;
+        }
+
         String vrfId = id.firstKeyOf(NetworkInstance.class)
                 .getName();
         final String processName = id.firstKeyOf(Protocol.class)
@@ -51,21 +58,35 @@ public class OspfProtocolWriter implements CliWriter<Config>, TypedWriter<Config
                     f("router ospf %s vrf %s", processName, vrfId),
                     "root");
         }
+        return true;
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF.canProcess(id, writeContext, false)) {
+            return false;
+        }
+
         // NOOP
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
-            throws WriteFailedException {
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF.canProcess(id, writeContext, true)) {
+            return false;
+        }
+
         final String processName = id.firstKeyOf(Protocol.class)
                 .getName();
         final String vrfName = OspfProtocolReader.resolveVrfWithName(id);
-        blockingWriteAndRead(cli, id, data,
+        blockingWriteAndRead(cli, id, dataBefore,
                 f("no router ospf %s %s", processName, vrfName));
+        return true;
     }
 }

@@ -16,9 +16,7 @@
 
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6;
 
-import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.concurrent.CompletableFuture;
@@ -91,22 +89,6 @@ public class Ipv6AdvertisementConfigReaderTest {
 
         Assert.assertThat(builder.isSuppress(), CoreMatchers.anyOf(CoreMatchers.is(CoreMatchers.nullValue()),
                 CoreMatchers.is(false)));
-    }
-
-    @Test
-    public void readAdvertisement_nonLAGInterface() throws ReadFailedException {
-        Mockito.when(context.read(Mockito.any()))
-                .then(invocation -> Optional.of(TestData.INTERFACE_WRONG_TYPE));
-
-        final Ipv6AdvertisementConfigReader reader = new Ipv6AdvertisementConfigReader(cliMock);
-
-        final ConfigBuilder configBuilder = new ConfigBuilder();
-        reader.readCurrentAttributes(TestData.ADVERTISEMENT_CONFIG_IID_VLAN_INTERFACE, configBuilder, context);
-
-        final ConfigBuilder emptyBuilder = new ConfigBuilder();
-        Assert.assertEquals(emptyBuilder.getInterval(), configBuilder.getInterval());
-        Assert.assertEquals(emptyBuilder.getLifetime(), configBuilder.getLifetime());
-        Assert.assertEquals(emptyBuilder.isSuppress(), configBuilder.isSuppress());
     }
 
     static class TestData {

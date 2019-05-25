@@ -19,7 +19,6 @@ package io.frinx.cli.dasan.conf;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
-import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.dasan.conf.handler.ConfigMetadataReader;
@@ -27,7 +26,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.openconfig.openconfig.configuration.metadata.IIDs;
-import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.configuration.metadata.rev180731.$YangModuleInfoImpl;
@@ -74,8 +72,6 @@ public class ConfigurationUnit implements TranslateUnit {
                                 @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        CheckRegistry checkRegistry = ChecksMap.getOpenconfigCheckRegistry();
-        readRegistry.setCheckRegistry(checkRegistry);
         provideReaders(readRegistry, cli);
     }
 

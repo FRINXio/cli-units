@@ -19,13 +19,15 @@ package io.frinx.cli.iosxr.ospfv3.handler;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
-import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class OspfV3ProtocolWriter implements CliWriter<Config>, TypedWriter<Config> {
+public class OspfV3ProtocolWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
 
     private Cli cli;
 
@@ -34,29 +36,48 @@ public class OspfV3ProtocolWriter implements CliWriter<Config>, TypedWriter<Conf
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> iid, Config data, WriteContext context)
-            throws WriteFailedException {
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
+                                                 @Nonnull Config data,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF3.canProcess(iid, writeContext, false)) {
+            return false;
+        }
+
         final String processName = iid.firstKeyOf(Protocol.class).getName();
         final String nwInsName = OspfV3ProtocolReader.resolveVrfWithName(iid);
 
         blockingWriteAndRead(cli, iid, data,
                 f("router ospfv3 %s %s", processName, nwInsName),
                 "root");
+        return true;
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> iid, Config dataBefore, Config dataAfter,
-                                               WriteContext context) throws WriteFailedException {
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF3.canProcess(iid, writeContext, false)) {
+            return false;
+        }
+
         // NOOP
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> iid, Config data, WriteContext context)
-            throws WriteFailedException {
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF3.canProcess(iid, writeContext, true)) {
+            return false;
+        }
+
         final String processName = iid.firstKeyOf(Protocol.class)
                 .getName();
         final String nwInsName = OspfV3ProtocolReader.resolveVrfWithName(iid);
-        blockingWriteAndRead(cli, iid, data,
+        blockingWriteAndRead(cli, iid, dataBefore,
                 f("no router ospfv3 %s %s", processName, nwInsName));
+        return true;
     }
 }

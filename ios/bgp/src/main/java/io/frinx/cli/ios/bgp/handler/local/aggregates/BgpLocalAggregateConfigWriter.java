@@ -23,9 +23,10 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter;
 import io.frinx.cli.ios.bgp.handler.GlobalConfigWriter;
-import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
 import io.frinx.openconfig.network.instance.NetworInstance;
-import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -43,7 +44,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpLocalAggregateConfigWriter implements CliWriter<Config>, TypedWriter<Config> {
+public class BgpLocalAggregateConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
 
     private final Cli cli;
 
@@ -83,8 +84,13 @@ public class BgpLocalAggregateConfigWriter implements CliWriter<Config>, TypedWr
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,
-                                              WriteContext writeContext) throws WriteFailedException {
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                 @Nonnull Config config,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.LOCALAGGREGATE.canProcess(instanceIdentifier, writeContext, false)) {
+            return false;
+        }
+
         final Protocols networkInstance =
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance.class).child(Protocols
                         .class)).get();
@@ -113,6 +119,7 @@ public class BgpLocalAggregateConfigWriter implements CliWriter<Config>, TypedWr
                                 "mask", getNetMask(config.getPrefix())));
             }
         }
+        return true;
     }
 
     private String getNetAddress(@Nonnull IpPrefix ipPrefix) {
@@ -135,16 +142,27 @@ public class BgpLocalAggregateConfigWriter implements CliWriter<Config>, TypedWr
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.LOCALAGGREGATE.canProcess(id, writeContext, false)) {
+            return false;
+        }
         // this is fine, we manipulate with networks and masks only, and there can be multiple masks
-        deleteCurrentAttributes(id, dataBefore, writeContext);
-        writeCurrentAttributes(id, dataAfter, writeContext);
+        deleteCurrentAttributesWResult(id, dataBefore, writeContext);
+        writeCurrentAttributesWResult(id, dataAfter, writeContext);
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                  @Nonnull Config config,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.LOCALAGGREGATE.canProcess(instanceIdentifier, writeContext, true)) {
+            return false;
+        }
+
         final Protocols networkInstance =
                 writeContext.readBefore(RWUtils.cutId(instanceIdentifier, NetworkInstance.class).child(Protocols
                         .class)).get();
@@ -171,6 +189,7 @@ public class BgpLocalAggregateConfigWriter implements CliWriter<Config>, TypedWr
                                 "mask", getNetMask(config.getPrefix())));
             }
         }
+        return true;
     }
 
     private Optional<Bgp> getBgpGlobal(Protocols protocolsContainer) {

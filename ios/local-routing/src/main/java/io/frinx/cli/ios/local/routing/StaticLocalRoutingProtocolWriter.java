@@ -18,28 +18,48 @@ package io.frinx.cli.ios.local.routing;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.unit.utils.CliWriter;
-import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StaticLocalRoutingProtocolWriter implements CliWriter<Config>, TypedWriter<Config> {
+public class StaticLocalRoutingProtocolWriter implements CompositeWriter.Child<Config> {
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config object,
-                                              WriteContext writeContext) throws WriteFailedException {
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
+                                                 @Nonnull Config data,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.STATIC_ROUTING.canProcess(iid, writeContext, false)) {
+            return false;
+        }
+
         // noop
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config object,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.STATIC_ROUTING.canProcess(iid, writeContext, false)) {
+            return false;
+        }
+
         // noop
+        return true;
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
+                                                  @Nonnull Config config,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.STATIC_ROUTING.canProcess(iid, writeContext, true)) {
+            return false;
+        }
+
         // noop
+        return true;
     }
 }

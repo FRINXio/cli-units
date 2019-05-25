@@ -27,6 +27,7 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import io.frinx.cli.unit.ios.init.IosCliInitializerUnit;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -100,7 +101,8 @@ public class IronwareCliInitializerUnit implements TranslateUnit {
     public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
-        // NO-OP
+        readRegistry.addCheckRegistry(ChecksMap.OPENCONFIG_REGISTRY);
+        writeRegistry.addCheckRegistry(ChecksMap.OPENCONFIG_REGISTRY);
     }
 
     @Override

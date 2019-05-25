@@ -18,7 +18,6 @@ package io.frinx.cli.unit.huawei.bgp;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -36,7 +35,6 @@ import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborPolicyConfigReader;
 import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborReader;
 import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
@@ -88,10 +86,7 @@ public class VrpCliBgpUnit implements TranslateUnit {
                                 @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        CheckRegistry checkRegistry = ChecksMap.getOpenconfigCheckRegistry();
-        readRegistry.setCheckRegistry(checkRegistry);
         provideReaders(readRegistry, cli);
-        writeRegistry.setCheckRegistry(checkRegistry);
         provideWriters(writeRegistry, cli);
     }
 

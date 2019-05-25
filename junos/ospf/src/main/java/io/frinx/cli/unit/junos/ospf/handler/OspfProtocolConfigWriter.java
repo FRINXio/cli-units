@@ -19,15 +19,17 @@ package io.frinx.cli.unit.junos.ospf.handler;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
-import io.frinx.translate.unit.commons.handler.spi.TypedWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.extension.rev190117.ProtocolConfAug;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class OspfProtocolConfigWriter implements CliWriter<Config>, TypedWriter<Config> {
+public class OspfProtocolConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
 
     private Cli cli;
 
@@ -36,31 +38,48 @@ public class OspfProtocolConfigWriter implements CliWriter<Config>, TypedWriter<
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
-            throws WriteFailedException {
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
+                                                 @Nonnull Config data,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF.canProcess(id, writeContext, false)) {
+            return false;
+        }
+
         writeExportPolicy(id, data);
+        return true;
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF.canProcess(id, writeContext, false)
+                || isEqualPolicy(dataBefore, dataAfter)) {
+            return false;
+        }
 
         // This is correct procedure here, if we register multiple values
         // in export-policy (this type is leaf-list), Junos also remembers their registering order.
         // So, when we update export-policy, we should delete all previous policies
         // and regiester all following policies rather than just addding or deleting differences.
-        if (!isEqualPolicy(dataBefore, dataAfter)) {
-            deleteExportPolicy(id, dataBefore);
-            writeExportPolicy(id, dataAfter);
-        }
+        deleteExportPolicy(id, dataBefore);
+        writeExportPolicy(id, dataAfter);
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config data, WriteContext writeContext)
-            throws WriteFailedException {
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF.canProcess(id, writeContext, true)) {
+            return false;
+        }
+
         final String vrfName = OspfProtocolReader.resolveVrfWithName(id);
-        blockingWriteAndRead(cli, id, data,
+        blockingWriteAndRead(cli, id, dataBefore,
                 f("delete%s protocols ospf", vrfName));
+        return true;
     }
 
     private void writeExportPolicy(
@@ -106,4 +125,5 @@ public class OspfProtocolConfigWriter implements CliWriter<Config>, TypedWriter<
 
         return bfrList.equals(aftList);
     }
+
 }

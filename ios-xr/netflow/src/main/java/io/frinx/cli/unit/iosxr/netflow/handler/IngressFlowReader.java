@@ -19,14 +19,11 @@ package io.frinx.cli.unit.iosxr.netflow.handler;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.iosxr.netflow.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.iosxr.netflow.handler.util.NetflowUtils;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.handler.spi.TypedListReader;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.IngressFlowsBuilder;
@@ -34,15 +31,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.ingress.flows.IngressFlowBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.ingress.flows.IngressFlowKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class IngressFlowReader implements TypedListReader<IngressFlow, IngressFlowKey, IngressFlowBuilder>,
-        CliConfigListReader<IngressFlow, IngressFlowKey, IngressFlowBuilder> {
+public class IngressFlowReader implements CliConfigListReader<IngressFlow, IngressFlowKey, IngressFlowBuilder> {
 
     private static final String SH_NETFLOW_INTF = "show running-config interface %s | include ingress";
     private static final Pattern FLOW_LINE = Pattern.compile("flow (?<type>.+) monitor \\S+( sampler .+)? ingress");
@@ -53,15 +46,9 @@ public class IngressFlowReader implements TypedListReader<IngressFlow, IngressFl
         this.cli = cli;
     }
 
-    @Override
-    public boolean containsAllKeys(final Stream<? extends Identifier<? extends DataObject>> keys,
-                                   final InstanceIdentifier<IngressFlow> instanceIdentifier) {
-        return InterfaceCheckUtil.checkInterfaceType(instanceIdentifier, EthernetCsmacd.class, Ieee8023adLag.class);
-    }
-
     @Nonnull
     @Override
-    public List<IngressFlowKey> getAllIdsForType(@Nonnull InstanceIdentifier<IngressFlow> instanceIdentifier,
+    public List<IngressFlowKey> getAllIds(@Nonnull InstanceIdentifier<IngressFlow> instanceIdentifier,
                                                  @Nonnull ReadContext readContext) throws ReadFailedException {
         InterfaceId interfaceId = instanceIdentifier.firstKeyOf(Interface.class)
                 .getId();
@@ -83,7 +70,7 @@ public class IngressFlowReader implements TypedListReader<IngressFlow, IngressFl
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<IngressFlow> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<IngressFlow> instanceIdentifier, @Nonnull
             IngressFlowBuilder ingressFlowBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final IngressFlowKey key = instanceIdentifier.firstKeyOf(IngressFlow.class);
         ingressFlowBuilder.setNetflowType(key.getNetflowType());

@@ -21,6 +21,7 @@ import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
@@ -114,15 +115,24 @@ public class MplsUnit implements TranslateUnit {
         return Sets.newHashSet();
     }
 
+    private static final CheckRegistry CHECK_REGISTRY;
+
+    static {
+        CheckRegistry.Builder builder = new CheckRegistry.Builder();
+        builder.add(IIDs.NE_NE_MPLS,
+                BasicCheck.checkData(ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+                        ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_DEFAULTINSTANCE));
+        CHECK_REGISTRY = builder.build();
+    }
+
     @Override
     public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        CheckRegistry checkRegistry = ChecksMap.getOpenconfigCheckRegistry();
-        readRegistry.setCheckRegistry(checkRegistry);
+        readRegistry.addCheckRegistry(CHECK_REGISTRY);
         provideReaders(readRegistry, cli);
-        writeRegistry.setCheckRegistry(checkRegistry);
+        writeRegistry.addCheckRegistry(CHECK_REGISTRY);
         provideWriters(writeRegistry, cli);
     }
 

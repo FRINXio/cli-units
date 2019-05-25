@@ -18,9 +18,6 @@ package io.frinx.cli.iosxr.ospfv3;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.spi.builder.BasicCheck;
-import io.fd.honeycomb.translate.spi.builder.Check;
-import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -30,16 +27,10 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.openconfig.openconfig.ospfv3.IIDs;
-import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.Function;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.OSPF3;
-import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class OspfV3Unit implements TranslateUnit {
@@ -66,24 +57,12 @@ public class OspfV3Unit implements TranslateUnit {
         return Collections.emptySet();
     }
 
-    private static final CheckRegistry CHECK_REGISTRY = ChecksMap.getOpenconfigCheckRegistry();
-
-    private static Function<InstanceIdentifier<? extends DataObject>, Check> ospfv3TypeCheck() {
-        return id -> BasicCheck.checkPath(new ProtocolKey(OSPF3.class, null));
-    }
-
-    static {
-        CHECK_REGISTRY.add(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OSPFV3, ospfv3TypeCheck());
-    }
-
     @Override
     public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
-        readRegistry.setCheckRegistry(CHECK_REGISTRY);
         provideReaders(readRegistry, cli);
-        writeRegistry.setCheckRegistry(CHECK_REGISTRY);
         provideWriters(writeRegistry, cli);
     }
 

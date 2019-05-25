@@ -81,7 +81,7 @@ public class BundleEtherLacpIntervalConfigWriterTest {
     @Test
     public void testWriteCurrentAttributes_001() throws Exception {
         prepare("Ethernet4/10");
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
@@ -89,7 +89,7 @@ public class BundleEtherLacpIntervalConfigWriterTest {
     @Test
     public void testDeleteCurrentAttributes_001() throws Exception {
         prepare("Ethernet4/12");
-        target.deleteCurrentAttributes(id, data, context);
+        target.deleteCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
