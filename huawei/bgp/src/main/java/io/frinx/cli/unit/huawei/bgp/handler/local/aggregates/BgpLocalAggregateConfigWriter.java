@@ -87,7 +87,7 @@ public class BgpLocalAggregateConfigWriter implements CompositeWriter.Child<Conf
     public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                                  @Nonnull Config config,
                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (!ChecksMap.PathCheck.Protocol.LOCALAGGREGATE.canProcess(instanceIdentifier, writeContext, false)) {
+        if (!ChecksMap.PathCheck.Protocol.BGP.canProcess(instanceIdentifier, writeContext, false)) {
             return false;
         }
 
@@ -143,7 +143,7 @@ public class BgpLocalAggregateConfigWriter implements CompositeWriter.Child<Conf
                                                   @Nonnull Config dataBefore,
                                                   @Nonnull Config dataAfter,
                                                   @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (!ChecksMap.PathCheck.Protocol.LOCALAGGREGATE.canProcess(id, writeContext, false)) {
+        if (!ChecksMap.PathCheck.Protocol.BGP.canProcess(id, writeContext, false)) {
             return false;
         }
         // this is fine, we manipulate with networks and masks only, and there can be multiple masks
@@ -156,7 +156,7 @@ public class BgpLocalAggregateConfigWriter implements CompositeWriter.Child<Conf
     public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                                   @Nonnull Config config,
                                                   @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (!ChecksMap.PathCheck.Protocol.LOCALAGGREGATE.canProcess(instanceIdentifier, writeContext, true)) {
+        if (!ChecksMap.PathCheck.Protocol.BGP.canProcess(instanceIdentifier, writeContext, true)) {
             return false;
         }
 

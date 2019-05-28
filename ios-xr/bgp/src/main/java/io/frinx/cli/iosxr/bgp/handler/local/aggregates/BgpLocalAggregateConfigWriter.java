@@ -76,7 +76,7 @@ public class BgpLocalAggregateConfigWriter implements CliWriterFormatter<Config>
     public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
                                                  @Nonnull Config config,
                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (!ChecksMap.PathCheck.Protocol.LOCALAGGREGATE.canProcess(id, writeContext, false)) {
+        if (!ChecksMap.PathCheck.Protocol.BGP.canProcess(id, writeContext, false)) {
             return false;
         }
 
@@ -117,7 +117,7 @@ public class BgpLocalAggregateConfigWriter implements CliWriterFormatter<Config>
                                                   @Nonnull Config dataBefore,
                                                   @Nonnull Config dataAfter,
                                                   @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (!ChecksMap.PathCheck.Protocol.LOCALAGGREGATE.canProcess(id, writeContext, false)) {
+        if (!ChecksMap.PathCheck.Protocol.BGP.canProcess(id, writeContext, false)) {
             return false;
         }
 
@@ -158,7 +158,7 @@ public class BgpLocalAggregateConfigWriter implements CliWriterFormatter<Config>
     public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
                                                   @Nonnull Config config,
                                                   @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (!ChecksMap.PathCheck.Protocol.LOCALAGGREGATE.canProcess(id, writeContext, true)) {
+        if (!ChecksMap.PathCheck.Protocol.BGP.canProcess(id, writeContext, true)) {
             return false;
         }
 
