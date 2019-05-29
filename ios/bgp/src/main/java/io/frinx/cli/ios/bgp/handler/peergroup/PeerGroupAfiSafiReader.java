@@ -16,6 +16,7 @@
 
 package io.frinx.cli.ios.bgp.handler.peergroup;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -51,9 +52,14 @@ public class PeerGroupAfiSafiReader implements CliConfigListReader<AfiSafi, AfiS
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         String peerGroupId = PeerGroupWriter.getPeerGroupId(id);
-        return NeighborAfiSafiReader.getAfiKeys(blockingRead(String.format(NeighborConfigReader.SH_SUMM, peerGroupId),
-                cli, id, readContext),
-                vrfKey, /*accept any mention of peer group under afi to set that afi as configured*/ line -> true)
+        final String configuration = blockingRead(String.format(NeighborConfigReader.SH_SUMM, peerGroupId),
+                cli, id, readContext);
+        return getAfiSafiKeys(vrfKey, configuration);
+    }
+
+    @VisibleForTesting
+    static List<AfiSafiKey> getAfiSafiKeys(final NetworkInstanceKey vrfKey, final String configuration) {
+        return NeighborAfiSafiReader.getAfiKeys(configuration, vrfKey, line -> line.contains("neighbor"))
                 .stream()
                 .map(k -> new AfiSafiKey(k.getAfiSafiName()))
                 .collect(Collectors.toList());
