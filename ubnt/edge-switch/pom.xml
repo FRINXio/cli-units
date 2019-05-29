@@ -27,26 +27,13 @@
   </parent>
 
   <groupId>io.frinx.cli</groupId>
-  <artifactId>cli-units-aggregator</artifactId>
+  <artifactId>cli-units-ubnt-es</artifactId>
   <version>3.1.12.rc6-frinx-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>ios-common</module>
-    <module>ios</module>
-    <module>ios-xr</module>
-    <module>brocade</module>
-    <module>junos</module>
-    <module>huawei</module>
-    <module>features</module>
-    <module>unit-parent</module>
-    <module>yang-docs-plugin</module>
-    <module>nexus</module>
-    <module>dasan</module>
-    <module>sros</module>
-    <module>ubnt/edge-switch</module>
-    <module>network-instance-base</module>
-    <module>interface-base</module>
+    <module>init</module>
+    <module>it</module>
   </modules>
 
   <build>
@@ -69,16 +56,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>karaf</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>karaf</module>
-      </modules>
-    </profile>
-
     <profile>
       <!--
           This profile is to ensure we only build javadocs reports
