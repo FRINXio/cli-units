@@ -71,7 +71,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.RouterAdvertisementBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.VlanBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -123,8 +122,6 @@ public final class NexusInterfaceUnit implements TranslateUnit {
 
     static {
         CheckRegistry.Builder builder = new CheckRegistry.Builder();
-        builder.add(IIDs.IN_IN_SUBINTERFACES,
-                BasicCheck.checkPath(new SubinterfaceKey(SubinterfaceReader.ZERO_SUBINTERFACE_ID)));
         builder.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_ROUTERADVERTISEMENT,
                 BasicCheck.checkData(ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
                         ChecksMap.DataCheck.InterfaceConfig.TYPE_ETHERNET_CSMACD)
