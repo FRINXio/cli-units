@@ -25,6 +25,7 @@ import com.google.gson.stream.JsonWriter;
 import io.fd.honeycomb.data.ReadableDataManager;
 import io.fd.honeycomb.data.impl.ModifiableDirectDataTreeDelegator;
 import io.fd.honeycomb.data.impl.ReadableDataTreeDelegator;
+import io.fd.honeycomb.rpc.RpcRegistry;
 import io.fd.honeycomb.rpc.RpcRegistryBuilder;
 import io.fd.honeycomb.translate.impl.read.registry.CustomizerReadRegistryBuilder;
 import io.fd.honeycomb.translate.impl.read.registry.CustomizerWriterRegistryBuilder;
@@ -168,6 +169,7 @@ public class IosAll {
     private BindingTransactionChain mockTxChain;
 
     private DataBroker bindingBroker;
+    protected RpcRegistry rpcReg;
     private DOMDataBroker domBroker;
     private SchemaContext schemaCtx;
     private Cli cli;
@@ -223,6 +225,7 @@ public class IosAll {
         // Get & register RPC handlers
         RpcRegistryBuilder rpcRegBuilder = new RpcRegistryBuilder();
         translateContext.getRpcs(transportContext).forEach(rpcRegBuilder::addService);
+        rpcReg = rpcRegBuilder.build();
 
         bindingBroker = ((DataBroker) new BindingDOMAdapterLoader(codec) {
             protected DOMService getDelegate(Class<? extends DOMService> reqDeleg) {

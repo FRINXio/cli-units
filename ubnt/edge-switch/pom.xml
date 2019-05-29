@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright © 2020 Frinx and others.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.opendaylight.odlparent</groupId>
+    <artifactId>odlparent</artifactId>
+    <version>3.1.1-Oxygen-SR2.4_2_4_rc5-frinxodl-SNAPSHOT</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>io.frinx.cli</groupId>
+  <artifactId>cli-units-ubnt-es</artifactId>
+  <version>4.2.4.rc5-frinx-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>init</module>
+    <module>it</module>
+  </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <!--
+          This profile is to ensure we only build javadocs reports
+          when we plan to deploy Maven site for our project.
+      -->
+      <id>maven-site</id>
+      <activation>
+        <file>
+          <exists>${user.dir}/deploy-site.xml</exists>
+        </file>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <id>aggregate</id>
+                <goals>
+                  <goal>aggregate</goal>
+                </goals>
+                <phase>package</phase>
+            </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <!--
+      Maven Site Configuration
+
+      The following configuration is necessary for maven-site-plugin to
+      correctly identify the correct deployment path for OpenDaylight Maven
+      sites.
+  -->
+  <url>${odl.site.url}/${project.groupId}/${stream}/</url>
+
+  <distributionManagement>
+    <site>
+      <id>opendaylight-site</id>
+      <url>${nexus.site.url}/</url>
+    </site>
+  </distributionManagement>
+</project>

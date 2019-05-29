@@ -113,6 +113,13 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>frinx-cli-unit-ubnt-es</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>frinx-cli-all-units</artifactId>
             <version>${project.version}</version>
             <type>xml</type>

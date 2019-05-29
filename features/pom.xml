@@ -48,5 +48,6 @@
         <module>frinx-cli-unit-nexus</module>
         <module>frinx-cli-unit-dasan</module>
         <module>frinx-cli-unit-sros</module>
+        <module>frinx-cli-unit-ubnt-es</module>
     </modules>
 </project>
