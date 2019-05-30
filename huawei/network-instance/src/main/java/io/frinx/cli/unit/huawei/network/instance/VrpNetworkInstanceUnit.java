@@ -28,9 +28,6 @@ import io.frinx.cli.unit.huawei.network.instance.handler.NetworkInstanceConfigWr
 import io.frinx.cli.unit.huawei.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.ifc.L3VrfInterfaceReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.ifc.L3VrfInterfaceWriter;
-import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.LocalAggregateConfigReader;
-import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.LocalAggregateConfigWriter;
-import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.LocalAggregateReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.ProtocolConfigReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.ProtocolReader;
@@ -93,11 +90,6 @@ public class VrpNetworkInstanceUnit implements TranslateUnit {
         writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
         writeRegistry.add(IIDs.NE_NE_IN_INTERFACE, new L3VrfInterfaceWriter(cli));
         writeRegistry.addNoop(IIDs.NE_NE_IN_IN_CONFIG);
-
-        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LOCALAGGREGATES);
-        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LO_AGGREGATE);
-        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigWriter(cli),
-                IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -111,10 +103,6 @@ public class VrpNetworkInstanceUnit implements TranslateUnit {
         // Protocols for VRF
         readRegistry.add(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli));
         readRegistry.add(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader());
-
-        // Local aggregates
-        readRegistry.add(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new LocalAggregateReader(cli));
-        readRegistry.add(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigReader(cli));
     }
 
     @Override

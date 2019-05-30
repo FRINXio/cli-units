@@ -39,8 +39,6 @@ import io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding.Policy
 import io.frinx.cli.unit.iosxr.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolConfigReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
-import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolLocalAggregateConfigWriter;
-import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolLocalAggregateReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolStateReader;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
@@ -50,8 +48,6 @@ import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.LocalAggregatesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.Aggregate;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ProtocolsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.InterfacesBuilder;
@@ -63,7 +59,6 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 public class IosXRNetworkInstanceUnit implements TranslateUnit {
 
     private static final InstanceIdentifier<Config> PF_IFC_CFG_ROOT_ID = InstanceIdentifier.create(Config.class);
-    private static final InstanceIdentifier<Aggregate> AGGREGATE_IID = InstanceIdentifier.create(Aggregate.class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -115,13 +110,6 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
                 new GenericConfigListReader<>(IIDs.NE_NE_PO_IN_INTERFACE, new PolicyForwardingInterfaceReader(cli)));
         readRegistry.add(
                 new GenericConfigReader<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli)));
-
-
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, LocalAggregatesBuilder.class);
-        readRegistry.subtreeAdd(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, AGGREGATE_IID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_LO_AG_CO_AUG_NIPROTAGGAUG, AGGREGATE_IID)),
-                new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new ProtocolLocalAggregateReader(cli)));
     }
 
     private void provideWriters(@Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
@@ -135,13 +123,7 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
 
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LOCALAGGREGATES, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new NoopCliListWriter<>()));
-        writeRegistry.subtreeAdd(Sets.newHashSet(
-            RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_LO_AG_CO_AUG_NIPROTAGGAUG,
-            InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx
-            .openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class))),
-                new GenericWriter<>(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new ProtocolLocalAggregateConfigWriter(cli)));
+
         // PF
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PO_IN_INTERFACE, new NoopCliListWriter<>()));
         writeRegistry.subtreeAddAfter(Sets.newHashSet(

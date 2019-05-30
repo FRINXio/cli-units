@@ -26,6 +26,9 @@ import io.frinx.cli.ios.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.ios.bgp.handler.GlobalConfigReader;
 import io.frinx.cli.ios.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.ios.bgp.handler.GlobalStateReader;
+import io.frinx.cli.ios.bgp.handler.local.aggregates.BgpLocalAggregateConfigReader;
+import io.frinx.cli.ios.bgp.handler.local.aggregates.BgpLocalAggregateConfigWriter;
+import io.frinx.cli.ios.bgp.handler.local.aggregates.BgpLocalAggregateReader;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborAfiSafiPolicyConfigReader;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborAfiSafiReader;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborConfigReader;
@@ -139,6 +142,10 @@ public class BgpUnit extends AbstractUnit {
                         IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY,
                         IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG),
                 IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP);
+
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigWriter(cli),
+                IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
+
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -168,6 +175,11 @@ public class BgpUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_ST_PREFIXES, new PrefixesReader(cli));
 
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_RO_CONFIG, new NeighborRouteReflectorConfigReader(cli));
+
+        // Local aggregates
+        readRegistry.add(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new BgpLocalAggregateReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigReader());
+
     }
 
     private void providePeerGroupReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {

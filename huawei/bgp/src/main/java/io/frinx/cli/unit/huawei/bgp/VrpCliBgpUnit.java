@@ -29,6 +29,9 @@ import io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiConfigWriter;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalConfigReader;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.unit.huawei.bgp.handler.local.aggregates.BgpLocalAggregateConfigReader;
+import io.frinx.cli.unit.huawei.bgp.handler.local.aggregates.BgpLocalAggregateConfigWriter;
+import io.frinx.cli.unit.huawei.bgp.handler.local.aggregates.BgpLocalAggregateReader;
 import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborAfiSafiReader;
 import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborConfigReader;
 import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborPolicyConfigReader;
@@ -117,6 +120,10 @@ public class VrpCliBgpUnit implements TranslateUnit {
                 RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG,
                     InstanceIdentifier.create(Neighbor.class))
             ), IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG);
+
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LOCALAGGREGATES);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LO_AGGREGATE);
+        writeRegistry.add(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigWriter(cli));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -132,6 +139,10 @@ public class VrpCliBgpUnit implements TranslateUnit {
         );
 
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_AP_CONFIG, new NeighborPolicyConfigReader(cli));
+
+        // Local aggregates
+        readRegistry.add(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new BgpLocalAggregateReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigReader());
     }
 
     @Override
