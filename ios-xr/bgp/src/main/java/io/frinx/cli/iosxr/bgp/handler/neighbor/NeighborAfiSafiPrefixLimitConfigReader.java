@@ -100,9 +100,8 @@ public class NeighborAfiSafiPrefixLimitConfigReader implements CliConfigReader<C
         String afiName = GlobalAfiSafiReader.transformAfiToString(instanceIdentifier.firstKeyOf(AfiSafi.class)
                 .getAfiSafiName());
 
-        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs()
-                .getValue()
-                .intValue(), insName, nwInsName, address, afiName), cli, instanceIdentifier, readContext);
+        String output = blockingRead(String.format(SH_NEI, globalConfig.getAs().getValue().intValue(),
+                insName, address, afiName), cli, instanceIdentifier, readContext);
         parsePrefixLimit(output, configBuilder);
 
     }
