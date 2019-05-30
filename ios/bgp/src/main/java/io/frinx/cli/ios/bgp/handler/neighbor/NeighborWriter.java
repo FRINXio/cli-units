@@ -22,12 +22,14 @@ import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ios.bgp.handler.BgpAfiSafiChecks;
 import io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter;
 import io.frinx.cli.unit.utils.CliListWriter;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -239,21 +241,21 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
     public void writeCurrentAttributes(InstanceIdentifier<Neighbor> instanceIdentifier, Neighbor neighbor,
                                               WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
+        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
 
-        final Global bgpGlobal = getGlobalBgp(instanceIdentifier, writeContext);
+        final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = getAsValue(bgpGlobal);
-        Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor
-                .getAfiSafis()));
+        Map<String, Object> afiSafisForNeighbor = getAfiSafisForNeighbor(neighbor.getAfiSafis());
+        if (!afiSafisForNeighbor.isEmpty()) {
+            BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
+        }
+        Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, afiSafisForNeighbor);
         String neighborIp = getNeighborIp(instanceIdentifier);
         Boolean enabled = neighbor.getConfig().isEnabled();
 
         renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, null, enabled, null, vrfKey, bgpAs, neighAfiSafi, Collections.emptyMap(), neighborIp,
                 NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
-    }
-
-    public static Global getGlobalBgp(InstanceIdentifier<?> instanceIdentifier, WriteContext writeContext) {
-        return writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get().getGlobal();
     }
 
     public static Global getGlobalBgpForDelete(InstanceIdentifier<?> instanceIdentifier, WriteContext writeContext) {
@@ -434,8 +436,12 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                                                Neighbor before, Neighbor neighbor,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
+        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
+        if (afiSafisHaveChanged(before, neighbor)) {
+            BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
+        }
 
-        final Global bgpGlobal = getGlobalBgp(instanceIdentifier, writeContext);
+        final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = getAsValue(bgpGlobal);
         Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor
                 .getAfiSafis()));
@@ -462,16 +468,32 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                 NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
     }
 
+    private static boolean afiSafisHaveChanged(final Neighbor before, final Neighbor after) {
+        final List<AfiSafi> afiSafisBefore = before.getAfiSafis().getAfiSafi();
+        final List<AfiSafi> afiSafisAfter = after.getAfiSafis().getAfiSafi();
+        if (afiSafisBefore == null && afiSafisAfter != null || afiSafisBefore != null && afiSafisAfter == null) {
+            return true;
+        } else if (afiSafisAfter == null) {
+            return false;
+        } else {
+            return new HashSet<>(afiSafisAfter).equals(new HashSet<>(afiSafisBefore));
+        }
+    }
+
     @Override
     public void deleteCurrentAttributes(InstanceIdentifier<Neighbor> instanceIdentifier, Neighbor neighbor,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
+        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
 
-        final Global bgpGlobal = getGlobalBgpForDelete(instanceIdentifier, writeContext);
+        final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = getAsValue(bgpGlobal);
 
-        Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor
-                .getAfiSafis()));
+        Map<String, Object> afiSafisForNeighbor = getAfiSafisForNeighbor(neighbor.getAfiSafis());
+        if (!afiSafisForNeighbor.isEmpty()) {
+            BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
+        }
+        Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, afiSafisForNeighbor);
         String neighborIp = getNeighborIp(instanceIdentifier);
 
         deleteNeighbor(this, cli, instanceIdentifier, neighbor, vrfKey, bgpAs, neighAfiSafi, neighborIp,
