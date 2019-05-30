@@ -76,7 +76,9 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
                                               WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         String vrfName = vrfKey.getName();
-        Long as = writeContext.readAfter(RWUtils.cutId(id, Global.class)).get().getConfig().getAs().getValue();
+        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get();
+        final Long as = bgp.getGlobal().getConfig().getAs().getValue();
+        BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
 
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             blockingWriteAndRead(f(GLOBAL_BGP_AFI_SAFI,
@@ -87,9 +89,7 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
                             .getConfig().getRouteDistinguisher() != null,
                     "Route distinguisher missing for VRF: %s. Cannot configure BGP afi/safi", vrfName);
 
-            DottedQuad routerId = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get().getGlobal().getConfig()
-                    .getRouterId();
-
+            DottedQuad routerId = bgp.getGlobal().getConfig().getRouterId();
             if (routerId == null) {
                 blockingWriteAndRead(f(VRF_BGP_AFI_SAFI,
                         as, toDeviceAddressFamily(config.getAfiSafiName()), vrfName),
@@ -136,6 +136,8 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         String vrfName = vrfKey.getName();
         Long as = writeContext.readBefore(RWUtils.cutId(id, Global.class)).get().getConfig().getAs().getValue();
+        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get();
+        BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
 
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             blockingWriteAndRead(f(GLOBAL_BGP_AFI_SAFI_DELETE,
