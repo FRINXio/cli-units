@@ -476,7 +476,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         } else if (afiSafisAfter == null) {
             return false;
         } else {
-            return new HashSet<>(afiSafisAfter).equals(new HashSet<>(afiSafisBefore));
+            return !(new HashSet<>(afiSafisAfter).equals(new HashSet<>(afiSafisBefore)));
         }
     }
 
