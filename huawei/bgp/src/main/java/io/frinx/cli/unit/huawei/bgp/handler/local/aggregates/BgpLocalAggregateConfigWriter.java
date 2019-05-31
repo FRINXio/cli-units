@@ -23,10 +23,8 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiConfigWriter;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalConfigWriter;
-import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
-import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
-import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -44,7 +42,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpLocalAggregateConfigWriter implements CompositeWriter.Child<Config>, CliWriterFormatter<Config> {
+public class BgpLocalAggregateConfigWriter implements CliWriter<Config> {
 
     private final Cli cli;
 
@@ -84,13 +82,9 @@ public class BgpLocalAggregateConfigWriter implements CompositeWriter.Child<Conf
     }
 
     @Override
-    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                                  @Nonnull Config config,
                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (!ChecksMap.PathCheck.Protocol.BGP.canProcess(instanceIdentifier, writeContext, false)) {
-            return false;
-        }
-
         final Protocols networkInstance = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance
                 .class).child(Protocols.class)).get();
         Optional<Bgp> bgp = getBgpGlobal(networkInstance);
@@ -114,7 +108,6 @@ public class BgpLocalAggregateConfigWriter implements CompositeWriter.Child<Conf
                                         config.getPrefix())));
             }
         }
-        return true;
     }
 
     private String getNetAddress(@Nonnull IpPrefix ipPrefix) {
@@ -139,27 +132,19 @@ public class BgpLocalAggregateConfigWriter implements CompositeWriter.Child<Conf
     }
 
     @Override
-    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                                   @Nonnull Config dataBefore,
                                                   @Nonnull Config dataAfter,
                                                   @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (!ChecksMap.PathCheck.Protocol.BGP.canProcess(id, writeContext, false)) {
-            return false;
-        }
         // this is fine, we manipulate with networks and masks only, and there can be multiple masks
-        deleteCurrentAttributesWResult(id, dataBefore, writeContext);
-        writeCurrentAttributesWResult(id, dataAfter, writeContext);
-        return true;
+        deleteCurrentAttributes(id, dataBefore, writeContext);
+        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
-    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                                   @Nonnull Config config,
                                                   @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (!ChecksMap.PathCheck.Protocol.BGP.canProcess(instanceIdentifier, writeContext, true)) {
-            return false;
-        }
-
         final Protocols networkInstance = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, NetworkInstance
                 .class).child(Protocols.class)).get();
         Optional<Bgp> bgp = getBgpGlobal(networkInstance);
@@ -180,7 +165,6 @@ public class BgpLocalAggregateConfigWriter implements CompositeWriter.Child<Conf
                                         config.getPrefix())));
             }
         }
-        return true;
     }
 
     private Optional<Bgp> getBgpGlobal(Protocols protocolsContainer) {

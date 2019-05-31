@@ -26,6 +26,8 @@ import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiConfigWriter;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.iosxr.bgp.handler.local.aggregates.BgpLocalAggregateConfigWriter;
+import io.frinx.cli.iosxr.bgp.handler.local.aggregates.BgpLocalAggregateReader;
 import io.frinx.cli.iosxr.bgp.handler.neighbor.NeighborAfiSafiApplyPolicyConfigReader;
 import io.frinx.cli.iosxr.bgp.handler.neighbor.NeighborAfiSafiApplyPolicyConfigWriter;
 import io.frinx.cli.iosxr.bgp.handler.neighbor.NeighborAfiSafiConfigWriter;
@@ -51,6 +53,7 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.afi.safi.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.Aggregate;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
@@ -62,6 +65,7 @@ public class BgpUnit implements TranslateUnit {
             .openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafi> GL_AFISAFI_IID =
             InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx
                     .openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafi.class);
+    private static final InstanceIdentifier<Aggregate> AGGREGATE_IID = InstanceIdentifier.create(Aggregate.class);
 
     private final TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;
@@ -139,6 +143,15 @@ public class BgpUnit implements TranslateUnit {
         writeRegistry.addNoop(IIDs.NETWO_NETWO_PROTO_PROTO_BGP_NEIGH_NEIGH_AFISA_AFISA_IPV6U_PREFIXLIMIT);
         writeRegistry.addAfter(IIDs.NETWO_NETWO_PROTO_PROTO_BGP_NEIGH_NEIGH_AFISA_AFISA_IPV6U_PREFI_CONFIG, new
                 NeighborAfiSafiPrefixLimitConfigWriter(cli), IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IP_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LOCALAGGREGATES);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LO_AGGREGATE);
+        writeRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigWriter(cli),
+                Sets.newHashSet(
+                    RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_LO_AG_CO_AUG_NIPROTAGGAUG,
+                        InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                .local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class))
+                )
+        );
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -164,6 +177,10 @@ public class BgpUnit implements TranslateUnit {
         readRegistry.add(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_CONFIG, new NeighborAfiSafiIpv6ConfigReader(cli));
         readRegistry.add(IIDs.NETWO_NETWO_PROTO_PROTO_BGP_NEIGH_NEIGH_AFISA_AFISA_IPV6U_PREFI_CONFIG,
                 new NeighborAfiSafiPrefixLimitConfigReader(cli));
+        readRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new BgpLocalAggregateReader(cli),
+                Sets.newHashSet(
+                    RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, AGGREGATE_IID),
+                    RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_LO_AG_CO_AUG_NIPROTAGGAUG, AGGREGATE_IID)));
     }
 
     @Override

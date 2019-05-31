@@ -30,9 +30,6 @@ import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceStateReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceWriter;
-import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.LocalAggregateConfigReader;
-import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.LocalAggregateConfigWriter;
-import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.LocalAggregateReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolConfigReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolReader;
@@ -103,9 +100,6 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.addAfter(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli),
                 IIDs.NE_NE_IN_INTERFACE);
 
-        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigWriter(cli),
-                IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
-
         // Interfaces for VRF
         writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
         writeRegistry.addAfter(IIDs.NE_NE_IN_INTERFACE, new VrfInterfaceWriter(cli),
@@ -134,10 +128,6 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli));
         readRegistry.add(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader());
         readRegistry.add(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader());
-
-        // Local aggregates
-        readRegistry.add(IIDs.NE_NE_PR_PR_LO_AGGREGATE, new LocalAggregateReader(cli));
-        readRegistry.add(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new LocalAggregateConfigReader(cli));
 
         // Table connections for VRF
         readRegistry.subtreeAdd(IIDs.NE_NE_TA_TABLECONNECTION, new TableConnectionReader(cli),

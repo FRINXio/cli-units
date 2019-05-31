@@ -34,15 +34,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.NiProtAggAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.LocalAggregatesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.Aggregate;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.AggregateBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.AggregateKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpLocalAggregateReader implements CliConfigListReader<Aggregate, AggregateKey, AggregateBuilder> {
@@ -58,11 +55,7 @@ public class BgpLocalAggregateReader implements CliConfigListReader<Aggregate, A
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Aggregate> aggregates) {
-        ((LocalAggregatesBuilder) builder).setAggregate(aggregates);
-    }
-
-    @Override
+    @Nonnull
     public List<AggregateKey> getAllIds(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
             ReadContext readContext) throws ReadFailedException {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
@@ -75,7 +68,7 @@ public class BgpLocalAggregateReader implements CliConfigListReader<Aggregate, A
 
         if (globalConfig
                 == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         final String nwInsName = GlobalConfigWriter.resolveVrfWithName(instanceIdentifier);
@@ -122,11 +115,9 @@ public class BgpLocalAggregateReader implements CliConfigListReader<Aggregate, A
 
         builder.setPrefix(key.getPrefix());
         ConfigBuilder configBuilder = new ConfigBuilder().setPrefix(key.getPrefix());
-        if (policies.isPresent()) {
-            configBuilder.addAugmentation(NiProtAggAug.class, new NiProtAggAugBuilder()
-                    .setApplyPolicy(Lists.newArrayList(policies.get()))
-                    .build());
-        }
+        policies.ifPresent(s -> configBuilder.addAugmentation(NiProtAggAug.class, new NiProtAggAugBuilder()
+                .setApplyPolicy(Lists.newArrayList(s))
+                .build()));
         builder.setConfig(configBuilder.build());
     }
 }
