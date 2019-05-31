@@ -113,6 +113,7 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
 
         final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = NeighborWriter.getAsValue(bgpGlobal);
+        NeighborWriter.checkLocalAsAgainstRemoteAsWithinRoutReflector(neighbor, bgpAs, neighbor.getConfig());
         Map<String, Object> afiSafisForPeerGroup = getAfiSafisForPeerGroup(neighbor.getAfiSafis());
         if (!afiSafisForPeerGroup.isEmpty()) {
             BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
@@ -145,8 +146,10 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
         }
 
         final Global bgpGlobal = bgp.getGlobal();
-        final Global bgpGlobalBefore = NeighborWriter.getGlobalBgpForDelete(instanceIdentifier, writeContext);
+        final Global bgpGlobalBefore = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class))
+                .get().getGlobal();
         Long bgpAs = NeighborWriter.getAsValue(bgpGlobal);
+        NeighborWriter.checkLocalAsAgainstRemoteAsWithinRoutReflector(neighbor, bgpAs, neighbor.getConfig());
 
         Map<String, Object> groupAfiSafi = NeighborWriter.getAfiSafisForNeighbor(bgpGlobal,
                 getAfiSafisForPeerGroup(neighbor.getAfiSafis()));
@@ -175,9 +178,9 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
     public void deleteCurrentAttributes(InstanceIdentifier<PeerGroup> instanceIdentifier, PeerGroup neighbor,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
-        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
+        final Bgp bgp = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
 
-        final Global bgpGlobal = NeighborWriter.getGlobalBgpForDelete(instanceIdentifier, writeContext);
+        final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = NeighborWriter.getAsValue(bgpGlobal);
 
         Map<String, Object> afiSafisForPeerGroup = getAfiSafisForPeerGroup(neighbor.getAfiSafis());

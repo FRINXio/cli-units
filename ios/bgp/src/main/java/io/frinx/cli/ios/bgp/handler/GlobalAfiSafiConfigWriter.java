@@ -136,7 +136,7 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         String vrfName = vrfKey.getName();
         Long as = writeContext.readBefore(RWUtils.cutId(id, Global.class)).get().getConfig().getAs().getValue();
-        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(id, Bgp.class)).get();
+        final Bgp bgp = writeContext.readBefore(RWUtils.cutId(id, Bgp.class)).get();
         BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
 
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {

@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupRouteReflectorConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonStructureNeighborGroupRouteReflector;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflector;
@@ -245,6 +246,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
         final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = getAsValue(bgpGlobal);
+        checkLocalAsAgainstRemoteAsWithinRoutReflector(neighbor, bgpAs, neighbor.getConfig());
         Map<String, Object> afiSafisForNeighbor = getAfiSafisForNeighbor(neighbor.getAfiSafis());
         if (!afiSafisForNeighbor.isEmpty()) {
             BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
@@ -256,10 +258,6 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, null, enabled, null, vrfKey, bgpAs, neighAfiSafi, Collections.emptyMap(), neighborIp,
                 NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
-    }
-
-    public static Global getGlobalBgpForDelete(InstanceIdentifier<?> instanceIdentifier, WriteContext writeContext) {
-        return writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class)).get().getGlobal();
     }
 
     private static <T extends DataObject> void renderNeighbor(CliWriter<T> writer, Cli cli,
@@ -443,10 +441,13 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
         final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = getAsValue(bgpGlobal);
+        checkLocalAsAgainstRemoteAsWithinRoutReflector(neighbor, bgpAs, neighbor.getConfig());
+
         Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, getAfiSafisForNeighbor(neighbor
                 .getAfiSafis()));
 
-        final Global bgpGlobalBefore = getGlobalBgpForDelete(instanceIdentifier, writeContext);
+        final Global bgpGlobalBefore = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class))
+                .get().getGlobal();
         Map<String, Object> neighAfiSafiBefore = getAfiSafisForNeighbor(bgpGlobalBefore, getAfiSafisForNeighbor(
                 before.getAfiSafis()));
         Map<String, Object> afisToRemove = Maps.difference(neighAfiSafiBefore, neighAfiSafi).entriesOnlyOnLeft();
@@ -484,7 +485,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
     public void deleteCurrentAttributes(InstanceIdentifier<Neighbor> instanceIdentifier, Neighbor neighbor,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
-        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
+        final Bgp bgp = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
 
         final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = getAsValue(bgpGlobal);
@@ -510,5 +511,16 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                 ?
                 addr.getIpv4Address().getValue() :
                 addr.getIpv6Address().getValue();
+    }
+
+    public static void checkLocalAsAgainstRemoteAsWithinRoutReflector(
+            final BgpCommonStructureNeighborGroupRouteReflector reflector, final Long bgpAsNumber,
+            final BgpCommonNeighborGroupConfig neighborGroupConfig) {
+        if (reflector.getRouteReflector() != null) {
+            Preconditions.checkArgument(bgpAsNumber.equals(neighborGroupConfig.getPeerAs().getValue()),
+                    "Cannot configure BGP: Route-reflector-client is not allowed to be configured "
+                            + "on external BGP peers - BGP process AS is %s while neighbor's AS is %s.",
+                    bgpAsNumber, neighborGroupConfig.getPeerAs().getValue());
+        }
     }
 }

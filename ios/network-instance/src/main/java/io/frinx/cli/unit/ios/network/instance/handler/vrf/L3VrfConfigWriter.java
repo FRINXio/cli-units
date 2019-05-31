@@ -43,7 +43,7 @@ public final class L3VrfConfigWriter extends AbstractL3VrfConfigWriter {
             + "end";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
-            + "no ip vrf {$config.name}\n"
+            + "no ip vrf {$data.name}\n"
             + "end";
 
     @Override
