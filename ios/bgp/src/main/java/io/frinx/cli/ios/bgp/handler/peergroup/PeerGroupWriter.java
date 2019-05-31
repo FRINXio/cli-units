@@ -167,7 +167,7 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
         } else if (afiSafisAfter == null) {
             return false;
         } else {
-            return new HashSet<>(afiSafisAfter).equals(new HashSet<>(afiSafisBefore));
+            return !(new HashSet<>(afiSafisAfter).equals(new HashSet<>(afiSafisBefore)));
         }
     }
 
