@@ -20,10 +20,13 @@ import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.read.Reader;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.Collections;
 import java.util.List;
@@ -252,6 +255,12 @@ public class L2P2PConnectionPointsReader implements CliConfigReader<ConnectionPo
                     .build());
         }
         return localBuilder.build();
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.checkData(ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+                ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2P2P);
     }
 
     public static final class InterfaceId {

@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.dasan.network.instance.handler;
 
-import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
 import io.frinx.cli.handlers.def.DefaultReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
@@ -38,7 +37,7 @@ public class NetworkInstanceReader
 
     @SuppressWarnings("serial")
     public NetworkInstanceReader(Cli cli) {
-        super(new ArrayList<ListReaderCustomizer<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {
+        super(new ArrayList<CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {
             {
                 add(new DefaultReader());
             }

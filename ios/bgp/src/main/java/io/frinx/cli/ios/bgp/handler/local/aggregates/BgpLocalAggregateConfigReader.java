@@ -18,7 +18,9 @@ package io.frinx.cli.ios.bgp.handler.local.aggregates;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.Aggregate;
@@ -39,4 +41,8 @@ public class BgpLocalAggregateConfigReader implements CliConfigReader<Config, Co
         configBuilder.setPrefix(aggregateKey.getPrefix());
     }
 
+    @Override
+    public Check getCheck() {
+        return ChecksMap.PathCheck.Protocol.BGP;
+    }
 }

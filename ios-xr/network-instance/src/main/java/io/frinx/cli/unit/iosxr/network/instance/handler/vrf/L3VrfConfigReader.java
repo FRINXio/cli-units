@@ -17,6 +17,8 @@
 package io.frinx.cli.unit.iosxr.network.instance.handler.vrf;
 
 import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
@@ -44,5 +46,10 @@ public final class L3VrfConfigReader implements CliConfigReader<Config, ConfigBu
         }
         configBuilder.setName(name);
         configBuilder.setType(L3VRF.class);
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 }

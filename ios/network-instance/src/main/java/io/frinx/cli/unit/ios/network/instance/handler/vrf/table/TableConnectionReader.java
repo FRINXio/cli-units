@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf.table;
 
-import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.table.BgpTableConnectionReader;
 import io.frinx.cli.ospf.handler.table.OspfTableConnectionReader;
@@ -34,7 +33,7 @@ public class TableConnectionReader
         implements CliConfigListReader<TableConnection, TableConnectionKey, TableConnectionBuilder> {
 
     public TableConnectionReader(Cli cli) {
-        super(new ArrayList<ListReaderCustomizer<TableConnection, TableConnectionKey, TableConnectionBuilder>>() {{
+        super(new ArrayList<CompositeListReader.Child<TableConnection, TableConnectionKey, TableConnectionBuilder>>() {{
                 add(new BgpTableConnectionReader(cli));
                 add(new OspfTableConnectionReader(cli));
             }

@@ -18,6 +18,8 @@ package io.frinx.cli.handlers.def;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
@@ -45,4 +47,8 @@ public class DefaultConfigReader implements CliConfigReader<Config, ConfigBuilde
         return instanceIdentifier.firstKeyOf(NetworkInstance.class).equals(NetworInstance.DEFAULT_NETWORK);
     }
 
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
+    }
 }

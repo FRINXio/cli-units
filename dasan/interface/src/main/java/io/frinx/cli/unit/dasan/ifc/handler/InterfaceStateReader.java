@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.dasan.ifc.handler;
 
-import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
@@ -33,7 +32,7 @@ public final class InterfaceStateReader extends CompositeReader<State, StateBuil
         implements CliOperReader<State, StateBuilder> {
 
     public InterfaceStateReader(Cli cli) {
-        super(new ArrayList<ReaderCustomizer<State,StateBuilder>>() {
+        super(new ArrayList<CompositeReader.Child<State,StateBuilder>>() {
             {
                 add(new PhysicalPortInterfaceStateReader(cli));
             }

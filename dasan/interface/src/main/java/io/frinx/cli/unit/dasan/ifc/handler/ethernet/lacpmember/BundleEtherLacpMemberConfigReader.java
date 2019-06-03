@@ -19,6 +19,8 @@ package io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpmember;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.dasan.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.dasan.ifc.handler.PhysicalPortInterfaceConfigWriter;
@@ -27,6 +29,7 @@ import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -43,7 +46,8 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BundleEtherLacpMemberConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public class BundleEtherLacpMemberConfigReader implements CliConfigReader<Config, ConfigBuilder>,
+        CompositeReader.Child<Config, ConfigBuilder> {
 
     private static final String AGGREGATE_IFC_NAME = "Bundle-Ether";
     @VisibleForTesting
@@ -152,5 +156,10 @@ public class BundleEtherLacpMemberConfigReader implements CliConfigReader<Config
     @Override
     public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
         ((EthernetBuilder) parentBuilder).setConfig(readValue);
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 }

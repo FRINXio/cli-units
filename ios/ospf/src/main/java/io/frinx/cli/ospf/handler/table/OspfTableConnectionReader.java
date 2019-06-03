@@ -19,6 +19,8 @@ package io.frinx.cli.ospf.handler.table;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -163,6 +165,11 @@ public class OspfTableConnectionReader implements
     public void merge(@Nonnull Builder<? extends DataObject> builder,
                       @Nonnull List<TableConnection> list) {
         // NOOP
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 
     @Override

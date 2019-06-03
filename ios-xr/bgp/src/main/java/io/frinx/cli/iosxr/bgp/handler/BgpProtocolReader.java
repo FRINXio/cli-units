@@ -19,9 +19,11 @@ package io.frinx.cli.iosxr.bgp.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +86,11 @@ public class BgpProtocolReader implements CliListReader<Protocol, ProtocolKey, P
             }
         }
         return rtn;
+    }
+
+    @Override
+    public Check getCheck() {
+        return ChecksMap.PathCheck.Protocol.BGP;
     }
 
     @VisibleForTesting

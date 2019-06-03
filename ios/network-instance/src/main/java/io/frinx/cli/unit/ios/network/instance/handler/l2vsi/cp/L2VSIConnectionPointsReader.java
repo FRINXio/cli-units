@@ -19,11 +19,14 @@ package io.frinx.cli.unit.ios.network.instance.handler.l2vsi.cp;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.read.Reader;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.cp.L2P2PConnectionPointsReader;
 import io.frinx.cli.unit.ios.network.instance.handler.l2vsi.L2VSIReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -149,4 +152,9 @@ public class L2VSIConnectionPointsReader implements CliConfigReader<ConnectionPo
                 .findFirst();
     }
 
+    @Override
+    public Check getCheck() {
+        return BasicCheck.checkData(ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+                ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2VSI);
+    }
 }

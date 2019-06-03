@@ -18,6 +18,8 @@ package io.frinx.cli.handlers.def;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
@@ -45,5 +47,10 @@ public class DefaultReader implements CliConfigListReader<NetworkInstance, Netwo
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         networkInstanceBuilder.setName(name);
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 }

@@ -18,6 +18,8 @@ package io.frinx.cli.unit.ios.network.instance.handler.l2vsi;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
@@ -51,5 +53,10 @@ public class L2VSIConfigReader implements CliConfigReader<Config, ConfigBuilder>
 
     private boolean isVSI(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {
         return L2VSIReader.getAllIds(id, readContext, cli, this).contains(id.firstKeyOf(NetworkInstance.class));
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 }

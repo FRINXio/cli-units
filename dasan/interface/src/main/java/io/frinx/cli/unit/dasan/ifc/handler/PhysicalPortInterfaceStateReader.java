@@ -19,6 +19,8 @@ package io.frinx.cli.unit.dasan.ifc.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliOperReader;
@@ -113,5 +115,10 @@ public class PhysicalPortInterfaceStateReader implements CliOperReader<State, St
             .map(m -> m.group("size"))
             .findFirst()
             .ifPresent(s -> builder.setMtu(Integer.valueOf(s)));
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 }

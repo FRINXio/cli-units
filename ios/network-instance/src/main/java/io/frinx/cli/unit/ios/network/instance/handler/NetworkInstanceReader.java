@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler;
 
-import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
 import io.frinx.cli.handlers.def.DefaultReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader;
@@ -34,7 +33,7 @@ public final class NetworkInstanceReader extends CompositeListReader<NetworkInst
         implements CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
     public NetworkInstanceReader(Cli cli) {
-        super(new ArrayList<ListReaderCustomizer<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {{
+        super(new ArrayList<CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {{
                 add(new L3VrfReader(cli));
                 add(new DefaultReader());
                 add(new L2P2PReader(cli));

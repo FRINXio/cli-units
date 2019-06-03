@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.brocade.network.instance;
 
-import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.L2P2PReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
@@ -31,7 +30,7 @@ public final class NetworkInstanceReader extends CompositeListReader<NetworkInst
         NetworkInstanceBuilder> {
 
     public NetworkInstanceReader(Cli cli) {
-        super(new ArrayList<ListReaderCustomizer<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {{
+        super(new ArrayList<CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {{
                 add(new L2P2PReader(cli));
             }
         });

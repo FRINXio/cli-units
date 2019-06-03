@@ -19,9 +19,11 @@ package io.frinx.cli.unit.junos.ospf.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -75,5 +77,10 @@ public class OspfProtocolConfigReader implements CliConfigReader<Config, ConfigB
         if (policyList != null && !policyList.isEmpty()) {
             builder.setExportPolicy(policyList);
         }
+    }
+
+    @Override
+    public Check getCheck() {
+        return ChecksMap.PathCheck.Protocol.OSPF;
     }
 }

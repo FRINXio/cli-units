@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.junos.network.instance.handler.vrf.protocol;
 
-import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.junos.ospf.handler.OspfProtocolConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
@@ -29,7 +28,7 @@ public class ProtocolConfigReader extends CompositeReader<Config, ConfigBuilder>
     implements CliConfigReader<Config, ConfigBuilder> {
 
     public ProtocolConfigReader(Cli cli) {
-        super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {{
+        super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {{
                 add(new OspfProtocolConfigReader(cli));
             }
         });

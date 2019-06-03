@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.iosxr.network.instance.handler;
 
-import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.handlers.def.DefaultStateReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
@@ -29,7 +28,7 @@ public final class NetworkInstanceStateReader extends CompositeReader<State, Sta
         implements CliOperReader<State, StateBuilder> {
 
     public NetworkInstanceStateReader(Cli cli) {
-        super(new ArrayList<ReaderCustomizer<State, StateBuilder>>() {{
+        super(new ArrayList<CompositeReader.Child<State, StateBuilder>>() {{
                 add(new DefaultStateReader());
             }
         });

@@ -18,6 +18,8 @@ package io.frinx.cli.ni.base.handler.l2p2p;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
@@ -40,6 +42,11 @@ public abstract class AbstractL2P2PReader
 
     protected AbstractL2P2PReader(Cli cli) {
         this.cli = cli;
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 
     @Nonnull

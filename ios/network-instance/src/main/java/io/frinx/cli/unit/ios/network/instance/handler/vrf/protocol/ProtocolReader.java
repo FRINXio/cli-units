@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol;
 
-import io.fd.honeycomb.translate.spi.read.ListReaderCustomizer;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.ios.local.routing.StaticLocalRoutingProtocolReader;
@@ -32,7 +31,7 @@ public class ProtocolReader extends CompositeListReader<Protocol, ProtocolKey, P
         implements CliConfigListReader<Protocol, ProtocolKey, ProtocolBuilder> {
 
     public ProtocolReader(Cli cli) {
-        super(new ArrayList<ListReaderCustomizer<Protocol, ProtocolKey, ProtocolBuilder>>() {
+        super(new ArrayList<CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder>>() {
             {
                 add(new OspfProtocolReader(cli));
                 add(new BgpProtocolReader(cli));

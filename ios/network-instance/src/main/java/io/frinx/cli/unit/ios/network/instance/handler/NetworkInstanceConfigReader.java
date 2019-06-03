@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler;
 
-import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.handlers.def.DefaultConfigReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PConfigReader;
@@ -32,7 +31,7 @@ public final class NetworkInstanceConfigReader extends CompositeReader<Config, C
         implements CliConfigReader<Config, ConfigBuilder> {
 
     public NetworkInstanceConfigReader(Cli cli) {
-        super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {{
+        super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {{
                 add(new L3VrfConfigReader(cli));
                 add(new DefaultConfigReader());
                 add(new L2P2PConfigReader(cli));

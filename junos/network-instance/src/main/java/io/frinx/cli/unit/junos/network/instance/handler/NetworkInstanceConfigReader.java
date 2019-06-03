@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.junos.network.instance.handler;
 
-import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.handlers.def.DefaultConfigReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.junos.network.instance.handler.vrf.L3VrfConfigReader;
@@ -30,7 +29,7 @@ public final class NetworkInstanceConfigReader extends CompositeReader<Config, C
         implements CliConfigReader<Config, ConfigBuilder> {
 
     public NetworkInstanceConfigReader(Cli cli) {
-        super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {{
+        super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {{
                 add(new DefaultConfigReader());
                 add(new L3VrfConfigReader(cli));
             }

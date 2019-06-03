@@ -19,6 +19,8 @@ package io.frinx.cli.ni.base.handler.vrf;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -42,6 +44,11 @@ public abstract class AbstractL3VrfConfigReader implements CliConfigReader<Confi
     protected AbstractL3VrfConfigReader(AbstractL3VrfReader parentReader, Cli cli) {
         this.parentReader = parentReader;
         this.cli = cli;
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 
     @Override
