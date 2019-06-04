@@ -36,7 +36,7 @@ public class LldpUnit extends AbstractUnit {
         this.delegate = new io.frinx.cli.unit.ios.lldp.LldpUnit(registry) {
             @Override
             protected Command getShowHostnameCommand() {
-                return Command.createUnCached("show running-config | utility egrep \"^hostname|^domain name\"");
+                return Command.showCommandNoCaching("show running-config | utility egrep \"^hostname|^domain name\"");
             }
         };
     }

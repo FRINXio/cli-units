@@ -21,7 +21,7 @@ import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
@@ -45,7 +45,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.OSPF;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpTableConnectionWriter implements CompositeWriter.Child<Config>, CliWriterFormatter<Config> {
+public class BgpTableConnectionWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
 
     private static final String UPDATE_REDIS = "configure terminal\n"
             + "router bgp {$bgp}\n"

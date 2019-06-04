@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +31,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.et
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BundleEtherLacpMemberConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
+public class BundleEtherLacpMemberConfigWriter implements CliWriter<Config>, CompositeWriter.Child<Config> {
 
     private final Cli cli;
     private static Pattern AGGREGATE_IFC_NAME = Pattern.compile("Bundle-Ether(?<id>\\d+)");

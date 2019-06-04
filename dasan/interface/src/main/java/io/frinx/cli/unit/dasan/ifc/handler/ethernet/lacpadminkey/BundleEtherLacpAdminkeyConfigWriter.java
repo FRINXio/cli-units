@@ -19,7 +19,7 @@ package io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpadminkey;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.ext.rev180926.Config1;
@@ -27,7 +27,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.et
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BundleEtherLacpAdminkeyConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
+public class BundleEtherLacpAdminkeyConfigWriter implements CliWriter<Config>, CompositeWriter.Child<Config> {
 
     private final Cli cli;
 

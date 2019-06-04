@@ -49,9 +49,9 @@ public class JunosCliInitializationStrategy implements SessionInitializationStra
     private static final int READ_TIMEOUT_SECONDS = 1;
     private static final int WRITE_TIMEOUT_SECONDS = 10;
 
-    private static final Command CONFIG_COMMAND = Command.create("configure");
-    private static final Command END_COMMAND = Command.create("exit configuration-mode");
-    private static final Command ABORT_COMMAND = Command.create("rollback 0");
+    private static final Command CONFIG_COMMAND = Command.writeCommand("configure");
+    private static final Command END_COMMAND = Command.writeCommand("exit configuration-mode");
+    private static final Command ABORT_COMMAND = Command.writeCommand("rollback 0");
     private static final String COMMIT = "commit";
 
     private static final Predicate<String> IS_SHELL_PROMPT = s -> SHELL_PROMPT_PATTERN.matcher(s).matches();
@@ -144,7 +144,7 @@ public class JunosCliInitializationStrategy implements SessionInitializationStra
             throws InterruptedException, ExecutionException {
 
         LOG.debug("{}: Executing commit command.", cli);
-        Command commit = Command.createCheckedCommand(COMMIT, errorCommitPatterns);
+        Command commit = Command.writeCommandCustomChecks(COMMIT, errorCommitPatterns);
         cli.executeAndRead(commit)
                 .toCompletableFuture()
                 .get();

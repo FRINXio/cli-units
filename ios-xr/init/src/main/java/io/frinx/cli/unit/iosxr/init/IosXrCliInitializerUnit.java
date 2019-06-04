@@ -61,10 +61,10 @@ public class IosXrCliInitializerUnit extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(IosXrCliInitializerUnit.class);
 
-    private static final Command ABORT = Command.create("abort");
+    private static final Command ABORT = Command.writeCommand("abort");
 
     @VisibleForTesting
-    static final Command SH_CONF_FAILED = Command.create("show configuration failed inheritance");
+    static final Command SH_CONF_FAILED = Command.showCommandNoCaching("show configuration failed inheritance");
 
     private IosXrCliInitializer initializer;
     private RemoteDeviceId deviceId;
@@ -125,7 +125,7 @@ public class IosXrCliInitializerUnit extends AbstractUnit {
             try {
                 Cli cli = context.getTransport();
                 try {
-                    final Command commit = Command.createCheckedCommand("commit", errorCommitPatterns);
+                    final Command commit = Command.writeCommandCustomChecks("commit", errorCommitPatterns);
                     cli.executeAndRead(commit)
                             .toCompletableFuture()
                             .get();

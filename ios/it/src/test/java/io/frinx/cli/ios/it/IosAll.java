@@ -22,9 +22,8 @@ import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.gson.stream.JsonWriter;
-import io.fd.honeycomb.data.ModifiableDataManager;
 import io.fd.honeycomb.data.ReadableDataManager;
-import io.fd.honeycomb.data.impl.ModifiableDataTreeDelegator;
+import io.fd.honeycomb.data.impl.ModifiableDirectDataTreeDelegator;
 import io.fd.honeycomb.data.impl.ReadableDataTreeDelegator;
 import io.fd.honeycomb.rpc.RpcRegistryBuilder;
 import io.fd.honeycomb.translate.impl.read.registry.CustomizerReadRegistryBuilder;
@@ -33,6 +32,7 @@ import io.fd.honeycomb.translate.read.registry.ReaderRegistry;
 import io.fd.honeycomb.translate.util.YangDAG;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.CliFlavour;
 import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.impl.IOConfigurationBuilder;
 import io.frinx.cli.io.impl.cli.KeepaliveCli;
@@ -188,6 +188,7 @@ public class IosAll {
 
         IOConfigurationBuilder ioConfigurationBuilder = new IOConfigurationBuilder()
                 .setId(remoteId)
+                .setCliFlavour(CliFlavour.CISCO)
                 .setCliConfiguration(getCliNode())
                 .setInitializer(translateContext.getInitializer(remoteId, getCliNode()))
                 .setPromptResolver(PromptResolutionStrategy.ENTER_AND_READ)
@@ -286,12 +287,22 @@ public class IosAll {
                                               ReaderRegistry readerRegistry,
                                               WriterRegistry writerRegistry,
                                               DataTree dataTree) {
-        ModifiableDataManager modTree = new ModifiableDataTreeDelegator(
-                serializer, dataTree, schemaContext, writerRegistry, contextBroker);
-        ReadableDataManager readTree = new ReadableDataTreeDelegator(
+        ReadableDataManager.Typed readTree = new ReadableDataTreeDelegator(
                 serializer, schemaContext, readerRegistry, contextBroker);
 
-        return io.fd.honeycomb.data.impl.DataBroker.create(modTree, readTree);
+        ModifiableDirectDataTreeDelegator modTree = new ModifiableDirectDataTreeDelegator(
+                serializer, dataTree, schemaContext, writerRegistry, contextBroker, readTree,
+            () -> {
+            },
+            () -> {
+            },
+            () -> {
+            },
+            e -> {
+            });
+
+        return new io.fd.honeycomb.data.impl.DataBroker(
+                new io.fd.honeycomb.data.impl.DataBroker.MainPipelineTxFactory(modTree, readTree));
     }
 
     @Ignore

@@ -22,7 +22,7 @@ import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
@@ -53,7 +53,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
-public class L2P2PConnectionPointsWriter implements CliWriterFormatter<ConnectionPoints>,
+public class L2P2PConnectionPointsWriter implements CliWriter<ConnectionPoints>,
         CompositeWriter.Child<ConnectionPoints> {
 
     public static final int NET_NAME_LENGTH = 15;

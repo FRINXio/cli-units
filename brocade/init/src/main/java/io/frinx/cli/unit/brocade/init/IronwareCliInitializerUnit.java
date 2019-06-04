@@ -47,7 +47,7 @@ public class IronwareCliInitializerUnit implements TranslateUnit {
             .setDeviceVersion("*")
             .build();
 
-    private static final Command WRITE_MEMORY = Command.createUncheckedCommand("write memory");
+    private static final Command WRITE_MEMORY = Command.writeCommandNoChecks("write memory");
 
     private TranslationUnitCollector registry;
     private TranslationUnitCollector.Registration reg;

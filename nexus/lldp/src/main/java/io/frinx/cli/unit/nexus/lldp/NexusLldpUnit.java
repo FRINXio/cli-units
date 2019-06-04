@@ -75,7 +75,7 @@ public class NexusLldpUnit extends AbstractUnit {
     }
 
     protected Command getShowHostnameCommand() {
-        return Command.createUnCached(LldpConfigReader.SHOW_HOSTNAME);
+        return Command.showCommandNoCaching(LldpConfigReader.SHOW_HOSTNAME);
     }
 
 }

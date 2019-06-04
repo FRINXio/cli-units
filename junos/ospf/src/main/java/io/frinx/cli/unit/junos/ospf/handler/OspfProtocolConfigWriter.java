@@ -19,7 +19,7 @@ package io.frinx.cli.unit.junos.ospf.handler;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
@@ -29,7 +29,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.extension.rev190117.ProtocolConfAug;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class OspfProtocolConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
+public class OspfProtocolConfigWriter implements CliWriter<Config>, CompositeWriter.Child<Config> {
 
     private Cli cli;
 

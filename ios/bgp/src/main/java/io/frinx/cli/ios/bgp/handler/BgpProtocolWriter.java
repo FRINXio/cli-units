@@ -18,14 +18,13 @@ package io.frinx.cli.ios.bgp.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.unit.utils.CliWriterFormatter;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpProtocolWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
+public class BgpProtocolWriter implements CompositeWriter.Child<Config> {
 
     @Override
     public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
