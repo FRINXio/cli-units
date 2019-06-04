@@ -46,8 +46,8 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
     private static final String PRIVILEGED_PROMPT_SUFFIX = "#";
     private static final String ENABLE_COMMAND = "enable";
     private static final String CONFIG_PROMPT_SUFFIX = "(config)#";
-    private static final Command CONFIG_COMMAND = Command.create("configure terminal");
-    private static final Command END_COMMAND = Command.create("end");
+    private static final Command CONFIG_COMMAND = Command.writeCommand("configure terminal");
+    private static final Command END_COMMAND = Command.writeCommand("end");
     private static final String SET_TERMINAL_LENGTH_COMMAND = "terminal length 0";
     private static final String SET_TERMINAL_WIDTH_COMMAND = "terminal width 0";
     private static final int WRITE_TIMEOUT_SECONDS = 10;

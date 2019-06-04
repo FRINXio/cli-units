@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.Set;
@@ -34,7 +34,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TrunkPortInterfaceConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
+public class TrunkPortInterfaceConfigWriter implements CliWriter<Config>, CompositeWriter.Child<Config> {
 
     public static final Set<Class<? extends InterfaceType>> PHYS_TRUNK_IFC_TYPES =
         Collections.singleton(Ieee8023adLag.class);

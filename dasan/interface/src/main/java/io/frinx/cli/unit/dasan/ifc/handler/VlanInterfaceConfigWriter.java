@@ -21,7 +21,7 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -31,7 +31,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L3ipvlan;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VlanInterfaceConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
+public class VlanInterfaceConfigWriter implements CliWriter<Config>, CompositeWriter.Child<Config> {
 
     private Cli cli;
 
