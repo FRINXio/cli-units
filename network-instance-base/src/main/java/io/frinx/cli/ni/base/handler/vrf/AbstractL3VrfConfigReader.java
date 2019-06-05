@@ -76,7 +76,7 @@ public abstract class AbstractL3VrfConfigReader implements CliConfigReader<Confi
 
         ParsingUtils.parseField(output,
             getDescriptionLine()::matcher,
-            matcher -> matcher.group("desc"),
+            matcher -> matcher.pattern().pattern().contains("?<desc>") ? matcher.group("desc") : null,
             builder::setDescription);
 
         // TODO set other attributes
