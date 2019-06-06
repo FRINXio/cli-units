@@ -25,7 +25,6 @@ import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
@@ -35,12 +34,14 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class StaticLocalRoutingProtocolReader implements CliConfigListReader<Protocol, ProtocolKey, ProtocolBuilder>,
         CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
+    private static final ProtocolKey DEFAULT_KEY = new ProtocolKey(STATIC.class, "default");
+    private static final List<ProtocolKey> PROTOCOL_KEYS = Collections.singletonList(DEFAULT_KEY);
+
     @Nonnull
     @Override
     public List<ProtocolKey> getAllIds(@Nonnull InstanceIdentifier<Protocol> id, @Nonnull ReadContext context) throws
             ReadFailedException {
-        String vrf = id.firstKeyOf(NetworkInstance.class).getName();
-        return Collections.singletonList(new ProtocolKey(STATIC.class, vrf));
+        return PROTOCOL_KEYS;
     }
 
     @Override
