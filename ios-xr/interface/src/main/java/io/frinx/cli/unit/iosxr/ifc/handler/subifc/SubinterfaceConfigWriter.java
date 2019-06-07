@@ -25,21 +25,17 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWriter {
 
-    private static final String UPDATE_TEMPLATE = "configure terminal\n"
-            + "interface {$name}\n"
+    private static final String UPDATE_TEMPLATE = "interface {$name}\n"
             + "{$data|update(description,description `$data.description`\n,no description\n)}"
             //  + "{$data|update(is_enabled,shutdown\n,no shutdown\n}"
             + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
-            + "end";
+            + "root";
 
-    private static final String DELETE_TEMPLATE = "configure terminal\n"
-            + "no interface ${name}\n"
-            + "end";
+    private static final String DELETE_TEMPLATE = "no interface ${name}";
 
     public SubinterfaceConfigWriter(Cli cli) {
         super(cli);
     }
-
 
     @Override
     protected String updateTemplate(Config before, Config after, InstanceIdentifier<Config> id) {
