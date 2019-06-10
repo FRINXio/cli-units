@@ -36,10 +36,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriterTest {
 
-    private static final String WRITE_INPUT = "set interfaces ge-0/0/4 description TEST\n\n";
+    private static final String WRITE_BASE = "edit interfaces ge-0/0/4\n%sexit\n";
 
-    private static final String UPDATE_INPUT = "delete interfaces ge-0/0/4 description\n"
-            + "set interfaces ge-0/0/4 disable\n";
+    private static final String WRITE_INPUT = "set description TEST\n";
+
+    private static final String UPDATE_INPUT = "delete description\n"
+            + "set disable\n";
 
     private static final String DELETE_INPUT = "delete interfaces ge-0/0/4\n";
 
@@ -74,11 +76,21 @@ public class InterfaceConfigWriterTest {
     }
 
     @Test
-    public void testWrite() throws WriteFailedException {
+    public void testWriteWithDesc() throws WriteFailedException {
         writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+        Assert.assertEquals(String.format(WRITE_BASE, WRITE_INPUT), response.getValue().getContent());
+    }
+
+    @Test
+    public void testWriteWithoutDesc() throws WriteFailedException {
+        data = new ConfigBuilder().setName("ge-0/0/4").setType(EthernetCsmacd.class)
+                .setEnabled(true).build();
+        writer.writeCurrentAttributes(iid, data, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(String.format(WRITE_BASE, ""), response.getValue().getContent());
     }
 
     @Test
@@ -89,7 +101,7 @@ public class InterfaceConfigWriterTest {
         writer.updateCurrentAttributes(iid, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+        Assert.assertEquals(String.format(WRITE_BASE, UPDATE_INPUT), response.getValue().getContent());
     }
 
     @Test
@@ -100,7 +112,7 @@ public class InterfaceConfigWriterTest {
         writer.updateCurrentAttributes(iid, beforedata, afterdata, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals("\n", response.getValue().getContent());
+        Assert.assertEquals(String.format(WRITE_BASE, ""), response.getValue().getContent());
     }
 
     @Test
