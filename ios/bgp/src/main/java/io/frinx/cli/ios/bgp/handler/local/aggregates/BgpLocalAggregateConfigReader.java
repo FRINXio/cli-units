@@ -18,10 +18,7 @@ package io.frinx.cli.ios.bgp.handler.local.aggregates;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
-import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.Aggregate;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.AggregateKey;
@@ -29,20 +26,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpLocalAggregateConfigReader implements CliConfigReader<Config, ConfigBuilder>,
-        CompositeReader.Child<Config, ConfigBuilder> {
+public class BgpLocalAggregateConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                             @Nonnull ConfigBuilder configBuilder,
-                                             @Nonnull ReadContext readContext) throws ReadFailedException {
+            @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         AggregateKey aggregateKey = instanceIdentifier.firstKeyOf(Aggregate.class);
 
         configBuilder.setPrefix(aggregateKey.getPrefix());
-    }
-
-    @Override
-    public Check getCheck() {
-        return ChecksMap.PathCheck.Protocol.BGP;
     }
 }
