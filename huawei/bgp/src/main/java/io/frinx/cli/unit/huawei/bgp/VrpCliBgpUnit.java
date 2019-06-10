@@ -123,7 +123,10 @@ public class VrpCliBgpUnit implements TranslateUnit {
 
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LOCALAGGREGATES);
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LO_AGGREGATE);
-        writeRegistry.add(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigWriter(cli));
+
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigWriter(cli),
+                IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG,
+                IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {

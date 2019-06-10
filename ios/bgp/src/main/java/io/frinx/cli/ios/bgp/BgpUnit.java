@@ -144,7 +144,8 @@ public class BgpUnit extends AbstractUnit {
                 IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP);
 
         writeRegistry.addAfter(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigWriter(cli),
-                IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
+                IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG,
+                IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
 
     }
 

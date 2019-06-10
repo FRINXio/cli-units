@@ -145,13 +145,13 @@ public class BgpUnit implements TranslateUnit {
                 NeighborAfiSafiPrefixLimitConfigWriter(cli), IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IP_CONFIG);
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LOCALAGGREGATES);
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_LO_AGGREGATE);
-        writeRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigWriter(cli),
-                Sets.newHashSet(
-                    RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_LO_AG_CO_AUG_NIPROTAGGAUG,
+
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigWriter(cli),
+                Sets.newHashSet(RWUtils.cutIdFromStart(IIDs.NE_NE_PR_PR_LO_AG_CO_AUG_NIPROTAGGAUG,
                         InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
-                                .local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class))
-                )
-        );
+                                .local.routing.rev170515.local.aggregate.top.local.aggregates.aggregate.Config.class))),
+                IIDs.NE_NE_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG,
+                IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
