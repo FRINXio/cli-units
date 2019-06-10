@@ -69,16 +69,19 @@ public final class BgpAfiSafiChecks {
     }
 
     private static Set<Class<? extends AFISAFITYPE>> getSpecificAfiSafis(final Bgp bgpConfigurationAfter) {
-        final Set<? extends Class<? extends AFISAFITYPE>> neighborsAfiSafis = Optional.ofNullable(
-                bgpConfigurationAfter.getNeighbors().getNeighbor())
+        final Set<? extends Class<? extends AFISAFITYPE>> neighborsAfiSafis = Optional.ofNullable(bgpConfigurationAfter)
+                .map(after -> after.getNeighbors())
+                .map(peers -> peers.getNeighbor())
                 .map(neighbors -> neighbors.stream()
                         .flatMap(neighbor -> Optional.ofNullable(neighbor.getAfiSafis().getAfiSafi())
                                 .map(afiSafis -> afiSafis.stream().map(afiSafi -> afiSafi.getAfiSafiName()))
                                 .orElse(Stream.empty()))
                         .collect(Collectors.toSet()))
                 .orElse(Collections.emptySet());
-        final Set<? extends Class<? extends AFISAFITYPE>> peerGroupsAfiSafis = Optional.ofNullable(
-                bgpConfigurationAfter.getPeerGroups().getPeerGroup())
+        final Set<? extends Class<? extends AFISAFITYPE>> peerGroupsAfiSafis = Optional
+                .ofNullable(bgpConfigurationAfter)
+                .map(after -> after.getPeerGroups())
+                .map(groups -> groups.getPeerGroup())
                 .map(peerGroups -> peerGroups.stream()
                         .flatMap(peerGroup -> Optional.ofNullable(peerGroup.getAfiSafis().getAfiSafi())
                                 .map(afiSafis -> afiSafis.stream().map(afiSafi -> afiSafi.getAfiSafiName()))
