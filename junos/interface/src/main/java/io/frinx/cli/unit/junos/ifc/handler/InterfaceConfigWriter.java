@@ -34,8 +34,8 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{$data|update(description,"
             + "set description `$data.description`\n,"
             + "delete description\n)}"
-            + "{% if ($enabled && $enabled == TRUE) %}delete disable\n"
-            + "{% elseIf (!$enabled) %}set disable\n{% endif %}"
+            + "{% if ($enabled == TRUE) %}delete disable\n"
+            + "{% elseIf ($enabled == FALSE) %}set disable\n{% endif %}"
             + "exit";
 
     private Cli cli;
@@ -56,19 +56,41 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
     @Override
     protected String updateTemplate(Config before, Config after) {
         // when "disable" is not set, "delete interface disable" will cause a error
-        String enabled = "false";
+        String enabled = null;
 
-        if (before != null && before.isEnabled() != null && !before.isEnabled()) {
-            if (after.isEnabled() != null && after.isEnabled()) {
-                enabled = Chunk.TRUE;
-            }
-        } else {
-            if (after.isEnabled() != null && !after.isEnabled()) {
-                enabled = null;
-            }
+        if (wasDisabled(before) && isEnabled(after)) {
+            enabled = Chunk.TRUE;
+        }
+
+        if (wasDisabled(before) && isDisabled(after)) {
+            enabled = null;
+        }
+
+        if (wasEnabled(before) && isDisabled(after)) {
+            enabled = "FALSE";
+        }
+
+        if (wasEnabled(before) && isEnabled(after)) {
+            enabled = null;
         }
 
         return fT(WRITE_TEMPLATE, "before", before, "data", after, "enabled", enabled);
+    }
+
+    private boolean isDisabled(Config after) {
+        return after == null || after.isEnabled() == null || !after.isEnabled();
+    }
+
+    private boolean isEnabled(Config after) {
+        return !isDisabled(after);
+    }
+
+    private boolean wasDisabled(Config before) {
+        return before == null || before.isEnabled() == null || !before.isEnabled();
+    }
+
+    private boolean wasEnabled(Config before) {
+        return !wasDisabled(before);
     }
 
     @Override

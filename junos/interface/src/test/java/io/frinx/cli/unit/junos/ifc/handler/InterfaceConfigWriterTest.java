@@ -80,7 +80,8 @@ public class InterfaceConfigWriterTest {
         writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(String.format(WRITE_BASE, WRITE_INPUT), response.getValue().getContent());
+        Assert.assertEquals(String.format(WRITE_BASE, WRITE_INPUT + "delete disable\n"),
+                response.getValue().getContent());
     }
 
     @Test
@@ -90,7 +91,7 @@ public class InterfaceConfigWriterTest {
         writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(String.format(WRITE_BASE, ""), response.getValue().getContent());
+        Assert.assertEquals(String.format(WRITE_BASE, "delete disable\n"), response.getValue().getContent());
     }
 
     @Test
@@ -102,6 +103,24 @@ public class InterfaceConfigWriterTest {
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(String.format(WRITE_BASE, UPDATE_INPUT), response.getValue().getContent());
+    }
+
+    @Test
+    public void testUpdateEnable() throws WriteFailedException {
+        data = new ConfigBuilder().setName("ge-0/0/4")
+                .setType(EthernetCsmacd.class)
+                .setEnabled(true)
+                .build();
+
+        Config newData = new ConfigBuilder()
+                .setName("ge-0/0/4")
+                .setType(EthernetCsmacd.class)
+                .build();
+
+        writer.updateCurrentAttributes(iid, data, newData, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertTrue(response.getValue().getContent().contains("set disable"));
     }
 
     @Test
