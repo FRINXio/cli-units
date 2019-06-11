@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    public static final String SH_SUMM = "show running-config | include ^router bgp|^ *address-family|^ *neighbor %s";
+    public static final String SH_SUMM = "show running-config | include ^router bgp|^ *address-family|^ *neighbor %s ";
     private static final String PASSWORD_FORM = "Encrypted[%s]";
 
     private static final Pattern NEIGHBOR_ACTIVATE_PATTERN =
