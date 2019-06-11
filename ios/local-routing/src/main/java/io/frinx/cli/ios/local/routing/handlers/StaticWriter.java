@@ -16,7 +16,6 @@
 
 package io.frinx.cli.ios.local.routing.handlers;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -53,19 +52,17 @@ public class StaticWriter implements CliListWriter<Static, StaticKey> {
         return new SubnetUtils(new String(config.getValue())).getInfo();
     }
 
-    private void doPreconditions(NextHops nextHops) {
-        Preconditions.checkNotNull(nextHops, "Next hops not defined");
-        Preconditions.checkNotNull(nextHops.getNextHop(), "Next hops not defined");
-        Preconditions.checkArgument(!nextHops.getNextHop().isEmpty(), "Next hops not defined");
+    private boolean checkPreconditions(NextHops nextHops) {
+        return !(nextHops == null || nextHops.getNextHop() == null || nextHops.getNextHop().isEmpty());
     }
 
     @Override
     public void writeCurrentAttributes(InstanceIdentifier<Static> id, Static config,
                                               WriteContext writeContext) throws WriteFailedException {
         NextHops nextHops = config.getNextHops();
-        doPreconditions(nextHops);
-
-        writeStaticRoutes(id, config, nextHops.getNextHop());
+        if (checkPreconditions(nextHops)) {
+            writeStaticRoutes(id, config, nextHops.getNextHop());
+        }
     }
 
     private void writeStaticRoutes(InstanceIdentifier<Static> id, Static config, Collection<NextHop> hops)
@@ -97,9 +94,9 @@ public class StaticWriter implements CliListWriter<Static, StaticKey> {
     public void deleteCurrentAttributes(InstanceIdentifier<Static> id, Static config,
                                                WriteContext writeContext) throws WriteFailedException {
         NextHops nextHops = config.getNextHops();
-        doPreconditions(nextHops);
-
-        deleteStaticRoutes(id, config, nextHops.getNextHop());
+        if (checkPreconditions(nextHops)) {
+            deleteStaticRoutes(id, config, nextHops.getNextHop());
+        }
     }
 
     private void deleteStaticRoutes(InstanceIdentifier<Static> id, Static config, Collection<NextHop> hops)
