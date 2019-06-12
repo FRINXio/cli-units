@@ -22,12 +22,9 @@ import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.acl.set.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AclSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
@@ -43,10 +40,5 @@ public class AclSetConfigReader implements CliConfigReader<Config, ConfigBuilder
                 .setName(aclName)
                 .setType(aclType)
                 .build();
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((AclSetBuilder) builder).setConfig(config);
     }
 }

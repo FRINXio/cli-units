@@ -26,13 +26,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.IngressFlowsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.ingress.flows.IngressFlow;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.ingress.flows.IngressFlowBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.ingress.netflow.top.ingress.flows.IngressFlowKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.interfaces.Interface;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class IngressFlowReader implements CliConfigListReader<IngressFlow, IngressFlowKey, IngressFlowBuilder> {
@@ -62,11 +59,6 @@ public class IngressFlowReader implements CliConfigListReader<IngressFlow, Ingre
             matcher -> NetflowUtils.getType(matcher.group("type")),
                 IngressFlowKey::new
         );
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<IngressFlow> list) {
-        ((IngressFlowsBuilder) builder).setIngressFlow(list);
     }
 
     @Override

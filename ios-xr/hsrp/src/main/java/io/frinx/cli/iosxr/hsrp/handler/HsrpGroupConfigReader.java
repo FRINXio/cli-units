@@ -28,12 +28,9 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.hsrp.groups.HsrpGroup;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.hsrp.groups.HsrpGroupBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.hsrp.groups.hsrp.group.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.hsrp.groups.hsrp.group.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.ADDRESSFAMILY;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class HsrpGroupConfigReader implements CliConfigReader<Config, ConfigBuilder> {
@@ -51,11 +48,6 @@ public class HsrpGroupConfigReader implements CliConfigReader<Config, ConfigBuil
 
     public HsrpGroupConfigReader(final Cli cli) {
         this.cli = cli;
-    }
-
-    @Override
-    public void merge(Builder<? extends DataObject> builder, Config config) {
-        ((HsrpGroupBuilder) builder).setConfig(config);
     }
 
     @VisibleForTesting

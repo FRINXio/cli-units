@@ -36,9 +36,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev17
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.logging.interfaces.structural.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.logging.interfaces.structural.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.logging.interfaces.structural.interfaces._interface.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.logging.top.LoggingBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class LoggingInterfacesReader implements CliConfigReader<Interfaces, InterfacesBuilder> {
@@ -100,11 +97,5 @@ public class LoggingInterfacesReader implements CliConfigReader<Interfaces, Inte
     private static String realignLoggingEnabledInterfacesOutput(String output) {
         String withoutNewlines = output.replaceAll(ParsingUtils.NEWLINE.pattern(), "");
         return withoutNewlines.replace("interface ", "\n");
-    }
-
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Interfaces readValue) {
-        ((LoggingBuilder) parentBuilder).setInterfaces(readValue);
     }
 }

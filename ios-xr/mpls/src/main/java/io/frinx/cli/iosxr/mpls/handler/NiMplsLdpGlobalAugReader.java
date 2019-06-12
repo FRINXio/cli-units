@@ -27,9 +27,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp.global.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NiMplsLdpGlobalAugReader implements CliConfigReader<NiMplsLdpGlobalAug, NiMplsLdpGlobalAugBuilder> {
@@ -61,10 +58,4 @@ public class NiMplsLdpGlobalAugReader implements CliConfigReader<NiMplsLdpGlobal
             configBuilder.setEnabled(true);
         }
     }
-
-    @Override
-    public void merge(Builder<? extends DataObject> arg0, NiMplsLdpGlobalAug arg1) {
-        ((ConfigBuilder) arg0).addAugmentation(NiMplsLdpGlobalAug.class, arg1);
-    }
-
 }

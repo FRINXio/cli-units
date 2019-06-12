@@ -17,48 +17,39 @@
 package io.frinx.cli.iosxr.conf;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.conf.handler.ConfigMetadataReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.configuration.metadata.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.configuration.metadata.rev180731.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class ConfigurationUnit implements TranslateUnit {
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class ConfigurationUnit extends AbstractUnit {
 
     public ConfigurationUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS XR Configuration Metadata unit";
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final TranslateUnit.Context context) {
-        return Sets.newHashSet();
     }
 
     @Override
@@ -70,11 +61,6 @@ public class ConfigurationUnit implements TranslateUnit {
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.add(new GenericOperReader<>(IIDs.CONFIGURATIONMETADATA, new ConfigMetadataReader(cli)));
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR Configuration Metadata unit";
+        readRegistry.add(IIDs.CONFIGURATIONMETADATA, new ConfigMetadataReader(cli));
     }
 }

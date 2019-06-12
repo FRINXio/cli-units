@@ -25,12 +25,9 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.TunnelsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.Tunnel;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.TunnelBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.TunnelKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class TunnelReader implements CliConfigListReader<Tunnel, TunnelKey, TunnelBuilder> {
@@ -44,7 +41,6 @@ public class TunnelReader implements CliConfigListReader<Tunnel, TunnelKey, Tunn
         this.cli = cli;
     }
 
-
     @Override
     public List<TunnelKey> getAllIds(@Nonnull InstanceIdentifier<Tunnel> instanceIdentifier, @Nonnull
             ReadContext readContext) throws ReadFailedException {
@@ -56,11 +52,6 @@ public class TunnelReader implements CliConfigListReader<Tunnel, TunnelKey, Tunn
     static List<TunnelKey> getTunnelKeys(String output) {
         return ParsingUtils.parseFields(output, 0, TUNNEL_TE_IFACE_LINE::matcher,
             matcher -> matcher.group("name"), TunnelKey::new);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Tunnel> readData) {
-        ((TunnelsBuilder) builder).setTunnel(readData);
     }
 
     @Override

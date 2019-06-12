@@ -26,12 +26,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.InterfaceKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class TeInterfaceReader implements CliConfigListReader<Interface, InterfaceKey,
@@ -60,11 +57,6 @@ public class TeInterfaceReader implements CliConfigListReader<Interface, Interfa
                 INTF_LINE::matcher,
             matcher -> matcher.group("id"),
             v -> new InterfaceKey(new InterfaceId(v)));
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Interface> readData) {
-        ((TeInterfaceAttributesBuilder) builder).setInterface(readData);
     }
 
     @Override

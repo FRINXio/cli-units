@@ -25,12 +25,9 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.community.set.top.CommunitySetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.community.set.top.community.sets.CommunitySet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.community.set.top.community.sets.CommunitySetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.community.set.top.community.sets.CommunitySetKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class CommunitySetReader implements CliConfigListReader<CommunitySet, CommunitySetKey, CommunitySetBuilder> {
@@ -58,11 +55,6 @@ public class CommunitySetReader implements CliConfigListReader<CommunitySet, Com
                 ID_PATTERN::matcher,
             m -> m.group("id"),
                 CommunitySetKey::new);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<CommunitySet> readData) {
-        ((CommunitySetsBuilder) builder).setCommunitySet(readData);
     }
 
     @Override

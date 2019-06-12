@@ -17,44 +17,35 @@
 package io.frinx.cli.iosxr.ospfv3;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.ospfv3.handler.StubRouterConfigReader;
 import io.frinx.cli.iosxr.ospfv3.handler.StubRouterConfigWriter;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.ospfv3.IIDs;
-import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class OspfV3Unit implements TranslateUnit {
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class OspfV3Unit extends AbstractUnit {
 
     public OspfV3Unit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+        super(registry);
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
+    }
+
+    @Override
+    protected String getUnitName() {
+        return "IOS XR OSPFv3 unit";
     }
 
     @Override
@@ -82,10 +73,5 @@ public class OspfV3Unit implements TranslateUnit {
                 $YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
                 .ospfv3.types.rev180817.$YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR OSPFv3 unit";
     }
 }

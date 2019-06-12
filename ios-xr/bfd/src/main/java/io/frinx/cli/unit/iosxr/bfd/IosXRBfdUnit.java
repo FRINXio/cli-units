@@ -17,53 +17,35 @@
 package io.frinx.cli.unit.iosxr.bfd;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.write.GenericListWriter;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.bfd.handler.ConfigReader;
 import io.frinx.cli.unit.iosxr.bfd.handler.ConfigWriter;
 import io.frinx.cli.unit.iosxr.bfd.handler.InterfaceReader;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
-import io.frinx.cli.unit.utils.NoopCliWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.bfd.IIDs;
-import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.ext.rev180211.IfBfdExtAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.rev171117.bfd.top.BfdBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.rev171117.bfd.top.bfd.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.rev171117.bfd.top.bfd.interfaces._interface.Config;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class IosXRBfdUnit implements TranslateUnit {
-
-    private static final InstanceIdentifier<Config> CONFIG_INSTANCE_IDENTIFIER_ROOT
-            = InstanceIdentifier.create(Config.class);
-
-    private final TranslationUnitCollector translationRegistry;
-    private TranslationUnitCollector.Registration reg;
+public class IosXRBfdUnit extends AbstractUnit {
 
     public IosXRBfdUnit(@Nonnull final TranslationUnitCollector translationRegistry) {
-        this.translationRegistry = translationRegistry;
+        super(translationRegistry);
     }
 
-    public void init() {
-        reg = translationRegistry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS XR BFD (Openconfig) translation unit";
     }
 
     @Override
@@ -73,12 +55,6 @@ public class IosXRBfdUnit implements TranslateUnit {
                         .$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.ext.rev180211
                         .$YangModuleInfoImpl.getInstance());
-
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return new HashSet<>();
     }
 
     @Override
@@ -90,25 +66,16 @@ public class IosXRBfdUnit implements TranslateUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.add(new GenericWriter<>(IIDs.BFD, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.BF_INTERFACES, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericListWriter<>(IIDs.BF_IN_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.subtreeAdd(Sets.newHashSet(
-                CONFIG_INSTANCE_IDENTIFIER_ROOT.augmentation(IfBfdExtAug.class)
-        ), new GenericWriter<>(IIDs.BF_IN_IN_CONFIG, new ConfigWriter(cli)));
+        writeRegistry.addNoop(IIDs.BFD);
+        writeRegistry.addNoop(IIDs.BF_INTERFACES);
+        writeRegistry.addNoop(IIDs.BF_IN_INTERFACE);
+        writeRegistry.subtreeAdd(IIDs.BF_IN_IN_CONFIG, new ConfigWriter(cli),
+                Sets.newHashSet(IIDs.BF_IN_IN_CO_AUG_IFBFDEXTAUG));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.BFD, BfdBuilder.class);
-        readRegistry.addStructuralReader(IIDs.BF_INTERFACES, InterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.BF_IN_INTERFACE, new InterfaceReader(cli)));
-        readRegistry.subtreeAdd(Sets.newHashSet(
-                CONFIG_INSTANCE_IDENTIFIER_ROOT.augmentation(IfBfdExtAug.class)
-        ), new GenericConfigReader<>(IIDs.BF_IN_IN_CONFIG, new ConfigReader(cli)));
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR BFD (Openconfig) translation unit";
+        readRegistry.add(IIDs.BF_IN_INTERFACE, new InterfaceReader(cli));
+        readRegistry.subtreeAdd(IIDs.BF_IN_IN_CONFIG, new ConfigReader(cli),
+                Sets.newHashSet(IIDs.BF_IN_IN_CO_AUG_IFBFDEXTAUG));
     }
 }

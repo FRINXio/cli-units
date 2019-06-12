@@ -17,19 +17,12 @@
 package io.frinx.cli.unit.iosxr.ifc;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.write.GenericListWriter;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
-import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.ifc.handler.HoldTimeConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.HoldTimeConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
@@ -62,53 +55,31 @@ import io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckIpv4Writer;
 import io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckIpv6Writer;
 import io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckReader;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
-import io.frinx.cli.unit.utils.NoopCliWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.damping.rev171024.IfDampAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.damping.rev171024.damping.top.DampingBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Interface1Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.aggregation.logical.top.AggregationBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd.rev171024.IfLagBfdAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd.rev171024.bfd.top.BfdBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoStatsAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.statistics.top.StatisticsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.verify.unicast.source.reachable.via.top.VerifyUnicastSourceReachableVia;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.EthernetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface2Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.Ipv4Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.AddressesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.Ipv6Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.RouterAdvertisementBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222._interface.phys.holdtime.top.HoldTimeBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.VlanBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public final class IosXRInterfaceUnit implements TranslateUnit {
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public final class IosXRInterfaceUnit extends AbstractUnit {
 
     public IosXRInterfaceUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS XR Interface (Openconfig) translate unit";
     }
 
     @Override
@@ -133,11 +104,6 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member
                         .rev171109.$YangModuleInfoImpl.getInstance(),
                 $YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final Context context) {
-        return Sets.newHashSet();
     }
 
     private static final CheckRegistry CHECK_REGISTRY;
@@ -183,181 +149,107 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                             .rev171024.ipv6.verify.Ipv6.class);
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
+        writeRegistry.addNoop(IIDs.IN_INTERFACE);
+        writeRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli));
 
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SUBINTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli)),
+        writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
+        writeRegistry.addAfter(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli),
                 IIDs.IN_IN_CONFIG);
-        writeRegistry.addAfter(new GenericWriter<>(
-                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
-                        new SubinterfaceVlanConfigWriter(cli)), IIDs.IN_IN_SU_SU_CONFIG);
+        writeRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
+                        new SubinterfaceVlanConfigWriter(cli), IIDs.IN_IN_SU_SU_CONFIG);
 
-        writeRegistry.add(new GenericWriter<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
-                new NoopCliListWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
-                        new Ipv4ConfigWriter(cli)), IIDs.IN_IN_CONFIG);
+        writeRegistry.addNoop(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS);
+        writeRegistry.addAfter(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
+                        new Ipv4ConfigWriter(cli), IIDs.IN_IN_CONFIG);
 
         // TODO implement IPv6 writers, NOOP writers are just workaround so we
         // provide at least some writers for IPv6 data
-        writeRegistry.add(new GenericWriter<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_ADDRESS,
-                new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_AD_CONFIG,
-                new Ipv6ConfigWriter(cli)));
+        writeRegistry.addNoop(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_ADDRESS);
+        writeRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_AD_CONFIG,
+                new Ipv6ConfigWriter(cli));
 
-        writeRegistry.add(new GenericWriter<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_RO_CONFIG,
-                new Ipv6AdvertisementConfigWriter(cli)));
+        writeRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_RO_CONFIG,
+                new Ipv6AdvertisementConfigWriter(cli));
 
         // hold-time
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_HO_CONFIG, new HoldTimeConfigWriter(cli)),
+        writeRegistry.addAfter(IIDs.IN_IN_HO_CONFIG, new HoldTimeConfigWriter(cli),
                 IIDs.IN_IN_CONFIG);
 
         // if-aggregation
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_AGGREGATION, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_AG_CONFIG, new AggregateConfigWriter(cli)),
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1_AGGREGATION);
+        writeRegistry.addAfter(IIDs.IN_IN_AUG_INTERFACE1_AG_CONFIG, new AggregateConfigWriter(cli),
                 IIDs.IN_IN_CONFIG);
 
         // bfd
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AG_AUG_IFLAGBFDAUG_BFD, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_AG_AUG_IFLAGBFDAUG_BF_CONFIG,
-                new BfdConfigWriter(cli)), IIDs.IN_IN_CONFIG);
+        writeRegistry.addNoop(IIDs.IN_IN_AG_AUG_IFLAGBFDAUG_BFD);
+        writeRegistry.addAfter(IIDs.IN_IN_AG_AUG_IFLAGBFDAUG_BF_CONFIG, new BfdConfigWriter(cli), IIDs.IN_IN_CONFIG);
 
         // damping
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_AUG_IFDAMPAUG_DA_CONFIG,
-                        new InterfaceDampingConfigWriter(cli)), IIDs.IN_IN_CONFIG);
+        writeRegistry.addAfter(IIDs.IN_IN_AUG_IFDAMPAUG_DA_CONFIG,
+                new InterfaceDampingConfigWriter(cli), IIDs.IN_IN_CONFIG);
 
         // cisco-if extensions
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG,
-                        new InterfaceStatisticsConfigWriter(cli)), IIDs.IN_IN_CONFIG);
+        writeRegistry.addAfter(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG,
+                        new InterfaceStatisticsConfigWriter(cli), IIDs.IN_IN_CONFIG);
 
         // if-ethernet
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET, new NoopCliWriter<>()));
-        writeRegistry.subtreeAddAfter(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.IN_IN_ET_CO_AUG_CONFIG1, IFC_ETH_CONFIG_ROOT_ID),
-                RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG,
-                        IFC_ETH_CONFIG_ROOT_ID)),
-                new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli)),
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET);
+        writeRegistry.subtreeAddAfter(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli),
+                Sets.newHashSet(IIDs.IN_IN_ET_CO_AUG_CONFIG1,
+                io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG),
                 IIDs.IN_IN_CONFIG);
 
         // RPF check
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_VERIFYUNICASTSOURCEREACHABLEVIA,
-                new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_VE_IPV4, new RpfCheckIpv4Writer(cli)));
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_AUG_INTERFACE1_VE_IPV6, new RpfCheckIpv6Writer(cli)));
-
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1_VERIFYUNICASTSOURCEREACHABLEVIA);
+        writeRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_VE_IPV4, new RpfCheckIpv4Writer(cli));
+        writeRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_VE_IPV6, new RpfCheckIpv6Writer(cli));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.INTERFACES, InterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.IN_INTERFACE, new InterfaceReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));
+        readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
+        readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli));
 
-        readRegistry.addStructuralReader(IIDs.IN_IN_SUBINTERFACES, SubinterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli)));
+        readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli));
+        readRegistry.add(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli));
 
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1,
-                Subinterface1Builder.class);
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IPV4,
-                Ipv4Builder.class);
-        readRegistry.addStructuralReader(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_ADDRESSES,
-                AddressesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
-                new Ipv4AddressReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
-                new Ipv4ConfigReader(cli)));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
+                new Ipv4AddressReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
+                new Ipv4ConfigReader(cli));
 
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2,
-                Subinterface2Builder.class);
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IPV6,
-                Ipv6Builder.class);
-        readRegistry.addStructuralReader(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_ADDRESSES,
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top
-                        .ipv6.AddressesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_ADDRESS,
-                new Ipv6AddressReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_AD_CONFIG,
-                new Ipv6ConfigReader(cli)));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_ADDRESS,
+                new Ipv6AddressReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_AD_CONFIG,
+                new Ipv6ConfigReader(cli));
 
-        readRegistry.addStructuralReader(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_ROUTERADVERTISEMENT,
-                RouterAdvertisementBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_RO_CONFIG,
-                new Ipv6AdvertisementConfigReader(cli)));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_RO_CONFIG,
+                new Ipv6AdvertisementConfigReader(cli));
 
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1,
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Subinterface1Builder.class);
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VLAN,
-                VlanBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(
-                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
-                new SubinterfaceVlanConfigReader(cli)));
+        readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
+                new SubinterfaceVlanConfigReader(cli));
 
         // hold-time
-        readRegistry.addStructuralReader(IIDs.IN_IN_HOLDTIME, HoldTimeBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_HO_CONFIG, new HoldTimeConfigReader(cli)));
+        readRegistry.add(IIDs.IN_IN_HO_CONFIG, new HoldTimeConfigReader(cli));
 
         // if-aggregation
-        readRegistry.addStructuralReader(IIDs.INT_INT_AUG_INTERFACE1, Interface1Builder.class);
-        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_INTERFACE1_AGGREGATION, AggregationBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_AUG_INTERFACE1_AG_CONFIG,
-                new AggregateConfigReader(cli)));
+        readRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_AG_CONFIG, new AggregateConfigReader(cli));
 
         // bfd
-        readRegistry.addStructuralReader(IIDs.IN_IN_AG_AUG_IFLAGBFDAUG, IfLagBfdAugBuilder.class);
-        readRegistry.addStructuralReader(IIDs.IN_IN_AG_AUG_IFLAGBFDAUG_BFD, BfdBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_AG_AUG_IFLAGBFDAUG_BF_CONFIG,
-                new BfdConfigReader(cli)));
+        readRegistry.add(IIDs.IN_IN_AG_AUG_IFLAGBFDAUG_BF_CONFIG, new BfdConfigReader(cli));
 
         // damping
-        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_IFDAMPAUG, IfDampAugBuilder.class);
-        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_IFDAMPAUG_DAMPING, DampingBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_AUG_IFDAMPAUG_DA_CONFIG,
-                new InterfaceDampingConfigReader(cli)));
+        readRegistry.add(IIDs.IN_IN_AUG_IFDAMPAUG_DA_CONFIG, new InterfaceDampingConfigReader(cli));
 
         // cisco if-extensions
-        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_IFCISCOSTATSAUG, IfCiscoStatsAugBuilder.class);
-        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_STATISTICS, StatisticsBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG,
-                new InterfaceStatisticsConfigReader(cli)));
+        readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG, new InterfaceStatisticsConfigReader(cli));
 
         // if-ethernet
-        readRegistry.addStructuralReader(IIDs.INTER_INTER_AUG_INTERFACE1,
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet
-                        .rev161222.Interface1Builder.class);
-        readRegistry.addStructuralReader(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET, EthernetBuilder.class);
-        readRegistry.subtreeAdd(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.IN_IN_ET_CO_AUG_CONFIG1, IFC_ETH_CONFIG_ROOT_ID),
-                RWUtils.cutIdFromStart(io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG,
-                        IFC_ETH_CONFIG_ROOT_ID)),
-                new GenericConfigReader<>(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli)));
+        readRegistry.subtreeAdd(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli),
+                Sets.newHashSet(IIDs.IN_IN_ET_CO_AUG_CONFIG1,
+                io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG));
 
         // RPF check
-        readRegistry.addStructuralReader(IIDs.INTE_INTE_AUG_INTERFACE1,
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco
-                        .rev171024.Interface1Builder.class);
-        readRegistry.subtreeAdd(
-                Sets.newHashSet(RPF_IPV4_SUBTREE_IID, RPF_IPV6_SUBTREE_IID),
-                new GenericConfigReader<>(IIDs.IN_IN_AUG_INTERFACE1_VERIFYUNICASTSOURCEREACHABLEVIA,
-                        new RpfCheckReader(cli))
-        );
+        readRegistry.subtreeAdd(IIDs.IN_IN_AUG_INTERFACE1_VERIFYUNICASTSOURCEREACHABLEVIA, new RpfCheckReader(cli),
+                Sets.newHashSet(RPF_IPV4_SUBTREE_IID, RPF_IPV6_SUBTREE_IID));
     }
-
-    @Override
-    public String toString() {
-        return "IOS XR Interface (Openconfig) translate unit";
-    }
-
 }

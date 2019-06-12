@@ -21,11 +21,8 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes._interface.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class RsvpInterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
@@ -35,10 +32,5 @@ public class RsvpInterfaceConfigReader implements CliConfigReader<Config, Config
             ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         configBuilder.setInterfaceId(instanceIdentifier.firstKeyOf(Interface.class)
                 .getInterfaceId());
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
-        ((InterfaceBuilder) parentBuilder).setConfig(readValue);
     }
 }

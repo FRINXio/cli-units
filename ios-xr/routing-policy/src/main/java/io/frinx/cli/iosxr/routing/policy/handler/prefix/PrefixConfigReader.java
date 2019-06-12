@@ -21,12 +21,9 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.Prefix;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.PrefixBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.PrefixKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.prefix.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.prefix.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixConfigReader implements CliConfigReader<Config, ConfigBuilder> {
@@ -37,10 +34,5 @@ public class PrefixConfigReader implements CliConfigReader<Config, ConfigBuilder
         PrefixKey prefixKey = id.firstKeyOf(Prefix.class);
         builder.setIpPrefix(prefixKey.getIpPrefix());
         builder.setMasklengthRange(prefixKey.getMasklengthRange());
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
-        ((PrefixBuilder) parentBuilder).setConfig(readValue);
     }
 }

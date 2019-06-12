@@ -17,14 +17,8 @@
 package io.frinx.cli.iosxr.unit.acl;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.write.GenericListWriter;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
-import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.unit.acl.handler.AclEntryReader;
 import io.frinx.cli.iosxr.unit.acl.handler.AclEntryWriter;
@@ -39,43 +33,29 @@ import io.frinx.cli.iosxr.unit.acl.handler.IngressAclSetConfigReader;
 import io.frinx.cli.iosxr.unit.acl.handler.IngressAclSetConfigWriter;
 import io.frinx.cli.iosxr.unit.acl.handler.IngressAclSetReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
-import io.frinx.cli.unit.utils.NoopCliWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.acl.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSetsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.AclEntriesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSetsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.top.AclBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.$YangModuleInfoImpl;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class AclUnit implements TranslateUnit {
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    private static final InstanceIdentifier<AclEntry> ACL_ENTRY_TREE_BASE = InstanceIdentifier.create(AclEntry.class);
+public class AclUnit extends AbstractUnit {
 
     public AclUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS XR ACL unit";
     }
 
     @Override
@@ -89,11 +69,6 @@ public class AclUnit implements TranslateUnit {
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final Context context) {
-        return Sets.newHashSet();
-    }
-
-    @Override
     public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
@@ -103,115 +78,83 @@ public class AclUnit implements TranslateUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.add(new GenericWriter<>(IIDs.ACL, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_CONFIG, new NoopCliWriter<>()));
+        writeRegistry.addNoop(IIDs.ACL);
+        writeRegistry.addNoop(IIDs.AC_IN_INTERFACE);
+        writeRegistry.addNoop(IIDs.AC_IN_IN_CONFIG);
 
         // ingress
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli)));
+        writeRegistry.addNoop(IIDs.AC_IN_IN_IN_INGRESSACLSET);
+        writeRegistry.add(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli));
 
         // egress
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_EG_EGRESSACLSET, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigWriter(cli)));
+        writeRegistry.addNoop(IIDs.AC_IN_IN_EG_EGRESSACLSET);
+        writeRegistry.add(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigWriter(cli));
 
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_ACLSETS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericListWriter<>(IIDs.AC_AC_ACLSET, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_AC_AC_CONFIG, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_AC_AC_ACLENTRIES, new NoopCliWriter<>()));
-        writeRegistry.subtreeAdd(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV4, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG3, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV4WILDCARDEDAUG,
-                        ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(
-                        IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV4WILDCARDEDAUG_SOURCEADDRESSWILDCARDED,
-                        ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(
-                        IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV4WILDCARDEDAUG_DESTINATIONADDRESSWILDCARDED,
-                        ACL_ENTRY_TREE_BASE),
+        writeRegistry.addNoop(IIDs.AC_ACLSETS);
+        writeRegistry.addNoop(IIDs.AC_AC_ACLSET);
+        writeRegistry.addNoop(IIDs.AC_AC_AC_CONFIG);
+        writeRegistry.addNoop(IIDs.AC_AC_AC_ACLENTRIES);
+        writeRegistry.subtreeAdd(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryWriter(cli),
+                Sets.newHashSet(IIDs.AC_AC_AC_AC_AC_CONFIG,
+                IIDs.AC_AC_AC_AC_AC_IPV4,
+                IIDs.AC_AC_AC_AC_AC_IP_CONFIG,
+                IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG3,
+                IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV4WILDCARDEDAUG,
+                IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV4WILDCARDEDAUG_SOURCEADDRESSWILDCARDED,
+                IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV4WILDCARDEDAUG_DESTINATIONADDRESSWILDCARDED,
 
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV6, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.ACL_ACL_ACL_ACL_ACL_IPV_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG4, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.NE_TO_NO_CO_AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV6WILDCARDEDAUG,
-                        ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(
-                    IIDs.NE_TO_NO_CO_AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV6WILDCARDEDAUG_SOURCEADDRESSWILDCARDED,
-                    ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(
-                IIDs.NE_TO_NO_CO_AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV6WILDCARDEDAUG_DESTINATIONADDRESSWILDCARDED,
-                        ACL_ENTRY_TREE_BASE),
+                IIDs.AC_AC_AC_AC_AC_IPV6,
+                IIDs.ACL_ACL_ACL_ACL_ACL_IPV_CONFIG,
+                IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG4,
+                IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV6WILDCARDEDAUG,
+                IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV6WILDCARDEDAUG_SOURCEADDRESSWILDCARDED,
+                IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_ACLSETACLENTRYIPV6WILDCARDEDAUG_DESTINATIONADDRESSWILDCARDED,
 
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TRANSPORT, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CO_AUG_ACLSETACLENTRYTRANSPORTPORTNAMEDAUG,
-                        ACL_ENTRY_TREE_BASE),
+                IIDs.AC_AC_AC_AC_AC_TRANSPORT,
+                IIDs.AC_AC_AC_AC_AC_TR_CONFIG,
+                IIDs.AC_AC_AC_AC_AC_TR_CONFIG,
+                IIDs.AC_AC_AC_AC_AC_TR_CO_AUG_ACLSETACLENTRYTRANSPORTPORTNAMEDAUG,
 
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_ACTIONS, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AC_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_ICMP, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG, ACL_ENTRY_TREE_BASE)),
-                new GenericWriter<>(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryWriter(cli)));
+                IIDs.AC_AC_AC_AC_AC_ACTIONS,
+                IIDs.AC_AC_AC_AC_AC_AC_CONFIG,
+                IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1,
+                IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_ICMP,
+                IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.ACL, AclBuilder.class);
-
-        readRegistry.addStructuralReader(IIDs.AC_INTERFACES, InterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_CONFIG, new AclInterfaceConfigReader()));
+        readRegistry.add(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli));
+        readRegistry.add(IIDs.AC_IN_IN_CONFIG, new AclInterfaceConfigReader());
 
         // ingress
-        readRegistry.addStructuralReader(IIDs.AC_IN_IN_INGRESSACLSETS, IngressAclSetsBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigReader(cli)));
+        readRegistry.add(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli));
+        readRegistry.add(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigReader(cli));
 
         // egress
-        readRegistry.addStructuralReader(IIDs.AC_IN_IN_EGRESSACLSETS, EgressAclSetsBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_IN_EG_EGRESSACLSET, new EgressAclSetReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigReader(cli)));
+        readRegistry.add(IIDs.AC_IN_IN_EG_EGRESSACLSET, new EgressAclSetReader(cli));
+        readRegistry.add(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigReader(cli));
 
         // sets
-        readRegistry.addStructuralReader(IIDs.AC_ACLSETS, AclSetsBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_AC_ACLSET, new AclSetReader(cli)));
+        readRegistry.add(IIDs.AC_AC_ACLSET, new AclSetReader(cli));
         // acl-set/config
-        readRegistry.add(new GenericConfigReader<>(IIDs.AC_AC_AC_CONFIG, new AclSetConfigReader()));
-        // Access list entries inside acl-set
-        readRegistry.addStructuralReader(IIDs.AC_AC_AC_ACLENTRIES, AclEntriesBuilder.class);
+        readRegistry.add(IIDs.AC_AC_AC_CONFIG, new AclSetConfigReader());
 
         // ACL Entry subtree
-        readRegistry.subtreeAdd(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_CONFIG, ACL_ENTRY_TREE_BASE),
-
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_ACTIONS, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AC_CONFIG, ACL_ENTRY_TREE_BASE),
-
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV4, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG3, ACL_ENTRY_TREE_BASE),
-
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IPV6, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.ACL_ACL_ACL_ACL_ACL_IPV_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG4 , ACL_ENTRY_TREE_BASE),
-
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TRANSPORT, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CONFIG, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_TR_CO_AUG_ACLSETACLENTRYTRANSPORTPORTNAMEDAUG,
-                        ACL_ENTRY_TREE_BASE),
-
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_ICMP, ACL_ENTRY_TREE_BASE),
-                RWUtils.cutIdFromStart(IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG, ACL_ENTRY_TREE_BASE)
-        ), new GenericConfigListReader<>(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryReader(cli)));
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR ACL unit";
+        readRegistry.subtreeAdd(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryReader(cli),
+                Sets.newHashSet(IIDs.AC_AC_AC_AC_AC_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_ACTIONS,
+                        IIDs.AC_AC_AC_AC_AC_AC_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_IPV4,
+                        IIDs.AC_AC_AC_AC_AC_IP_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG3,
+                        IIDs.AC_AC_AC_AC_AC_IPV6,
+                        IIDs.ACL_ACL_ACL_ACL_ACL_IPV_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG4,
+                        IIDs.AC_AC_AC_AC_AC_TRANSPORT,
+                        IIDs.AC_AC_AC_AC_AC_TR_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_TR_CO_AUG_ACLSETACLENTRYTRANSPORTPORTNAMEDAUG,
+                        IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1,
+                        IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_ICMP,
+                        IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG));
     }
 }

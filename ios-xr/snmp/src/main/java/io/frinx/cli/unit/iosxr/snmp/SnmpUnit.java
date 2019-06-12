@@ -17,51 +17,38 @@
 package io.frinx.cli.unit.iosxr.snmp;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.write.GenericListWriter;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
-import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.iosxr.snmp.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.snmp.handler.SnmpInterfacesReader;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.snmp.IIDs;
-import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp._interface.config.EnabledTrapForEvent;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.interfaces._interface.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.top.SnmpBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class SnmpUnit implements TranslateUnit {
-
-    private static final InstanceIdentifier<Interfaces> IFCS_ID = InstanceIdentifier.create(Interfaces.class);
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class SnmpUnit extends AbstractUnit {
 
     public SnmpUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS XR SNMP unit";
     }
 
     @Override
@@ -69,11 +56,6 @@ public class SnmpUnit implements TranslateUnit {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.event.types.rev171024.$YangModuleInfoImpl
                         .getInstance());
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
     }
 
     @Override
@@ -85,23 +67,15 @@ public class SnmpUnit implements TranslateUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.add(new GenericListWriter<>(IIDs.SN_IN_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.subtreeAdd(Sets.newHashSet(InstanceIdentifier.create(Config.class)
-                        .child(EnabledTrapForEvent.class)),
-                new GenericWriter<>(IIDs.SN_IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
+        writeRegistry.addNoop(IIDs.SN_IN_INTERFACE);
+        writeRegistry.subtreeAdd(IIDs.SN_IN_IN_CONFIG, new InterfaceConfigWriter(cli),
+                Sets.newHashSet(InstanceIdentifier.create(Config.class).child(EnabledTrapForEvent.class)));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.SNMP, SnmpBuilder.class);
-        readRegistry.subtreeAdd(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.SN_IN_INTERFACE, IFCS_ID),
-                RWUtils.cutIdFromStart(IIDs.SN_IN_IN_CONFIG, IFCS_ID),
-                RWUtils.cutIdFromStart(IIDs.SN_IN_IN_CO_ENABLEDTRAPFOREVENT, IFCS_ID)),
-                new GenericConfigReader<>(IIDs.SN_INTERFACES, new SnmpInterfacesReader(cli)));
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR SNMP unit";
+        readRegistry.subtreeAdd(IIDs.SN_INTERFACES, new SnmpInterfacesReader(cli),
+                Sets.newHashSet(IIDs.SN_IN_INTERFACE,
+                        IIDs.SN_IN_IN_CONFIG,
+                        IIDs.SN_IN_IN_CO_ENABLEDTRAPFOREVENT));
     }
 }

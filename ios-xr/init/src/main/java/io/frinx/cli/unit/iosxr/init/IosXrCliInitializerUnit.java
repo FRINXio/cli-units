@@ -19,7 +19,6 @@ package io.frinx.cli.unit.iosxr.init;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.spi.write.CommitFailedException;
@@ -31,8 +30,8 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * session. That is, upon establishing connection to IOS-XR device, enter Privileged
  * EXEC mode by issuing the 'enable' command.
  */
-public class IosXrCliInitializerUnit implements TranslateUnit {
+public class IosXrCliInitializerUnit extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(IosXrCliInitializerUnit.class);
 
@@ -74,24 +73,22 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
     @VisibleForTesting
     static final Command SH_CONF_FAILED = Command.create("show configuration failed inheritance");
 
-    private TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration iosXrReg;
     private IosXrCliInitializer initializer;
     private RemoteDeviceId deviceId;
 
-
     public IosXrCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        iosXrReg = registry.registerTranslateUnit(IOS_XR, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(IosXrDevices.IOS_XR_GENERIC);
+
     }
 
-    public void close() {
-        if (iosXrReg != null) {
-            iosXrReg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS XR cli init (FRINX) translate unit";
     }
 
     @Override
@@ -105,11 +102,6 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
         this.deviceId = id;
         this.initializer = new IosXrCliInitializer(cliNodeConfiguration, id);
         return initializer;
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final Context context) {
-        return Sets.newHashSet();
     }
 
     @Override
@@ -215,11 +207,5 @@ public class IosXrCliInitializerUnit implements TranslateUnit {
                 Pattern.compile("(^|\\n)% (?i)Failed(?-i).*")
         ));
     }
-
-    @Override
-    public String toString() {
-        return "IOS XR cli init (FRINX) translate unit";
-    }
-
 }
 

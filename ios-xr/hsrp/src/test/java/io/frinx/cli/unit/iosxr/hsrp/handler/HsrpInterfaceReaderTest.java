@@ -19,7 +19,6 @@ package io.frinx.cli.unit.iosxr.hsrp.handler;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.hsrp.handler.HsrpInterfaceReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -33,7 +32,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.collections.Sets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.Interfaces;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.InterfaceKey;
@@ -112,13 +110,4 @@ public class HsrpInterfaceReaderTest {
         Assert.assertEquals(builder.getInterfaceId(), interfaceName);
     }
 
-    @Test
-    public void testMerge_001() throws Exception {
-        final List<Interface> interfaceList = new ArrayList<>();
-        final InterfacesBuilder interfaceBuilderIn = new InterfacesBuilder();
-
-        target.merge(interfaceBuilderIn, interfaceList);
-
-        Assert.assertThat(interfaceBuilderIn.getInterface(), CoreMatchers.sameInstance(interfaceList));
-    }
 }

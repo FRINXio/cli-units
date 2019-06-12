@@ -17,9 +17,6 @@
 package io.frinx.cli.iosxr.platform;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
-import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -27,38 +24,29 @@ import io.frinx.cli.iosxr.platform.handler.XrOsComponentConfigReader;
 import io.frinx.cli.iosxr.platform.handler.XrOsComponentReader;
 import io.frinx.cli.iosxr.platform.handler.XrOsComponentStateReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.platform.IIDs;
-import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.ComponentsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class XrPlatformUnit implements TranslateUnit {
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class XrPlatformUnit extends AbstractUnit {
 
     public XrPlatformUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+        super(registry);
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
+    }
+
+    @Override
+    protected String getUnitName() {
+        return "IOS XR Platform unit";
     }
 
     @Override
@@ -75,19 +63,13 @@ public class XrPlatformUnit implements TranslateUnit {
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.COMPONENTS, ComponentsBuilder.class);
-        readRegistry.add(new GenericOperListReader<>(IIDs.CO_COMPONENT, new XrOsComponentReader(cli)));
-        readRegistry.add(new GenericOperReader<>(IIDs.CO_CO_CONFIG, new XrOsComponentConfigReader()));
-        readRegistry.add(new GenericOperReader<>(IIDs.CO_CO_STATE, new XrOsComponentStateReader(cli)));
+        readRegistry.add(IIDs.CO_COMPONENT, new XrOsComponentReader(cli));
+        readRegistry.add(IIDs.CO_CO_CONFIG, new XrOsComponentConfigReader());
+        readRegistry.add(IIDs.CO_CO_STATE, new XrOsComponentStateReader(cli));
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR Platform unit";
     }
 }
