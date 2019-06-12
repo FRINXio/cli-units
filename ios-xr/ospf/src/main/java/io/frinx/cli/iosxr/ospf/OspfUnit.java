@@ -17,10 +17,6 @@
 package io.frinx.cli.iosxr.ospf;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -40,52 +36,29 @@ import io.frinx.cli.iosxr.ospf.handler.MaxMetricTimerConfigWriter;
 import io.frinx.cli.iosxr.ospf.handler.MaxMetricTimerReader;
 import io.frinx.cli.iosxr.ospf.handler.OspfAreaReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
-import io.frinx.cli.unit.utils.NoopCliWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
-import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.ext.rev180211.OspfAreaIfBfdExtAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.rev171117.bfd.enable.EnableBfdBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222._interface.ref.InterfaceRefBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.Timers1Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.max.metrics.fields.MaxMetricTimersBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.MplsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.mpls.IgpLdpSyncBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.GlobalBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.TimersBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.Ospfv2Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.AreasBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class OspfUnit implements TranslateUnit {
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class OspfUnit extends AbstractUnit {
 
     public OspfUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
-
+        super(registry);
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
+    }
+
+    @Override
+    protected String getUnitName() {
+        return "IOS XR OSPF unit";
     }
 
     @Override
@@ -98,81 +71,53 @@ public class OspfUnit implements TranslateUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigWriter(cli)),
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigWriter(cli),
                 IIDs.NE_NE_PR_PR_CONFIG);
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TIMERS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MAXMETRICTIMERS,
-                new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MA_MAXMETRICTIMER,
-                new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TI_MA_CONFIG, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MA_MA_CONFIG,
-                new MaxMetricTimerConfigWriter(cli)), IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_GL_TIMERS);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MAXMETRICTIMERS);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MA_MAXMETRICTIMER);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_GL_TI_MA_CONFIG);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MA_MA_CONFIG,
+                new MaxMetricTimerConfigWriter(cli), IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
 
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new NoopCliListWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigWriter(cli)),
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_AR_AREA);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigWriter(cli),
                 IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
 
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG,
-                        new AreaInterfaceConfigWriter(cli)),
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG, new AreaInterfaceConfigWriter(cli),
                 IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG);
 
-        writeRegistry.add(new GenericWriter<>(
-                io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDEXTAUG,
-                new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(
-                io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDEXTAUG_ENABLEBFD,
-                new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(
+        writeRegistry.addNoop(
+                io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDEXTAUG);
+        writeRegistry.addNoop(
+                io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDEXTAUG_ENABLEBFD);
+        writeRegistry.add(
                 io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDEXTAUG_EN_CONFIG,
-                new AreaInterfaceEnableBfdConfigWriter(cli)));
+                new AreaInterfaceEnableBfdConfigWriter(cli));
 
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MPLS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IGPLDPSYNC, new NoopCliWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IG_CONFIG, new
-                        AreaInterfaceMplsSyncConfigWriter(cli)),
-                IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MPLS);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IGPLDPSYNC);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IG_CONFIG,
+                new AreaInterfaceMplsSyncConfigWriter(cli), IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG);
 
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_IN_CONFIG, new NoopCliWriter<>()));
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_IN_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OSPFV2, Ospfv2Builder.class);
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GLOBAL, GlobalBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GL_TIMERS, TimersBuilder.class);
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1, Timers1Builder.class);
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MAXMETRICTIMERS,
-                MaxMetricTimersBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MA_MAXMETRICTIMER,
-                new MaxMetricTimerReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MA_MA_CONFIG,
-                new MaxMetricTimerConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AREAS, AreasBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AREA, new OspfAreaReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigReader()));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_INTERFACES, InterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE,
-                new AreaInterfaceReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG,
-                new AreaInterfaceConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MPLS, MplsBuilder.class);
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IGPLDPSYNC, IgpLdpSyncBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IG_CONFIG, new
-                AreaInterfaceMplsSyncConfigReader(cli)));
-        readRegistry.addStructuralReader(
-                io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDEXTAUG,
-                OspfAreaIfBfdExtAugBuilder.class);
-        readRegistry.addStructuralReader(
-                io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDEXTAUG_ENABLEBFD,
-                EnableBfdBuilder.class);
-        readRegistry.add(new GenericConfigReader<>(
+        readRegistry.add(IIDs.NE_NE_PR_PR_OS_GL_CONFIG, new GlobalConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MA_MAXMETRICTIMER, new MaxMetricTimerReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_OS_GL_TI_AUG_TIMERS1_MA_MA_CONFIG, new MaxMetricTimerConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_OS_AR_AREA, new OspfAreaReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigReader());
+        readRegistry.add(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new AreaInterfaceReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_CONFIG, new AreaInterfaceConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_MP_IG_CONFIG, new AreaInterfaceMplsSyncConfigReader(cli));
+        readRegistry.add(
                 io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDEXTAUG_EN_CONFIG,
-                new AreaInterfaceEnableBfdConfigReader(cli)));
-        readRegistry.addStructuralReader(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF, InterfaceRefBuilder.class);
+                new AreaInterfaceEnableBfdConfigReader(cli));
     }
 
     @Override
@@ -183,10 +128,5 @@ public class OspfUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.ext.rev180211.$YangModuleInfoImpl
                         .getInstance(),
                 $YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR OSPF unit";
     }
 }

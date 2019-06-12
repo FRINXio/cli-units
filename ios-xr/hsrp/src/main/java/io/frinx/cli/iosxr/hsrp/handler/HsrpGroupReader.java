@@ -28,13 +28,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.hsrp.groups.HsrpGroup;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.hsrp.groups.HsrpGroupBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.hsrp.groups.HsrpGroupKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.ADDRESSFAMILY;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class HsrpGroupReader implements CliConfigListReader<HsrpGroup, HsrpGroupKey, HsrpGroupBuilder> {
@@ -74,12 +71,6 @@ public class HsrpGroupReader implements CliConfigListReader<HsrpGroup, HsrpGroup
                 value -> hsrpGroups.add(new HsrpGroupKey(family, value)));
         }
         return hsrpGroups;
-    }
-
-    @Override
-    public void merge(Builder<? extends DataObject> parentBuilder, List<HsrpGroup> readValue) {
-        ((InterfaceBuilder) parentBuilder).setHsrpGroup(readValue);
-
     }
 
     @VisibleForTesting

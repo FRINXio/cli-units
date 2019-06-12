@@ -30,7 +30,6 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.OsComponent;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.PlatformComponentState;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.Component;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.ComponentBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.component.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.component.StateBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.types.rev170816.CHASSIS;
@@ -40,8 +39,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.type
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.types.rev170816.OPENCONFIGHARDWARECOMPONENT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.types.rev170816.POWERSUPPLY;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.types.rev170816.TRANSCEIVER;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class XrOsComponentStateReader implements CliOperReader<State, StateBuilder> {
@@ -66,11 +63,6 @@ public class XrOsComponentStateReader implements CliOperReader<State, StateBuild
                 cli, instanceIdentifier,
                     readContext));
         }
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State state) {
-        ((ComponentBuilder) builder).setState(state);
     }
 
     private static final Map<Set<String>, Class<? extends OPENCONFIGHARDWARECOMPONENT>> HW_TYPES = new HashMap<>();

@@ -17,24 +17,14 @@
 package io.frinx.cli.iosxr.bgp.handler.neighbor;
 
 import io.frinx.cli.io.Cli;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.ipv4.ipv6.unicast.common.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.mp.ipv6.unicast.group.Ipv6UnicastBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV6UNICAST;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 
 public class NeighborAfiSafiIpv6ConfigReader extends NeighborAfiSafiIpvConfigReader {
 
 
     public NeighborAfiSafiIpv6ConfigReader(Cli cli) {
         super(cli);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((Ipv6UnicastBuilder)builder).setConfig(config);
     }
 
     @Override

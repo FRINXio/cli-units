@@ -17,11 +17,6 @@
 package io.frinx.cli.iosxr.hsrp;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.write.GenericListWriter;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -32,34 +27,28 @@ import io.frinx.cli.iosxr.hsrp.handler.HsrpInterfaceConfigReader;
 import io.frinx.cli.iosxr.hsrp.handler.HsrpInterfaceConfigWriter;
 import io.frinx.cli.iosxr.hsrp.handler.HsrpInterfaceReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
-import io.frinx.cli.unit.utils.NoopCliWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.hsrp.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.hsrp.top.HsrpBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class HsrpUnit implements TranslateUnit {
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class HsrpUnit extends AbstractUnit {
 
     public HsrpUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS XR Hsrp unit";
     }
 
     @Override
@@ -67,11 +56,6 @@ public class HsrpUnit implements TranslateUnit {
         return Sets.newHashSet(
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.$YangModuleInfoImpl
                         .getInstance());
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final Context context) {
-        return Sets.newHashSet();
     }
 
     @Override
@@ -83,27 +67,20 @@ public class HsrpUnit implements TranslateUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.add(new GenericWriter<>(IIDs.HSRP, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.HS_INTERFACES, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericListWriter<>(IIDs.HS_IN_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.HS_IN_IN_CONFIG, new HsrpInterfaceConfigWriter(cli)));
+        writeRegistry.addNoop(IIDs.HSRP);
+        writeRegistry.addNoop(IIDs.HS_INTERFACES);
+        writeRegistry.addNoop(IIDs.HS_IN_INTERFACE);
+        writeRegistry.add(IIDs.HS_IN_IN_CONFIG, new HsrpInterfaceConfigWriter(cli));
 
-        writeRegistry.add(new GenericListWriter<>(IIDs.HS_IN_IN_HSRPGROUP, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.HS_IN_IN_HS_CONFIG, new HsrpGroupConfigWriter(cli)));
+        writeRegistry.addNoop(IIDs.HS_IN_IN_HSRPGROUP);
+        writeRegistry.add(IIDs.HS_IN_IN_HS_CONFIG, new HsrpGroupConfigWriter(cli));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.HSRP, HsrpBuilder.class);
-        readRegistry.addStructuralReader(IIDs.HS_INTERFACES, InterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.HS_IN_INTERFACE, new HsrpInterfaceReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.HS_IN_IN_CONFIG, new HsrpInterfaceConfigReader(cli)));
+        readRegistry.add(IIDs.HS_IN_INTERFACE, new HsrpInterfaceReader(cli));
+        readRegistry.add(IIDs.HS_IN_IN_CONFIG, new HsrpInterfaceConfigReader(cli));
 
-        readRegistry.add(new GenericConfigListReader<>(IIDs.HS_IN_IN_HSRPGROUP, new HsrpGroupReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.HS_IN_IN_HS_CONFIG, new HsrpGroupConfigReader(cli)));
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR Hsrp unit";
+        readRegistry.add(IIDs.HS_IN_IN_HSRPGROUP, new HsrpGroupReader(cli));
+        readRegistry.add(IIDs.HS_IN_IN_HS_CONFIG, new HsrpGroupConfigReader(cli));
     }
 }

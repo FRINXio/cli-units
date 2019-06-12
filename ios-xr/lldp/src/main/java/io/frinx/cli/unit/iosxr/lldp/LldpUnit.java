@@ -16,25 +16,23 @@
 
 package io.frinx.cli.unit.iosxr.lldp;
 
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class LldpUnit implements TranslateUnit {
+public class LldpUnit extends AbstractUnit {
 
-    private final TranslationUnitCollector registry;
     private final io.frinx.cli.unit.ios.lldp.LldpUnit delegate;
-    private TranslationUnitCollector.Registration reg;
 
     public LldpUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
         this.delegate = new io.frinx.cli.unit.ios.lldp.LldpUnit(registry) {
             @Override
             protected Command getShowHostnameCommand() {
@@ -43,14 +41,14 @@ public class LldpUnit implements TranslateUnit {
         };
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS XR LLDP (Openconfig) translate unit";
     }
 
     @Override
@@ -59,19 +57,9 @@ public class LldpUnit implements TranslateUnit {
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return delegate.getRpcs(context);
-    }
-
-    @Override
     public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder writeRegistry,
                                 @Nonnull CustomizerAwareWriteRegistryBuilder readRegistry,
                                 @Nonnull Context context) {
         delegate.provideHandlers(writeRegistry, readRegistry, context);
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR LLDP (Openconfig) translate unit";
     }
 }

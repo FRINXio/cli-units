@@ -28,19 +28,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.as.path.sets.AsPathSet;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.as.path.sets.AsPathSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.as.path.sets.AsPathSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.as.path.sets.as.path.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.set.top.as.path.sets.as.path.set.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AsPathSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_AS_PATH_SET = "show running-config as-path-set %s";
     private static final Pattern AS_PATH_PATTERN = Pattern.compile("\\s+(?<asPathRule>.+?),?\\s*");
-
 
     private final Cli cli;
 
@@ -68,10 +64,5 @@ public class AsPathSetConfigReader implements CliConfigReader<Config, ConfigBuil
 
         builder.setAsPathSetName(prefixSetKey.getAsPathSetName());
         builder.setAsPathSetMember(asPathRule);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> parentBuilder, @Nonnull Config readValue) {
-        ((AsPathSetBuilder) parentBuilder).setConfig(readValue);
     }
 }

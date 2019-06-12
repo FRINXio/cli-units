@@ -20,7 +20,6 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.hsrp.handler.HsrpGroupReader;
 import io.frinx.cli.iosxr.hsrp.handler.util.HsrpUtil;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +34,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.collections.Sets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.hsrp.groups.HsrpGroup;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814.hsrp.groups.HsrpGroupBuilder;
@@ -149,13 +147,4 @@ public class HsrpGroupReaderTest {
         Assert.assertEquals(builder.getVirtualRouterId(), Long.valueOf(1L));
     }
 
-    @Test
-    public void testMerge_001() throws Exception {
-        final List<HsrpGroup> groupList = new ArrayList<>();
-        final InterfaceBuilder hsrpGroupBuilderIn = new InterfaceBuilder();
-
-        target.merge(hsrpGroupBuilderIn, groupList);
-
-        Assert.assertThat(hsrpGroupBuilderIn.getHsrpGroup(), CoreMatchers.sameInstance(groupList));
-    }
 }

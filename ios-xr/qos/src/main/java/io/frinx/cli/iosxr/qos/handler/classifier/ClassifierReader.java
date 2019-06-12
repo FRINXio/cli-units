@@ -27,12 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.ClassifiersBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.ClassifierBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.ClassifierKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ClassifierReader implements CliConfigListReader<Classifier, ClassifierKey, ClassifierBuilder> {
@@ -71,11 +68,6 @@ public class ClassifierReader implements CliConfigListReader<Classifier, Classif
     static List<ClassifierKey> getClassifierDefaultKeys(String output) {
         return ParsingUtils.parseFields(output, 0, SchedulerPolicyReader.POLICY_NAME_LINE::matcher,
             matcher -> matcher.group("name"), n -> new ClassifierKey(n + DEFAULT_CLASS_SUFFIX));
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Classifier> readData) {
-        ((ClassifiersBuilder) builder).setClassifier(readData);
     }
 
     @Override

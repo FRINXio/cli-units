@@ -27,6 +27,11 @@ public final class IosXrDevices {
 
     }
 
+    public static final Device IOS_XR_GENERIC = new DeviceIdBuilder()
+            .setDeviceType("ios xr")
+            .setDeviceVersion("*")
+            .build();
+
     public static final Device IOS_4 = new DeviceIdBuilder()
             .setDeviceType("ios xr")
             .setDeviceVersion("4.*")

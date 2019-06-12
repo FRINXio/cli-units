@@ -29,13 +29,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.aggregation.lacp.members.top.MembersBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.aggregation.lacp.members.top.members.Member;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.aggregation.lacp.members.top.members.MemberBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.aggregation.lacp.members.top.members.MemberKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.lacp.interfaces.top.interfaces.Interface;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class MemberReader implements CliConfigListReader<Member, MemberKey, MemberBuilder> {
@@ -97,10 +94,5 @@ public class MemberReader implements CliConfigListReader<Member, MemberKey, Memb
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Member> instanceIdentifier,
                                       @Nonnull MemberBuilder memberBuilder, @Nonnull ReadContext readContext) {
         memberBuilder.setInterface(instanceIdentifier.firstKeyOf(Member.class).getInterface());
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Member> list) {
-        ((MembersBuilder) builder).setMember(list);
     }
 }

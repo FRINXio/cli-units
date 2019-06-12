@@ -41,9 +41,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev17102
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.interfaces.structural.interfaces._interface.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev171024.snmp.top.SnmpBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SnmpInterfacesReader implements CliConfigReader<Interfaces, InterfacesBuilder> {
@@ -124,11 +121,6 @@ public class SnmpInterfacesReader implements CliConfigReader<Interfaces, Interfa
                 .setConfig(config)
                 .setInterfaceId(config.getInterfaceId())
                 .build();
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Interfaces interfaces) {
-        ((SnmpBuilder) builder).setInterfaces(interfaces);
     }
 
     private static String realignSnmpDisabledInterfacesOutput(String output) {

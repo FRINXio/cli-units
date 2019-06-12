@@ -27,8 +27,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.configuration.metadata.rev180731.metadata.ConfigurationMetadata;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.configuration.metadata.rev180731.metadata.ConfigurationMetadataBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata, ConfigurationMetadataBuilder> {
@@ -56,12 +54,6 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
 
         Optional<String> data = getLastConfigurationFingerprint(output);
         data.ifPresent(configurationMetadataBuilder::setLastConfigurationFingerprint);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull ConfigurationMetadata
-            configurationMetadata) {
-        // NOOP, root reader
     }
 }
 

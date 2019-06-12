@@ -37,8 +37,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public abstract class NeighborAfiSafiIpvConfigReader implements CliConfigReader<Config, ConfigBuilder> {
@@ -51,9 +49,6 @@ public abstract class NeighborAfiSafiIpvConfigReader implements CliConfigReader<
     public NeighborAfiSafiIpvConfigReader(final Cli cli) {
         this.cli = cli;
     }
-
-    @Override
-    public abstract void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config);
 
     protected abstract boolean isCorrectAfi(Class<? extends AFISAFITYPE> afiClass);
 

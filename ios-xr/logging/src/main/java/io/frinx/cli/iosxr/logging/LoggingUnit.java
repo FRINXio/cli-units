@@ -17,61 +17,40 @@
 package io.frinx.cli.iosxr.logging;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.write.GenericListWriter;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
-import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.logging.handler.LoggingInterfaceConfigWriter;
 import io.frinx.cli.iosxr.logging.handler.LoggingInterfacesReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.logging.IIDs;
-import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.logging.interfaces.structural.Interfaces;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.logging.interfaces.structural.interfaces._interface.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.logging.rev171024.logging.top.LoggingBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public final class LoggingUnit implements TranslateUnit {
-
-    private static final InstanceIdentifier<Interfaces> IFCS_ID = InstanceIdentifier.create(Interfaces.class);
-    private static final InstanceIdentifier<Config> IFC_CFG_ID = InstanceIdentifier.create(Config.class);
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public final class LoggingUnit extends AbstractUnit {
 
     public LoggingUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS XR Logging (Openconfig) translate unit";
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
     }
 
     @Override
@@ -83,25 +62,17 @@ public final class LoggingUnit implements TranslateUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.add(new GenericListWriter<>(IIDs.LO_IN_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.subtreeAddAfter(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.LO_IN_IN_CO_ENABLEDLOGGINGFOREVENT, IFC_CFG_ID)),
-                new GenericWriter<>(IIDs.LO_IN_IN_CONFIG, new LoggingInterfaceConfigWriter(cli)),
+        writeRegistry.addNoop(IIDs.LO_IN_INTERFACE);
+        writeRegistry.subtreeAddAfter(IIDs.LO_IN_IN_CONFIG, new LoggingInterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.LO_IN_IN_CO_ENABLEDLOGGINGFOREVENT),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.LOGGING, LoggingBuilder.class);
-        readRegistry.subtreeAdd(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.LO_IN_INTERFACE, IFCS_ID),
-                RWUtils.cutIdFromStart(IIDs.LO_IN_IN_CONFIG, IFCS_ID),
-                RWUtils.cutIdFromStart(IIDs.LO_IN_IN_CO_ENABLEDLOGGINGFOREVENT, IFCS_ID)),
-                new GenericConfigReader<>(IIDs.LO_INTERFACES, new LoggingInterfacesReader(cli)));
+        readRegistry.subtreeAdd(IIDs.LO_INTERFACES, new LoggingInterfacesReader(cli),
+                Sets.newHashSet(
+                IIDs.LO_IN_INTERFACE,
+                IIDs.LO_IN_IN_CONFIG,
+                IIDs.LO_IN_IN_CO_ENABLEDLOGGINGFOREVENT));
     }
-
-    @Override
-    public String toString() {
-        return "IOS XR Logging (Openconfig) translate unit";
-    }
-
 }

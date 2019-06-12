@@ -18,18 +18,11 @@ package io.frinx.cli.unit.iosxr.network.instance;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.read.GenericOperReader;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
-import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.handlers.def.DefaultConfigWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.NetworkInstanceReader;
@@ -41,45 +34,28 @@ import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolCon
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolReader;
 import io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol.ProtocolStateReader;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
-import io.frinx.cli.unit.utils.NoopCliWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
-import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstancesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ProtocolsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.interfaces._interface.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.policy.forwarding.top.PolicyForwardingBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class IosXRNetworkInstanceUnit implements TranslateUnit {
-
-    private static final InstanceIdentifier<Config> PF_IFC_CFG_ROOT_ID = InstanceIdentifier.create(Config.class);
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class IosXRNetworkInstanceUnit extends AbstractUnit {
 
     public IosXRNetworkInstanceUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+        super(registry);
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
+    }
+
+    @Override
+    protected String getUnitName() {
+        return "IOS XR Network Instance (Openconfig) translate unit";
     }
 
     @Override
@@ -93,42 +69,35 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         // VRFs
-        readRegistry.addStructuralReader(IIDs.NETWORKINSTANCES, NetworkInstancesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli)));
-        readRegistry.add(new GenericOperReader<>(IIDs.NE_NE_STATE, new NetworkInstanceStateReader(cli)));
+        readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
+        readRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_STATE, new NetworkInstanceStateReader(cli));
 
-        readRegistry.addStructuralReader(IIDs.NE_NE_PROTOCOLS, ProtocolsBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader()));
-        readRegistry.add(new GenericOperReader<>(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader()));
+        readRegistry.add(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader());
+        readRegistry.add(IIDs.NE_NE_PR_PR_STATE, new ProtocolStateReader());
 
         // PF
-        readRegistry.addStructuralReader(IIDs.NE_NE_POLICYFORWARDING, PolicyForwardingBuilder.class);
-        readRegistry.addStructuralReader(IIDs.NE_NE_PO_INTERFACES, InterfacesBuilder.class);
-        readRegistry.add(
-                new GenericConfigListReader<>(IIDs.NE_NE_PO_IN_INTERFACE, new PolicyForwardingInterfaceReader(cli)));
-        readRegistry.add(
-                new GenericConfigReader<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli)));
+        readRegistry.add(IIDs.NE_NE_PO_IN_INTERFACE, new PolicyForwardingInterfaceReader(cli));
+        readRegistry.add(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli));
     }
 
     private void provideWriters(@Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         // No handling required on the network instance level
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NETWORKINSTANCE, new NoopCliWriter<>()));
+        writeRegistry.addNoop(IIDs.NE_NETWORKINSTANCE);
 
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.NE_NE_CONFIG,
+        writeRegistry.addAfter(IIDs.NE_NE_CONFIG,
                         new CompositeWriter<>(Lists.newArrayList(
-                                new DefaultConfigWriter()))),
+                                new DefaultConfigWriter())),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
 
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PROTOCOL, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli)));
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PROTOCOL);
+        writeRegistry.add(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli));
 
         // PF
-        writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_PO_IN_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.subtreeAddAfter(Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFCISCOAUG, PF_IFC_CFG_ROOT_ID)),
-                new GenericWriter<>(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigWriter(cli)),
+        writeRegistry.addNoop(IIDs.NE_NE_PO_IN_INTERFACE);
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFCISCOAUG),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
     }
 
@@ -143,10 +112,5 @@ public class IosXRNetworkInstanceUnit implements TranslateUnit {
                         .cisco.rev171109.$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.$YangModuleInfoImpl
                         .getInstance());
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR Network Instance (Openconfig) translate unit";
     }
 }

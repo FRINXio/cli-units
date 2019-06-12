@@ -25,11 +25,8 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.hsrp.rev180814._interface.top.interfaces._interface.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class HsrpInterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
@@ -60,10 +57,5 @@ public class HsrpInterfaceConfigReader implements CliConfigReader<Config, Config
 
         ParsingUtils.parseField(output, 0, HSRP_DELAY_LINE::matcher, matcher -> Long.valueOf(matcher.group("relDelay")),
                 builder::setReloadDelay);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((InterfaceBuilder) builder).setConfig(config);
     }
 }
