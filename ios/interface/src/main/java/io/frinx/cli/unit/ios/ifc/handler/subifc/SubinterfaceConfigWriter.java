@@ -33,7 +33,7 @@ public final class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWr
             + "end";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
-            + "no interface ${name}\n"
+            + "no interface {$name}\n"
             + "end";
 
     public SubinterfaceConfigWriter(Cli cli) {
@@ -48,6 +48,6 @@ public final class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWr
 
     @Override
     protected String deleteTemplate(InstanceIdentifier<Config> id) {
-        return f(DELETE_TEMPLATE, "name", Util.getSubinterfaceName(id));
+        return fT(DELETE_TEMPLATE, "name", Util.getSubinterfaceName(id));
     }
 }

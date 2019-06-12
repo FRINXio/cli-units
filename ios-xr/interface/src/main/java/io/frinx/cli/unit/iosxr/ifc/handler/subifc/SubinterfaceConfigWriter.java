@@ -31,7 +31,7 @@ public class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWriter {
             + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
             + "root";
 
-    private static final String DELETE_TEMPLATE = "no interface ${name}";
+    private static final String DELETE_TEMPLATE = "no interface {$name}";
 
     public SubinterfaceConfigWriter(Cli cli) {
         super(cli);
@@ -45,6 +45,6 @@ public class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWriter {
 
     @Override
     protected String deleteTemplate(InstanceIdentifier<Config> id) {
-        return f(DELETE_TEMPLATE, "name", Util.getSubinterfaceName(id));
+        return fT(DELETE_TEMPLATE, "name", Util.getSubinterfaceName(id));
     }
 }
