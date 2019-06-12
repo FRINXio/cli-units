@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 // the privileged mode already), refactor this into abstract class implementing
 // TranslateLogicProvider interface. Let other units extend this interface,
 // instead of creating a standalone unit just for cli initialization purposes.
-public class IosCliInitializerUnit  extends AbstractUnit {
+public class IosCliInitializerUnit extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(IosCliInitializerUnit.class);
 

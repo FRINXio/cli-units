@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.brocade.init;
 
-import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.spi.write.PostTransactionHook;
@@ -27,43 +25,35 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import io.frinx.cli.unit.ios.init.IosCliInitializerUnit;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IronwareCliInitializerUnit implements TranslateUnit {
+public class BrocadeCliInitializerUnit extends AbstractUnit {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IronwareCliInitializerUnit.class);
-
-    private static final Device BROCADE = new DeviceIdBuilder()
-            .setDeviceType("ironware")
-            .setDeviceVersion("*")
-            .build();
+    private static final Logger LOG = LoggerFactory.getLogger(BrocadeCliInitializerUnit.class);
 
     private static final Command WRITE_MEMORY = Command.writeCommandNoChecks("write memory");
 
-    private TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    public IronwareCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+    public BrocadeCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(BROCADE, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(BrocadeDevices.BROCADE_GENERIC);
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "Ironware cli init (FRINX) translate unit";
     }
 
     @Override
@@ -93,21 +83,11 @@ public class IronwareCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final TranslateUnit.Context context) {
-        return Sets.newHashSet();
-    }
-
-    @Override
     public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         readRegistry.addCheckRegistry(ChecksMap.OPENCONFIG_REGISTRY);
         writeRegistry.addCheckRegistry(ChecksMap.OPENCONFIG_REGISTRY);
-    }
-
-    @Override
-    public String toString() {
-        return "Ironware cli init (FRINX) translate unit";
     }
 }
 

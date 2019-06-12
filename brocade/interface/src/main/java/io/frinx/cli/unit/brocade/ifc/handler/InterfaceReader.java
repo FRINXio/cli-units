@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 
-public final class InterfaceReader extends AbstractInterfaceReader {
+public class InterfaceReader extends AbstractInterfaceReader {
 
     private static final String SH_INTERFACE = "sh interface | include line";
 
