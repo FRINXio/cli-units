@@ -18,55 +18,41 @@ package io.frinx.cli.unit.brocade.network.instance;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
-import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ni.base.handler.l2p2p.L2P2PConfigWriter;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.brocade.init.BrocadeDevices;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.ConnectionPointsReader;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.ConnectionPointsWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
-import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class BrocadeNetworkInstanceUnit implements TranslateUnit {
-    private static final Device IOS_ALL = new DeviceIdBuilder()
-            .setDeviceType("ironware")
-            .setDeviceVersion("*")
-            .build();
-    public static final InstanceIdentifier<ConnectionPoints> CONN_PTS_ID = InstanceIdentifier.create(ConnectionPoints
-            .class);
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class BrocadeNetworkInstanceUnit extends AbstractUnit {
 
     public BrocadeNetworkInstanceUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(IOS_ALL, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+        super(registry);
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
+    protected Set<Device> getSupportedVersions() {
+        return BrocadeDevices.BROCADE_ALL;
+    }
+
+    @Override
+    protected String getUnitName() {
+        return "Ironware Network Instance (Openconfig) translate unit";
+    }
+
+    @Override
+    public Set<YangModuleInfo> getYangSchemas() {
+        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE);
     }
 
     @Override
@@ -81,23 +67,21 @@ public class BrocadeNetworkInstanceUnit implements TranslateUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         // No handling required on the network instance level
         writeRegistry.addNoop(IIDs.NE_NETWORKINSTANCE);
-        writeRegistry.addAfter(IIDs.NE_NE_CONFIG, new CompositeWriter<>(Lists.newArrayList(
-                                new L2P2PConfigWriter(cli))),
+        writeRegistry.addAfter(IIDs.NE_NE_CONFIG, new CompositeWriter<>(Lists.newArrayList(new L2P2PConfigWriter(cli))),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
 
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_CONNECTIONPOINTS, new ConnectionPointsWriter(cli),
-            Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CONNECTIONPOINT, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_CONFIG, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_ENDPOINTS, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_ENDPOINT, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_CONFIG, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_LOCAL, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_LO_CONFIG, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_REMOTE, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_RE_CONFIG, CONN_PTS_ID)
-            ),
-            /*handle after network instance configuration*/ IIDs.NE_NE_CONFIG);
+                Sets.newHashSet(
+                        IIDs.NE_NE_CO_CONNECTIONPOINT,
+                        IIDs.NE_NE_CO_CO_CONFIG,
+                        IIDs.NE_NE_CO_CO_ENDPOINTS,
+                        IIDs.NE_NE_CO_CO_EN_ENDPOINT,
+                        IIDs.NE_NE_CO_CO_EN_EN_CONFIG,
+                        IIDs.NE_NE_CO_CO_EN_EN_LOCAL,
+                        IIDs.NE_NE_CO_CO_EN_EN_LO_CONFIG,
+                        IIDs.NE_NE_CO_CO_EN_EN_REMOTE,
+                        IIDs.NE_NE_CO_CO_EN_EN_RE_CONFIG),
+                /*handle after network instance configuration*/ IIDs.NE_NE_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -108,32 +92,20 @@ public class BrocadeNetworkInstanceUnit implements TranslateUnit {
 
         // Connection points for L2P2p
         readRegistry.subtreeAdd(IIDs.NE_NE_CONNECTIONPOINTS, new ConnectionPointsReader(cli),
-            Sets.newHashSet(
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CONNECTIONPOINT, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_CONFIG, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_STATE, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_ENDPOINTS, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_ENDPOINT, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_CONFIG, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_STATE, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_LOCAL, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_LO_CONFIG, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_LO_STATE, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_REMOTE, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_RE_CONFIG, CONN_PTS_ID),
-                RWUtils.cutIdFromStart(IIDs.NE_NE_CO_CO_EN_EN_RE_STATE, CONN_PTS_ID)
-            )
-        );
+                Sets.newHashSet(
+                        IIDs.NE_NE_CO_CONNECTIONPOINT,
+                        IIDs.NE_NE_CO_CO_CONFIG,
+                        IIDs.NE_NE_CO_CO_STATE,
+                        IIDs.NE_NE_CO_CO_ENDPOINTS,
+                        IIDs.NE_NE_CO_CO_EN_ENDPOINT,
+                        IIDs.NE_NE_CO_CO_EN_EN_CONFIG,
+                        IIDs.NE_NE_CO_CO_EN_EN_STATE,
+                        IIDs.NE_NE_CO_CO_EN_EN_LOCAL,
+                        IIDs.NE_NE_CO_CO_EN_EN_LO_CONFIG,
+                        IIDs.NE_NE_CO_CO_EN_EN_LO_STATE,
+                        IIDs.NE_NE_CO_CO_EN_EN_REMOTE,
+                        IIDs.NE_NE_CO_CO_EN_EN_RE_CONFIG,
+                        IIDs.NE_NE_CO_CO_EN_EN_RE_STATE));
     }
 
-    @Override
-    public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228
-                .$YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public String toString() {
-        return "Ironware Network Instance (Openconfig) translate unit";
-    }
 }

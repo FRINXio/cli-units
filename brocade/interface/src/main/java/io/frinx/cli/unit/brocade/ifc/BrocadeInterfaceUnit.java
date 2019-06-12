@@ -17,17 +17,10 @@
 package io.frinx.cli.unit.brocade.ifc;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.read.GenericOperReader;
-import io.fd.honeycomb.translate.impl.write.GenericListWriter;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.brocade.ifc.handler.InterfaceReader;
@@ -42,63 +35,37 @@ import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6.Ipv6AddressReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6.Ipv6ConfigReader;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
-import io.frinx.cli.unit.utils.NoopCliWriter;
+import io.frinx.cli.unit.brocade.init.BrocadeDevices;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface2Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.Ipv4Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.AddressesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.Ipv6Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public final class BrocadeInterfaceUnit implements TranslateUnit {
-
-    private static final Device BROCADE_ALL = new DeviceIdBuilder()
-            .setDeviceType("ironware")
-            .setDeviceVersion("*")
-            .build();
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public final class BrocadeInterfaceUnit extends AbstractUnit {
 
     public BrocadeInterfaceUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(BROCADE_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return BrocadeDevices.BROCADE_ALL;
     }
 
-    public void close() {
-        if (reg
-                != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "Ironware Interface (Openconfig) translate unit";
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.$YangModuleInfoImpl
-                        .getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet
-                        .rev161222.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.$YangModuleInfoImpl
-                        .getInstance(),
-                $YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final Context context) {
-        return Sets.newHashSet();
+                IIDs.FRINX_OPENCONFIG_INTERFACES,
+                IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
+                io.frinx.openconfig.openconfig.vlan.IIDs.FRINX_OPENCONFIG_VLAN,
+                io.frinx.openconfig.openconfig._if.ip.IIDs.FRINX_OPENCONFIG_IF_IP);
     }
 
     @Override
@@ -111,73 +78,41 @@ public final class BrocadeInterfaceUnit implements TranslateUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writerRegistry, Cli cli) {
-        writerRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
-        writerRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
+        writerRegistry.addNoop(IIDs.IN_INTERFACE);
+        writerRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli));
 
-        writerRegistry.addAfter(new GenericWriter<>(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_CO_AUG_CONFIG1,
-                        new TpIdInterfaceWriter(cli)), IIDs.IN_IN_CONFIG);
+        writerRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_CO_AUG_CONFIG1,
+                new TpIdInterfaceWriter(cli), IIDs.IN_IN_CONFIG);
 
-        writerRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SUBINTERFACE, new NoopCliListWriter<>()));
-        writerRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SU_CONFIG, new NoopCliWriter<>()));
-        writerRegistry.add(new GenericWriter<>(
-                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
-                new NoopCliWriter<>()));
+        writerRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
+        writerRegistry.addNoop(IIDs.IN_IN_SU_SU_CONFIG);
+        writerRegistry.addNoop(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG);
 
-        writerRegistry.add(new GenericWriter<>(
-                        io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
-                        new NoopCliListWriter<>()));
-        writerRegistry.addAfter(new GenericWriter<>(
-                        io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
-                        new Ipv4ConfigWriter(cli)), IIDs.IN_IN_CONFIG);
+        writerRegistry.addNoop(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS);
+        writerRegistry.addAfter(
+                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
+                new Ipv4ConfigWriter(cli), IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.INTERFACES, InterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.IN_INTERFACE, new InterfaceReader(cli)));
-        readRegistry.add(new GenericOperReader<>(IIDs.IN_IN_STATE, new InterfaceStateReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));
+        readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
+        readRegistry.add(IIDs.IN_IN_STATE, new InterfaceStateReader(cli));
+        readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli));
 
-        readRegistry.add(new GenericConfigReader<>(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_CO_AUG_CONFIG1,
-                new TpIdInterfaceReader(cli)));
+        readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_CO_AUG_CONFIG1, new TpIdInterfaceReader(cli));
 
-        readRegistry.addStructuralReader(IIDs.IN_IN_SUBINTERFACES, SubinterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli)));
-        readRegistry.add(new GenericOperReader<>(IIDs.IN_IN_SU_SU_STATE, new SubinterfaceStateReader(cli)));
+        readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli));
+        readRegistry.add(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli));
+        readRegistry.add(IIDs.IN_IN_SU_SU_STATE, new SubinterfaceStateReader(cli));
 
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1,
-                Subinterface1Builder.class);
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IPV4,
-                Ipv4Builder.class);
-        readRegistry.addStructuralReader(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_ADDRESSES,
-                AddressesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
-                new Ipv4AddressReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
-                new Ipv4ConfigReader(cli)));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
+                new Ipv4AddressReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
+                new Ipv4ConfigReader(cli));
 
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2,
-                Subinterface2Builder.class);
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IPV6,
-                Ipv6Builder.class);
-        readRegistry.addStructuralReader(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_ADDRESSES,
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top
-                        .ipv6.AddressesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_ADDRESS,
-                new Ipv6AddressReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_AD_CONFIG,
-                new Ipv6ConfigReader(cli)));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_ADDRESS,
+                new Ipv6AddressReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_AD_CONFIG,
+                new Ipv6ConfigReader(cli));
     }
-
-    @Override
-    public String toString() {
-        return "Ironware Interface (Openconfig) translate unit";
-    }
-
 }
