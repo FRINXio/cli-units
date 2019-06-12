@@ -93,6 +93,7 @@ public class BgpUnit extends AbstractUnit {
     public Set<Pattern> getErrorPatterns() {
         return Sets.newLinkedHashSet(Arrays.asList(
                 Pattern.compile("% Configure the peer-group .+ first", Pattern.DOTALL),
+                Pattern.compile("% Cannot configure the local system as neighbor", Pattern.DOTALL),
                 Pattern.compile("(^|\\n)% (?i)BGP(?-i).*", Pattern.DOTALL),
                 Pattern.compile("(^|\\n)% Topology global(?-i).*", Pattern.DOTALL)
         ));
