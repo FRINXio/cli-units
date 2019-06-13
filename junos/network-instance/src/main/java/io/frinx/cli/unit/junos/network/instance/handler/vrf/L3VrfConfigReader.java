@@ -16,60 +16,48 @@
 
 package io.frinx.cli.unit.junos.network.instance.handler.vrf;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.ni.base.handler.vrf.AbstractL3VrfConfigReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
-import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L3VrfConfigReader
-        implements CliConfigReader<Config, ConfigBuilder>,
-        CompositeReader.Child<Config, ConfigBuilder> {
-
-    private Cli cli;
+public class L3VrfConfigReader extends AbstractL3VrfConfigReader {
 
     public L3VrfConfigReader(Cli cli) {
-        this.cli = cli;
+        super(new L3VrfReader(cli), cli);
     }
 
     @Override
     public void readCurrentAttributes(
-        @Nonnull InstanceIdentifier<Config> instanceIdentifier,
-        @Nonnull ConfigBuilder configBuilder,
-        @Nonnull ReadContext readContext) throws ReadFailedException {
-
-        String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        if (NetworInstance.DEFAULT_NETWORK_NAME.equals(name)) {
+            @Nonnull InstanceIdentifier<Config> instanceIdentifier,
+            @Nonnull ConfigBuilder configBuilder,
+            @Nonnull ReadContext readContext) throws ReadFailedException {
+        String niName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
+        if (NetworInstance.DEFAULT_NETWORK_NAME.equals(niName)) {
             return;
         }
-
-        if (isL3Vrf(name, instanceIdentifier, readContext)) {
-            configBuilder.setName(name);
-            configBuilder.setType(L3VRF.class);
-        }
-    }
-
-    @VisibleForTesting
-    boolean isL3Vrf(String name, InstanceIdentifier<Config> instanceIdentifier, ReadContext readContext)
-        throws ReadFailedException {
-
-        return L3VrfReader.getL3VrfNames(this, cli, instanceIdentifier, readContext).stream()
-                .filter(name::equals)
-                .findFirst()
-                .isPresent();
+        super.readCurrentAttributes(instanceIdentifier, configBuilder, readContext);
     }
 
     @Override
-    public ConfigBuilder getBuilder(InstanceIdentifier<Config> builder) {
-        // NOOP
-        throw new UnsupportedOperationException("Should not be invoked");
+    protected String getReadCommand() {
+        return "";
+    }
+
+    @Override
+    protected Pattern getRouteDistinguisherLine() {
+        return Pattern.compile("");
+    }
+
+    @Override
+    protected Pattern getDescriptionLine() {
+        return Pattern.compile("");
     }
 }

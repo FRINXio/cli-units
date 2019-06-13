@@ -61,7 +61,7 @@ public class OspfV3ProtocolReaderTest {
         final ReadContext ctx = Mockito.mock(ReadContext.class);
         OspfV3ProtocolReader target = new OspfV3ProtocolReader(cli);
         // test
-        target.readCurrentAttributesForType(iid, builder, ctx);
+        target.readCurrentAttributes(iid, builder, ctx);
         // verify
         Assert.assertEquals(builder.build().getName(), protocolKey.getName());
         Assert.assertEquals(builder.build().getIdentifier(), protocolKey.getIdentifier());

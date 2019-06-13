@@ -18,6 +18,8 @@ package io.frinx.cli.handlers.def;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import javax.annotation.Nonnull;
@@ -40,4 +42,8 @@ public class DefaultStateReader implements CliOperReader<State, StateBuilder>,
         }
     }
 
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
+    }
 }

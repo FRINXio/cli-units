@@ -27,8 +27,8 @@ import io.fd.honeycomb.data.ReadableDataManager;
 import io.fd.honeycomb.data.impl.ModifiableDataTreeDelegator;
 import io.fd.honeycomb.data.impl.ReadableDataTreeDelegator;
 import io.fd.honeycomb.rpc.RpcRegistryBuilder;
-import io.fd.honeycomb.translate.impl.read.registry.CompositeReaderRegistryBuilder;
-import io.fd.honeycomb.translate.impl.write.registry.FlatWriterRegistryBuilder;
+import io.fd.honeycomb.translate.impl.read.registry.CustomizerReadRegistryBuilder;
+import io.fd.honeycomb.translate.impl.read.registry.CustomizerWriterRegistryBuilder;
 import io.fd.honeycomb.translate.read.registry.ReaderRegistry;
 import io.fd.honeycomb.translate.util.YangDAG;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
@@ -102,7 +102,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTree;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeConfiguration;
-import org.opendaylight.yangtools.yang.data.api.schema.tree.TreeType;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.tree.InMemoryDataTreeFactory;
@@ -205,8 +204,8 @@ public class IosAll {
         BindingToNormalizedNodeCodec codec = translateContext.getCodec();
 
         // Get & register CRUD handlers
-        CompositeReaderRegistryBuilder readerRegistryBuilder = new CompositeReaderRegistryBuilder(new YangDAG());
-        FlatWriterRegistryBuilder writerRegistryBuilder = new FlatWriterRegistryBuilder(new YangDAG());
+        CustomizerReadRegistryBuilder readerRegistryBuilder = new CustomizerReadRegistryBuilder(new YangDAG());
+        CustomizerWriterRegistryBuilder writerRegistryBuilder = new CustomizerWriterRegistryBuilder(new YangDAG());
         TranslateUnit.Context transportContext = () -> cli;
 
         translateContext.provideHandlers(readerRegistryBuilder, writerRegistryBuilder, transportContext);
@@ -215,7 +214,7 @@ public class IosAll {
         WriterRegistry writerRegistry = writerRegistryBuilder.build();
 
         // Get DOM brokers
-        DataTree dataTree = getDataTree(schemaCtx, TreeType.CONFIGURATION);
+        final DataTree dataTree = getDataTree(schemaCtx, DataTreeConfiguration.DEFAULT_CONFIGURATION);
         domBroker = getDomBroker(schemaCtx, NoopDataBroker.NOOP_DATA_BROKER, codec, readerRegistry, writerRegistry,
                 dataTree);
 
@@ -275,8 +274,8 @@ public class IosAll {
         return reg;
     }
 
-    private static DataTree getDataTree(SchemaContext ctx, TreeType configuration) {
-        DataTree dataTree = new InMemoryDataTreeFactory().create(DataTreeConfiguration.builder(configuration).build());
+    private static DataTree getDataTree(final SchemaContext ctx, final DataTreeConfiguration configuration) {
+        final DataTree dataTree = new InMemoryDataTreeFactory().create(configuration);
         dataTree.setSchemaContext(ctx);
         return dataTree;
     }

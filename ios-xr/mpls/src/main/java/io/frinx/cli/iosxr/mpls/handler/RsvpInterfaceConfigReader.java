@@ -18,7 +18,7 @@ package io.frinx.cli.iosxr.mpls.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.mpls.MplsReader;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.InterfaceBuilder;
@@ -28,10 +28,10 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class RsvpInterfaceConfigReader implements MplsReader.MplsConfigReader<Config, ConfigBuilder> {
+public class RsvpInterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
             ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         configBuilder.setInterfaceId(instanceIdentifier.firstKeyOf(Interface.class)
                 .getInterfaceId());

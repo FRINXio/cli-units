@@ -19,22 +19,19 @@ package io.frinx.cli.ospf.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.ospf.OspfReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.GlobalBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DottedQuad;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, ConfigBuilder> {
+public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private Cli cli;
 
@@ -46,7 +43,7 @@ public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, C
     static final Pattern ROUTER_ID = Pattern.compile(".*?router-id (?<routerId>[0-9.]+).*");
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         String ospfId = instanceIdentifier.firstKeyOf(Protocol.class).getName();
@@ -69,8 +66,4 @@ public class GlobalConfigReader implements OspfReader.OspfConfigReader<Config, C
                 .ifPresent(rd -> builder.setRouterId(new DottedQuad(rd)));
     }
 
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((GlobalBuilder) builder).setConfig(config);
-    }
 }

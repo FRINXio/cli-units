@@ -91,7 +91,7 @@ public class OspfProtocolConfigReaderTest {
 
         final ConfigBuilder builder = new ConfigBuilder();
 
-        target.readCurrentAttributesForType(iid, builder, readContext);
+        target.readCurrentAttributes(iid, builder, readContext);
 
         Assert.assertThat(builder.getAugmentation(ProtocolConfAug.class).getExportPolicy(),
                 CoreMatchers.equalTo(Lists.newArrayList("OUT-FIL")));

@@ -21,14 +21,14 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.afi.safi.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
+public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
@@ -37,7 +37,7 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
+    public void writeCurrentAttributes(InstanceIdentifier<Config> id, Config config,
                                               WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
@@ -52,13 +52,13 @@ public class GlobalAfiSafiConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+    public void updateCurrentAttributes(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
         //NOOP
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
+    public void deleteCurrentAttributes(InstanceIdentifier<Config> id, Config config,
                                                WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(RWUtils.cutId(id, Bgp.class));
         if (!bgpOptional.isPresent()) {

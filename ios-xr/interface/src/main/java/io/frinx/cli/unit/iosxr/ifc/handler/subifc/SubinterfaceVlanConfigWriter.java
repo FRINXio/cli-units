@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.iosxr.ifc.Util;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
@@ -47,7 +48,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
 
         blockingWriteAndRead(cli, id, dataAfter,
                 f(WRITE_TEMPLATE,
-                        SubinterfaceReader.getSubinterfaceName(id),
+                        Util.getSubinterfaceName(id),
                         dataAfter.getVlanId()
                                 .getVlanId()
                                 .getValue()));
@@ -80,7 +81,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
 
         blockingDeleteAndRead(cli, id,
                 f(DELETE_TEMPLATE,
-                        SubinterfaceReader.getSubinterfaceName(id),
+                        Util.getSubinterfaceName(id),
                         dataBefore.getVlanId()
                                 .getVlanId()
                                 .getValue()));

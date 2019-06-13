@@ -19,10 +19,10 @@ package io.frinx.cli.unit.huawei.bgp.handler.local.aggregates;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.huawei.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,17 +33,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.apache.commons.net.util.SubnetUtils;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.LocalAggregatesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.Aggregate;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.AggregateBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local.aggregate.top.local.aggregates.AggregateKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReader<Aggregate, AggregateKey,
+public class BgpLocalAggregateReader implements CliConfigListReader<Aggregate, AggregateKey,
         AggregateBuilder> {
 
     private static final String GROUP_IP = "ip";
@@ -59,7 +56,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
 
     @Nonnull
     @Override
-    public List<AggregateKey> getAllIdsForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
+    public List<AggregateKey> getAllIds(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
             ReadContext readContext) throws ReadFailedException {
         String niName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
 
@@ -73,12 +70,7 @@ public class BgpLocalAggregateReader implements BgpListReader.BgpConfigListReade
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Aggregate> list) {
-        ((LocalAggregatesBuilder) builder).setAggregate(list);
-    }
-
-    @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Aggregate> instanceIdentifier, @Nonnull
             AggregateBuilder aggregateBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         aggregateBuilder.setKey(instanceIdentifier.firstKeyOf(Aggregate.class));
     }

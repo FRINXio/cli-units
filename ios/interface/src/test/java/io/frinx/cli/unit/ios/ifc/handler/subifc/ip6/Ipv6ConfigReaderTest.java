@@ -16,49 +16,26 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip6;
 
+import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.Addresses;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressKey;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6AddressNoZone;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class Ipv6ConfigReaderTest {
 
     @Test
-    public void testParse() throws Exception {
+    public void testParse() {
         final ConfigBuilder builder = new ConfigBuilder();
-        final InstanceIdentifier idLocal = InstanceIdentifier.create(Addresses.class)
-                .child(Address.class, new AddressKey((new Ipv6AddressNoZone("FE80::C801:7FF:FEBC:1C"))));
-        Ipv6ConfigReader.parseAddressConfig(builder, Ipv6AddressReaderTest.OUTPUT, idLocal);
 
-        Assert.assertEquals(new ConfigBuilder()
-                        .setIp(new Ipv6AddressNoZone("FE80::C801:7FF:FEBC:1C"))
-                        .setPrefixLength((short) 64)
-                        .build(),
-                builder.build());
-
-        InstanceIdentifier idUnicast = InstanceIdentifier.create(Addresses.class)
-                .child(Address.class, new AddressKey((new Ipv6AddressNoZone("2002::1"))));
-        Ipv6ConfigReader.parseAddressConfig(builder, Ipv6AddressReaderTest.OUTPUT, idUnicast);
+        new Ipv6ConfigReader(Mockito.mock(Cli.class))
+                .parseAddressConfig(builder, Ipv6AddressReaderTest.OUTPUT, new Ipv6AddressNoZone("2002::1"));
 
         Assert.assertEquals(new ConfigBuilder()
                 .setIp(new Ipv6AddressNoZone("2002::1"))
                 .setPrefixLength((short) 65)
                 .build(),
                 builder.build());
-
-        idUnicast = InstanceIdentifier.create(Addresses.class)
-                .child(Address.class, new AddressKey((new Ipv6AddressNoZone("2003::1"))));
-        Ipv6ConfigReader.parseAddressConfig(builder, Ipv6AddressReaderTest.OUTPUT, idUnicast);
-
-        Assert.assertEquals(new ConfigBuilder()
-                .setIp(new Ipv6AddressNoZone("2003::1"))
-                .setPrefixLength((short) 124)
-                .build(),
-                builder.build());
     }
-
 }

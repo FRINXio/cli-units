@@ -22,12 +22,9 @@ import io.frinx.cli.iosxr.bgp.handler.BgpProtocolWriter;
 import io.frinx.cli.iosxr.ospf.handler.OspfProtocolWriter;
 import io.frinx.cli.iosxr.ospfv3.handler.OspfV3ProtocolWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.INSTALLPROTOCOLTYPE;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 
-public class ProtocolConfigWriter extends CompositeWriter {
+public class ProtocolConfigWriter extends CompositeWriter<Config> {
 
     public ProtocolConfigWriter(final Cli cli) {
         super(Lists.newArrayList(
@@ -35,11 +32,5 @@ public class ProtocolConfigWriter extends CompositeWriter {
                 new OspfProtocolWriter(cli),
                 new OspfV3ProtocolWriter(cli)
         ));
-    }
-
-    public static boolean checkProtocolType(InstanceIdentifier<?> id, Class<? extends INSTALLPROTOCOLTYPE> type) {
-        ProtocolKey protocolKey = id.firstKeyOf(Protocol.class);
-
-        return protocolKey != null && type.equals(protocolKey.getIdentifier());
     }
 }

@@ -20,7 +20,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.rib.handler.Ipv4RoutesReader;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

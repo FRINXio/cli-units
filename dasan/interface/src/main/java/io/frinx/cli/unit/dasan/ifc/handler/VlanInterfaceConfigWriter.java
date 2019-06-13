@@ -21,7 +21,8 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import javax.annotation.Nonnull;
@@ -30,7 +31,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L3ipvlan;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VlanInterfaceConfigWriter implements CliWriter<Config> {
+public class VlanInterfaceConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
 
     private Cli cli;
 
@@ -39,15 +40,16 @@ public class VlanInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String name = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = VlanInterfaceReader.INTERFACE_NAME_PATTERN.matcher(name);
         if (!matcher.matches() || data.getType() != L3ipvlan.class) {
-            return;
+            return false;
         }
         writeOrUpdateInterface(id, data, matcher.group("id"));
+        return true;
     }
 
     @VisibleForTesting
@@ -58,28 +60,30 @@ public class VlanInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
             @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String name = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = VlanInterfaceReader.INTERFACE_NAME_PATTERN.matcher(name);
         if (!matcher.matches() || dataAfter.getType() != L3ipvlan.class) {
-            return;
+            return false;
         }
         validateIfcNameAgainstType(dataAfter);
         writeOrUpdateInterface(id, dataAfter, name);
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String name = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = VlanInterfaceReader.INTERFACE_NAME_PATTERN.matcher(name);
         if (!matcher.matches() || dataBefore.getType() != L3ipvlan.class) {
-            return;
+            return false;
         }
         deleteInterface(id, dataBefore, name);
+        return true;
     }
 
     private void deleteInterface(InstanceIdentifier<Config> id, Config data, String vlanId)

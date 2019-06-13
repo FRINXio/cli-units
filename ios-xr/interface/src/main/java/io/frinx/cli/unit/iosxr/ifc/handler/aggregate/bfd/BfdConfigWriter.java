@@ -25,7 +25,6 @@ import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd.rev171024.bfd.top.bfd.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -45,8 +44,7 @@ public class BfdConfigWriter implements CliWriter<Config> {
 
         checkIfcType(ifcName);
 
-        IpAddress destinationAddress = dataAfter.getDestinationAddress();
-        Ipv4Address destinationIpv4 = destinationAddress != null ? destinationAddress.getIpv4Address() : null;
+        Ipv4Address destinationIpv4 = dataAfter.getDestinationAddress();
 
         blockingWriteAndRead(cli, id, dataAfter,
                 f("interface %s", ifcName),
@@ -61,8 +59,8 @@ public class BfdConfigWriter implements CliWriter<Config> {
                 "root");
     }
 
-    private static void checkIfcType(String ifcName) {
-        Preconditions.checkArgument(AggregateConfigReader.isLAGInterface(ifcName),
+    private void checkIfcType(String ifcName) {
+        Preconditions.checkArgument(new AggregateConfigReader(cli).isLAGInterface(ifcName),
                 "Cannot configure bfd on non-LAG interface %s", ifcName);
     }
 

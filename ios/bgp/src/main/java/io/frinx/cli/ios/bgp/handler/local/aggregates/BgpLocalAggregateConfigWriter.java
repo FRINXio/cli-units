@@ -20,10 +20,10 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter;
 import io.frinx.cli.ios.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +42,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
+public class BgpLocalAggregateConfigWriter implements CliWriter<Config> {
 
     private final Cli cli;
 
@@ -82,8 +82,9 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,
-                                              WriteContext writeContext) throws WriteFailedException {
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                 @Nonnull Config config,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
         final Protocols networkInstance =
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance.class).child(Protocols
                         .class)).get();
@@ -134,16 +135,19 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
         // this is fine, we manipulate with networks and masks only, and there can be multiple masks
         deleteCurrentAttributes(id, dataBefore, writeContext);
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                  @Nonnull Config config,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
         final Protocols networkInstance =
                 writeContext.readBefore(RWUtils.cutId(instanceIdentifier, NetworkInstance.class).child(Protocols
                         .class)).get();

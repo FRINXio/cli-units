@@ -14,112 +14,117 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<!-- vi: set et smarttab sw=4 tabstop=4: -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.opendaylight.odlparent</groupId>
-    <artifactId>odlparent</artifactId>
-    <version>3.1.1-Oxygen-SR2.4_2_1_rc9-frinxodl-SNAPSHOT</version>
-    <relativePath/>
-  </parent>
+    <parent>
+        <groupId>org.opendaylight.odlparent</groupId>
+        <artifactId>odlparent</artifactId>
+        <version>3.1.1-Oxygen-SR2.4_2_1_rc9-frinxodl-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
 
-  <groupId>io.frinx.cli</groupId>
-  <artifactId>cli-units-aggregator</artifactId>
-  <version>4.2.1.rc9-frinx-SNAPSHOT</version>
-  <packaging>pom</packaging>
+    <groupId>io.frinx.cli</groupId>
+    <artifactId>cli-units-aggregator</artifactId>
+    <version>4.2.1.rc9-frinx-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-  <modules>
-    <module>artifacts</module>
-    <module>ios-common</module>
-    <module>ios</module>
-    <module>ios-xr</module>
-    <module>brocade</module>
-    <module>junos</module>
-    <module>huawei</module>
-    <module>features</module>
-    <module>unit-parent</module>
-    <module>nexus</module>
-    <module>dasan</module>
-    <module>yang-docs-plugin</module>
-  </modules>
+    <modules>
+        <module>artifacts</module>
+        <module>ios-common</module>
+        <module>ios</module>
+        <module>ios-xr</module>
+        <module>brocade</module>
+        <module>junos</module>
+        <module>huawei</module>
+        <module>features</module>
+        <module>unit-parent</module>
+        <module>nexus</module>
+        <module>dasan</module>
+        <module>yang-docs-plugin</module>
+        <module>interface-base</module>
+        <module>network-instance-base</module>
+    </modules>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
-  <profiles>
-    <profile>
-      <id>karaf</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>karaf</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <!--
-          This profile is to ensure we only build javadocs reports
-          when we plan to deploy Maven site for our project.
-      -->
-      <id>maven-site</id>
-      <activation>
-        <file>
-          <exists>${user.dir}/deploy-site.xml</exists>
-        </file>
-      </activation>
-
-      <build>
+    <build>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <inherited>false</inherited>
-            <executions>
-              <execution>
-                <id>aggregate</id>
-                <goals>
-                  <goal>aggregate</goal>
-                </goals>
-                <phase>package</phase>
-            </execution>
-            </executions>
-          </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
         </plugins>
-      </build>
-    </profile>
-  </profiles>
+    </build>
 
-  <!--
-      Maven Site Configuration
+    <profiles>
+        <profile>
+            <id>karaf</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>karaf</module>
+            </modules>
+        </profile>
 
-      The following configuration is necessary for maven-site-plugin to
-      correctly identify the correct deployment path for OpenDaylight Maven
-      sites.
-  -->
-  <url>${odl.site.url}/${project.groupId}/${stream}/</url>
+        <profile>
+            <!--
+                This profile is to ensure we only build javadocs reports
+                when we plan to deploy Maven site for our project.
+            -->
+            <id>maven-site</id>
+            <activation>
+                <file>
+                    <exists>${user.dir}/deploy-site.xml</exists>
+                </file>
+            </activation>
 
-  <distributionManagement>
-    <site>
-      <id>opendaylight-site</id>
-      <url>${nexus.site.url}/</url>
-    </site>
-  </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <executions>
+                            <execution>
+                                <id>aggregate</id>
+                                <goals>
+                                    <goal>aggregate</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <!--
+        Maven Site Configuration
+
+        The following configuration is necessary for maven-site-plugin to
+        correctly identify the correct deployment path for OpenDaylight Maven
+        sites.
+    -->
+    <url>${odl.site.url}/${project.groupId}/${stream}/</url>
+
+    <distributionManagement>
+        <site>
+            <id>opendaylight-site</id>
+            <url>${nexus.site.url}/</url>
+        </site>
+    </distributionManagement>
 </project>

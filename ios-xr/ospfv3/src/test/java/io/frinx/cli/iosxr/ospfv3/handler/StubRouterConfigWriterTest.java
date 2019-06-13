@@ -97,7 +97,7 @@ public class StubRouterConfigWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        writer.writeCurrentAttributesForType(iid, data, context);
+        writer.writeCurrentAttributes(iid, data, context);
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue()
@@ -112,7 +112,7 @@ public class StubRouterConfigWriterTest {
                 .setSet(true)
                 .build();
 
-        writer.updateCurrentAttributesForType(iid, data, newData, context);
+        writer.updateCurrentAttributes(iid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -122,7 +122,7 @@ public class StubRouterConfigWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
-        writer.deleteCurrentAttributesForType(iid, data, context);
+        writer.deleteCurrentAttributes(iid, data, context);
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue()

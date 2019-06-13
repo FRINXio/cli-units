@@ -14,31 +14,33 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<!-- vi: set et smarttab sw=4 tabstop=4: -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>io.frinx.cli</groupId>
-    <artifactId>unit-parent</artifactId>
+    <parent>
+        <groupId>io.frinx.cli</groupId>
+        <artifactId>unit-parent</artifactId>
+        <version>4.2.1.rc9-frinx-SNAPSHOT</version>
+        <relativePath>../../unit-parent</relativePath>
+    </parent>
+
+    <artifactId>huawei-cli-init-unit</artifactId>
     <version>4.2.1.rc9-frinx-SNAPSHOT</version>
-    <relativePath>../../unit-parent</relativePath>
-  </parent>
+    <packaging>bundle</packaging>
 
-  <artifactId>huawei-cli-init-unit</artifactId>
-  <version>4.2.1.rc9-frinx-SNAPSHOT</version>
-  <packaging>bundle</packaging>
-
-  <dependencies>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>topology-api</artifactId>
-      <version>${cli.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
-      <artifactId>translation-registry-model</artifactId>
-      <version>${cli.version}</version>
-    </dependency>
-  </dependencies>
-
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>topology-api</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>translation-registry-model</artifactId>
+            <version>${cli.version}</version>
+        </dependency>
+    </dependencies>
 </project>

@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.dasan.network.instance.handler;
 
-import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.handlers.def.DefaultConfigReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
@@ -35,7 +34,7 @@ public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigB
 
     @SuppressWarnings("serial")
     public NetworkInstanceConfigReader(Cli cli) {
-        super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {
+        super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {
             {
                 add(new DefaultConfigReader());
             }

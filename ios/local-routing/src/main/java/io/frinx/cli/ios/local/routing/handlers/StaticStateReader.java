@@ -20,22 +20,19 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.local.routing.common.LrReader;
+import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.StateBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StaticStateReader implements LrReader.LrOperReader<State, StateBuilder> {
+public class StaticStateReader implements CliOperReader<State, StateBuilder> {
 
     private static final String SH_IP_STATIC_ROUTE = "show ip route | include %s";
     private static final String SH_IPV6_STATIC_ROUTE = "show ipv6 route | include %s";
@@ -72,7 +69,7 @@ public class StaticStateReader implements LrReader.LrOperReader<State, StateBuil
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         IpPrefix ipPrefix = instanceIdentifier.firstKeyOf(Static.class).getPrefix();
@@ -84,8 +81,4 @@ public class StaticStateReader implements LrReader.LrOperReader<State, StateBuil
         }
     }
 
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State state) {
-        ((StaticBuilder) builder).setState(state);
-    }
 }

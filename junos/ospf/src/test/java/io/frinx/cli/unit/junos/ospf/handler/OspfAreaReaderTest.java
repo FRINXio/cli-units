@@ -95,7 +95,7 @@ public class OspfAreaReaderTest {
                 Mockito.eq(iid),
                 Mockito.eq(readContext));
 
-        List<AreaKey> result = target.getAllIdsForType(iid, readContext);
+        List<AreaKey> result = target.getAllIds(iid, readContext);
 
         Assert.assertThat(result, CoreMatchers.equalTo(EXPECTED_AREA_KEYS));
 
@@ -119,7 +119,7 @@ public class OspfAreaReaderTest {
 
         final AreaBuilder builder = new AreaBuilder();
 
-        target.readCurrentAttributesForType(iid, builder , readContext);
+        target.readCurrentAttributes(iid, builder , readContext);
 
         Assert.assertEquals(builder.getIdentifier().getDottedQuad().getValue(), area);
     }

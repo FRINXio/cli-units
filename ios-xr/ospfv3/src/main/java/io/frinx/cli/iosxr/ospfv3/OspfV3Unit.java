@@ -18,26 +18,19 @@ package io.frinx.cli.iosxr.ospfv3;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.iosxr.ospfv3.handler.StubRouterConfigReader;
 import io.frinx.cli.iosxr.ospfv3.handler.StubRouterConfigWriter;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
-import io.frinx.cli.unit.utils.NoopCliWriter;
+import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.openconfig.openconfig.ospfv3.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.ProtocolOspfv3ExtAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.ospfv3.global.structural.GlobalBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.ospfv3.global.structural.global.config.StubRouterBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.ospfv3.top.Ospfv3Builder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class OspfV3Unit implements TranslateUnit {
@@ -65,34 +58,22 @@ public class OspfV3Unit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
-            @Nonnull ModifiableWriterRegistryBuilder writeRegistry, @Nonnull Context context) {
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
+                                @Nonnull Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
         provideWriters(writeRegistry, cli);
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder rreg, Cli cli) {
-        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG, ProtocolOspfv3ExtAugBuilder.class);
-        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OSPFV3, Ospfv3Builder.class);
-        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GLOBAL, GlobalBuilder.class);
-        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CONFIG,
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
-                .ospfv3.rev180817.ospfv3.global.structural.global.ConfigBuilder.class);
-        rreg.addStructuralReader(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_STUBROUTER,
-                StubRouterBuilder.class);
-        rreg.add(new GenericConfigReader<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_ST_CONFIG,
-                new StubRouterConfigReader(cli)));
+    private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder rreg, Cli cli) {
+        rreg.add(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_ST_CONFIG, new StubRouterConfigReader(cli));
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder wreg, Cli cli) {
-        wreg.addAfter(new GenericWriter<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CONFIG,
-                new NoopCliWriter<>()),
-                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_PR_PR_CONFIG);
-        wreg.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_STUBROUTER,
-                new NoopCliWriter<>()));
-        wreg.add(new GenericWriter<>(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_ST_CONFIG,
-                new StubRouterConfigWriter(cli)));
+    private void provideWriters(CustomizerAwareWriteRegistryBuilder wreg, Cli cli) {
+        wreg.addNoop(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CONFIG);
+        wreg.addNoop(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_STUBROUTER);
+        wreg.add(IIDs.NE_NE_PR_PR_AUG_PROTOCOLOSPFV3EXTAUG_OS_GL_CO_ST_CONFIG, new StubRouterConfigWriter(cli));
     }
 
     @Override

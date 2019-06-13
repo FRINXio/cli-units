@@ -99,7 +99,7 @@ public class BundleEtherLacpMemberConfigWriterTest {
     @Test
     public void testWriteCurrentAttributes_001() throws Exception {
         prepare(Ieee8023adLag.class, "Ethernet3/4", "Bundle-Ether8");
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue()
                 .getContent());
@@ -108,7 +108,7 @@ public class BundleEtherLacpMemberConfigWriterTest {
     @Test
     public void testWriteCurrentAttributes_002() throws Exception {
         prepare(Ieee8023adLag.class, "Ethernet4/4", null);
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
 
@@ -117,7 +117,7 @@ public class BundleEtherLacpMemberConfigWriterTest {
         prepare(Ieee8023adLag.class, "Ethernet2/4", "Bundle-Ether8");
         ConfigBuilder builder = new ConfigBuilder();
         data = builder.build();
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
 
@@ -125,7 +125,7 @@ public class BundleEtherLacpMemberConfigWriterTest {
     public void testUpdateCurrentAttributes_001() throws Exception {
         prepare(Ieee8023adLag.class, "Ethernet3/4", "Bundle-Ether8");
         Config dataBefore = generateConfig(Ieee8023adLag.class, "Ethernet3/4", "Bundle-Ether9");
-        target.updateCurrentAttributes(id, dataBefore, data, context);
+        target.updateCurrentAttributesWResult(id, dataBefore, data, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(UPDATE_INPUT, response.getValue()
                 .getContent());
@@ -135,7 +135,7 @@ public class BundleEtherLacpMemberConfigWriterTest {
     public void testUpdateCurrentAttributes_002() throws Exception {
         prepare(Ieee8023adLag.class, "Ethernet3/4", null);
         Config dataBefore = generateConfig(Ieee8023adLag.class, "Ethernet3/4", "Bundle-Ether9");
-        target.updateCurrentAttributes(id, dataBefore, data, context);
+        target.updateCurrentAttributesWResult(id, dataBefore, data, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(UPDATE_INPUT_NONASSIGN, response.getValue()
                 .getContent());
@@ -144,7 +144,7 @@ public class BundleEtherLacpMemberConfigWriterTest {
     @Test
     public void testDeleteCurrentAttributes_001() throws Exception {
         prepare(Ieee8023adLag.class, "Ethernet2/4", "Bundle-Ether7");
-        target.deleteCurrentAttributes(id, data, context);
+        target.deleteCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue()
                 .getContent());

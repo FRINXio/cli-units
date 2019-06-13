@@ -93,7 +93,7 @@ public class AreaInterfaceTimersConfigReaderTest {
 
         final ConfigBuilder builder = new ConfigBuilder();
 
-        target.readCurrentAttributesForType(iid, builder, readContext);
+        target.readCurrentAttributes(iid, builder, readContext);
 
         Assert.assertThat(builder.getRetransmissionInterval(), CoreMatchers.equalTo(TimersName));
     }

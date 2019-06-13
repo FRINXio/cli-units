@@ -20,8 +20,8 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.network.instance.L3VrfListWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliListWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
@@ -29,7 +29,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceKey> {
+public class VrfInterfaceWriter implements CliListWriter<Interface, InterfaceKey> {
 
     private final Cli cli;
     private static final String WRITE_TEMPLATE = "configure terminal\n"
@@ -47,7 +47,7 @@ public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceK
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Interface> instanceIdentifier, Interface anInterface,
+    public void writeCurrentAttributes(InstanceIdentifier<Interface> instanceIdentifier, Interface anInterface,
                                               WriteContext writeContext) throws WriteFailedException {
 
         boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx
@@ -70,14 +70,14 @@ public class VrfInterfaceWriter implements L3VrfListWriter<Interface, InterfaceK
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Interface> id, Interface dataBefore,
+    public void updateCurrentAttributes(InstanceIdentifier<Interface> id, Interface dataBefore,
                                                Interface dataAfter, WriteContext writeContext) throws
             WriteFailedException {
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Interface> instanceIdentifier, Interface anInterface,
+    public void deleteCurrentAttributes(InstanceIdentifier<Interface> instanceIdentifier, Interface anInterface,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey networkInstanceKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 

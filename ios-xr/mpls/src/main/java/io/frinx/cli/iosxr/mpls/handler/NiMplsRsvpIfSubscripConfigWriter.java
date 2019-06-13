@@ -19,8 +19,8 @@ package io.frinx.cli.iosxr.mpls.handler;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.mpls.MplsWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension.rev171024.MplsRsvpSubscriptionConfig;
@@ -30,7 +30,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev17082
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.rsvp.rev170824.rsvp.global.rsvp.te._interface.attributes.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NiMplsRsvpIfSubscripConfigWriter implements MplsWriter<Config> {
+public class NiMplsRsvpIfSubscripConfigWriter implements CliWriter<Config> {
 
     private static final String BW_FORMAT = "0.###";
     private final Cli cli;
@@ -40,7 +40,7 @@ public class NiMplsRsvpIfSubscripConfigWriter implements MplsWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id,
+    public void writeCurrentAttributes(InstanceIdentifier<Config> id,
                                               Config config,
                                               WriteContext writeContext) throws WriteFailedException {
         Percentage subscription = config.getSubscription();
@@ -81,15 +81,15 @@ public class NiMplsRsvpIfSubscripConfigWriter implements MplsWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id,
+    public void updateCurrentAttributes(InstanceIdentifier<Config> id,
                                                Config dataBefore,
                                                Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id,
+    public void deleteCurrentAttributes(InstanceIdentifier<Config> id,
                                                Config config,
                                                WriteContext writeContext) throws WriteFailedException {
         final String name = id.firstKeyOf(Interface.class)

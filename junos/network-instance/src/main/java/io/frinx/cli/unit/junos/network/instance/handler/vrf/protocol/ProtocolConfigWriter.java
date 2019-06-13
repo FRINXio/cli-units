@@ -20,11 +20,7 @@ import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.junos.ospf.handler.OspfProtocolConfigWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.INSTALLPROTOCOLTYPE;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ProtocolConfigWriter extends CompositeWriter<Config> {
 
@@ -32,11 +28,5 @@ public class ProtocolConfigWriter extends CompositeWriter<Config> {
         super(Lists.newArrayList(
                 new OspfProtocolConfigWriter(cli)
         ));
-    }
-
-    public static boolean checkProtocolType(InstanceIdentifier<?> id, Class<? extends INSTALLPROTOCOLTYPE> type) {
-        ProtocolKey protocolKey = id.firstKeyOf(Protocol.class);
-
-        return protocolKey != null && type.equals(protocolKey.getIdentifier());
     }
 }

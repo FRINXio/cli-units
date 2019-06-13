@@ -19,21 +19,21 @@ package io.frinx.cli.unit.junos.init;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.spi.write.CommitFailedException;
 import io.fd.honeycomb.translate.spi.write.PostCommitHook;
 import io.fd.honeycomb.translate.spi.write.PostFailedHook;
 import io.fd.honeycomb.translate.spi.write.PreCommitHook;
 import io.fd.honeycomb.translate.write.RevertFailedException;
 import io.fd.honeycomb.translate.write.RevertSuccessException;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.SessionInitializationStrategy;
-import io.frinx.cli.junos.JunosDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -85,10 +85,11 @@ public class JunosCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
+    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
-        // NO-OP
+        readRegistry.addCheckRegistry(ChecksMap.OPENCONFIG_REGISTRY);
+        writeRegistry.addCheckRegistry(ChecksMap.OPENCONFIG_REGISTRY);
     }
 
     @Override
@@ -182,9 +183,9 @@ public class JunosCliInitializerUnit implements TranslateUnit {
 
     @Override
     public Set<Pattern> getCommitErrorPatterns() {
-        return Sets.newLinkedHashSet(Arrays.asList(
+        return Sets.newLinkedHashSet(Collections.singletonList(
                 Pattern.compile("(^|\\n)(?i)error:(?-i) .*", Pattern.DOTALL)
-            ));
+        ));
     }
 
     @Override

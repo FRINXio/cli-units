@@ -17,8 +17,8 @@
 package io.frinx.cli.unit.iosxr.network.instance.handler.vrf;
 
 import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.io.Cli;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
@@ -29,24 +29,27 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L3VRF;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L3VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
+public final class L3VrfConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         CompositeReader.Child<Config, ConfigBuilder> {
 
-    private Cli cli;
+    public L3VrfConfigReader() {
 
-    public L3VrfConfigReader(Cli cli) {
-        this.cli = cli;
     }
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+                                      @Nonnull ReadContext readContext) {
         String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         if (NetworInstance.DEFAULT_NETWORK_NAME.equals(name)) {
             return;
         }
         configBuilder.setName(name);
         configBuilder.setType(L3VRF.class);
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 }

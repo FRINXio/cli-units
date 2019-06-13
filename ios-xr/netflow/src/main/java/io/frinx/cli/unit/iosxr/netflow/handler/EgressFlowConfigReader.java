@@ -20,13 +20,10 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.netflow.handler.util.FlowDetails;
-import io.frinx.cli.unit.iosxr.netflow.handler.util.InterfaceCheckUtil;
 import io.frinx.cli.unit.iosxr.netflow.handler.util.NetflowUtils;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.handler.spi.TypedReader;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.NETFLOWTYPE;
@@ -35,15 +32,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.egress.netflow.top.egress.flows.egress.flow.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228._interface.egress.netflow.top.egress.flows.egress.flow.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.netflow.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class EgressFlowConfigReader implements TypedReader<Config, ConfigBuilder>, CliConfigReader<Config,
-        ConfigBuilder> {
+public class EgressFlowConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_SINGLE_INTERFACE_FLOW_CFG =
             "show running-config interface %s | include flow %s monitor";
@@ -57,13 +50,7 @@ public class EgressFlowConfigReader implements TypedReader<Config, ConfigBuilder
     }
 
     @Override
-    public boolean containsAllKeys(final Stream<? extends Identifier<? extends DataObject>> keys,
-                                   final InstanceIdentifier<Config> instanceIdentifier) {
-        return InterfaceCheckUtil.checkInterfaceType(instanceIdentifier, EthernetCsmacd.class, Ieee8023adLag.class);
-    }
-
-    @Override
-    public void readCurrentAttributesForType(@Nonnull final InstanceIdentifier<Config> id,
+    public void readCurrentAttributes(@Nonnull final InstanceIdentifier<Config> id,
                                              @Nonnull final ConfigBuilder builder,
                                              @Nonnull final ReadContext ctx) throws ReadFailedException {
         final InterfaceId ifcName = id.firstKeyOf(Interface.class)

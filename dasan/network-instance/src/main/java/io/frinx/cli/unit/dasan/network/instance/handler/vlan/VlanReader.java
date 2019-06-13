@@ -19,6 +19,8 @@ package io.frinx.cli.unit.dasan.network.instance.handler.vlan;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.dasan.utils.DasanCliUtil;
 import io.frinx.cli.unit.utils.CliConfigListReader;
@@ -102,5 +104,10 @@ public class VlanReader implements CliConfigListReader<Vlan, VlanKey, VlanBuilde
     @Override
     public void merge(Builder<? extends DataObject> builder, List<Vlan> list) {
         ((VlansBuilder) builder).setVlan(list);
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 }

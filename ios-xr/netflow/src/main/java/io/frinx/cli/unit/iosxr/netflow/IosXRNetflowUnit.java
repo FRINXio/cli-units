@@ -21,13 +21,13 @@ import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.api.TranslationUnitCollector.Registration;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.iosxr.netflow.handler.EgressFlowConfigReader;
 import io.frinx.cli.unit.iosxr.netflow.handler.EgressFlowConfigWriter;
 import io.frinx.cli.unit.iosxr.netflow.handler.EgressFlowReader;
@@ -80,8 +80,8 @@ public final class IosXRNetflowUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
+    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
         Cli cli = context.getTransport();
 
@@ -89,7 +89,7 @@ public final class IosXRNetflowUnit implements TranslateUnit {
         provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(final ModifiableWriterRegistryBuilder writeRegistry, final Cli cli) {
+    private void provideWriters(final CustomizerAwareWriteRegistryBuilder writeRegistry, final Cli cli) {
         writeRegistry.add(new GenericWriter<>(IIDs.NE_INTERFACES, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_INTERFACE, new NoopCliWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_CONFIG, new NoopCliWriter<>()));
@@ -103,7 +103,7 @@ public final class IosXRNetflowUnit implements TranslateUnit {
         writeRegistry.add(new GenericWriter<>(IIDs.NE_IN_IN_EG_EG_CONFIG, new EgressFlowConfigWriter(cli)));
     }
 
-    private void provideReaders(final ModifiableReaderRegistryBuilder readRegistry, final Cli cli) {
+    private void provideReaders(final CustomizerAwareReadRegistryBuilder readRegistry, final Cli cli) {
         readRegistry.addStructuralReader(IIDs.NETFLOW, NetflowBuilder.class);
         readRegistry.addStructuralReader(IIDs.NE_INTERFACES, InterfacesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.NE_IN_INTERFACE, new NetflowInterfaceReader(cli)));

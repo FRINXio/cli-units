@@ -18,6 +18,8 @@ package io.frinx.cli.unit.dasan.ifc.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
@@ -65,5 +67,10 @@ public class VlanInterfaceConfigReader
 
         ParsingUtils.parseField(output, 0, MTU_LINE::matcher, matcher -> Integer.valueOf(matcher.group("mtu")),
                 builder::setMtu);
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 }

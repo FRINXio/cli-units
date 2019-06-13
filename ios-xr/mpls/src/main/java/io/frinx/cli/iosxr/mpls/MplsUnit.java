@@ -21,11 +21,12 @@ import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.iosxr.mpls.handler.LdpInterfaceConfigReader;
 import io.frinx.cli.iosxr.mpls.handler.LdpInterfaceConfigWriter;
 import io.frinx.cli.iosxr.mpls.handler.LdpInterfaceReader;
@@ -50,9 +51,11 @@ import io.frinx.cli.iosxr.mpls.handler.TunnelConfigWriter;
 import io.frinx.cli.iosxr.mpls.handler.TunnelReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.LdpBuilder;
@@ -112,16 +115,28 @@ public class MplsUnit implements TranslateUnit {
         return Sets.newHashSet();
     }
 
+    private static final CheckRegistry CHECK_REGISTRY;
+
+    static {
+        CheckRegistry.Builder builder = new CheckRegistry.Builder();
+        builder.add(IIDs.NE_NE_MPLS,
+                BasicCheck.checkData(ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+                        ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_DEFAULTINSTANCE));
+        CHECK_REGISTRY = builder.build();
+    }
+
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
-                                @Nonnull final TranslateUnit.Context context) {
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
+                                @Nonnull Context context) {
         Cli cli = context.getTransport();
+        readRegistry.addCheckRegistry(CHECK_REGISTRY);
         provideReaders(readRegistry, cli);
+        writeRegistry.addCheckRegistry(CHECK_REGISTRY);
         provideWriters(writeRegistry, cli);
     }
 
-    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+    private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MPLS, new NoopCliWriter<>()));
 
         // RSVP
@@ -170,7 +185,7 @@ public class MplsUnit implements TranslateUnit {
         writeRegistry.add(new GenericWriter<>(IIDs.NE_NE_MP_LS_CO_TU_TU_P2_CONFIG, new P2pAttributesConfigWriter(cli)));
     }
 
-    private void provideReaders(@Nonnull ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.NE_NE_MPLS, MplsBuilder.class);
 
         // RSVP

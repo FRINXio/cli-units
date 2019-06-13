@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.junos.ifc.Util;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
@@ -48,7 +49,7 @@ public class SubinterfaceVlanConfigReader implements CliConfigReader<Config, Con
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
         @Nonnull ReadContext ctx) throws ReadFailedException {
 
-        String subIfcName = SubinterfaceReader.getSubinterfaceName(id);
+        String subIfcName = Util.getSubinterfaceName(id);
 
         String output = blockingRead(String.format("show configuration interfaces %s | display set", subIfcName), cli,
             id, ctx);

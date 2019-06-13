@@ -108,12 +108,12 @@ public class BundleConfigWriter implements CliWriter<Config> {
                         "lacp_interval", config.getInterval()));
     }
 
-    private static void checkInterface(@Nonnull String ifcName, WriteContext writeContext) {
+    private void checkInterface(@Nonnull String ifcName, WriteContext writeContext) {
         Optional<Interface> interfaceOptional = writeContext.readAfter(IIDs.INTERFACES
                 .child(Interface.class, new InterfaceKey(ifcName)));
         Preconditions.checkArgument(interfaceOptional.isPresent(), "Cannot change LACP "
                 + "configuration for non-existing interface %s", ifcName);
-        Preconditions.checkArgument(AggregateConfigReader.isLAGInterface(ifcName),
+        Preconditions.checkArgument(new AggregateConfigReader(cli).isLAGInterface(ifcName),
                 "Cannot change LACP configuration for non-bundle interface %s", ifcName);
     }
 }

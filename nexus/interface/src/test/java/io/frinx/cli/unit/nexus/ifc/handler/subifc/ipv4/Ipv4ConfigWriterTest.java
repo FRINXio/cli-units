@@ -18,6 +18,8 @@ package io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv4;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigReaderTest;
+import io.frinx.cli.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigWriterTest;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import java.util.concurrent.CompletableFuture;
@@ -28,20 +30,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.Ipv4;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.Addresses;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.Address;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.AddressKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.Subinterfaces;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class Ipv4ConfigWriterTest {
@@ -54,6 +43,10 @@ public class Ipv4ConfigWriterTest {
             + " no ip address 192.168.1.1/16\n"
             + "root\n";
 
+    private static final String UPDATE_INPUT = "interface Ethernet1/1.5\n"
+            + " ip address 192.168.1.5/24\n"
+            + "root\n";
+
     @Mock
     private Cli cli;
 
@@ -64,10 +57,10 @@ public class Ipv4ConfigWriterTest {
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
-    private InstanceIdentifier<Config> iid;
+    private InstanceIdentifier<Config> iid = AbstractIpv4ConfigWriterTest.configIID("Ethernet1/1.5", 0L);
 
     // test data
-    private Config data;
+    private Config data = AbstractIpv4ConfigReaderTest.buildData("192.168.1.1", "16");
 
     @Before
     public void setUp() {
@@ -77,30 +70,10 @@ public class Ipv4ConfigWriterTest {
                 .then(invocation -> CompletableFuture.completedFuture(""));
 
         this.writer = new Ipv4ConfigWriter(this.cli);
-        initializeData();
-
-        final InterfaceKey interfaceKey = new InterfaceKey("Ethernet1/1.5");
-        final SubinterfaceKey subinterfaceKey = new SubinterfaceKey(Long.valueOf(0));
-        iid = InstanceIdentifier.create(Interfaces.class)
-                .child(Interface.class, interfaceKey)
-                .child(Subinterfaces.class)
-                .child(Subinterface.class, subinterfaceKey)
-                .augmentation(Subinterface1.class)
-                .child(Ipv4.class)
-                .child(Addresses.class)
-                .child(Address.class, new AddressKey(new Ipv4AddressNoZone("192.168.1.1")))
-                .child(Config.class);
-    }
-
-    private void initializeData() {
-        data = new ConfigBuilder()
-                .setIp(new Ipv4AddressNoZone("192.168.1.1"))
-                .setPrefixLength((short) 16)
-                .build();
     }
 
     @Test
-    public void write() throws WriteFailedException {
+    public void testWrite() throws WriteFailedException {
         this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
@@ -108,11 +81,20 @@ public class Ipv4ConfigWriterTest {
     }
 
     @Test
-    public void delete() throws WriteFailedException {
+    public void testDelete() throws WriteFailedException {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 
+    @Test
+    public void testUpdate() throws WriteFailedException {
+        Config newData = AbstractIpv4ConfigReaderTest.buildData("192.168.1.5", "24");
+
+        this.writer.updateCurrentAttributes(iid, data, newData, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+    }
 }

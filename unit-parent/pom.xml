@@ -15,7 +15,9 @@
   ~ limitations under the License.
   -->
 <!-- vi: set et smarttab sw=4 tabstop=4: -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -114,17 +116,17 @@
 
         <!-- Cli -->
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>translation-registry-api</artifactId>
             <version>${cli.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>translation-registry-spi</artifactId>
             <version>${cli.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>io-api</artifactId>
             <version>${cli.version}</version>
         </dependency>
@@ -145,7 +147,7 @@
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>translate-impl</artifactId>
             <version>${hc.version}</version>
-         </dependency>
+        </dependency>
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
             <artifactId>translate-utils</artifactId>
@@ -223,7 +225,7 @@
                                     <resourceBaseDir>${project.build.directory}/generated-sources/spi</resourceBaseDir>
                                 </generator>
                             </codeGenerators>
-                            <inspectOnlyDependencies>true</inspectOnlyDependencies>
+                            <inspectDependencies>true</inspectDependencies>
                         </configuration>
                     </execution>
                 </executions>
@@ -241,7 +243,5 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
     </build>
-
 </project>

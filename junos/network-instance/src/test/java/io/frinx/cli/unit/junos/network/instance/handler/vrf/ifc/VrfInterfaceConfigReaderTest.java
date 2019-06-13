@@ -55,7 +55,7 @@ public class VrfInterfaceConfigReaderTest {
     @Test
     public void testReadCurrentAttributesForType() throws Exception {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        target.readCurrentAttributesForType(IIDS_INTERFACE_CONFIG, configBuilder , readContext);
+        target.readCurrentAttributes(IIDS_INTERFACE_CONFIG, configBuilder , readContext);
 
         Assert.assertThat(configBuilder.getId(), CoreMatchers.sameInstance(IFC_NAME));
     }

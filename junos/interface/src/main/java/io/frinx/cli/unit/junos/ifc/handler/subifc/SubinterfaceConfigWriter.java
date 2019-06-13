@@ -16,69 +16,48 @@
 
 package io.frinx.cli.unit.junos.ifc.handler.subifc;
 
-import com.google.common.base.Preconditions;
-import io.fd.honeycomb.translate.util.RWUtils;
-import io.fd.honeycomb.translate.write.WriteContext;
-import io.fd.honeycomb.translate.write.WriteFailedException;
+import com.x5.template.Chunk;
+import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceConfigWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.junos.ifc.handler.InterfaceConfigWriter;
-import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import io.frinx.cli.unit.junos.ifc.Util;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceConfigWriter implements CliWriter<Config> {
+public final class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWriter {
 
-    private Cli cli;
+    private static final String DELETE_TEMPLATE = "delete interfaces {$name}";
+
+    private static final String UPDATE_TEMPLATE = "{$data|update(description,"
+            + "set interfaces `$name` description `$data.description`\n,"
+            + "delete interfaces `$name` description\n)}"
+            + "{% if ($enabled && $enabled == TRUE) %}delete interfaces {$name} disable"
+            + "{% elseIf (!$enabled) %}set interfaces {$name} disable{% endif %}";
+
 
     public SubinterfaceConfigWriter(Cli cli) {
-        this.cli = cli;
+        super(cli);
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
-        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
-
-        Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId).get().getConfig().getType();
-
-        Preconditions.checkArgument(InterfaceConfigWriter.isSupportedType(parentIfcType),
-            "Unable to create subinterface for interface of type %s", parentIfcType);
-
-        String sbif = SubinterfaceReader.getSubinterfaceName(id);
-
-        blockingWriteAndRead(cli, id, data,
-            data.getDescription() == null
-                ? f("delete interfaces %s description", sbif)
-                : f("set interfaces %s description %s", sbif, data.getDescription()));
-
-        blockingWriteAndRead(cli, id, data,
-                data.isEnabled()
-                    ? f("delete interfaces %s disable", sbif)
-                    : f("set interfaces %s disable", sbif));
+    protected String updateTemplate(Config before, Config after, InstanceIdentifier<Config> id) {
+        // when "disable" is not set, "delete interface disable" will cause a error
+        String enabled = "false";
+        if (before != null && before.isEnabled() != null && !before.isEnabled()) {
+            if (after.isEnabled() != null && after.isEnabled()) {
+                enabled = Chunk.TRUE;
+            }
+        } else {
+            if (after.isEnabled() != null && !after.isEnabled()) {
+                enabled = null;
+            }
+        }
+        return fT(UPDATE_TEMPLATE, "before", before, "data", after, "name", Util.getSubinterfaceName(id),
+                "enabled", enabled);
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
-        @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributes(id, dataAfter, writeContext);
-    }
-
-    @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
-        @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
-
-        Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId).get().getConfig().getType();
-
-        Preconditions.checkArgument(InterfaceConfigWriter.isSupportedType(parentIfcType),
-            "Unable to create subinterface for interface of type %s", parentIfcType);
-
-        String sbif = SubinterfaceReader.getSubinterfaceName(id);
-
-        blockingDeleteAndRead(cli, id, "delete interfaces " + sbif);
+    protected String deleteTemplate(InstanceIdentifier<Config> id) {
+        String subIfcName = Util.getSubinterfaceName(id);
+        return fT(DELETE_TEMPLATE, "name", subIfcName);
     }
 }

@@ -20,13 +20,14 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.unit.utils.CliWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.NiProtAggAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
@@ -34,7 +35,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
+public class BgpLocalAggregateConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
@@ -70,8 +71,9 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
-                                              WriteContext writeContext) throws WriteFailedException {
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                                 @Nonnull Config config,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(id.firstIdentifierOf(Protocol.class)
                 .child(Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
@@ -104,8 +106,10 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(id.firstIdentifierOf(Protocol.class)
                 .child(Bgp.class));
         Preconditions.checkArgument(bgpOptional.isPresent());
@@ -139,8 +143,9 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config config,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
         Optional<Bgp> bgpOptional = writeContext.readAfter(id.firstIdentifierOf(Protocol.class)
                 .child(Bgp.class));
         if (!bgpOptional.isPresent()) {
@@ -188,4 +193,5 @@ public class BgpLocalAggregateConfigWriter implements BgpWriter<Config> {
         }
         return policies.get(0);
     }
+
 }

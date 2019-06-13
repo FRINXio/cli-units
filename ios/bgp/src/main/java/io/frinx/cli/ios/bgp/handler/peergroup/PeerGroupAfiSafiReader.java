@@ -16,12 +16,13 @@
 
 package io.frinx.cli.ios.bgp.handler.peergroup;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborAfiSafiReader;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborConfigReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -37,7 +38,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class PeerGroupAfiSafiReader implements BgpListReader.BgpConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
+public class PeerGroupAfiSafiReader implements CliConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
     private Cli cli;
 
@@ -47,13 +48,18 @@ public class PeerGroupAfiSafiReader implements BgpListReader.BgpConfigListReader
 
     @Nonnull
     @Override
-    public List<AfiSafiKey> getAllIdsForType(@Nonnull InstanceIdentifier<AfiSafi> id,
+    public List<AfiSafiKey> getAllIds(@Nonnull InstanceIdentifier<AfiSafi> id,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         String peerGroupId = PeerGroupWriter.getPeerGroupId(id);
-        return NeighborAfiSafiReader.getAfiKeys(blockingRead(String.format(NeighborConfigReader.SH_SUMM, peerGroupId),
-                cli, id, readContext),
-                vrfKey, /*accept any mention of peer group under afi to set that afi as configured*/ line -> true)
+        final String configuration = blockingRead(String.format(NeighborConfigReader.SH_SUMM, peerGroupId),
+                cli, id, readContext);
+        return getAfiSafiKeys(vrfKey, configuration);
+    }
+
+    @VisibleForTesting
+    static List<AfiSafiKey> getAfiSafiKeys(final NetworkInstanceKey vrfKey, final String configuration) {
+        return NeighborAfiSafiReader.getAfiKeys(configuration, vrfKey, line -> line.contains("neighbor"))
                 .stream()
                 .map(k -> new AfiSafiKey(k.getAfiSafiName()))
                 .collect(Collectors.toList());
@@ -66,7 +72,7 @@ public class PeerGroupAfiSafiReader implements BgpListReader.BgpConfigListReader
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier,
                                              @Nonnull AfiSafiBuilder afiSafiBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         Class<? extends AFISAFITYPE> key = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();

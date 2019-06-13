@@ -25,14 +25,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.OsComponent;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.ComponentsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.Component;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.ComponentBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.components.ComponentKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ComponentReader implements CliOperListReader<Component, ComponentKey, ComponentBuilder> {
@@ -50,11 +46,6 @@ public class ComponentReader implements CliOperListReader<Component, ComponentKe
     static final Pattern LINE_HW_SW_FW = Pattern.compile("\\s*(?<index>\\d+)\\s+(?<macs>.+)\\s+(?<hw>\\S+)\\s+"
             + "(?<fw>\\S+)\\s+(?<sw>\\S+)\\s+(?<status>\\S+)\\s*");
 
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Component> config) {
-        ((ComponentsBuilder) builder).setComponent(config);
-    }
 
     @Override
     public void readCurrentAttributes(InstanceIdentifier<Component> instanceIdentifier, ComponentBuilder

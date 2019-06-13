@@ -103,7 +103,7 @@ public class TunnelConfigWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        this.writer.writeCurrentAttributesForType(iid, data, context);
+        this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -117,7 +117,7 @@ public class TunnelConfigWriterTest {
         Config newData = new ConfigBuilder().setShortcutEligible(true)
                 .build();
 
-        this.writer.updateCurrentAttributesForType(iid, data, newData, context);
+        this.writer.updateCurrentAttributes(iid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -131,7 +131,7 @@ public class TunnelConfigWriterTest {
         Config noMetricData = new ConfigBuilder().setShortcutEligible(true)
                 .build();
 
-        this.writer.updateCurrentAttributesForType(iid, noMetricData, noMetricData, context);
+        this.writer.updateCurrentAttributes(iid, noMetricData, noMetricData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -144,10 +144,10 @@ public class TunnelConfigWriterTest {
         Config noMetricData = new ConfigBuilder().setShortcutEligible(true)
                 .build();
 
-        this.writer.writeCurrentAttributesForType(iid, data, context);
-        this.writer.updateCurrentAttributesForType(iid, data, noMetricData, context);
-        this.writer.deleteCurrentAttributesForType(iid, data, context);
-        this.writer.writeCurrentAttributesForType(iid, data, context);
+        this.writer.writeCurrentAttributes(iid, data, context);
+        this.writer.updateCurrentAttributes(iid, data, noMetricData, context);
+        this.writer.deleteCurrentAttributes(iid, data, context);
+        this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli, Mockito.atLeastOnce())
                 .executeAndRead(response.capture());
@@ -161,7 +161,7 @@ public class TunnelConfigWriterTest {
         Config newData = new ConfigBuilder().setShortcutEligible(false)
                 .build();
 
-        this.writer.updateCurrentAttributesForType(iid, data, newData, context);
+        this.writer.updateCurrentAttributes(iid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -171,7 +171,7 @@ public class TunnelConfigWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
-        this.writer.deleteCurrentAttributesForType(iid, data, context);
+        this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());

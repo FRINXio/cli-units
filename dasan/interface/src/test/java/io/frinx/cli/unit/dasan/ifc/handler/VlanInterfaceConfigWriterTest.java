@@ -87,7 +87,7 @@ public class VlanInterfaceConfigWriterTest {
     @Test
     public void testWriteCurrentAttributes_001() throws Exception {
         prepare(L3ipvlan.class, "Vlan100");
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(UPDATE_INPUT, response.getValue()
                 .getContent());
@@ -96,7 +96,7 @@ public class VlanInterfaceConfigWriterTest {
     @Test
     public void testWriteCurrentAttributes_002() throws Exception {
         prepare(L3ipvlan.class, "100");
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
 
@@ -104,7 +104,7 @@ public class VlanInterfaceConfigWriterTest {
     public void testUpdateCurrentAttributes_001() throws Exception {
         prepare(L3ipvlan.class, "Vlan100");
         Config newData = new ConfigBuilder(data).build();
-        target.updateCurrentAttributes(id, data, newData, context);
+        target.updateCurrentAttributesWResult(id, data, newData, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(UPDATE_INPUT, response.getValue()
                 .getContent());
@@ -114,7 +114,7 @@ public class VlanInterfaceConfigWriterTest {
     public void testDeleteCurrentAttributes_001() throws Exception {
         prepare(L3ipvlan.class, "Vlan100");
 
-        target.deleteCurrentAttributes(id, data, context);
+        target.deleteCurrentAttributesWResult(id, data, context);
 
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue()

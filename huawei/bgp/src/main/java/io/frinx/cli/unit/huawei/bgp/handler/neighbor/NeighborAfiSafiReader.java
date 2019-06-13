@@ -19,9 +19,9 @@ package io.frinx.cli.unit.huawei.bgp.handler.neighbor;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;
@@ -45,7 +45,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
+public class NeighborAfiSafiReader implements CliConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
 
     private static final Pattern FAMILY_LINE = Pattern.compile("\\s*ipv4-family (?<family>\\S+).*");
@@ -58,7 +58,7 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
 
     @Nonnull
     @Override
-    public List<AfiSafiKey> getAllIdsForType(@Nonnull InstanceIdentifier<AfiSafi> id,
+    public List<AfiSafiKey> getAllIds(@Nonnull InstanceIdentifier<AfiSafi> id,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
 
@@ -119,7 +119,7 @@ public class NeighborAfiSafiReader implements BgpListReader.BgpConfigListReader<
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier,
                                              @Nonnull AfiSafiBuilder afiSafiBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         Class<? extends AFISAFITYPE> key = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();

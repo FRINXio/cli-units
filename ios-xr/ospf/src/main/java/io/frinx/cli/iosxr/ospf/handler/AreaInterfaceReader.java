@@ -19,8 +19,8 @@ package io.frinx.cli.iosxr.ospf.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.ospf.OspfListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -38,8 +38,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<Interface, InterfaceKey,
-        InterfaceBuilder> {
+public class AreaInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private static final String SHOW_OSPF_INT = "show running-config router ospf %s %s area %s";
     private static final Pattern INTERFACE_NAME_LINE = Pattern.compile("interface (?<name>.*)");
@@ -52,7 +51,7 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
 
     @Nonnull
     @Override
-    public List<InterfaceKey> getAllIdsForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                                @Nonnull ReadContext readContext) throws ReadFailedException {
         ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
         AreaKey areaKey = instanceIdentifier.firstKeyOf(Area.class);
@@ -84,7 +83,7 @@ public class AreaInterfaceReader implements OspfListReader.OspfConfigListReader<
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                              @Nonnull InterfaceBuilder interfaceBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class)

@@ -17,74 +17,47 @@
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.ip6.AbstractIpv6ConfigReader;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
-import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.Config;
+import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6AddressNoZone;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class Ipv6ConfigReader implements CliConfigReader<Config, ConfigBuilder> {
-
-    private Cli cli;
+public class Ipv6ConfigReader extends AbstractIpv6ConfigReader {
 
     public Ipv6ConfigReader(Cli cli) {
-        this.cli = cli;
+        super(cli);
     }
 
-    private static final short DEFAULT_PREFIX_LENGHT = (short) 64;
+    @Override
+    protected Pattern getIpLine() {
+        return Ipv6AddressReader.IPV6_UNICAST_ADDRESS;
+    }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                      @Nonnull ConfigBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        String name = id.firstKeyOf(Interface.class)
-                .getName();
-        Long subId = id.firstKeyOf(Subinterface.class)
-                .getIndex();
-
-        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            Ipv6AddressNoZone address = id.firstKeyOf(Address.class)
-                    .getIp();
-            parseAddressConfig(configBuilder, blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP, name),
-                    cli, id, readContext), address);
-        }
+    protected String getReadCommand(String ifcName) {
+        return f(Ipv6AddressReader.SH_INTERFACE_IP, ifcName);
     }
 
     @VisibleForTesting
-    static void parseAddressConfig(ConfigBuilder configBuilder, String output, Ipv6AddressNoZone address) {
+    @Override
+    public void parseAddressConfig(ConfigBuilder configBuilder, String output, Ipv6AddressNoZone address) {
         Optional<String> optionalAddressLine = ParsingUtils.NEWLINE.splitAsStream(output)
-                .filter(line -> line.contains(address.getValue()))
-                .findAny();
+            .filter(line -> line.contains(address.getValue()))
+            .findAny();
 
         if (!optionalAddressLine.isPresent()) {
             return;
         }
 
         configBuilder.setIp(address);
-        configBuilder.setPrefixLength(DEFAULT_PREFIX_LENGHT);
+        configBuilder.setPrefixLength(AbstractIpv6ConfigReader.DEFAULT_PREFIX_LENGHT);
 
         ParsingUtils.parseField(optionalAddressLine.get(),
-                Ipv6AddressReader.IPV6_UNICAST_ADDRESS::matcher,
+            Ipv6AddressReader.IPV6_UNICAST_ADDRESS::matcher,
             m -> Short.parseShort(m.group("prefix")),
-                configBuilder::setPrefixLength);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((AddressBuilder) builder).setConfig(config);
+            configBuilder::setPrefixLength);
     }
 }

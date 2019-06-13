@@ -19,6 +19,7 @@ package io.frinx.cli.unit.junos.ifc.handler.subifc;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.junos.ifc.Util;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.Config;
@@ -39,7 +40,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
         @Nonnull WriteContext writeContext) throws WriteFailedException {
 
-        String sbif = SubinterfaceReader.getSubinterfaceName(id);
+        String sbif = Util.getSubinterfaceName(id);
 
         blockingWriteAndRead(cli, id, dataAfter,
             f(WRITE_TEMPLATE, sbif, dataAfter.getVlanId().getVlanId().getValue()));
@@ -59,7 +60,7 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
         @Nonnull WriteContext writeContext) throws WriteFailedException {
 
-        String sbif = SubinterfaceReader.getSubinterfaceName(id);
+        String sbif = Util.getSubinterfaceName(id);
 
         blockingDeleteAndRead(cli, id, f(DELETE_TEMPLATE, sbif));
     }

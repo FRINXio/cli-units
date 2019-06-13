@@ -16,106 +16,38 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc;
 
-import com.google.common.base.Preconditions;
-import io.fd.honeycomb.translate.util.RWUtils;
-import io.fd.honeycomb.translate.write.WriteContext;
-import io.fd.honeycomb.translate.write.WriteFailedException;
+import com.x5.template.Chunk;
+import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceConfigWriter;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.ios.ifc.handler.InterfaceConfigWriter;
-import io.frinx.cli.unit.utils.CliWriter;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
+import io.frinx.cli.unit.ios.ifc.Util;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceConfigWriter implements CliWriter<Config> {
+public final class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWriter {
 
-    private Cli cli;
+    private static final String UPDATE_TEMPLATE = "configure terminal\n"
+            + "interface {$name}\n"
+            + "{$data|update(description,description `$data.description`\n,no description\n)}"
+            //  + "{$data|update(is_enabled,shutdown\n,no shutdown\n}"
+            + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
+            + "end";
+
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
+            + "no interface {$name}\n"
+            + "end";
 
     public SubinterfaceConfigWriter(Cli cli) {
-        this.cli = cli;
+        super(cli);
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                       @Nonnull Config data,
-                                       @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (isZeroSubinterface(id)) {
-            // Check that config is empty for .0 subinterface and do nothing.
-            // .0 subinterface is special auto-generated subinterface
-            // containing just IP configuration of the parent interface.
-            Preconditions.checkArgument(data.getDescription() == null,
-                    "'description' cannot be specified for .0 subinterface."
-                            + "Use 'description' under interface/config instead.");
-            Preconditions.checkArgument(data.getName() == null,
-                    "'name' cannot be specified for .0 subinterface."
-                            + "Use 'name' under interface/config instead.");
-            Preconditions.checkArgument(data.isEnabled() == null,
-                    "'enabled' cannot be specified for .0 subinterface."
-                            + "Use 'name' under interface/config instead.");
-            return;
-        }
-
-        InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
-        Class<? extends InterfaceType> parentIfcType = writeContext.readAfter(parentIfcId)
-                .get()
-                .getConfig()
-                .getType();
-
-        if (InterfaceConfigWriter.PHYS_IFC_TYPES.contains(parentIfcType)) {
-            blockingWriteAndRead(cli, id, data,
-                    "configure terminal",
-                    f("interface %s", SubinterfaceReader.getSubinterfaceName(id)),
-                    f("description %s", data.getDescription()),
-                    data.isEnabled() != null && data.isEnabled() ? "no shutdown" : "shutdown",
-                    "end");
-        } else {
-            throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Unable to create subinterface for interface of type: "
-                            + parentIfcType));
-        }
-    }
-
-    private static boolean isZeroSubinterface(@Nonnull InstanceIdentifier<?> id) {
-        Long subifcIndex = id.firstKeyOf(Subinterface.class).getIndex();
-        return subifcIndex == SubinterfaceReader.ZERO_SUBINTERFACE_ID;
+    protected String updateTemplate(Config before, Config after, InstanceIdentifier<Config> id) {
+        return fT(UPDATE_TEMPLATE, "before", before, "data", after, "name", Util.getSubinterfaceName(id),
+                "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null);
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                        @Nonnull Config dataBefore,
-                                        @Nonnull Config dataAfter,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributes(id, dataAfter, writeContext);
-    }
-
-    @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                        @Nonnull Config data,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        if (isZeroSubinterface(id)) {
-            // do nothing for .0 subinterface
-            return;
-        }
-
-        InstanceIdentifier<Interface> parentIfcId = RWUtils.cutId(id, Interface.class);
-        Class<? extends InterfaceType> parentIfcType = writeContext.readBefore(parentIfcId)
-                .get()
-                .getConfig()
-                .getType();
-
-        if (InterfaceConfigWriter.PHYS_IFC_TYPES.contains(parentIfcType)) {
-            blockingDeleteAndRead(cli, id,
-                    "configure terminal",
-                    f("no interface %s", SubinterfaceReader.getSubinterfaceName(id)),
-                    "end");
-        } else {
-            throw new WriteFailedException.CreateFailedException(id, data,
-                    new IllegalArgumentException("Unable to create subinterface for interface of type: "
-                            + parentIfcType));
-        }
+    protected String deleteTemplate(InstanceIdentifier<Config> id) {
+        return fT(DELETE_TEMPLATE, "name", Util.getSubinterfaceName(id));
     }
 }

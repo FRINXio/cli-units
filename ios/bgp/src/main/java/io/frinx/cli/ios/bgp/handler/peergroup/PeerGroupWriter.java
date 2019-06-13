@@ -16,14 +16,17 @@
 
 package io.frinx.cli.ios.bgp.handler.peergroup;
 
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.bgp.BgpListWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.ios.bgp.handler.BgpAfiSafiChecks;
 import io.frinx.cli.ios.bgp.handler.GlobalAfiSafiConfigWriter;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborWriter;
+import io.frinx.cli.unit.utils.CliListWriter;
 import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,12 +34,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.AfiSafis;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.list.PeerGroup;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.list.PeerGroupKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
+public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
 
     private static final String PEER_GROUP_ESSENTIAL_CONFIG = "neighbor {$neighbor_id} peer-group\n"
             + "{.if ($neighbor.config.peer_as.value) }neighbor {$neighbor_id} remote-as {$neighbor.config.peer_as"
@@ -102,14 +106,19 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<PeerGroup> instanceIdentifier, PeerGroup neighbor,
+    public void writeCurrentAttributes(InstanceIdentifier<PeerGroup> instanceIdentifier, PeerGroup neighbor,
                                               WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
+        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
 
-        final Global bgpGlobal = NeighborWriter.getGlobalBgp(instanceIdentifier, writeContext);
+        final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = NeighborWriter.getAsValue(bgpGlobal);
-        Map<String, Object> groupAfiSafi = NeighborWriter.getAfiSafisForNeighbor(bgpGlobal,
-                getAfiSafisForPeerGroup(neighbor.getAfiSafis()));
+        NeighborWriter.checkLocalAsAgainstRemoteAsWithinRoutReflector(neighbor, bgpAs, neighbor.getConfig());
+        Map<String, Object> afiSafisForPeerGroup = getAfiSafisForPeerGroup(neighbor.getAfiSafis());
+        if (!afiSafisForPeerGroup.isEmpty()) {
+            BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
+        }
+        Map<String, Object> groupAfiSafi = NeighborWriter.getAfiSafisForNeighbor(bgpGlobal, afiSafisForPeerGroup);
         String groupId = getPeerGroupId(instanceIdentifier);
 
         NeighborWriter.renderNeighbor(this, cli, instanceIdentifier,
@@ -127,14 +136,20 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<PeerGroup> instanceIdentifier,
+    public void updateCurrentAttributes(InstanceIdentifier<PeerGroup> instanceIdentifier,
                                                PeerGroup before, PeerGroup neighbor,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
+        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
+        if (afiSafisHaveChanged(before, neighbor)) {
+            BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
+        }
 
-        final Global bgpGlobal = NeighborWriter.getGlobalBgp(instanceIdentifier, writeContext);
-        final Global bgpGlobalBefore = NeighborWriter.getGlobalBgpForDelete(instanceIdentifier, writeContext);
+        final Global bgpGlobal = bgp.getGlobal();
+        final Global bgpGlobalBefore = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class))
+                .get().getGlobal();
         Long bgpAs = NeighborWriter.getAsValue(bgpGlobal);
+        NeighborWriter.checkLocalAsAgainstRemoteAsWithinRoutReflector(neighbor, bgpAs, neighbor.getConfig());
 
         Map<String, Object> groupAfiSafi = NeighborWriter.getAfiSafisForNeighbor(bgpGlobal,
                 getAfiSafisForPeerGroup(neighbor.getAfiSafis()));
@@ -147,16 +162,32 @@ public class PeerGroupWriter implements BgpListWriter<PeerGroup, PeerGroupKey> {
                 PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
     }
 
+    private static boolean afiSafisHaveChanged(final PeerGroup before, final PeerGroup after) {
+        final List<AfiSafi> afiSafisBefore = before.getAfiSafis().getAfiSafi();
+        final List<AfiSafi> afiSafisAfter = after.getAfiSafis().getAfiSafi();
+        if (afiSafisBefore == null && afiSafisAfter != null || afiSafisBefore != null && afiSafisAfter == null) {
+            return true;
+        } else if (afiSafisAfter == null) {
+            return false;
+        } else {
+            return !(new HashSet<>(afiSafisAfter).equals(new HashSet<>(afiSafisBefore)));
+        }
+    }
+
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<PeerGroup> instanceIdentifier, PeerGroup neighbor,
+    public void deleteCurrentAttributes(InstanceIdentifier<PeerGroup> instanceIdentifier, PeerGroup neighbor,
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
+        final Bgp bgp = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
 
-        final Global bgpGlobal = NeighborWriter.getGlobalBgpForDelete(instanceIdentifier, writeContext);
+        final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = NeighborWriter.getAsValue(bgpGlobal);
 
-        Map<String, Object> groupAfiSafi = NeighborWriter.getAfiSafisForNeighbor(bgpGlobal,
-                getAfiSafisForPeerGroup(neighbor.getAfiSafis()));
+        Map<String, Object> afiSafisForPeerGroup = getAfiSafisForPeerGroup(neighbor.getAfiSafis());
+        if (!afiSafisForPeerGroup.isEmpty()) {
+            BgpAfiSafiChecks.checkAddressFamilies(vrfKey, bgp);
+        }
+        Map<String, Object> groupAfiSafi = NeighborWriter.getAfiSafisForNeighbor(bgpGlobal, afiSafisForPeerGroup);
         String groupId = getPeerGroupId(instanceIdentifier);
 
         NeighborWriter.deleteNeighbor(this, cli, instanceIdentifier, neighbor, vrfKey, bgpAs, groupAfiSafi, groupId,

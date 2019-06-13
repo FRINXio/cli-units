@@ -18,13 +18,13 @@ package io.frinx.cli.iosxr.ospf.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.global.structural.global.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalConfigWriter implements OspfWriter<Config> {
+public class GlobalConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
@@ -33,7 +33,7 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
+    public void writeCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
@@ -43,13 +43,13 @@ public class GlobalConfigWriter implements OspfWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+    public void updateCurrentAttributes(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
         // NOOP
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
+    public void deleteCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
         final String processName = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();

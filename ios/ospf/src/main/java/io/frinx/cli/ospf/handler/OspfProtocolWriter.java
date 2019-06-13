@@ -18,15 +18,18 @@ package io.frinx.cli.ospf.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class OspfProtocolWriter implements OspfWriter<Config> {
+public class OspfProtocolWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
 
     private Cli cli;
 
@@ -47,8 +50,12 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
             + "end";
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,
-                                              WriteContext writeContext) throws WriteFailedException {
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                 @Nonnull Config config,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF.canProcess(instanceIdentifier, writeContext, false)) {
+            return false;
+        }
 
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String protocolName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
@@ -57,17 +64,29 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
                 fT(WRITE_TEMPLATE,
                         "ospf", protocolName,
                         "vrf", vrfName.equals(NetworInstance.DEFAULT_NETWORK_NAME) ? null : vrfName));
+        return true;
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF.canProcess(iid, writeContext, false)) {
+            return false;
+        }
+
         // NOOP
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config config,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                                  @Nonnull Config config,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (!ChecksMap.PathCheck.Protocol.OSPF.canProcess(instanceIdentifier, writeContext, true)) {
+            return false;
+        }
 
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String protocolName = instanceIdentifier.firstKeyOf(Protocol.class).getName();
@@ -76,5 +95,6 @@ public class OspfProtocolWriter implements OspfWriter<Config> {
                 fT(DELETE_TEMPLATE,
                         "ospf", protocolName,
                         "vrf", vrfName.equals(NetworInstance.DEFAULT_NETWORK_NAME) ? null : vrfName));
+        return true;
     }
 }

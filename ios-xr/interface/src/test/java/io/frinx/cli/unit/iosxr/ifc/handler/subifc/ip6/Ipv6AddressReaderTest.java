@@ -17,10 +17,12 @@
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6;
 
 import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6AddressNoZone;
 
@@ -39,6 +41,7 @@ public class Ipv6AddressReaderTest {
 
     @Test
     public void testParseAddressIds() {
-        Assert.assertEquals(EXPECTED_ADRESS_IDS, Ipv6AddressReader.parseAddressIds(SH_RUN_INT_IPV6));
+        Assert.assertEquals(EXPECTED_ADRESS_IDS,
+                new Ipv6AddressReader(Mockito.mock(Cli.class)).parseAddressIds(SH_RUN_INT_IPV6));
     }
 }

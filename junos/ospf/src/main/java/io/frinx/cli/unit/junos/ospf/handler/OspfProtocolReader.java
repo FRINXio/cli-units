@@ -19,10 +19,11 @@ package io.frinx.cli.unit.junos.ospf.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.ospf.OspfReader;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, ProtocolBuilder>,
-        OspfReader.OspfConfigReader<Protocol, ProtocolBuilder>,
         CompositeListReader.Child<Protocol, ProtocolKey, ProtocolBuilder> {
 
     private Cli cli;
@@ -68,7 +68,7 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Protocol> instanceIdentifier,
                                              @Nonnull ProtocolBuilder protocolBuilder,
                                              @Nonnull ReadContext readContext) {
         ProtocolKey key = instanceIdentifier.firstKeyOf(Protocol.class);
@@ -83,5 +83,10 @@ public class OspfProtocolReader implements CliListReader<Protocol, ProtocolKey, 
                 ?
                 "" : " routing-instances " + vrfId;
         return rtn;
+    }
+
+    @Override
+    public Check getCheck() {
+        return ChecksMap.PathCheck.Protocol.OSPF;
     }
 }

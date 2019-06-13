@@ -32,7 +32,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bf
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd.rev171024.bfd.top.bfd.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd.rev171024.bfd.top.bfd.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
@@ -54,7 +53,7 @@ public class BfdConfigReader implements CliConfigReader<Config, ConfigBuilder> {
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         String ifcName = id.firstKeyOf(Interface.class)
                 .getName();
-        if (!AggregateConfigReader.isLAGInterface(ifcName)) {
+        if (!new AggregateConfigReader(cli).isLAGInterface(ifcName)) {
             // read bfd configuration just for LAG interfaces
             return;
         }
@@ -105,7 +104,7 @@ public class BfdConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
         ParsingUtils.parseField(output,
                 BFD_DESTINATION::matcher,
-            matcher -> new IpAddress(new Ipv4Address(matcher.group("destination"))),
+            matcher -> new Ipv4Address(matcher.group("destination")),
                 builder::setDestinationAddress);
     }
 

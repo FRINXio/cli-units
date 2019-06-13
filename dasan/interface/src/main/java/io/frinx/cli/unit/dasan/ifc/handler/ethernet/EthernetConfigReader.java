@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.dasan.ifc.handler.ethernet;
 
-import io.fd.honeycomb.translate.spi.read.ReaderCustomizer;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpadminkey.BundleEtherLacpAdminkeyConfigReader;
 import io.frinx.cli.unit.dasan.ifc.handler.ethernet.lacpinterval.BundleEtherLacpIntervalConfigReader;
@@ -36,7 +35,7 @@ public final class EthernetConfigReader extends CompositeReader<Config, ConfigBu
         implements CliConfigReader<Config, ConfigBuilder> {
 
     public EthernetConfigReader(Cli cli) {
-        super(new ArrayList<ReaderCustomizer<Config, ConfigBuilder>>() {
+        super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {
             {
                 add(new BundleEtherLacpMemberConfigReader(cli));
                 add(new BundleEtherLacpAdminkeyConfigReader(cli));

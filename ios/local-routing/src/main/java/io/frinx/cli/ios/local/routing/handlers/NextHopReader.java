@@ -20,7 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.local.routing.common.LrListReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.ArrayList;
@@ -30,17 +30,14 @@ import javax.annotation.Nonnull;
 import org.apache.commons.net.util.SubnetUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.NextHopsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHop;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHopBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes._static.next.hops.NextHopKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, NextHopKey, NextHopBuilder> {
+public class NextHopReader implements CliConfigListReader<NextHop, NextHopKey, NextHopBuilder> {
 
     private static final String SH_IP_STATIC_ROUTE = "show running-config | include route %s";
     private static final String SH_IP_STATIC_ROUTE_VRF = "show running-config | include route vrf %s %s";
@@ -53,7 +50,7 @@ public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, N
 
     @Nonnull
     @Override
-    public List<NextHopKey> getAllIdsForType(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
+    public List<NextHopKey> getAllIds(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 
@@ -122,12 +119,7 @@ public class NextHopReader implements LrListReader.LrConfigListReader<NextHop, N
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<NextHop> list) {
-        ((NextHopsBuilder) builder).setNextHop(list);
-    }
-
-    @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<NextHop> instanceIdentifier,
                                              @Nonnull NextHopBuilder nextHopBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         nextHopBuilder.setIndex(instanceIdentifier.firstKeyOf(NextHop.class)

@@ -20,7 +20,8 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -33,7 +34,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TrunkPortInterfaceConfigWriter implements CliWriter<Config> {
+public class TrunkPortInterfaceConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
 
     public static final Set<Class<? extends InterfaceType>> PHYS_TRUNK_IFC_TYPES =
         Collections.singleton(Ieee8023adLag.class);
@@ -45,14 +46,14 @@ public class TrunkPortInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config data,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String name = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = TRUNK_IF_NAME_PATTERN.matcher(name);
         if (!matcher.matches()) {
-            return;
+            return false;
         }
 
         Preconditions.checkArgument(isTrunkPortInterface(data),
@@ -78,7 +79,7 @@ public class TrunkPortInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
@@ -86,7 +87,7 @@ public class TrunkPortInterfaceConfigWriter implements CliWriter<Config> {
         String name = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = TRUNK_IF_NAME_PATTERN.matcher(name);
         if (!matcher.matches()) {
-            return;
+            return false;
         }
 
         Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
@@ -98,17 +99,18 @@ public class TrunkPortInterfaceConfigWriter implements CliWriter<Config> {
             "Unexpected interface type: %s", dataAfter.getType());
 
         writeOrUpdateInterface(id, dataAfter, matcher.group("portid"));
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String name = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = TRUNK_IF_NAME_PATTERN.matcher(name);
         if (!matcher.matches()) {
-            return;
+            return false;
         }
 
         Preconditions.checkArgument(isTrunkPortInterface(dataBefore),

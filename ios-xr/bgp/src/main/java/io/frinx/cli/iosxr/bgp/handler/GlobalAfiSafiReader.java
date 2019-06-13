@@ -20,8 +20,8 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
-import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
@@ -49,7 +49,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
+public class GlobalAfiSafiReader implements CliConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
     private static final String SH_AFI = "show running-config router bgp %s %s %s | include ^%saddress-family";
     private static final Pattern FAMILY_LINE = Pattern.compile("(.*)address-family (?<family>[^\\n].*)");
@@ -61,7 +61,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
 
     @Nonnull
     @Override
-    public List<AfiSafiKey> getAllIdsForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull
+    public List<AfiSafiKey> getAllIds(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull
             ReadContext readContext) throws ReadFailedException {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
                 globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)
@@ -94,7 +94,7 @@ public class GlobalAfiSafiReader implements BgpListReader.BgpConfigListReader<Af
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<AfiSafi> instanceIdentifier, @Nonnull
             AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         Class<? extends AFISAFITYPE> key = instanceIdentifier.firstKeyOf(AfiSafi.class)
                 .getAfiSafiName();

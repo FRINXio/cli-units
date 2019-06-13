@@ -19,8 +19,8 @@ package io.frinx.cli.unit.huawei.bgp.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.regex.Matcher;
@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
+public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String DISPLAY_BGP_CONFIG =
             "display current-configuration configuration bgp | include ^bgp|^ *router-id|^ ipv4-family vpn-instance";
@@ -58,7 +58,7 @@ public class GlobalConfigReader implements BgpReader.BgpConfigReader<Config, Con
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         String output = blockingRead(DISPLAY_BGP_CONFIG, cli, id, readContext);

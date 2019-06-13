@@ -19,89 +19,75 @@ package io.frinx.cli.unit.ios.ifc.handler.subifc;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceReader;
-import io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4AddressReader;
-import io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6AddressReader;
-import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4ConfigReader;
+import io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class SubinterfaceReader implements CliConfigListReader<Subinterface, SubinterfaceKey,
-        SubinterfaceBuilder> {
+public final class SubinterfaceReader extends AbstractSubinterfaceReader {
 
-    private static final char SEPARATOR = '.';
-    public static final long ZERO_SUBINTERFACE_ID = 0L;
+    public static final String SEPARATOR = ".";
+    private static final Pattern SUBINTERFACE_NAME = Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
 
+    private InterfaceReader ifaceReader;
+    private Ipv4ConfigReader v4reader;
+    private Ipv6ConfigReader v6reader;
     private Cli cli;
 
     public SubinterfaceReader(Cli cli) {
+        super(cli);
         this.cli = cli;
+        this.ifaceReader = new InterfaceReader(cli);
+        this.v4reader = new Ipv4ConfigReader(cli);
+        this.v6reader = new Ipv6ConfigReader(cli);
     }
 
     @Nonnull
     @Override
     public List<SubinterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier,
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
-        String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        List<SubinterfaceKey> keys = parseSubinterfaceIds(blockingRead(getReadCommand(),
+                cli, instanceIdentifier, readContext), ifcName);
+        boolean hasIpv4Address = v4reader.hasIpAddress(instanceIdentifier, ifcName, readContext);
+        boolean hasIpv6Address = v6reader.hasIpAddress(instanceIdentifier, ifcName, readContext);
 
-        List<SubinterfaceKey> subinterfaceKeys = parseInterfaceIds(blockingRead(InterfaceReader.SH_INTERFACE, cli,
-                instanceIdentifier, readContext), id);
-
-        // Subinterface with ID 0 is reserved for IP addresses of the interface
-        boolean hasIpv4Address = !Ipv4AddressReader.parseAddressIds(
-                blockingRead(String.format(Ipv4AddressReader.SH_INTERFACE_IP, id),
-                        cli, instanceIdentifier, readContext)).isEmpty();
-
-        boolean hasIpv6Address = !Ipv6AddressReader.parseAddressIds(
-                blockingRead(String.format(Ipv6AddressReader.SH_INTERFACE_IP, id),
-                        cli, instanceIdentifier, readContext)).isEmpty();
         if (hasIpv4Address || hasIpv6Address) {
-            subinterfaceKeys.add(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
+            keys.add(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
         }
-
-        return subinterfaceKeys;
+        return keys;
     }
 
     @VisibleForTesting
-    static List<SubinterfaceKey> parseInterfaceIds(String output, String ifcName) {
-        return InterfaceReader.parseAllInterfaceIds(output)
-                // Now exclude interfaces
-                .stream()
-                .filter(InterfaceReader::isSubinterface)
-                .map(InterfaceKey::getName)
-                .filter(subifcName -> subifcName.startsWith(ifcName))
-                .map(name -> name.substring(name.lastIndexOf(SEPARATOR) + 1))
-                .map(subifcIndex -> new SubinterfaceKey(Long.valueOf(subifcIndex)))
-                .collect(Collectors.toList());
+    @Override
+    public List<SubinterfaceKey> parseSubinterfaceIds(String output, String ifcName) {
+        return ifaceReader.parseAllInterfaceIds(output)
+            // Now exclude interfaces
+            .stream()
+            .filter(key -> isSubinterface(key.getName()))
+            .map(InterfaceKey::getName)
+            .filter(subifcName -> subifcName.startsWith(ifcName))
+            .map(name -> name.substring(name.lastIndexOf(SEPARATOR) + 1))
+            .map(subifcIndex -> new SubinterfaceKey(Long.valueOf(subifcIndex)))
+            .collect(Collectors.toList());
     }
 
-    static String getSubinterfaceName(InstanceIdentifier<?> id) {
-        InterfaceKey ifcKey = id.firstKeyOf(Interface.class);
-        SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
-
-        return ifcKey.getName() + SEPARATOR + subKey.getIndex().toString();
+    private boolean isSubinterface(String ifcName) {
+        return SUBINTERFACE_NAME.matcher(ifcName).matches();
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Subinterface> list) {
-        ((SubinterfacesBuilder) builder).setSubinterface(list);
-    }
-
-    @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Subinterface> id,
-                                      @Nonnull SubinterfaceBuilder builder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        builder.setIndex(id.firstKeyOf(Subinterface.class).getIndex());
+    protected String getReadCommand() {
+        return InterfaceReader.SH_INTERFACE;
     }
 }

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
   ~ Copyright © 2018 Frinx and others.
   ~
@@ -15,47 +14,44 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!-- vi: set et smarttab sw=4 tabstop=4: -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>io.frinx.cli</groupId>
-    <artifactId>unit-parent</artifactId>
+    <parent>
+        <groupId>io.frinx.cli</groupId>
+        <artifactId>unit-parent</artifactId>
+        <version>4.2.1.rc9-frinx-SNAPSHOT</version>
+        <relativePath>../../unit-parent</relativePath>
+    </parent>
+
+    <artifactId>dasan-cli-utils</artifactId>
     <version>4.2.1.rc9-frinx-SNAPSHOT</version>
-    <relativePath>../../unit-parent</relativePath>
-  </parent>
+    <packaging>bundle</packaging>
 
-  <groupId>io.frinx.cli</groupId>
-  <artifactId>dasan-cli-utils</artifactId>
-  <version>4.2.1.rc9-frinx-SNAPSHOT</version>
-  <packaging>bundle</packaging>
-
-  <dependencies>
-
-    <!-- for JUnit -->
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-module-junit4</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
+    <dependencies>
+        <!-- for JUnit -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

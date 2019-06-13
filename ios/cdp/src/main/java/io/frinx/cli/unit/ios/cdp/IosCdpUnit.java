@@ -17,45 +17,37 @@
 package io.frinx.cli.unit.ios.cdp;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
-import io.fd.honeycomb.translate.impl.read.GenericOperReader;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.IosDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.ios.cdp.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.ios.cdp.handler.InterfaceReader;
 import io.frinx.cli.unit.ios.cdp.handler.NeighborReader;
 import io.frinx.cli.unit.ios.cdp.handler.NeighborStateReader;
+import io.frinx.cli.unit.ios.init.IosDevices;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.cdp.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cdp.rev171024.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cdp.rev171024.cdp.top.CdpBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp._interface.top.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp.neighbor.top.NeighborsBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public final class IosCdpUnit implements TranslateUnit {
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public final class IosCdpUnit extends AbstractUnit {
 
     public IosCdpUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(IosDevices.IOS_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return IosDevices.IOS_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS CDP (FRINX) translate unit";
     }
 
     @Override
@@ -64,21 +56,14 @@ public final class IosCdpUnit implements TranslateUnit {
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final Context context) {
-        return Sets.newHashSet();
-    }
-
-    @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
+    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);
     }
 
-    private void provideReaders(ModifiableReaderRegistryBuilder readeRegistry, Cli cli) {
-        readeRegistry.addStructuralReader(IIDs.CDP, CdpBuilder.class);
-        readeRegistry.addStructuralReader(IIDs.CD_INTERFACES, InterfacesBuilder.class);
+    private void provideReaders(CustomizerAwareReadRegistryBuilder readeRegistry, Cli cli) {
         // TODO keeping InterfaceReader and InterfaceConfigReader just as Operational readers
         // because we do not yet support writes
         // and also because finding out whether an interface is cdp enabled or not is not possible
@@ -86,16 +71,10 @@ public final class IosCdpUnit implements TranslateUnit {
         // info from running config is to use "show run all". But that would not do well with CliReader right now and
         // would
         // slow down reads by a lot
-        readeRegistry.add(new GenericOperListReader<>(IIDs.CD_IN_INTERFACE, new InterfaceReader(cli)));
-        readeRegistry.add(new GenericOperReader<>(IIDs.CD_IN_IN_CONFIG, new InterfaceConfigReader()));
-        readeRegistry.addStructuralReader(IIDs.CD_IN_IN_NEIGHBORS, NeighborsBuilder.class);
-        readeRegistry.add(new GenericOperListReader<>(IIDs.CD_IN_IN_NE_NEIGHBOR, new NeighborReader(cli)));
-        readeRegistry.add(new GenericOperReader<>(IIDs.CD_IN_IN_NE_NE_STATE, new NeighborStateReader(cli)));
-    }
-
-    @Override
-    public String toString() {
-        return "IOS CDP (FRINX) translate unit";
+        readeRegistry.add(IIDs.CD_IN_INTERFACE, new InterfaceReader(cli));
+        readeRegistry.add(IIDs.CD_IN_IN_CONFIG, new InterfaceConfigReader());
+        readeRegistry.add(IIDs.CD_IN_IN_NE_NEIGHBOR, new NeighborReader(cli));
+        readeRegistry.add(IIDs.CD_IN_IN_NE_NE_STATE, new NeighborStateReader(cli));
     }
 
 }

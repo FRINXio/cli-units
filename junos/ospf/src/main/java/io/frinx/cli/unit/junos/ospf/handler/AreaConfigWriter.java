@@ -18,12 +18,12 @@ package io.frinx.cli.unit.junos.ospf.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.ospf.OspfWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.structure.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AreaConfigWriter implements OspfWriter<Config> {
+public class AreaConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
@@ -32,19 +32,19 @@ public class AreaConfigWriter implements OspfWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
+    public void writeCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                               WriteContext writeContext) {
         // NOOP
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore,
+    public void updateCurrentAttributes(InstanceIdentifier<Config> id, Config dataBefore,
                                                Config dataAfter, WriteContext writeContext) {
         // NOOP
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> instanceIdentifier, Config data,
+    public void deleteCurrentAttributes(InstanceIdentifier<Config> instanceIdentifier, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
         blockingWriteAndRead(cli, instanceIdentifier, data,
                 f("delete%s protocols ospf area %s", OspfProtocolReader.resolveVrfWithName(instanceIdentifier),

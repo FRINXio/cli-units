@@ -22,9 +22,9 @@ import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.read.Reader;
-import io.frinx.cli.handlers.network.instance.L2p2pReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.ifc.handler.InterfaceStateReader;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +58,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<ConnectionPoints,
+public class ConnectionPointsReader implements CliConfigReader<ConnectionPoints,
         ConnectionPointsBuilder> {
 
     public static final String POINT_1 = "1";
@@ -80,7 +80,7 @@ public class ConnectionPointsReader implements L2p2pReader.L2p2pConfigReader<Con
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<ConnectionPoints> id,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<ConnectionPoints> id,
                                              @Nonnull ConnectionPointsBuilder builder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
         boolean isOper = isOper(ctx);

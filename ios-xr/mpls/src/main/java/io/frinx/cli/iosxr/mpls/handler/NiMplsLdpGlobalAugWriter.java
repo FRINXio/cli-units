@@ -20,15 +20,15 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.mpls.MplsWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension.rev180822.NiMplsLdpGlobalAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.ldp.global.Ldp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.rev180702.mpls.ldp._interface.attributes.top.InterfaceAttributes;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NiMplsLdpGlobalAugWriter implements MplsWriter<NiMplsLdpGlobalAug> {
+public class NiMplsLdpGlobalAugWriter implements CliWriter<NiMplsLdpGlobalAug> {
 
     private Cli cli;
 
@@ -37,27 +37,27 @@ public class NiMplsLdpGlobalAugWriter implements MplsWriter<NiMplsLdpGlobalAug> 
     }
 
     @Override
-    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<NiMplsLdpGlobalAug> id,
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsLdpGlobalAug> id,
             @Nonnull NiMplsLdpGlobalAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (data.isEnabled() == true) {
             blockingWriteAndRead(cli, id, data,
                         "mpls ldp",
                         "root");
         } else {
-            deleteCurrentAttributesForType(id, data, writeContext);
+            deleteCurrentAttributes(id, data, writeContext);
         }
     }
 
     @Override
-    public void updateCurrentAttributesForType(@Nonnull final InstanceIdentifier<NiMplsLdpGlobalAug> id,
+    public void updateCurrentAttributes(@Nonnull final InstanceIdentifier<NiMplsLdpGlobalAug> id,
                                         @Nonnull final NiMplsLdpGlobalAug dataBefore,
                                         @Nonnull final NiMplsLdpGlobalAug dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
-    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<NiMplsLdpGlobalAug> id, @Nonnull
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsLdpGlobalAug> id, @Nonnull
             NiMplsLdpGlobalAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
         final InterfaceAttributes ifaces = writeContext.readAfter(RWUtils.cutId(id,Ldp.class))
                 .get().getInterfaceAttributes();

@@ -23,9 +23,10 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.junos.JunosDevices;
 import io.frinx.cli.junos.routing.policy.handler.actions.ActionsConfigReader;
 import io.frinx.cli.junos.routing.policy.handler.actions.ActionsConfigWriter;
 import io.frinx.cli.junos.routing.policy.handler.actions.ospf.actions.SetMetricConfigReader;
@@ -40,6 +41,7 @@ import io.frinx.cli.junos.routing.policy.handler.policy.StatementConfigWriter;
 import io.frinx.cli.junos.routing.policy.handler.policy.StatementListReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.junos.init.JunosDevices;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.openconfig.openconfig.policy.IIDs;
 import java.util.Collections;
@@ -83,8 +85,8 @@ public class RoutingPolicyUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull ModifiableWriterRegistryBuilder writeRegistry,
+    public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull Context context) {
         Cli cli = context.getTransport();
         provideReaders(readRegistry, cli);

@@ -19,22 +19,18 @@ package io.frinx.cli.ios.bgp.handler;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.StateBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.GlobalBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.yang.rev170403.DottedQuad;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-
-public class GlobalStateReader implements BgpReader.BgpOperReader<State, StateBuilder> {
+public class GlobalStateReader implements CliOperReader<State, StateBuilder> {
 
     private Cli cli;
     static final String SH_BGP = "show bgp summary";
@@ -45,15 +41,10 @@ public class GlobalStateReader implements BgpReader.BgpOperReader<State, StateBu
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext ctx) throws ReadFailedException {
         parseGlobal(blockingRead(SH_BGP, cli, instanceIdentifier, ctx), stateBuilder);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State config) {
-        ((GlobalBuilder) builder).setState(config);
     }
 
     @VisibleForTesting

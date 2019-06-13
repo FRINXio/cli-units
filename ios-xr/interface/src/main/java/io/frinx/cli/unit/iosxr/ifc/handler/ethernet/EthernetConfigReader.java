@@ -20,8 +20,8 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.iosxr.ifc.Util;
 import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
-import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Matcher;
@@ -51,13 +51,15 @@ public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuild
         this.cli = cli;
     }
 
+
+
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         String ifcName = id.firstKeyOf(Interface.class)
                 .getName();
 
-        if (!InterfaceConfigWriter.PHYS_IFC_TYPES.contains(InterfaceConfigReader.parseType(ifcName))) {
+        if (!Util.isPhysicalInterface(Util.parseType(ifcName))) {
             // we should parse ethernet configuration just for ethernet interfaces
             return;
         }

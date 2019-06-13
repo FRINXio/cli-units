@@ -16,35 +16,34 @@
 
 package io.frinx.cli.unit.junos.ifc.handler;
 
-import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.write.WriteContext;
+import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
+import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.concurrent.CompletableFuture;
-import org.apache.commons.lang3.StringUtils;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriterTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    private static final String WRITE_BASE = "edit interfaces ge-0/0/4\n%sexit\n";
+
+    private static final String WRITE_INPUT = "set description TEST\n";
+
+    private static final String UPDATE_INPUT = "delete description\n"
+            + "set disable\n";
+
+    private static final String DELETE_INPUT = "delete interfaces ge-0/0/4\n";
 
     @Mock
     private Cli cli;
@@ -52,133 +51,96 @@ public class InterfaceConfigWriterTest {
     @Mock
     private WriteContext context;
 
-    private InterfaceConfigWriter target;
+    private InterfaceConfigWriter writer;
 
-    private InstanceIdentifier<Config> id;
+    private InstanceIdentifier<Config> iid = IIDs.IN_IN_CONFIG;
 
     // test data
     private Config data;
 
-    private ArgumentCaptor<Command> response;
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        target = Mockito.spy(new InterfaceConfigWriter(cli));
 
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
-        response = ArgumentCaptor.forClass(Command.class);
+
+        writer = new InterfaceConfigWriter(this.cli);
+        initializeData();
+    }
+
+    private void initializeData() {
+        data = new ConfigBuilder().setName("ge-0/0/4").setType(EthernetCsmacd.class)
+                .setDescription("TEST").setEnabled(true).build();
     }
 
     @Test
-    public void testWriteCurrentAttributes_001() throws Exception {
-
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("ge-0/0/4"))
-            .child(Config.class);
-
-        data = new ConfigBuilder().setName("ge-0/0/4").setType(EthernetCsmacd.class)
-            .setDescription("TEST").setEnabled(true).build();
-
-        target.writeCurrentAttributes(id, data, context);
+    public void testWriteWithDesc() throws WriteFailedException {
+        writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
-            "set interfaces ge-0/0/4 description TEST",
-            "delete interfaces ge-0/0/4 disable",
-            ""
-            ), "\n")));
+        Assert.assertEquals(String.format(WRITE_BASE, WRITE_INPUT + "delete disable\n"),
+                response.getValue().getContent());
     }
 
     @Test
-    public void testWriteCurrentAttributes_002() throws Exception {
-
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("ge-0/0/4"))
-            .child(Config.class);
-
+    public void testWriteWithoutDesc() throws WriteFailedException {
         data = new ConfigBuilder().setName("ge-0/0/4").setType(EthernetCsmacd.class)
-            .setDescription("").setEnabled(false).build();
-
-        target.writeCurrentAttributes(id, data, context);
+                .setEnabled(true).build();
+        writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
-            "delete interfaces ge-0/0/4 description",
-            "set interfaces ge-0/0/4 disable",
-            ""
-            ), "\n")));
+        Assert.assertEquals(String.format(WRITE_BASE, "delete disable\n"), response.getValue().getContent());
     }
 
     @Test
-    public void testUpdateCurrentAttributes_001() throws Exception {
+    public void testUpdate() throws WriteFailedException {
+        Config newData = new ConfigBuilder().setName("ge-0/0/4")
+                .setType(EthernetCsmacd.class).setEnabled(false).build();
 
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("ge-0/0/4"))
-            .child(Config.class);
+        writer.updateCurrentAttributes(iid, data, newData, context);
 
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(String.format(WRITE_BASE, UPDATE_INPUT), response.getValue().getContent());
+    }
+
+    @Test
+    public void testUpdateEnable() throws WriteFailedException {
+        data = new ConfigBuilder().setName("ge-0/0/4")
+                .setType(EthernetCsmacd.class)
+                .setEnabled(true)
+                .build();
+
+        Config newData = new ConfigBuilder()
+                .setName("ge-0/0/4")
+                .setType(EthernetCsmacd.class)
+                .build();
+
+        writer.updateCurrentAttributes(iid, data, newData, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertTrue(response.getValue().getContent().contains("set disable"));
+    }
+
+    @Test
+    public void testUpdateClean() throws WriteFailedException {
         final Config beforedata = new ConfigBuilder().setName("ge-0/0/4").setType(EthernetCsmacd.class).build();
         final Config afterdata = new ConfigBuilder().setName("ge-0/0/4").setType(EthernetCsmacd.class).build();
 
-        target.updateCurrentAttributes(id, beforedata, afterdata, context);
+        writer.updateCurrentAttributes(iid, beforedata, afterdata, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
-            "delete interfaces ge-0/0/4 description",
-            "delete interfaces ge-0/0/4 disable",
-            ""
-            ), "\n")));
+        Assert.assertEquals(String.format(WRITE_BASE, ""), response.getValue().getContent());
     }
 
     @Test
-    public void testUpdateCurrentAttributes_002() throws Exception {
+    public void testDelete() throws WriteFailedException {
+        data = new ConfigBuilder().setName("ge-0/0/4").setType(EthernetCsmacd.class).build();
 
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("ge-0/0/4"))
-            .child(Config.class);
-
-        final Config beforedata = new ConfigBuilder().setName("ge-0/0/4").setType(EthernetCsmacd.class).build();
-        final Config afterdata = new ConfigBuilder().setName("ge-0/0/4").setType(Other.class).build();
-
-        thrown.expect(IllegalArgumentException.class);
-        target.updateCurrentAttributes(id, beforedata, afterdata, context);
-    }
-
-    @Test
-    public void testUpdateCurrentAttributes_003() throws Exception {
-
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("ge-0/0/4"))
-            .child(Config.class);
-
-        final Config beforedata = new ConfigBuilder().setName("ge-0/0/4").setType(Other.class).build();
-        final Config afterdata = new ConfigBuilder().setName("ge-0/0/4").setType(Other.class).build();
-
-        thrown.expect(IllegalArgumentException.class);
-        target.updateCurrentAttributes(id, beforedata, afterdata, context);
-    }
-
-    @Test
-    public void testDeleteCurrentAttributes_001() throws Exception {
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("ge-0/0/4"))
-            .child(Config.class);
-
-        data = new ConfigBuilder().setName("ge-0/0/4").setType(EthernetCsmacd.class)
-            .setDescription("TEST").setEnabled(true).build();
-
-        target.deleteCurrentAttributes(id, data, context);
+        writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
-            "delete interfaces ge-0/0/4",
-            ""
-            ), "\n")));
-    }
-
-    @Test
-    public void testDeleteCurrentAttributes_002() throws Exception {
-        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("ge-0/0/4"))
-            .child(Config.class);
-
-        data = new ConfigBuilder().setName("ge-0/0/4").setType(Other.class)
-            .setDescription("TEST").setEnabled(true).build();
-
-        thrown.expect(IllegalArgumentException.class);
-        target.deleteCurrentAttributes(id, data, context);
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }

@@ -16,32 +16,12 @@
 
 package io.frinx.cli.unit.junos.network.instance.handler.vrf;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.cli.unit.utils.CliReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
-import java.util.List;
+import io.frinx.cli.ni.base.handler.vrf.AbstractL3VrfReader;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L3VrfReader
-        implements CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>,
-        CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
+public final class L3VrfReader extends AbstractL3VrfReader {
 
-    private final Cli cli;
-
-    @VisibleForTesting
     static final String DISPLAY_CONF_VRF =
         "show configuration routing-instances | display set | match \"instance-type virtual-router$\"";
 
@@ -49,40 +29,16 @@ public class L3VrfReader
         Pattern.compile("set routing-instances (?<vrfName>\\S+) instance-type virtual-router");
 
     public L3VrfReader(Cli cli) {
-        this.cli = cli;
-    }
-
-    @Nonnull
-    @Override
-    public List<NetworkInstanceKey> getAllIds(
-        @Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier,
-        @Nonnull ReadContext readContext) throws ReadFailedException {
-
-        return getL3VrfNames(this, cli, instanceIdentifier, readContext).stream()
-            .map(NetworkInstanceKey::new)
-            .collect(Collectors.toList());
+        super(cli);
     }
 
     @Override
-    public void readCurrentAttributes(
-        @Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier,
-        @Nonnull NetworkInstanceBuilder networkInstanceBuilder,
-        @Nonnull ReadContext readContext) throws ReadFailedException {
-
-        String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        networkInstanceBuilder.setName(name);
+    protected String getReadCommand() {
+        return DISPLAY_CONF_VRF;
     }
 
-    public static <O extends DataObject, B extends Builder<O>> List<String> getL3VrfNames(
-        CliReader<O, B> cliReader,
-        Cli cli,
-        InstanceIdentifier<O> instanceIdentifier,
-        ReadContext readContext) throws ReadFailedException {
-
-        String output = cliReader.blockingRead(DISPLAY_CONF_VRF, cli, instanceIdentifier, readContext);
-        return ParsingUtils.parseFields(output, 0,
-            VRF_CONFIGURATION_LINE::matcher,
-            matcher -> matcher.group("vrfName"),
-            s -> s);
+    @Override
+    protected Pattern getVrfLine() {
+        return VRF_CONFIGURATION_LINE;
     }
 }

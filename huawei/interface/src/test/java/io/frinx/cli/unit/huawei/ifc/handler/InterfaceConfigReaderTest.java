@@ -16,8 +16,10 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler;
 
+import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
@@ -50,11 +52,13 @@ public class InterfaceConfigReaderTest {
     @Test
     public void testParseInterface() {
         ConfigBuilder actualConfig = new ConfigBuilder();
-        InterfaceConfigReader.parseInterface(DISPLAY_CURRENT_INT, actualConfig, "GigabitEthernet0/0/0");
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseInterface(DISPLAY_CURRENT_INT, actualConfig, "GigabitEthernet0/0/0");
         Assert.assertEquals(EXPECTED_CONFIG, actualConfig.build());
 
         ConfigBuilder actualConfig2 = new ConfigBuilder();
-        InterfaceConfigReader.parseInterface(DISPLAY_CURRENT_INT2, actualConfig2, "LoopBack100");
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseInterface(DISPLAY_CURRENT_INT2, actualConfig2, "LoopBack100");
         Assert.assertEquals(EXPECTED_CONFIG2, actualConfig2.build());
     }
 }

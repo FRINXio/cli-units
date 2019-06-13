@@ -104,7 +104,7 @@ public class NiMplsRsvpIfSubscripConfigWriterTest {
                 new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(5000L))
                         .build())
                 .build();
-        this.writer.writeCurrentAttributesForType(iid, data, context);
+        this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
@@ -113,7 +113,7 @@ public class NiMplsRsvpIfSubscripConfigWriterTest {
     @Test
     public void writePercentage() throws Exception {
         Config data = new ConfigBuilder().setSubscription(new Percentage((short) 45)).build();
-        this.writer.writeCurrentAttributesForType(iid, data, context);
+        this.writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT_PERCENTAGE, response.getValue().getContent());
@@ -127,7 +127,7 @@ public class NiMplsRsvpIfSubscripConfigWriterTest {
                 .setSubscription(new Percentage((short) 45))
                 .build();
         exception.expect(IllegalArgumentException.class);
-        this.writer.writeCurrentAttributesForType(iid, data, context);
+        this.writer.writeCurrentAttributes(iid, data, context);
     }
 
     @Test
@@ -142,7 +142,7 @@ public class NiMplsRsvpIfSubscripConfigWriterTest {
                         .build())
                 .build();
 
-        this.writer.updateCurrentAttributesForType(iid, data, newData, context);
+        this.writer.updateCurrentAttributes(iid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -164,7 +164,7 @@ public class NiMplsRsvpIfSubscripConfigWriterTest {
                         .build())
                 .build();
 
-        this.writer.updateCurrentAttributesForType(iid, data, newData, context);
+        this.writer.updateCurrentAttributes(iid, data, newData, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
@@ -178,7 +178,7 @@ public class NiMplsRsvpIfSubscripConfigWriterTest {
                 new NiMplsRsvpIfSubscripAugBuilder().setBandwidth(new MplsRsvpSubscriptionConfig.Bandwidth(5000L))
                         .build())
                 .build();
-        this.writer.deleteCurrentAttributesForType(iid, data, context);
+        this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());

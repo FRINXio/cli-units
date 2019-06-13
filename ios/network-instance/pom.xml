@@ -15,7 +15,9 @@
   ~ limitations under the License.
   -->
 <!-- vi: set et smarttab sw=4 tabstop=4: -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -37,11 +39,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ios-utils</artifactId>
+            <artifactId>ios-cli-init-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>io.frinx.cli</groupId>
             <artifactId>ios-interface-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -53,18 +55,18 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ios-ospf-unit</artifactId>
-            <version>${project.version}</version>
+            <version>${cli.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ios-bgp-unit</artifactId>
-            <version>${project.version}</version>
+            <version>${cli.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>io.frinx.translate.unit.commons</groupId>
-            <artifactId>handlers</artifactId>
-            <version>${translate.unit.commons.version}</version>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>network-instance-base</artifactId>
+            <version>${cli.version}</version>
         </dependency>
 
         <dependency>

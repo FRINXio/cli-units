@@ -19,10 +19,10 @@ package io.frinx.cli.ios.bgp.handler.peergroup;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.ios.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.ios.bgp.handler.neighbor.NeighborReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -30,13 +30,10 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.list.PeerGroup;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.list.PeerGroupBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.list.PeerGroupKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.PeerGroupsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class PeerGroupReader implements BgpListReader.BgpConfigListReader<PeerGroup, PeerGroupKey, PeerGroupBuilder> {
+public class PeerGroupReader implements CliConfigListReader<PeerGroup, PeerGroupKey, PeerGroupBuilder> {
 
     private static final Pattern GROUP_LINE = Pattern.compile("neighbor (?<id>\\S+) peer-group");
     private Cli cli;
@@ -46,7 +43,7 @@ public class PeerGroupReader implements BgpListReader.BgpConfigListReader<PeerGr
     }
 
     @Override
-    public List<PeerGroupKey> getAllIdsForType(@Nonnull InstanceIdentifier<PeerGroup> instanceIdentifier,
+    public List<PeerGroupKey> getAllIds(@Nonnull InstanceIdentifier<PeerGroup> instanceIdentifier,
                                                @Nonnull ReadContext readContext) throws ReadFailedException {
 
         String networkInstanceName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
@@ -58,11 +55,6 @@ public class PeerGroupReader implements BgpListReader.BgpConfigListReader<PeerGr
         }
     }
 
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<PeerGroup> list) {
-        ((PeerGroupsBuilder) builder).setPeerGroup(list).build();
-    }
-
     @VisibleForTesting
     static List<PeerGroupKey> getVrfPeerGroupKeys(String output, String vrfName) {
         return NeighborReader.parseKeys(Arrays.stream(NeighborReader.splitOutput(output))
@@ -72,7 +64,7 @@ public class PeerGroupReader implements BgpListReader.BgpConfigListReader<PeerGr
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<PeerGroup> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<PeerGroup> instanceIdentifier,
                                              @Nonnull PeerGroupBuilder peerGroupBuilder, @Nonnull ReadContext
                                                          readContext) throws ReadFailedException {
         peerGroupBuilder.setPeerGroupName(instanceIdentifier.firstKeyOf(PeerGroup.class).getPeerGroupName());

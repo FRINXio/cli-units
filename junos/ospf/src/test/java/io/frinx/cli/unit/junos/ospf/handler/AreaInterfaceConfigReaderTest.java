@@ -103,7 +103,7 @@ public class AreaInterfaceConfigReaderTest {
 
         final ConfigBuilder builder = new ConfigBuilder();
 
-        target.readCurrentAttributesForType(iid, builder, readContext);
+        target.readCurrentAttributes(iid, builder, readContext);
 
         Assert.assertThat(builder.getAugmentation(OspfAreaIfConfAug.class).isEnabled(),
                 CoreMatchers.equalTo(Boolean.FALSE));

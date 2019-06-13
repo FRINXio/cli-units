@@ -22,10 +22,9 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.junos.JunosDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.junos.ifc.handler.InterfaceConfigReader;
@@ -41,6 +40,7 @@ import io.frinx.cli.unit.junos.ifc.handler.subifc.SubinterfaceVlanConfigWriter;
 import io.frinx.cli.unit.junos.ifc.handler.subifc.ip4.Ipv4AddressReader;
 import io.frinx.cli.unit.junos.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import io.frinx.cli.unit.junos.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
+import io.frinx.cli.unit.junos.init.JunosDevices;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Set;
@@ -98,8 +98,8 @@ public final class JunosInterfaceUnit implements TranslateUnit {
     }
 
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
-        @Nonnull final ModifiableWriterRegistryBuilder writeRegistry, @Nonnull final Context context) {
+    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
+        @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry, @Nonnull final Context context) {
         Cli cli = context.getTransport();
 
         provideReaders(readRegistry, cli);
@@ -130,7 +130,7 @@ public final class JunosInterfaceUnit implements TranslateUnit {
         .rev170714.Config1> TP_ID_AUG_ID = IIDs.IN_IN_CONFIG
         .augmentation(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1.class);
 
-    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+    private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
 
@@ -147,7 +147,7 @@ public final class JunosInterfaceUnit implements TranslateUnit {
         writeRegistry.addAfter(new GenericWriter<>(SUBIFC_IPV4_CFG_ID, new Ipv4ConfigWriter(cli)), IIDs.IN_IN_CONFIG);
     }
 
-    private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.INTERFACES, InterfacesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.IN_INTERFACE, new InterfaceReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));

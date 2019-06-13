@@ -19,9 +19,9 @@ package io.frinx.cli.iosxr.bgp.handler.neighbor;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
-import io.frinx.cli.handlers.bgp.BgpReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.regex.Pattern;
@@ -39,7 +39,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NeighborTransportConfigReader implements BgpReader.BgpConfigReader<Config, ConfigBuilder> {
+public class NeighborTransportConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_NEI = "show running-config router bgp %s %s %s neighbor %s";
     private static final Pattern UPADTE_SOURCE_LINE = Pattern.compile("update-source (?<iface>.+)");
@@ -56,7 +56,7 @@ public class NeighborTransportConfigReader implements BgpReader.BgpConfigReader<
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull
             ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
                 globalConfig = readContext.read(RWUtils.cutId(instanceIdentifier, Bgp.class)

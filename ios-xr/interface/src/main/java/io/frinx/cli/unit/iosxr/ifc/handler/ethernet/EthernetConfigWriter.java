@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.iosxr.ifc.handler.InterfaceConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.Util;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -140,8 +140,8 @@ public class EthernetConfigWriter implements CliWriter<Config> {
                 "root");
     }
 
-    private static void checkIfcType(String ifcName) {
-        Preconditions.checkState(InterfaceConfigReader.parseType(ifcName) == EthernetCsmacd.class,
+    private void checkIfcType(String ifcName) {
+        Preconditions.checkState(Util.parseType(ifcName) == EthernetCsmacd.class,
                 "Cannot change ethernet configuration for non ethernet interface %s", ifcName);
     }
 }

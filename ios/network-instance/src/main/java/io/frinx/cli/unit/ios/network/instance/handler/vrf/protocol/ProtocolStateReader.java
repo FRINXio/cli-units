@@ -18,21 +18,18 @@ package io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.handlers.network.instance.L3VrfReader;
+import io.frinx.cli.unit.utils.CliOperReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.State;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.StateBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class ProtocolStateReader implements L3VrfReader.L3VrfOperReader<State, StateBuilder> {
+public class ProtocolStateReader implements CliOperReader<State, StateBuilder> {
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<State> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<State> instanceIdentifier,
                                              @Nonnull StateBuilder stateBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         ProtocolKey protocolKey = instanceIdentifier.firstKeyOf(Protocol.class);
@@ -40,8 +37,4 @@ public class ProtocolStateReader implements L3VrfReader.L3VrfOperReader<State, S
         stateBuilder.setName(protocolKey.getName());
     }
 
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull State state) {
-        ((ProtocolBuilder) builder).setState(state);
-    }
 }

@@ -19,8 +19,8 @@ package io.frinx.cli.unit.huawei.bgp.handler;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collection;
@@ -50,7 +50,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.BGP;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalConfigWriter implements BgpWriter<Config> {
+public class GlobalConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
@@ -59,7 +59,7 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config config, WriteContext writeContext)
+    public void writeCurrentAttributes(InstanceIdentifier<Config> id, Config config, WriteContext writeContext)
             throws WriteFailedException {
 
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
@@ -97,14 +97,14 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+    public void updateCurrentAttributes(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
         // Just perform write, delete not necessary (bgp router is global and encapsulates configuration for all vrfs)
         // cannot just delete and replace
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
-    @Override public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config config,
+    @Override public void deleteCurrentAttributes(InstanceIdentifier<Config> id, Config config,
                                                          WriteContext writeContext) throws WriteFailedException {
 
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);

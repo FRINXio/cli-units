@@ -17,10 +17,12 @@
 package io.frinx.cli.unit.ios.network.instance.handler.l2p2p;
 
 import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 
 public class L2P2PReaderTest {
@@ -48,8 +50,9 @@ public class L2P2PReaderTest {
             .collect(Collectors.toList());
 
     @Test
-    public void testIds() throws Exception {
-        List<NetworkInstanceKey> networkInstanceKeys = L2P2PReader.parseXconnectIds(OUTPUT);
+    public void testIds() {
+        List<NetworkInstanceKey> networkInstanceKeys = new L2P2PReader(Mockito.mock(Cli.class))
+                .parseLocalRemote(OUTPUT);
         Assert.assertEquals(EXPECTED, networkInstanceKeys);
     }
 }

@@ -91,7 +91,7 @@ public class BundleEtherLacpAdminKeyConfigWriterTest {
     @Test
     public void testWriteCurrentAttributes_001() throws Exception {
         prepare(Ieee8023adLag.class, "Ethernet4/10", 2);
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue()
                 .getContent());
@@ -100,7 +100,7 @@ public class BundleEtherLacpAdminKeyConfigWriterTest {
     @Test
     public void testWriteCurrentAttributes_002() throws Exception {
         prepare(Ieee8023adLag.class, "Ethernet4/10", null);
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
 
@@ -109,7 +109,7 @@ public class BundleEtherLacpAdminKeyConfigWriterTest {
         prepare(Ieee8023adLag.class, "Ethernet4/12", 2);
         ConfigBuilder builder = new ConfigBuilder();
         data = builder.build();
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
 
@@ -117,7 +117,7 @@ public class BundleEtherLacpAdminKeyConfigWriterTest {
     public void testUpdateCurrentAttributes_001() throws Exception {
         prepare(Ieee8023adLag.class, "Ethernet4/10", 2);
         Config dataBefore = createConfig(Ieee8023adLag.class, "Ethernet4/10", 1);
-        target.updateCurrentAttributes(id, dataBefore, data, context);
+        target.updateCurrentAttributesWResult(id, dataBefore, data, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue()
                 .getContent());
@@ -126,7 +126,7 @@ public class BundleEtherLacpAdminKeyConfigWriterTest {
     @Test
     public void testDeleteCurrentAttributes_001() throws Exception {
         prepare(Ieee8023adLag.class, "Ethernet4/12",2);
-        target.deleteCurrentAttributes(id, data, context);
+        target.deleteCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue()
                 .getContent());

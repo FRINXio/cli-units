@@ -85,7 +85,7 @@ public class TrunkPortInterfaceConfigWriterTest {
         prepare(Ieee8023adLag.class, "Ethernet100/200");  //other interface name
         Config newData = new ConfigBuilder(data).build();
 
-        target.updateCurrentAttributes(id, data, newData, context);
+        target.updateCurrentAttributesWResult(id, data, newData, context);
 
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
@@ -95,7 +95,7 @@ public class TrunkPortInterfaceConfigWriterTest {
         prepare(Ieee8023adLag.class, "Trunk5");
         Config newData = new ConfigBuilder(data).build();
 
-        target.updateCurrentAttributes(id, data, newData, context);
+        target.updateCurrentAttributesWResult(id, data, newData, context);
 
         Mockito.verify(cli, Mockito.atLeastOnce()).executeAndRead(response.capture());
         Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
@@ -115,7 +115,7 @@ public class TrunkPortInterfaceConfigWriterTest {
             .setMtu(null)               //if null, "no jumbo ..."
             .build();
 
-        target.updateCurrentAttributes(id, data, newData, context);
+        target.updateCurrentAttributesWResult(id, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
@@ -135,7 +135,7 @@ public class TrunkPortInterfaceConfigWriterTest {
             .setMtu(null)
             .build();
 
-        target.updateCurrentAttributes(id, data, newData, context);
+        target.updateCurrentAttributesWResult(id, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
@@ -154,7 +154,7 @@ public class TrunkPortInterfaceConfigWriterTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot delete TrunkPort interface:Trunk5");
 
-        target.deleteCurrentAttributes(id, data, context);
+        target.deleteCurrentAttributesWResult(id, data, context);
 
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }

@@ -113,7 +113,7 @@ public class AreaInterfaceConfigWriterTest {
         Mockito.doReturn(Optional.of(ifData)).when(writeContext)
                 .readAfter(RWUtils.cutId(INSTANCE_IDENTIFIER, Interface.class));
 
-        target.writeCurrentAttributesForType(INSTANCE_IDENTIFIER, data, writeContext);
+        target.writeCurrentAttributes(INSTANCE_IDENTIFIER, data, writeContext);
 
         Mockito.verify(data, Mockito.times(4)).getNetworkType();
         Mockito.verify(data, Mockito.times(2)).getMetric();
@@ -158,7 +158,7 @@ public class AreaInterfaceConfigWriterTest {
         Mockito.doReturn(Optional.of(ifData)).when(writeContext)
                 .readBefore(RWUtils.cutId(INSTANCE_IDENTIFIER, Interface.class));
 
-        target.deleteCurrentAttributesForType(INSTANCE_IDENTIFIER, data, writeContext);
+        target.deleteCurrentAttributes(INSTANCE_IDENTIFIER, data, writeContext);
 
         Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
 

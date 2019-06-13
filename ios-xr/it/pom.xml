@@ -14,7 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<!-- vi: set et smarttab sw=4 tabstop=4: -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
@@ -43,50 +46,22 @@
             <dependency>
                 <groupId>org.opendaylight.yangtools</groupId>
                 <artifactId>yangtools-artifacts</artifactId>
-                <type>pom</type>
                 <version>${yangtools.version}</version>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.mdsal.model</groupId>
-                <artifactId>mdsal-model-artifacts</artifactId>
                 <type>pom</type>
-                <version>${mdsal.model.version}</version>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.mdsal</groupId>
                 <artifactId>mdsal-artifacts</artifactId>
-                <type>pom</type>
                 <version>${mdsal.version}</version>
+                <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.opendaylight.controller</groupId>
-                <artifactId>mdsal-artifacts</artifactId>
+                <groupId>org.opendaylight.mdsal.model</groupId>
+                <artifactId>mdsal-model-artifacts</artifactId>
+                <version>${mdsal.model.version}</version>
                 <type>pom</type>
-                <version>${controller.version}</version>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.frinx.openconfig</groupId>
-                <artifactId>openconfig-artifacts</artifactId>
-                <type>pom</type>
-                <version>${openconfig.version}</version>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.frinx.cli</groupId>
-                <artifactId>cli-artifacts</artifactId>
-                <type>pom</type>
-                <version>${cli.version}</version>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>cli-units-artifacts</artifactId>
-                <type>pom</type>
-                <version>${project.version}</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
@@ -100,27 +75,27 @@
         </dependency>
 
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>io-impl</artifactId>
             <version>${cli.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>topology-impl</artifactId>
             <version>${cli.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>translation-registry</artifactId>
             <version>${cli.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>generic-unit</artifactId>
-            <version>${cli.version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -274,6 +249,11 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.1.7</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

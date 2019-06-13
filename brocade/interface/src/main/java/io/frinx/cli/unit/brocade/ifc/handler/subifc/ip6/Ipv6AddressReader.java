@@ -16,101 +16,38 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.ifc.base.handler.subifc.ip6.AbstractIpv6AddressesReader;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader;
-import io.frinx.cli.unit.brocade.ifc.handler.subifc.SubinterfaceReader;
-import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import io.frinx.cli.unit.brocade.ifc.Util;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.AddressesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.Address;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.AddressKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6AddressNoZone;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class Ipv6AddressReader implements CliConfigListReader<Address, AddressKey, AddressBuilder> {
+public final class Ipv6AddressReader extends AbstractIpv6AddressesReader {
 
-    private final Cli cli;
+    static final String SH_INTERFACE_IP = "sh ipv6 inter %s %s";
+    private static final Pattern IPV6_LOCAL_ADDRESS =
+            Pattern.compile(".*?link-local address is (?<ipv6local>[^\\s]+).*");
+    private static final Pattern IPV6_UNICAST_ADDRESS =
+            Pattern.compile(".*?(?<ipv6unicast>[a-fA-F0-9:]+), subnet is [^/]+.*/(?<prefix>[^\\s]+).*");
 
     public Ipv6AddressReader(Cli cli) {
-        this.cli = cli;
-    }
-
-    public static final String SH_INTERFACE_IP = "sh ipv6 inter %s %s";
-    static final Pattern IPV6_LOCAL_ADDRESS = Pattern.compile(".*?link-local address is (?<ipv6local>[^\\s]+).*");
-    static final Pattern IPV6_UNICAST_ADDRESS = Pattern.compile(".*?(?<ipv6unicast>[a-fA-F0-9:]+), subnet is [^/]+.*/"
-            + "(?<prefix>[^\\s]+).*");
-
-    @Nonnull
-    @Override
-    public List<AddressKey> getAllIds(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        String id = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
-
-        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId
-                == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            Class<? extends InterfaceType> ifcType = InterfaceConfigReader.parseType(id);
-            String ifcNumber = InterfaceConfigReader.getIfcNumber(id);
-            final String input = blockingRead(String.format(SH_INTERFACE_IP,
-                    InterfaceConfigReader.getTypeOnDevice(ifcType), ifcNumber),
-                    cli, instanceIdentifier, readContext);
-            return parseAddressIds(input);
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
-    @VisibleForTesting
-    public static List<AddressKey> parseAddressIds(String output) {
-        List<AddressKey> addressKeys = new ArrayList<>();
-        addressKeys.addAll(ParsingUtils.parseFields(output, 0,
-            IPV6_LOCAL_ADDRESS::matcher,
-            m -> m.group("ipv6local"),
-            addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
-        addressKeys.addAll(ParsingUtils.parseFields(output, 0,
-            IPV6_UNICAST_ADDRESS::matcher,
-            m -> m.group("ipv6unicast"),
-            addr -> new AddressKey(new Ipv6AddressNoZone(addr))));
-        return addressKeys;
+        super(cli);
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder,
-                      @Nonnull List<Address> list) {
-        ((AddressesBuilder) builder).setAddress(list);
-    }
-
-    @Nonnull
-    @Override
-    public AddressBuilder getBuilder(@Nonnull InstanceIdentifier<Address> instanceIdentifier) {
-        return new AddressBuilder();
+    protected String getReadCommand(String ifcName) {
+        Class<? extends InterfaceType> ifcType = Util.parseType(ifcName);
+        String ifcNumber = Util.getIfcNumber(ifcName);
+        return f(SH_INTERFACE_IP, Util.getTypeOnDevice(ifcType), ifcNumber);
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
-                                      @Nonnull AddressBuilder addressBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+    protected Pattern getLocalIpLine() {
+        return IPV6_LOCAL_ADDRESS;
+    }
 
-        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId
-                == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class).getIp());
-        }
+    @Override
+    protected Pattern getUnicastIpLine() {
+        return IPV6_UNICAST_ADDRESS;
     }
 }

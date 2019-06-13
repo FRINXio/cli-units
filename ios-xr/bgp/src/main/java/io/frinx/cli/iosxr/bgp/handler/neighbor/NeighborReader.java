@@ -20,10 +20,10 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
-import io.frinx.cli.handlers.bgp.BgpListReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.iosxr.bgp.handler.GlobalConfigWriter;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
+public class NeighborReader implements CliConfigListReader<Neighbor, NeighborKey, NeighborBuilder> {
 
     private static final String SH_NEI = "show running-config router bgp %s %s %s | include ^%sneighbor";
     private static final Pattern NEIGHBOR_LINE = Pattern.compile("neighbor (?<neighborIp>.+)");
@@ -60,7 +60,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
     }
 
     @Override
-    public List<NeighborKey> getAllIdsForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier, @Nonnull
+    public List<NeighborKey> getAllIds(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier, @Nonnull
             ReadContext readContext) throws ReadFailedException {
         final String protName = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
@@ -93,7 +93,7 @@ public class NeighborReader implements BgpListReader.BgpConfigListReader<Neighbo
     }
 
     @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier, @Nonnull
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier, @Nonnull
             NeighborBuilder neighborBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         neighborBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class)
                 .getNeighborAddress());

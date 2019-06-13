@@ -18,13 +18,13 @@ package io.frinx.cli.iosxr.ospfv3.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.ospfv3.OspfV3Writer;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv3.rev180817.ospfv3.global.structural.global.config.stub.router.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StubRouterConfigWriter implements OspfV3Writer<Config> {
+public class StubRouterConfigWriter implements CliWriter<Config> {
 
     private final Cli cli;
 
@@ -33,7 +33,7 @@ public class StubRouterConfigWriter implements OspfV3Writer<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> iid, Config data,
+    public void writeCurrentAttributes(InstanceIdentifier<Config> iid, Config data,
                                               WriteContext context) throws WriteFailedException {
         final String processName = iid.firstKeyOf(Protocol.class).getName();
         final String nwInsName = OspfV3ProtocolReader.resolveVrfWithName(iid);
@@ -45,7 +45,7 @@ public class StubRouterConfigWriter implements OspfV3Writer<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> iid, Config dataBefore,
+    public void updateCurrentAttributes(InstanceIdentifier<Config> iid, Config dataBefore,
                                                Config dataAfter, WriteContext context) throws
             WriteFailedException {
         final String processName = iid.firstKeyOf(Protocol.class).getName();
@@ -59,7 +59,7 @@ public class StubRouterConfigWriter implements OspfV3Writer<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> iid, Config data,
+    public void deleteCurrentAttributes(InstanceIdentifier<Config> iid, Config data,
                                                WriteContext context) throws WriteFailedException {
         final String processName = iid.firstKeyOf(Protocol.class).getName();
         final String nwInsName = OspfV3ProtocolReader.resolveVrfWithName(iid);

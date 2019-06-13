@@ -21,7 +21,8 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.cli.unit.utils.CliWriterFormatter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +35,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BundleEtherInterfaceConfigWriter implements CliWriter<Config> {
+public class BundleEtherInterfaceConfigWriter implements CliWriterFormatter<Config>, CompositeWriter.Child<Config> {
 
     private Cli cli;
 
@@ -51,13 +52,13 @@ public class BundleEtherInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config data,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String ifName = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PATTERN.matcher(ifName);
         if (!matcher.matches()) {
-            return;
+            return false;
         }
 
         checkSupportedInterface(data,
@@ -65,6 +66,7 @@ public class BundleEtherInterfaceConfigWriter implements CliWriter<Config> {
         validateIfcNameAgainstType(data);
         validateIfcConfiguration(data);
         writeOrUpdateInterface(id, data);
+        return true;
     }
 
     private static void checkSupportedInterface(Config config, String exceptionMsg) {
@@ -106,13 +108,13 @@ public class BundleEtherInterfaceConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
             @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String ifName = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PATTERN.matcher(ifName);
         if (!matcher.matches()) {
-            return;
+            return false;
         }
 
         try {
@@ -126,20 +128,22 @@ public class BundleEtherInterfaceConfigWriter implements CliWriter<Config> {
         checkSupportedInterface(dataAfter, "Unknown interface type: " + dataAfter.getType());
         validateIfcConfiguration(dataAfter);
         writeOrUpdateInterface(id, dataAfter);
+        return true;
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
             @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         String ifName = id.firstKeyOf(Interface.class).getName();
         Matcher matcher = BundleEtherInterfaceReader.BUNDLE_ETHER_IF_NAME_PATTERN.matcher(ifName);
         if (!matcher.matches()) {
-            return;
+            return false;
         }
 
         checkSupportedInterface(dataBefore, "Unexpected interface type: " + dataBefore.getType());
         deleteInterface(id, dataBefore);
+        return true;
     }
 
     @VisibleForTesting

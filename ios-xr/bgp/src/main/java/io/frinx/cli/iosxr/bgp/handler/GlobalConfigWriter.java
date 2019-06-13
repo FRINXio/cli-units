@@ -20,15 +20,15 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.bgp.BgpWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class GlobalConfigWriter implements BgpWriter<Config> {
+public class GlobalConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
@@ -37,7 +37,7 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
+    public void writeCurrentAttributes(InstanceIdentifier<Config> id, Config data,
                                               WriteContext writeContext) throws WriteFailedException {
         final String instName = getProtoInstanceName(id);
         final String nwInsName = resolveVrfWithName(id);
@@ -51,18 +51,18 @@ public class GlobalConfigWriter implements BgpWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
+    public void updateCurrentAttributes(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
                                                WriteContext writeContext) throws WriteFailedException {
         final String protName = id.firstKeyOf(Protocol.class)
                 .getName();
         Preconditions.checkArgument(dataBefore.getAs()
                         .equals(dataAfter.getAs()),
                 "Cannot update AS number. Only one BGP instance in instance '{}' is allowed.", protName);
-        writeCurrentAttributesForType(id, dataAfter, writeContext);
+        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
-    public void deleteCurrentAttributesForType(InstanceIdentifier<Config> id, Config data,
+    public void deleteCurrentAttributes(InstanceIdentifier<Config> id, Config data,
                                                WriteContext writeContext) throws WriteFailedException {
         final String instName = getProtoInstanceName(id);
         final String nwInsName = resolveVrfWithName(id);

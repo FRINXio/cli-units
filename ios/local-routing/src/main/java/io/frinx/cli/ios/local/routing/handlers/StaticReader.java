@@ -20,7 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ios.local.routing.common.LrListReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.HashMap;
@@ -30,17 +30,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.apache.commons.net.util.SubnetUtils;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top.StaticRoutesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.Static;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.local._static.top._static.routes.StaticKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class StaticReader implements LrListReader.LrConfigListReader<Static, StaticKey, StaticBuilder> {
+public class StaticReader implements CliConfigListReader<Static, StaticKey, StaticBuilder> {
 
     private static final String SH_IP_STATIC_ROUTE = "show running-config | include ip route|ipv6 route";
 
@@ -88,7 +85,7 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
 
     @Nonnull
     @Override
-    public List<StaticKey> getAllIdsForType(@Nonnull InstanceIdentifier<Static> instanceIdentifier,
+    public List<StaticKey> getAllIds(@Nonnull InstanceIdentifier<Static> instanceIdentifier,
                                             @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(Protocol.class)
                 .getName();
@@ -125,12 +122,7 @@ public class StaticReader implements LrListReader.LrConfigListReader<Static, Sta
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Static> list) {
-        ((StaticRoutesBuilder) builder).setStatic(list);
-    }
-
-    @Override
-    public void readCurrentAttributesForType(@Nonnull InstanceIdentifier<Static> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Static> instanceIdentifier,
                                              @Nonnull StaticBuilder staticBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
         staticBuilder.setPrefix(instanceIdentifier.firstKeyOf(Static.class)

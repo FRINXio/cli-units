@@ -86,7 +86,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
     public void testWriteCurrentAttributes_001() throws Exception {
         prepare(Ieee8023adLag.class, "Bundle-Ether100");
 
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
 
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
@@ -98,7 +98,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot create physical interface");
 
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
 
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
@@ -112,7 +112,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
             "Unexpected interface type: class org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana."
             + "_if.type.rev140508.Ieee8023adLag");
 
-        target.writeCurrentAttributes(id, data, context);
+        target.writeCurrentAttributesWResult(id, data, context);
 
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
@@ -122,7 +122,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
         prepare(Ieee8023adLag.class, "Bundle-Ether100");  //other interface name
         Config newData = new ConfigBuilder(data).build();
 
-        target.updateCurrentAttributes(id, data, newData, context);
+        target.updateCurrentAttributesWResult(id, data, newData, context);
 
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
@@ -132,7 +132,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
         prepare(EthernetCsmacd.class, "Ethernet100/200");
         Config newData = new ConfigBuilder(data).build();
 
-        target.updateCurrentAttributes(id, data, newData, context);
+        target.updateCurrentAttributesWResult(id, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
@@ -153,7 +153,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
             .setMtu(null)               //if null, "no jumbo ..."
             .build();
 
-        target.updateCurrentAttributes(id, data, newData, context);
+        target.updateCurrentAttributesWResult(id, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
@@ -174,7 +174,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
             .setMtu(null)
             .build();
 
-        target.updateCurrentAttributes(id, data, newData, context);
+        target.updateCurrentAttributesWResult(id, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertThat(response.getValue().getContent(), CoreMatchers.equalTo(StringUtils.join(Lists.newArrayList(
@@ -202,7 +202,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
                 + "After: class org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508"
                 + ".Ieee8023adLag");
 
-        target.updateCurrentAttributes(id, data, newData, context);
+        target.updateCurrentAttributesWResult(id, data, newData, context);
 
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
@@ -211,7 +211,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
     public void testDeleteCurrentAttributes_001() throws Exception {
         prepare(Ieee8023adLag.class, "Bundle-Ether100");
 
-        target.deleteCurrentAttributes(id, data, context);
+        target.deleteCurrentAttributesWResult(id, data, context);
 
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
@@ -223,7 +223,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Cannot delete physical interface");
 
-        target.deleteCurrentAttributes(id, data, context);
+        target.deleteCurrentAttributesWResult(id, data, context);
 
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }
@@ -237,7 +237,7 @@ public class PhysicalPortInterfaceConfigWriterTest {
             + "class org.opendaylight.yang.gen.v1.urn.ietf.params.xml"
             + ".ns.yang.iana._if.type.rev140508.Ieee8023adLag");
 
-        target.deleteCurrentAttributes(id, data, context);
+        target.deleteCurrentAttributesWResult(id, data, context);
 
         Mockito.verify(cli, Mockito.never()).executeAndRead(Mockito.any());
     }

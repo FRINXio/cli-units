@@ -22,11 +22,12 @@ import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericListWriter;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
-import io.fd.honeycomb.translate.read.registry.ModifiableReaderRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.CheckRegistry;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
+import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
-import io.fd.honeycomb.translate.write.registry.ModifiableWriterRegistryBuilder;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.IosXrDevices;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.ifc.handler.HoldTimeConfigReader;
@@ -60,9 +61,11 @@ import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6.Ipv6ConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckIpv4Writer;
 import io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckIpv6Writer;
 import io.frinx.cli.unit.iosxr.ifc.handler.verify.RpfCheckReader;
+import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.damping.rev171024.IfDampAugBuilder;
@@ -137,12 +140,24 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
         return Sets.newHashSet();
     }
 
+    private static final CheckRegistry CHECK_REGISTRY;
+
+    static {
+        CheckRegistry.Builder builder = new CheckRegistry.Builder();
+        builder.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_ROUTERADVERTISEMENT,
+                BasicCheck.checkData(ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
+                        ChecksMap.DataCheck.InterfaceConfig.TYPE_ETHERNET_CSMACD)
+                        .or(BasicCheck.checkData(ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
+                                ChecksMap.DataCheck.InterfaceConfig.TYPE_IEEE802AD_LAG)));
+        CHECK_REGISTRY = builder.build();
+    }
+
     @Override
-    public void provideHandlers(@Nonnull final ModifiableReaderRegistryBuilder readRegistry,
-                                @Nonnull final ModifiableWriterRegistryBuilder writeRegistry,
+    public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
+                                @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final Context context) {
         Cli cli = context.getTransport();
-
+        readRegistry.addCheckRegistry(CHECK_REGISTRY);
         // TODO lot of handlers are exactly the same as the handlers from
         // ios-interface unit. Extract common logic and reuse it
         provideReaders(readRegistry, cli);
@@ -167,7 +182,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
                     .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco
                             .rev171024.ipv6.verify.Ipv6.class);
 
-    private void provideWriters(ModifiableWriterRegistryBuilder writeRegistry, Cli cli) {
+    private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
         writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
 
@@ -237,7 +252,7 @@ public final class IosXRInterfaceUnit implements TranslateUnit {
 
     }
 
-    private void provideReaders(ModifiableReaderRegistryBuilder readRegistry, Cli cli) {
+    private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.addStructuralReader(IIDs.INTERFACES, InterfacesBuilder.class);
         readRegistry.add(new GenericConfigListReader<>(IIDs.IN_INTERFACE, new InterfaceReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));

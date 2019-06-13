@@ -92,7 +92,7 @@ public class StaticWriterTest {
     @Test
     public void writeCurrentAttributesForTypeTest() throws WriteFailedException {
         Static writeData1 = getStaticData("1.1.1.1/16", "9.9.9.9");
-        staticWriter.writeCurrentAttributesForType(iid, writeData1, Mockito.mock(WriteContext.class));
+        staticWriter.writeCurrentAttributes(iid, writeData1, Mockito.mock(WriteContext.class));
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(String.format(EXPECTED_WRITE_OUTPUT, "1.1.1.1 255.255.0.0 9.9.9.9"),
                 response.getValue().getContent());
@@ -100,7 +100,7 @@ public class StaticWriterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void writeCurrentAttributesIAExceptionTest() throws WriteFailedException {
-        staticWriter.writeCurrentAttributesForType(iid, getStaticData("", (String) null),
+        staticWriter.writeCurrentAttributes(iid, getStaticData("", (String) null),
                 Mockito.mock(WriteContext.class));
     }
 
@@ -108,12 +108,12 @@ public class StaticWriterTest {
     public void updateCurrentAttributesForTypeTest() throws WriteFailedException {
         Static writeData1 = getStaticData("1.1.1.1/16", "9.9.9.9", "Ethernet1");
         Static writeData2 = getStaticData("1.1.1.1/16", "9.9.9.9");
-        staticWriter.updateCurrentAttributesForType(iid, writeData1, writeData2, Mockito.mock(WriteContext.class));
+        staticWriter.updateCurrentAttributes(iid, writeData1, writeData2, Mockito.mock(WriteContext.class));
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(String.format(EXPECTED_DELETE_OUTPUT, "1.1.1.1 255.255.0.0 Ethernet1"),
                 response.getValue().getContent());
 
-        staticWriter.updateCurrentAttributesForType(iid, writeData2, writeData1, Mockito.mock(WriteContext.class));
+        staticWriter.updateCurrentAttributes(iid, writeData2, writeData1, Mockito.mock(WriteContext.class));
         Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
         Assert.assertEquals(String.format(EXPECTED_WRITE_OUTPUT, "1.1.1.1 255.255.0.0 Ethernet1"),
                 response.getValue().getContent());
@@ -122,7 +122,7 @@ public class StaticWriterTest {
     @Test
     public void deleteCurrentAttributesForTypeTest() throws WriteFailedException {
         Static writeData1 = getStaticData("1.1.1.1/16", "9.9.9.9");
-        staticWriter.deleteCurrentAttributesForType(iid, writeData1, Mockito.mock(WriteContext.class));
+        staticWriter.deleteCurrentAttributes(iid, writeData1, Mockito.mock(WriteContext.class));
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(String.format(EXPECTED_DELETE_OUTPUT, "1.1.1.1 255.255.0.0 9.9.9.9"),
                 response.getValue().getContent());

@@ -16,11 +16,12 @@
 
 package io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv4;
 
+import io.frinx.cli.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigReaderTest;
+import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
 
 public class Ipv4ConfigReaderTest {
 
@@ -28,16 +29,10 @@ public class Ipv4ConfigReaderTest {
             + "interface Ethernet1/1.5\n"
             + " ip address 192.168.1.1/16\n";
 
-    private static Config EXPECTED_CONFIG = new ConfigBuilder()
-            .setIp(new Ipv4AddressNoZone("192.168.1.1"))
-            .setPrefixLength((short) 16)
-            .build();
-
     @Test
-    public void testParseAddressconfig() {
-        ConfigBuilder configBuilder = new ConfigBuilder();
-        Ipv4ConfigReader.parseAddressConfig(configBuilder, SH_RUN_INT_IP);
-        Assert.assertEquals(EXPECTED_CONFIG, configBuilder.build());
+    public void testParseConfigAddress() {
+        ConfigBuilder actual = new ConfigBuilder();
+        new Ipv4ConfigReader(Mockito.mock(Cli.class)).parseAddressConfig(actual, SH_RUN_INT_IP);
+        Assert.assertEquals(AbstractIpv4ConfigReaderTest.buildData("192.168.1.1", "16"), actual.build());
     }
-
 }

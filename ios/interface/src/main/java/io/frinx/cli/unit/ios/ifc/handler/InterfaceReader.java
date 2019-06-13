@@ -16,77 +16,34 @@
 
 package io.frinx.cli.unit.ios.ifc.handler;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.ifc.base.handler.AbstractInterfaceReader;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class InterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
-
-    private Cli cli;
-
-    public InterfaceReader(Cli cli) {
-        this.cli = cli;
-    }
+public final class InterfaceReader extends AbstractInterfaceReader {
 
     public static final String SH_INTERFACE = "show running-config | include ^interface";
 
-    @Nonnull
-    @Override
-    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                        @Nonnull ReadContext readContext) throws ReadFailedException {
-        return parseInterfaceIds(blockingRead(SH_INTERFACE, cli, instanceIdentifier, readContext));
-    }
+    private static final Pattern INTERFACE_ID_LINE = Pattern.compile("interface (?<id>\\S+)");
 
-    private static final Pattern INTERFACE_ID_LINE =
-            Pattern.compile("interface (?<id>\\S+)");
+    private static final Pattern SUBINTERFACE_NAME = Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
 
-    public static final Pattern SUBINTERFACE_NAME =
-            Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
-
-    @VisibleForTesting
-    static List<InterfaceKey> parseInterfaceIds(String output) {
-        return parseAllInterfaceIds(output)
-                // Now exclude subinterfaces
-                .stream()
-                .filter(ifcName -> !isSubinterface(ifcName))
-                .collect(Collectors.toList());
-    }
-
-    public static List<InterfaceKey> parseAllInterfaceIds(String output) {
-        return ParsingUtils.parseFields(output, 0,
-                INTERFACE_ID_LINE::matcher,
-            m -> m.group("id"),
-                InterfaceKey::new);
-    }
-
-    public static boolean isSubinterface(InterfaceKey ifcName) {
-        return SUBINTERFACE_NAME.matcher(ifcName.getName()).matches();
+    public InterfaceReader(Cli cli) {
+        super(cli);
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Interface> list) {
-        ((InterfacesBuilder) builder).setInterface(list);
+    protected String getReadCommand() {
+        return SH_INTERFACE;
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                      @Nonnull InterfaceBuilder builder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        builder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
+    protected Pattern getInterfaceIdLine() {
+        return INTERFACE_ID_LINE;
     }
 
+    @Override
+    protected Pattern subinterfaceName() {
+        return SUBINTERFACE_NAME;
+    }
 }

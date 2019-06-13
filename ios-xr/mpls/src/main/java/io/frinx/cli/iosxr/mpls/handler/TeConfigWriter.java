@@ -20,15 +20,15 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.handlers.mpls.MplsWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.global.config.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.Mpls;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributes;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TeConfigWriter implements MplsWriter<Config> {
+public class TeConfigWriter implements CliWriter<Config> {
 
     private static final String MPLS_COMMAND = "mpls traffic-eng\n"
                                                 + "root";
@@ -41,7 +41,7 @@ public class TeConfigWriter implements MplsWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (config.isEnabled()) {
@@ -50,18 +50,18 @@ public class TeConfigWriter implements MplsWriter<Config> {
     }
 
     @Override
-    public void updateCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> id,
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore, @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (dataAfter.isEnabled()) {
-            writeCurrentAttributesForType(id, dataAfter, writeContext);
+            writeCurrentAttributes(id, dataAfter, writeContext);
         } else {
-            deleteCurrentAttributesForType(id, dataBefore, writeContext);
+            deleteCurrentAttributes(id, dataBefore, writeContext);
         }
     }
 
     @Override
-    public void deleteCurrentAttributesForType(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                                @Nonnull Config config, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
         final TeInterfaceAttributes ifaces = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Mpls.class))

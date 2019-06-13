@@ -114,7 +114,7 @@ public class ConfigWriter implements CliWriter<Config> {
                         .interfaces.Interface.class, new InterfaceKey(ifcName)));
         Preconditions.checkArgument(interfaceOptional.isPresent(), "Cannot change BFD "
                 + "configuration for non-existing bundle interface %s", ifcName);
-        Preconditions.checkArgument(AggregateConfigReader.isLAGInterface(ifcName),
+        Preconditions.checkArgument(new AggregateConfigReader(cli).isLAGInterface(ifcName),
                 "Cannot change BFD configuration for non-bundle interface %s", ifcName);
     }
 }
