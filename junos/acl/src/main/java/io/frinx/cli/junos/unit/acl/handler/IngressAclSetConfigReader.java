@@ -21,12 +21,9 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSet;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class IngressAclSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
@@ -41,10 +38,5 @@ public class IngressAclSetConfigReader implements CliConfigReader<Config, Config
 
         configBuilder.setType(key.getType());
         configBuilder.setSetName(key.getSetName());
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((IngressAclSetBuilder) builder).setConfig(config);
     }
 }
