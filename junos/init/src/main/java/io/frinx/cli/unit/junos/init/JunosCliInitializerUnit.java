@@ -18,7 +18,6 @@ package io.frinx.cli.unit.junos.init;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.spi.write.CommitFailedException;
@@ -33,6 +32,7 @@ import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,11 +44,12 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JunosCliInitializerUnit implements TranslateUnit {
+public class JunosCliInitializerUnit extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(JunosCliInitializerUnit.class);
 
@@ -57,21 +58,18 @@ public class JunosCliInitializerUnit implements TranslateUnit {
 
     private static JunosCliInitializationStrategy INITIALIZER = new JunosCliInitializationStrategy();
 
-    private TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
     public JunosCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(JunosDevices.JUNOS_GENERIC, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(JunosDevices.JUNOS_GENERIC);
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "Junos cli init (FRINX) translate unit";
     }
 
     @Override
@@ -80,21 +78,11 @@ public class JunosCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final TranslateUnit.Context context) {
-        return Sets.newHashSet();
-    }
-
-    @Override
     public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
         readRegistry.addCheckRegistry(ChecksMap.OPENCONFIG_REGISTRY);
         writeRegistry.addCheckRegistry(ChecksMap.OPENCONFIG_REGISTRY);
-    }
-
-    @Override
-    public String toString() {
-        return "Junos cli init (FRINX) translate unit";
     }
 
     @Override
