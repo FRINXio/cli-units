@@ -69,9 +69,12 @@ public class ActionsParserTest {
     @Test
     public void testParseCommunity() throws Exception {
         BgpActionsBuilder builder = new BgpActionsBuilder();
-        ActionsParser.parseSetCommunity("set community (17676:320, 17676:430, 17676:436)", builder);
+        ActionsParser.parseSetCommunity(
+            "set community (17676:320, 17676:430, 17676:436, no-export, no-advertise, local-as)",
+            builder);
         Assert.assertEquals(StatementsTest.getSetCommInlineAction(
-                Lists.newArrayList("17676:320", "17676:430", "17676:436"), null),
+                Lists.newArrayList("17676:320", "17676:430", "17676:436", "no-export", "no-advertise", "local-as"),
+                null),
                 builder.build()
                         .getSetCommunity());
 

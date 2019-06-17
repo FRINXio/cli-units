@@ -121,18 +121,21 @@ final class ConditionParser {
         }
     }
 
-    private static final Pattern AS_PATH_IN = Pattern.compile("as-path in (?<value>\\S+)");
+    private static final Pattern AS_PATH_IN = Pattern.compile("(?<invert>not )?as-path in (?<value>\\S+)");
 
     private static void parseAsPathIn(String line, BgpConditionsBuilder builder) {
         Matcher matcher = AS_PATH_IN.matcher(line);
         if (matcher.find()) {
             String val = matcher.group("value");
 
+            MatchSetOptionsType matchSetType = matcher.group("invert") != null
+                ? MatchSetOptionsType.INVERT : MatchSetOptionsType.ANY;
+
             builder.setMatchAsPathSet(new MatchAsPathSetBuilder()
                     .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy
                             .rev170730.match.as.path.top.match.as.path.set.ConfigBuilder()
                             .setAsPathSet(val)
-                            .setMatchSetOptions(MatchSetOptionsType.ANY)
+                            .setMatchSetOptions(matchSetType)
                             .build())
                     .build());
         }
@@ -168,17 +171,19 @@ final class ConditionParser {
         }
     }
 
-    private static final Pattern DESTINATION_IN = Pattern.compile("destination in (?<value>\\S+)");
+    private static final Pattern DESTINATION_IN = Pattern.compile("(?<invert>not )?destination in (?<value>\\S+)");
 
     private static void parseDestination(String line, MatchPrefixSetBuilder builder) {
         Matcher matcher = DESTINATION_IN.matcher(line);
         if (matcher.find()) {
             String val = matcher.group("value");
+            MatchSetOptionsRestrictedType matchSetType = matcher.group("invert") != null
+                ? MatchSetOptionsRestrictedType.INVERT : MatchSetOptionsRestrictedType.ANY;
 
             builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy
                     .rev170714.prefix.set.condition.top.match.prefix.set.ConfigBuilder()
                     .setPrefixSet(val)
-                    .setMatchSetOptions(MatchSetOptionsRestrictedType.ANY)
+                    .setMatchSetOptions(matchSetType)
                     .build());
         }
     }
