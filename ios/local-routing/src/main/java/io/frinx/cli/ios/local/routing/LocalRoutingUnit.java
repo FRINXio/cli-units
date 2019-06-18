@@ -54,8 +54,7 @@ public class LocalRoutingUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515
-                .$YangModuleInfoImpl.getInstance());
+        return Sets.newHashSet(io.frinx.openconfig.openconfig.local.routing.IIDs.FRINX_OPENCONFIG_LOCAL_ROUTING);
     }
 
     @Override

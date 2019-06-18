@@ -17,8 +17,6 @@
 package io.frinx.cli.platform;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.translate.impl.read.GenericOperListReader;
-import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -32,7 +30,6 @@ import io.frinx.openconfig.openconfig.platform.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.platform.rev161222.platform.component.top.ComponentsBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
@@ -61,10 +58,9 @@ public class PlatformUnit extends AbstractUnit {
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.COMPONENTS, ComponentsBuilder.class);
-        readRegistry.add(new GenericOperListReader<>(IIDs.CO_COMPONENT, new ComponentReader(cli)));
-        readRegistry.add(new GenericOperReader<>(IIDs.CO_CO_CONFIG, new ComponentConfigReader()));
-        readRegistry.add(new GenericOperReader<>(IIDs.CO_CO_STATE, new ComponentStateReader(cli)));
+        readRegistry.add(IIDs.CO_COMPONENT, new ComponentReader(cli));
+        readRegistry.add(IIDs.CO_CO_CONFIG, new ComponentConfigReader());
+        readRegistry.add(IIDs.CO_CO_STATE, new ComponentStateReader(cli));
     }
 
     @Override
