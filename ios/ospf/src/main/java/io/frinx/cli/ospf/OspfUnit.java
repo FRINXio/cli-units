@@ -93,9 +93,7 @@ public class OspfUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.$YangModuleInfoImpl
-                        .getInstance(),
+        return Sets.newHashSet(io.frinx.openconfig.openconfig.ospf.IIDs.FRINX_OPENCONFIG_OSPFV2,
                 $YangModuleInfoImpl.getInstance());
     }
 }
