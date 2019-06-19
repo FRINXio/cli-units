@@ -48,8 +48,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.ty
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.BGP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.INSTALLPROTOCOLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.OSPF;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class OspfTableConnectionReader implements
@@ -159,12 +157,6 @@ public class OspfTableConnectionReader implements
                 .reduce((s1, s2) -> s1 + "\n" + s2)
                 .orElse("");
         return output;
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder,
-                      @Nonnull List<TableConnection> list) {
-        // NOOP
     }
 
     @Override

@@ -64,13 +64,9 @@ public final class IosInterfaceUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.$YangModuleInfoImpl
-                        .getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet
-                        .rev161222.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.$YangModuleInfoImpl
-                        .getInstance(),
+        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_INTERFACES,
+                IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
+                io.frinx.openconfig.openconfig.vlan.IIDs.FRINX_OPENCONFIG_VLAN,
                 $YangModuleInfoImpl.getInstance());
     }
 
