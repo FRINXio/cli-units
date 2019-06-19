@@ -60,10 +60,8 @@ import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.verify.unicast.source.reachable.via.top.VerifyUnicastSourceReachableVia;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public final class IosXRInterfaceUnit extends AbstractUnit {
@@ -84,25 +82,15 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.$YangModuleInfoImpl
-                        .getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet
-                        .rev161222.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.$YangModuleInfoImpl
-                        .getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate
-                        .rev161222.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.bfd
-                        .rev171024.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.damping.rev171024.$YangModuleInfoImpl
-                        .getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco
-                        .rev171024.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet
-                        .rev161222.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member
-                        .rev171109.$YangModuleInfoImpl.getInstance(),
+        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_INTERFACES,
+                IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
+                io.frinx.openconfig.openconfig.vlan.IIDs.FRINX_OPENCONFIG_VLAN,
+                IIDs.FRINX_OPENCONFIG_IF_AGGREGATE,
+                IIDs.FRINX_BFD,
+                IIDs.FRINX_DAMPING,
+                IIDs.FRINX_CISCO_IF_EXTENSION,
+                IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
+                io.frinx.openconfig.openconfig.lacp.IIDs.FRINX_LACP_LAG_MEMBER,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -129,24 +117,6 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
         provideReaders(readRegistry, cli);
         provideWriters(writeRegistry, cli);
     }
-
-    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
-            .ethernet.rev161222.ethernet.top.ethernet.Config> IFC_ETH_CONFIG_ROOT_ID =
-            InstanceIdentifier.create(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet
-                    .rev161222.ethernet.top.ethernet.Config.class);
-
-    // RPF check IIDs
-    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
-            .cisco.rev171024.ipv4.verify.Ipv4> RPF_IPV4_SUBTREE_IID =
-            InstanceIdentifier.create(VerifyUnicastSourceReachableVia.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco
-                            .rev171024.ipv4.verify.Ipv4.class);
-
-    private static final InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
-            .cisco.rev171024.ipv6.verify.Ipv6> RPF_IPV6_SUBTREE_IID =
-            InstanceIdentifier.create(VerifyUnicastSourceReachableVia.class)
-                    .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco
-                            .rev171024.ipv6.verify.Ipv6.class);
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.IN_INTERFACE);
@@ -250,6 +220,7 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
 
         // RPF check
         readRegistry.subtreeAdd(IIDs.IN_IN_AUG_INTERFACE1_VERIFYUNICASTSOURCEREACHABLEVIA, new RpfCheckReader(cli),
-                Sets.newHashSet(RPF_IPV4_SUBTREE_IID, RPF_IPV6_SUBTREE_IID));
+                Sets.newHashSet(IIDs.IN_IN_AUG_INTERFACE1_VE_IPV4,
+                        IIDs.IN_IN_AUG_INTERFACE1_VE_IPV6));
     }
 }

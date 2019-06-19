@@ -70,8 +70,8 @@ public class BgpUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet($YangModuleInfoImpl.getInstance(), org.opendaylight.yang.gen.v1.http.frinx.openconfig
-                .net.yang.bgp.extension.rev180323.$YangModuleInfoImpl.getInstance());
+        return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
+                IIDs.FRINX_BGP_EXTENSION);
     }
 
     @Override

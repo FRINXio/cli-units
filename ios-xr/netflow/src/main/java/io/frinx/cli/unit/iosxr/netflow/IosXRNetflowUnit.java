@@ -55,10 +55,7 @@ public final class IosXRNetflowUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.netflow.rev180228.$YangModuleInfoImpl
-                        .getInstance()
-        );
+        return Sets.newHashSet(IIDs.FRINX_NETFLOW);
     }
 
     @Override

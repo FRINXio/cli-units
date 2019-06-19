@@ -123,10 +123,8 @@ public class OspfUnit extends AbstractUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.cisco.rev171124.$YangModuleInfoImpl
-                        .getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bfd.ext.rev180211.$YangModuleInfoImpl
-                        .getInstance(),
+                IIDs.FRINX_CISCO_OSPF_EXTENSION,
+                io.frinx.openconfig.openconfig.bfd.IIDs.FRINX_BFD_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
 }
