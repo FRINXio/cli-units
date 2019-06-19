@@ -24,7 +24,7 @@
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
         <version>4.2.1.rc9-frinx-SNAPSHOT</version>
-        <relativePath/>
+        <relativePath>../unit-parent</relativePath>
     </parent>
 
     <artifactId>network-instance-base</artifactId>
