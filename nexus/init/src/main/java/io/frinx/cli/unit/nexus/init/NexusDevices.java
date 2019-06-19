@@ -27,13 +27,13 @@ public final class NexusDevices {
 
     }
 
-    private static final Device NEXUS = new DeviceIdBuilder()
-        .setDeviceType("nexus")
-        .setDeviceVersion("*")
-        .build();
+    public static final Device NEXUS_GENERIC = new DeviceIdBuilder()
+            .setDeviceType("nexus")
+            .setDeviceVersion("*")
+            .build();
 
     public static final Set<Device> NEXUS_ALL = new HashSet<Device>() {{
-            add(NEXUS);
+            add(NEXUS_GENERIC);
         }
     };
 }
