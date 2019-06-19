@@ -45,7 +45,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,13 +60,6 @@ import org.slf4j.LoggerFactory;
 public class IosXrCliInitializerUnit extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(IosXrCliInitializerUnit.class);
-
-    // TODO This is reused all over the units. Move this to som Util class so
-    // we can reuse it.
-    private static final Device IOS_XR = new DeviceIdBuilder()
-            .setDeviceType("ios xr")
-            .setDeviceVersion("*")
-            .build();
 
     private static final Command ABORT = Command.create("abort");
 

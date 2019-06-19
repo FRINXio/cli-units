@@ -103,14 +103,9 @@ public class IosXRNetworkInstanceUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance
-                        .rev170228.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding
-                        .rev170621.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension
-                        .cisco.rev171109.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.$YangModuleInfoImpl
-                        .getInstance());
+        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE,
+                io.frinx.openconfig.openconfig.policy.forwarding.IIDs.FRINX_OPENCONFIG_POLICY_FORWARDING,
+                IIDs.FRINX_CISCO_PF_INTERFACES_EXTENSION,
+                IIDs.FRINX_BGP_EXTENSION);
     }
 }

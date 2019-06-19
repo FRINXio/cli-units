@@ -189,7 +189,6 @@ public class RoutingPolicyUnit extends AbstractUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.$YangModuleInfoImpl
-                        .getInstance());
+                IIDs.FRINX_OPENCONFIG_BGP_POLICY);
     }
 }

@@ -74,14 +74,10 @@ public class MplsUnit extends AbstractUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.extension
-                        .rev171024.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco
-                        .rev171024.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp
-                        .rev180702.$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ldp.extension
-                        .rev180822.$YangModuleInfoImpl.getInstance());
+                IIDs.FRINX_MPLS_RSVP_EXTENSION,
+                IIDs.FRINX_CISCO_MPLS_TE_EXTENSION,
+                io.frinx.openconfig.openconfig.mpls.IIDs.FRINX_OPENCONFIG_MPLS_LDP,
+                IIDs.FRINX_MPLS_LDP_EXTENSION);
     }
 
     private static final CheckRegistry CHECK_REGISTRY;

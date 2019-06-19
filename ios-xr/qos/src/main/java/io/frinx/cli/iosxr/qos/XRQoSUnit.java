@@ -144,7 +144,6 @@ public class XRQoSUnit extends AbstractUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension
-                        .rev180304.$YangModuleInfoImpl.getInstance());
+                IIDs.FRINX_QOS_EXTENSION);
     }
 }
