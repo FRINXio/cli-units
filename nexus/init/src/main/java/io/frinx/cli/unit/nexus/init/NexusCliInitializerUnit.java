@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.nexus.init;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.SessionInitializationStrategy;
@@ -25,6 +24,7 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import io.frinx.cli.unit.ios.init.IosCliInitializerUnit;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,10 +33,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Translate unit that does not actually translate anything.
@@ -44,34 +41,20 @@ import org.slf4j.LoggerFactory;
  * session. That is, upon establishing connection to IOS device, enter privileged
  * EXEC mode by issuing the 'enable' command and filling in the secret.
  */
-public class NexusCliInitializerUnit  implements TranslateUnit {
-
-    private static final Logger LOG = LoggerFactory.getLogger(NexusCliInitializerUnit.class);
-
-    // TODO This is reused all over the units. Move this to som Util class so
-    // we can reuse it.
-
-    private static final Device IOS = new DeviceIdBuilder()
-            .setDeviceType("nexus")
-            .setDeviceVersion("*")
-            .build();
-
-    private TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration iosReg;
-
+public class NexusCliInitializerUnit extends AbstractUnit {
 
     public NexusCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        iosReg = registry.registerTranslateUnit(IOS, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(NexusDevices.NEXUS_GENERIC);
     }
 
-    public void close() {
-        if (iosReg != null) {
-            iosReg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "Nexus cli init (FRINX) translate unit";
     }
 
     @Override
@@ -91,11 +74,6 @@ public class NexusCliInitializerUnit  implements TranslateUnit {
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final TranslateUnit.Context context) {
-        return Sets.newHashSet();
-    }
-
-    @Override
     public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
@@ -111,11 +89,5 @@ public class NexusCliInitializerUnit  implements TranslateUnit {
                 Pattern.compile("% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
         ));
     }
-
-    @Override
-    public String toString() {
-        return "Nexus cli init (FRINX) translate unit";
-    }
-
 }
 

@@ -26,11 +26,8 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp.top.LldpBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp.top.lldp.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp.top.lldp.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class LldpConfigReader implements CliOperReader<Config, ConfigBuilder> {
@@ -73,11 +70,5 @@ public class LldpConfigReader implements CliOperReader<Config, ConfigBuilder> {
         configBuilder.setSystemName(domain
             .map(s -> host.get() + "." + s)
                 .orElseGet(host::get));
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder,
-                      @Nonnull Config config) {
-        ((LldpBuilder) builder).setConfig(config);
     }
 }
