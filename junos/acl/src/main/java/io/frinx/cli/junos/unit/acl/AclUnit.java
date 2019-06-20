@@ -17,11 +17,6 @@
 package io.frinx.cli.junos.unit.acl;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.write.GenericListWriter;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -32,47 +27,35 @@ import io.frinx.cli.junos.unit.acl.handler.IngressAclSetConfigReader;
 import io.frinx.cli.junos.unit.acl.handler.IngressAclSetConfigWriter;
 import io.frinx.cli.junos.unit.acl.handler.IngressAclSetReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.junos.init.JunosDevices;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.acl.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.top.AclBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class AclUnit implements TranslateUnit {
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class AclUnit extends AbstractUnit {
 
     public AclUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(JunosDevices.JUNOS_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return JunosDevices.JUNOS_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "Junos CLI ACL unit";
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
-                        .$YangModuleInfoImpl.getInstance()
-        );
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final Context context) {
-        return Sets.newHashSet();
+        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_ACL);
     }
 
     @Override
@@ -85,36 +68,27 @@ public class AclUnit implements TranslateUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.add(new GenericWriter<>(IIDs.ACL, new NoopCliWriter<>()));
+        writeRegistry.addNoop(IIDs.ACL);
 
         // interface
-        writeRegistry.add(new GenericListWriter<>(IIDs.AC_IN_INTERFACE, new AclInterfaceWriter()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.AC_IN_IN_CONFIG, new NoopCliWriter<>()),
+        writeRegistry.add(IIDs.AC_IN_INTERFACE, new AclInterfaceWriter());
+        writeRegistry.addAfter(IIDs.AC_IN_IN_CONFIG, new NoopCliWriter<>(),
             io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
 
         // ingress
-        writeRegistry.add(new GenericWriter<>(IIDs.AC_IN_IN_INGRESSACLSETS, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericListWriter<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new NoopCliListWriter<>()));
-        writeRegistry.addAfter(new GenericWriter<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli)),
+        writeRegistry.add(IIDs.AC_IN_IN_INGRESSACLSETS, new NoopCliWriter<>());
+        writeRegistry.add(IIDs.AC_IN_IN_IN_INGRESSACLSET, new NoopCliListWriter<>());
+        writeRegistry.addAfter(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli),
             IIDs.AC_IN_IN_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.ACL, AclBuilder.class);
-
         // interface
-        readRegistry.addStructuralReader(IIDs.AC_INTERFACES, InterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_CONFIG, new AclInterfaceConfigReader()));
+        readRegistry.add(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli));
+        readRegistry.add(IIDs.AC_IN_IN_CONFIG, new AclInterfaceConfigReader());
 
         // ingress
-        readRegistry.addStructuralReader(IIDs.AC_IN_IN_INGRESSACLSETS, IngressAclSetsBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigReader()));
-    }
-
-    @Override
-    public String toString() {
-        return "Junos CLI ACL unit";
+        readRegistry.add(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli));
+        readRegistry.add(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigReader());
     }
 }

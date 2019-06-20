@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.InterfaceKey;
@@ -59,11 +58,6 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
             .map(InterfaceId::new)
             .map(InterfaceKey::new)
             .collect(Collectors.toList());
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Interface> list) {
-        ((InterfacesBuilder) builder).setInterface(list);
     }
 
     @Override
