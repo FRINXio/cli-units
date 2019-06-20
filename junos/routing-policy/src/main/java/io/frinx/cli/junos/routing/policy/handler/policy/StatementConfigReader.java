@@ -21,11 +21,8 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.statements.top.statements.Statement;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.statements.top.statements.StatementBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.statements.top.statements.statement.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.statements.top.statements.statement.ConfigBuilder;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class StatementConfigReader implements CliConfigReader<Config, ConfigBuilder> {
@@ -35,11 +32,5 @@ public class StatementConfigReader implements CliConfigReader<Config, ConfigBuil
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         String termId = id.firstKeyOf(Statement.class).getName();
         builder.setName(termId);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder,
-                      @Nonnull Config config) {
-        ((StatementBuilder) builder).setConfig(config);
     }
 }
