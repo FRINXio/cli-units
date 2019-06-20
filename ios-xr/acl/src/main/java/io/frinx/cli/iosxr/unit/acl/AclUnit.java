@@ -61,11 +61,8 @@ public class AclUnit extends AbstractUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
-                        .$YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
-                        .$YangModuleInfoImpl.getInstance()
-        );
+                IIDs.FRINX_OPENCONFIG_ACL,
+                IIDs.FRINX_ACL_EXTENSION);
     }
 
     @Override

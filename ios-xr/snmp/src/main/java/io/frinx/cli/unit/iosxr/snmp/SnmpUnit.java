@@ -54,8 +54,7 @@ public class SnmpUnit extends AbstractUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
-                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.event.types.rev171024.$YangModuleInfoImpl
-                        .getInstance());
+                io.frinx.openconfig.openconfig.types.IIDs.FRINX_EVENT_TYPES);
     }
 
     @Override

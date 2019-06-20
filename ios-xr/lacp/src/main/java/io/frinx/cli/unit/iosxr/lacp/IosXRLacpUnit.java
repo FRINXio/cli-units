@@ -53,8 +53,7 @@ public class IosXRLacpUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505
-                .$YangModuleInfoImpl.getInstance());
+        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_LACP);
     }
 
     @Override
