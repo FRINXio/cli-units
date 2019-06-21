@@ -24,7 +24,6 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.unit.acl.handler.util.AclUtil;
 import io.frinx.cli.unit.utils.CliWriter;
-import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -46,10 +45,10 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
             config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
         final Class<? extends ACLTYPE> aclType = config.getType();
         Preconditions.checkArgument(aclType != null, "Missing acl type");
 
+        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
         checkIngressAclSetConfigExists(instanceIdentifier, aclType, writeContext, interfaceName);
 
         final String aclCommand =
@@ -97,21 +96,10 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config
             config, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final String name = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
-
-        boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx
-                        .openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
-                        .interfaces.InterfaceKey(name)))
-                .isPresent();
-        if (!ifcExists) {
-            // No point in removing ACL from nonexisting ifc
-            return;
-        }
-
         final Class<? extends ACLTYPE> aclType = config.getType();
         Preconditions.checkArgument(aclType != null, "Missing acl type");
 
+        final String name = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
         final String aclCommand =
                 f("no %s access-group %s ingress", AclUtil.getStringType(aclType), config.getSetName());
 
