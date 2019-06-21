@@ -52,6 +52,7 @@
     <module>hsrp</module>
     <module>lacp</module>
     <module>bfd</module>
+    <module>evpn</module>
   </modules>
 
   <build>
