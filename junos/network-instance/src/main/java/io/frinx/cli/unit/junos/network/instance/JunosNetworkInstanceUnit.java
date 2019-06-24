@@ -51,7 +51,7 @@ public class JunosNetworkInstanceUnit extends AbstractUnit {
     private static final Set<InstanceIdentifier<?>> NE_NE_PO_IN_IN_CONFIG_SUBTREE = Sets.newHashSet(
             IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFJUNIPERAUG,
             IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFJUNIPERAUG_CLASSIFIERS,
-            IIDs.NE_TO_NO_CO_NE_NE_PO_IN_IN_CO_AUG_NIPFIFJUNIPERAUG_CL_INETPRECEDENCE);
+            IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFJUNIPERAUG_CL_INETPRECEDENCE);
 
     public JunosNetworkInstanceUnit(@Nonnull final TranslationUnitCollector registry) {
         super(registry);
