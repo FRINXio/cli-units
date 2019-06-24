@@ -26,10 +26,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.snmp.rev17102
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriter implements CliWriter<Config> {
-
+    /*  XR6 has a timing problem for inserting multiple Snmp commands in one string unit
+        It throws "Invalid input detected"
+        Added "?" command as a workaround to make gap between commands  */
     static final String SNMP_IFC_TEMPLATE =
             "snmp-server interface {$config.interface_id.value}\n"
-                    + "{% if ($enable_linkup) %}no {% endif %}notification linkupdown disable\n"
+                    + "{% if ($enable_linkup) %}?\nno {% endif %}notification linkupdown disable\n"
                     + "root";
 
     static final String SNMP_IFC_TEMPLATE_DELETE = "no snmp-server interface {$config.interface_id.value}";
