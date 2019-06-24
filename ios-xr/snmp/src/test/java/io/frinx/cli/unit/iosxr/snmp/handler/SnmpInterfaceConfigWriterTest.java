@@ -43,7 +43,7 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 public class SnmpInterfaceConfigWriterTest {
 
     private static final String WRITE_INPUT = "snmp-server interface Loopback0\n"
-            + "no notification linkupdown disable\n"
+            + "?\nno notification linkupdown disable\n"
             + "root\n";
 
     private static final String DELETE_INPUT = "no snmp-server interface Loopback0\n";
