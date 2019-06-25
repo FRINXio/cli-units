@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.BgpNextHopType;
@@ -36,7 +37,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.action.top.SetCommunityBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.InlineBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.reference.top.ReferenceBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BGPWELLKNOWNSTDCOMMUNITY;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.NOADVERTISE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.NOEXPORT;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.NOEXPORTSUBCONFED;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.PolicyResultType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.ActionsBuilder;
@@ -153,6 +158,8 @@ final class ActionsParser {
     private static final Pattern INLINE_COM_SEPARATOR = Pattern.compile(",\\s");
     private static final Pattern INLINE_COM = Pattern.compile("[0-9:]+");
 
+    private static final Pattern WELL_KNOWN_COM = WellKnownCommunity.pattern();
+
     @VisibleForTesting
     static void parseSetCommunity(String line, BgpActionsBuilder builder) {
         Matcher matcher = SET_COMM.matcher(line);
@@ -181,8 +188,7 @@ final class ActionsParser {
         if (matcher.matches()) {
             String val = matcher.group("value");
             List<SetCommunityInlineConfig.Communities> parsedCommunities = INLINE_COM_SEPARATOR.splitAsStream(val)
-                    .filter(c -> INLINE_COM.matcher(c)
-                            .matches())
+                    .filter(c -> INLINE_COM.matcher(c).matches() || WELL_KNOWN_COM.matcher(c).matches())
                     .map(ActionsParser::parseSingleInlineCommunity)
                     .collect(Collectors.toList());
             String additive = matcher.group("additive");
@@ -204,8 +210,13 @@ final class ActionsParser {
     }
 
     private static SetCommunityInlineConfig.Communities parseSingleInlineCommunity(String string) {
-        SetCommunityInlineConfig.Communities communities = new SetCommunityInlineConfig.Communities(new
-                BgpStdCommunityType(string));
+        SetCommunityInlineConfig.Communities communities;
+        WellKnownCommunity wellKnownCommunity = WellKnownCommunity.of(string);
+        if (wellKnownCommunity != null) {
+            communities = new SetCommunityInlineConfig.Communities(wellKnownCommunity.getClazz());
+        } else {
+            communities = new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(string));
+        }
         // This is a workaround, if we don't call getValue, the _value field will not be set and then equals method
         // does not work as expected
         communities.getValue();
@@ -347,5 +358,46 @@ final class ActionsParser {
         }
     }
 
+    enum WellKnownCommunity {
+        NO_EXPORT(NOEXPORT.class, "no-export"),
+        NO_ADVERTISE(NOADVERTISE.class, "no-advertise"),
+        LOCAL_AS(NOEXPORTSUBCONFED.class, "local-as");
 
+        private Class<? extends BGPWELLKNOWNSTDCOMMUNITY> clazz;
+        private String displayName;
+
+        WellKnownCommunity(Class<? extends BGPWELLKNOWNSTDCOMMUNITY> clazz, String displayName) {
+            this.clazz = clazz;
+            this.displayName = displayName;
+        }
+
+        public Class<? extends BGPWELLKNOWNSTDCOMMUNITY> getClazz() {
+            return clazz;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public static WellKnownCommunity of(Class<? extends BGPWELLKNOWNSTDCOMMUNITY> clazz) {
+            return Stream.of(values())
+            .filter(v -> v.clazz == clazz)
+            .findFirst()
+            .orElse(null);
+        }
+
+        public static WellKnownCommunity of(String displayName) {
+            return Stream.of(values())
+            .filter(v -> v.displayName.equals(displayName))
+            .findFirst()
+            .orElse(null);
+        }
+
+        public static Pattern pattern() {
+            String joining = Stream.of(values())
+                .map(v -> v.displayName)
+                .collect(Collectors.joining("|"));
+            return Pattern.compile(joining);
+        }
+    }
 }

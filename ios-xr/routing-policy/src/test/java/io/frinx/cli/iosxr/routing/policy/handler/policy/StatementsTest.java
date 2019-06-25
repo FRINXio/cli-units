@@ -17,6 +17,7 @@
 package io.frinx.cli.iosxr.routing.policy.handler.policy;
 
 import com.google.common.collect.Lists;
+import io.frinx.cli.iosxr.routing.policy.handler.policy.ActionsParser.WellKnownCommunity;
 import io.frinx.cli.unit.utils.CliFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +54,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.reference.top.ReferenceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.ATTRIBUTECOMPARISON;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.ATTRIBUTEGE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.ATTRIBUTELE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.MatchSetOptionsRestrictedType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.MatchSetOptionsType;
@@ -183,27 +185,55 @@ public class StatementsTest {
             + "  drop\n"
             + "end-policy\n";
 
-    public static final Statements DATA_ALL_CONDITIONS = new StatementsBuilder().setStatement(Lists.newArrayList(new
-            StatementBuilder().setName("1")
-            .setConfig(getStatementConfig("1"))
-            .setConditions(new ConditionsBuilder().setConfig(getConditionsConfig("a"))
+    public static final Statements DATA_ALL_CONDITIONS = new StatementsBuilder()
+        .setStatement(
+            Lists.newArrayList(
+                new StatementBuilder()
+                .setName("1")
+                .setConfig(getStatementConfig("1"))
+                .setConditions(new ConditionsBuilder()
+                    .setConfig(getConditionsConfig("a"))
                     .setMatchPrefixSet(getMatchPrefixSet("pset_name"))
-                    .addAugmentation(Conditions2.class, new Conditions2Builder().setBgpConditions(new
-                            BgpConditionsBuilder().setAsPathLength(getAsPathLengthCondition(44L, ATTRIBUTELE.class))
+                    .addAugmentation(Conditions2.class, new Conditions2Builder()
+                        .setBgpConditions(new BgpConditionsBuilder()
+                            .setAsPathLength(getAsPathLengthCondition(44L, ATTRIBUTELE.class))
                             .setMatchCommunitySet(getMatchCommunitySet("cset_name"))
                             .setMatchAsPathSet(getMatchAsPathSet("aset_name"))
                             .build())
+                        .build())
+                    .build())
+                .setActions(new ActionsBuilder()
+                    .setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
+                    .build())
+                .build(),
+                new StatementBuilder()
+                .setName("2")
+                .setConfig(getStatementConfig("2"))
+                .setConditions(new ConditionsBuilder()
+                    .setConfig(getConditionsConfig("b"))
+                    .setMatchPrefixSet(getMatchPrefixSet("pset_name2", MatchSetOptionsRestrictedType.INVERT))
+                        .addAugmentation(Conditions2.class, new Conditions2Builder()
+                            .setBgpConditions(new BgpConditionsBuilder()
+                                .setAsPathLength(getAsPathLengthCondition(55L, ATTRIBUTEGE.class))
+                                .setMatchCommunitySet(getMatchCommunitySet("cset_name2", MatchSetOptionsType.ALL))
+                                .setMatchAsPathSet(getMatchAsPathSet("aset_name2", MatchSetOptionsType.INVERT))
+                                .build())
                             .build())
+                        .build())
+                .setActions(new ActionsBuilder()
+                    .setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
                     .build())
-            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.REJECTROUTE))
-                    .build())
-            .build()))
-            .build();
+                .build()))
+        .build();
 
     private static final String OUTPUT_ALL_CONDITIONS = "route-policy route_policy_3\n"
-            + "  if destination in pset_name and as-path length le 44 and community matches-any cset_name and as-path"
-            + " in aset_name then\n"
+            + "  if destination in pset_name and as-path length le 44 and community matches-any cset_name"
+            + " and as-path in aset_name then\n"
             + "    apply a\r\n"
+            + "    drop\n"
+            + "  elseif not destination in pset_name2 and as-path length ge 55 and community matches-every cset_name2"
+            + " and not as-path in aset_name2 then\n"
+            + "    apply b\r\n"
             + "    drop\n"
             + "  endif\n"
             + "end-policy\n";
@@ -252,7 +282,7 @@ public class StatementsTest {
             .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
                     .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
                             .setConfig(getBgpActionsNextHopConfig("dead:beef::1"))
-                            .setSetCommunity(getSetCommInlineAction(Lists.newArrayList("23:23"),
+                            .setSetCommunity(getSetCommInlineAction(Lists.newArrayList("23:23", "no-export"),
                                     BgpSetCommunityOptionType.ADD))
                             .build())
                             .build())
@@ -493,27 +523,39 @@ public class StatementsTest {
     }
 
     private static MatchCommunitySet getMatchCommunitySet(String csetName) {
+        return getMatchCommunitySet(csetName, MatchSetOptionsType.ANY);
+    }
+
+    private static MatchCommunitySet getMatchCommunitySet(String csetName, MatchSetOptionsType matchType) {
         return new MatchCommunitySetBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net
                 .yang.bgp.policy.rev170730.match.community.top.match.community.set.ConfigBuilder()
                 .setCommunitySet(csetName)
-                .setMatchSetOptions(MatchSetOptionsType.ANY)
+                .setMatchSetOptions(matchType)
                 .build())
                 .build();
     }
 
     static MatchPrefixSet getMatchPrefixSet(String psetName) {
+        return getMatchPrefixSet(psetName, MatchSetOptionsRestrictedType.ANY);
+    }
+
+    static MatchPrefixSet getMatchPrefixSet(String psetName, MatchSetOptionsRestrictedType matchType) {
         return new MatchPrefixSetBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
                 .routing.policy.rev170714.prefix.set.condition.top.match.prefix.set.ConfigBuilder()
                 .setPrefixSet(psetName)
-                .setMatchSetOptions(MatchSetOptionsRestrictedType.ANY)
+                .setMatchSetOptions(matchType)
                 .build())
                 .build();
     }
 
     private static MatchAsPathSet getMatchAsPathSet(String asetName) {
+        return getMatchAsPathSet(asetName, MatchSetOptionsType.ANY);
+    }
+
+    private static MatchAsPathSet getMatchAsPathSet(String asetName, MatchSetOptionsType matchType) {
         return new MatchAsPathSetBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
                 .bgp.policy.rev170730.match.as.path.top.match.as.path.set.ConfigBuilder().setAsPathSet(asetName)
-                .setMatchSetOptions(MatchSetOptionsType.ANY)
+                .setMatchSetOptions(matchType)
                 .build())
                 .build();
     }
@@ -578,7 +620,13 @@ public class StatementsTest {
 
     static SetCommunity getSetCommInlineAction(ArrayList<String> comms, BgpSetCommunityOptionType add) {
         List<SetCommunityInlineConfig.Communities> collect = comms.stream()
-                .map(s -> new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(s)))
+                .map(s -> {
+                    WellKnownCommunity community = WellKnownCommunity.of(s);
+                    if (community != null) {
+                        return new SetCommunityInlineConfig.Communities(community.getClazz());
+                    }
+                    return new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(s));
+                })
                 .collect(Collectors.toList());
         collect.forEach(SetCommunityInlineConfig.Communities::getValue);
 
