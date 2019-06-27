@@ -18,6 +18,7 @@ package io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol;
 
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.BgpProtocolReader;
+import io.frinx.cli.iosxr.isis.handler.IsisProtocolReader;
 import io.frinx.cli.iosxr.ospf.handler.OspfProtocolReader;
 import io.frinx.cli.iosxr.ospfv3.handler.OspfV3ProtocolReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
@@ -35,6 +36,7 @@ public class ProtocolReader extends CompositeListReader<Protocol, ProtocolKey, P
                 add(new BgpProtocolReader(cli));
                 add(new OspfProtocolReader(cli));
                 add(new OspfV3ProtocolReader(cli));
+                add(new IsisProtocolReader(cli));
             }
         });
     }

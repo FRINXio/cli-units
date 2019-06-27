@@ -54,6 +54,7 @@
         <module>lacp</module>
         <module>bfd</module>
         <module>evpn</module>
+        <module>isis</module>
     </modules>
 
     <build>

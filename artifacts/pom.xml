@@ -283,6 +283,11 @@
                 <artifactId>ios-xr-evpn-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xr-isis-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- junos -->
             <dependency>
