@@ -167,7 +167,7 @@ public class StatementsTest {
                     .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
                             .setSetAsPathPrepend(getSetAsPathPrependAction(new AsNumber(455L), 5))
                             .setSetCommunity(getSetCommunityAction(BgpSetCommunityOptionType.ADD, "comset"))
-                            .setConfig(getBgpActionsConfig(123L, 123L))
+                            .setConfig(getBgpActionsSetMedConfig(123L, 123L))
                             .build())
                             .build())
                     .build())
@@ -259,7 +259,7 @@ public class StatementsTest {
             .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
                     .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
                             .setSetAsPathPrepend(getSetAsPathPrependAction(new AsNumber(123L), 3))
-                            .setConfig(getBgpActionsConfig(1, null))
+                            .setConfig(getBgpActionsSetMedConfig(1, null))
                             .build())
                             .build())
                     .build())
@@ -273,12 +273,26 @@ public class StatementsTest {
                     .build())
             .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
                     .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
-                            .setConfig(getBgpActionsConfig(2, null))
+                            .setConfig(getBgpActionsSetMedConfig("+2", null))
                             .build())
                             .build())
                     .build())
             .build(), new StatementBuilder().setName("4")
             .setConfig(getStatementConfig("4"))
+            .setConditions(new ConditionsBuilder().setMatchPrefixSet(getMatchPrefixSet("pset_name"))
+                    .addAugmentation(Conditions2.class, new Conditions2Builder().setBgpConditions(new
+                            BgpConditionsBuilder().setMatchAsPathSet(getMatchAsPathSet("aset_name"))
+                            .build())
+                            .build())
+                    .build())
+            .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
+                    .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
+                            .setConfig(getBgpActionsSetMedConfig("-3", null))
+                            .build())
+                            .build())
+                    .build())
+            .build(), new StatementBuilder().setName("5")
+            .setConfig(getStatementConfig("5"))
             .setActions(new ActionsBuilder().setConfig(getActionsConfig(PolicyResultType.ACCEPTROUTE))
                     .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(new BgpActionsBuilder()
                             .setConfig(getBgpActionsNextHopConfig("dead:beef::1"))
@@ -299,7 +313,10 @@ public class StatementsTest {
             + "    prepend as-path 123 3\r\n"
             + "    done\r\n"
             + "  elseif destination in pset_name and as-path in aset_name then\r\n"
-            + "    set med 2\r\n"
+            + "    set med +2\r\n"
+            + "    done\r\n"
+            + "  elseif destination in pset_name and as-path in aset_name then\r\n"
+            + "    set med -3\r\n"
             + "    done\r\n"
             + "  else\r\n"
             + "    set next-hop dead:beef::1\r\n"
@@ -581,7 +598,15 @@ public class StatementsTest {
     }
 
     private static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top
-            .bgp.actions.Config getBgpActionsConfig(long setMed, Long setLocalPref) {
+            .bgp.actions.Config getBgpActionsSetMedConfig(long setMed, Long setLocalPref) {
+        return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top
+                .bgp.actions.ConfigBuilder().setSetMed(new BgpSetMedType(Long.valueOf(setMed)))
+                .setSetLocalPref(setLocalPref)
+                .build();
+    }
+
+    private static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top
+            .bgp.actions.Config getBgpActionsSetMedConfig(String setMed, Long setLocalPref) {
         return new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top
                 .bgp.actions.ConfigBuilder().setSetMed(new BgpSetMedType(setMed))
                 .setSetLocalPref(setLocalPref)
