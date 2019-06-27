@@ -107,6 +107,7 @@
         <bundle>mvn:io.frinx.cli/ios-xr-lacp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-bfd-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-evpn-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xr-isis-unit/{{VERSION}}</bundle>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-lldp</feature>
     </feature>
 

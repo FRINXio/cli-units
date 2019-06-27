@@ -19,6 +19,7 @@ package io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol;
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.iosxr.bgp.handler.BgpProtocolWriter;
+import io.frinx.cli.iosxr.isis.handler.IsisProtocolConfigWriter;
 import io.frinx.cli.iosxr.ospf.handler.OspfProtocolWriter;
 import io.frinx.cli.iosxr.ospfv3.handler.OspfV3ProtocolWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
@@ -30,7 +31,8 @@ public class ProtocolConfigWriter extends CompositeWriter<Config> {
         super(Lists.newArrayList(
                 new BgpProtocolWriter(),
                 new OspfProtocolWriter(cli),
-                new OspfV3ProtocolWriter(cli)
+                new OspfV3ProtocolWriter(cli),
+                new IsisProtocolConfigWriter(cli)
         ));
     }
 }
