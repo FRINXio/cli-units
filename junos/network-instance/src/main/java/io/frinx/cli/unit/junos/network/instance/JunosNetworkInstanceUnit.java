@@ -41,7 +41,6 @@ import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -66,9 +65,6 @@ public class JunosNetworkInstanceUnit extends AbstractUnit {
     protected String getUnitName() {
         return "Junos Network Instance (Openconfig) translate unit";
     }
-
-    private static final InstanceIdentifier<Config> NE_NE_PR_PR_CONFIG_SUBTREE_ROOT =
-            InstanceIdentifier.create(Config.class);
 
     @Override
     public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
@@ -99,7 +95,7 @@ public class JunosNetworkInstanceUnit extends AbstractUnit {
         // Protocol
         readRegistry.add(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli));
         readRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader(cli),
-                Sets.newHashSet(IIDs.NE_NE_PR_PR_CO_AUG_PROTOCOLCONFAUG, NE_NE_PR_PR_CONFIG_SUBTREE_ROOT));
+                Sets.newHashSet(IIDs.NE_NE_PR_PR_CO_AUG_PROTOCOLCONFAUG));
     }
 
     private void provideWriters(@Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
