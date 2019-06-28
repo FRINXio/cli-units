@@ -20,10 +20,12 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.isis.handler.global.IsisGlobalConfigAugWriter;
+import io.frinx.cli.iosxr.isis.handler.global.IsisGlobalConfigReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.utils.AbstractUnit;
-import io.frinx.openconfig.openconfig.isis.IIDs;
+import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
@@ -57,15 +59,23 @@ public class IosXRIsisUnit extends AbstractUnit {
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder rreg, Cli cli) {
+        rreg.subtreeAddAfter(IIDs.NE_NE_PR_PR_IS_GL_CONFIG, new IsisGlobalConfigReader(cli),
+            Sets.newHashSet(IIDs.NE_NE_PR_PR_IS_GL_CO_AUG_ISISGLOBALCONFAUG),IIDs.NE_NE_PR_PR_CONFIG);
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder wreg, Cli cli) {
+        wreg.addNoop(IIDs.NE_NE_PR_PR_ISIS);
+        wreg.addNoop(IIDs.NE_NE_PR_PR_IS_GLOBAL);
+        wreg.addNoop(IIDs.NE_NE_PR_PR_IS_GL_CONFIG);
+        wreg.addAfter(IIDs.NE_NE_PR_PR_IS_GL_CO_AUG_ISISGLOBALCONFAUG, new IsisGlobalConfigAugWriter(cli),
+            IIDs.NE_NE_PR_PR_CONFIG);
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(
-            IIDs.FRINX_OPENCONFIG_ISIS,
-            IIDs.FRINX_OPENCONFIG_ISIS_TYPES);
+            io.frinx.openconfig.openconfig.isis.IIDs.FRINX_OPENCONFIG_ISIS,
+            io.frinx.openconfig.openconfig.isis.IIDs.FRINX_OPENCONFIG_ISIS_TYPES,
+            IIDs.FRINX_ISIS_EXTENSION);
     }
 }
