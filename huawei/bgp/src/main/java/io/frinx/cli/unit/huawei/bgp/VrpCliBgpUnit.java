@@ -17,13 +17,11 @@
 package io.frinx.cli.unit.huawei.bgp;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiConfigReader;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiConfigWriter;
 import io.frinx.cli.unit.huawei.bgp.handler.GlobalAfiSafiReader;
@@ -37,7 +35,10 @@ import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborConfigReader;
 import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborPolicyConfigReader;
 import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborReader;
 import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+
+import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.$YangModuleInfoImpl;
@@ -49,39 +50,20 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.tran
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class VrpCliBgpUnit implements TranslateUnit {
+public class VrpCliBgpUnit extends AbstractUnit {
 
     private static final Device HUAWEI = new DeviceIdBuilder()
             .setDeviceType("vrp")
             .setDeviceVersion("*")
             .build();
 
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    public VrpCliBgpUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(HUAWEI, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    public VrpCliBgpUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final TranslateUnit.Context context) {
-        return Sets.newHashSet();
     }
 
     @Override
@@ -149,7 +131,12 @@ public class VrpCliBgpUnit implements TranslateUnit {
     }
 
     @Override
-    public String toString() {
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(HUAWEI);
+    }
+
+    @Override
+    protected String getUnitName() {
         return "VRP BGP (Openconfig) translate unit";
     }
 }

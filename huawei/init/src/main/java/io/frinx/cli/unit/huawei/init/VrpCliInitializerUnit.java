@@ -16,8 +16,6 @@
 
 package io.frinx.cli.unit.huawei.init;
 
-import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Session;
@@ -26,6 +24,7 @@ import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Collections;
 import java.util.Set;
@@ -39,7 +38,7 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VrpCliInitializerUnit implements TranslateUnit {
+public class VrpCliInitializerUnit extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(VrpCliInitializerUnit.class);
 
@@ -48,21 +47,8 @@ public class VrpCliInitializerUnit implements TranslateUnit {
             .setDeviceVersion("*")
             .build();
 
-    private TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    public VrpCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(HUAWEI, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    public VrpCliInitializerUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
     @Override
@@ -77,11 +63,6 @@ public class VrpCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final TranslateUnit.Context context) {
-        return Sets.newHashSet();
-    }
-
-    @Override
     public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
@@ -90,7 +71,12 @@ public class VrpCliInitializerUnit implements TranslateUnit {
     }
 
     @Override
-    public String toString() {
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(HUAWEI);
+    }
+
+    @Override
+    protected String getUnitName() {
         return "VRP cli init (FRINX) translate unit";
     }
 

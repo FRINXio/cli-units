@@ -17,16 +17,15 @@
 package io.frinx.cli.unit.huawei.routing.policy;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.huawei.routing.policy.handler.ExtCommunitySetConfigWriter;
 import io.frinx.cli.unit.huawei.routing.policy.handler.ExtCommunitySetReader;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.policy.IIDs;
 import java.util.Collections;
@@ -42,33 +41,15 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.tran
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class RoutingPolicyUnit implements TranslateUnit {
+public class RoutingPolicyUnit extends AbstractUnit {
 
     private static final Device HUAWEI = new DeviceIdBuilder()
             .setDeviceType("vrp")
             .setDeviceVersion("*")
             .build();
 
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    public RoutingPolicyUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(HUAWEI, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
+    public RoutingPolicyUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
     @Override
@@ -126,7 +107,12 @@ public class RoutingPolicyUnit implements TranslateUnit {
     }
 
     @Override
-    public String toString() {
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(HUAWEI);
+    }
+
+    @Override
+    protected String getUnitName() {
         return "VRP Routing policy (Openconfig) translate unit";
     }
 }

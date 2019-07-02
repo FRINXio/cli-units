@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.brocade.cdp;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
@@ -25,52 +24,40 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.brocade.cdp.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.brocade.cdp.handler.InterfaceReader;
 import io.frinx.cli.unit.brocade.cdp.handler.InterfaceStateReader;
+import io.frinx.cli.unit.brocade.init.BrocadeDevices;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.cdp.IIDs;
+
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cdp.rev171024.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cdp.rev171024.cdp.top.CdpBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lldp.rev160516.lldp._interface.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public final class BrocadeCdpUnit implements TranslateUnit {
+public final class BrocadeCdpUnit extends AbstractUnit {
 
-    private static final Device IOS_ALL = new DeviceIdBuilder()
-            .setDeviceType("ironware")
-            .setDeviceVersion("*")
-            .build();
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    public BrocadeCdpUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+    public BrocadeCdpUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(IOS_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return BrocadeDevices.BROCADE_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "Ironware CDP (FRINX) translate unit";
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final Context context) {
-        return Sets.newHashSet();
     }
 
     @Override
@@ -87,11 +74,6 @@ public final class BrocadeCdpUnit implements TranslateUnit {
         readRegistry.add(new GenericConfigListReader<>(IIDs.CD_IN_INTERFACE, new InterfaceReader(cli)));
         readRegistry.add(new GenericConfigReader<>(IIDs.CD_IN_IN_CONFIG, new InterfaceConfigReader()));
         readRegistry.add(new GenericOperReader<>(IIDs.CD_IN_IN_STATE, new InterfaceStateReader()));
-    }
-
-    @Override
-    public String toString() {
-        return "Ironware CDP (FRINX) translate unit";
     }
 
 }
