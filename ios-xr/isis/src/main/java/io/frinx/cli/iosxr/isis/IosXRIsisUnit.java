@@ -20,6 +20,8 @@ import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.iosxr.isis.handler.global.IsisGlobalAfiSafiConfigWriter;
+import io.frinx.cli.iosxr.isis.handler.global.IsisGlobalAfiSafiReader;
 import io.frinx.cli.iosxr.isis.handler.global.IsisGlobalConfigAugWriter;
 import io.frinx.cli.iosxr.isis.handler.global.IsisGlobalConfigReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
@@ -61,6 +63,8 @@ public class IosXRIsisUnit extends AbstractUnit {
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder rreg, Cli cli) {
         rreg.subtreeAddAfter(IIDs.NE_NE_PR_PR_IS_GL_CONFIG, new IsisGlobalConfigReader(cli),
             Sets.newHashSet(IIDs.NE_NE_PR_PR_IS_GL_CO_AUG_ISISGLOBALCONFAUG),IIDs.NE_NE_PR_PR_CONFIG);
+        rreg.subtreeAddAfter(IIDs.NE_NE_PR_PR_IS_GL_AF_AF, new IsisGlobalAfiSafiReader(cli),
+            Sets.newHashSet(IIDs.NE_NE_PR_PR_IS_GL_AF_AF_CONFIG), IIDs.NE_NE_PR_PR_IS_GL_CONFIG);
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder wreg, Cli cli) {
@@ -69,6 +73,10 @@ public class IosXRIsisUnit extends AbstractUnit {
         wreg.addNoop(IIDs.NE_NE_PR_PR_IS_GL_CONFIG);
         wreg.addAfter(IIDs.NE_NE_PR_PR_IS_GL_CO_AUG_ISISGLOBALCONFAUG, new IsisGlobalConfigAugWriter(cli),
             IIDs.NE_NE_PR_PR_CONFIG);
+        wreg.addNoop(IIDs.NE_NE_PR_PR_IS_GL_AFISAFI);
+        wreg.addNoop(IIDs.NE_NE_PR_PR_IS_GL_AF_AF);
+        wreg.addAfter(IIDs.NE_NE_PR_PR_IS_GL_AF_AF_CONFIG, new IsisGlobalAfiSafiConfigWriter(cli),
+            IIDs.NE_NE_PR_PR_IS_GL_CONFIG);
     }
 
     @Override
