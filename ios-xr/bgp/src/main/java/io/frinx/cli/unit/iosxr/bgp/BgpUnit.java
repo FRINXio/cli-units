@@ -43,6 +43,13 @@ import io.frinx.cli.unit.iosxr.bgp.handler.neighbor.NeighborEbgpConfigWriter;
 import io.frinx.cli.unit.iosxr.bgp.handler.neighbor.NeighborReader;
 import io.frinx.cli.unit.iosxr.bgp.handler.neighbor.NeighborTransportConfigReader;
 import io.frinx.cli.unit.iosxr.bgp.handler.neighbor.NeighborTransportConfigWriter;
+import io.frinx.cli.unit.iosxr.bgp.handler.peergroup.PeerGroupAfiSafiApplyPolicyConfigReader;
+import io.frinx.cli.unit.iosxr.bgp.handler.peergroup.PeerGroupAfiSafiApplyPolicyConfigWriter;
+import io.frinx.cli.unit.iosxr.bgp.handler.peergroup.PeerGroupAfiSafiConfigWriter;
+import io.frinx.cli.unit.iosxr.bgp.handler.peergroup.PeerGroupAfiSafiListReader;
+import io.frinx.cli.unit.iosxr.bgp.handler.peergroup.PeerGroupConfigReader;
+import io.frinx.cli.unit.iosxr.bgp.handler.peergroup.PeerGroupConfigWriter;
+import io.frinx.cli.unit.iosxr.bgp.handler.peergroup.PeerGroupListReader;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
@@ -92,6 +99,15 @@ public class BgpUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR);
         writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigWriter(cli),
                 IIDs.NE_NE_PR_PR_BG_GL_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_PEERGROUPS);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_PE_PE_CONFIG, new PeerGroupConfigWriter(cli),
+                IIDs.NE_NE_PR_PR_BG_GL_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_PE_PE_AFISAFIS);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AFISAFI);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_CONFIG,new PeerGroupAfiSafiConfigWriter(cli),
+                IIDs.NE_NE_PR_PR_BG_GL_CONFIG,
+                IIDs.NE_NE_PR_PR_BG_PE_PE_CONFIG);
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NE_TRANSPORT);
         writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_NE_NE_TR_CONFIG, new NeighborTransportConfigWriter(cli),
                 IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG);
@@ -108,6 +124,12 @@ public class BgpUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY);
         writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, new
                 NeighborAfiSafiApplyPolicyConfigWriter(cli), IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_APPLYPOLICY);
+        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_AP_CONFIG, new
+                PeerGroupAfiSafiApplyPolicyConfigWriter(cli),
+                IIDs.NE_NE_PR_PR_BG_GL_CONFIG,
+                IIDs.NE_NE_PR_PR_BG_PE_PE_CONFIG,
+                IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_CONFIG);
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IPV4UNICAST);
         writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IP_CONFIG, new NeighborAfiSafiIpvConfigWriter(cli),
                 IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG);
@@ -133,6 +155,9 @@ public class BgpUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigReader(cli));
         readRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI, new GlobalAfiSafiReader(cli),
                 Sets.newHashSet(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG));
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP, new PeerGroupListReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_PE_PE_CONFIG, new PeerGroupConfigReader());
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AFISAFI, new PeerGroupAfiSafiListReader(cli));
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborReader(cli));
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader(cli));
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_TR_CONFIG, new NeighborTransportConfigReader(cli));
@@ -145,6 +170,7 @@ public class BgpUnit extends AbstractUnit {
             )
         );
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG, new NeighborAfiSafiApplyPolicyConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_PE_PE_AF_AF_AP_CONFIG, new PeerGroupAfiSafiApplyPolicyConfigReader(cli));
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_IP_CONFIG, new NeighborAfiSafiIpv4ConfigReader(cli));
         readRegistry.add(IIDs.NET_NET_PRO_PRO_BGP_NEI_NEI_AFI_AFI_IPV_PRE_CONFIG,
                 new NeighborAfiSafiPrefixLimitConfigReader(cli));
