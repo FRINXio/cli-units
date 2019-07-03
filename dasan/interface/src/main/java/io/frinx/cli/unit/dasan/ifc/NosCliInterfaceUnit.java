@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.dasan.ifc;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
@@ -28,7 +27,6 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.dasan.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.dasan.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.dasan.ifc.handler.InterfaceReader;
@@ -48,6 +46,7 @@ import io.frinx.cli.unit.dasan.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.dasan.ifc.handler.subifc.ip4.Ipv4AddressConfigReader;
 import io.frinx.cli.unit.dasan.ifc.handler.subifc.ip4.Ipv4AddressConfigWriter;
 import io.frinx.cli.unit.dasan.ifc.handler.subifc.ip4.Ipv4AddressReader;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
@@ -77,28 +76,15 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.tran
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class NosCliInterfaceUnit implements TranslateUnit {
+public class NosCliInterfaceUnit extends AbstractUnit {
 
     private static final Device DASAN = new DeviceIdBuilder()
             .setDeviceType("nos")
             .setDeviceVersion("*")
             .build();
 
-    private TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    public NosCliInterfaceUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(DASAN, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    public NosCliInterfaceUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
     @Override
@@ -123,11 +109,6 @@ public class NosCliInterfaceUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp
                 .rev170505.$YangModuleInfoImpl.getInstance()
                 );
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
     }
 
     @Override
@@ -264,7 +245,12 @@ public class NosCliInterfaceUnit implements TranslateUnit {
     }
 
     @Override
-    public String toString() {
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(DASAN);
+    }
+
+    @Override
+    protected String getUnitName() {
         return "Dasan Interface (Openconfig) translate unit";
     }
 }

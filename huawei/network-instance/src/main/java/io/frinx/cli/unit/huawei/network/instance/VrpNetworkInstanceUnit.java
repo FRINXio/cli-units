@@ -17,12 +17,10 @@
 package io.frinx.cli.unit.huawei.network.instance;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.huawei.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.huawei.network.instance.handler.NetworkInstanceReader;
@@ -31,6 +29,7 @@ import io.frinx.cli.unit.huawei.network.instance.handler.vrf.ifc.L3VrfInterfaceW
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.ProtocolConfigReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.ProtocolConfigWriter;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.ProtocolReader;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
@@ -39,33 +38,15 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.tran
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class VrpNetworkInstanceUnit implements TranslateUnit {
+public class VrpNetworkInstanceUnit extends AbstractUnit {
 
     private static final Device HUAWEI = new DeviceIdBuilder()
             .setDeviceType("vrp")
             .setDeviceVersion("*")
             .build();
 
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    public VrpNetworkInstanceUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(HUAWEI, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
+    public VrpNetworkInstanceUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
     @Override
@@ -112,7 +93,12 @@ public class VrpNetworkInstanceUnit implements TranslateUnit {
     }
 
     @Override
-    public String toString() {
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(HUAWEI);
+    }
+
+    @Override
+    protected String getUnitName() {
         return "VRP Network Instance (Openconfig) translate unit";
     }
 }
