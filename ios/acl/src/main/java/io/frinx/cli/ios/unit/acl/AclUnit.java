@@ -17,7 +17,6 @@
 package io.frinx.cli.ios.unit.acl;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.util.RWUtils;
@@ -35,35 +34,23 @@ import io.frinx.cli.ios.unit.acl.handler.IngressAclSetConfigReader;
 import io.frinx.cli.ios.unit.acl.handler.IngressAclSetConfigWriter;
 import io.frinx.cli.ios.unit.acl.handler.IngressAclSetReader;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.ios.init.IosDevices;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.acl.IIDs;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class AclUnit implements TranslateUnit {
-
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
+public class AclUnit extends AbstractUnit {
 
     private static final InstanceIdentifier<AclEntry> ACL_ENTRY_TREE_BASE = InstanceIdentifier.create(AclEntry.class);
 
-    public AclUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(IosDevices.IOS_ALL, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    public AclUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
     @Override
@@ -74,11 +61,6 @@ public class AclUnit implements TranslateUnit {
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314
                         .$YangModuleInfoImpl.getInstance()
         );
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final Context context) {
-        return Sets.newHashSet();
     }
 
     @Override
@@ -189,7 +171,12 @@ public class AclUnit implements TranslateUnit {
     }
 
     @Override
-    public String toString() {
+    protected Set<Device> getSupportedVersions() {
+        return IosDevices.IOS_ALL;
+    }
+
+    @Override
+    protected String getUnitName() {
         return "IOS ACL unit";
     }
 }

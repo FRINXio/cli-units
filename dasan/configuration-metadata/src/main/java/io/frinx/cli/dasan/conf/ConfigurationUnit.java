@@ -17,15 +17,15 @@
 package io.frinx.cli.dasan.conf;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericOperReader;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.dasan.conf.handler.ConfigMetadataReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.configuration.metadata.IIDs;
+import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.configuration.metadata.rev180731.$YangModuleInfoImpl;
@@ -33,38 +33,20 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.tran
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class ConfigurationUnit implements TranslateUnit {
+public class ConfigurationUnit extends AbstractUnit {
 
     private static final Device NOS = new DeviceIdBuilder()
             .setDeviceType("nos")
             .setDeviceVersion("*")
             .build();
 
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    public ConfigurationUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(NOS, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    public ConfigurationUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet($YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final TranslateUnit.Context context) {
-        return Sets.newHashSet();
     }
 
     @Override
@@ -80,7 +62,12 @@ public class ConfigurationUnit implements TranslateUnit {
     }
 
     @Override
-    public String toString() {
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(NOS);
+    }
+
+    @Override
+    protected String getUnitName() {
         return "Dasan Configuration Metadata unit";
     }
 }

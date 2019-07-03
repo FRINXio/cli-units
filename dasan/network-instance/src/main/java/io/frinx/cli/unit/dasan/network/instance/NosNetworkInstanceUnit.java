@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.dasan.network.instance;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
 import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
 import io.fd.honeycomb.translate.impl.write.GenericWriter;
@@ -26,13 +25,13 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.dasan.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.dasan.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.dasan.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.dasan.network.instance.handler.vlan.VlanConfigReader;
 import io.frinx.cli.unit.dasan.network.instance.handler.vlan.VlanConfigWriter;
 import io.frinx.cli.unit.dasan.network.instance.handler.vlan.VlanReader;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
@@ -44,33 +43,15 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.tran
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class NosNetworkInstanceUnit implements TranslateUnit {
+public class NosNetworkInstanceUnit extends AbstractUnit {
 
     private static final Device DASAN = new DeviceIdBuilder()
             .setDeviceType("nos")
             .setDeviceVersion("*")
             .build();
 
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    public NosNetworkInstanceUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        reg = registry.registerTranslateUnit(DASAN, this);
-    }
-
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
+    public NosNetworkInstanceUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
     @Override
@@ -122,7 +103,12 @@ public class NosNetworkInstanceUnit implements TranslateUnit {
     }
 
     @Override
-    public String toString() {
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(DASAN);
+    }
+
+    @Override
+    protected String getUnitName() {
         return "Dasan Network Instance (Openconfig) translate unit";
     }
 }

@@ -18,7 +18,6 @@ package io.frinx.cli.unit.dasan.init;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.PromptResolutionStrategy;
@@ -28,6 +27,7 @@ import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * session. That is, upon establishing connection to NOS device, enter privileged
  * EXEC mode by issuing the 'enable' command and filling in the secret.
  */
-public class NosCliInitializerUnit  implements TranslateUnit {
+public class NosCliInitializerUnit extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(NosCliInitializerUnit.class);
 
@@ -62,22 +62,8 @@ public class NosCliInitializerUnit  implements TranslateUnit {
             .setDeviceVersion("*")
             .build();
 
-    private TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration nosReg;
-
-
-    public NosCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
-    }
-
-    public void init() {
-        nosReg = registry.registerTranslateUnit(NOS, this);
-    }
-
-    public void close() {
-        if (nosReg != null) {
-            nosReg.close();
-        }
+    public NosCliInitializerUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
     @Override
@@ -92,11 +78,6 @@ public class NosCliInitializerUnit  implements TranslateUnit {
     }
 
     @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull final TranslateUnit.Context context) {
-        return Sets.newHashSet();
-    }
-
-    @Override
     public void provideHandlers(@Nonnull final CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull final CustomizerAwareWriteRegistryBuilder writeRegistry,
                                 @Nonnull final TranslateUnit.Context context) {
@@ -105,7 +86,12 @@ public class NosCliInitializerUnit  implements TranslateUnit {
     }
 
     @Override
-    public String toString() {
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(NOS);
+    }
+
+    @Override
+    protected String getUnitName() {
         return "NOS cli init (FRINX) translate unit";
     }
 
