@@ -19,7 +19,7 @@ package io.frinx.cli.unit.iosxr.evpn.handler;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
-import io.frinx.cli.iosxr.evpn.handler.EvpnConfigWriter;
+
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;

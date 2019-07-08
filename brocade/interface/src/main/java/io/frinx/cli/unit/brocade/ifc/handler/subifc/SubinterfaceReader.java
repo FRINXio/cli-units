@@ -18,10 +18,10 @@ package io.frinx.cli.unit.brocade.ifc.handler.subifc;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6.Ipv6ConfigReader;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceReader;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;

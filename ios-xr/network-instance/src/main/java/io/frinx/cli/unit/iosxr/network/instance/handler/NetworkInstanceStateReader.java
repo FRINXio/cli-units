@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.iosxr.network.instance.handler;
 
-import io.frinx.cli.handlers.def.DefaultStateReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.handlers.def.DefaultStateReader;
 import io.frinx.cli.unit.utils.CliOperReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.ArrayList;

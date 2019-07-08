@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.dasan.network.instance.handler;
 
-import io.frinx.cli.handlers.def.DefaultConfigReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.handlers.def.DefaultConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.ArrayList;

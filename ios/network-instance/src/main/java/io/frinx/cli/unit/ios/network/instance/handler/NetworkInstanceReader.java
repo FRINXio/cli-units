@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.ios.network.instance.handler;
 
-import io.frinx.cli.handlers.def.DefaultReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.handlers.def.DefaultReader;
 import io.frinx.cli.unit.ios.network.instance.handler.l2p2p.L2P2PReader;
 import io.frinx.cli.unit.ios.network.instance.handler.l2vsi.L2VSIReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.L3VrfReader;

@@ -18,10 +18,10 @@ package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigReaderTest;
-import io.frinx.cli.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigWriterTest;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
+import io.frinx.cli.unit.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigReaderTest;
+import io.frinx.cli.unit.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigWriterTest;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;

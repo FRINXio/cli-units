@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.nexus.ifc.handler.subifc;
 
-import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceConfigReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceConfigReader;
 import io.frinx.cli.unit.nexus.ifc.Util;
 import io.frinx.cli.unit.nexus.ifc.handler.InterfaceConfigReader;
 import java.util.regex.Pattern;

@@ -18,8 +18,8 @@ package io.frinx.cli.unit.junos.ifc.handler.subifc;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceConfigReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceConfigReader;
 import io.frinx.cli.unit.junos.ifc.Util;
 import io.frinx.cli.unit.junos.ifc.handler.InterfaceConfigReader;
 import java.util.regex.Pattern;

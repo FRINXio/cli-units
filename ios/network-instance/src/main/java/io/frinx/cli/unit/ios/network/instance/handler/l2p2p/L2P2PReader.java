@@ -17,7 +17,7 @@
 package io.frinx.cli.unit.ios.network.instance.handler.l2p2p;
 
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ni.base.handler.l2p2p.AbstractL2P2PReader;
+import io.frinx.cli.unit.ni.base.handler.l2p2p.AbstractL2P2PReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Matcher;

@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv4;
 
-import io.frinx.cli.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigReaderTest;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigReaderTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;

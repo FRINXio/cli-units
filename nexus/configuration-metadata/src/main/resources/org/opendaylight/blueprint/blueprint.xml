@@ -25,7 +25,7 @@
                interface="io.frinx.cli.registry.api.TranslationUnitCollector"/>
 
     <bean id="NexusConfigurationMetadataUnit"
-          class="io.frinx.cli.nexus.conf.ConfigurationUnit"
+          class="io.frinx.cli.unit.nexus.conf.ConfigurationUnit"
           init-method="init" destroy-method="close">
         <argument ref="translationRegistry" />
     </bean>

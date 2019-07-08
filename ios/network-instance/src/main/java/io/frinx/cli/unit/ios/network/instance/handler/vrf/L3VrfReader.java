@@ -19,7 +19,7 @@ package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ni.base.handler.vrf.AbstractL3VrfReader;
+import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfReader;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.List;

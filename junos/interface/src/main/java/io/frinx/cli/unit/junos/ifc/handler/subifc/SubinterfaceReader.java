@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.junos.ifc.handler.subifc;
 
-import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceReader;
 import io.frinx.cli.unit.junos.ifc.Util;
 import io.frinx.cli.unit.junos.ifc.handler.InterfaceReader;
 import java.util.List;

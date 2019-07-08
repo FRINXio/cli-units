@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip6;
 
-import io.frinx.cli.ifc.base.handler.subifc.ip6.AbstractIpv6ConfigReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.ip6.AbstractIpv6ConfigReader;
 import java.util.regex.Pattern;
 
 public final class Ipv6ConfigReader extends AbstractIpv6ConfigReader {

@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv6;
 
-import io.frinx.cli.ifc.base.handler.subifc.ip6.AbstractIpv6ConfigWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.ip6.AbstractIpv6ConfigWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv6.top.ipv6.addresses.address.Config;
 
 public final class Ipv6ConfigWriter extends AbstractIpv6ConfigWriter {

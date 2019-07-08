@@ -17,9 +17,9 @@
 package io.frinx.cli.unit.brocade.ifc.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.frinx.cli.ifc.base.handler.AbstractInterfaceStateReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.ifc.Util;
+import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceStateReader;
 import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.StateBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;

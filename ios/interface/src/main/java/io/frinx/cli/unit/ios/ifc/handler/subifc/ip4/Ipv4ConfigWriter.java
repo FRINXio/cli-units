@@ -16,9 +16,9 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
-import io.frinx.cli.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigWriter;
-import io.frinx.cli.ifc.base.util.NetUtils;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigWriter;
+import io.frinx.cli.unit.ifc.base.util.NetUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
 
 public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {

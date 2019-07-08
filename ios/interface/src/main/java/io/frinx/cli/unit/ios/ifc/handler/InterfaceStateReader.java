@@ -17,8 +17,8 @@
 package io.frinx.cli.unit.ios.ifc.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.frinx.cli.ifc.base.handler.AbstractInterfaceStateReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceStateReader;
 import io.frinx.cli.unit.ios.ifc.Util;
 import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.StateBuilder;

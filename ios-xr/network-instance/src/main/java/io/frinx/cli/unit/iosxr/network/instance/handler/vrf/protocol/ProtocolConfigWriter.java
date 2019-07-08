@@ -18,10 +18,10 @@ package io.frinx.cli.unit.iosxr.network.instance.handler.vrf.protocol;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.bgp.handler.BgpProtocolWriter;
-import io.frinx.cli.iosxr.isis.handler.IsisProtocolConfigWriter;
-import io.frinx.cli.iosxr.ospf.handler.OspfProtocolWriter;
-import io.frinx.cli.iosxr.ospfv3.handler.OspfV3ProtocolWriter;
+import io.frinx.cli.unit.iosxr.bgp.handler.BgpProtocolWriter;
+import io.frinx.cli.unit.iosxr.isis.handler.IsisProtocolConfigWriter;
+import io.frinx.cli.unit.iosxr.ospf.handler.OspfProtocolWriter;
+import io.frinx.cli.unit.iosxr.ospfv3.handler.OspfV3ProtocolWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.protocol.Config;
 

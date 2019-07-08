@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.subifc.ip4;
 
-import io.frinx.cli.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigReader;
 import java.util.regex.Pattern;
 
 public final class Ipv4ConfigReader extends AbstractIpv4ConfigReader {
