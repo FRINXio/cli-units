@@ -18,7 +18,7 @@ package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ni.base.handler.vrf.AbstractL3VrfConfigReader;
+import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;

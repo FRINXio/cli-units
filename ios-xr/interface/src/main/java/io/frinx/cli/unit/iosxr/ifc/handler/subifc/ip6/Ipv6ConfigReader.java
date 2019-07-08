@@ -17,8 +17,8 @@
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.frinx.cli.ifc.base.handler.subifc.ip6.AbstractIpv6ConfigReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.ip6.AbstractIpv6ConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
 import java.util.regex.Pattern;

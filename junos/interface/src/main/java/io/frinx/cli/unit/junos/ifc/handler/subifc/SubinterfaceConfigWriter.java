@@ -17,8 +17,8 @@
 package io.frinx.cli.unit.junos.ifc.handler.subifc;
 
 import com.x5.template.Chunk;
-import io.frinx.cli.ifc.base.handler.subifc.AbstractSubinterfaceConfigWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceConfigWriter;
 import io.frinx.cli.unit.junos.ifc.Util;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;

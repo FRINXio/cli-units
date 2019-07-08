@@ -16,9 +16,9 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler;
 
-import io.frinx.cli.ifc.base.handler.AbstractInterfaceConfigReader;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.ifc.Util;
+import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;

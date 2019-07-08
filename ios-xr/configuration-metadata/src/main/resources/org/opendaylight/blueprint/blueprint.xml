@@ -25,7 +25,7 @@
                interface="io.frinx.cli.registry.api.TranslationUnitCollector"/>
 
     <bean id="iosXrConfigurationMetadataUnit"
-          class="io.frinx.cli.iosxr.conf.ConfigurationUnit"
+          class="io.frinx.cli.unit.iosxr.conf.ConfigurationUnit"
           init-method="init" destroy-method="close">
         <argument ref="translationRegistry" />
     </bean>

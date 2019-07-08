@@ -25,7 +25,7 @@
              interface="io.frinx.cli.registry.api.TranslationUnitCollector"/>
 
   <bean id="iosXrOspfV3Unit"
-        class="io.frinx.cli.iosxr.ospfv3.OspfV3Unit"
+        class="io.frinx.cli.unit.iosxr.ospfv3.OspfV3Unit"
         init-method="init" destroy-method="close">
     <argument ref="translationRegistry" />
   </bean>

@@ -17,7 +17,7 @@
 package io.frinx.cli.unit.brocade.network.instance.l2p2p;
 
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ni.base.handler.l2p2p.AbstractL2P2ConfigReader;
+import io.frinx.cli.unit.ni.base.handler.l2p2p.AbstractL2P2ConfigReader;
 
 public final class L2P2PConfigReader extends AbstractL2P2ConfigReader {
 

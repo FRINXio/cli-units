@@ -21,7 +21,7 @@ import com.google.common.collect.HashMultiset;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ni.base.handler.vrf.AbstractL3VrfConfigWriter;
+import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfConfigWriter;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;

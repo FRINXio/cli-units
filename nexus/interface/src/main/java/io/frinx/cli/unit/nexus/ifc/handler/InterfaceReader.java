@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.nexus.ifc.handler;
 
-import io.frinx.cli.ifc.base.handler.AbstractInterfaceReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceReader;
 import java.util.regex.Pattern;
 
 public final class InterfaceReader extends AbstractInterfaceReader {

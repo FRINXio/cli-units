@@ -17,7 +17,7 @@
 package io.frinx.cli.unit.brocade.network.instance.l2p2p;
 
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ni.base.handler.l2p2p.AbstractL2P2PReader;
+import io.frinx.cli.unit.ni.base.handler.l2p2p.AbstractL2P2PReader;
 import java.util.regex.Pattern;
 
 public final class L2P2PReader extends AbstractL2P2PReader {

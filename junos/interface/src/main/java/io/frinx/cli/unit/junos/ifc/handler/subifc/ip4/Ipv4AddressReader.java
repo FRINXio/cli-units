@@ -18,8 +18,8 @@ package io.frinx.cli.unit.junos.ifc.handler.subifc.ip4;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.frinx.cli.ifc.base.handler.subifc.ip4.AbstractIpv4AddressesReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4AddressesReader;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;

@@ -17,8 +17,8 @@
 package io.frinx.cli.unit.nexus.ifc.handler;
 
 import com.x5.template.Chunk;
-import io.frinx.cli.ifc.base.handler.AbstractInterfaceConfigWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigWriter;
 import io.frinx.cli.unit.nexus.ifc.Util;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 

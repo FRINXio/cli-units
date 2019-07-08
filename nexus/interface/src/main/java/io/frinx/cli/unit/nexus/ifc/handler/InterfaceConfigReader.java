@@ -16,8 +16,8 @@
 
 package io.frinx.cli.unit.nexus.ifc.handler;
 
-import io.frinx.cli.ifc.base.handler.AbstractInterfaceConfigReader;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigReader;
 import io.frinx.cli.unit.nexus.ifc.Util;
 import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;

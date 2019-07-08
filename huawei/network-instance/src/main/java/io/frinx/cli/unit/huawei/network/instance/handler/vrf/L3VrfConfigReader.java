@@ -17,7 +17,7 @@
 package io.frinx.cli.unit.huawei.network.instance.handler.vrf;
 
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ni.base.handler.vrf.AbstractL3VrfConfigReader;
+import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfConfigReader;
 import java.util.regex.Pattern;
 
 public final class L3VrfConfigReader extends AbstractL3VrfConfigReader {

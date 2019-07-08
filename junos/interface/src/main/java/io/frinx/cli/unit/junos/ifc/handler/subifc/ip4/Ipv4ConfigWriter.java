@@ -18,8 +18,8 @@ package io.frinx.cli.unit.junos.ifc.handler.subifc.ip4;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigWriter;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigWriter;
 import io.frinx.cli.unit.junos.ifc.handler.subifc.SubinterfaceReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;

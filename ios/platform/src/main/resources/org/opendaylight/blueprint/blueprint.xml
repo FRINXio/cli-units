@@ -25,7 +25,7 @@
     interface="io.frinx.cli.registry.api.TranslationUnitCollector"/>
 
   <bean id="ios-platform-unit"
-        class="io.frinx.cli.platform.PlatformUnit"
+        class="io.frinx.cli.unit.platform.PlatformUnit"
     init-method="init" destroy-method="close">
     <argument ref="translationRegistry" />
   </bean>

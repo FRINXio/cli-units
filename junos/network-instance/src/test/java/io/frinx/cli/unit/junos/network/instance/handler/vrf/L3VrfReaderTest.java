@@ -19,7 +19,7 @@ package io.frinx.cli.unit.junos.network.instance.handler.vrf;
 import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ni.base.handler.vrf.AbstractL3VrfReader;
+import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfReader;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.List;
 import org.junit.Assert;

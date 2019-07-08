@@ -18,8 +18,7 @@ package io.frinx.cli.unit.iosxr.hsrp.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.iosxr.hsrp.handler.HsrpGroupConfigReader;
-import io.frinx.cli.iosxr.hsrp.handler.util.HsrpUtil;
+import io.frinx.cli.unit.iosxr.hsrp.handler.util.HsrpUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

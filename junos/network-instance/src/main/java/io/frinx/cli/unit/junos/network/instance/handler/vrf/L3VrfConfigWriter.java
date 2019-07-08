@@ -17,7 +17,7 @@
 package io.frinx.cli.unit.junos.network.instance.handler.vrf;
 
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.ni.base.handler.vrf.AbstractL3VrfConfigWriter;
+import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfConfigWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 
 public final class L3VrfConfigWriter extends AbstractL3VrfConfigWriter {
