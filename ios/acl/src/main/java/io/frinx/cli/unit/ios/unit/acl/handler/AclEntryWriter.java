@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.util.SubnetUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
@@ -84,23 +85,42 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             + "must contain address and wildcard-mask";
 
     private static final String ACL_IP_ENTRY = "configure terminal\n"
-            + "{$type} access-list extended {$aclName}\n"
+            + "ip access-list extended {$aclName}\n"
             + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclTtl}\n"
             + "end\n";
+    private static final String ACL_IP6_ENTRY = "configure terminal\n"
+            + "ipv6 access-list {$aclName}\n"
+            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclTtl} {$aclSeqId}\n"
+            + "end\n";
     private static final String ACL_TCP_ENTRY = "configure terminal\n"
-            + "{$type} access-list extended {$aclName}\n"
+            + "ip access-list extended {$aclName}\n"
             + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclSrcPort} {$aclDstAddr} "
             + "{$aclDstPort} {$aclTtl}\n"
             + "end\n";
+    private static final String ACL_TCP_IP6_ENTRY = "configure terminal\n"
+            + "ipv6 access-list {$aclName}\n"
+            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclSrcPort} {$aclDstAddr} {$aclSeqId} "
+            + "{$aclDstPort} {$aclTtl}\n"
+            + "end\n";
     private static final String ACL_ICMP_ENTRY = "configure terminal\n"
-            + "{$type} access-list extended {$aclName}\n"
+            + "ip access-list extended {$aclName}\n"
             + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType} "
             + "{$aclTtl}\n"
             + "end\n";
+    private static final String ACL_ICMP_IP6_ENTRY = "configure terminal\n"
+            + "ipv6 access-list {$aclName}\n"
+            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType} {$aclSeqId} "
+            + "{$aclTtl}\n"
+            + "end\n";
     private static final String ACL_DELETE = "configure terminal\n"
-            + "{$type} access-list extended {$aclName}\n"
+            + "ip access-list extended {$aclName}\n"
             + "no {$aclSeqId}\n"
             + "end\n";
+    private static final String ACL_IP6_DELETE = "configure terminal\n"
+            + "ipv6 access-list {$aclName}\n"
+            + "no sequence {$aclSeqId}\n"
+            + "end\n";
+
     private static final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
     private static final Pattern PORT_RANGE_NAMED_PATTERN = Pattern.compile("(?<from>\\S*)\\.\\.(?<to>\\S*)");
     private static final Pattern IPV4_IN_IPV6_PATTERN =
@@ -133,16 +153,11 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                                         @Nonnull AclEntry dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
-        final String aclType = aclSetKey.getType().equals(ACLIPV4.class) ? "ip" : "ipv6";
+        final String command = aclSetKey.getType().equals(ACLIPV4.class) ? ACL_DELETE : ACL_IP6_DELETE;
         final String aclName = aclSetKey.getName();
         final String aclSequenceId = dataBefore.getSequenceId().toString();
 
-        blockingWriteAndRead(
-                fT(ACL_DELETE,
-                        "type", aclType,
-                        "aclName", aclName,
-                        "aclSeqId", aclSequenceId),
-                cli, id, dataBefore);
+        blockingWriteAndRead(fT(command, "aclName", aclName, "aclSeqId", aclSequenceId), cli, id, dataBefore);
     }
 
     private void processChange(@Nonnull InstanceIdentifier<AclEntry> id,
@@ -150,13 +165,13 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         MaxMetricCommandDTO commandVars = new MaxMetricCommandDTO();
         AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
         commandVars.aclName = aclSetKey.getName();
-        commandVars.type = aclSetKey.getType().equals(ACLIPV4.class) ? "ip" : "ipv6";
         commandVars.aclSeqId = entry.getSequenceId().toString();
         // ipv4|ipv6
         if (entry.getIpv4() != null) {
             processIpv4(entry, commandVars);
         } else if (entry.getIpv6() != null) {
             processIpv6(entry, commandVars);
+            commandVars.aclSeqId = " sequence " + entry.getSequenceId().toString();
         } else {
             throw new IllegalStateException(f("No ip|ipv6 container found in acl entry %s", entry));
         }
@@ -168,9 +183,18 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
 
         switch (commandVars.aclProtocol) {
             case "ip":
-            case "ipv6":
                 blockingWriteAndRead(fT(ACL_IP_ENTRY,
-                        "type", commandVars.type,
+                        "aclName", commandVars.aclName,
+                        "aclSeqId", commandVars.aclSeqId,
+                        "aclFwdAction", commandVars.aclFwdAction,
+                        "aclProtocol", commandVars.aclProtocol,
+                        "aclSrcAddr", commandVars.aclSrcAddr,
+                        "aclDstAddr", commandVars.aclDstAddr,
+                        "aclTtl", commandVars.aclTtl),
+                        cli, id, entry);
+                break;
+            case "ipv6":
+                blockingWriteAndRead(fT(ACL_IP6_ENTRY,
                         "aclName", commandVars.aclName,
                         "aclSeqId", commandVars.aclSeqId,
                         "aclFwdAction", commandVars.aclFwdAction,
@@ -182,8 +206,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 break;
             case "udp":
             case "tcp":
-                blockingWriteAndRead(fT(ACL_TCP_ENTRY,
-                        "type", commandVars.type,
+                blockingWriteAndRead(fT((entry.getIpv4() != null) ? ACL_TCP_ENTRY : ACL_TCP_IP6_ENTRY,
                         "aclName", commandVars.aclName,
                         "aclSeqId", commandVars.aclSeqId,
                         "aclFwdAction", commandVars.aclFwdAction,
@@ -196,9 +219,19 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                         cli, id, entry);
                 break;
             case "icmp":
-            case "icmpv6":
                 blockingWriteAndRead(fT(ACL_ICMP_ENTRY,
-                        "type", commandVars.type,
+                        "aclName", commandVars.aclName,
+                        "aclSeqId", commandVars.aclSeqId,
+                        "aclFwdAction", commandVars.aclFwdAction,
+                        "aclProtocol", commandVars.aclProtocol,
+                        "aclSrcAddr", commandVars.aclSrcAddr,
+                        "aclDstAddr", commandVars.aclDstAddr,
+                        "aclIcmpMsgType", commandVars.aclIcmpMsgType,
+                        "aclTtl", commandVars.aclTtl),
+                        cli, id, entry);
+                break;
+            case "icmpv6":
+                blockingWriteAndRead(fT(ACL_ICMP_IP6_ENTRY,
                         "aclName", commandVars.aclName,
                         "aclSeqId", commandVars.aclSeqId,
                         "aclFwdAction", commandVars.aclFwdAction,
@@ -231,7 +264,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         if (ipv4PrefixOpt.isPresent()) {
             Preconditions.checkArgument(!ipv4WildcardedOpt.isPresent(),
                     SOURCE_ADDRESS_AND_SOURCE_ADDRESS_WILDCARDED_TOGETHER_ERROR);
-            commandVars.aclSrcAddr = ipv4PrefixOpt.get();
+            SubnetUtils.SubnetInfo info = new SubnetUtils(ipv4PrefixOpt.get()).getInfo();
+            commandVars.aclSrcAddr = info.getAddress() + " " + info.getNetmask();
         } else {
             Preconditions.checkArgument(ipv4WildcardedOpt.isPresent(),
                     NONE_SOURCE_ADDRESS_OR_SOURCE_ADDRESS_WILDCARDED_ERROR);
@@ -247,7 +281,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         if (ipv4PrefixOpt.isPresent()) {
             Preconditions.checkArgument(!ipv4WildcardedOpt.isPresent(),
                     DESTINATION_ADDRESS_AND_DESTINATION_ADDRESS_WILDCARDED_TOGETHER_ERROR);
-            commandVars.aclDstAddr = ipv4PrefixOpt.get();
+            SubnetUtils.SubnetInfo info = new SubnetUtils(ipv4PrefixOpt.get()).getInfo();
+            commandVars.aclDstAddr = info.getAddress() + " " + info.getNetmask();
         } else {
             Preconditions.checkArgument(ipv4WildcardedOpt.isPresent(),
                     NONE_DESTINATION_ADDRESS_OR_DESTINATION_ADDRESS_WILDCARDED_ERROR);
@@ -261,7 +296,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv4().getConfig())
                 .map(IpProtocolFieldsCommonConfig::getProtocol)
                 .orElse(null);
-        commandVars.aclProtocol = formatProtocol(ipProtocolType, commandVars.type);
+        commandVars.aclProtocol = formatProtocol(ipProtocolType, "ip");
     }
 
     private Optional<String> getIpv4Prefix(AclEntry entry, Function<Ipv4ProtocolFieldsConfig, Ipv4Prefix> mapper) {
@@ -331,7 +366,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv6().getConfig())
                 .map(IpProtocolFieldsCommonConfig::getProtocol)
                 .orElse(null);
-        commandVars.aclProtocol = formatProtocol(ipProtocolType, commandVars.type);
+        commandVars.aclProtocol = formatProtocol(ipProtocolType, "ipv6");
     }
 
     private static String tryTranslateIpv6ToIpv4InIpv6(String ipv6Prefix) {
@@ -541,8 +576,6 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
 
     @VisibleForTesting
     static class MaxMetricCommandDTO {
-
-        String type = "";
         String aclName = "";
         String aclSeqId = "";
         String aclFwdAction = "";
