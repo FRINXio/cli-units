@@ -52,13 +52,11 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
 
         checkEgressAclSetConfigExists(instanceIdentifier, aclType, writeContext, interfaceName);
 
-        final String aclCommand =
-                f("%s access-group %s out", AclUtil.getStringType(aclType), config.getSetName());
-
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                f("interface %s", interfaceName),
-                aclCommand,
-                "root");
+            "configure terminal\n",
+            f("interface %s", interfaceName),
+            f("%s %s out", AclUtil.chooseIpCommand(aclType), config.getSetName()),
+            "end");
     }
 
     private void checkEgressAclSetConfigExists(final InstanceIdentifier<Config> instanceIdentifier,
@@ -114,12 +112,10 @@ public class EgressAclSetConfigWriter implements CliWriter<Config> {
         final Class<? extends ACLTYPE> aclType = config.getType();
         Preconditions.checkArgument(aclType != null, "Missing acl type");
 
-        final String aclCommand =
-                f("no %s access-group %s out", AclUtil.getStringType(aclType), config.getSetName());
-
         blockingWriteAndRead(cli, instanceIdentifier, config,
+                "configure terminal\n",
                 f("interface %s", name),
-                aclCommand,
-                "root");
+                f("no %s %s out", AclUtil.chooseIpCommand(aclType), config.getSetName()),
+                "end");
     }
 }
