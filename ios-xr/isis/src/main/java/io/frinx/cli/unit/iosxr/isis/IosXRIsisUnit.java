@@ -26,6 +26,9 @@ import io.frinx.cli.unit.iosxr.isis.handler.global.IsisGlobalAfiSafiConfigWriter
 import io.frinx.cli.unit.iosxr.isis.handler.global.IsisGlobalAfiSafiReader;
 import io.frinx.cli.unit.iosxr.isis.handler.global.IsisGlobalConfigAugWriter;
 import io.frinx.cli.unit.iosxr.isis.handler.global.IsisGlobalConfigReader;
+import io.frinx.cli.unit.iosxr.isis.handler.global.IsisRedistributionConfigReader;
+import io.frinx.cli.unit.iosxr.isis.handler.global.IsisRedistributionConfigWriter;
+import io.frinx.cli.unit.iosxr.isis.handler.global.IsisRedistributionReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Set;
@@ -65,6 +68,10 @@ public class IosXRIsisUnit extends AbstractUnit {
             Sets.newHashSet(IIDs.NE_NE_PR_PR_IS_GL_CO_AUG_ISISGLOBALCONFAUG),IIDs.NE_NE_PR_PR_CONFIG);
         rreg.subtreeAddAfter(IIDs.NE_NE_PR_PR_IS_GL_AF_AF, new IsisGlobalAfiSafiReader(cli),
             Sets.newHashSet(IIDs.NE_NE_PR_PR_IS_GL_AF_AF_CONFIG), IIDs.NE_NE_PR_PR_IS_GL_CONFIG);
+        rreg.add(IIDs.NE_NE_PR_PR_IS_GL_AF_AF_AUG_ISISGLOBALAFISAFICONFAUG_RE_REDISTRIBUTION,
+            new IsisRedistributionReader(cli));
+        rreg.add(IIDs.NE_NE_PR_PR_IS_GL_AF_AF_AUG_ISISGLOBALAFISAFICONFAUG_RE_RE_CONFIG,
+            new IsisRedistributionConfigReader(cli));
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder wreg, Cli cli) {
@@ -77,6 +84,12 @@ public class IosXRIsisUnit extends AbstractUnit {
         wreg.addNoop(IIDs.NE_NE_PR_PR_IS_GL_AF_AF);
         wreg.addAfter(IIDs.NE_NE_PR_PR_IS_GL_AF_AF_CONFIG, new IsisGlobalAfiSafiConfigWriter(cli),
             IIDs.NE_NE_PR_PR_IS_GL_CONFIG);
+
+        wreg.addNoop(IIDs.NE_NE_PR_PR_IS_GL_AF_AF_AUG_ISISGLOBALAFISAFICONFAUG);
+        wreg.addNoop(IIDs.NE_NE_PR_PR_IS_GL_AF_AF_AUG_ISISGLOBALAFISAFICONFAUG_REDISTRIBUTIONS);
+        wreg.addNoop(IIDs.NE_NE_PR_PR_IS_GL_AF_AF_AUG_ISISGLOBALAFISAFICONFAUG_RE_REDISTRIBUTION);
+        wreg.addAfter(IIDs.NE_NE_PR_PR_IS_GL_AF_AF_AUG_ISISGLOBALAFISAFICONFAUG_RE_RE_CONFIG,
+            new IsisRedistributionConfigWriter(cli), IIDs.NE_NE_PR_PR_IS_GL_AF_AF_CONFIG);
     }
 
     @Override

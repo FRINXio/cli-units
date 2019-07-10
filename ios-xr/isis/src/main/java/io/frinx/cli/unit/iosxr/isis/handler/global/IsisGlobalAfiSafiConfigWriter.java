@@ -20,12 +20,6 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.isis.types.rev181121.AFITYPE;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.isis.types.rev181121.IPV4;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.isis.types.rev181121.IPV6;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.isis.types.rev181121.MULTICAST;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.isis.types.rev181121.SAFITYPE;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.isis.types.rev181121.UNICAST;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.isis.rev181121.isis.afi.safi.list.af.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -53,8 +47,8 @@ public class IsisGlobalAfiSafiConfigWriter implements CliWriter<Config> {
         blockingWriteAndRead(cli, id, config,
                 fT(COMMAND_TEMPLATE,
                     "instanceName", instanceName,
-                    "afi", convertAfiTypeToString(config.getAfiName()),
-                    "safi", convertSafiTypeToString(config.getSafiName())));
+                    "afi", IsisGlobalAfiSafiReader.convertAfiTypeToString(config.getAfiName()),
+                    "safi", IsisGlobalAfiSafiReader.convertSafiTypeToString(config.getSafiName())));
     }
 
     @Override
@@ -79,27 +73,7 @@ public class IsisGlobalAfiSafiConfigWriter implements CliWriter<Config> {
             fT(COMMAND_TEMPLATE,
                 "instanceName", instanceName,
                 "delete", true,
-                "afi", convertAfiTypeToString(config.getAfiName()),
-                "safi", convertSafiTypeToString(config.getSafiName())));
-    }
-
-    private static String convertAfiTypeToString(Class<? extends AFITYPE> afi) {
-        if (afi == IPV4.class) {
-            return "ipv4";
-        } else if (afi == IPV6.class) {
-            return "ipv6";
-        } else {
-            throw new IllegalArgumentException("Unknown AFI type " + afi.getName());
-        }
-    }
-
-    private static String convertSafiTypeToString(Class<? extends SAFITYPE> safi) {
-        if (safi == UNICAST.class) {
-            return "unicast";
-        } else if (safi == MULTICAST.class) {
-            return "multicast";
-        } else {
-            throw new IllegalArgumentException("Unknown SAFI type " + safi.getName());
-        }
+                "afi", IsisGlobalAfiSafiReader.convertAfiTypeToString(config.getAfiName()),
+                "safi", IsisGlobalAfiSafiReader.convertSafiTypeToString(config.getSafiName())));
     }
 }
