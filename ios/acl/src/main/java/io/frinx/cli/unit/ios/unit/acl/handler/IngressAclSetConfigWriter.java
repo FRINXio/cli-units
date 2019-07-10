@@ -52,13 +52,11 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
 
         checkIngressAclSetConfigExists(instanceIdentifier, aclType, writeContext, interfaceName);
 
-        final String aclCommand =
-                f("%s access-group %s in", AclUtil.getStringType(aclType), config.getSetName());
-
         blockingWriteAndRead(cli, instanceIdentifier, config,
+                "configure terminal\n",
                 f("interface %s", interfaceName),
-                aclCommand,
-                "root");
+                f("%s %s in", AclUtil.chooseIpCommand(aclType), config.getSetName()),
+                "end");
     }
 
     private void checkIngressAclSetConfigExists(final InstanceIdentifier<Config> instanceIdentifier,
@@ -112,12 +110,10 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
         final Class<? extends ACLTYPE> aclType = config.getType();
         Preconditions.checkArgument(aclType != null, "Missing acl type");
 
-        final String aclCommand =
-                f("no %s access-group %s in", AclUtil.getStringType(aclType), config.getSetName());
-
         blockingWriteAndRead(cli, instanceIdentifier, config,
+                "configure terminal\n",
                 f("interface %s", name),
-                aclCommand,
-                "root");
+                f("no %s %s in", AclUtil.chooseIpCommand(aclType), config.getSetName()),
+                "end");
     }
 }

@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.unit.acl.handler.util.AclUtil;
+import io.frinx.cli.unit.ios.unit.acl.handler.util.NameTypeEntry;
 import io.frinx.openconfig.openconfig.acl.IIDs;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -79,11 +80,10 @@ public class EgressAclSetReaderTest {
                 + " out\n"
                 + "!";
 
-        final EgressAclSetBuilder builder = new EgressAclSetBuilder();
-        EgressAclSetReader.parseAcl(readOutput, builder, setName);
+        NameTypeEntry entry = EgressAclSetReader.parseAcl(readOutput, setName);
 
-        Assert.assertEquals(builder.getSetName(), setName);
-        Assert.assertEquals(builder.getType(), AclUtil.getType(type));
+        Assert.assertEquals(entry.getName(), setName);
+        Assert.assertEquals(entry.getType(), AclUtil.getType(type));
     }
 
     @Test
@@ -118,8 +118,8 @@ public class EgressAclSetReaderTest {
         private static final String ACL_SET_NAME_OTHER = "bubu_group";
         private static final Class<? extends ACLTYPE> ACL_TYPE = ACLIPV6.class;
         private static final String READ_OUTPUT = String.format("interface GigabitEthernet0/0/0/0\n"
-                        + " ipv6 access-group %s out\n"
-                        + " ipv6 access-group %s out\n"
+                        + " ipv6 traffic-filter %s out\n"
+                        + " ipv6 traffic-filter %s out\n"
                         + "!",
                 ACL_SET_NAME, ACL_SET_NAME_OTHER);
 

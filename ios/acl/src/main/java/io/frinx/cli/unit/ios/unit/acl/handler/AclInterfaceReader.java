@@ -29,19 +29,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.InterfacesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AclInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private final Cli cli;
-    private static final String SH_IFACES = "show running-config";
+    private static final String SH_RUN = "show running-config";
     private static final Pattern IFACE_LINE = Pattern.compile("interface (?<name>.+)");
 
     public AclInterfaceReader(Cli cli) {
@@ -52,7 +49,7 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull
             ReadContext readContext) throws ReadFailedException {
-        return getInterfaceKeys(blockingRead(SH_IFACES, cli, instanceIdentifier, readContext));
+        return getInterfaceKeys(blockingRead(SH_RUN, cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting
@@ -60,9 +57,11 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
         List<InterfaceKey> keys = new ArrayList<>();
         List<String> candidates = Pattern.compile("!").splitAsStream(output).collect(Collectors.toList());
         for (String candidate : candidates) {
-            Optional<Boolean> maybeAcl = ParsingUtils.parseField(candidate, 0, Pattern.compile(".*access-group.*")
+            Optional<Boolean> maybeV4Acl = ParsingUtils.parseField(candidate, 0, Pattern.compile(".*access-group.*")
                     ::matcher, Matcher::matches);
-            if (maybeAcl.isPresent() && maybeAcl.get()) {
+            Optional<Boolean> maybeV6Acl = ParsingUtils.parseField(candidate, 0, Pattern.compile(".*traffic-filter.*")
+                    ::matcher, Matcher::matches);
+            if ((maybeV4Acl.isPresent() && maybeV4Acl.get()) || (maybeV6Acl.isPresent() && maybeV6Acl.get())) {
                 ParsingUtils.parseField(candidate, 0, IFACE_LINE::matcher, matcher -> matcher.group("name"))
                         .ifPresent(s -> keys.add(new InterfaceKey(new InterfaceId(s))));
             }
@@ -71,13 +70,8 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
     }
 
     @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull List<Interface> list) {
-        ((InterfacesBuilder) builder).setInterface(list);
-    }
-
-    @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier, @Nonnull
-            InterfaceBuilder interfaceBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
+            InterfaceBuilder interfaceBuilder, @Nonnull ReadContext readContext) {
         InterfaceKey key = instanceIdentifier.firstKeyOf(Interface.class);
         interfaceBuilder.setId(key.getId());
     }
