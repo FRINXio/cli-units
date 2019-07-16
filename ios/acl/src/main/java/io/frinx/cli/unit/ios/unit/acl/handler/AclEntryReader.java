@@ -48,7 +48,10 @@ public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey
     );
 
     // find lines starting with number and not continuing with word remark
-    private static final Pattern SEQUENCE_PATTERN = Pattern.compile("^\\s*(?<sequenceId>\\d+) (?!remark).*", Pattern
+    private static final Pattern IP_SEQUENCE_PATTERN = Pattern.compile("^\\s*(?<sequenceId>\\d+) (?!remark).*", Pattern
+            .MULTILINE);
+
+    private static final Pattern IPV6_SEQUENCE_PATTERN = Pattern.compile("^.*sequence (?<sequenceId>\\d+)$", Pattern
             .MULTILINE);
 
     private final Cli cli;
@@ -60,8 +63,9 @@ public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey
     @Override
     public List<AclEntryKey> getAllIds(@Nonnull final InstanceIdentifier<AclEntry> instanceIdentifier,
                                               @Nonnull final ReadContext readContext) throws ReadFailedException {
+        AclSetKey aclSetKey = instanceIdentifier.firstKeyOf(AclSet.class);
         String command = getAclCommand(instanceIdentifier);
-        return parseAclEntryKey(blockingRead(command, cli, instanceIdentifier, readContext));
+        return parseAclEntryKey(blockingRead(command, cli, instanceIdentifier, readContext), aclSetKey.getType());
     }
 
     static String getAclCommand(InstanceIdentifier<?> id) {
@@ -71,8 +75,8 @@ public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey
     }
 
     @VisibleForTesting
-    static List<AclEntryKey> parseAclEntryKey(String output) {
-        Matcher matcher = SEQUENCE_PATTERN.matcher(output);
+    static List<AclEntryKey> parseAclEntryKey(String output, Class<? extends ACLTYPE> type) {
+        Matcher matcher = (ACLIPV4.class.equals(type) ? IP_SEQUENCE_PATTERN : IPV6_SEQUENCE_PATTERN).matcher(output);
         List<AclEntryKey> result = new ArrayList<>();
         while (matcher.find()) {
             long parseLong = Long.parseLong(matcher.group(1));
@@ -100,7 +104,8 @@ public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey
 
         AclSetKey aclSetKey = instanceIdentifier.firstKeyOf(AclSet.class);
 
-        Optional<String> maybeLine = AclEntryLineParser.findAclEntryWithSequenceId(instanceIdentifier, output);
+        Optional<String> maybeLine = AclEntryLineParser.findAclEntryWithSequenceId(instanceIdentifier,
+                output, aclSetKey.getType());
 
         maybeLine.ifPresent(s -> AclEntryLineParser.parseLine(aclEntryBuilder, s, aclSetKey.getType()));
     }

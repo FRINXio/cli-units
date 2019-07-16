@@ -17,7 +17,7 @@
 package io.frinx.cli.unit.ios.unit.acl.handler;
 
 import io.frinx.openconfig.openconfig.acl.IIDs;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,25 +37,25 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AclEntryReaderTest {
 
-    public static final String OUTPUT = "Fri Feb 23 15:25:27.410 UTC\n"
+    private static final String OUTPUT = "Fri Feb 23 15:25:27.410 UTC\n"
             + "ip access-list ipv4foo\n"
             + " 1 permit ip any any\n"
             + " 10 remark remark1\n"
             + "!";
-    public static final AclEntryKey ACL_ENTRY_KEY = new AclEntryKey(1L);
+    private static final AclEntryKey ACL_ENTRY_KEY = new AclEntryKey(1L);
 
     @Test
     public void testParseAclEntryKey() {
-        List<AclEntryKey> result = AclEntryReader.parseAclEntryKey(OUTPUT);
-        Assert.assertEquals(Arrays.asList(ACL_ENTRY_KEY), result);
+        List<AclEntryKey> result = AclEntryReader.parseAclEntryKey(OUTPUT, ACLIPV4.class);
+        Assert.assertEquals(Collections.singletonList(ACL_ENTRY_KEY), result);
     }
 
     @Test
     public void testParseAclBody() {
         AclEntryBuilder aclEntryBuilder = new AclEntryBuilder();
-        InstanceIdentifier<?> aclEntryInstanceIdentifier =  IidUtils.createIid(IIDs.AC_AC_AC_AC_ACLENTRY,
+        InstanceIdentifier<AclEntry> aclEntryInstanceIdentifier =  IidUtils.createIid(IIDs.AC_AC_AC_AC_ACLENTRY,
                 new AclSetKey("ipv4foo", ACLIPV4.class), ACL_ENTRY_KEY);
-        AclEntryReader.parseACL((InstanceIdentifier<AclEntry>) aclEntryInstanceIdentifier, aclEntryBuilder, OUTPUT);
+        AclEntryReader.parseACL(aclEntryInstanceIdentifier, aclEntryBuilder, OUTPUT);
 
         AclEntry expected = new AclEntryBuilder()
                 .setSequenceId(ACL_ENTRY_KEY.getSequenceId())
