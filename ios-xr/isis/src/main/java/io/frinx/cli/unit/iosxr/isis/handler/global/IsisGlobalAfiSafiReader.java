@@ -110,4 +110,24 @@ public class IsisGlobalAfiSafiReader implements CliConfigListReader<Af, AfKey, A
                 throw new IllegalArgumentException("Unknown SAFI type " + safi);
         }
     }
+
+    public static String convertSafiTypeToString(Class<? extends SAFITYPE> safi) {
+        if (safi == UNICAST.class) {
+            return "unicast";
+        } else if (safi == MULTICAST.class) {
+            return "multicast";
+        } else {
+            throw new IllegalArgumentException("Unknown SAFI type " + safi.getName());
+        }
+    }
+
+    public static String convertAfiTypeToString(Class<? extends AFITYPE> afi) {
+        if (afi == IPV4.class) {
+            return "ipv4";
+        } else if (afi == IPV6.class) {
+            return "ipv6";
+        } else {
+            throw new IllegalArgumentException("Unknown AFI type " + afi.getName());
+        }
+    }
 }
