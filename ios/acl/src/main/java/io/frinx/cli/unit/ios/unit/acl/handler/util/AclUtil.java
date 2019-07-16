@@ -44,4 +44,8 @@ public abstract class AclUtil {
         );
     }
 
+    public static String chooseIpCommand(Class<? extends ACLTYPE> type) {
+        return (ACLIPV6.class.equals(type))
+                ? "ipv6 traffic-filter" : "ip access-group";
+    }
 }

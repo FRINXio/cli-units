@@ -19,20 +19,17 @@ package io.frinx.cli.unit.ios.unit.acl.handler;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.unit.acl.handler.util.NameTypeEntry;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSet;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
-import org.opendaylight.yangtools.concepts.Builder;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    static final String SH_ACL_INTF = "show running-config interface %s";
     private final Cli cli;
 
     public EgressAclSetConfigReader(final Cli cli) {
@@ -45,7 +42,7 @@ public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigB
         final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
         final String setName = instanceIdentifier.firstKeyOf(EgressAclSet.class).getSetName();
 
-        final String readCommand = f(SH_ACL_INTF, interfaceName);
+        final String readCommand = f(EgressAclSetReader.SH_ACL_INTF, interfaceName);
         final String readConfig = blockingRead(
                 readCommand,
                 cli,
@@ -53,11 +50,8 @@ public class EgressAclSetConfigReader implements CliConfigReader<Config, ConfigB
                 readContext
         );
 
-        EgressAclSetReader.parseAcl(readConfig, configBuilder, setName);
-    }
-
-    @Override
-    public void merge(@Nonnull Builder<? extends DataObject> builder, @Nonnull Config config) {
-        ((EgressAclSetBuilder) builder).setConfig(config);
+        NameTypeEntry entry = EgressAclSetReader.parseAcl(readConfig, setName);
+        configBuilder.setSetName(entry.getName());
+        configBuilder.setType(entry.getType());
     }
 }

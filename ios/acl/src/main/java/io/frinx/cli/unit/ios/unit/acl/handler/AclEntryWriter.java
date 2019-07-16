@@ -83,20 +83,24 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     public static final String DESTINATION_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR = "destination-address-wildcarded "
             + "must contain address and wildcard-mask";
 
-    private static final String ACL_IP_ENTRY = "{$type} access-list extended {$aclName}\n"
+    private static final String ACL_IP_ENTRY = "configure terminal\n"
+            + "{$type} access-list extended {$aclName}\n"
             + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclTtl}\n"
-            + "root\n";
-    private static final String ACL_TCP_ENTRY = "{$type} access-list extended {$aclName}\n"
+            + "end\n";
+    private static final String ACL_TCP_ENTRY = "configure terminal\n"
+            + "{$type} access-list extended {$aclName}\n"
             + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclSrcPort} {$aclDstAddr} "
             + "{$aclDstPort} {$aclTtl}\n"
-            + "root\n";
-    private static final String ACL_ICMP_ENTRY = "{$type} access-list extended {$aclName}\n"
+            + "end\n";
+    private static final String ACL_ICMP_ENTRY = "configure terminal\n"
+            + "{$type} access-list extended {$aclName}\n"
             + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType} "
             + "{$aclTtl}\n"
-            + "root\n";
-    private static final String ACL_DELETE = "{$type} access-list extended {$aclName}\n"
+            + "end\n";
+    private static final String ACL_DELETE = "configure terminal\n"
+            + "{$type} access-list extended {$aclName}\n"
             + "no {$aclSeqId}\n"
-            + "root\n";
+            + "end\n";
     private static final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
     private static final Pattern PORT_RANGE_NAMED_PATTERN = Pattern.compile("(?<from>\\S*)\\.\\.(?<to>\\S*)");
     private static final Pattern IPV4_IN_IPV6_PATTERN =
