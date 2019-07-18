@@ -449,9 +449,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             return String.valueOf(ipProtocolType.getUint8());
         }
 
-        if (protocol.equals(IPPROTOCOL.class)) {
-            return type;
-        } else if (protocol.equals(IPUDP.class)) {
+        if (protocol.equals(IPUDP.class)) {
             return "udp";
         } else if (protocol.equals(IPTCP.class)) {
             return "tcp";
