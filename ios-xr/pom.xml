@@ -55,6 +55,7 @@
         <module>bfd</module>
         <module>evpn</module>
         <module>isis</module>
+        <module>oam</module>
     </modules>
 
     <build>

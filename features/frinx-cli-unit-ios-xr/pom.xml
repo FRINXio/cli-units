@@ -128,6 +128,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>ios-xr-isis-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-oam-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>

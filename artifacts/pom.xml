@@ -288,6 +288,11 @@
                 <artifactId>ios-xr-isis-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xr-oam-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- junos -->
             <dependency>
