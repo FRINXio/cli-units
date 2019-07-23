@@ -45,6 +45,8 @@ import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceVlanConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceVlanConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.cfm.CfmConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.cfm.CfmConfigWriter;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.cfm.CfmDomainReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.cfm.CfmDomainWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4.Ipv4AddressReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
@@ -181,6 +183,14 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
         writeRegistry.addNoop(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CFM);
         writeRegistry.addAfter(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_CONFIG,
                 new CfmConfigWriter(cli), IIDs.IN_IN_SU_SU_CONFIG);
+        writeRegistry.addNoop(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DOMAINS);
+        writeRegistry.subtreeAddAfter(
+            io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DOMAIN,
+            new CfmDomainWriter(cli), Sets.newHashSet(
+                io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_CONFIG,
+                io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_MEP,
+                io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_ME_CONFIG),
+            io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -234,5 +244,11 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
         // cfm
         readRegistry.add(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_CONFIG,
                 new CfmConfigReader(cli));
+        readRegistry.subtreeAdd(
+            io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DOMAIN,
+            new CfmDomainReader(cli), Sets.newHashSet(
+                io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_CONFIG,
+                io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_MEP,
+                io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_ME_CONFIG));
     }
 }
