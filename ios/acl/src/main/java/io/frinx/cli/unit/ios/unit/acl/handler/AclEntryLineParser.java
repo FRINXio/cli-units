@@ -23,6 +23,7 @@ import com.google.common.net.InetAddresses;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.regex.Matcher;
@@ -83,8 +84,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-public final class AclEntryLineParser {
+final class AclEntryLineParser {
     private static final Logger LOG = LoggerFactory.getLogger(AclEntryLineParser.class);
     static final Ipv4Prefix IPV4_HOST_ANY = new Ipv4Prefix("0.0.0.0/0");
     static final Ipv6Prefix IPV6_HOST_ANY = new Ipv6Prefix("::/0");
@@ -96,20 +96,22 @@ public final class AclEntryLineParser {
     private static final IpProtocolType IP_PROTOCOL_TCP_NUMBER = new IpProtocolType((short) 6);
     private static final IpProtocolType IP_PROTOCOL_UDP = new IpProtocolType(IPUDP.class);
     private static final IpProtocolType IP_PROTOCOL_UDP_NUMBER = new IpProtocolType((short) 17);
-    public static final Pattern ZERO_TO_255_PATTERN = Pattern.compile("^2[0-5][0-5]|2[0-4][0-9]|1?[0-9]?[0-9]$");
+    private static final Pattern ZERO_TO_255_PATTERN = Pattern.compile("^2[0-5][0-5]|2[0-4][0-9]|1?[0-9]?[0-9]$");
 
     private AclEntryLineParser() {
 
     }
 
-    static Optional<String> findAclEntryWithSequenceId(InstanceIdentifier<?> id, String lines) {
+    static Optional<String> findAclEntryWithSequenceId(InstanceIdentifier<?> id, String lines,
+                                                       Class<? extends ACLTYPE> aclType) {
         // search for line containing current sequence number
         AclEntryKey entryKey = id.firstKeyOf(AclEntry.class);
         long sequenceId = entryKey.getSequenceId();
-        return findLineWithSequenceId(sequenceId, lines);
+        return ACLIPV4.class.equals(aclType) ? findIpv4LineWithSequenceId(sequenceId, lines)
+                : findIpv6LineWithSequenceId(sequenceId, lines);
     }
 
-    static Optional<String> findLineWithSequenceId(long sequenceId, String lines) {
+    static Optional<String> findIpv4LineWithSequenceId(long sequenceId, String lines) {
         Pattern pattern = Pattern.compile("^\\s*(" + sequenceId + " .*)$", Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(lines);
         if (matcher.find()) {
@@ -118,19 +120,24 @@ public final class AclEntryLineParser {
         return Optional.empty();
     }
 
+    static Optional<String> findIpv6LineWithSequenceId(long sequenceId, String lines) {
+        Pattern pattern = Pattern.compile("^.* sequence " + sequenceId + "$", Pattern.MULTILINE);
+        Matcher matcher = pattern.matcher(lines);
+        if (matcher.find()) {
+            return Optional.of(matcher.group(0));
+        }
+        return Optional.empty();
+    }
+
     static void parseLine(final AclEntryBuilder builder, String line, Class<? extends ACLTYPE> aclType) {
 
         Preconditions.checkArgument(ACLIPV4.class.equals(aclType) || ACLIPV6.class.equals(aclType),
                 "Unsupported ACL type" + aclType);
-        Queue<String> words = Lists.newLinkedList(Arrays.asList(line.split("\\s")));
-        long sequenceId = Long.parseLong(words.poll());
-        // sequence id
-        builder.setSequenceId(sequenceId);
-        builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list
-                .entries.top.acl.entries.acl.entry.ConfigBuilder()
-                .setSequenceId(sequenceId)
-                .build()
-        );
+        Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
+        // ipv4 access lists have sequence number in the beginning of the line, ipv6 access lists have it at the end
+        if (ACLIPV4.class.equals(aclType)) {
+            parseSequenceId(builder, words);
+        }
         // fwd action
         Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
         builder.setActions(createActions(fwdAction));
@@ -150,16 +157,31 @@ public final class AclEntryLineParser {
             builder.setIpv6(ipv6Builder.build());
             builder.setTransport(parseIpv6LineResult.transport);
             builder.addAugmentation(AclEntry1.class, parseIpv6LineResult.icmpMsgTypeAugment);
-        } else {
-            throw new IllegalArgumentException("Not supported:" + aclType);
+            // skip the word 'sequence', and only parse sequence ID if it's present
+            String maybeSequence = words.peek();
+            if ("sequence".equals(maybeSequence)) {
+                words.poll();
+                parseSequenceId(builder, words);
+            }
         }
+    }
+
+    private static void parseSequenceId(final AclEntryBuilder builder, Queue<String> words) {
+        long sequenceId = Long.parseLong(Objects.requireNonNull(words.poll()));
+        // sequence id
+        builder.setSequenceId(sequenceId);
+        builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list
+                .entries.top.acl.entries.acl.entry.ConfigBuilder()
+                .setSequenceId(sequenceId)
+                .build()
+        );
     }
 
     static Actions createActions(Class<? extends FORWARDINGACTION> fwdAction) {
         return new ActionsBuilder().setConfig(new ConfigBuilder().setForwardingAction(fwdAction).build()).build();
     }
 
-    static Class<? extends FORWARDINGACTION> parseAction(String action) {
+    private static Class<? extends FORWARDINGACTION> parseAction(String action) {
         switch (action) {
             case "permit":
                 return ACCEPT.class;
@@ -458,14 +480,14 @@ public final class AclEntryLineParser {
         String possiblePortRangeKeyword = words.poll();
 
         String port1String = words.poll();
-        String port2String = possiblePortRangeKeyword.equals("range") ? words.peek() : null;
+        String port2String = "range".equals(possiblePortRangeKeyword) ? words.peek() : null;
 
         boolean arePortsNumeric = port2String == null
                 ? StringUtils.isNumeric(port1String) : StringUtils.isNumeric(port1String)
                 && StringUtils.isNumeric(port2String);
 
         if (arePortsNumeric) {
-            Integer port1 = serviceToPortNumber(port1String);
+            int port1 = serviceToPortNumber(port1String);
 
             if (source) {
                 transportConfigBuilder.setSourcePort(parsePortNumRangeNumbers(possiblePortRangeKeyword, port1, words));
@@ -606,13 +628,10 @@ public final class AclEntryLineParser {
         } else if ("host".equals(first)) {
             // remove "host" from queue
             words.remove();
+            // when "host" is used, the wildcard is always 0.0.0.0
             int mask = 32;
             String ip = words.poll();
             return Optional.of(new Ipv4Prefix(ip + "/" + mask));
-        } else if (first.contains("/")) {
-            // remove "x.x.x.x/x" from queue
-            words.remove();
-            return Optional.of(new Ipv4Prefix(first));
         }
         return Optional.empty();
     }
@@ -639,7 +658,7 @@ public final class AclEntryLineParser {
             int mask = 128;
             String ip = words.poll();
             return Optional.of(new Ipv6Prefix(ip + "/" + mask));
-        } else if (first.contains("/")) {
+        } else if (first != null && first.contains("/")) {
             // remove "x:x:x:x:x:x:x:x/x" from queue
             words.remove();
             if (first.contains(".")) {
@@ -651,7 +670,7 @@ public final class AclEntryLineParser {
     }
 
     @VisibleForTesting
-    static String translateIpv4InIpv6ToIpv6(String ipv4InIpv6) {
+    private static String translateIpv4InIpv6ToIpv6(String ipv4InIpv6) {
         String ipv4String = ipv4InIpv6.substring(ipv4InIpv6.lastIndexOf(":") + 1, ipv4InIpv6.indexOf("/"));
         InetAddress ia = InetAddresses.forString(ipv4String);
         byte[] address = ia.getAddress();

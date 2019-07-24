@@ -22,6 +22,7 @@ import com.google.common.net.InetAddresses;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.unit.acl.handler.util.AclUtil;
 import io.frinx.cli.unit.utils.CliListWriter;
 import java.util.Optional;
 import java.util.function.Function;
@@ -99,8 +100,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             + "end\n";
     private static final String ACL_TCP_IP6_ENTRY = "configure terminal\n"
             + "ipv6 access-list {$aclName}\n"
-            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclSrcPort} {$aclDstAddr} {$aclSeqId} "
-            + "{$aclDstPort} {$aclTtl}\n"
+            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclSrcPort} {$aclDstAddr} "
+            + "{$aclDstPort} {$aclTtl} {$aclSeqId}\n"
             + "end\n";
     private static final String ACL_ICMP_ENTRY = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
@@ -109,8 +110,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             + "end\n";
     private static final String ACL_ICMP_IP6_ENTRY = "configure terminal\n"
             + "ipv6 access-list {$aclName}\n"
-            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType} {$aclSeqId} "
-            + "{$aclTtl}\n"
+            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType} "
+            + "{$aclTtl} {$aclSeqId}\n"
             + "end\n";
     private static final String ACL_DELETE = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
@@ -264,7 +265,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             Preconditions.checkArgument(!ipv4WildcardedOpt.isPresent(),
                     SOURCE_ADDRESS_AND_SOURCE_ADDRESS_WILDCARDED_TOGETHER_ERROR);
             SubnetUtils.SubnetInfo info = new SubnetUtils(ipv4PrefixOpt.get()).getInfo();
-            commandVars.aclSrcAddr = info.getAddress() + " " + info.getNetmask();
+            commandVars.aclSrcAddr = info.getAddress() + " " + AclUtil.getWildcardfromSubnet(info.getNetmask());
         } else {
             Preconditions.checkArgument(ipv4WildcardedOpt.isPresent(),
                     NONE_SOURCE_ADDRESS_OR_SOURCE_ADDRESS_WILDCARDED_ERROR);
@@ -281,7 +282,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             Preconditions.checkArgument(!ipv4WildcardedOpt.isPresent(),
                     DESTINATION_ADDRESS_AND_DESTINATION_ADDRESS_WILDCARDED_TOGETHER_ERROR);
             SubnetUtils.SubnetInfo info = new SubnetUtils(ipv4PrefixOpt.get()).getInfo();
-            commandVars.aclDstAddr = info.getAddress() + " " + info.getNetmask();
+            commandVars.aclDstAddr = info.getAddress() + " " + AclUtil.getWildcardfromSubnet(info.getNetmask());
         } else {
             Preconditions.checkArgument(ipv4WildcardedOpt.isPresent(),
                     NONE_DESTINATION_ADDRESS_OR_DESTINATION_ADDRESS_WILDCARDED_ERROR);
@@ -449,9 +450,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             return String.valueOf(ipProtocolType.getUint8());
         }
 
-        if (protocol.equals(IPPROTOCOL.class)) {
-            return type;
-        } else if (protocol.equals(IPUDP.class)) {
+        if (protocol.equals(IPUDP.class)) {
             return "udp";
         } else if (protocol.equals(IPTCP.class)) {
             return "tcp";

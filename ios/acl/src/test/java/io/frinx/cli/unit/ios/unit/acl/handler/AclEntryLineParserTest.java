@@ -138,9 +138,9 @@ public class AclEntryLineParserTest {
     @Test
     public void testIpv4() {
         String lines = "Mon May 14 14:36:55.408 UTC\n"
-                + "ip access-list foo\n"
-                + " 2 deny ip host 1.2.3.4 any\n"
-                + " 3 permit udp 192.168.1.1/24 10.10.10.10/24\n"
+                + "ip access-list extended foo\n"
+                + " 2 deny ip host 0.0.0.0 host 0.0.0.0\n"
+                + " 3 permit udp 192.168.1.1 0.0.0.255 10.10.10.10 0.0.0.255\n"
                 + " 4 permit tcp host 1.2.3.4 eq www any\n"
                 + " 5 deny icmp host 1.1.1.1 host 2.2.2.2 ttl range 0 10\n"
                 + " 6 permit udp 0.0.0.0 0.255.255.255 eq 10 0.0.0.0 0.255.255.255 gt 10\n"
@@ -154,24 +154,33 @@ public class AclEntryLineParserTest {
         LinkedHashMap<Long, AclEntry> expectedResults = new LinkedHashMap<>();
 
         {
-            // 2 deny ipv4 host 1.2.3.4 any
+            // 2 deny ip host 0.0.0.0 host 0.0.0.0
             long sequenceId = 2;
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields
                     .top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
                     .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
-            configBuilder.setSourceAddress(new Ipv4Prefix("1.2.3.4/32"));
-            configBuilder.setDestinationAddress(AclEntryLineParser.IPV4_HOST_ANY);
+            configBuilder.setSourceAddress(new Ipv4Prefix("0.0.0.0/32"));
+            configBuilder.setDestinationAddress(new Ipv4Prefix("0.0.0.0/32"));
 
             expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(), null));
         }
         {
-            // 3 permit udp 192.168.1.1/24 10.10.10.10/24
+            // 3 permit udp 192.168.1.1 0.0.0.255 10.10.10.10 0.0.0.255
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields
                     .top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
                     .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
             configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
-            configBuilder.setSourceAddress(new Ipv4Prefix("192.168.1.1/24"));
-            configBuilder.setDestinationAddress(new Ipv4Prefix("10.10.10.10/24"));
+            configBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class, new
+                    AclSetAclEntryIpv4WildcardedAugBuilder()
+                    .setSourceAddressWildcarded(new SourceAddressWildcardedBuilder()
+                            .setAddress(new Ipv4Address("192.168.1.1"))
+                            .setWildcardMask(new Ipv4Address("0.0.0.255"))
+                            .build())
+                    .setDestinationAddressWildcarded((new DestinationAddressWildcardedBuilder()
+                            .setAddress(new Ipv4Address("10.10.10.10"))
+                            .setWildcardMask(new Ipv4Address("0.0.0.255"))
+                            .build()))
+                    .build());
             TransportBuilder transportBuilder = new TransportBuilder();
             transportBuilder.setConfig(
                     new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
@@ -364,7 +373,7 @@ public class AclEntryLineParserTest {
         // verify expected results
         for (Entry<Long, AclEntry> entry : expectedResults.entrySet()) {
             long sequenceId = entry.getKey();
-            String line = AclEntryLineParser.findLineWithSequenceId(sequenceId, lines).get();
+            String line = AclEntryLineParser.findIpv4LineWithSequenceId(sequenceId, lines).get();
             AclEntryBuilder resultBuilder = new AclEntryBuilder();
             AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4.class);
             Assert.assertEquals(entry.getValue(), resultBuilder.build());
@@ -377,27 +386,27 @@ public class AclEntryLineParserTest {
                 + " 1 foo\n"
                 + " 2 bar baz\n"
                 + "xxx";
-        Assert.assertEquals(Optional.of("1 foo"), AclEntryLineParser.findLineWithSequenceId(1L, lines));
-        Assert.assertEquals(Optional.of("2 bar baz"), AclEntryLineParser.findLineWithSequenceId(2L, lines));
-        Assert.assertEquals(Optional.empty(), AclEntryLineParser.findLineWithSequenceId(3L, lines));
+        Assert.assertEquals(Optional.of("1 foo"), AclEntryLineParser.findIpv4LineWithSequenceId(1L, lines));
+        Assert.assertEquals(Optional.of("2 bar baz"), AclEntryLineParser.findIpv4LineWithSequenceId(2L, lines));
+        Assert.assertEquals(Optional.empty(), AclEntryLineParser.findIpv4LineWithSequenceId(3L, lines));
     }
 
     @Test
     public void testIpv6() {
-        String lines = "ipv6 access-list foo\n"
-                + " 1 permit ipv6 any any\n"
-                + " 3 permit icmpv6 any any router-solicitation\n"
-                + " 4 deny ipv6 2001:db8:a0b:12f0::1/55 any\n"
-                + " 5 permit tcp host ::1 host ::1\n"
-                + " 6 permit tcp host ::1 host ::1 lt www ttl eq 10\n"
-                + " 7 permit icmpv6 any host ::1 8 ttl neq 10\n"
-                + " 8 permit udp f::a a::b eq 10 fe80:0000:0000:0000:0202:b3ff:fe1e:8329 "
-                + "fe80:0000:0000:0000:0202:b3ff:fe1e:8329 gt 10\n"
-                + " 9 permit udp host fe80:0000:0000:0000:0202:b3ff:fe1e:8329 gt 10 f::a a::b lt 10\n"
-                + " 10 permit udp f::a a::b lt 10 any range 10 10\n"
-                + " 11 remark foo\n"
-                + " 21 remark bar\n"
-                + " 31 remark baz2\n"
+        String lines = "IPv6 access-list foo\n"
+                + " permit ipv6 any any sequence 1\n"
+                + " permit icmpv6 any any router-solicitation sequence 3\n"
+                + " deny ipv6 2001:db8:a0b:12f0::1/55 any sequence 4\n"
+                + " permit tcp host ::1 host ::1 sequence 5\n"
+                + " permit tcp host ::1 host ::1 lt www ttl eq 10 sequence 6\n"
+                + " permit icmpv6 any host ::1 8 ttl neq 10 sequence 7\n"
+                + " permit udp f::a a::b eq 10 fe80:0000:0000:0000:0202:b3ff:fe1e:8329 "
+                + "fe80:0000:0000:0000:0202:b3ff:fe1e:8329 gt 10 sequence 8\n"
+                + " permit udp host fe80:0000:0000:0000:0202:b3ff:fe1e:8329 gt 10 f::a a::b lt 10 sequence 9\n"
+                + " permit udp f::a a::b lt 10 any range 10 10 sequence 10\n"
+                + " remark foo sequence 11\n"
+                + " remark bar sequence 21\n"
+                + " remark baz2 sequence 31\n"
                 + "!\n";
         LinkedHashMap<Long, AclEntry> expectedResults = new LinkedHashMap<>();
 
@@ -576,7 +585,7 @@ public class AclEntryLineParserTest {
         // verify expected results
         for (Entry<Long, AclEntry> entry : expectedResults.entrySet()) {
             long sequenceId = entry.getKey();
-            String line = AclEntryLineParser.findLineWithSequenceId(sequenceId, lines).get();
+            String line = AclEntryLineParser.findIpv6LineWithSequenceId(sequenceId, lines).get();
             AclEntryBuilder resultBuilder = new AclEntryBuilder();
             AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV6.class);
             Assert.assertEquals(entry.getValue(), resultBuilder.build());

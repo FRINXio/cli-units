@@ -48,4 +48,15 @@ public abstract class AclUtil {
         return (ACLIPV6.class.equals(type))
                 ? "ipv6 traffic-filter" : "ip access-group";
     }
+
+    public static String getWildcardfromSubnet(String subnet) {
+        String wildcard = "";
+        String[] array = subnet.split("\\.");
+        for (int index = 0; index < 4; index++) {
+            int ii = Integer.valueOf(array[index]);
+            ii = StrictMath.abs(ii - 255);
+            wildcard = wildcard.concat(ii + ".");
+        }
+        return wildcard.substring(0, wildcard.length() - 1);
+    }
 }
