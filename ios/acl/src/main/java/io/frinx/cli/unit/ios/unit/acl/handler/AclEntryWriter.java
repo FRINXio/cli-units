@@ -99,8 +99,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             + "end\n";
     private static final String ACL_TCP_IP6_ENTRY = "configure terminal\n"
             + "ipv6 access-list {$aclName}\n"
-            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclSrcPort} {$aclDstAddr} {$aclSeqId} "
-            + "{$aclDstPort} {$aclTtl}\n"
+            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclSrcPort} {$aclDstAddr} "
+            + "{$aclDstPort} {$aclTtl} {$aclSeqId}\n"
             + "end\n";
     private static final String ACL_ICMP_ENTRY = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
@@ -109,8 +109,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             + "end\n";
     private static final String ACL_ICMP_IP6_ENTRY = "configure terminal\n"
             + "ipv6 access-list {$aclName}\n"
-            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType} {$aclSeqId} "
-            + "{$aclTtl}\n"
+            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType} "
+            + "{$aclTtl} {$aclSeqId}\n"
             + "end\n";
     private static final String ACL_DELETE = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
