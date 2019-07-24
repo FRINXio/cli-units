@@ -138,9 +138,9 @@ public class AclEntryLineParserTest {
     @Test
     public void testIpv4() {
         String lines = "Mon May 14 14:36:55.408 UTC\n"
-                + "ip access-list foo\n"
-                + " 2 deny ip host 1.2.3.4 any\n"
-                + " 3 permit udp 192.168.1.1/24 10.10.10.10/24\n"
+                + "ip access-list extended foo\n"
+                + " 2 deny ip host 0.0.0.0 host 0.0.0.0\n"
+                + " 3 permit udp 192.168.1.1 0.0.0.255 10.10.10.10 0.0.0.255\n"
                 + " 4 permit tcp host 1.2.3.4 eq www any\n"
                 + " 5 deny icmp host 1.1.1.1 host 2.2.2.2 ttl range 0 10\n"
                 + " 6 permit udp 0.0.0.0 0.255.255.255 eq 10 0.0.0.0 0.255.255.255 gt 10\n"
@@ -154,24 +154,33 @@ public class AclEntryLineParserTest {
         LinkedHashMap<Long, AclEntry> expectedResults = new LinkedHashMap<>();
 
         {
-            // 2 deny ipv4 host 1.2.3.4 any
+            // 2 deny ip host 0.0.0.0 host 0.0.0.0
             long sequenceId = 2;
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields
                     .top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
                     .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
-            configBuilder.setSourceAddress(new Ipv4Prefix("1.2.3.4/32"));
-            configBuilder.setDestinationAddress(AclEntryLineParser.IPV4_HOST_ANY);
+            configBuilder.setSourceAddress(new Ipv4Prefix("0.0.0.0/32"));
+            configBuilder.setDestinationAddress(new Ipv4Prefix("0.0.0.0/32"));
 
             expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(), null));
         }
         {
-            // 3 permit udp 192.168.1.1/24 10.10.10.10/24
+            // 3 permit udp 192.168.1.1 0.0.0.255 10.10.10.10 0.0.0.255
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields
                     .top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
                     .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
             configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
-            configBuilder.setSourceAddress(new Ipv4Prefix("192.168.1.1/24"));
-            configBuilder.setDestinationAddress(new Ipv4Prefix("10.10.10.10/24"));
+            configBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class, new
+                    AclSetAclEntryIpv4WildcardedAugBuilder()
+                    .setSourceAddressWildcarded(new SourceAddressWildcardedBuilder()
+                            .setAddress(new Ipv4Address("192.168.1.1"))
+                            .setWildcardMask(new Ipv4Address("0.0.0.255"))
+                            .build())
+                    .setDestinationAddressWildcarded((new DestinationAddressWildcardedBuilder()
+                            .setAddress(new Ipv4Address("10.10.10.10"))
+                            .setWildcardMask(new Ipv4Address("0.0.0.255"))
+                            .build()))
+                    .build());
             TransportBuilder transportBuilder = new TransportBuilder();
             transportBuilder.setConfig(
                     new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
