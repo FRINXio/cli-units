@@ -628,13 +628,10 @@ final class AclEntryLineParser {
         } else if ("host".equals(first)) {
             // remove "host" from queue
             words.remove();
+            // when "host" is used, the wildcard is always 0.0.0.0
             int mask = 32;
             String ip = words.poll();
             return Optional.of(new Ipv4Prefix(ip + "/" + mask));
-        } else if (first != null && first.contains("/")) {
-            // remove "x.x.x.x/x" from queue
-            words.remove();
-            return Optional.of(new Ipv4Prefix(first));
         }
         return Optional.empty();
     }
@@ -673,7 +670,7 @@ final class AclEntryLineParser {
     }
 
     @VisibleForTesting
-    static String translateIpv4InIpv6ToIpv6(String ipv4InIpv6) {
+    private static String translateIpv4InIpv6ToIpv6(String ipv4InIpv6) {
         String ipv4String = ipv4InIpv6.substring(ipv4InIpv6.lastIndexOf(":") + 1, ipv4InIpv6.indexOf("/"));
         InetAddress ia = InetAddresses.forString(ipv4String);
         byte[] address = ia.getAddress();
