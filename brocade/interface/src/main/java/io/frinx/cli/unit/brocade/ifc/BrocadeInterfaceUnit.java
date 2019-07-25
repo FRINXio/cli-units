@@ -66,6 +66,7 @@ public final class BrocadeInterfaceUnit extends AbstractUnit {
         return Sets.newHashSet(
                 IIDs.FRINX_OPENCONFIG_INTERFACES,
                 IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
+                IIDs.FRINX_BROCADE_IF_EXTENSION,
                 io.frinx.openconfig.openconfig.vlan.IIDs.FRINX_OPENCONFIG_VLAN,
                 io.frinx.openconfig.openconfig._if.ip.IIDs.FRINX_OPENCONFIG_IF_IP);
     }
@@ -81,7 +82,8 @@ public final class BrocadeInterfaceUnit extends AbstractUnit {
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writerRegistry, Cli cli) {
         writerRegistry.addNoop(IIDs.IN_INTERFACE);
-        writerRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli));
+        writerRegistry.subtreeAdd(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.IN_IN_CO_AUG_IFBROCADEPRIORITYAUG));
 
         writerRegistry.addAfter(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli), IIDs.IN_IN_CONFIG);
 
@@ -104,7 +106,8 @@ public final class BrocadeInterfaceUnit extends AbstractUnit {
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
-        readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli));
+        readRegistry.subtreeAdd(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli),
+                Sets.newHashSet(IIDs.IN_IN_CO_AUG_IFBROCADEPRIORITYAUG));
 
         readRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli));
 

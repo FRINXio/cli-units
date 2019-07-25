@@ -20,6 +20,7 @@ import com.x5.template.Chunk;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.ifc.Util;
 import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigWriter;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.brocade.extension.rev190726.IfBrocadePriorityAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 
 public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
@@ -29,6 +30,12 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{$data|update(mtu,mtu `$data.mtu`\n,no mtu\n)}"
             + "{$data|update(description,port-name `$data.description`\n,no port-name\n)}"
             + "{% if ($enabled) %}enable\n{% else %}disable\n{% endif %}"
+
+            + "{% if ($priority) %}"
+                + "{$priority|update(priority,priority `$priority.priority`\n,priority 0\n)}"
+                + "{% if ($forced) %}priority force\n{% else %}no priority force\n{% endif %}"
+            + "{% endif %}"
+
             + "end";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
@@ -41,8 +48,10 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
 
     @Override
     protected String updateTemplate(Config before, Config after) {
+        IfBrocadePriorityAug priorityAug = after.getAugmentation(IfBrocadePriorityAug.class);
         return fT(WRITE_TEMPLATE, "before", before, "data", after,
-            "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null);
+            "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
+            "priority", priorityAug, "forced", priorityAug.isPriorityForce() ? Chunk.TRUE : null);
     }
 
     @Override
