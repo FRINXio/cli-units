@@ -43,6 +43,8 @@ import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceVlanConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceVlanConfigWriter;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.cfm.CfmConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.cfm.CfmConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4.Ipv4AddressReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
@@ -91,6 +93,7 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
                 IIDs.FRINX_CISCO_IF_EXTENSION,
                 IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
                 io.frinx.openconfig.openconfig.lacp.IIDs.FRINX_LACP_LAG_MEMBER,
+                io.frinx.openconfig.openconfig.oam.IIDs.FRINX_OAM,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -126,11 +129,11 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
         writeRegistry.addAfter(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli),
                 IIDs.IN_IN_CONFIG);
         writeRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
-                        new SubinterfaceVlanConfigWriter(cli), IIDs.IN_IN_SU_SU_CONFIG);
+                new SubinterfaceVlanConfigWriter(cli), IIDs.IN_IN_SU_SU_CONFIG);
 
         writeRegistry.addNoop(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS);
         writeRegistry.addAfter(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
-                        new Ipv4ConfigWriter(cli), IIDs.IN_IN_CONFIG);
+                new Ipv4ConfigWriter(cli), IIDs.IN_IN_CONFIG);
 
         // TODO implement IPv6 writers, NOOP writers are just workaround so we
         // provide at least some writers for IPv6 data
@@ -160,7 +163,7 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
 
         // cisco-if extensions
         writeRegistry.addAfter(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG,
-                        new InterfaceStatisticsConfigWriter(cli), IIDs.IN_IN_CONFIG);
+                new InterfaceStatisticsConfigWriter(cli), IIDs.IN_IN_CONFIG);
 
         // if-ethernet
         writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET);
@@ -173,6 +176,11 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1_VERIFYUNICASTSOURCEREACHABLEVIA);
         writeRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_VE_IPV4, new RpfCheckIpv4Writer(cli));
         writeRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_VE_IPV6, new RpfCheckIpv6Writer(cli));
+
+        // cfm
+        writeRegistry.addNoop(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CFM);
+        writeRegistry.addAfter(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_CONFIG,
+                new CfmConfigWriter(cli), IIDs.IN_IN_SU_SU_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -222,5 +230,9 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
         readRegistry.subtreeAdd(IIDs.IN_IN_AUG_INTERFACE1_VERIFYUNICASTSOURCEREACHABLEVIA, new RpfCheckReader(cli),
                 Sets.newHashSet(IIDs.IN_IN_AUG_INTERFACE1_VE_IPV4,
                         IIDs.IN_IN_AUG_INTERFACE1_VE_IPV6));
+
+        // cfm
+        readRegistry.add(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_CONFIG,
+                new CfmConfigReader(cli));
     }
 }
