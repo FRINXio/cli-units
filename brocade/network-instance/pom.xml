@@ -95,5 +95,9 @@
             <artifactId>sal-common-api</artifactId>
             <version>${controller.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
     </dependencies>
 </project>

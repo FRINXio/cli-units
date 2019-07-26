@@ -27,6 +27,9 @@ import io.frinx.cli.unit.brocade.network.instance.cp.ConnectionPointsWriter;
 import io.frinx.cli.unit.brocade.network.instance.ifc.InterfaceConfigReader;
 import io.frinx.cli.unit.brocade.network.instance.ifc.InterfaceReader;
 import io.frinx.cli.unit.brocade.network.instance.ifc.InterfaceWriter;
+import io.frinx.cli.unit.brocade.network.instance.policy.forwarding.PolicyForwardingInterfaceConfigReader;
+import io.frinx.cli.unit.brocade.network.instance.policy.forwarding.PolicyForwardingInterfaceConfigWriter;
+import io.frinx.cli.unit.brocade.network.instance.policy.forwarding.PolicyForwardingInterfaceReader;
 import io.frinx.cli.unit.brocade.network.instance.vlan.VlanConfigReader;
 import io.frinx.cli.unit.brocade.network.instance.vlan.VlanConfigWriter;
 import io.frinx.cli.unit.brocade.network.instance.vlan.VlanReader;
@@ -55,7 +58,11 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE);
+        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE,
+                IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE_TYPES,
+                io.frinx.openconfig.openconfig.policy.IIDs.FRINX_OPENCONFIG_ROUTING_POLICY,
+                io.frinx.openconfig.openconfig.policy.forwarding.IIDs.FRINX_OPENCONFIG_POLICY_FORWARDING,
+                io.frinx.openconfig.openconfig.network.instance.IIDs.FRINX_BROCADE_PF_INTERFACES_EXTENSION);
     }
 
     @Override
@@ -83,6 +90,11 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
                 IIDs.NE_NE_CONFIG);
         writeRegistry.addNoop(IIDs.NE_NE_IN_IN_CONFIG);
 
+        // Policy-Forwarding
+        writeRegistry.addNoop(IIDs.NE_NE_PO_IN_INTERFACE);
+        writeRegistry.subtreeAdd(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFBROCADEAUG));
+
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_CONNECTIONPOINTS, new ConnectionPointsWriter(cli),
                 Sets.newHashSet(
                         IIDs.NE_NE_CO_CONNECTIONPOINT,
@@ -104,6 +116,11 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
 
         readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
         readRegistry.add(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli));
+
+        // Policy-Forwarding
+        readRegistry.add(IIDs.NE_NE_PO_IN_INTERFACE, new PolicyForwardingInterfaceReader(cli));
+        readRegistry.subtreeAdd(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli),
+                Sets.newHashSet(IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFBROCADEAUG));
 
         // Interfaces for VRF
         readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new InterfaceReader(cli));
