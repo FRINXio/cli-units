@@ -46,8 +46,18 @@ public class CfmDomainReaderTest {
         + "  mep domain DML4 service MA-004 mep-id 6 sla operation profile PPP target mep-id 2";
 
     private static final String SH_RUN =
-        "show running-config interface Bundle-Ether1000.100 ethernet cfm | include ^ {2}mep domain DML1";
+        "show running-config interface Bundle-Ether1000.100 ethernet cfm | include ^ {2}mep domain DML1 ";
     private static final String SH_RUN_OUTPUT = "  mep domain DML1 service MA-001 mep-id 3\n";
+
+    private static final String SH_RUN_DETAILS =
+        "show running-config interface Bundle-Ether1000.100 ethernet cfm mep domain DML1 service MA-001 mep-id 3";
+    private static final String SH_RUN_DETAILS_OUTPUT = "interface Bundle-Ether1000.100"
+        + " ethernet cfm"
+        + "  mep domain DML1 service MA-001 mep-id 3\n"
+        + "   cos 1\n"
+        + "  !\n"
+        + " !\n"
+        + "!\n";
 
     @Mock
     private Cli cli;
@@ -93,6 +103,8 @@ public class CfmDomainReaderTest {
     public void testReadCurrentAttributes() throws ReadFailedException {
         Mockito.doReturn(SH_RUN_OUTPUT).when(target)
             .blockingRead(SH_RUN, cli, IID, ctx);
+        Mockito.doReturn(SH_RUN_DETAILS_OUTPUT).when(target)
+            .blockingRead(SH_RUN_DETAILS, cli, IID, ctx);
 
         final DomainBuilder builder = new DomainBuilder();
 
@@ -102,5 +114,6 @@ public class CfmDomainReaderTest {
         Assert.assertThat(builder.getConfig().getDomainName(), CoreMatchers.equalTo(DOMAIN_NAME));
         Assert.assertThat(builder.getMep().getConfig().getMaName(), CoreMatchers.equalTo("MA-001"));
         Assert.assertThat(builder.getMep().getConfig().getMepId(), CoreMatchers.equalTo(Integer.valueOf(3)));
+        Assert.assertThat(builder.getMep().getConfig().getCos(), CoreMatchers.equalTo((short) 1));
     }
 }
