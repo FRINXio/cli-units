@@ -58,6 +58,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>brocade-configuration-metadata-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>brocade-cli-init-unit</artifactId>
         </dependency>
         <dependency>
