@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.brocade.init;
 
+import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.fd.honeycomb.translate.spi.write.PostTransactionHook;
@@ -29,6 +30,7 @@ import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Collections;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
@@ -41,6 +43,9 @@ public class BrocadeCliInitializerUnit extends AbstractUnit {
     private static final Logger LOG = LoggerFactory.getLogger(BrocadeCliInitializerUnit.class);
 
     private static final Command WRITE_MEMORY = Command.writeCommandNoChecks("write memory");
+
+    private static final Pattern INVALID_COMMAND = Pattern.compile("^Invalid input.*");
+    private static final Pattern ERROR_COMMAND = Pattern.compile("^Error.*");
 
     public BrocadeCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
         super(registry);
@@ -73,13 +78,18 @@ public class BrocadeCliInitializerUnit extends AbstractUnit {
         return () -> {
             try {
                 LOG.trace("Running Post transaction hook");
-                String output = ctx.getTransport().executeAndRead(WRITE_MEMORY).toCompletableFuture().get();
-                LOG.debug("Post transaction hook invoked successfully with output: {}", output);
+//                String output = ctx.getTransport().executeAndRead(WRITE_MEMORY).toCompletableFuture().get();
+//                LOG.debug("Post transaction hook invoked successfully with output: {}", output);
             } catch (Exception e) {
                 LOG.warn("Unable to execute post transaction hook", e);
                 throw new IllegalStateException("Post transaction hook failure", e);
             }
         };
+    }
+
+    @Override
+    public Set<Pattern> getErrorPatterns() {
+        return Sets.newHashSet(INVALID_COMMAND, ERROR_COMMAND);
     }
 
     @Override

@@ -39,6 +39,7 @@
         <module>cdp</module>
         <module>network-instance</module>
         <module>stp</module>
+        <module>it</module>
     </modules>
 
     <build>

@@ -357,9 +357,8 @@ public class IosAll {
     public void getAllDOM() throws Exception {
         DOMDataReadOnlyTransaction readOnlyTransaction = domBroker.newReadOnlyTransaction();
         CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read =
-                readOnlyTransaction.read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.EMPTY);
+                readOnlyTransaction.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.EMPTY);
         NormalizedNode<?, ?> root = read.checkedGet().get();
-        // print(toJson(root));
     }
 
     @Ignore
