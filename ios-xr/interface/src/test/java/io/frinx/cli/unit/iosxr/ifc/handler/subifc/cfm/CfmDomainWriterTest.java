@@ -50,6 +50,7 @@ public class CfmDomainWriterTest {
     private static final String WRITE_INPUT = "interface Bundle-Ether1000.100\n"
         + "ethernet cfm\n"
         + "mep domain DML1 service MA-001 mep-id 10\n"
+        + "cos 7\n"
         + "root\n";
     private static final String DELETE_INPUT = "interface Bundle-Ether1000.100\n"
         + "ethernet cfm\n"
@@ -66,6 +67,7 @@ public class CfmDomainWriterTest {
     private static final DomainKey DOMAIN_KEY = new DomainKey(DOMAIN_NAME);
     private static final String MA_NAME = "MA-001";
     private static final Integer MEP_ID = Integer.valueOf(10);
+    private static final Short COS = Short.valueOf((short) 7);
 
     private static final InstanceIdentifier<Domain> IID =
         IidUtils.createIid(IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DOMAIN, INTERFACE_KEY, SUBIFC_KEY, DOMAIN_KEY);
@@ -80,6 +82,7 @@ public class CfmDomainWriterTest {
                 ._interface.cfm.domains.domain.mep.ConfigBuilder()
                 .setMaName(MA_NAME)
                 .setMepId(MEP_ID)
+                .setCos(COS)
                 .build())
             .build())
         .build();

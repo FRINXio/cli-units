@@ -30,6 +30,11 @@ public class CfmDomainWriter implements CliWriter<Domain> {
     private static final String CREATE_TEMPLATE = "interface {$ifc}\n"
         + "ethernet cfm\n"
         + "mep domain {$domain.domain_name} service {$mep.ma_name} mep-id {$mep.mep_id}\n"
+        + "{% if $mep.cos %}"
+        + "cos {$mep.cos}\n"
+        + "{% else %}"
+        + "no cos\n"
+        + "{% endif %}"
         + "root";
 
     private static final String DELETE_TEMPLATE = "interface {$ifc}\n"
@@ -58,7 +63,10 @@ public class CfmDomainWriter implements CliWriter<Domain> {
     }
 
     private boolean isActive(Domain data) {
-        return data.getConfig() != null && data.getMep() != null && data.getMep().getConfig() != null;
+        return data.getConfig() != null && data.getMep() != null && data.getMep().getConfig() != null
+            && data.getConfig().getDomainName() != null
+            && data.getMep().getConfig().getMaName() != null
+            && data.getMep().getConfig().getMepId() != null;
     }
 
     @Override
