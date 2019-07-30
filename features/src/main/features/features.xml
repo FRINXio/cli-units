@@ -131,6 +131,9 @@
         <bundle>mvn:io.frinx.cli/brocade-cdp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/network-instance-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/brocade-network-instance-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/brocade-stp-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/brocade-isis-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/brocade-configuration-metadata-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-junos' version='${project.version}'>

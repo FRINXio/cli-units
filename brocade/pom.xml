@@ -31,79 +31,83 @@
   <version>3.1.12.rc2-frinx-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>init</module>
-    <module>interface</module>
-    <module>cdp</module>
-    <module>network-instance</module>
-  </modules>
+    <modules>
+        <module>init</module>
+        <module>configuration-metadata</module>
+        <module>interface</module>
+        <module>cdp</module>
+        <module>network-instance</module>
+        <module>stp</module>
+        <module>isis</module>
+        <module>it</module>
+    </modules>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
-  <profiles>
-    <profile>
-      <!--
-          This profile is to ensure we only build javadocs reports
-          when we plan to deploy Maven site for our project.
-      -->
-      <id>maven-site</id>
-      <activation>
-        <file>
-          <exists>${user.dir}/deploy-site.xml</exists>
-        </file>
-      </activation>
-
-      <build>
+    <build>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <inherited>false</inherited>
-            <executions>
-              <execution>
-                <id>aggregate</id>
-                <goals>
-                  <goal>aggregate</goal>
-                </goals>
-                <phase>package</phase>
-            </execution>
-            </executions>
-          </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
         </plugins>
-      </build>
-    </profile>
-  </profiles>
+    </build>
 
-  <!--
-      Maven Site Configuration
+    <profiles>
+        <profile>
+            <!--
+                This profile is to ensure we only build javadocs reports
+                when we plan to deploy Maven site for our project.
+            -->
+            <id>maven-site</id>
+            <activation>
+                <file>
+                    <exists>${user.dir}/deploy-site.xml</exists>
+                </file>
+            </activation>
 
-      The following configuration is necessary for maven-site-plugin to
-      correctly identify the correct deployment path for OpenDaylight Maven
-      sites.
-  -->
-  <url>${odl.site.url}/${project.groupId}/${stream}/</url>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <executions>
+                            <execution>
+                                <id>aggregate</id>
+                                <goals>
+                                    <goal>aggregate</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
-  <distributionManagement>
-    <site>
-      <id>opendaylight-site</id>
-      <url>${nexus.site.url}/</url>
-    </site>
-  </distributionManagement>
+    <!--
+        Maven Site Configuration
+
+        The following configuration is necessary for maven-site-plugin to
+        correctly identify the correct deployment path for OpenDaylight Maven
+        sites.
+    -->
+    <url>${odl.site.url}/${project.groupId}/${stream}/</url>
+
+    <distributionManagement>
+        <site>
+            <id>opendaylight-site</id>
+            <url>${nexus.site.url}/</url>
+        </site>
+    </distributionManagement>
 </project>

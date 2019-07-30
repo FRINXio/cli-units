@@ -50,5 +50,11 @@
             <artifactId>openconfig-lldp</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>brocade-cli-init-unit</artifactId>
+            <version>${cli.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

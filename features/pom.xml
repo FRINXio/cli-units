@@ -218,6 +218,21 @@
     </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
+      <artifactId>brocade-stp-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>brocade-configuration-metadata-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>brocade-isis-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
       <artifactId>ios-xr-interface-unit</artifactId>
       <version>${project.version}</version>
     </dependency>

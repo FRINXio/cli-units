@@ -31,12 +31,6 @@
     <packaging>bundle</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>io.frinx.translate.unit.commons</groupId>
-            <artifactId>handlers</artifactId>
-            <version>${translate.unit.commons.version}</version>
-        </dependency>
-
         <!-- Openconfig models -->
         <dependency>
             <groupId>io.frinx.openconfig</groupId>

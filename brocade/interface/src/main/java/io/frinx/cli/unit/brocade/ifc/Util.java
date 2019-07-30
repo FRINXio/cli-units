@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.brocade.ifc;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,40 +25,46 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L3ipvlan;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 
 public final class Util {
 
-    private static final Set<String> ETHERNET_NAME_PREFIX = Sets.newHashSet(
-            "GigabitEther", "10GigabitEther", "FastEther", "Ethernetmgmt");
+    private static final Pattern IFC_NAME = Pattern.compile("[a-z]+\\s+(?<number>[^a-zA-Z]+)");
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
-    private static final Pattern IFC_NAME = Pattern.compile("[^a-zA-Z]*[a-zA-Z]+(?<number>[^a-zA-Z]+)");
+    private static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES =
+            Collections.singleton(EthernetCsmacd.class);
 
-    private static final Set<Class<? extends InterfaceType>> PHYS_IFC_TYPES = Collections.singleton(EthernetCsmacd
-            .class);
-
-    private Util() {}
+    private Util() {
+    }
 
     public static Class<? extends InterfaceType> parseType(String name) {
-        for (String ethernetNamePrefix : ETHERNET_NAME_PREFIX) {
-            if (name.startsWith(ethernetNamePrefix)) {
-                return EthernetCsmacd.class;
-            }
-        }
-        if (name.startsWith("Loopback")) {
-            return SoftwareLoopback.class;
-        } else {
-            return Other.class;
-        }
+        return IFC_TYPE_MAP.entrySet().stream()
+                .filter(entry -> name.startsWith(entry.getValue()))
+                .findFirst()
+                .<Class<? extends InterfaceType>>map(Map.Entry::getKey).orElse(Other.class);
     }
 
     public static String getIfcNumber(String name) {
         Matcher matcher = IFC_NAME.matcher(name);
         Preconditions.checkArgument(matcher.matches(), "Interface name %s in unexpected format. Expected format: "
-                + "GigabitEthernet1/0", name);
+                + "ethernet 1/10", name);
         return matcher.group("number");
+    }
+
+    public static String expandInterfaceName(String name) {
+        String expandedName = WHITESPACE_PATTERN.splitAsStream(name)
+                .findFirst()
+                .flatMap(shortName -> IFC_TYPE_MAP.values().stream()
+                        .filter(fullName -> fullName.startsWith(shortName))
+                        .findFirst())
+                .orElseThrow(() -> new IllegalArgumentException("Unable to expand interface name from " + name
+                        + ", available interface types: " + IFC_TYPE_MAP));
+
+        return expandedName + " " + getIfcNumber(name);
     }
 
     private static final Map<Class<? extends InterfaceType>, String> IFC_TYPE_MAP = new HashMap<>();
@@ -67,6 +72,7 @@ public final class Util {
     static {
         IFC_TYPE_MAP.put(EthernetCsmacd.class, "ethernet");
         IFC_TYPE_MAP.put(SoftwareLoopback.class, "loopback");
+        IFC_TYPE_MAP.put(L3ipvlan.class, "ve");
     }
 
     public static String getTypeOnDevice(Class<? extends InterfaceType> openconfigType) {

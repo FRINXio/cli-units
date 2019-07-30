@@ -43,7 +43,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class TpIdInterfaceReader implements CliConfigReader<Config1, Config1Builder> {
 
-    private static final String SH_IFC_TAG_TYPE = "sh run | include tag-type";
+    private static final String SH_IFC_TAG_TYPE = "show running-config | include tag-type";
     private static final Pattern TAG_TYPE = Pattern.compile(".*tag-type (?<tpid>\\S+) (?<ifcType>\\S+) "
             + "(?<ifcNumber>\\S+).*");
 

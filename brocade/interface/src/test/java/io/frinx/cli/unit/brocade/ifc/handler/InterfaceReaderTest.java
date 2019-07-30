@@ -26,20 +26,42 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 
 public class InterfaceReaderTest {
 
-    private static final String OUTPUT = "GigabitEthernet1/1 is up, line protocol is up \n"
-            + "GigabitEthernet1/2 is up, line protocol is up \n"
-            + "GigabitEthernet3/20 is down, line protocol is down \n"
-            + "10GigabitEthernet4/1 is up, line protocol is up \n"
-            + "10GigabitEthernet4/2 is up, line protocol is up \n"
-            + "Ethernetmgmt1 is down, line protocol is down \n"
-            + "Ve3 is down, line protocol is down \n"
-            + "Ve210 is down, line protocol is down \n"
-            + "Loopback1 is up, line protocol is up \n"
-            + "Loopback2 is up, line protocol is up \n";
+    private static final String OUTPUT = "interface ethernet 1/1\n"
+            + "interface ethernet 1/2\n"
+            + "interface ethernet 1/3\n"
+            + "interface ethernet 1/4\n"
+            + "interface ethernet 1/5\n"
+            + "interface ethernet 1/6\n"
+            + "interface ethernet 1/7\n"
+            + "interface ethernet 1/8\n"
+            + "interface ethernet 1/9\n"
+            + "interface ethernet 1/10\n"
+            + "interface ethernet 1/11\n"
+            + "interface ethernet 1/12\n"
+            + "interface ethernet 1/13\n"
+            + "interface ethernet 1/14\n"
+            + "interface ethernet 1/15\n"
+            + "interface ethernet 1/16\n"
+            + "interface ethernet 1/17\n"
+            + "interface ethernet 1/18\n"
+            + "interface ethernet 1/19\n"
+            + "interface ethernet 1/20\n"
+            + "interface ethernet 1/21\n"
+            + "interface ethernet 1/22\n"
+            + "interface ethernet 1/23\n"
+            + "interface ethernet 1/24\n"
+            + "interface ethernet 2/1\n"
+            + "interface ethernet 2/2\n"
+            + "interface ve 12\n"
+            + "interface ve 33\n"
+            + "interface ve 30\n"
+            + "interface ve 111\n"
+            + "interface ve 112\n"
+            + "interface loopback 1";
 
     @Test
     public void testAllIds() {
-        List<InterfaceKey> interfaceKeys = new InterfaceReader(Mockito.mock(Cli.class)).parseAllInterfaceIds(OUTPUT);
-        Assert.assertThat(interfaceKeys, CoreMatchers.hasItem(new InterfaceKey("10GigabitEthernet4/2")));
+        List<InterfaceKey> interfaceKeys = new InterfaceReader(Mockito.mock(Cli.class)).parseInterfaceIds(OUTPUT);
+        Assert.assertThat(interfaceKeys, CoreMatchers.hasItem(new InterfaceKey("ve 12")));
     }
 }

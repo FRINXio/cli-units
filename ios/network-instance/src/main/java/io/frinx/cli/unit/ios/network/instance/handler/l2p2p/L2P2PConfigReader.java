@@ -18,10 +18,21 @@ package io.frinx.cli.unit.ios.network.instance.handler.l2p2p;
 
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ni.base.handler.l2p2p.AbstractL2P2ConfigReader;
+import java.util.regex.Pattern;
 
 public final class L2P2PConfigReader extends AbstractL2P2ConfigReader {
 
     public L2P2PConfigReader(Cli cli) {
-        super(new L2P2PReader(cli));
+        super(new L2P2PReader(cli), cli);
+    }
+
+    @Override
+    protected String getReadCommand(String vllName) {
+        return "";
+    }
+
+    @Override
+    protected Pattern getMtuLine() {
+        return null;
     }
 }

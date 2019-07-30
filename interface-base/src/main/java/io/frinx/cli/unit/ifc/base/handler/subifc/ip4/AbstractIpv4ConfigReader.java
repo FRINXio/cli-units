@@ -27,6 +27,7 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.Address;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -50,13 +51,16 @@ public abstract class AbstractIpv4ConfigReader implements CliConfigReader<Config
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
         if (isSupportedInterface(instanceIdentifier)) {
+            Ipv4AddressNoZone address = instanceIdentifier.firstKeyOf(Address.class).getIp();
             parseAddressConfig(configBuilder,
-                    blockingRead(getReadCommand(ifcName, subId), cli, instanceIdentifier, readContext));
+                    blockingRead(getReadCommand(ifcName, subId), cli, instanceIdentifier, readContext), address);
         }
     }
 
     @VisibleForTesting
-    public void parseAddressConfig(ConfigBuilder configBuilder, String output) {
+    public void parseAddressConfig(ConfigBuilder configBuilder, String output, Ipv4AddressNoZone address) {
+        configBuilder.setIp(address);
+
         ParsingUtils.parseField(output,
             getIpLine()::matcher,
             m -> new Ipv4AddressNoZone(m.group("ip")),

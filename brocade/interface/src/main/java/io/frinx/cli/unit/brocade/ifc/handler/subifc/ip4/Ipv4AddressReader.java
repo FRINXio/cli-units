@@ -24,9 +24,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.
 
 public final class Ipv4AddressReader extends AbstractIpv4AddressesReader {
 
-    static final String SH_INTERFACE_IP = "sh ip inter %s %s | include ip address:";
-    static final Pattern INTERFACE_IP_LINE =
-            Pattern.compile("ip address: (?<ip>[^/]+)/(?<prefix>[0-9]+)");
+    static final String SH_INTERFACE_IP = "show running-config interface {$ifcType} {$ifcNumber} | include ip address";
+    static final Pattern INTERFACE_IP_LINE = Pattern.compile("ip address (?<ip>[^/]+)/(?<prefix>[0-9]+)");
 
     public Ipv4AddressReader(Cli cli) {
         super(cli);
@@ -36,7 +35,7 @@ public final class Ipv4AddressReader extends AbstractIpv4AddressesReader {
     protected String getReadCommand(String ifcName) {
         String ifcNumber = Util.getIfcNumber(ifcName);
         Class<? extends InterfaceType> ifcType = Util.parseType(ifcName);
-        return f(Ipv4AddressReader.SH_INTERFACE_IP, Util.getTypeOnDevice(ifcType), ifcNumber);
+        return fT(Ipv4AddressReader.SH_INTERFACE_IP, "ifcType", Util.getTypeOnDevice(ifcType), "ifcNumber", ifcNumber);
     }
 
     @Override
