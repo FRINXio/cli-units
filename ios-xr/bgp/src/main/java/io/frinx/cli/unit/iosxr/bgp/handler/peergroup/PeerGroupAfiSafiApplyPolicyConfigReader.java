@@ -24,9 +24,7 @@ import io.frinx.cli.unit.iosxr.bgp.handler.GlobalAfiSafiReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.list.PeerGroup;
@@ -60,19 +58,22 @@ public class PeerGroupAfiSafiApplyPolicyConfigReader implements CliConfigReader<
                 cli,
                 iid,
                 context);
-        List<String> importPolicy = ParsingUtils.NEWLINE.splitAsStream(output.trim())
-                .map(ROUTE_POLICY_IN_LINE::matcher)
-                .filter(Matcher::find)
-                .map(matcher -> matcher.group("policyName"))
-                .collect(Collectors.toList());
+        List<String> importPolicy = ParsingUtils.parseFields(
+            output,
+            0,
+            ROUTE_POLICY_IN_LINE::matcher,
+            matcher -> matcher.group("policyName"),
+            v -> v);
+
         if (importPolicy.size() > 0) {
             configBuilder.setImportPolicy(importPolicy);
         }
-        List<String> exportPolicy = ParsingUtils.NEWLINE.splitAsStream(output.trim())
-                .map(ROUTE_POLICY_OUT_LINE::matcher)
-                .filter(Matcher::find)
-                .map(matcher -> matcher.group("policyName"))
-                .collect(Collectors.toList());
+        List<String> exportPolicy = ParsingUtils.parseFields(
+            output,
+            0,
+            ROUTE_POLICY_OUT_LINE::matcher,
+            matcher -> matcher.group("policyName"),
+            v -> v);
         if (exportPolicy.size() > 0) {
             configBuilder.setExportPolicy(exportPolicy);
         }
