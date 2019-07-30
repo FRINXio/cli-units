@@ -20,8 +20,11 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.Check;
+import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
@@ -32,10 +35,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public abstract class AbstractL2P2ConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         CompositeReader.Child<Config, ConfigBuilder> {
 
+    private final Cli cli;
     private AbstractL2P2PReader parentReader;
 
-    protected AbstractL2P2ConfigReader(AbstractL2P2PReader parentReader) {
+    protected AbstractL2P2ConfigReader(AbstractL2P2PReader parentReader, Cli cli) {
         this.parentReader = parentReader;
+        this.cli = cli;
     }
 
     @Override
@@ -44,13 +49,26 @@ public abstract class AbstractL2P2ConfigReader implements CliConfigReader<Config
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                       @Nonnull ConfigBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        if (parentReader.isP2P(instanceIdentifier, readContext)) {
-            configBuilder.setName(instanceIdentifier.firstKeyOf(NetworkInstance.class).getName());
+                                      @Nonnull ReadContext ctx) throws ReadFailedException {
+        if (parentReader.isP2P(id, ctx)) {
+            String vllName = id.firstKeyOf(NetworkInstance.class).getName();
             configBuilder.setType(L2P2P.class);
-            // TODO set other attributes i.e. description
+            parseL2p2(blockingRead(getReadCommand(vllName), cli, id, ctx), configBuilder, vllName);
         }
     }
+
+    protected abstract String getReadCommand(String vllName);
+
+    protected void parseL2p2(String output, ConfigBuilder builder, String neName) {
+        builder.setName(neName);
+
+        ParsingUtils.parseField(output,
+            getMtuLine()::matcher,
+            matcher -> Integer.valueOf(matcher.group("mtu")),
+            builder::setMtu);
+    }
+
+    protected abstract Pattern getMtuLine();
 }

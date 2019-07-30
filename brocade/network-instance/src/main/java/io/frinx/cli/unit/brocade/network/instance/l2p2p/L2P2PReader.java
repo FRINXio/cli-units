@@ -22,10 +22,10 @@ import java.util.regex.Pattern;
 
 public final class L2P2PReader extends AbstractL2P2PReader {
 
-    private static final String SH_VLL = "sh run | include vll";
+    private static final String SH_VLL = "show running-config | include vll";
     private static final Pattern VLL_ID_LINE = Pattern.compile("vll (?<network>\\S+)\\s+(?<vccid>\\S+).*");
 
-    private static final String SH_VLL_LOCAL = "sh run | include vll-local";
+    private static final String SH_VLL_LOCAL = "show running-config | include vll-local";
     private static final Pattern VLL_LOCAL_ID_LINE = Pattern.compile("vll-local (?<network>\\S+).*");
 
     public L2P2PReader(Cli cli) {

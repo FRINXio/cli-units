@@ -18,6 +18,8 @@ package io.frinx.cli.unit.brocade.network.instance;
 
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.L2P2PReader;
+import io.frinx.cli.unit.brocade.network.instance.vrf.L3VrfReader;
+import io.frinx.cli.unit.handlers.def.DefaultReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
@@ -25,13 +27,16 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 
-public final class NetworkInstanceReader extends CompositeListReader<NetworkInstance, NetworkInstanceKey,
-        NetworkInstanceBuilder> implements CliConfigListReader<NetworkInstance, NetworkInstanceKey,
-        NetworkInstanceBuilder> {
+public final class NetworkInstanceReader
+        extends CompositeListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>
+        implements CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
     public NetworkInstanceReader(Cli cli) {
-        super(new ArrayList<CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {{
+        super(new ArrayList<CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {
+            {
                 add(new L2P2PReader(cli));
+                add(new L3VrfReader(cli));
+                add(new DefaultReader());
             }
         });
     }

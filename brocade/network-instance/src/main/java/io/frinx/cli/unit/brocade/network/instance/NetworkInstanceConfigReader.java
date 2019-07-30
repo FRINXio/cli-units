@@ -18,6 +18,8 @@ package io.frinx.cli.unit.brocade.network.instance;
 
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.L2P2PConfigReader;
+import io.frinx.cli.unit.brocade.network.instance.vrf.L3VrfConfigReader;
+import io.frinx.cli.unit.handlers.def.DefaultConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.ArrayList;
@@ -28,9 +30,12 @@ public final class NetworkInstanceConfigReader extends CompositeReader<Config, C
         implements CliConfigReader<Config, ConfigBuilder> {
 
     public NetworkInstanceConfigReader(Cli cli) {
-        super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {{
+        super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {
+            {
                 add(new L2P2PConfigReader(cli));
-                }
+                add(new L3VrfConfigReader(cli));
+                add(new DefaultConfigReader());
+            }
         });
     }
 }
