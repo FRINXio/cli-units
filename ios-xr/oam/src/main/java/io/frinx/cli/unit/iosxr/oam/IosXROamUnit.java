@@ -68,7 +68,7 @@ public class IosXROamUnit extends AbstractUnit {
         rreg.add(IIDs.OA_CF_DO_DOMAIN, new CfmDomainReader(cli));
         rreg.add(IIDs.OA_CF_DO_DO_CONFIG, new CfmDomainConfigReader(cli));
         rreg.add(IIDs.OA_CF_DO_DO_MA_MA, new CfmMaReader(cli));
-        rreg.add(IIDs.OA_CF_DO_DO_MA_MA_CONFIG, new CfmMaConfigReader());
+        rreg.add(IIDs.OA_CF_DO_DO_MA_MA_CONFIG, new CfmMaConfigReader(cli));
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder wreg, Cli cli) {
