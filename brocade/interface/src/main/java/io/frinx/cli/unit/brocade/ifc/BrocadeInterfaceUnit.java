@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Frinx and others.
+ * Copyright © 2019 Frinx and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.brocade.ifc.handler.InterfaceReader;
-import io.frinx.cli.unit.brocade.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.brocade.ifc.handler.TpIdInterfaceReader;
 import io.frinx.cli.unit.brocade.ifc.handler.TpIdInterfaceWriter;
+import io.frinx.cli.unit.brocade.ifc.handler.ethernet.EthernetConfigReader;
+import io.frinx.cli.unit.brocade.ifc.handler.ethernet.EthernetConfigWriter;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.SubinterfaceConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.SubinterfaceReader;
-import io.frinx.cli.unit.brocade.ifc.handler.subifc.SubinterfaceStateReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4AddressReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
@@ -81,6 +81,8 @@ public final class BrocadeInterfaceUnit extends AbstractUnit {
         writerRegistry.addNoop(IIDs.IN_INTERFACE);
         writerRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli));
 
+        writerRegistry.addAfter(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli), IIDs.IN_IN_CONFIG);
+
         writerRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_CO_AUG_CONFIG1,
                 new TpIdInterfaceWriter(cli), IIDs.IN_IN_CONFIG);
 
@@ -96,14 +98,14 @@ public final class BrocadeInterfaceUnit extends AbstractUnit {
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
-        readRegistry.add(IIDs.IN_IN_STATE, new InterfaceStateReader(cli));
         readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli));
+
+        readRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli));
 
         readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_CO_AUG_CONFIG1, new TpIdInterfaceReader(cli));
 
         readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli));
         readRegistry.add(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli));
-        readRegistry.add(IIDs.IN_IN_SU_SU_STATE, new SubinterfaceStateReader(cli));
 
         readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
                 new Ipv4AddressReader(cli));

@@ -25,7 +25,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
 
     private static final String WRITE_TEMPLATE = "configure terminal\n"
-            + "interface ${data.name}\n"
+            + "interface {$data.name}\n"
             + "{$data|update(mtu,mtu `$data.mtu`\n,no mtu\n)}"
             + "{$data|update(description,port-name `$data.description`\n,no port-name\n)}"
             + "{% if ($enabled) %}enable\n{% else %}disable\n{% endif %}"

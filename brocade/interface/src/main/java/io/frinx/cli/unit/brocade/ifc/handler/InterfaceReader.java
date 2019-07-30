@@ -25,10 +25,9 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 
 public class InterfaceReader extends AbstractInterfaceReader {
 
-    private static final String SH_INTERFACE = "sh interface | include line";
+    private static final String SH_INTERFACE = "show running-config interface | include interface";
 
-    private static final Pattern STATUS_LINE =
-            Pattern.compile("(?<id>.+)[.\\s]* is (?<admin>[^,]+), line protocol is (?<line>.+)");
+    private static final Pattern STATUS_LINE = Pattern.compile("interface (?<id>.+)[.\\s]*");
 
     public InterfaceReader(Cli cli) {
         super(cli);

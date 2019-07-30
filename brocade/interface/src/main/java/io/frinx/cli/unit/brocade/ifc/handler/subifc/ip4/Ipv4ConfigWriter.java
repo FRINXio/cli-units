@@ -35,14 +35,14 @@ public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
     @Override
     protected String writeTemplate(Config config, String ifcName) {
         return fT(WRITE_TEMPLATE, "name", ifcName,
-                "ip", config.getIp(),
+                "ip", config.getIp().getValue(),
                 "netmask", NetUtils.getSubnetInfo(config.getIp(), config.getPrefixLength()));
     }
 
     @Override
     protected String deleteTemplate(Config config, String ifcName) {
         return fT(WRITE_TEMPLATE, "name", ifcName,
-                "ip", config.getIp(),
+                "ip", config.getIp().getValue(),
                 "netmask", NetUtils.getSubnetInfo(config.getIp(), config.getPrefixLength()),
                 "delete", true);
     }

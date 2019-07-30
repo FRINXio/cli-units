@@ -51,7 +51,8 @@ public final class AbstractIpv4ConfigReaderTest {
         final InstanceIdentifier<Config> instanceIdentifier0 = AbstractIpv4ConfigWriterTest.configIID(0L);
 
         reader.readCurrentAttributes(instanceIdentifier0, builder, ctx);
-        Mockito.verify(reader).parseAddressConfig(Mockito.eq(builder), Mockito.anyString());
+        Mockito.verify(reader).parseAddressConfig(Mockito.eq(builder), Mockito.anyString(),
+                Mockito.any(Ipv4AddressNoZone.class));
     }
 
     @Test
@@ -59,7 +60,8 @@ public final class AbstractIpv4ConfigReaderTest {
         final InstanceIdentifier<Config> instanceIdentifier1 = AbstractIpv4ConfigWriterTest.configIID(1L);
 
         reader.readCurrentAttributes(instanceIdentifier1, builder, ctx);
-        Mockito.verify(reader, Mockito.never()).parseAddressConfig(Mockito.eq(builder), Mockito.anyString());
+        Mockito.verify(reader, Mockito.never()).parseAddressConfig(Mockito.eq(builder), Mockito.anyString(),
+                Mockito.any(Ipv4AddressNoZone.class));
     }
 
     // helper methods

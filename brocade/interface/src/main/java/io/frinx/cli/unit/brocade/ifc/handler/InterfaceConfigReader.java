@@ -26,7 +26,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.
 
 public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
 
-    private static final String SH_SINGLE_INTERFACE_CFG = "sh run int %s %s";
+    public static final String SH_SINGLE_INTERFACE_CFG = "show running-config interface {$ifcType} {$ifcNumber}";
 
     private static final Pattern SHUTDOWN_LINE = Pattern.compile("enable");
     private static final Pattern MTU_LINE = Pattern.compile("\\s*mtu (?<mtu>.+)$");
@@ -40,7 +40,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     protected String getReadCommand(String ifcName) {
         Class<? extends InterfaceType> ifcType = parseType(ifcName);
         String ifcNumber = Util.getIfcNumber(ifcName);
-        return f(SH_SINGLE_INTERFACE_CFG, Util.getTypeOnDevice(ifcType), ifcNumber);
+        return fT(SH_SINGLE_INTERFACE_CFG, "ifcType", Util.getTypeOnDevice(ifcType), "ifcNumber", ifcNumber);
     }
 
     @Override
@@ -57,7 +57,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     protected Pattern getDescriptionLine() {
         return DESCR_LINE;
     }
-
 
     @Override
     public Class<? extends InterfaceType> parseType(String name) {

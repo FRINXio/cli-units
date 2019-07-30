@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4AddressNoZone;
 
 public class Ipv4ConfigReaderTest {
 
@@ -31,7 +32,8 @@ public class Ipv4ConfigReaderTest {
     @Test
     public void testParseConfigAddress() {
         final ConfigBuilder actual = new ConfigBuilder();
-        new Ipv4ConfigReader(Mockito.mock(Cli.class)).parseAddressConfig(actual, OUTPUT_SINGLE_IFACE);
+        new Ipv4ConfigReader(Mockito.mock(Cli.class)).parseAddressConfig(actual, OUTPUT_SINGLE_IFACE,
+                new Ipv4AddressNoZone("10.11.12.13"));
         Assert.assertEquals(AbstractIpv4ConfigReaderTest.buildData("10.11.12.13", "16"), actual.build());
     }
 }

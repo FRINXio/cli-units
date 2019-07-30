@@ -24,11 +24,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.
 
 public final class Ipv6AddressReader extends AbstractIpv6AddressesReader {
 
-    static final String SH_INTERFACE_IP = "sh ipv6 inter %s %s";
-    private static final Pattern IPV6_LOCAL_ADDRESS =
-            Pattern.compile(".*?link-local address is (?<ipv6local>[^\\s]+).*");
-    private static final Pattern IPV6_UNICAST_ADDRESS =
-            Pattern.compile(".*?(?<ipv6unicast>[a-fA-F0-9:]+), subnet is [^/]+.*/(?<prefix>[^\\s]+).*");
+    static final String SH_INTERFACE_IP = "show running-config interface {$ifcType} {$ifcNumber} | include ipv6";
+    private static final Pattern IPV6_LOCAL_ADDRESS = Pattern.compile(
+            "ipv6 address (?<ipv6local>fe80:[^\\\\s]+)/(?<prefix>[0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])");
+    private static final Pattern IPV6_UNICAST_ADDRESS = Pattern.compile(
+            "ipv6 address (?!(fe80:))(?<ipv6unicast>[^\\\\s]+)/(?<prefix>[0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])");
 
     public Ipv6AddressReader(Cli cli) {
         super(cli);
@@ -38,7 +38,7 @@ public final class Ipv6AddressReader extends AbstractIpv6AddressesReader {
     protected String getReadCommand(String ifcName) {
         Class<? extends InterfaceType> ifcType = Util.parseType(ifcName);
         String ifcNumber = Util.getIfcNumber(ifcName);
-        return f(SH_INTERFACE_IP, Util.getTypeOnDevice(ifcType), ifcNumber);
+        return fT(SH_INTERFACE_IP, "ifcType", Util.getTypeOnDevice(ifcType), "ifcNumber", ifcNumber);
     }
 
     @Override

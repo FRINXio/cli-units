@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.nexus.ifc.handler.subifc.ipv4;
+package io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4;
 
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.subifc.ipv4.AbstractIpv4ConfigReaderTest;
@@ -26,12 +26,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 
 public class Ipv4ConfigReaderTest {
 
-    private static String SH_RUN_INT_IP = "Mon Feb 12 12:47:42.025 UTC\n"
-            + "interface Ethernet1/1.5\n"
+    private static String SH_RUN_INT_IP = "interface Ethernet1/1.5\n"
             + " ip address 192.168.1.1/16\n";
 
     @Test
-    public void testParseConfigAddress() {
+    public void parseAddressConfig() {
         ConfigBuilder actual = new ConfigBuilder();
         new Ipv4ConfigReader(Mockito.mock(Cli.class)).parseAddressConfig(actual, SH_RUN_INT_IP,
                 new Ipv4AddressNoZone("192.168.1.1"));
