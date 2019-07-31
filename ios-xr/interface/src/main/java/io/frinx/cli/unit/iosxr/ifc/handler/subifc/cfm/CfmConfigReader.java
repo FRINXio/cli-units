@@ -56,9 +56,6 @@ public class CfmConfigReader implements CliConfigReader<Config, ConfigBuilder> {
     }
 
     private static void parseCfmConfig(String output, ConfigBuilder builder) {
-        ParsingUtils.parseField(output,
-            CFM_ENABLED::matcher,
-            matcher -> Boolean.TRUE,
-            builder::setEnabled);
+        ParsingUtils.findMatch(output, CFM_ENABLED, builder::setEnabled);
     }
 }
