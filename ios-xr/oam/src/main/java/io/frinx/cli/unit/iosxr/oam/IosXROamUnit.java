@@ -24,6 +24,9 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.iosxr.oam.handler.CfmConfigReader;
 import io.frinx.cli.unit.iosxr.oam.handler.CfmConfigWriter;
+import io.frinx.cli.unit.iosxr.oam.handler.domain.CfmDomainConfigReader;
+import io.frinx.cli.unit.iosxr.oam.handler.domain.CfmDomainConfigWriter;
+import io.frinx.cli.unit.iosxr.oam.handler.domain.CfmDomainReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.oam.IIDs;
 import java.util.Set;
@@ -59,12 +62,17 @@ public class IosXROamUnit extends AbstractUnit {
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder rreg, Cli cli) {
         rreg.add(IIDs.OA_CF_CONFIG, new CfmConfigReader(cli));
+        rreg.add(IIDs.OA_CF_DO_DOMAIN, new CfmDomainReader(cli));
+        rreg.add(IIDs.OA_CF_DO_DO_CONFIG, new CfmDomainConfigReader(cli));
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder wreg, Cli cli) {
         wreg.addNoop(IIDs.OAM);
         wreg.addNoop(IIDs.OA_CFM);
         wreg.add(IIDs.OA_CF_CONFIG, new CfmConfigWriter(cli));
+        wreg.addNoop(IIDs.OA_CF_DOMAINS);
+        wreg.addNoop(IIDs.OA_CF_DO_DOMAIN);
+        wreg.addAfter(IIDs.OA_CF_DO_DO_CONFIG, new CfmDomainConfigWriter(cli), IIDs.OA_CF_CONFIG);
     }
 
     @Override
