@@ -74,7 +74,7 @@ public class CfmMaReader implements CliConfigListReader<Ma, MaKey, MaBuilder> {
             s -> new MaKey(s));
     }
 
-    private static Config readDomainConfig(InstanceIdentifier<Ma> id, ReadContext readContext) {
+    public static Config readDomainConfig(InstanceIdentifier<?> id, ReadContext readContext) {
         InstanceIdentifier<Config> configId = RWUtils.cutId(id, Domain.class).child(Config.class);
 
         return readContext.read(configId).orNull();
