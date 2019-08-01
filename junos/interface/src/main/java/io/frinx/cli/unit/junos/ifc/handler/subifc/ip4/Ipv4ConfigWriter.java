@@ -20,10 +20,9 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigWriter;
-import io.frinx.cli.unit.junos.ifc.handler.subifc.SubinterfaceReader;
+import io.frinx.cli.unit.junos.ifc.Util;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
@@ -41,28 +40,34 @@ public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        String ifcName = Util.getSubinterfaceName(instanceIdentifier);
         blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, ifcName));
     }
 
     @Override
     protected String writeTemplate(Config config, String ifcName) {
-        return fT(TEMPLATE, "name", junosIfcName(ifcName), "config", config);
-    }
-
-    private static String junosIfcName(String ifcName) {
-        return ifcName + SubinterfaceReader.SEPARATOR + 0;
+        return fT(TEMPLATE, "name", ifcName, "config", config);
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        String ifcName = Util.getSubinterfaceName(instanceIdentifier);
         blockingWriteAndRead(cli, instanceIdentifier, config, deleteTemplate(config, ifcName));
     }
 
     @Override
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                        @Nonnull Config configBefore, @Nonnull Config configAfter,
+                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+
+        // Junos does not support to update prefix-length.
+        deleteCurrentAttributes(instanceIdentifier, configBefore, writeContext);
+        writeCurrentAttributes(instanceIdentifier, configAfter, writeContext);
+    }
+
+    @Override
     protected String deleteTemplate(Config config, String ifcName) {
-        return fT(TEMPLATE, "name", junosIfcName(ifcName), "config", config, "delete", true);
+        return fT(TEMPLATE, "name", ifcName, "config", config, "delete", true);
     }
 }
