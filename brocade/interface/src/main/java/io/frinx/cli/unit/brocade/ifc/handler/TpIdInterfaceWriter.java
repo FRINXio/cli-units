@@ -31,7 +31,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public final class TpIdInterfaceWriter implements CliWriter<Config1> {
 
     private static final String WRITE_TEMPLATE = "configure terminal\n"
-            + "{% if ($delete) %}no {% endif %}tag-type {$tpId} {$typeOnDevice} [$ifcNumber}\n"
+            + "{% if ($delete) %}no {% endif %}tag-type {$tpId} {$typeOnDevice} {$ifcNumber}\n"
             + "end";
     private Cli cli;
 
