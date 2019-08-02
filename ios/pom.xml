@@ -30,24 +30,23 @@
   <artifactId>cli-units-ios</artifactId>
   <version>3.1.10.rc3-frinx-SNAPSHOT</version>
   <packaging>pom</packaging>
-
-  <modules>
-    <module>init</module>
-    <module>interface</module>
-    <module>acl</module>
-    <module>bgp</module>
-    <module>rib</module>
-    <module>network-instance</module>
-    <module>ospf</module>
-    <module>local-routing</module>
-    <module>routing-policy</module>
-    <module>cdp</module>
-    <module>platform</module>
-    <module>lldp</module>
-    <module>it</module>
-    <module>configuration-metadata</module>
-  </modules>
-
+    <modules>
+        <module>interface</module>
+        <module>bgp</module>
+        <module>rib</module>
+        <module>network-instance</module>
+        <module>ospf</module>
+        <module>local-routing</module>
+        <module>routing-policy</module>
+        <module>cdp</module>
+        <module>platform</module>
+        <module>mpls</module>
+        <module>lldp</module>
+        <module>it</module>
+        <module>configuration-metadata</module>
+        <module>acl</module>
+        <module>init</module>
+    </modules>
   <build>
     <plugins>
       <plugin>
