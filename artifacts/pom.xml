@@ -184,6 +184,11 @@
                 <artifactId>ios-acl-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-mpls-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- IOS common -->
             <dependency>

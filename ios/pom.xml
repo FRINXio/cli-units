@@ -42,6 +42,7 @@
         <module>routing-policy</module>
         <module>cdp</module>
         <module>platform</module>
+        <module>mpls</module>
         <module>lldp</module>
         <module>it</module>
         <module>configuration-metadata</module>

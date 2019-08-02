@@ -82,6 +82,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>ios-mpls-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-cdp-unit</artifactId>
         </dependency>
         <dependency>
