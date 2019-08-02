@@ -41,6 +41,8 @@ import io.frinx.cli.unit.iosxr.ifc.handler.ethernet.EthernetConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceStatisticsConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceStatisticsConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceVlanConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceVlanConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.cfm.CfmConfigReader;
@@ -166,6 +168,9 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
         // cisco-if extensions
         writeRegistry.addAfter(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG,
                 new InterfaceStatisticsConfigWriter(cli), IIDs.IN_IN_CONFIG);
+        writeRegistry.addNoop(IIDs.IN_IN_SU_SU_AUG_IFSUBIFCISCOSTATSAUG_STATISTICS);
+        writeRegistry.addAfter(IIDs.IN_IN_SU_SU_AUG_IFSUBIFCISCOSTATSAUG_ST_CONFIG,
+            new SubinterfaceStatisticsConfigWriter(cli), IIDs.IN_IN_SU_SU_CONFIG);
 
         // if-ethernet
         writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET);
@@ -230,6 +235,8 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
 
         // cisco if-extensions
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG, new InterfaceStatisticsConfigReader(cli));
+        readRegistry.add(IIDs.IN_IN_SU_SU_AUG_IFSUBIFCISCOSTATSAUG_ST_CONFIG,
+            new SubinterfaceStatisticsConfigReader(cli));
 
         // if-ethernet
         readRegistry.subtreeAdd(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli),
