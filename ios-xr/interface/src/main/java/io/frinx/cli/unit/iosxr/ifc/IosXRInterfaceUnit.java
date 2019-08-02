@@ -38,6 +38,8 @@ import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.bfd.BfdConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.bfd.BfdConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.ethernet.EthernetConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.ethernet.EthernetConfigWriter;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceArpConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceArpConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceConfigWriter;
 import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
@@ -94,6 +96,7 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
                 IIDs.FRINX_DAMPING,
                 IIDs.FRINX_CISCO_IF_EXTENSION,
                 IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
+                IIDs.FRINX_IF_ETHERNET_EXTENSION,
                 io.frinx.openconfig.openconfig.lacp.IIDs.FRINX_LACP_LAG_MEMBER,
                 io.frinx.openconfig.openconfig.oam.IIDs.FRINX_OAM,
                 $YangModuleInfoImpl.getInstance());
@@ -191,6 +194,12 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
                 io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_MEP,
                 io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_ME_CONFIG),
             io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_CONFIG);
+
+        // if-ethernet extension
+        writeRegistry.addNoop(IIDs.IN_IN_SU_SU_AUG_SUBIFAUGETHEXT_ARP);
+        writeRegistry.addAfter(IIDs.IN_IN_SU_SU_AUG_SUBIFAUGETHEXT_AR_CONFIG, new SubinterfaceArpConfigWriter(cli),
+            IIDs.IN_IN_SU_SU_CONFIG);
+
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -250,5 +259,8 @@ public final class IosXRInterfaceUnit extends AbstractUnit {
                 io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_CONFIG,
                 io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_MEP,
                 io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DO_ME_CONFIG));
+
+        // if-ethernet extension
+        readRegistry.add(IIDs.IN_IN_SU_SU_AUG_SUBIFAUGETHEXT_AR_CONFIG, new SubinterfaceArpConfigReader(cli));
     }
 }
