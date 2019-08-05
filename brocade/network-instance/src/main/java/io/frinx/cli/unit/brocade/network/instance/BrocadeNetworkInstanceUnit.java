@@ -62,7 +62,8 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
                 IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE_TYPES,
                 io.frinx.openconfig.openconfig.policy.IIDs.FRINX_OPENCONFIG_ROUTING_POLICY,
                 io.frinx.openconfig.openconfig.policy.forwarding.IIDs.FRINX_OPENCONFIG_POLICY_FORWARDING,
-                io.frinx.openconfig.openconfig.network.instance.IIDs.FRINX_BROCADE_PF_INTERFACES_EXTENSION);
+                io.frinx.openconfig.openconfig.network.instance.IIDs.FRINX_BROCADE_PF_INTERFACES_EXTENSION,
+                io.frinx.openconfig.openconfig.network.instance.IIDs.FRINX_BROCADE_CP_EXTENSION);
     }
 
     @Override
@@ -104,6 +105,7 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
                         IIDs.NE_NE_CO_CO_EN_EN_CONFIG,
                         IIDs.NE_NE_CO_CO_EN_EN_LOCAL,
                         IIDs.NE_NE_CO_CO_EN_EN_LO_CONFIG,
+                        IIDs.NE_NE_CO_CO_EN_EN_LO_CO_AUG_NICPBROCADEAUG,
                         IIDs.NE_NE_CO_CO_EN_EN_REMOTE,
                         IIDs.NE_NE_CO_CO_EN_EN_RE_CONFIG),
                 /*handle after network instance configuration*/ IIDs.NE_NE_CONFIG, IIDs.NE_NE_VL_VL_CONFIG);
@@ -114,6 +116,7 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
         readRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli));
 
+        // Vlan
         readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
         readRegistry.add(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli));
 
@@ -139,6 +142,7 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
                         IIDs.NE_NE_CO_CO_EN_EN_LOCAL,
                         IIDs.NE_NE_CO_CO_EN_EN_LO_CONFIG,
                         IIDs.NE_NE_CO_CO_EN_EN_LO_STATE,
+                        IIDs.NE_NE_CO_CO_EN_EN_LO_CO_AUG_NICPBROCADEAUG,
                         IIDs.NE_NE_CO_CO_EN_EN_REMOTE,
                         IIDs.NE_NE_CO_CO_EN_EN_RE_CONFIG,
                         IIDs.NE_NE_CO_CO_EN_EN_RE_STATE));

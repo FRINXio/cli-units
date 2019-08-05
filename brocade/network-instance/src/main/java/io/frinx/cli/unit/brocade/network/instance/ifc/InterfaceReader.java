@@ -19,6 +19,7 @@ package io.frinx.cli.unit.brocade.network.instance.ifc;
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.ifc.L2P2PInterfaceReader;
+import io.frinx.cli.unit.brocade.network.instance.l2vsi.ifc.L2VSIInterfaceReader;
 import io.frinx.cli.unit.brocade.network.instance.vrf.ifc.VrfInterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
@@ -30,6 +31,9 @@ public class InterfaceReader extends CompositeListReader<Interface, InterfaceKey
         implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     public InterfaceReader(Cli cli) {
-        super(Lists.newArrayList(new VrfInterfaceReader(cli), new L2P2PInterfaceReader()));
+        super(Lists.newArrayList(
+                new VrfInterfaceReader(cli),
+                new L2P2PInterfaceReader(),
+                new L2VSIInterfaceReader()));
     }
 }

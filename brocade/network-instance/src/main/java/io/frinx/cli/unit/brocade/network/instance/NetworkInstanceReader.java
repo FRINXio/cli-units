@@ -18,6 +18,7 @@ package io.frinx.cli.unit.brocade.network.instance;
 
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.L2P2PReader;
+import io.frinx.cli.unit.brocade.network.instance.l2vsi.L2VSIReader;
 import io.frinx.cli.unit.brocade.network.instance.vrf.L3VrfReader;
 import io.frinx.cli.unit.handlers.def.DefaultReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
@@ -35,6 +36,7 @@ public final class NetworkInstanceReader
         super(new ArrayList<CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {
             {
                 add(new L2P2PReader(cli));
+                add(new L2VSIReader(cli));
                 add(new L3VrfReader(cli));
                 add(new DefaultReader());
             }

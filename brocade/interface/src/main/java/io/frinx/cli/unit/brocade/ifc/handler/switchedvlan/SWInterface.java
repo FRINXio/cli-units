@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler.switchedvlan;
 
+import java.util.List;
 import javax.annotation.Nonnull;
 
 public interface SWInterface {
@@ -23,4 +24,6 @@ public interface SWInterface {
     boolean containsInterface(@Nonnull String ifcName);
 
     String getTag();
+
+    List<String> getInterfaces();
 }

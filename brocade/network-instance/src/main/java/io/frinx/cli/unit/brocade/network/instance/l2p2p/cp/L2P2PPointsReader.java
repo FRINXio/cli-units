@@ -307,12 +307,12 @@ public class L2P2PPointsReader implements CompositeReader.Child<ConnectionPoints
                 ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2P2P);
     }
 
-    static final class InterfaceId {
+    public static final class InterfaceId {
 
-        private final String ifc;
-        private final Long subifc;
+        public final String ifc;
+        public final Long subifc;
 
-        private InterfaceId(String ifcName, Long subifc) {
+        public InterfaceId(String ifcName, Long subifc) {
             this.ifc = Util.expandInterfaceName(ifcName);
             this.subifc = subifc;
         }
@@ -321,7 +321,7 @@ public class L2P2PPointsReader implements CompositeReader.Child<ConnectionPoints
             this(ifcName, null);
         }
 
-        static InterfaceId parse(String name) {
+        public static InterfaceId parse(String name) {
             String[] splitIfcName = name.split("\\.");
 
             String ifcRealName = splitIfcName.length == 2 ? splitIfcName[0] : name;
@@ -336,11 +336,11 @@ public class L2P2PPointsReader implements CompositeReader.Child<ConnectionPoints
             return ifc + subifcString;
         }
 
-        String toParentIfcString() {
+        public String toParentIfcString() {
             return ifc;
         }
 
-        static InterfaceId fromEndpoint(Endpoint endpoint1) {
+        public static InterfaceId fromEndpoint(Endpoint endpoint1) {
             return new InterfaceId(endpoint1.getLocal().getConfig().getInterface(),
                     ((Long) endpoint1.getLocal().getConfig().getSubinterface()));
         }

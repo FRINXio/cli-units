@@ -18,6 +18,7 @@ package io.frinx.cli.unit.brocade.network.instance;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.brocade.network.instance.l2vsi.L2VSIConfigWriter;
 import io.frinx.cli.unit.brocade.network.instance.vrf.L3VrfConfigWriter;
 import io.frinx.cli.unit.handlers.def.DefaultConfigWriter;
 import io.frinx.cli.unit.ni.base.handler.l2p2p.L2P2PConfigWriter;
@@ -30,6 +31,7 @@ public final class NetworkInstanceConfigWriter extends CompositeWriter<Config> {
         super(Lists.newArrayList(
                 new L3VrfConfigWriter(cli),
                 new DefaultConfigWriter(),
-                new L2P2PConfigWriter(cli)));
+                new L2P2PConfigWriter(cli),
+                new L2VSIConfigWriter(cli)));
     }
 }

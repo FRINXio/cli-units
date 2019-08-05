@@ -16,6 +16,8 @@
 
 package io.frinx.cli.unit.brocade.ifc.handler.switchedvlan;
 
+import com.google.common.collect.Lists;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -51,5 +53,10 @@ public class InterfaceInVlan implements SWInterface {
     @Override
     public String getTag() {
         return tagName;
+    }
+
+    @Override
+    public List<String> getInterfaces() {
+        return Lists.newArrayList(String.format("ethernet %s/%s", prefixFrom, from));
     }
 }

@@ -162,7 +162,7 @@ public final class Vlan {
         return newTrunkVlans;
     }
 
-    static Vlan create(String line) {
+    public static Vlan create(String line) {
         Integer vlanId = ParsingUtils.NEWLINE.splitAsStream(line)
                 .map(VLAN_ID_LINE::matcher)
                 .filter(Matcher::find)

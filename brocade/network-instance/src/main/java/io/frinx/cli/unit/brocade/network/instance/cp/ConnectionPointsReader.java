@@ -19,6 +19,7 @@ package io.frinx.cli.unit.brocade.network.instance.cp;
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.L2P2PPointsReader;
+import io.frinx.cli.unit.brocade.network.instance.l2vsi.cp.L2VSIPointsReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
@@ -28,7 +29,9 @@ public class ConnectionPointsReader extends CompositeReader<ConnectionPoints, Co
         implements CliConfigReader<ConnectionPoints, ConnectionPointsBuilder> {
 
     public ConnectionPointsReader(Cli cli) {
-        super(Lists.newArrayList(new L2P2PPointsReader(cli)));
+        super(Lists.newArrayList(
+                new L2P2PPointsReader(cli),
+                new L2VSIPointsReader(cli)));
     }
 
 }
