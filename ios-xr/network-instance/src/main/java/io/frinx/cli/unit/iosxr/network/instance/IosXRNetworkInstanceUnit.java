@@ -98,7 +98,8 @@ public class IosXRNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NE_PO_IN_INTERFACE);
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigWriter(cli),
                 Sets.newHashSet(IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFCISCOAUG),
-                /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
+                /*handle after sub-ifc configuration*/
+                io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
     }
 
     @Override
