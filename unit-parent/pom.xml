@@ -226,6 +226,7 @@
                                 </generator>
                             </codeGenerators>
                             <inspectDependencies>true</inspectDependencies>
+                            <inspectOnlyDependencies>true</inspectOnlyDependencies>
                         </configuration>
                     </execution>
                 </executions>
