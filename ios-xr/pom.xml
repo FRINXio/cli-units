@@ -40,6 +40,7 @@
     <module>ospf</module>
     <module>snmp</module>
     <module>ospfv3</module>
+    <module>lr</module>
     <module>logging</module>
     <module>acl</module>
     <module>routing-policy</module>
