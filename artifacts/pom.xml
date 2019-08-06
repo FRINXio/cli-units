@@ -308,6 +308,11 @@
                 <artifactId>ios-xr-oam-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xr-lr-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- junos -->
             <dependency>
