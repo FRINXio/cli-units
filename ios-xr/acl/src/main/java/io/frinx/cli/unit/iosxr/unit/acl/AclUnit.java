@@ -81,11 +81,13 @@ public class AclUnit extends AbstractUnit {
 
         // ingress
         writeRegistry.addNoop(IIDs.AC_IN_IN_IN_INGRESSACLSET);
-        writeRegistry.add(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli));
+        writeRegistry.addAfter(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli),
+            io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
 
         // egress
         writeRegistry.addNoop(IIDs.AC_IN_IN_EG_EGRESSACLSET);
-        writeRegistry.add(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigWriter(cli));
+        writeRegistry.addAfter(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigWriter(cli),
+            io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
 
         writeRegistry.addNoop(IIDs.AC_ACLSETS);
         writeRegistry.addNoop(IIDs.AC_AC_ACLSET);
