@@ -62,6 +62,10 @@ public class PolicyForwardingInterfaceConfigWriterTest {
             + "no service-policy input\n"
             + "root\n";
 
+    private static final String WRITE_INPUT_SUBIF = WRITE_INPUT.replace("Loopback0", "Bundle-Ether1000.200");
+    private static final String UPDATE_INPUT_SUBIF = UPDATE_INPUT.replace("Loopback0", "Bundle-Ether1000.200");
+    private static final String DELETE_INPUT_SUBIF = DELETE_INPUT.replace("Loopback0", "Bundle-Ether1000.200");
+
     @Mock
     private Cli cli;
 
@@ -77,6 +81,12 @@ public class PolicyForwardingInterfaceConfigWriterTest {
             .child(PolicyForwarding.class)
             .child(Interfaces.class)
             .child(Interface.class, new InterfaceKey(new InterfaceId("Loopback0")));
+
+    private InstanceIdentifier iidSubif = KeyedInstanceIdentifier.create(NetworkInstances.class)
+        .child(NetworkInstance.class, new NetworkInstanceKey(NetworInstance.DEFAULT_NETWORK))
+        .child(PolicyForwarding.class)
+        .child(Interfaces.class)
+        .child(Interface.class, new InterfaceKey(new InterfaceId("Bundle-Ether1000.200")));
 
     // test data
     private Config data;
@@ -115,6 +125,16 @@ public class PolicyForwardingInterfaceConfigWriterTest {
     }
 
     @Test
+    public void writeSubif() throws WriteFailedException {
+        this.writer.writeCurrentAttributes(iidSubif, data, context);
+
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT_SUBIF, response.getValue()
+                .getContent());
+    }
+
+    @Test
     public void update() throws WriteFailedException {
         // removed export policy, changed import
         Config newData = new ConfigBuilder().addAugmentation(NiPfIfCiscoAug.class,
@@ -137,12 +157,44 @@ public class PolicyForwardingInterfaceConfigWriterTest {
     }
 
     @Test
+    public void updateSubif() throws WriteFailedException {
+        // removed export policy, changed import
+        Config newData = new ConfigBuilder().addAugmentation(NiPfIfCiscoAug.class,
+                new NiPfIfCiscoAugBuilder()
+                        .setInputServicePolicy("input-pol1")
+                        .build())
+                .build();
+
+        this.writer.updateCurrentAttributes(iidSubif, data, newData, context);
+
+        Mockito.verify(cli, Mockito.times(2))
+                .executeAndRead(response.capture());
+
+        Assert.assertEquals(DELETE_INPUT_SUBIF, response.getAllValues()
+                .get(0)
+                .getContent());
+        Assert.assertEquals(UPDATE_INPUT_SUBIF, response.getAllValues()
+                .get(1)
+                .getContent());
+    }
+
+    @Test
     public void delete() throws WriteFailedException {
         this.writer.deleteCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue()
+                .getContent());
+    }
+
+    @Test
+    public void deleteSubif() throws WriteFailedException {
+        this.writer.deleteCurrentAttributes(iidSubif, data, context);
+
+        Mockito.verify(cli)
+                .executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT_SUBIF, response.getValue()
                 .getContent());
     }
 }

@@ -19,11 +19,16 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import java.util.regex.Matcher;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.Subinterfaces;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.pf.interfaces.extension.cisco.rev171109.NiPfIfCiscoAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.interfaces.Interface;
@@ -48,14 +53,8 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
                 .getInterfaceId()
                 .getValue();
 
-        // check ifc existence
-        InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
-                .rev161222.interfaces.top.interfaces.Interface> ifcId =
-                IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
-                                .rev161222.interfaces.top.interfaces.Interface.class,
-                        new InterfaceKey(ifcName));
-        Preconditions.checkArgument(writeContext.readAfter(ifcId)
-                        .isPresent(),
+        // check ifc/sub-ifc existence
+        Preconditions.checkArgument(existsInterface(ifcName, writeContext),
                 "Cannot configure policy forwarding on non-existent interface %s", ifcName);
 
         NiPfIfCiscoAug pfIfAug = dataAfter.getAugmentation(NiPfIfCiscoAug.class);
@@ -97,6 +96,29 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
                 "no service-policy output",
                 "no service-policy input",
                 "root");
+    }
 
+    private static boolean existsInterface(String ifcName, WriteContext writeContext) {
+        if (SubinterfaceReader.isSubinterface(ifcName)) {
+            Matcher matcher = SubinterfaceReader.SUBINTERFACE_NAME.matcher(ifcName);
+            matcher.matches();
+
+            InstanceIdentifier<Subinterface> subifcId = IIDs.INTERFACES
+                .child(
+                    org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                            .rev161222.interfaces.top.interfaces.Interface.class,
+                    new InterfaceKey(matcher.group("ifcId")))
+                .child(Subinterfaces.class)
+                .child(Subinterface.class, new SubinterfaceKey(Long.valueOf(matcher.group("subifcIndex"))));
+            return writeContext.readAfter(subifcId).isPresent();
+        }
+
+        InstanceIdentifier<org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                .rev161222.interfaces.top.interfaces.Interface> ifcId = IIDs.INTERFACES
+                        .child(
+                            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222
+                                    .interfaces.top.interfaces.Interface.class,
+                            new InterfaceKey(ifcName));
+        return writeContext.readAfter(ifcId).isPresent();
     }
 }
