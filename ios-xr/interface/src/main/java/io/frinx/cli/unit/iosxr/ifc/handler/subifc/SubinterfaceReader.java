@@ -43,7 +43,7 @@ public final class SubinterfaceReader extends AbstractSubinterfaceReader {
     private Ipv6ConfigReader v6reader;
     private Cli cli;
 
-    private static final Pattern SUBINTERFACE_NAME = Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
+    public static final Pattern SUBINTERFACE_NAME = Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
 
     public SubinterfaceReader(Cli cli) {
         super(cli);
@@ -88,7 +88,7 @@ public final class SubinterfaceReader extends AbstractSubinterfaceReader {
             .collect(Collectors.toList());
     }
 
-    private boolean isSubinterface(String ifcName) {
+    public static boolean isSubinterface(String ifcName) {
         return SUBINTERFACE_NAME.matcher(ifcName).matches();
     }
 }
