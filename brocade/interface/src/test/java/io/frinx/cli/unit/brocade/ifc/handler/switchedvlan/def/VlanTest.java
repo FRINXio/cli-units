@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.brocade.ifc.handler.switchedvlan;
+package io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.def;
 
-import java.util.List;
-import javax.annotation.Nonnull;
+import org.junit.Assert;
+import org.junit.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 
-public interface SWInterface {
+public class VlanTest {
 
-    boolean containsInterface(@Nonnull String ifcName);
-
-    String getTag();
-
-    List<String> getInterfaces();
+    @Test
+    public void create() {
+        Vlan vlan = Vlan.create("vlan 112 untagged e 2/18 to 2/20 e 1/7 to 1/9 "
+                + "tagged e 1/2 e 1/5 to 1/10 router-interface ve 112");
+        Assert.assertEquals(new VlanId(112), vlan.getId());
+    }
 }

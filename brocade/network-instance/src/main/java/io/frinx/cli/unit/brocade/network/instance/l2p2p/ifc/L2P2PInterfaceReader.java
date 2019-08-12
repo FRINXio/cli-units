@@ -41,11 +41,13 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class L2P2PInterfaceReader implements CompositeListReader.Child<Interface, InterfaceKey, InterfaceBuilder>,
         CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
+    public static final Check L2P2P_CHECK = BasicCheck.checkData(
+            ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+            ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2P2P);
+
     @Override
     public Check getCheck() {
-        return BasicCheck.checkData(
-                ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
-                ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2P2P);
+        return L2P2P_CHECK;
     }
 
     @Nonnull
@@ -69,12 +71,7 @@ public class L2P2PInterfaceReader implements CompositeListReader.Child<Interface
     @Nullable
     private String getIfc(Endpoint ep) {
         if (ep.getLocal() != null && ep.getLocal().getConfig() != null) {
-            String ifcName = ep.getLocal().getConfig().getInterface();
-            if (ep.getLocal().getConfig().getSubinterface() != null) {
-                return ifcName + "." + ep.getLocal().getConfig().getSubinterface();
-            } else {
-                return ifcName;
-            }
+            return ep.getLocal().getConfig().getInterface();
         }
 
         return null;

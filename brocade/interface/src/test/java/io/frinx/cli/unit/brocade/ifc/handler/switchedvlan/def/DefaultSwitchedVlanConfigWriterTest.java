@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.brocade.ifc.handler.switchedvlan;
+package io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.def;
 
 import io.frinx.cli.io.Cli;
 import java.util.Arrays;
@@ -28,11 +28,11 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanModeType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanRange;
 
-public class SwitchedVlanConfigWriterTest {
+public class DefaultSwitchedVlanConfigWriterTest {
 
     @Test
     public void writeVlans() {
-        SwitchedVlanConfigWriter writer = new SwitchedVlanConfigWriter(Mockito.mock(Cli.class));
+        DefaultSwitchedVlanConfigWriter writer = new DefaultSwitchedVlanConfigWriter(Mockito.mock(Cli.class));
 
         Config config = new ConfigBuilder()
                 .setInterfaceMode(VlanModeType.TRUNK)
@@ -65,7 +65,7 @@ public class SwitchedVlanConfigWriterTest {
 
     @Test
     public void deleteVlans() {
-        SwitchedVlanConfigWriter writer = new SwitchedVlanConfigWriter(Mockito.mock(Cli.class));
+        DefaultSwitchedVlanConfigWriter writer = new DefaultSwitchedVlanConfigWriter(Mockito.mock(Cli.class));
 
         Config config = new ConfigBuilder()
                 .setInterfaceMode(VlanModeType.TRUNK)

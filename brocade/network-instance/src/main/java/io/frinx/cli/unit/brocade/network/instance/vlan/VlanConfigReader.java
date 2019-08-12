@@ -16,48 +16,24 @@
 
 package io.frinx.cli.unit.brocade.network.instance.vlan;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
+import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.brocade.network.instance.l2p2p.vlan.L2P2PVlanConfigReader;
+import io.frinx.cli.unit.brocade.network.instance.l2vsi.vlan.L2VSIVlanConfigReader;
+import io.frinx.cli.unit.brocade.network.instance.vrf.vlan.DefaultVlanConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanConfig;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.Vlan;
+import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VlanConfigReader implements CliConfigReader<Config, ConfigBuilder> {
-
-    private static final String SH_VLAN_CONFIG = "show running-config vlan | begin ^vlan {$id}";
-
-    private final Cli cli;
+public class VlanConfigReader extends CompositeReader<Config, ConfigBuilder>
+        implements CliConfigReader<Config, ConfigBuilder> {
 
     public VlanConfigReader(Cli cli) {
-        this.cli = cli;
-    }
-
-    @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                      @Nonnull ConfigBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        VlanId id = instanceIdentifier.firstKeyOf(Vlan.class).getVlanId();
-        parseVlanConfig(blockingRead(fT(SH_VLAN_CONFIG, "id", id.getValue()),
-                cli, instanceIdentifier, readContext), configBuilder, id);
-    }
-
-    @VisibleForTesting
-    static void parseVlanConfig(String output, ConfigBuilder configBuilder, VlanId id) {
-        output = output.substring(0, output.indexOf(Cli.NEWLINE + "!"));
-
-        configBuilder.setVlanId(id);
-        // Brocade does not support suspended vlans
-        configBuilder.setStatus(VlanConfig.Status.ACTIVE);
-        ParsingUtils.parseField(output,
-                VlanReader.VLAN_ID_LINE::matcher, m -> m.group("name"), configBuilder::setName);
-
+        super(Lists.newArrayList(
+                new DefaultVlanConfigReader(cli),
+                new L2P2PVlanConfigReader(),
+                new L2VSIVlanConfigReader()
+        ));
     }
 }

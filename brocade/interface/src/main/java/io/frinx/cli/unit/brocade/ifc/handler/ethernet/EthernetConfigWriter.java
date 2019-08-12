@@ -18,7 +18,6 @@ package io.frinx.cli.unit.brocade.ifc.handler.ethernet;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.x5.template.Chunk;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -32,9 +31,49 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EthernetConfigWriter implements CliWriter<Config> {
 
-    static final String WRITE_TEMPLATE = "configure terminal\n"
-        + "gig-default {% if ($autoNegotiate) %}auto-gig{% else %}neg-off{% endif %}\n"
-        + "end";
+    private static final String WRITE_TEMPLATE =
+         "{% if ($before == null) %}"
+            + "{% if ($autoNegotiate == true) %}"
+                + "configure terminal\n"
+                + "interface {$ifcName}\n"
+                + "gig-default auto-gig\n"
+                + "end"
+            + "{% endif %}"
+            + "{% if ($autoNegotiate == false) %}"
+                 + "configure terminal\n"
+                 + "interface {$ifcName}\n"
+                 + "gig-default neg-off\n"
+                 + "end"
+            + "{% endif %}"
+        + "{% endif %}"
+        + "{% if ($before == true) %}"
+            + "{% if ($autoNegotiate == false) %}"
+                 + "configure terminal\n"
+                 + "interface {$ifcName}\n"
+                 + "gig-default neg-off\n"
+                 + "end"
+            + "{% endif %}"
+            + "{% if ($autoNegotiate == null) %}"
+                 + "configure terminal\n"
+                 + "interface {$ifcName}\n"
+                 + "no gig-default auto-gig\n"
+                 + "end"
+            + "{% endif %}"
+        + "{% endif %}"
+        + "{% if ($before == false) %}"
+            + "{% if ($autoNegotiate == true) %}"
+                 + "configure terminal\n"
+                 + "interface {$ifcName}\n"
+                 + "gig-default auto-gig\n"
+                 + "end"
+            + "{% endif %}"
+            + "{% if ($autoNegotiate == null) %}"
+                 + "configure terminal\n"
+                 + "interface {$ifcName}\n"
+                 + "no gig-default neg-off\n"
+                 + "end"
+            + "{% endif %}"
+        + "{% endif %}";
 
     private final Cli cli;
 
@@ -43,17 +82,25 @@ public class EthernetConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                       @Nonnull Config dataAfter,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
         checkIfcType(ifcName);
 
-        blockingWriteAndRead(getCommand(dataAfter.isAutoNegotiate()), cli, id, dataAfter);
+        blockingWriteAndRead(getCommand(ifcName, null, dataAfter), cli, id, dataAfter);
     }
 
     @VisibleForTesting
-    String getCommand(Boolean autoNegotiate) {
-        return fT(WRITE_TEMPLATE, "autoNegotiate", autoNegotiate ? Chunk.TRUE : null);
+    String getCommand(String ifcName, Config before, Config config) {
+        return fT(WRITE_TEMPLATE, "ifcName", ifcName, "before", getAutoNeg(before),
+                "autoNegotiate", getAutoNeg(config));
+    }
+
+    private String getAutoNeg(Config config) {
+        return config == null
+                ? "null"
+                : (config.isAutoNegotiate() != null ? Boolean.toString(config.isAutoNegotiate()) : "null");
     }
 
     @Override
@@ -63,7 +110,7 @@ public class EthernetConfigWriter implements CliWriter<Config> {
         String ifcName = id.firstKeyOf(Interface.class).getName();
         checkIfcType(ifcName);
 
-        blockingDeleteAndRead(getCommand(!dataBefore.isAutoNegotiate()), cli, id);
+        blockingDeleteAndRead(getCommand(ifcName, dataBefore, null), cli, id);
     }
 
     private void checkIfcType(String ifcName) {

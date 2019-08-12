@@ -28,9 +28,6 @@ import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
@@ -40,7 +37,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.ConnectionPoint;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.endpoints.Endpoint;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L2P2P;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.LOCAL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.REMOTE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.utils.IidUtils;
@@ -60,7 +56,6 @@ public class L2P2PPointsWriter implements CompositeWriter.Child<ConnectionPoints
     static String VLL_REMOTE = "configure terminal\n"
             + "router mpls\n"
             + "vll {$network} {$remote.remote.config.virtual_circuit_identifier}\n"
-            + "vll-mtu {$mtu}\n"
             + "vll-peer {$remote.remote.config.remote_system.ipv4_address.value}\n"
             + "end\n";
 
@@ -114,20 +109,16 @@ public class L2P2PPointsWriter implements CompositeWriter.Child<ConnectionPoints
                 "L2P2P network only supports 2 endpoints, but were: %s",
                 dataAfter.getConnectionPoint());
 
-        Set<String> usedInterfaces = getUsedInterfaces(id, writeContext);
-
         ConnectionPoint connectionPoint1 = getCPoint(dataAfter, L2P2PPointsReader.POINT_1);
-        Endpoint endpoint1 = getEndpoint(id, connectionPoint1, writeContext, usedInterfaces, true);
+        Endpoint endpoint1 = getEndpoint(id, connectionPoint1, writeContext, true);
 
         ConnectionPoint connectionPoint2 = getCPoint(dataAfter, L2P2PPointsReader.POINT_2);
-        Endpoint endpoint2 = getEndpoint(id, connectionPoint2, writeContext, usedInterfaces, true);
-
-        Integer mtu = writeContext.readAfter(id.firstIdentifierOf(NetworkInstance.class)).get().getConfig().getMtu();
+        Endpoint endpoint2 = getEndpoint(id, connectionPoint2, writeContext, true);
 
         if (isLocal(endpoint1, endpoint2)) {
             writeVllLocal(id, dataAfter, endpoint1, endpoint2);
         } else if (isLocalRemote(endpoint1, endpoint2)) {
-            writeVll(id, dataAfter, endpoint1, endpoint2, mtu);
+            writeVll(id, dataAfter, endpoint1, endpoint2);
         } else {
             throw new IllegalArgumentException("Unable to configure L2P2P with REMOTE only endpoints: "
                     + dataAfter.getConnectionPoint());
@@ -136,38 +127,18 @@ public class L2P2PPointsWriter implements CompositeWriter.Child<ConnectionPoints
         return true;
     }
 
-    public static Set<String> getUsedInterfaces(@Nonnull InstanceIdentifier<ConnectionPoints> id,
-                                                @Nonnull WriteContext writeContext) {
-        return writeContext.readAfter(io.frinx.openconfig.openconfig.network.instance.IIDs.NETWORKINSTANCES).get()
-                .getNetworkInstance().stream()
-                .filter(instance -> instance.getConfig().getType() == L2P2P.class)
-                .filter(instance -> !Objects.equals(instance.getName(), id.firstKeyOf(NetworkInstance.class).getName()))
-                // Stream connection points
-                .filter(instance -> instance.getConnectionPoints() != null
-                        && !instance.getConnectionPoints().getConnectionPoint().isEmpty())
-                .flatMap(instance -> instance.getConnectionPoints().getConnectionPoint().stream())
-                // Stream endpoints
-                .filter(connPoint -> connPoint.getEndpoints() != null
-                        && !connPoint.getEndpoints().getEndpoint().isEmpty())
-                .flatMap(connPoint -> connPoint.getEndpoints().getEndpoint().stream())
-                .filter(endpoint -> endpoint.getConfig().getType() == LOCAL.class)
-                .map(L2P2PPointsReader.InterfaceId::fromEndpoint).map(L2P2PPointsReader.InterfaceId::toString)
-                .collect(Collectors.toSet());
-    }
-
     private void writeVll(InstanceIdentifier<ConnectionPoints> id,
                           ConnectionPoints dataAfter,
                           Endpoint endpoint1,
-                          Endpoint endpoint2, Integer mtu) throws WriteFailedException.CreateFailedException {
+                          Endpoint endpoint2) throws WriteFailedException.CreateFailedException {
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
         Endpoint local = getLocal(endpoint1, endpoint2);
         Endpoint remote = getRemote(endpoint1, endpoint2);
 
-        blockingWriteAndRead(cli, id, dataAfter, fT(VLL_REMOTE, "network", netName, "remote", remote, "mtu", mtu));
+        blockingWriteAndRead(cli, id, dataAfter, fT(VLL_REMOTE, "network", netName, "remote", remote));
 
         String template = local.getLocal().getConfig().getSubinterface() == null ? VLL_IFC : VLL_SUBINTERFACE;
-        blockingWriteAndRead(cli, id, dataAfter,
-                fT(template, "network", netName, "remote", remote, "local", local));
+        blockingWriteAndRead(cli, id, dataAfter, fT(template, "network", netName, "remote", remote, "local", local));
     }
 
     private Endpoint getRemote(Endpoint endpoint1, Endpoint endpoint2) {
@@ -210,13 +181,12 @@ public class L2P2PPointsWriter implements CompositeWriter.Child<ConnectionPoints
     private void deleteVllLocal(InstanceIdentifier<ConnectionPoints> id) throws WriteFailedException
             .DeleteFailedException {
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
-        blockingDeleteAndRead(cli, id, fT(DELETE_VLL_LOCAL, netName));
+        blockingDeleteAndRead(cli, id, fT(DELETE_VLL_LOCAL, "network", netName));
     }
 
     private static Endpoint getEndpoint(InstanceIdentifier<ConnectionPoints> id,
                                         ConnectionPoint connectionPoint1,
                                         WriteContext writeContext,
-                                        Set<String> usedInterfaces,
                                         boolean isWrite) {
         Endpoint endpoint1 = connectionPoint1.getEndpoints().getEndpoint().get(0);
         Preconditions.checkArgument(endpoint1.getEndpointId().equals(L2P2PPointsReader.ENDPOINT_ID),
@@ -229,13 +199,6 @@ public class L2P2PPointsWriter implements CompositeWriter.Child<ConnectionPoints
             L2P2PPointsReader.InterfaceId interfaceId = L2P2PPointsReader.InterfaceId.fromEndpoint(endpoint1);
 
             getInterfaceData(writeContext, isWrite, interfaceId);
-
-            // Check interface not used already (or its parent)
-            Preconditions.checkArgument(!usedInterfaces.contains(interfaceId.toString()),
-                    "Interface %s already used in L2P2P network as: %s", interfaceId, interfaceId);
-            Preconditions.checkArgument(!usedInterfaces.contains(interfaceId.toParentIfcString()),
-                    "Interface %s already used in L2P2P network as: %s",
-                    interfaceId, interfaceId.toParentIfcString());
 
             // No subinterface verification required here
 
@@ -260,7 +223,7 @@ public class L2P2PPointsWriter implements CompositeWriter.Child<ConnectionPoints
                 .transform(Interfaces::getInterface)
                 .or(Collections.emptyList())
                 .stream()
-                .anyMatch(ifc -> ifc.getId().equals(interfaceId.toString()));
+                .anyMatch(ifc -> ifc.getId().equals(interfaceId.toParentIfcString()));
 
         Preconditions.checkArgument(interfaceInNe, "Interface %s is not part of %s", interfaceId, neKey.getName());
     }
@@ -309,10 +272,10 @@ public class L2P2PPointsWriter implements CompositeWriter.Child<ConnectionPoints
         }
 
         ConnectionPoint connectionPoint1 = getCPoint(dataBefore, L2P2PPointsReader.POINT_1);
-        Endpoint endpoint1 = getEndpoint(id, connectionPoint1, writeContext, Collections.emptySet(), false);
+        Endpoint endpoint1 = getEndpoint(id, connectionPoint1, writeContext, false);
 
         ConnectionPoint connectionPoint2 = getCPoint(dataBefore, L2P2PPointsReader.POINT_2);
-        Endpoint endpoint2 = getEndpoint(id, connectionPoint2, writeContext, Collections.emptySet(), false);
+        Endpoint endpoint2 = getEndpoint(id, connectionPoint2, writeContext, false);
 
         if (isLocal(endpoint1, endpoint2)) {
             deleteVllLocal(id);

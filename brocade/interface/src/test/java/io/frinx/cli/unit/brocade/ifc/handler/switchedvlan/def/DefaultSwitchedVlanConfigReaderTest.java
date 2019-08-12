@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.brocade.ifc.handler.switchedvlan;
+package io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.def;
 
 import io.fd.honeycomb.translate.ModificationCache;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -29,7 +29,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanModeType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanRange;
 
-public class SwitchedVlanConfigReaderTest {
+public class DefaultSwitchedVlanConfigReaderTest {
 
     @Test
     public void parseVlanConfig() {
@@ -57,7 +57,7 @@ public class SwitchedVlanConfigReaderTest {
                 + "vlan 1501 \n";
 
         ConfigBuilder configBuilder = new ConfigBuilder();
-        SwitchedVlanConfigReader.parseVlanConfig(output, configBuilder, "1/3", mock);
+        DefaultSwitchedVlanConfigReader.parseVlanConfig(output, configBuilder, "1/3", mock);
         Config config = configBuilder.build();
         Assert.assertEquals(VlanModeType.TRUNK, config.getInterfaceMode());
         Assert.assertEquals(Arrays.asList(
@@ -66,7 +66,7 @@ public class SwitchedVlanConfigReaderTest {
         Assert.assertNull(config.getNativeVlan());
 
         configBuilder = new ConfigBuilder();
-        SwitchedVlanConfigReader.parseVlanConfig(output, configBuilder, "1/7", mock);
+        DefaultSwitchedVlanConfigReader.parseVlanConfig(output, configBuilder, "1/7", mock);
         config = configBuilder.build();
         Assert.assertEquals(VlanModeType.ACCESS, config.getInterfaceMode());
         Assert.assertEquals(new VlanId(111), config.getAccessVlan());
@@ -74,7 +74,7 @@ public class SwitchedVlanConfigReaderTest {
         Assert.assertNull(config.getTrunkVlans());
 
         configBuilder = new ConfigBuilder();
-        SwitchedVlanConfigReader.parseVlanConfig(output, configBuilder, "1/5", mock);
+        DefaultSwitchedVlanConfigReader.parseVlanConfig(output, configBuilder, "1/5", mock);
         config = configBuilder.build();
         Assert.assertEquals(VlanModeType.TRUNK, config.getInterfaceMode());
         Assert.assertEquals(Arrays.asList(
@@ -84,7 +84,7 @@ public class SwitchedVlanConfigReaderTest {
         Assert.assertNull(config.getAccessVlan());
 
         configBuilder = new ConfigBuilder();
-        SwitchedVlanConfigReader.parseVlanConfig(output, configBuilder, "1/13", mock);
+        DefaultSwitchedVlanConfigReader.parseVlanConfig(output, configBuilder, "1/13", mock);
         config = configBuilder.build();
         Assert.assertEquals(VlanModeType.TRUNK, config.getInterfaceMode());
         Assert.assertEquals(Arrays.asList(

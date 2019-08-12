@@ -24,7 +24,7 @@ import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.ifc.Util;
-import io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.Vlan;
+import io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.def.Vlan;
 import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.L2P2PPointsReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;

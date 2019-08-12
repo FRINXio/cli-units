@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.brocade.network.instance.policy.forwarding;
+package io.frinx.cli.unit.brocade.network.instance.vrf.policy.forwarding;
 
 import io.frinx.cli.io.Cli;
 import org.junit.Assert;
@@ -26,21 +26,32 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.forwarding.rev170621.pf.interfaces.structural.interfaces._interface.ConfigBuilder;
 
-public class PolicyForwardingInterfaceConfigWriterTest {
+public class VrfPFInterfaceConfigWriterTest {
 
     @Test
     public void writeOutput() {
         Config config = new ConfigBuilder().setInterfaceId(new InterfaceId("eth 1/3")).build();
         NiPfIfBrocadeAug brcd = new NiPfIfBrocadeAugBuilder()
-            .setInputServicePolicy("policy_test")
-            .setOutputServicePolicy("policy_test").build();
+                .setInputServicePolicy("policy_test")
+                .setOutputServicePolicy("policy_test").build();
 
-        PolicyForwardingInterfaceConfigWriter writer =
-                new PolicyForwardingInterfaceConfigWriter(Mockito.mock(Cli.class));
+        VrfPFInterfaceConfigWriter writer =
+                new VrfPFInterfaceConfigWriter(Mockito.mock(Cli.class));
         Assert.assertEquals("configure terminal\n"
                 + "interface eth 1/3\n"
                 + "rate-limit input policy-map policy_test\n"
+                + "exit\n"
+                + "interface eth 1/3\n"
                 + "rate-limit output policy-map policy_test\n"
-                + "end", writer.getCommand(config, brcd, false));
+                + "end", writer.getCommand(config, brcd, null, false));
+
+        Assert.assertEquals("configure terminal\n"
+                        + "interface eth 1/3\n"
+                        + "no rate-limit input policy-map policy_test\n"
+                        + "exit\n"
+                        + "interface eth 1/3\n"
+                        + "no rate-limit output policy-map policy_test\n"
+                        + "end",
+                writer.getCommand(config, null, brcd, true));
     }
 }

@@ -28,6 +28,7 @@ import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -68,6 +69,10 @@ public class VrfInterfaceReader implements CompositeListReader.Child<Interface, 
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext ctx) throws ReadFailedException {
+        if (ctx.getModificationCache().get(this) != null && ctx.getModificationCache().get(this).equals("SKIP")) {
+            return Collections.emptyList();
+        }
+
         final String name = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String output = blockingRead(SH_IP_VRF_INTERFACES_ALL, cli, instanceIdentifier, ctx);
         return parseIds(name, output);

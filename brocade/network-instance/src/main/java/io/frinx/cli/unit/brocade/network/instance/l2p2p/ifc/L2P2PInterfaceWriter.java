@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.brocade.network.instance.l2p2p.ifc;
 
 import io.fd.honeycomb.translate.write.WriteContext;
-import io.frinx.cli.unit.brocade.network.instance.l2p2p.cp.L2P2PPointsWriter;
 import io.frinx.cli.unit.utils.CliListWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.Interface;
@@ -30,7 +29,7 @@ public class L2P2PInterfaceWriter implements CliListWriter<Interface, InterfaceK
     public boolean writeCurrentAttributesWResult(InstanceIdentifier<Interface> instanceIdentifier,
                                                  Interface anInterface,
                                                  WriteContext writeContext) {
-        return L2P2PPointsWriter.L2P2P_CHECK.canProcess(instanceIdentifier, writeContext, false);
+        return L2P2PInterfaceReader.L2P2P_CHECK.canProcess(instanceIdentifier, writeContext, false);
     }
 
     @Override
@@ -38,13 +37,13 @@ public class L2P2PInterfaceWriter implements CliListWriter<Interface, InterfaceK
                                                   Interface dataBefore,
                                                   Interface dataAfter,
                                                   WriteContext writeContext) {
-        return L2P2PPointsWriter.L2P2P_CHECK.canProcess(id, writeContext, false);
+        return L2P2PInterfaceReader.L2P2P_CHECK.canProcess(id, writeContext, false);
     }
 
     @Override
     public boolean deleteCurrentAttributesWResult(InstanceIdentifier<Interface> instanceIdentifier,
                                                   Interface anInterface,
                                                   WriteContext writeContext) {
-        return L2P2PPointsWriter.L2P2P_CHECK.canProcess(instanceIdentifier, writeContext, true);
+        return L2P2PInterfaceReader.L2P2P_CHECK.canProcess(instanceIdentifier, writeContext, true);
     }
 }

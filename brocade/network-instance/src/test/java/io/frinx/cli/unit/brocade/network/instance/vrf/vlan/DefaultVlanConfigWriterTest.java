@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.brocade.network.instance.vlan;
+package io.frinx.cli.unit.brocade.network.instance.vrf.vlan;
 
 import io.frinx.cli.unit.utils.CliFormatter;
 import org.junit.Assert;
@@ -22,11 +22,11 @@ import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 
-public class VlanConfigWriterTest implements CliFormatter {
+public class DefaultVlanConfigWriterTest implements CliFormatter {
 
     @Test
     public void testWrite() {
-        String config = fT(VlanConfigWriter.WRITE_TEMPLATE, "data", new ConfigBuilder()
+        String config = fT(DefaultVlanConfigWriter.WRITE_TEMPLATE, "data", new ConfigBuilder()
                 .setVlanId(new VlanId(14))
                 .setName("abcd")
                 .build());

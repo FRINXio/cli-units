@@ -44,8 +44,8 @@ public class BrocadeCliInitializerUnit extends AbstractUnit {
 
     private static final Command WRITE_MEMORY = Command.writeCommandNoChecks("write memory");
 
-    private static final Pattern INVALID_COMMAND = Pattern.compile("^Invalid input.*");
-    private static final Pattern ERROR_COMMAND = Pattern.compile("^Error.*");
+    private static final Pattern INVALID_COMMAND = Pattern.compile("Invalid input.*");
+    private static final Pattern ERROR_COMMAND = Pattern.compile("Error.*");
 
     public BrocadeCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
         super(registry);

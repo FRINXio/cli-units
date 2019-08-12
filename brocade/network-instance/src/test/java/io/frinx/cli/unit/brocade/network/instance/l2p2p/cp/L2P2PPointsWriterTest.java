@@ -48,8 +48,7 @@ public class L2P2PPointsWriterTest implements CliFormatter {
                                 + "router mpls\n"
                                 + "vll abcd 44\n"
                                 + "untag ethernet 1/8\n"
-                                + "end\n",
-                        null
+                                + "end\n"
                 },
                 {
                         L2P2PPointsWriter.VLL_SUBINTERFACE,
@@ -60,8 +59,7 @@ public class L2P2PPointsWriterTest implements CliFormatter {
                                 + "vll abcd 44\n"
                                 + "vlan 99\n"
                                 + "tag ethernet 1/8\n"
-                                + "end\n",
-                        null
+                                + "end\n"
                 },
                 {
                         L2P2PPointsWriter.DELETE_VLL,
@@ -70,8 +68,7 @@ public class L2P2PPointsWriterTest implements CliFormatter {
                         "configure terminal\n"
                                 + "router mpls\n"
                                 + "no vll abcd 44\n"
-                                + "end\n",
-                        null
+                                + "end\n"
                 },
                 {
                         L2P2PPointsWriter.DELETE_VLL_LOCAL,
@@ -80,8 +77,7 @@ public class L2P2PPointsWriterTest implements CliFormatter {
                         "configure terminal\n"
                                 + "router mpls\n"
                                 + "no vll-local abcd\n"
-                                + "end\n",
-                        null
+                                + "end\n"
                 },
                 {
                         L2P2PPointsWriter.VLL_REMOTE,
@@ -90,10 +86,8 @@ public class L2P2PPointsWriterTest implements CliFormatter {
                         "configure terminal\n"
                                 + "router mpls\n"
                                 + "vll abcd 44\n"
-                                + "vll-mtu 1234\n"
                                 + "vll-peer 1.2.3.4\n"
-                                + "end\n",
-                        1234
+                                + "end\n"
                 },
                 {
                         L2P2PPointsWriter.VLL_LOCAL_IFC,
@@ -103,8 +97,7 @@ public class L2P2PPointsWriterTest implements CliFormatter {
                                 + "router mpls\n"
                                 + "vll-local abcd\n"
                                 + "untag ethernet 1/8\n"
-                                + "end\n",
-                        null
+                                + "end\n"
                 },
                 {
                         L2P2PPointsWriter.VLL_LOCAL_SUBINTERFACE,
@@ -115,8 +108,7 @@ public class L2P2PPointsWriterTest implements CliFormatter {
                                 + "vll-local abcd\n"
                                 + "vlan 99\n"
                                 + "tag ethernet 1/8\n"
-                                + "end\n",
-                        null
+                                + "end\n"
                 }
         });
     }
@@ -160,19 +152,17 @@ public class L2P2PPointsWriterTest implements CliFormatter {
     private final Endpoint remote;
     private final Endpoint local;
     private final String output;
-    private final Integer mtu;
 
-    public L2P2PPointsWriterTest(String template, Endpoint remote, Endpoint local, String output, Integer mtu) {
+    public L2P2PPointsWriterTest(String template, Endpoint remote, Endpoint local, String output) {
         this.template = template;
         this.remote = remote;
         this.local = local;
         this.output = output;
-        this.mtu = mtu;
     }
 
     @Test
     public void testFormatting() {
-        String formatted = fT(template, "network", NETNAME, "remote", remote, "local", local, "mtu", mtu);
+        String formatted = fT(template, "network", NETNAME, "remote", remote, "local", local, "vlan", 99);
         Assert.assertEquals(output, formatted);
     }
 }

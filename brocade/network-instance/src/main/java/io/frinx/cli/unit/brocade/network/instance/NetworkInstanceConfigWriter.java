@@ -32,6 +32,7 @@ public final class NetworkInstanceConfigWriter extends CompositeWriter<Config> {
                 new L3VrfConfigWriter(cli),
                 new DefaultConfigWriter(),
                 new L2P2PConfigWriter(cli),
-                new L2VSIConfigWriter(cli)));
+                new L2VSIConfigWriter(cli)
+        ));
     }
 }

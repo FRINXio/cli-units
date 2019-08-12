@@ -31,6 +31,7 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
     private static final String SHOW_RUNNING_CONFIG = "show running-config";
 
     private final Cli cli;
+    private int counter = 0;
 
     public ConfigMetadataReader(final Cli cli) {
         this.cli = cli;
@@ -44,9 +45,10 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<ConfigurationMetadata> instanceIdentifier,
                                       @Nonnull ConfigurationMetadataBuilder configurationMetadataBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String output = blockingRead(SHOW_RUNNING_CONFIG, cli, instanceIdentifier, readContext);
-
-        String fingerPrint = getLastConfigurationFingerprint(output);
-        configurationMetadataBuilder.setLastConfigurationFingerprint(fingerPrint);
+        configurationMetadataBuilder.setLastConfigurationFingerprint(String.format("%d", counter++));
+//        String output = blockingRead(SHOW_RUNNING_CONFIG, cli, instanceIdentifier, readContext);
+//
+//        String fingerPrint = getLastConfigurationFingerprint(output);
+//        configurationMetadataBuilder.setLastConfigurationFingerprint(fingerPrint);
     }
 }

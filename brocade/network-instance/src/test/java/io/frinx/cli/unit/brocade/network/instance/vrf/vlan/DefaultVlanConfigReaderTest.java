@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.brocade.network.instance.vlan;
+package io.frinx.cli.unit.brocade.network.instance.vrf.vlan;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev17071
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 
-public class VlanConfigReaderTest {
+public class DefaultVlanConfigReaderTest {
 
     private static final String OUTPUT1 = "vlan 1500 \n"
             + " tagged e 2/11 \n"
@@ -42,14 +42,14 @@ public class VlanConfigReaderTest {
     @Test
     public void testParseConfig() {
         ConfigBuilder parsedBuilder = new ConfigBuilder();
-        VlanConfigReader.parseVlanConfig(OUTPUT1, parsedBuilder, new VlanId(1500));
+        DefaultVlanConfigReader.parseVlanConfig(OUTPUT1, parsedBuilder, new VlanId(1500));
         Assert.assertEquals(new ConfigBuilder()
                 .setVlanId(new VlanId(1500))
                 .setStatus(VlanConfig.Status.ACTIVE)
                 .build(), parsedBuilder.build());
 
         parsedBuilder = new ConfigBuilder();
-        VlanConfigReader.parseVlanConfig(OUTPUT2, parsedBuilder, new VlanId(4090));
+        DefaultVlanConfigReader.parseVlanConfig(OUTPUT2, parsedBuilder, new VlanId(4090));
         Assert.assertEquals(new ConfigBuilder()
                 .setVlanId(new VlanId(4090))
                 .setStatus(VlanConfig.Status.ACTIVE)

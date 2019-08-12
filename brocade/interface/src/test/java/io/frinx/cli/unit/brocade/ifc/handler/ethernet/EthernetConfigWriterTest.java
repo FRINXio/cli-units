@@ -20,20 +20,60 @@ import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.ConfigBuilder;
 
 public class EthernetConfigWriterTest {
 
     @Test
     public void negotiationTest() {
-        Config data = new ConfigBuilder().setAutoNegotiate(true).build();
         Assert.assertEquals("configure terminal\n"
-            + "gig-default auto-gig\n"
-            + "end", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand(data.isAutoNegotiate()));
+                + "interface eth 1/1\n"
+                + "no gig-default auto-gig\n"
+                + "end", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand("eth 1/1",
+                new ConfigBuilder().setAutoNegotiate(true).build(), new ConfigBuilder().build()));
 
         Assert.assertEquals("configure terminal\n"
-            + "gig-default neg-off\n"
-            + "end", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand(!data.isAutoNegotiate()));
+                + "interface eth 1/1\n"
+                + "no gig-default neg-off\n"
+                + "end", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand("eth 1/1",
+                new ConfigBuilder().setAutoNegotiate(false).build(), new ConfigBuilder().build()));
+
+        Assert.assertEquals("configure terminal\n"
+                + "interface eth 1/1\n"
+                + "gig-default auto-gig\n"
+                + "end", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand("eth 1/1", null,
+                new ConfigBuilder().setAutoNegotiate(true).build()));
+
+        Assert.assertEquals("", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand("eth 1/1", null,
+                new ConfigBuilder().build()));
+
+        Assert.assertEquals("", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand("eth 1/1",
+                new ConfigBuilder().setAutoNegotiate(true).build(),
+                new ConfigBuilder().setAutoNegotiate(true).build()));
+
+        Assert.assertEquals("configure terminal\n"
+                + "interface eth 1/1\n"
+                + "gig-default auto-gig\n"
+                + "end", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand("eth 1/1",
+                new ConfigBuilder().setAutoNegotiate(false).build(),
+                new ConfigBuilder().setAutoNegotiate(true).build()));
+
+        Assert.assertEquals("configure terminal\n"
+                + "interface eth 1/1\n"
+                + "gig-default neg-off\n"
+                + "end", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand("eth 1/1",
+                new ConfigBuilder().setAutoNegotiate(true).build(),
+                new ConfigBuilder().setAutoNegotiate(false).build()));
+
+        Assert.assertEquals("configure terminal\n"
+                + "interface eth 1/1\n"
+                + "gig-default neg-off\n"
+                + "end", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand("eth 1/1",
+                new ConfigBuilder().build(),
+                new ConfigBuilder().setAutoNegotiate(false).build()));
+
+        Assert.assertEquals("", new EthernetConfigWriter(Mockito.mock(Cli.class)).getCommand("eth 1/1",
+                new ConfigBuilder().setAutoNegotiate(false).build(),
+                new ConfigBuilder().setAutoNegotiate(false).build()));
     }
 }

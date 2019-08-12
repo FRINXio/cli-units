@@ -27,6 +27,7 @@ import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -55,15 +56,24 @@ public final class L2VSIReader implements
         return getAllIds(instanceIdentifier, readContext, this.cli, this);
     }
 
-    static List<NetworkInstanceKey> getAllIds(@Nonnull InstanceIdentifier<?> instanceIdentifier,
-                                              @Nonnull ReadContext readContext,
-                                              @Nonnull Cli cli,
-                                              @Nonnull CliReader reader) throws ReadFailedException {
+    public static List<NetworkInstanceKey> getAllIds(@Nonnull InstanceIdentifier<?> instanceIdentifier,
+                                                     @Nonnull ReadContext readContext,
+                                                     @Nonnull Cli cli,
+                                                     @Nonnull CliReader reader) throws ReadFailedException {
+        // Caching here to speed up reading
+        if (readContext.getModificationCache().get(new AbstractMap.SimpleEntry<>(L2VSIReader.class, reader)) != null) {
+            return (List<NetworkInstanceKey>) readContext.getModificationCache()
+                    .get(new AbstractMap.SimpleEntry<>(L2VSIReader.class, reader));
+        }
+
         if (!instanceIdentifier.getTargetType().equals(NetworkInstance.class)) {
             instanceIdentifier = RWUtils.cutId(instanceIdentifier, NetworkInstance.class);
         }
 
-        return parseL2Vsis(reader.blockingRead(SH_L2_VSI, cli, instanceIdentifier, readContext));
+        List<NetworkInstanceKey> allIds =
+                parseL2Vsis(reader.blockingRead(SH_L2_VSI, cli, instanceIdentifier, readContext));
+        readContext.getModificationCache().put(new AbstractMap.SimpleEntry<>(L2VSIReader.class, reader), allIds);
+        return allIds;
     }
 
     @VisibleForTesting

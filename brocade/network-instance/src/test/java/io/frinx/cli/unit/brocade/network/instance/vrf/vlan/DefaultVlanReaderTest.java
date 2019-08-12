@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.brocade.network.instance.vlan;
+package io.frinx.cli.unit.brocade.network.instance.vrf.vlan;
 
 import com.google.common.collect.Lists;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.VlanKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 
-public class VlanReaderTest {
+public class DefaultVlanReaderTest {
 
     private static final String OUTPUT = "vlan 1 name DEFAULT-VLAN \n"
             + "vlan 3 \n"
@@ -43,6 +43,6 @@ public class VlanReaderTest {
                         .map(VlanId::new)
                         .map(VlanKey::new)
                         .collect(Collectors.toList()),
-                VlanReader.parseVlans(OUTPUT));
+                DefaultVlanReader.parseVlans(OUTPUT));
     }
 }

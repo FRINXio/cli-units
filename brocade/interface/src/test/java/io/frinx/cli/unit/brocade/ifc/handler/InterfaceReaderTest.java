@@ -61,7 +61,7 @@ public class InterfaceReaderTest {
 
     @Test
     public void testAllIds() {
-        List<InterfaceKey> interfaceKeys = new InterfaceReader(Mockito.mock(Cli.class)).parseAllInterfaceIds(OUTPUT);
+        List<InterfaceKey> interfaceKeys = new InterfaceReader(Mockito.mock(Cli.class)).parseInterfaceIds(OUTPUT);
         Assert.assertThat(interfaceKeys, CoreMatchers.hasItem(new InterfaceKey("ve 12")));
     }
 }

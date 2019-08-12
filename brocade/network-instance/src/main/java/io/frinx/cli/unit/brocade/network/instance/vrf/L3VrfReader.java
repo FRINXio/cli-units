@@ -18,19 +18,22 @@ package io.frinx.cli.unit.brocade.network.instance.vrf;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.util.RWUtils;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfReader;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class L3VrfReader extends AbstractL3VrfReader {
 
-    private static final String SH_IP_VRF = "show running-config | include ^vrf";
+    static final String SH_IP_VRF = "show running-config | include ^vrf|^ rd";
     private static final Pattern VRF_ID_LINE = Pattern.compile("vrf (?<vrfName>[\\S]+).*");
 
     public L3VrfReader(Cli cli) {
@@ -50,8 +53,20 @@ public final class L3VrfReader extends AbstractL3VrfReader {
     public List<NetworkInstanceKey> getAllIds(@Nonnull CliReader reader,
                                               @Nonnull InstanceIdentifier<?> id,
                                               @Nonnull ReadContext readContext) throws ReadFailedException {
+        // Caching here to speed up reading
+        if (readContext.getModificationCache().get(new AbstractMap.SimpleEntry<>(L3VrfReader.class, reader)) != null) {
+            return (List<NetworkInstanceKey>) readContext.getModificationCache()
+                    .get(new AbstractMap.SimpleEntry<>(L3VrfReader.class, reader));
+        }
+
+        if (!id.getTargetType().equals(NetworkInstance.class)) {
+            id = RWUtils.cutId(id, NetworkInstance.class);
+        }
+
         List<NetworkInstanceKey> keys = super.getAllIds(reader, id, readContext);
         keys.add(NetworInstance.DEFAULT_NETWORK);
+        readContext.getModificationCache().put(new AbstractMap.SimpleEntry<>(L3VrfReader.class, reader), keys);
         return keys;
+
     }
 }

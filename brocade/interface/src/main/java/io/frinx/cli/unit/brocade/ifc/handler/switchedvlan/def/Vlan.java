@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.brocade.ifc.handler.switchedvlan;
+package io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.def;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;

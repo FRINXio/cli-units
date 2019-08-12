@@ -18,7 +18,6 @@ package io.frinx.cli.unit.brocade.ifc.handler;
 
 import com.x5.template.Chunk;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.brocade.ifc.Util;
 import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.brocade.extension.rev190726.IfBrocadePriorityAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
@@ -56,7 +55,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
 
     @Override
     public boolean isPhysicalInterface(Config data) {
-        return Util.isPhysicalInterface(data);
+        return false;
     }
 
     @Override

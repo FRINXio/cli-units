@@ -27,9 +27,9 @@ import io.frinx.cli.unit.brocade.network.instance.cp.ConnectionPointsWriter;
 import io.frinx.cli.unit.brocade.network.instance.ifc.InterfaceConfigReader;
 import io.frinx.cli.unit.brocade.network.instance.ifc.InterfaceReader;
 import io.frinx.cli.unit.brocade.network.instance.ifc.InterfaceWriter;
-import io.frinx.cli.unit.brocade.network.instance.policy.forwarding.PolicyForwardingInterfaceConfigReader;
-import io.frinx.cli.unit.brocade.network.instance.policy.forwarding.PolicyForwardingInterfaceConfigWriter;
-import io.frinx.cli.unit.brocade.network.instance.policy.forwarding.PolicyForwardingInterfaceReader;
+import io.frinx.cli.unit.brocade.network.instance.policy.forwarding.PFInterfaceConfigReader;
+import io.frinx.cli.unit.brocade.network.instance.policy.forwarding.PFInterfaceConfigWriter;
+import io.frinx.cli.unit.brocade.network.instance.policy.forwarding.PFInterfaceReader;
 import io.frinx.cli.unit.brocade.network.instance.vlan.VlanConfigReader;
 import io.frinx.cli.unit.brocade.network.instance.vlan.VlanConfigWriter;
 import io.frinx.cli.unit.brocade.network.instance.vlan.VlanReader;
@@ -93,7 +93,7 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
 
         // Policy-Forwarding
         writeRegistry.addNoop(IIDs.NE_NE_PO_IN_INTERFACE);
-        writeRegistry.subtreeAdd(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigWriter(cli),
+        writeRegistry.subtreeAdd(IIDs.NE_NE_PO_IN_IN_CONFIG, new PFInterfaceConfigWriter(cli),
                 Sets.newHashSet(IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFBROCADEAUG));
 
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_CONNECTIONPOINTS, new ConnectionPointsWriter(cli),
@@ -121,8 +121,8 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli));
 
         // Policy-Forwarding
-        readRegistry.add(IIDs.NE_NE_PO_IN_INTERFACE, new PolicyForwardingInterfaceReader(cli));
-        readRegistry.subtreeAdd(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli),
+        readRegistry.add(IIDs.NE_NE_PO_IN_INTERFACE, new PFInterfaceReader(cli));
+        readRegistry.subtreeAdd(IIDs.NE_NE_PO_IN_IN_CONFIG, new PFInterfaceConfigReader(cli),
                 Sets.newHashSet(IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFBROCADEAUG));
 
         // Interfaces for VRF

@@ -59,42 +59,40 @@ public class L2P2PPointsReaderTest {
             + " vll abcd2 45672\n";
 
     @Test
-    public void testParseVllLocal() {
+    public void l2VSIPointsReaderRemoteTesttestParseVllLocal() {
         List<ConnectionPoint> connectionPoints = L2P2PPointsReader.parseVllLocalPoints(VLL_LOCAL_OUTPUT_1);
         Assert.assertEquals(2, connectionPoints.size());
 
         ConnectionPoint endpoint0 = connectionPoints.get(0);
         Assert.assertEquals("1", endpoint0.getConnectionPointId());
         Assert.assertEquals(1, endpoint0.getEndpoints().getEndpoint().size());
-        assertEndpoint(endpoint0, "ethernet 1/7", 20L);
+        assertEndpoint(endpoint0, "ethernet 1/7");
 
         ConnectionPoint endpoint1 = connectionPoints.get(1);
         Assert.assertEquals("2", endpoint1.getConnectionPointId());
         Assert.assertEquals(1, endpoint1.getEndpoints().getEndpoint().size());
-        assertEndpoint(endpoint1, "ethernet 1/9", 20L);
+        assertEndpoint(endpoint1, "ethernet 1/9");
 
         connectionPoints = L2P2PPointsReader.parseVllLocalPoints(VLL_LOCAL_OUTPUT_2);
-        assertEndpoint(connectionPoints.get(0), "ethernet 1/7", 20L);
-        assertEndpoint(connectionPoints.get(1), "ethernet 1/9", 30L);
+        assertEndpoint(connectionPoints.get(0), "ethernet 1/7");
+        assertEndpoint(connectionPoints.get(1), "ethernet 1/9");
 
         connectionPoints = L2P2PPointsReader.parseVllLocalPoints(VLL_LOCAL_OUTPUT_3);
-        assertEndpoint(connectionPoints.get(0), "ethernet 1/7", null);
-        assertEndpoint(connectionPoints.get(1), "ethernet 1/9", null);
+        assertEndpoint(connectionPoints.get(0), "ethernet 1/7");
+        assertEndpoint(connectionPoints.get(1), "ethernet 1/9");
 
         connectionPoints = L2P2PPointsReader.parseVllLocalPoints(VLL_LOCAL_OUTPUT_4);
-        assertEndpoint(connectionPoints.get(0), "ethernet 1/7", 20L);
-        assertEndpoint(connectionPoints.get(1), "ethernet 1/9", null);
+        assertEndpoint(connectionPoints.get(0), "ethernet 1/7");
+        assertEndpoint(connectionPoints.get(1), "ethernet 1/9");
 
         connectionPoints = L2P2PPointsReader.parseVllLocalPoints(VLL_LOCAL_OUTPUT_INCOMPLETE);
         Assert.assertEquals(0, connectionPoints.size());
     }
 
-    private void assertEndpoint(ConnectionPoint endpoint0, String ifc, Long vlan) {
+    private void assertEndpoint(ConnectionPoint endpoint0, String ifc) {
         Assert.assertEquals(LOCAL.class,
                 endpoint0.getEndpoints().getEndpoint().get(0).getConfig().getType());
         Assert.assertEquals(ifc,
                 endpoint0.getEndpoints().getEndpoint().get(0).getLocal().getConfig().getInterface());
-        Assert.assertEquals(vlan,
-                endpoint0.getEndpoints().getEndpoint().get(0).getLocal().getConfig().getSubinterface());
     }
 }

@@ -60,7 +60,7 @@ public class L2VSIPointsReaderRemoteTest {
         Assert.assertEquals("1", endpoint0.getConnectionPointId());
         Assert.assertEquals(1, endpoint0.getEndpoints().getEndpoint().size());
 
-        assertLocalEndpoint(endpoint0, null, "ethernet 1/8");
+        assertLocalEndpoint(endpoint0, "ethernet 1/8");
     }
 
     @Test
@@ -78,7 +78,7 @@ public class L2VSIPointsReaderRemoteTest {
         Assert.assertEquals("1", endpoint0.getConnectionPointId());
         Assert.assertEquals(1, endpoint0.getEndpoints().getEndpoint().size());
 
-        assertLocalEndpoint(endpoint0, 100L, "ethernet 1/8");
+        assertLocalEndpoint(endpoint0, "ethernet 1/8");
     }
 
     @Test
@@ -96,12 +96,10 @@ public class L2VSIPointsReaderRemoteTest {
                 endpoint1.getEndpoints().getEndpoint().get(0).getRemote().getConfig().getRemoteSystem());
     }
 
-    private void assertLocalEndpoint(ConnectionPoint endpoint0, Long vlan, String ifc) {
+    private void assertLocalEndpoint(ConnectionPoint endpoint0, String ifc) {
         Assert.assertEquals(LOCAL.class,
                 endpoint0.getEndpoints().getEndpoint().get(0).getConfig().getType());
         Assert.assertEquals(ifc,
                 endpoint0.getEndpoints().getEndpoint().get(0).getLocal().getConfig().getInterface());
-        Assert.assertEquals(vlan,
-                endpoint0.getEndpoints().getEndpoint().get(0).getLocal().getConfig().getSubinterface());
     }
 }

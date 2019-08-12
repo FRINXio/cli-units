@@ -34,6 +34,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final Pattern GIG_DEFAULT = Pattern.compile("gig-default neg-off");
+    private static final Pattern GIG_DEFAULT_AUTO = Pattern.compile("gig-default auto-gig");
 
     private final Cli cli;
 
@@ -53,11 +54,13 @@ public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuild
     }
 
     private void parseEthernetConfig(String output, ConfigBuilder builder) {
-        builder.setAutoNegotiate(true);
-
         ParsingUtils.parseField(output,
             GIG_DEFAULT::matcher,
             m -> false,
+            builder::setAutoNegotiate);
+        ParsingUtils.parseField(output,
+            GIG_DEFAULT_AUTO::matcher,
+            m -> true,
             builder::setAutoNegotiate);
     }
 }
