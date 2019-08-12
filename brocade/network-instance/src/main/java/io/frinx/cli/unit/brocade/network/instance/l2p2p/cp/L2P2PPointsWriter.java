@@ -56,6 +56,7 @@ public class L2P2PPointsWriter implements CompositeWriter.Child<ConnectionPoints
     static String VLL_REMOTE = "configure terminal\n"
             + "router mpls\n"
             + "vll {$network} {$remote.remote.config.virtual_circuit_identifier}\n"
+            + "{% if ($mtu) %}vll-mtu {$mtu}\n{% endif %}"
             + "vll-peer {$remote.remote.config.remote_system.ipv4_address.value}\n"
             + "end\n";
 
@@ -115,10 +116,12 @@ public class L2P2PPointsWriter implements CompositeWriter.Child<ConnectionPoints
         ConnectionPoint connectionPoint2 = getCPoint(dataAfter, L2P2PPointsReader.POINT_2);
         Endpoint endpoint2 = getEndpoint(id, connectionPoint2, writeContext, true);
 
+        Integer mtu = writeContext.readAfter(id.firstIdentifierOf(NetworkInstance.class)).get().getConfig().getMtu();
+
         if (isLocal(endpoint1, endpoint2)) {
             writeVllLocal(id, dataAfter, endpoint1, endpoint2);
         } else if (isLocalRemote(endpoint1, endpoint2)) {
-            writeVll(id, dataAfter, endpoint1, endpoint2);
+            writeVll(id, dataAfter, endpoint1, endpoint2, mtu);
         } else {
             throw new IllegalArgumentException("Unable to configure L2P2P with REMOTE only endpoints: "
                     + dataAfter.getConnectionPoint());
@@ -130,12 +133,12 @@ public class L2P2PPointsWriter implements CompositeWriter.Child<ConnectionPoints
     private void writeVll(InstanceIdentifier<ConnectionPoints> id,
                           ConnectionPoints dataAfter,
                           Endpoint endpoint1,
-                          Endpoint endpoint2) throws WriteFailedException.CreateFailedException {
+                          Endpoint endpoint2, Integer mtu) throws WriteFailedException.CreateFailedException {
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
         Endpoint local = getLocal(endpoint1, endpoint2);
         Endpoint remote = getRemote(endpoint1, endpoint2);
 
-        blockingWriteAndRead(cli, id, dataAfter, fT(VLL_REMOTE, "network", netName, "remote", remote));
+        blockingWriteAndRead(cli, id, dataAfter, fT(VLL_REMOTE, "network", netName, "remote", remote, "mtu", mtu));
 
         String template = local.getLocal().getConfig().getSubinterface() == null ? VLL_IFC : VLL_SUBINTERFACE;
         blockingWriteAndRead(cli, id, dataAfter, fT(template, "network", netName, "remote", remote, "local", local));

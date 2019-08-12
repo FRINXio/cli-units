@@ -35,6 +35,10 @@ import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6.Ipv6AddressReader;
 import io.frinx.cli.unit.brocade.ifc.handler.subifc.ip6.Ipv6ConfigReader;
+import io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.SwitchedVlanConfigReader;
+import io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.SwitchedVlanConfigWriter;
+import io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.def.RoutedVlanConfigReader;
+import io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.def.RoutedVlanConfigWriter;
 import io.frinx.cli.unit.brocade.init.BrocadeDevices;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
@@ -80,14 +84,18 @@ public final class BrocadeInterfaceUnit extends AbstractUnit {
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writerRegistry, Cli cli) {
         writerRegistry.addNoop(IIDs.IN_INTERFACE);
-        writerRegistry.subtreeAdd(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli),
-                Sets.newHashSet(IIDs.IN_IN_CO_AUG_IFBROCADEPRIORITYAUG));
+        writerRegistry.subtreeAddAfter(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.IN_IN_CO_AUG_IFBROCADEPRIORITYAUG),
+                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_AUG_INTERFACE1_RO_CONFIG);
 
         writerRegistry.addAfter(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli), IIDs.IN_IN_CONFIG);
+        writerRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_AUG_INTERFACE1_RO_CONFIG,
+                new RoutedVlanConfigWriter(cli),
+                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_VL_VL_CONFIG);
 
-//        writerRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
-//                new SwitchedVlanConfigWriter(cli), IIDs.IN_IN_CONFIG,
-//                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_VL_VL_CONFIG);
+        writerRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
+                new SwitchedVlanConfigWriter(cli), IIDs.IN_IN_CONFIG,
+                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_VL_VL_CONFIG);
 
         writerRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_CO_AUG_CONFIG1,
                 new TpIdInterfaceWriter(cli), IIDs.IN_IN_CONFIG);
@@ -108,9 +116,11 @@ public final class BrocadeInterfaceUnit extends AbstractUnit {
                 Sets.newHashSet(IIDs.IN_IN_CO_AUG_IFBROCADEPRIORITYAUG));
 
         readRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_AUG_INTERFACE1_RO_CONFIG,
+                new RoutedVlanConfigReader(cli));
 
-//        readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
-//                new SwitchedVlanConfigReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
+                new SwitchedVlanConfigReader(cli));
 
         readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_CO_AUG_CONFIG1, new TpIdInterfaceReader(cli));
 

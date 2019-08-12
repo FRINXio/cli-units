@@ -29,23 +29,55 @@ public class InterfaceConfigWriterTest {
 
     @Test
     public void updateTemplate() {
-        InterfaceConfigWriter writer = new InterfaceConfigWriter(Mockito.mock(Cli.class));
-        IfBrocadePriorityAug cfg = new IfBrocadePriorityAugBuilder()
-            .setPriority((short) 4)
-            .setPriorityForce(true)
-            .build();
-        Config config = new ConfigBuilder()
-            .setEnabled(true)
-            .setName("test")
-            .addAugmentation(IfBrocadePriorityAug.class, cfg)
-            .build();
+        Config configBefore = getConfig("e 1", 4, true);
 
-        String output = writer.updateTemplate(null, config);
+        InterfaceConfigWriter writer = new InterfaceConfigWriter(Mockito.mock(Cli.class));
+
+        Config config = getConfig("e 1", 0, true);
+        String output = writer.updateTemplate(configBefore, config);
         Assert.assertEquals("configure terminal\n"
-                + "interface test\n"
+                + "interface e 1\n"
+                + "enable\n"
+                + "priority 0\n"
+                + "end", output);
+
+        config = getConfig("e 1", 4, false);
+        output = writer.updateTemplate(configBefore, config);
+        Assert.assertEquals("configure terminal\n"
+                + "interface e 1\n"
+                + "enable\n"
+                + "no priority force\n"
+                + "end", output);
+
+        config = getConfig("e 1", 4, false);
+        output = writer.updateTemplate(null, config);
+        Assert.assertEquals("configure terminal\n"
+                + "interface e 1\n"
                 + "enable\n"
                 + "priority 4\n"
-                + "priority force\n"
                 + "end", output);
+
+        config = getConfig("e 1", 4, true);
+        output = writer.updateTemplate(configBefore, config);
+        Assert.assertEquals("configure terminal\n"
+                + "interface e 1\n"
+                + "enable\n"
+                + "end", output);
+    }
+
+    private Config getConfig(String name, int priority, boolean force) {
+        IfBrocadePriorityAugBuilder cfg;
+        Config config;
+        cfg = new IfBrocadePriorityAugBuilder()
+            .setPriority((short) priority);
+        if (force) {
+            cfg.setPriorityForce(force);
+        }
+        config = new ConfigBuilder()
+            .setEnabled(true)
+            .setName(name)
+            .addAugmentation(IfBrocadePriorityAug.class, cfg.build())
+            .build();
+        return config;
     }
 }

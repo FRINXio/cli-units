@@ -33,6 +33,14 @@ public class DefaultVlanConfigWriterTest implements CliFormatter {
 
         Assert.assertEquals("configure terminal\n"
                 + "vlan 14 name abcd\n"
-                + "end\n", config);
+                + "end", config);
+
+        config = fT(DefaultVlanConfigWriter.WRITE_TEMPLATE, "data", new ConfigBuilder()
+                .setVlanId(new VlanId(14))
+                .build());
+
+        Assert.assertEquals("configure terminal\n"
+                + "vlan 14\n"
+                + "end", config);
     }
 }

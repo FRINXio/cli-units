@@ -105,7 +105,7 @@ public final class DefaultSwitchedVlanConfigWriter implements CompositeWriter.Ch
 
     @VisibleForTesting
     String getCommand(@Nonnull Config config, String anInterface, boolean delete) {
-        String command;
+        String command = "";
         if (VlanModeType.TRUNK.equals(config.getInterfaceMode())) {
             command = fT(WRITE_TRUNK_TEMPLATE, "data", io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.def.Vlan
                             .parseVlanRanges(config.getTrunkVlans()),
@@ -118,7 +118,7 @@ public final class DefaultSwitchedVlanConfigWriter implements CompositeWriter.Ch
                         "ifc", anInterface,
                         "delete", delete ? Chunk.TRUE : null);
             }
-        } else {
+        } else if (config.getAccessVlan().getValue() != 1) {
             command = fT(WRITE_ACCESS_TEMPLATE, "vlanid", config.getAccessVlan(),
                     "ifc", anInterface,
                     "delete", delete ? Chunk.TRUE : null);

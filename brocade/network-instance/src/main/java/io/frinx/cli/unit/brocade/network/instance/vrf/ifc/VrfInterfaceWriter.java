@@ -16,16 +16,11 @@
 
 package io.frinx.cli.unit.brocade.network.instance.vrf.ifc;
 
-import com.google.common.base.Preconditions;
-import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListWriter;
-import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -56,25 +51,27 @@ public class VrfInterfaceWriter implements CompositeWriter.Child<Interface>, Cli
             return false;
         }
 
-        boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx
-                        .openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
-                        .interfaces.InterfaceKey(anInterface.getId())))
-                .isPresent();
-        Preconditions.checkArgument(ifcExists, "Interface: %s does not exist, cannot add it to VRF", anInterface
-                .getId());
-
-        final NetworkInstance networkInstance =
-                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance.class))
-                        .get();
-
-        blockingWriteAndRead(cli, instanceIdentifier, anInterface,
-                f(WRITE_TEMPLATE,
-                        anInterface.getId(),
-                        networkInstance.getConfig()
-                                .getName()));
-
         return true;
+
+//        boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx
+//                        .openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
+//                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+//                        .interfaces.InterfaceKey(anInterface.getId())))
+//                .isPresent();
+//        Preconditions.checkArgument(ifcExists, "Interface: %s does not exist, cannot add it to VRF", anInterface
+//                .getId());
+//
+//        final NetworkInstance networkInstance =
+//                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, NetworkInstance.class))
+//                        .get();
+//
+//        blockingWriteAndRead(cli, instanceIdentifier, anInterface,
+//                f(WRITE_TEMPLATE,
+//                        anInterface.getId(),
+//                        networkInstance.getConfig()
+//                                .getName()));
+//
+//        return true;
     }
 
     @Override
@@ -94,23 +91,25 @@ public class VrfInterfaceWriter implements CompositeWriter.Child<Interface>, Cli
             return false;
         }
 
-        NetworkInstanceKey networkInstanceKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
-
-        boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx
-                        .openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
-                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
-                        .interfaces.InterfaceKey(anInterface.getId())))
-                .isPresent();
-        if (!ifcExists) {
-            // No point of removing vrf from nonexisting ifc
-            return true;
-        }
-
-        blockingDeleteAndRead(cli, instanceIdentifier,
-                f(DELETE_TEMPLATE,
-                        anInterface.getId(),
-                        networkInstanceKey.getName()));
-
         return true;
+
+//        NetworkInstanceKey networkInstanceKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
+//
+//        boolean ifcExists = writeContext.readAfter(IIDs.INTERFACES.child(org.opendaylight.yang.gen.v1.http.frinx
+//                        .openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface.class,
+//                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top
+//                        .interfaces.InterfaceKey(anInterface.getId())))
+//                .isPresent();
+//        if (!ifcExists) {
+//            // No point of removing vrf from nonexisting ifc
+//            return true;
+//        }
+//
+//        blockingDeleteAndRead(cli, instanceIdentifier,
+//                f(DELETE_TEMPLATE,
+//                        anInterface.getId(),
+//                        networkInstanceKey.getName()));
+//
+//        return true;
     }
 }

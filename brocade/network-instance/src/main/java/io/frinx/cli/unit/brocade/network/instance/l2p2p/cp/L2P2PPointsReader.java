@@ -122,7 +122,11 @@ public class L2P2PPointsReader implements CompositeReader.Child<ConnectionPoints
     @VisibleForTesting
     static List<ConnectionPoint> parseVllPoints(String output) {
 
-        output = output.substring(0, output.indexOf(Cli.NEWLINE + Cli.NEWLINE));
+        int endIdx = output.indexOf(Cli.NEWLINE + Cli.NEWLINE);
+        if (endIdx == -1) {
+            endIdx = output.indexOf(Cli.NEWLINE + "\r" + Cli.NEWLINE);
+        }
+        output = output.substring(0, endIdx);
         output = TAGGED_IFC_PREFIX_PATTERN.matcher(output).replaceAll(" tagged");
 
         Optional<String> remoteIp = ParsingUtils.parseField(output, 0, VLL_PEER_LINE::matcher,
@@ -159,7 +163,11 @@ public class L2P2PPointsReader implements CompositeReader.Child<ConnectionPoints
     @VisibleForTesting
     static List<ConnectionPoint> parseVllLocalPoints(String output) {
 
-        output = output.substring(0, output.indexOf(Cli.NEWLINE + Cli.NEWLINE));
+        int endIdx = output.indexOf(Cli.NEWLINE + Cli.NEWLINE);
+        if (endIdx == -1) {
+            endIdx = output.indexOf(Cli.NEWLINE + "\r" + Cli.NEWLINE);
+        }
+        output = output.substring(0, endIdx);
         output = TAGGED_IFC_PREFIX_PATTERN.matcher(output).replaceAll(" tagged");
 
         List<String> ifcs = ParsingUtils.parseFields(output, 0,

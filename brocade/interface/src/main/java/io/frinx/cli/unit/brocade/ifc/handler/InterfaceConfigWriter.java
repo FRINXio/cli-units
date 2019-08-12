@@ -18,9 +18,11 @@ package io.frinx.cli.unit.brocade.ifc.handler;
 
 import com.x5.template.Chunk;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.brocade.ifc.Util;
 import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.brocade.extension.rev190726.IfBrocadePriorityAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 
 public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
 
@@ -29,13 +31,15 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{$data|update(mtu,mtu `$data.mtu`\n,no mtu\n)}"
             + "{$data|update(description,port-name `$data.description`\n,no port-name\n)}"
             + "{% if ($enabled) %}enable\n{% else %}disable\n{% endif %}"
-
-            + "{% if ($priority) %}"
-                + "{$priority|update(priority,priority `$priority.priority`\n,priority 0\n)}"
-                + "{% if ($forced) %}priority force\n{% else %}no priority force\n{% endif %}"
-            + "{% endif %}"
-
+            + "{$priority}"
             + "end";
+
+    private static final String PRIORITY_TEMPLATE =
+            "{$priority|update(priority,priority `$priority.priority`\n,priority 0\n)}"
+            + "{% if ($update) %}"
+            + "{% if (!$forced) %}no {% endif %}priority force\n"
+            + "{% endif %}";
+
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
             + "no interface {$data.name}\n"
@@ -47,10 +51,30 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
 
     @Override
     protected String updateTemplate(Config before, Config after) {
-        IfBrocadePriorityAug priorityAug = after.getAugmentation(IfBrocadePriorityAug.class);
+        boolean etheType = EthernetCsmacd.class.equals(Util.parseType(Util.expandInterfaceName(after.getName())));
+        String priorityCommand = etheType ? getPriority(before, after) : "";
+
         return fT(WRITE_TEMPLATE, "before", before, "data", after,
-            "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
-            "priority", priorityAug, "forced", priorityAug.isPriorityForce() ? Chunk.TRUE : null);
+                "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
+                "priority", priorityCommand);
+    }
+
+    private String getPriority(Config before, Config after) {
+        IfBrocadePriorityAug priorityAug = after.getAugmentation(IfBrocadePriorityAug.class);
+        IfBrocadePriorityAug priorityAugBefore = null;
+        if (before != null) {
+            priorityAugBefore = before.getAugmentation(IfBrocadePriorityAug.class);
+        }
+        boolean update = priorityAug != null && priorityAugBefore != null
+                && !getPriorityForce(priorityAug).equals(getPriorityForce(priorityAugBefore));
+        return fT(PRIORITY_TEMPLATE, "before", priorityAugBefore, "priority", priorityAug,
+                "forced", (priorityAug != null && priorityAug.isPriorityForce() != null
+                        && priorityAug.isPriorityForce()) ? Chunk.TRUE : null,
+                "update", update ? Chunk.TRUE : null);
+    }
+
+    private Boolean getPriorityForce(IfBrocadePriorityAug priority) {
+        return priority.isPriorityForce() != null && priority.isPriorityForce();
     }
 
     @Override

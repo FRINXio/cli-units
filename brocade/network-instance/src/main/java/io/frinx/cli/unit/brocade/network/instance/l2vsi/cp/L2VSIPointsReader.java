@@ -107,7 +107,11 @@ public class L2VSIPointsReader implements CompositeReader.Child<ConnectionPoints
     @VisibleForTesting
     static List<ConnectionPoint> parseVplsLines(String output) {
 
-        output = output.substring(0, output.indexOf(Cli.NEWLINE + Cli.NEWLINE));
+        int endIdx = output.indexOf(Cli.NEWLINE + Cli.NEWLINE);
+        if (endIdx == -1) {
+            endIdx = output.indexOf(Cli.NEWLINE + "\r" + Cli.NEWLINE);
+        }
+        output = output.substring(0, endIdx);
 
         List<String> remoteIps = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
@@ -127,7 +131,7 @@ public class L2VSIPointsReader implements CompositeReader.Child<ConnectionPoints
         }
 
         Vlan vlan = Vlan.create(VPLS_SUBIFCS_DIVIDER.matcher(output).replaceAll(" "));
-        if (vlan.getInterfaces().isEmpty()) {
+        if (vlan == null || vlan.getInterfaces().isEmpty()) {
             return Collections.emptyList();
         }
 

@@ -26,24 +26,25 @@ public class RouterInterfaceInVlan implements SWInterface {
 
     private static final Pattern IFC_VE = Pattern.compile("ve (?<port>\\d+)");
     private String port;
-    private String tagName;
 
-    RouterInterfaceInVlan(String tag, String ifc) {
-        this.tagName = tag;
+    RouterInterfaceInVlan(String ifc) {
+        port = extractPort(ifc);
+    }
+
+    private String extractPort(String ifc) {
         Matcher matcher = IFC_VE.matcher(ifc.trim());
-        if (matcher.matches()) {
-            port = matcher.group("port");
-        }
+        return matcher.matches() ? matcher.group("port") : null;
     }
 
     @Override
     public boolean containsInterface(@Nonnull String ifcName) {
-        return ifcName.equalsIgnoreCase(port);
+        String ifcPort = extractPort(ifcName);
+        return ifcPort != null && ifcPort.equalsIgnoreCase(port);
     }
 
     @Override
     public String getTag() {
-        return tagName;
+        return null;
     }
 
     @Override

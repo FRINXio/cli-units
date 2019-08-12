@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -29,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanRoutedConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanSwitchedConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
@@ -63,6 +65,14 @@ public final class Vlan {
 
     public List<SWInterface> getInterfaces() {
         return this.interfaces;
+    }
+
+    static void buildConfiguration(@Nonnull String ifcName, @Nonnull org.opendaylight.yang.gen.v1.http.frinx.openconfig
+            .net.yang.vlan.rev170714.vlan.routed.top.routed.vlan.ConfigBuilder configBuilder, @Nonnull Vlan vlan) {
+        vlan.getInterfaces().stream()
+            .filter(sw -> sw.containsInterface(ifcName))
+            .findFirst()
+            .ifPresent(sw -> configBuilder.setVlan(new VlanRoutedConfig.Vlan(vlan.getId().getValue())));
     }
 
     static void buildConfiguration(@Nonnull String ifcName, @Nonnull ConfigBuilder configBuilder, @Nonnull Vlan vlan) {
@@ -139,7 +149,7 @@ public final class Vlan {
         return newVlans;
     }
 
-    static List<VlanSwitchedConfig.TrunkVlans> parseVlanRanges(List<VlanSwitchedConfig.TrunkVlans> trunkVlans) {
+    public static List<VlanSwitchedConfig.TrunkVlans> parseVlanRanges(List<VlanSwitchedConfig.TrunkVlans> trunkVlans) {
         List<VlanSwitchedConfig.TrunkVlans> newTrunkVlans = trunkVlans.stream()
             .filter(tv -> tv.getVlanId() != null)
             .collect(Collectors.toList());
@@ -163,15 +173,14 @@ public final class Vlan {
     }
 
     public static Vlan create(String line) {
-        Integer vlanId = ParsingUtils.NEWLINE.splitAsStream(line)
+        Optional<Integer> vlanId = ParsingUtils.NEWLINE.splitAsStream(line)
                 .map(VLAN_ID_LINE::matcher)
                 .filter(Matcher::find)
                 .map(m -> m.group("id"))
                 .findFirst()
-                .map(Integer::valueOf)
-                .get();
+                .map(Integer::valueOf);
 
-        return new Vlan(new VlanId(vlanId), findAllInterfaces(line));
+        return vlanId.map(vlanNum -> new Vlan(new VlanId(vlanNum), findAllInterfaces(line))).orElse(null);
     }
 
     private static List<SWInterface> findAllInterfaces(String line) {
@@ -188,7 +197,7 @@ public final class Vlan {
         findAll(ifcLine, IFC_RANGE, ifc -> list.add(new InterfaceRangeInVlan(tagged, ifc)));
         findAll(ifcLine, IFC_SINGLE, m -> ifcLine.indexOf("to", m.end()) - m.end() != 0, Matcher::group,
             ifc -> list.add(new InterfaceInVlan(tagged, ifc)));
-        findAll(ifcLine, IFC_VE, ifc -> list.add(new RouterInterfaceInVlan(tagged, ifc)));
+        findAll(ifcLine, IFC_VE, ifc -> list.add(new RouterInterfaceInVlan(ifc)));
     }
 
     private static void findAll(String line, Pattern pattern, Consumer<String> consumer) {

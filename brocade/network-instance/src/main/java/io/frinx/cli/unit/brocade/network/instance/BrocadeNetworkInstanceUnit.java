@@ -33,6 +33,9 @@ import io.frinx.cli.unit.brocade.network.instance.policy.forwarding.PFInterfaceR
 import io.frinx.cli.unit.brocade.network.instance.vlan.VlanConfigReader;
 import io.frinx.cli.unit.brocade.network.instance.vlan.VlanConfigWriter;
 import io.frinx.cli.unit.brocade.network.instance.vlan.VlanReader;
+import io.frinx.cli.unit.brocade.network.instance.vrf.protocol.ProtocolConfigReader;
+import io.frinx.cli.unit.brocade.network.instance.vrf.protocol.ProtocolConfigWriter;
+import io.frinx.cli.unit.brocade.network.instance.vrf.protocol.ProtocolReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Set;
@@ -78,12 +81,14 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         // No handling required on the network instance level
         writeRegistry.addNoop(IIDs.NE_NETWORKINSTANCE);
-        writeRegistry.addAfter(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli),
-                /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
+        writeRegistry.addAfter(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli));
 
         writeRegistry.addNoop(IIDs.NE_NE_VL_VLAN);
-        writeRegistry.addAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
-                io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG, IIDs.NE_NE_CONFIG);
+        writeRegistry.addAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli), IIDs.NE_NE_CONFIG);
+
+        // protocol
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PROTOCOL);
+        writeRegistry.add(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter(cli));
 
         // Interfaces for VRF
         writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
@@ -116,7 +121,10 @@ public class BrocadeNetworkInstanceUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
         readRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli));
 
-        // Vlan
+        // protocol
+        readRegistry.add(IIDs.NE_NE_PR_PROTOCOL, new ProtocolReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigReader());
+
         readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
         readRegistry.add(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli));
 

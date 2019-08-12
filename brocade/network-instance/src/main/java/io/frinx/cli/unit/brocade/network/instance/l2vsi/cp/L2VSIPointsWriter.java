@@ -53,6 +53,7 @@ public class L2VSIPointsWriter implements CompositeWriter.Child<ConnectionPoints
     static String VPLS_REMOTE = "configure terminal\n"
             + "router mpls\n"
             + "vpls {$network} {$vccid}\n"
+            + "{% if ($mtu) %}vpls-mtu {$mtu}\n{% endif %}"
             + "{% loop in $remotes as $remote %}"
             + "vpls-peer {$remote.remote.config.remote_system.ipv4_address.value}\n"
             + "{% endloop %}"
@@ -99,7 +100,9 @@ public class L2VSIPointsWriter implements CompositeWriter.Child<ConnectionPoints
                 "L2VSI network supports at least 1 local and 1 remote endpoint, but were: LOCAL: %s, REMOTE: %s",
                 locals.size(), remotes.size());
 
-        writeVpls(id, dataAfter, locals, remotes);
+        Integer mtu = writeContext.readAfter(id.firstIdentifierOf(NetworkInstance.class)).get().getConfig().getMtu();
+
+        writeVpls(id, dataAfter, locals, remotes, mtu);
 
         return true;
     }
@@ -107,7 +110,7 @@ public class L2VSIPointsWriter implements CompositeWriter.Child<ConnectionPoints
     private void writeVpls(InstanceIdentifier<ConnectionPoints> id,
                            ConnectionPoints dataAfter,
                            List<Endpoint> local,
-                           List<Endpoint> remotes) throws WriteFailedException.CreateFailedException {
+                           List<Endpoint> remotes, Integer mtu) throws WriteFailedException.CreateFailedException {
         String netName = id.firstKeyOf(NetworkInstance.class).getName();
 
         Long vccid = remotes.get(0).getRemote().getConfig().getVirtualCircuitIdentifier();
@@ -117,7 +120,7 @@ public class L2VSIPointsWriter implements CompositeWriter.Child<ConnectionPoints
         Preconditions.checkArgument(remotes.size() == count, "All remote must have the same VCCID.");
 
         blockingWriteAndRead(cli, id, dataAfter, fT(VPLS_REMOTE,
-                "network", netName, "vccid", vccid, "remotes", remotes));
+                "network", netName, "vccid", vccid, "remotes", remotes, "mtu", mtu));
 
         for (Endpoint ep : local) {
             boolean isUntagged = java.util.Optional.ofNullable(

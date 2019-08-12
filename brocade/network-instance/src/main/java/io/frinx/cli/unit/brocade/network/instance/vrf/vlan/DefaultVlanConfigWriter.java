@@ -17,18 +17,28 @@
 package io.frinx.cli.unit.brocade.network.instance.vrf.vlan;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.Check;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.brocade.ifc.handler.switchedvlan.def.Vlan;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
+import java.util.List;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.Interface1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Ethernet1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanConfig;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanRoutedTop;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanSwitchedConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class DefaultVlanConfigWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
@@ -36,12 +46,12 @@ public final class DefaultVlanConfigWriter implements CompositeWriter.Child<Conf
     @VisibleForTesting
     static final String WRITE_TEMPLATE = "configure terminal\n"
             + "vlan {$data.vlan_id.value}"
-            + "{% if ($data.name) %} name {$data.name}\n{% else %}\n{% endif %}"
-            + "end\n";
+            + "{% if ($data.name) %} name {$data.name}{% endif %}\n"
+            + "end";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
             + "no vlan {$data.vlan_id.value}\n"
-            + "exit";
+            + "end";
 
     private final Cli cli;
 
@@ -70,8 +80,11 @@ public final class DefaultVlanConfigWriter implements CompositeWriter.Child<Conf
                                                   @Nonnull Config dataBefore,
                                                   @Nonnull Config dataAfter,
                                                   @Nonnull WriteContext writeContext) throws WriteFailedException {
-        // Only "name" parameter can be changed for a VLAN, which is safe to update via write template
-        return writeCurrentAttributesWResult(id, dataAfter, writeContext);
+        if (!Objects.equal(dataBefore.getName(), dataAfter.getName())) {
+            // Only "name" parameter can be changed for a VLAN, which is safe to update via write template
+            return writeCurrentAttributesWResult(id, dataAfter, writeContext);
+        }
+        return false;
     }
 
     @Override
@@ -82,10 +95,49 @@ public final class DefaultVlanConfigWriter implements CompositeWriter.Child<Conf
             return false;
         }
 
-        // FIXME, consistency check: no interfaces should be using this vlan before we delete it !!
+        Optional<Interfaces> allInterfaces = writeContext.readAfter(io.frinx.openconfig.openconfig.interfaces
+                .IIDs.INTERFACES);
+        Preconditions.checkArgument(!(allInterfaces.isPresent()
+                && isAnyInterfaceInVlanId(allInterfaces.get(), config.getVlanId())),
+                "Cannot delete vlan %s, it contains another interfaces", config.getVlanId().getValue());
 
         blockingDeleteAndRead(fT(DELETE_TEMPLATE, "data", config), cli, instanceIdentifier);
         return true;
+    }
+
+    private boolean isAnyInterfaceInVlanId(Interfaces interfaces, VlanId vlanId) {
+        boolean isSwitchedIfcInVlan = interfaces.getInterface().stream()
+                .map(i -> i.getAugmentation(Interface1.class))
+                .filter(java.util.Objects::nonNull)
+                .map(i1 -> i1.getEthernet().getAugmentation(Ethernet1.class))
+                .filter(java.util.Objects::nonNull)
+                .map(e -> e.getSwitchedVlan())
+                .filter(java.util.Objects::nonNull)
+                .map(e -> e.getConfig())
+                .anyMatch(c -> containsVlan(c, vlanId));
+
+        boolean isRoutedIfcInVlan = interfaces.getInterface().stream()
+                .map(i -> i.getAugmentation(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714
+                        .Interface1.class))
+                .filter(java.util.Objects::nonNull)
+                .map(VlanRoutedTop::getRoutedVlan)
+                .filter(java.util.Objects::nonNull)
+                .anyMatch(c -> c.getConfig().getVlan().getUint16().equals(vlanId.getValue()));
+
+        return isSwitchedIfcInVlan || isRoutedIfcInVlan;
+    }
+
+    private boolean containsVlan(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan
+                                         .switched.top.switched.vlan.Config config, VlanId vlanId) {
+        return (config.getNativeVlan() != null && config.getNativeVlan().equals(vlanId))
+                || (config.getAccessVlan() != null && config.getAccessVlan().equals(vlanId))
+                || (config.getTrunkVlans() != null && isVlanIdInTrunkVlans(config.getTrunkVlans(), vlanId));
+    }
+
+    private boolean isVlanIdInTrunkVlans(List<VlanSwitchedConfig.TrunkVlans> trunkVlans, VlanId vlanId) {
+        return Vlan.parseVlanRanges(trunkVlans).stream()
+                .map(VlanSwitchedConfig.TrunkVlans::getVlanId)
+                .anyMatch(tv -> tv.equals(vlanId));
     }
 
     public Check getCheck() {

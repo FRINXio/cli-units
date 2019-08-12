@@ -106,12 +106,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>brocade-interface-unit</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>brocade-network-instance-unit</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
