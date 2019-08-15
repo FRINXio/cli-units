@@ -44,6 +44,7 @@ public final class AbstractIpv4ConfigReaderTest {
         MockitoAnnotations.initMocks(this);
         Mockito.doCallRealMethod().when(reader)
                 .readCurrentAttributes(Mockito.any(InstanceIdentifier.class), Mockito.eq(builder), Mockito.eq(ctx));
+        Mockito.doCallRealMethod().when(reader).isSupportedInterface(Mockito.any(InstanceIdentifier.class));
     }
 
     @Test

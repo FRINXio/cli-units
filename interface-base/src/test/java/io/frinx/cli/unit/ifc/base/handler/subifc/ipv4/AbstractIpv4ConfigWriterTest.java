@@ -67,6 +67,9 @@ public class AbstractIpv4ConfigWriterTest {
         Mockito.doCallRealMethod().when(writer)
                 .deleteCurrentAttributes(Mockito.any(InstanceIdentifier.class),
                         Mockito.any(Config.class), Mockito.eq(context));
+        Mockito.doCallRealMethod().when(writer)
+                .isSupportedInterface(Mockito.any(InstanceIdentifier.class));
+
     }
 
     @Test
