@@ -23,8 +23,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospf.types.rev170228.OspfAreaIdentifier;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.area.interfaces.structure.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ospfv2.rev170228.ospfv2.top.ospfv2.areas.Area;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -44,15 +42,11 @@ public class AreaInterfaceConfigWriter implements CliWriter<Config> {
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Area.class))
                         .get()
                         .getIdentifier();
-        final InterfaceKey intfId =
-                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Interface.class))
-                        .get()
-                        .getKey();
         blockingWriteAndRead(cli, instanceIdentifier, data,
                 f("router ospf %s %s", instanceIdentifier.firstKeyOf(Protocol.class)
                         .getName(), OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
-                f("interface %s", intfId.getId()),
+                f("interface %s", data.getId()),
                 data.getMetric() != null ? f("cost %s", data.getMetric()
                         .getValue()) : "",
                 data.isPassive() != null ? data.isPassive() ? "passive enable" : "passive disable" : "",
@@ -65,13 +59,11 @@ public class AreaInterfaceConfigWriter implements CliWriter<Config> {
             WriteFailedException {
         final OspfAreaIdentifier areaId =
                 writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Area.class)).get().getIdentifier();
-        final InterfaceKey intfId =
-                writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Interface.class)).get().getKey();
         blockingWriteAndRead(cli, instanceIdentifier, dataAfter,
                 f("router ospf %s %s", instanceIdentifier.firstKeyOf(Protocol.class).getName(),
                         OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
-                f("interface %s", intfId.getId()),
+                f("interface %s", dataAfter.getId()),
                 dataAfter.getMetric() != null ? f("cost %s", dataAfter.getMetric().getValue())
                         : dataBefore.getMetric() != null ? "no cost" : "",
                 dataAfter.isPassive() != null ? dataAfter.isPassive() == false ? "passive disable" : "passive enable" :
@@ -86,15 +78,11 @@ public class AreaInterfaceConfigWriter implements CliWriter<Config> {
                 writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Area.class))
                         .get()
                         .getIdentifier();
-        final InterfaceKey intfId =
-                writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Interface.class))
-                        .get()
-                        .getKey();
         blockingDeleteAndRead(cli, instanceIdentifier,
                 f("router ospf %s %s", instanceIdentifier.firstKeyOf(Protocol.class)
                         .getName(), OspfProtocolReader.resolveVrfWithName(instanceIdentifier)),
                 f("area %s", AreaInterfaceReader.areaIdToString(areaId)),
-                f("no interface %s", intfId.getId()),
+                f("no interface %s", data.getId()),
                 "root");
     }
 }
