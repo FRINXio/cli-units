@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8100;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8A88;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X88A8;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -87,17 +87,13 @@ public final class TpIdInterfaceWriter implements CliWriter<Config1> {
 
     @VisibleForTesting
     static String getTpIdForDevice(@Nonnull Config1 dataAfter) {
-        if (dataAfter.getTpid() == TPID0X8A88.class) {
-            return "8A88";
-        } else {
-            String simpleTpIdClassName = dataAfter.getTpid().getSimpleName().toLowerCase();
-            return simpleTpIdClassName.substring(simpleTpIdClassName.indexOf('x') + 1).toUpperCase();
-        }
+        String simpleTpIdClassName = dataAfter.getTpid().getSimpleName().toLowerCase();
+        return simpleTpIdClassName.substring(simpleTpIdClassName.indexOf('x') + 1).toUpperCase();
     }
 
     @VisibleForTesting
     static String getTpIdTag(@Nonnull Config1 dataAfter) {
-        if (dataAfter.getTpid() == TPID0X8A88.class) {
+        if (dataAfter.getTpid() == TPID0X88A8.class) {
             return "tag2";
         } else if (dataAfter.getTpid() == TPID0X8100.class) {
             return "tag1";

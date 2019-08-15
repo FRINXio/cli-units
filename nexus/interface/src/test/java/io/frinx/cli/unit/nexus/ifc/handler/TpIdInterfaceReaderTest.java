@@ -22,7 +22,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8A88;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X88A8;
 
 public class TpIdInterfaceReaderTest {
 
@@ -35,7 +35,7 @@ public class TpIdInterfaceReaderTest {
             + "\n";
 
     private static final Config EXPECTED_CONFIG = new ConfigBuilder()
-            .addAugmentation(Config1.class, new Config1Builder().setTpid(TPID0X8A88.class).build())
+            .addAugmentation(Config1.class, new Config1Builder().setTpid(TPID0X88A8.class).build())
             .build();
 
     @Test

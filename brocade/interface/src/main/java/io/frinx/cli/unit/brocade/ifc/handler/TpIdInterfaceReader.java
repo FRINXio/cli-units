@@ -23,6 +23,8 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.brocade.ifc.Util;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +34,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8100;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8A88;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X88A8;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X9100;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X9200;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPIDTYPES;
@@ -84,23 +86,31 @@ public class TpIdInterfaceReader implements CliConfigReader<Config1, Config1Buil
     }
 
     private static final Set<Class<? extends TPIDTYPES>> SUPPORTED_IDS = Sets.newHashSet(
-            TPID0X8100.class, TPID0X8A88.class, TPID0X9100.class, TPID0X9200.class
+            TPID0X8100.class, TPID0X88A8.class, TPID0X9100.class, TPID0X9200.class
     );
 
+    //map default tag values, may not be accurate, device has possibility to change default tag-values
+    private static final Map<String, Class<? extends TPIDTYPES>> SUPPORTED_TAGS =
+        new HashMap<String, Class<? extends TPIDTYPES>>() {
+        {
+            put("tag1", TPID0X8100.class);
+            put("tag2", TPID0X88A8.class);
+        }
+    };
+
     private Class<? extends TPIDTYPES> parseTpId(String string) {
-        return SUPPORTED_IDS.stream()
+        Class<? extends TPIDTYPES> tpId = SUPPORTED_IDS.stream()
                 .filter(cls -> cls.getSimpleName().toLowerCase().contains(string.toLowerCase()))
                 .findFirst()
                 .orElseGet(() -> {
-                    // 88a8 on device == 8A88
-                    if (string.toLowerCase().equals("88a8")) {
-                        return TPID0X8A88.class;
-                    } else {
-                        // Other tags are unsupported
-                        // This also applies to some Ironware devices where tag-type command has different syntax
-                        return null;
-                    }
+                    // Other tags are unsupported
+                    // This also applies to some Ironware devices where tag-type command has different syntax
+                    return null;
                 });
+        if (tpId == null) {
+            return SUPPORTED_TAGS.get(string.toLowerCase());
+        }
+        return tpId;
 
     }
 
