@@ -120,7 +120,7 @@ public class AreaInterfaceConfigWriterTest {
     }
 
     private void initializeData() {
-        ConfigBuilder builder = new ConfigBuilder().setMetric(new OspfMetric(300));
+        ConfigBuilder builder = new ConfigBuilder().setId("Loopback97").setMetric(new OspfMetric(300));
         data = builder.setPassive(true).build();
         area = new AreaBuilder().setIdentifier(new OspfAreaIdentifier(1000L))
                 .build();
@@ -148,7 +148,7 @@ public class AreaInterfaceConfigWriterTest {
     @Test
     public void update() throws WriteFailedException {
         // cost to 500
-        ConfigBuilder builder = new ConfigBuilder().setMetric(new OspfMetric(500));
+        ConfigBuilder builder = new ConfigBuilder().setId("Loopback97").setMetric(new OspfMetric(500));
         Config newData = builder.setPassive(false).build();
 
         this.writer.updateCurrentAttributes(piid, data, newData, context);
@@ -162,7 +162,7 @@ public class AreaInterfaceConfigWriterTest {
     @Test
     public void updateNoCost() throws WriteFailedException {
         // removing cost
-        Config newData = new ConfigBuilder().build();
+        Config newData = new ConfigBuilder().setId("Loopback97").build();
 
         this.writer.updateCurrentAttributes(piid, data, newData, context);
 
