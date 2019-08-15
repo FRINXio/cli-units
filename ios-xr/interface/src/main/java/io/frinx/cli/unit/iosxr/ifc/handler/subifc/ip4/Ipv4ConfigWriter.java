@@ -20,6 +20,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigWriter;
 import io.frinx.cli.unit.ifc.base.util.NetUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
 
@@ -41,5 +42,15 @@ public class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
     @Override
     protected String deleteTemplate(Config config, String ifcName) {
         return fT(TEMPLATE, "name", ifcName, "delete", true);
+    }
+
+    @Override
+    protected String getInterfaceName(String ifcName, Long subId) {
+        return Ipv4AddressReader.getTargetInterfaceName(ifcName, subId);
+    }
+
+    @Override
+    public boolean isSupportedInterface(InstanceIdentifier<Config> instanceIdentifier) {
+        return Ipv4AddressReader.SUPPORTED_INTERFACE;
     }
 }
