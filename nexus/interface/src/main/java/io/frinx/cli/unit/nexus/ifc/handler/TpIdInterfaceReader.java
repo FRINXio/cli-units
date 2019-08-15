@@ -27,7 +27,7 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8A88;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X88A8;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPIDTYPES;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -64,11 +64,10 @@ public class TpIdInterfaceReader implements CliConfigReader<Config1, Config1Buil
     @VisibleForTesting
     private static Class<? extends TPIDTYPES> parseId(String string) {
 
-        // 88a8 on device == 8A88
-        if (string.toLowerCase()
-                .equals("0x88a8")) {
+        // 88a8 on device == 88A8
+        if (string.toLowerCase().equals("0x88a8")) {
 
-            return TPID0X8A88.class;
+            return TPID0X88A8.class;
         } else {
             // Other tags are unsupported
             // This also applies to some Ironware devices where tag-type command has different syntax

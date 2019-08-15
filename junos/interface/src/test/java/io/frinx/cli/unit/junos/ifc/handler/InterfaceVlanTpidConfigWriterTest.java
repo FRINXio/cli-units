@@ -39,7 +39,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8100;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8A88;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X88A8;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPIDTYPES;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -47,7 +47,7 @@ public class InterfaceVlanTpidConfigWriterTest {
     private static final String INTERFACE_NAME = "ge-0/0/4";
     private static final InterfaceKey INTERFACE_KEY = new InterfaceKey(INTERFACE_NAME);
     private static final Class<? extends TPIDTYPES> SUPPORTED_TPID = TPID0X8100.class;
-    private static final Class<? extends TPIDTYPES> UNSUPPORTED_TPID = TPID0X8A88.class;
+    private static final Class<? extends TPIDTYPES> UNSUPPORTED_TPID = TPID0X88A8.class;
     private static final Config1 SUPPORTED_CONFIG = new Config1Builder().setTpid(SUPPORTED_TPID).build();
     private static final Config1 UNSUPPORTED_CONFIG = new Config1Builder().setTpid(UNSUPPORTED_TPID).build();
     private static final InstanceIdentifier<Config1> ID = InstanceIdentifier.create(Interfaces.class)
