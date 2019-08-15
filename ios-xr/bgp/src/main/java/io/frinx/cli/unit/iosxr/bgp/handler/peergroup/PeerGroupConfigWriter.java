@@ -19,7 +19,9 @@ package io.frinx.cli.unit.iosxr.bgp.handler.peergroup;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.iosxr.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.unit.utils.CliWriter;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -27,7 +29,7 @@ public class PeerGroupConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
 
-    static final String WRITE_PEER_GROUP = "router bgp {$as}\n"
+    private static final String WRITE_PEER_GROUP = "router bgp {$as} {$instance}{$vrf}\n"
             + "{% if $delete %}no {% endif %}"
             + "neighbor-group {$groupName}\n"
             + "root\n";
@@ -37,27 +39,37 @@ public class PeerGroupConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(InstanceIdentifier<Config> iid, Config config,
-                                              WriteContext context) throws WriteFailedException {
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> iid, Config config,
+                                       @Nonnull WriteContext context) throws WriteFailedException {
         Long asNumber = PeerGroupListReader.readAsNumberFromContext(iid, context, false);
+        final String instName = GlobalConfigWriter.getProtoInstanceName(iid);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(iid);
         String cmd = fT(WRITE_PEER_GROUP,
                 "as", asNumber,
+                "instance", instName,
+                "vrf", nwInsName,
                 "groupName", config.getPeerGroupName());
         blockingWriteAndRead(cmd, cli, iid, config);
     }
 
     @Override
-    public void updateCurrentAttributes(InstanceIdentifier<Config> iid, Config dataBefore, Config dataAfter,
-                                               WriteContext context) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> iid, @Nonnull Config dataBefore,
+                                        @Nonnull Config dataAfter, @Nonnull WriteContext context)
+            throws WriteFailedException {
         writeCurrentAttributes(iid, dataAfter, context);
     }
 
     @Override
-    public void deleteCurrentAttributes(InstanceIdentifier<Config> iid, Config config, WriteContext context)
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> iid, Config config,
+                                        @Nonnull WriteContext context)
             throws WriteFailedException {
         Long asNumber = PeerGroupListReader.readAsNumberFromContext(iid, context, true);
+        final String instName = GlobalConfigWriter.getProtoInstanceName(iid);
+        final String nwInsName = GlobalConfigWriter.resolveVrfWithName(iid);
         String cmd = fT(WRITE_PEER_GROUP,
                 "as", asNumber,
+                "instance", instName,
+                "vrf", nwInsName,
                 "delete", true,
                 "groupName", config.getPeerGroupName());
         blockingDeleteAndRead(cmd, cli, iid);

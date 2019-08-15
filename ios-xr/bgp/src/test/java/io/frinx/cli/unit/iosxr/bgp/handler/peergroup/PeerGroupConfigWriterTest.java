@@ -47,11 +47,11 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class PeerGroupConfigWriterTest {
 
-    private static final String WRITE_INPUT = "router bgp %s\n"
+    private static final String WRITE_INPUT = "router bgp 17676 \n"
             + "neighbor-group RL-GROUP\n"
             + "root\n";
 
-    private static final String DELETE_INPUT = "router bgp %s\n"
+    private static final String DELETE_INPUT = "router bgp 17676 \n"
             + "no neighbor-group RL-GROUP\n"
             + "root\n";
 
@@ -87,7 +87,7 @@ public class PeerGroupConfigWriterTest {
         target = new PeerGroupConfigWriter(this.cli);
         data = new ConfigBuilder().setPeerGroupName("RL-GROUP")
                 .build();
-        PeerGroupListReaderTest.mockAsNumber(context);
+        PeerGroupAfiSafiConfigWriterTest.mockAsNumber(context);
     }
 
     @Test
@@ -95,8 +95,7 @@ public class PeerGroupConfigWriterTest {
         target.writeCurrentAttributes(iid, data, context);
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
-        Assert.assertEquals(String.format(WRITE_INPUT,PeerGroupListReaderTest.AS_NUMBER),
-                response.getValue().getContent());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
@@ -104,7 +103,6 @@ public class PeerGroupConfigWriterTest {
         target.deleteCurrentAttributes(iid, data, context);
         Mockito.verify(cli)
                 .executeAndRead(response.capture());
-        Assert.assertEquals(target.f(DELETE_INPUT,PeerGroupListReaderTest.AS_NUMBER),
-                response.getValue().getContent());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }

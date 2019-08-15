@@ -16,15 +16,17 @@
 
 package io.frinx.cli.unit.iosxr.bgp.handler.peergroup;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.iosxr.bgp.handler.BgpProtocolReader;
+import io.frinx.cli.unit.iosxr.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -35,12 +37,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.list.PeerGroupKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PeerGroupListReader implements CliConfigListReader<PeerGroup, PeerGroupKey, PeerGroupBuilder> {
 
-    static final String READ_NBR_GROUPS_CMD = "show running-config router bgp %s | include neighbor-group";
+    static final String READ_NBR_GROUPS_CMD = "show running-config router bgp %s %s %s | include neighbor-group";
 
     private static final Pattern GROUP_LINE = Pattern.compile("neighbor\\-group (?<groupname>\\S+)");
     private Cli cli;
@@ -49,35 +51,39 @@ public class PeerGroupListReader implements CliConfigListReader<PeerGroup, PeerG
         this.cli = cli;
     }
 
+    @Nonnull
     @Override
-    public List<PeerGroupKey> getAllIds(@Nonnull InstanceIdentifier<PeerGroup> iid,
-                                               @Nonnull ReadContext readContext) throws ReadFailedException {
-        String networkInstanceName = iid.firstKeyOf(NetworkInstance.class).getName();
+    public List<PeerGroupKey> getAllIds(@Nonnull InstanceIdentifier<PeerGroup> iid, @Nonnull ReadContext readContext)
+            throws ReadFailedException {
         Long as = readAsNumberFromContext(iid, readContext);
         if (as == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
-        String output = blockingRead(f(READ_NBR_GROUPS_CMD, as), cli, iid, readContext);
-        if (NetworInstance.DEFAULT_NETWORK_NAME.equals(networkInstanceName)) {
-            return ParsingUtils.parseFields(output,
-                0,
-                GROUP_LINE::matcher,
-                matcher -> matcher.group("groupname"),
-                value -> new PeerGroupKey(value));
-        } else {
-            return Collections.EMPTY_LIST;
-        }
+        final String protName = iid.firstKeyOf(Protocol.class).getName();
+        final String instance = BgpProtocolReader.DEFAULT_BGP_INSTANCE.equals(protName)
+                ? "" : String.format("instance %s", protName);
+        String nwInsName = GlobalConfigWriter.resolveVrfWithName(iid);
+        return parseAllIds(blockingRead(f(READ_NBR_GROUPS_CMD, as, instance, nwInsName), cli, iid, readContext));
+    }
+
+    @VisibleForTesting
+    public List<PeerGroupKey> parseAllIds(String output) {
+        return ParsingUtils.parseFields(output,
+            0,
+            GROUP_LINE::matcher,
+            matcher -> matcher.group("groupname"),
+            PeerGroupKey::new);
     }
 
     @Override
-    public void readCurrentAttributes(InstanceIdentifier<PeerGroup> id, PeerGroupBuilder builder, ReadContext ctx)
-            throws ReadFailedException {
+    public void readCurrentAttributes(InstanceIdentifier<PeerGroup> id, PeerGroupBuilder builder,
+                                      @Nonnull ReadContext ctx) {
         String name = id.firstKeyOf(PeerGroup.class).getPeerGroupName();
         builder.setPeerGroupName(name);
         builder.setKey(new PeerGroupKey(name));
     }
 
-    public static Long readAsNumberFromContext(InstanceIdentifier<?> iid, WriteContext context, Boolean delete) {
+    static Long readAsNumberFromContext(InstanceIdentifier<?> iid, WriteContext context, Boolean delete) {
         Optional<Config> gc;
         if (delete) {
             gc = context.readBefore(RWUtils.cutId(iid, Bgp.class)
@@ -94,7 +100,7 @@ public class PeerGroupListReader implements CliConfigListReader<PeerGroup, PeerG
         return gc.get().getAs().getValue();
     }
 
-    public static Long readAsNumberFromContext(InstanceIdentifier<?> iid, ReadContext context) {
+    static Long readAsNumberFromContext(InstanceIdentifier<?> iid, ReadContext context) {
         Optional<Config> gc = context.read(RWUtils.cutId(iid, Bgp.class)
                 .child(Global.class)
                 .child(Config.class));
