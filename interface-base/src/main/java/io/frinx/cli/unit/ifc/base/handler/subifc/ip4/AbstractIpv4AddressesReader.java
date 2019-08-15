@@ -53,12 +53,17 @@ public abstract class AbstractIpv4AddressesReader implements CliConfigListReader
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == AbstractSubinterfaceReader.ZERO_SUBINTERFACE_ID) {
-            return parseAddressIds(blockingRead(getReadCommand(ifcName), cli, instanceIdentifier, ctx));
+        if (isSupportedInterface(instanceIdentifier)) {
+            return parseAddressIds(blockingRead(getReadCommand(getInterfaceName(ifcName, subId)),
+                cli, instanceIdentifier, ctx));
         } else {
             return Collections.emptyList();
         }
+    }
+
+    protected String getInterfaceName(String ifcName, Long subId) {
+     // Typically interface(not sub-interface) has IP.
+        return ifcName;
     }
 
     protected abstract String getReadCommand(String ifcName);
@@ -83,11 +88,15 @@ public abstract class AbstractIpv4AddressesReader implements CliConfigListReader
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Address> instanceIdentifier,
                                       @Nonnull AddressBuilder addressBuilder,
                                       @Nonnull ReadContext ctx) {
-        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == AbstractSubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (isSupportedInterface(instanceIdentifier)) {
             addressBuilder.setIp(instanceIdentifier.firstKeyOf(Address.class).getIp());
         }
+    }
+
+    @VisibleForTesting
+    public boolean isSupportedInterface(InstanceIdentifier<Address> instanceIdentifier) {
+        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
+        return AbstractSubinterfaceReader.isSubInterfaceZero(instanceIdentifier);
     }
 }
