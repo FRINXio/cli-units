@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.iosxr.bgp.handler.peergroup;
 
 import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.base.Config;
@@ -33,7 +32,7 @@ public class PeerGroupConfigReader implements CliConfigReader<Config, ConfigBuil
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                              @Nonnull ConfigBuilder configBuilder,
-                                             @Nonnull ReadContext readContext) throws ReadFailedException {
+                                             @Nonnull ReadContext readContext) {
         configBuilder.setPeerGroupName(id.firstKeyOf(PeerGroup.class).getPeerGroupName());
     }
 }

@@ -16,11 +16,14 @@
 
 package io.frinx.cli.unit.iosxr.bgp.handler.peergroup;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.iosxr.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.unit.iosxr.bgp.handler.GlobalAfiSafiReader;
+import io.frinx.cli.unit.iosxr.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
@@ -28,13 +31,14 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.list.PeerGroup;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.apply.policy.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.apply.policy.group.apply.policy.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PeerGroupAfiSafiApplyPolicyConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    static final String SH_NEI = "show running-config router bgp %s neighbor-group %s address-family %s";
+    static final String SH_NEI = "show running-config router bgp %s %s %s neighbor-group %s address-family %s";
     private static final Pattern ROUTE_POLICY_IN_LINE = Pattern.compile("route-policy (?<policyName>.+) in");
     private static final Pattern ROUTE_POLICY_OUT_LINE = Pattern.compile("route-policy (?<policyName>.+) out");
 
@@ -52,12 +56,21 @@ public class PeerGroupAfiSafiApplyPolicyConfigReader implements CliConfigReader<
         Preconditions.checkNotNull(asNumber);
         String groupName = iid.firstKeyOf(PeerGroup.class).getPeerGroupName();
         String afiName = GlobalAfiSafiReader.transformAfiToString(iid.firstKeyOf(AfiSafi.class)
-                .getAfiSafiName());
+            .getAfiSafiName());
+        final String protName = iid.firstKeyOf(Protocol.class).getName();
+        final String instance = BgpProtocolReader.DEFAULT_BGP_INSTANCE.equals(protName)
+            ? "" : String.format("instance %s", protName);
+        String nwInsName = GlobalConfigWriter.resolveVrfWithName(iid);
         String output = blockingRead(
-                f(SH_NEI, asNumber,groupName, afiName),
-                cli,
-                iid,
-                context);
+            f(SH_NEI, asNumber,instance, nwInsName, groupName, afiName),
+            cli,
+            iid,
+            context);
+        read(output, configBuilder);
+    }
+
+    @VisibleForTesting
+    public void read(String output, @Nonnull ConfigBuilder configBuilder) {
         List<String> importPolicy = ParsingUtils.parseFields(
             output,
             0,

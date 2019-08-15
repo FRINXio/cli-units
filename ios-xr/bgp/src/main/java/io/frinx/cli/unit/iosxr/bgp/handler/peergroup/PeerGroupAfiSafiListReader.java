@@ -16,13 +16,15 @@
 
 package io.frinx.cli.unit.iosxr.bgp.handler.peergroup;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.iosxr.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.unit.iosxr.bgp.handler.GlobalAfiSafiReader;
+import io.frinx.cli.unit.iosxr.bgp.handler.GlobalConfigWriter;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -35,12 +37,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.afi.safi.list.afi.safi.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group.list.PeerGroup;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PeerGroupAfiSafiListReader implements CliConfigListReader<AfiSafi, AfiSafiKey, AfiSafiBuilder> {
 
-    static final String SH_AFI = "show running-config router bgp %s"
+    static final String SH_AFI = "show running-config router bgp %s %s %s"
         + " neighbor-group %s | include address-family";
     private static final Pattern FAMILY_LINE = Pattern.compile("address-family (?<family>.+)");
     private Cli cli;
@@ -53,34 +55,38 @@ public class PeerGroupAfiSafiListReader implements CliConfigListReader<AfiSafi, 
     @Override
     public List<AfiSafiKey> getAllIds(@Nonnull InstanceIdentifier<AfiSafi> iid, @Nonnull
             ReadContext context) throws ReadFailedException {
-        String networkInstanceName = iid.firstKeyOf(NetworkInstance.class).getName();
         String peerGroupName = iid.firstKeyOf(PeerGroup.class).getPeerGroupName();
         Long as = PeerGroupListReader.readAsNumberFromContext(iid, context);
         if (as == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
-        String cmd = f(SH_AFI, as, peerGroupName);
-        if (NetworInstance.DEFAULT_NETWORK_NAME.equals(networkInstanceName)) {
-            String output = blockingRead(cmd, cli, iid, context);
-            return ParsingUtils.parseFields(
-                output,
-                0,
-                FAMILY_LINE::matcher,
-                matcher -> matcher.group("family"),
-                value -> GlobalAfiSafiReader.transformAfiFromString(value.trim())
-            ).stream()
+        final String protName = iid.firstKeyOf(Protocol.class).getName();
+        final String instance = BgpProtocolReader.DEFAULT_BGP_INSTANCE.equals(protName)
+                ? "" : String.format("instance %s", protName);
+        String nwInsName = GlobalConfigWriter.resolveVrfWithName(iid);
+        String cmd = f(SH_AFI, as,  instance, nwInsName, peerGroupName);
+        String output = blockingRead(cmd, cli, iid, context);
+        return parseAllIds(output);
+    }
+
+    @VisibleForTesting
+    public List<AfiSafiKey> parseAllIds(String output) {
+        return ParsingUtils.parseFields(
+            output,
+            0,
+            FAMILY_LINE::matcher,
+            matcher -> matcher.group("family"),
+            value -> GlobalAfiSafiReader.transformAfiFromString(value.trim()))
+            .stream()
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(AfiSafiKey::new)
             .collect(Collectors.toList());
-        } else {
-            return Collections.EMPTY_LIST;
-        }
     }
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<AfiSafi> iid, @Nonnull
-            AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext context) throws ReadFailedException {
+            AfiSafiBuilder afiSafiBuilder, @Nonnull ReadContext context) {
         Class<? extends AFISAFITYPE> cla = iid.firstKeyOf(AfiSafi.class).getAfiSafiName();
         afiSafiBuilder.setAfiSafiName(cla);
         afiSafiBuilder.setConfig(new ConfigBuilder().setAfiSafiName(cla).build());

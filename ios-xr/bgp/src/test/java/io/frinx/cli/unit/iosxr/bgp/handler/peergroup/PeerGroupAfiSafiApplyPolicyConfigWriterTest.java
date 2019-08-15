@@ -20,8 +20,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
-import io.frinx.openconfig.network.instance.NetworInstance;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,6 +52,26 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class PeerGroupAfiSafiApplyPolicyConfigWriterTest {
 
+    private static final String WRITE_INPUT = "router bgp 17676 instance instance1 vrf vrf1\n"
+        + "neighbor-group PEER-GROUP01\n"
+        + "address-family vpnv4 unicast\n"
+        + "route-policy POLICY_IN in\n"
+        + "route-policy POLICY_OUT out\n"
+        + "root\n";
+
+    private static final String WRITE_INPUT2 = "router bgp 17676 instance instance1 vrf vrf1\n"
+            + "neighbor-group PEER-GROUP01\n"
+            + "address-family vpnv4 unicast\n"
+            + "route-policy POLICY_IN in\n"
+            + "root\n";
+
+    private static final String DELETE_INPUT = "router bgp 17676 instance instance1 vrf vrf1\n"
+            + "neighbor-group PEER-GROUP01\n"
+            + "address-family vpnv4 unicast\n"
+            + "no route-policy POLICY_IN in\n"
+            + "no route-policy POLICY_OUT out\n"
+            + "root\n";
+
     static final String POLICY_IN = "POLICY_IN";
     static final String POLICY_OUT = "POLICY_OUT";
 
@@ -64,12 +83,12 @@ public class PeerGroupAfiSafiApplyPolicyConfigWriterTest {
     private PeerGroupAfiSafiApplyPolicyConfigWriter target;
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
     private InstanceIdentifier<Config> iid = KeyedInstanceIdentifier.create(NetworkInstances.class)
-            .child(NetworkInstance.class, new NetworkInstanceKey(NetworInstance.DEFAULT_NETWORK))
+            .child(NetworkInstance.class, new NetworkInstanceKey("vrf1"))
             .child(Protocols.class)
-            .child(Protocol.class, new ProtocolKey(BGP.class, "default"))
+            .child(Protocol.class, new ProtocolKey(BGP.class, "instance1"))
             .child(Bgp.class)
             .child(PeerGroups.class)
-            .child(PeerGroup.class, new PeerGroupKey(PeerGroupListReaderTest.PEER_GROUP_1))
+            .child(PeerGroup.class, new PeerGroupKey("PEER-GROUP01"))
             .child(AfiSafis.class)
             .child(AfiSafi.class, new AfiSafiKey(L3VPNIPV4UNICAST.class))
             .child(ApplyPolicy.class)
@@ -81,57 +100,38 @@ public class PeerGroupAfiSafiApplyPolicyConfigWriterTest {
         Mockito.when(cli.executeAndRead(Mockito.any()))
                 .then(invocation -> CompletableFuture.completedFuture(""));
         target = new PeerGroupAfiSafiApplyPolicyConfigWriter(this.cli);
-        PeerGroupListReaderTest.mockAsNumber(context);
+        PeerGroupAfiSafiConfigWriterTest.mockAsNumber(context);
     }
 
     @Test
     public void testWriterCurrentAttributes01() throws WriteFailedException {
         Config config = new ConfigBuilder()
-                .setImportPolicy(Arrays.asList(POLICY_IN))
-                .setExportPolicy(Arrays.asList(POLICY_OUT))
+                .setImportPolicy(Collections.singletonList(POLICY_IN))
+                .setExportPolicy(Collections.singletonList(POLICY_OUT))
                 .build();
         target.writeCurrentAttributes(iid, config, context);
         Mockito.verify(cli).executeAndRead(response.capture());
-        String expected = target.fT(PeerGroupAfiSafiApplyPolicyConfigWriter.WRITE_PEER_GROUP_AFI_APPLY_POLICY,
-                "as", PeerGroupListReaderTest.AS_NUMBER,
-                "groupName", PeerGroupListReaderTest.PEER_GROUP_1,
-                "afiSafi", "vpnv4 unicast",
-                "config", config);
-        Assert.assertEquals(expected, response.getValue()
-                .getContent());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
     public void testWriterCurrentAttributes02() throws WriteFailedException {
         Config config = new ConfigBuilder()
-                .setImportPolicy(Arrays.asList(POLICY_IN))
+                .setImportPolicy(Collections.singletonList(POLICY_IN))
                 .build();
         target.writeCurrentAttributes(iid, config, context);
         Mockito.verify(cli).executeAndRead(response.capture());
-        String expected = target.fT(PeerGroupAfiSafiApplyPolicyConfigWriter.WRITE_PEER_GROUP_AFI_APPLY_POLICY,
-                "as", PeerGroupListReaderTest.AS_NUMBER,
-                "groupName", PeerGroupListReaderTest.PEER_GROUP_1,
-                "afiSafi", "vpnv4 unicast",
-                "config", config);
-        Assert.assertEquals(expected, response.getValue()
-                .getContent());
+        Assert.assertEquals(WRITE_INPUT2, response.getValue().getContent());
     }
 
     @Test
     public void testDeleteCurrentAttributes() throws WriteFailedException {
         Config config = new ConfigBuilder()
-                .setImportPolicy(Arrays.asList(POLICY_IN))
-                .setExportPolicy(Arrays.asList(POLICY_OUT))
+                .setImportPolicy(Collections.singletonList(POLICY_IN))
+                .setExportPolicy(Collections.singletonList(POLICY_OUT))
                 .build();
         target.deleteCurrentAttributes(iid, config, context);
         Mockito.verify(cli).executeAndRead(response.capture());
-        String expected = target.fT(PeerGroupAfiSafiApplyPolicyConfigWriter.WRITE_PEER_GROUP_AFI_APPLY_POLICY,
-                "as", PeerGroupListReaderTest.AS_NUMBER,
-                "groupName", PeerGroupListReaderTest.PEER_GROUP_1,
-                "afiSafi", "vpnv4 unicast",
-                "config", config,
-                "delete", false);
-        Assert.assertEquals(expected, response.getValue()
-                .getContent());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }

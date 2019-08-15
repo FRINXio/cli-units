@@ -16,11 +16,13 @@
 
 package io.frinx.cli.unit.iosxr.bgp.handler.peergroup;
 
+import com.google.common.base.Optional;
+import io.fd.honeycomb.translate.ModificationContext;
+import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
-import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,13 +48,25 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.protocols.ProtocolKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.policy.types.rev160512.BGP;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class PeerGroupAfiSafiConfigWriterTest {
 
+    private static final String DELETE_INPUT = "router bgp 17676 instance inst1 vrf vrf1\n"
+            + "neighbor-group PEER-GROUP01\n"
+            + "no address-family vpnv4 unicast\n"
+            + "root\n";
+
+    private static final String WRITE_INPUT = "router bgp 17676 instance inst1 vrf vrf1\n"
+            + "neighbor-group PEER-GROUP01\n"
+            + "address-family vpnv4 unicast\n"
+            + "root\n";
+
     @Mock
     private Cli cli;
+
     @Mock
     private WriteContext context;
 
@@ -60,12 +74,12 @@ public class PeerGroupAfiSafiConfigWriterTest {
     private PeerGroupAfiSafiConfigWriter target;
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
     private InstanceIdentifier<Config> iid = KeyedInstanceIdentifier.create(NetworkInstances.class)
-            .child(NetworkInstance.class, new NetworkInstanceKey(NetworInstance.DEFAULT_NETWORK))
+            .child(NetworkInstance.class, new NetworkInstanceKey("vrf1"))
             .child(Protocols.class)
-            .child(Protocol.class, new ProtocolKey(BGP.class, "default"))
+            .child(Protocol.class, new ProtocolKey(BGP.class, "inst1"))
             .child(Bgp.class)
             .child(PeerGroups.class)
-            .child(PeerGroup.class, new PeerGroupKey(PeerGroupListReaderTest.PEER_GROUP_1))
+            .child(PeerGroup.class, new PeerGroupKey("PEER-GROUP01"))
             .child(AfiSafis.class)
             .child(AfiSafi.class,new AfiSafiKey(L3VPNIPV4UNICAST.class))
             .child(Config.class);
@@ -78,36 +92,40 @@ public class PeerGroupAfiSafiConfigWriterTest {
         target = new PeerGroupAfiSafiConfigWriter(this.cli);
         data = new ConfigBuilder().setAfiSafiName(L3VPNIPV4UNICAST.class)
                 .build();
-        PeerGroupListReaderTest.mockAsNumber(context);
+        mockAsNumber(context);
+    }
+
+    public static void mockAsNumber(ModificationContext context) {
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config config =
+            new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
+                    .ConfigBuilder()
+                .setAs(new AsNumber(17676L))
+                .build();
+        if (context instanceof ReadContext) {
+            Mockito.when(((ReadContext)context).read(Mockito.any(InstanceIdentifier.class)))
+                    .thenReturn(Optional.of(config))
+                    .thenReturn(Optional.absent());
+        } else {
+            Mockito.when(((WriteContext)context).readAfter(Mockito.any(InstanceIdentifier.class)))
+                    .thenReturn(Optional.of(config))
+                    .thenReturn(Optional.absent());
+            Mockito.when(((WriteContext)context).readBefore(Mockito.any(InstanceIdentifier.class)))
+                    .thenReturn(Optional.of(config))
+                    .thenReturn(Optional.absent());
+        }
     }
 
     @Test
     public void testWriteCurrentAttributes() throws WriteFailedException {
         target.writeCurrentAttributes(iid, data, context);
-        Mockito.verify(cli)
-                .executeAndRead(response.capture());
-
-        String expected = target.fT(PeerGroupAfiSafiConfigWriter.WRITE_PEER_GROUP_AFI_SAFI,
-                "as", PeerGroupListReaderTest.AS_NUMBER,
-                "groupName", PeerGroupListReaderTest.PEER_GROUP_1,
-                "afiSafi", "vpnv4 unicast",
-                "config", data);
-        Assert.assertEquals(expected, response.getValue()
-                .getContent());
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
     public void testDeleteCurrentAttributes() throws WriteFailedException {
         target.deleteCurrentAttributes(iid, data, context);
-        Mockito.verify(cli)
-                .executeAndRead(response.capture());
-        String expected = target.fT(PeerGroupAfiSafiConfigWriter.WRITE_PEER_GROUP_AFI_SAFI,
-                "as", PeerGroupListReaderTest.AS_NUMBER,
-                "groupName", PeerGroupListReaderTest.PEER_GROUP_1,
-                "afiSafi", "vpnv4 unicast",
-                "config", data,
-                "delete", true);
-        Assert.assertEquals(expected, response.getValue()
-                .getContent());
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 }
