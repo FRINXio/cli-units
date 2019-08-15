@@ -17,13 +17,19 @@
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4;
 
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceReader;
 import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4AddressesReader;
+import io.frinx.cli.unit.iosxr.ifc.Util;
 import java.util.regex.Pattern;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.Address;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class Ipv4AddressReader extends AbstractIpv4AddressesReader {
 
     static final String SH_RUN_INT_IP = "show running-config interface %s | include ^ ipv4 address";
     static final Pattern INTERFACE_IP_LINE = Pattern.compile("ipv4 address (?<ip>\\S+) (?<prefix>\\S+)");
+
+    static boolean SUPPORTED_INTERFACE = true;
 
     public Ipv4AddressReader(Cli cli) {
         super(cli);
@@ -37,5 +43,23 @@ public class Ipv4AddressReader extends AbstractIpv4AddressesReader {
     @Override
     protected Pattern getIpLine() {
         return INTERFACE_IP_LINE;
+    }
+
+    @Override
+    protected String getInterfaceName(String ifcName, Long subId) {
+        return getTargetInterfaceName(ifcName, subId);
+    }
+
+    static String getTargetInterfaceName(String ifcName, Long subId) {
+        if (subId == AbstractSubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+            return ifcName;
+        } else {
+            return Util.getSubinterfaceName(ifcName, subId);
+        }
+    }
+
+    @Override
+    public boolean isSupportedInterface(InstanceIdentifier<Address> instanceIdentifier) {
+        return SUPPORTED_INTERFACE;
     }
 }

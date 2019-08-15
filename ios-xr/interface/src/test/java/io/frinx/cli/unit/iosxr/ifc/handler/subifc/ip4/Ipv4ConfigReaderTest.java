@@ -29,11 +29,23 @@ public class Ipv4ConfigReaderTest {
     private static String SH_RUN_INT_IP = "Mon Feb 12 13:00:17.954 UTC\n"
             + " ipv4 address 192.168.1.214 255.255.255.0\n";
 
+    private static String EXPECTED_COMMAND_SUBIF =
+        "show running-config interface Bundle-Ether1000.200 | include ^ ipv4 address";
+    private static String EXPECTED_COMMAND =
+        "show running-config interface Bundle-Ether1000 | include ^ ipv4 address";
+
     @Test
     public void testParseConfigAddress() {
         ConfigBuilder configBuilder = new ConfigBuilder();
         new Ipv4ConfigReader(Mockito.mock(Cli.class)).parseAddressConfig(configBuilder, SH_RUN_INT_IP,
                 new Ipv4AddressNoZone("192.168.1.214"));
         Assert.assertEquals(AbstractIpv4ConfigReaderTest.buildData("192.168.1.214", "24"), configBuilder.build());
+    }
+
+    @Test
+    public void testGetReadCommand() {
+        Ipv4ConfigReader reader = new Ipv4ConfigReader(Mockito.mock(Cli.class));
+        Assert.assertEquals(EXPECTED_COMMAND_SUBIF, reader.getReadCommand("Bundle-Ether1000", 200L));
+        Assert.assertEquals(EXPECTED_COMMAND, reader.getReadCommand("Bundle-Ether1000", 0L));
     }
 }
