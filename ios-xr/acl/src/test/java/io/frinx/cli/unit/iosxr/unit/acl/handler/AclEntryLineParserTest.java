@@ -135,6 +135,17 @@ public class AclEntryLineParserTest {
         return builder.build();
     }
 
+    static Transport defTransport() {
+        TransportBuilder transportBuilder = new TransportBuilder();
+        transportBuilder.setConfig(
+                new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
+                        .fields.top.transport.ConfigBuilder()
+                        .setSourcePort(new PortNumRange(Enumeration.ANY))
+                        .setDestinationPort(new PortNumRange(Enumeration.ANY))
+                        .build());
+        return transportBuilder.build();
+    }
+
     @Test
     public void testIpv4() {
         String lines = "Mon May 14 14:36:55.408 UTC\n"
@@ -162,7 +173,8 @@ public class AclEntryLineParserTest {
             configBuilder.setSourceAddress(new Ipv4Prefix("1.2.3.4/32"));
             configBuilder.setDestinationAddress(AclEntryLineParser.IPV4_HOST_ANY);
 
-            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(), null));
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(),
+                    defTransport()));
         }
         {
             // 3 permit udp 192.168.1.1/24 10.10.10.10/24
@@ -172,16 +184,10 @@ public class AclEntryLineParserTest {
             configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
             configBuilder.setSourceAddress(new Ipv4Prefix("192.168.1.1/24"));
             configBuilder.setDestinationAddress(new Ipv4Prefix("10.10.10.10/24"));
-            TransportBuilder transportBuilder = new TransportBuilder();
-            transportBuilder.setConfig(
-                    new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
-                            .fields.top.transport.ConfigBuilder()
-                            .setSourcePort(new PortNumRange(Enumeration.ANY))
-                            .setDestinationPort(new PortNumRange(Enumeration.ANY))
-                            .build());
+
             long sequenceId = 3;
             expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(),
-                    transportBuilder.build()));
+                    defTransport()));
         }
         {
             // 4 permit tcp host 1.2.3.4 eq www any
@@ -216,7 +222,8 @@ public class AclEntryLineParserTest {
             configBuilder.addAugmentation(Config3.class, new Config3Builder().setHopRange(new HopRange("0..10"))
                     .build());
             long sequenceId = 5;
-            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(), null));
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(),
+                    defTransport()));
         }
         {
             // 6 permit udp 0.0.0.0 0.255.255.255 eq 10 0.0.0.0 0.255.255.255 gt 10
@@ -325,7 +332,8 @@ public class AclEntryLineParserTest {
             configBuilder.addAugmentation(Config3.class, new Config3Builder().setHopRange(new HopRange("13..255"))
                     .build());
             long sequenceId = 14;
-            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null));
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(),
+                    defTransport()));
         }
         {
             // 15 permit udp any neq 80 any ttl neq 10
@@ -357,8 +365,8 @@ public class AclEntryLineParserTest {
             configBuilder.setSourceAddress(AclEntryLineParser.IPV4_HOST_ANY);
             configBuilder.setDestinationAddress(AclEntryLineParser.IPV4_HOST_ANY);
             long sequenceId = 26;
-            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null,
-                    (short) 10));
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(),
+                    defTransport(), (short) 10));
         }
 
         // verify expected results
@@ -409,7 +417,8 @@ public class AclEntryLineParserTest {
             configBuilder.setSourceAddress(AclEntryLineParser.IPV6_HOST_ANY);
             configBuilder.setDestinationAddress(AclEntryLineParser.IPV6_HOST_ANY);
             long sequenceId = 1;
-            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null));
+            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(),
+                    defTransport()));
         }
         {
             // 3 permit icmpv6 any any router-solicitation
@@ -420,8 +429,8 @@ public class AclEntryLineParserTest {
             configBuilder.setSourceAddress(AclEntryLineParser.IPV6_HOST_ANY);
             configBuilder.setDestinationAddress(AclEntryLineParser.IPV6_HOST_ANY);
             long sequenceId = 3;
-            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null,
-                    (short) 133));
+            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(),
+                    defTransport(), (short) 133));
         }
         {
             // 4 deny ipv6 2001:db8:a0b:12f0::1/55 any
@@ -431,7 +440,8 @@ public class AclEntryLineParserTest {
             configBuilder.setSourceAddress(new Ipv6Prefix("2001:db8:a0b:12f0::1/55"));
             configBuilder.setDestinationAddress(AclEntryLineParser.IPV6_HOST_ANY);
             long sequenceId = 4;
-            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, DROP.class, configBuilder.build(), null));
+            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, DROP.class, configBuilder.build(),
+                    defTransport()));
         }
         {
             // 5 permit tcp host ::1 host ::1
@@ -489,8 +499,8 @@ public class AclEntryLineParserTest {
                     .setHopRange(new HopRange("11..9"))
                     .build());
             long sequenceId = 7;
-            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null,
-                    (short) 8));
+            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(),
+                    defTransport(), (short) 8));
         }
         {
             // 8 permit udp f::a a::b eq 10 FE80:0000:0000:0000:0202:B3FF:FE1E:8329
