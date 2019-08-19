@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.ifc.base.handler.subifc.ip4;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -42,11 +43,16 @@ public abstract class AbstractIpv4ConfigWriter implements CliWriter<Config> {
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        if (subId != AbstractSubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (!isSupportedInterface(instanceIdentifier)) {
             throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
                     new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
         }
-        blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, ifcName));
+        blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, getInterfaceName(ifcName, subId)));
+    }
+
+    protected String getInterfaceName(String ifcName, Long subId) {
+        // Typically interface(not sub-interface) has IP.
+        return ifcName;
     }
 
     protected abstract String writeTemplate(Config config, String ifcName);
@@ -70,12 +76,17 @@ public abstract class AbstractIpv4ConfigWriter implements CliWriter<Config> {
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        if (subId != AbstractSubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (!isSupportedInterface(instanceIdentifier)) {
             throw new WriteFailedException.DeleteFailedException(instanceIdentifier,
                     new IllegalArgumentException("Unable to manage IP for subinterface: " + subId));
         }
-        blockingDeleteAndRead(cli, instanceIdentifier, deleteTemplate(config, ifcName));
+        blockingDeleteAndRead(cli, instanceIdentifier, deleteTemplate(config, getInterfaceName(ifcName, subId)));
     }
 
     protected abstract String deleteTemplate(Config config, String ifcName);
+
+    @VisibleForTesting
+    public boolean isSupportedInterface(InstanceIdentifier<Config> instanceIdentifier) {
+        return AbstractSubinterfaceReader.isSubInterfaceZero(instanceIdentifier);
+    }
 }

@@ -57,4 +57,9 @@ public abstract class AbstractSubinterfaceReader implements CliConfigListReader<
     protected abstract String getReadCommand();
 
     protected abstract List<SubinterfaceKey> parseSubinterfaceIds(String output, String ifcName);
+
+    public static boolean isSubInterfaceZero(InstanceIdentifier<?> instanceIdentifier) {
+        Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
+        return subId == ZERO_SUBINTERFACE_ID;
+    }
 }
