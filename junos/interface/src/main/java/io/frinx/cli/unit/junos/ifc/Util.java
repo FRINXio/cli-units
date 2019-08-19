@@ -24,7 +24,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
@@ -47,11 +46,14 @@ public final class Util {
         }
     }
 
-
     public static String getSubinterfaceName(InstanceIdentifier<?> id) {
-        InterfaceKey ifcKey = id.firstKeyOf(Interface.class);
-        SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
-        return ifcKey.getName() + SubinterfaceReader.SEPARATOR + subKey.getIndex().toString();
+        String ifcName = id.firstKeyOf(Interface.class).getName();
+        Long subId = id.firstKeyOf(Subinterface.class).getIndex();
+        return getSubinterfaceName(ifcName, subId);
+    }
+
+    public static String getSubinterfaceName(String ifcName, Long subId) {
+        return ifcName + SubinterfaceReader.SEPARATOR + subId.toString();
     }
 
     public static boolean isPhysicalInterface(Config data) {
