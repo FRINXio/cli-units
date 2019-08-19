@@ -19,6 +19,8 @@ package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip4;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigReader;
 import java.util.regex.Pattern;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class Ipv4ConfigReader extends AbstractIpv4ConfigReader {
 
@@ -33,6 +35,12 @@ public class Ipv4ConfigReader extends AbstractIpv4ConfigReader {
 
     @Override
     protected String getReadCommand(String ifcName, Long subId) {
-        return f(Ipv4AddressReader.SH_RUN_INT_IP, ifcName);
+        return f(Ipv4AddressReader.SH_RUN_INT_IP, Ipv4AddressReader.getTargetInterfaceName(ifcName, subId));
+    }
+
+
+    @Override
+    public boolean isSupportedInterface(InstanceIdentifier<Config> instanceIdentifier) {
+        return Ipv4AddressReader.SUPPORTED_INTERFACE;
     }
 }

@@ -55,7 +55,11 @@ public final class Util {
     public static String getSubinterfaceName(InstanceIdentifier<?> id) {
         InterfaceKey ifcKey = id.firstKeyOf(Interface.class);
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
-        return ifcKey.getName() + SubinterfaceReader.SEPARATOR + subKey.getIndex() .toString();
+        return getSubinterfaceName(ifcKey.getName(), subKey.getIndex());
+    }
+
+    public static String getSubinterfaceName(String ifcName, Long subId) {
+        return ifcName + SubinterfaceReader.SEPARATOR + subId.toString();
     }
 
     public static boolean isPhysicalInterface(Config data) {

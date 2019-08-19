@@ -47,6 +47,18 @@ public class Ipv4ConfigWriterTest {
             + "no ipv4 address\n"
             + "root\n";
 
+    private static final String WRITE_INPUT_SUBIF = "interface Bundle-Ether45.10\n"
+            + "ipv4 address 71.71.71.73 255.255.255.192\n"
+            + "root\n";
+
+    private static final String UPDATE_INPUT_SUBIF = "interface Bundle-Ether45.10\n"
+            + "ipv4 address 71.71.71.74 255.255.255.192\n"
+            + "root\n";
+
+    private static final String DELETE_INPUT_SUBIF = "interface Bundle-Ether45.10\n"
+            + "no ipv4 address\n"
+            + "root\n";
+
     @Mock
     private Cli cli;
 
@@ -58,6 +70,7 @@ public class Ipv4ConfigWriterTest {
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
     private InstanceIdentifier iid =  AbstractIpv4ConfigWriterTest.configIID("Bundle-Ether45", 0L);
+    private InstanceIdentifier iidSubif =  AbstractIpv4ConfigWriterTest.configIID("Bundle-Ether45", 10L);
 
     // test data
     private Config data;
@@ -101,5 +114,33 @@ public class Ipv4ConfigWriterTest {
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+    }
+
+    @Test
+    public void writeSubif() throws WriteFailedException {
+        Config newData = AbstractIpv4ConfigReaderTest.buildData("71.71.71.73", "26");
+        this.writer.writeCurrentAttributes(iidSubif, newData, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT_SUBIF, response.getValue().getContent());
+    }
+
+    @Test
+    public void updateSubif() throws WriteFailedException {
+        // update values
+        Config newData = AbstractIpv4ConfigReaderTest.buildData("71.71.71.74", "26");
+
+        this.writer.updateCurrentAttributes(iidSubif, data, newData, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT_SUBIF, response.getValue().getContent());
+    }
+
+    @Test
+    public void deleteSubif() throws WriteFailedException {
+        this.writer.deleteCurrentAttributes(iidSubif, data, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT_SUBIF, response.getValue().getContent());
     }
 }
