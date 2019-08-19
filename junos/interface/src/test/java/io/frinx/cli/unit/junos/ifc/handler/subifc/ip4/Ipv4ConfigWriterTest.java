@@ -40,6 +40,15 @@ public class Ipv4ConfigWriterTest {
 
     private static final String UPDATE_INPUT = "set interfaces ge-0/0/3 unit 0 family inet address 20.21.22.23/24\n";
 
+    private static final String WRITE_INPUT_SUBIF =
+        "set interfaces ge-10/0/3 unit 10 family inet address 10.11.12.130/16\n";
+
+    private static final String DELETE_INPUT_SUBIF =
+        "delete interfaces ge-10/0/3 unit 10 family inet address 10.11.12.130/16\n";
+
+    private static final String UPDATE_INPUT_SUBIF =
+        "set interfaces ge-10/0/3 unit 10 family inet address 20.21.22.230/24\n";
+
     @Mock
     private WriteContext context;
 
@@ -49,9 +58,11 @@ public class Ipv4ConfigWriterTest {
     private Ipv4ConfigWriter writer;
 
     private InstanceIdentifier<Config> id = AbstractIpv4ConfigWriterTest.configIID("ge-0/0/3", 0L);
+    private InstanceIdentifier<Config> idSubif = AbstractIpv4ConfigWriterTest.configIID("ge-10/0/3", 10L);
 
     // test data
     private Config data = AbstractIpv4ConfigReaderTest.buildData("10.11.12.13", "16");
+    private Config dataSubif = AbstractIpv4ConfigReaderTest.buildData("10.11.12.130", "16");
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
@@ -85,7 +96,34 @@ public class Ipv4ConfigWriterTest {
         final Config newData = AbstractIpv4ConfigReaderTest.buildData("20.21.22.23", "24");
         writer.updateCurrentAttributes(id, data, newData, context);
 
+        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getAllValues().get(0).getContent());
+        Assert.assertEquals(UPDATE_INPUT, response.getAllValues().get(1).getContent());
+    }
+
+    @Test
+    public void testWriteSubif() throws Exception {
+        writer.writeCurrentAttributes(idSubif, dataSubif, context);
+
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+        Assert.assertEquals(WRITE_INPUT_SUBIF, response.getValue().getContent());
+    }
+
+    @Test
+    public void testDeleteSubif() throws Exception {
+        writer.deleteCurrentAttributes(idSubif, dataSubif, context);
+
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT_SUBIF, response.getValue().getContent());
+    }
+
+    @Test
+    public void testUpdateSubif() throws Exception {
+        final Config newData = AbstractIpv4ConfigReaderTest.buildData("20.21.22.230", "24");
+        writer.updateCurrentAttributes(idSubif, dataSubif, newData, context);
+
+        Mockito.verify(cli, Mockito.times(2)).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT_SUBIF, response.getAllValues().get(0).getContent());
+        Assert.assertEquals(UPDATE_INPUT_SUBIF, response.getAllValues().get(1).getContent());
     }
 }

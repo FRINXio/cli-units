@@ -29,11 +29,21 @@ public class Ipv4ConfigReaderTest {
     private static final String OUTPUT_SINGLE_IFACE =
             "set interfaces ge-0/0/3 unit 0 family inet address 10.11.12.13/16";
 
+    private static final String OUTPUT_SINGLE_SUB_IFACE =
+        "set interfaces ge-0/0/3 unit 10 family inet address 10.11.12.23/16";
+
     @Test
     public void testParseConfigAddress() {
         final ConfigBuilder actual = new ConfigBuilder();
         new Ipv4ConfigReader(Mockito.mock(Cli.class)).parseAddressConfig(actual, OUTPUT_SINGLE_IFACE,
                 new Ipv4AddressNoZone("10.11.12.13"));
         Assert.assertEquals(AbstractIpv4ConfigReaderTest.buildData("10.11.12.13", "16"), actual.build());
+    }
+
+    @Test
+    public void testParseConfigAddressSubIf() {
+        final ConfigBuilder actual = new ConfigBuilder();
+        new Ipv4ConfigReader(Mockito.mock(Cli.class)).parseAddressConfig(actual, OUTPUT_SINGLE_SUB_IFACE, null);
+        Assert.assertEquals(AbstractIpv4ConfigReaderTest.buildData("10.11.12.23", "16"), actual.build());
     }
 }
