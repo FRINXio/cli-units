@@ -30,30 +30,13 @@ public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
     private static final String TEMPLATE = "{% if($delete) %}delete{% else %}set{% endif %} "
             + "interfaces {$name} family inet address {$config.ip.value}/{$config.prefix_length}";
 
-    private final Cli cli;
-
     public Ipv4ConfigWriter(Cli cli) {
         super(cli);
-        this.cli = cli;
-    }
-
-    @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
-                                       @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = Util.getSubinterfaceName(instanceIdentifier);
-        blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, ifcName));
     }
 
     @Override
     protected String writeTemplate(Config config, String ifcName) {
         return fT(TEMPLATE, "name", ifcName, "config", config);
-    }
-
-    @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = Util.getSubinterfaceName(instanceIdentifier);
-        blockingWriteAndRead(cli, instanceIdentifier, config, deleteTemplate(config, ifcName));
     }
 
     @Override
@@ -69,5 +52,15 @@ public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
     @Override
     protected String deleteTemplate(Config config, String ifcName) {
         return fT(TEMPLATE, "name", ifcName, "config", config, "delete", true);
+    }
+
+    @Override
+    protected String getInterfaceName(String ifcName, Long subId) {
+        return Util.getSubinterfaceName(ifcName, subId);
+    }
+
+    @Override
+    public boolean isSupportedInterface(InstanceIdentifier<Config> instanceIdentifier) {
+        return Ipv4AddressReader.SUPPORTED_INTERFACE;
     }
 }
