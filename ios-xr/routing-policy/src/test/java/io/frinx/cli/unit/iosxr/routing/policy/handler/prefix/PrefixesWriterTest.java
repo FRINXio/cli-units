@@ -61,10 +61,10 @@ public class PrefixesWriterTest implements CliFormatter {
         Assert.assertEquals("prefix-set testing\n"
                 + "1.1.1.1/32 ge 32 le 32,\n"
                 + "1.1.1.1/4 ge 32 le 32,\n"
-                + "1.1.1.1/4 ge 11 le 11,\n"
+                + "1.1.1.1/4 ge 11 le 24,\n"
                 + "dead:beef::/4 ge 128 le 128,\n"
                 + "dead:beef::1/128 ge 128 le 128,\n"
-                + "dead:beef::1/128 ge 1 le 1,\n"
+                + "dead:beef::1/128 ge 1 le 128,\n"
                 + "dead:beef::1/45 ge 45 le 45,\n"
                 + "dead:beef::1/46\n"
                 + "end-set", output);
