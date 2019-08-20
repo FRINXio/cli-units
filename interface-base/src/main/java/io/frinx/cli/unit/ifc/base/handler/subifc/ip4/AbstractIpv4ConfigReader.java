@@ -50,8 +50,7 @@ public abstract class AbstractIpv4ConfigReader implements CliConfigReader<Config
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
         Long subId = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
 
-        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
-        if (subId == AbstractSubinterfaceReader.ZERO_SUBINTERFACE_ID) {
+        if (isSupportedInterface(instanceIdentifier)) {
             Ipv4AddressNoZone address = instanceIdentifier.firstKeyOf(Address.class).getIp();
             parseAddressConfig(configBuilder,
                     blockingRead(getReadCommand(ifcName, subId), cli, instanceIdentifier, readContext), address);
@@ -76,6 +75,12 @@ public abstract class AbstractIpv4ConfigReader implements CliConfigReader<Config
     protected abstract Pattern getIpLine();
 
     protected abstract String getReadCommand(String ifcName, Long subId);
+
+    @VisibleForTesting
+    public boolean isSupportedInterface(InstanceIdentifier<Config> instanceIdentifier) {
+        // Only subinterface with ID ZERO_SUBINTERFACE_ID can have IP
+        return AbstractSubinterfaceReader.isSubInterfaceZero(instanceIdentifier);
+    }
 
     public boolean hasIpAddress(InstanceIdentifier instanceIdentifier, String ifcName, ReadContext ctx)
             throws ReadFailedException {

@@ -56,6 +56,7 @@ public class AbstractIpv4AddressesReaderTest {
         Mockito.doCallRealMethod().when(reader).getAllIds(Mockito.any(InstanceIdentifier.class), Mockito.eq(ctx));
         Mockito.doCallRealMethod().when(reader).readCurrentAttributes(Mockito.any(InstanceIdentifier.class),
                 Mockito.any(AddressBuilder.class), Mockito.eq(ctx));
+        Mockito.doCallRealMethod().when(reader).isSupportedInterface(Mockito.any(InstanceIdentifier.class));
     }
 
     private static InstanceIdentifier<Address> addressIID(String ifcName, String ipAddress, Long subId) {
@@ -89,7 +90,6 @@ public class AbstractIpv4AddressesReaderTest {
     @Test
     public void testReadCurrentAttributes0Sub() {
         AddressBuilder builder = new AddressBuilder();
-
 
         InstanceIdentifier<Address> id = addressIID("Vlan100", "10.187.100.49", 0L);
 
