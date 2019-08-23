@@ -23,6 +23,7 @@ import io.frinx.cli.unit.iosxr.conf.ConfigurationUnit;
 import io.frinx.cli.unit.iosxr.hsrp.HsrpUnit;
 import io.frinx.cli.unit.iosxr.ifc.IosXRInterfaceUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrCliInitializerUnit;
+import io.frinx.cli.unit.iosxr.isis.IosXRIsisUnit;
 import io.frinx.cli.unit.iosxr.lacp.IosXRLacpUnit;
 import io.frinx.cli.unit.iosxr.lldp.LldpUnit;
 import io.frinx.cli.unit.iosxr.logging.LoggingUnit;
@@ -60,7 +61,7 @@ public class IosAll extends io.frinx.cli.unit.ios.it.IosAll {
             .build();
 
     private static final int PORT = 22;
-    private static final String HOST = "192.168.1.211";
+    private static final String HOST = "192.168.1.212";
     private static final InetSocketAddress IOS_ADDR = new InetSocketAddress(HOST, PORT);
 
     public IosAll() {
@@ -121,6 +122,7 @@ public class IosAll extends io.frinx.cli.unit.ios.it.IosAll {
         new MplsUnit(reg).init();
         new IosXRNetflowUnit(reg).init();
         new XrPlatformUnit(reg).init();
+        new IosXRIsisUnit(reg).init();
         new XRQoSUnit(reg).init();
         new RoutingPolicyUnit(reg).init();
         new SnmpUnit(reg).init();
