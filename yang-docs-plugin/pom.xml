@@ -16,13 +16,13 @@
     <parent>
         <groupId>io.frinx.translate.unit.commons</groupId>
         <artifactId>checkstyle-parent</artifactId>
-        <version>3.1.9.rc10-frinx</version>
+        <version>3.1.9.rc11-frinx-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>yang-docs-plugin</artifactId>
-    <version>3.1.9.rc10-frinx</version>
+    <version>3.1.9.rc11-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencyManagement>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>io.frinx.cli</groupId>
             <artifactId>translation-registry-api</artifactId>
-            <version>3.1.9.rc10-frinx</version>
+            <version>3.1.9.rc11-frinx-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.fd.honeycomb</groupId>
@@ -121,12 +121,12 @@
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>utils</artifactId>
-            <version>3.1.9.rc10-frinx</version>
+            <version>3.1.9.rc11-frinx-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>yang-docs-plugin-common</artifactId>
-            <version>3.1.9.rc10-frinx</version>
+            <version>3.1.9.rc11-frinx-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
