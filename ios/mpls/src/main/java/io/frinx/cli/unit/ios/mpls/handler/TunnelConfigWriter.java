@@ -31,12 +31,22 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class TunnelConfigWriter implements CliWriter<Config> {
 
     private static final String INPUT_T = "{% if ($delete) %}no {% endif %}interface tunnel {$name}\n"
-            + "{% if (!$delete) %}"
-            + "{% if (!$autoroute) %}no {% endif %}tunnel mpls traffic-end autoroute announce\n"
-            + "{% if ($autoroute) %}{% if ($metric == nondefined) %}"
-            + "no tunnel mpls traffic-end autoroute metric\n{% else if ( $metric != $null) %}tunnel mpls traffic-end "
-            + "autoroute metric absolute {$metric}\n{% endif %}{% endif %}"
-            + "end{% endif %}";
+                + "{% if (!$delete) %}"
+                + "{% if (!$autoroute) %}"
+                + "no tunnel mpls traffic-eng autoroute announce\n"
+                + "{% else if ($autoroute) %}"
+                + "tunnel mode mpls traffic-eng\n"
+                + "tunnel mpls traffic-eng autoroute announce\n"
+                + "{% endif %}"
+                + "{% if ($autoroute) %}"
+                + "{% if ($metric == nondefined) %}"
+                + "no tunnel mpls traffic-eng autoroute metric\n"
+                + "{% else if ( $metric != $null) %}"
+                + "tunnel mpls traffic-eng autoroute metric absolute {$metric}\n"
+                + "{% endif %}"
+                + "{% endif %}"
+                + "end"
+                + "{% endif %}";
 
     private Cli cli;
 

@@ -26,6 +26,11 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.ios.init.IosDevices;
 import io.frinx.cli.unit.ios.mpls.handler.LdpInterfaceConfigReader;
 import io.frinx.cli.unit.ios.mpls.handler.LdpInterfaceConfigWriter;
+import io.frinx.cli.unit.ios.mpls.handler.LdpInterfaceReader;
+import io.frinx.cli.unit.ios.mpls.handler.LoadShareConfigReader;
+import io.frinx.cli.unit.ios.mpls.handler.LoadShareConfigWriter;
+import io.frinx.cli.unit.ios.mpls.handler.P2pAttributesConfigReader;
+import io.frinx.cli.unit.ios.mpls.handler.P2pAttributesConfigWriter;
 import io.frinx.cli.unit.ios.mpls.handler.TunnelConfigReader;
 import io.frinx.cli.unit.ios.mpls.handler.TunnelConfigWriter;
 import io.frinx.cli.unit.ios.mpls.handler.TunnelReader;
@@ -103,14 +108,22 @@ public class MplsUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NE_MP_LS_CONSTRAINEDPATH);
         writeRegistry.addNoop(IIDs.NE_NE_MP_LS_CO_TU_TUNNEL);
         writeRegistry.add(IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG, new TunnelConfigWriter(cli));
+        writeRegistry.addAfter(IIDs.NE_NE_MP_LS_CO_TU_TU_AUG_NIMPLSTETUNNELCISCOAUG_CI_CONFIG,
+                new LoadShareConfigWriter(cli), IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_MP_LS_CO_TU_TU_P2PTUNNELATTRIBUTES);
+        writeRegistry.add(IIDs.NE_NE_MP_LS_CO_TU_TU_P2_CONFIG, new P2pAttributesConfigWriter(cli));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         // LDP
+        readRegistry.add(IIDs.NE_NE_MP_SI_LD_IN_IN_INTERFACE, new LdpInterfaceReader(cli));
         readRegistry.add(IIDs.NE_NE_MP_SI_LD_IN_IN_IN_CONFIG, new LdpInterfaceConfigReader());
 
         // Tunnel
         readRegistry.add(IIDs.NE_NE_MP_LS_CO_TU_TUNNEL, new TunnelReader(cli));
         readRegistry.add(IIDs.NE_NE_MP_LS_CO_TU_TU_CONFIG, new TunnelConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_MP_LS_CO_TU_TU_AUG_NIMPLSTETUNNELCISCOAUG_CI_CONFIG,
+                new LoadShareConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_MP_LS_CO_TU_TU_P2_CONFIG, new P2pAttributesConfigReader(cli));
     }
 }

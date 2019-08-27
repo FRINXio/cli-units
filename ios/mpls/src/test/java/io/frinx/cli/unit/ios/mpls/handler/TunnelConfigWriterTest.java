@@ -44,21 +44,24 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class TunnelConfigWriterTest {
 
     private static final String WRITE_INPUT = "interface tunnel 55\n"
-            + "tunnel mpls traffic-end autoroute announce\n"
-            + "tunnel mpls traffic-end autoroute metric absolute 5\n"
+            + "tunnel mode mpls traffic-eng\n"
+            + "tunnel mpls traffic-eng autoroute announce\n"
+            + "tunnel mpls traffic-eng autoroute metric absolute 5\n"
             + "end\n";
 
     private static final String UPDATE_INPUT = "interface tunnel 55\n"
-            + "tunnel mpls traffic-end autoroute announce\n"
-            + "no tunnel mpls traffic-end autoroute metric\n"
+            + "tunnel mode mpls traffic-eng\n"
+            + "tunnel mpls traffic-eng autoroute announce\n"
+            + "no tunnel mpls traffic-eng autoroute metric\n"
             + "end\n";
 
     private static final String UPDATE_INPUT2 = "interface tunnel 55\n"
-            + "tunnel mpls traffic-end autoroute announce\n"
+            + "tunnel mode mpls traffic-eng\n"
+            + "tunnel mpls traffic-eng autoroute announce\n"
             + "end\n";
 
     private static final String UPDATE_CLEAN_INPUT = "interface tunnel 55\n"
-            + "no tunnel mpls traffic-end autoroute announce\n"
+            + "no tunnel mpls traffic-eng autoroute announce\n"
             + "end\n";
 
     private static final String DELETE_INPUT = "no interface tunnel 55\n\n";
