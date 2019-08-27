@@ -24,21 +24,17 @@ import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.cisco.rev171024.cisco.mpls.te.tunnel.top.cisco.mpls.te.extension.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.Tunnel;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.rev170824.LSPMETRICABSOLUTE;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TunnelConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public class LoadShareConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    static final String SH_RUN_TUNNEL = "show running-config interface Tunnel%s";
-    private static final Pattern AUTOROUTE_LINE = Pattern.compile("tunnel mpls traffic-eng autoroute announce");
-    private static final Pattern METRIC_LINE = Pattern.compile("tunnel mpls traffic-eng autoroute metric absolute "
-            + "(?<metric>.*)");
-    private final Cli cli;
+    private Cli cli;
+    private static final Pattern LOAD_LINE = Pattern.compile("tunnel mpls traffic-eng load-share (?<load>.*)");
 
-    public TunnelConfigReader(Cli cli) {
+    public LoadShareConfigReader(Cli cli) {
         this.cli = cli;
     }
 
@@ -47,21 +43,14 @@ public class TunnelConfigReader implements CliConfigReader<Config, ConfigBuilder
             ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final String name = instanceIdentifier.firstKeyOf(Tunnel.class)
                 .getName();
-        configBuilder.setName(name);
-        parseConfig(blockingRead(String.format(SH_RUN_TUNNEL, name), cli, instanceIdentifier, readContext),
-                configBuilder);
+        parseConfig(blockingRead(String.format(TunnelConfigReader.SH_RUN_TUNNEL, name), cli, instanceIdentifier,
+                readContext), configBuilder);
     }
 
     @VisibleForTesting
     public static void parseConfig(String output, ConfigBuilder builder) {
-        ParsingUtils.findMatch(output, AUTOROUTE_LINE, builder::setShortcutEligible);
-
-        ParsingUtils.parseField(output, METRIC_LINE::matcher,
-            matcher -> matcher.group("metric"),
-            v -> builder.setMetric(Integer.valueOf(v)));
-
-        if (builder.getMetric() != null) {
-            builder.setMetricType(LSPMETRICABSOLUTE.class);
-        }
+        ParsingUtils.parseField(output, LOAD_LINE::matcher,
+            matcher -> matcher.group("load"),
+            v -> builder.setLoadShare(Long.valueOf(v)));
     }
 }

@@ -35,7 +35,13 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class LdpInterfaceConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE = "configure terminal\n"
-            + "{% if ($delete) %}no {% endif %}mpls ldp router-id {$name}\n"
+            + "{% if ($delete) %}no interface {$name}\n"
+            + "{% else %}"
+            + "mpls ip\n"
+            + "mpls label protocol ldp\n"
+            + "interface {$name}\n"
+            + "mpls ip\n"
+            + "{% endif %}"
             + "end\n";
 
     private Cli cli;

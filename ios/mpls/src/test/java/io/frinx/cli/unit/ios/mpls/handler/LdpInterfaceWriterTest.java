@@ -56,11 +56,14 @@ public class LdpInterfaceWriterTest {
             .child(Mpls.class);
 
     private static final String WRITE_INTERFACE_INPUT = "configure terminal\n"
-            + "mpls ldp router-id tunnel 1\n"
+            + "mpls ip\n"
+            + "mpls label protocol ldp\n"
+            + "interface tunnel 1\n"
+            + "mpls ip\n"
             + "end\n";
 
     private static final String DELETE_INTERFACE_INPUT = "configure terminal\n"
-            + "no mpls ldp router-id tunnel 1\n"
+            + "no interface tunnel 1\n"
             + "end\n";
 
     @Mock

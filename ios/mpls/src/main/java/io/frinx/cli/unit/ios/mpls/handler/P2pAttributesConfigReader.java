@@ -24,21 +24,19 @@ import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnel.p2p_top.p2p.tunnel.attributes.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnel.p2p_top.p2p.tunnel.attributes.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.Tunnel;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te.tunnels_top.tunnels.tunnel.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.types.rev170824.LSPMETRICABSOLUTE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Address;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TunnelConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public class P2pAttributesConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    static final String SH_RUN_TUNNEL = "show running-config interface Tunnel%s";
-    private static final Pattern AUTOROUTE_LINE = Pattern.compile("tunnel mpls traffic-eng autoroute announce");
-    private static final Pattern METRIC_LINE = Pattern.compile("tunnel mpls traffic-eng autoroute metric absolute "
-            + "(?<metric>.*)");
+    private static final Pattern DESTINATION_LINE = Pattern.compile("tunnel destination (?<destination>.*)");
     private final Cli cli;
 
-    public TunnelConfigReader(Cli cli) {
+    public P2pAttributesConfigReader(Cli cli) {
         this.cli = cli;
     }
 
@@ -47,21 +45,14 @@ public class TunnelConfigReader implements CliConfigReader<Config, ConfigBuilder
             ConfigBuilder configBuilder, @Nonnull ReadContext readContext) throws ReadFailedException {
         final String name = instanceIdentifier.firstKeyOf(Tunnel.class)
                 .getName();
-        configBuilder.setName(name);
-        parseConfig(blockingRead(String.format(SH_RUN_TUNNEL, name), cli, instanceIdentifier, readContext),
-                configBuilder);
+        parseConfig(blockingRead(String.format(TunnelConfigReader.SH_RUN_TUNNEL, name), cli, instanceIdentifier,
+                readContext), configBuilder);
     }
 
     @VisibleForTesting
     public static void parseConfig(String output, ConfigBuilder builder) {
-        ParsingUtils.findMatch(output, AUTOROUTE_LINE, builder::setShortcutEligible);
-
-        ParsingUtils.parseField(output, METRIC_LINE::matcher,
-            matcher -> matcher.group("metric"),
-            v -> builder.setMetric(Integer.valueOf(v)));
-
-        if (builder.getMetric() != null) {
-            builder.setMetricType(LSPMETRICABSOLUTE.class);
-        }
+        ParsingUtils.parseField(output, DESTINATION_LINE::matcher,
+            matcher -> matcher.group("destination"),
+            v -> builder.setDestination(new IpAddress(new Ipv4Address(v))));
     }
 }
