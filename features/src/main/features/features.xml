@@ -87,6 +87,7 @@
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr-common-cli-initializer</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.translate.unit.commons/ios-xr-route-policy-util/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/network-instance-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-network-instance-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-bgp-unit/{{VERSION}}</bundle>
