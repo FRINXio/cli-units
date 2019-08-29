@@ -32,6 +32,10 @@
     <version>4.2.3.rc7-frinx-SNAPSHOT</version>
     <name>Frinx :: Cli :: Unit :: IOS :: XR</name>
 
+    <properties>
+        <translate.unit.commons.version>4.2.3.rc7-frinx-SNAPSHOT</translate.unit.commons.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -52,6 +56,12 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>io.frinx.translate.unit.commons</groupId>
+            <artifactId>ios-xr-route-policy-util</artifactId>
+            <version>${translate.unit.commons.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ios-xr-acl-unit</artifactId>

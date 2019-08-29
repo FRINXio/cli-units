@@ -37,6 +37,11 @@
             <artifactId>ios-xr-cli-init-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.translate.unit.commons</groupId>
+            <artifactId>ios-xr-route-policy-util</artifactId>
+            <version>${translate.unit.commons.version}</version>
+        </dependency>
 
         <!-- Openconfig models -->
         <dependency>
@@ -58,6 +63,19 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <!-- Testing Dependencies -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-utils</artifactId>
+            <version>${openconfig.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
