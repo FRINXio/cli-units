@@ -29,7 +29,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-junos</artifactId>
-    <version>4.2.3.rc6-frinx</version>
+    <version>4.2.3.rc7-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
