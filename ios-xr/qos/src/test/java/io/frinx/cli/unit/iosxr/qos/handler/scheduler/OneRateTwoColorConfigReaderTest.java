@@ -23,16 +23,37 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 
 public class OneRateTwoColorConfigReaderTest {
 
+    // class maps are ordered
     private static final String OUTPUT = "Mon Mar 26 12:08:19.067 UTC\r\n"
             + " class map1\r\n"
             + "  set mpls experimental topmost 5\r\n"
             + "  police rate percent 33 \r\n"
             + "  ! \r\n"
-            + "  queue-limit 4 ms \r\n"
             + "  bandwidth remaining percent 10 \r\n"
             + "  bandwidth percent 15 \r\n"
             + " ! \r\n"
+            + " class map2\r\n"
+            + "  queue-limit 8 ms \r\n"
+            + "  bandwidth remaining percent 12 \r\n"
+            + "  bandwidth percent 17 \r\n"
+            + "  ! \r\n"
             + " class class-default\r\n"
+            + " end-policy-map\r\n"
+            + "! \r\n";
+
+    // class maps are unordered
+    private static final String OUTPUT_RANDOM = "Mon Mar 26 12:08:19.067 UTC\r\n"
+            + " class map2\r\n"
+            + "  queue-limit 4 ms \r\n"
+            + "  bandwidth percent 30 \r\n"
+            + "  bandwidth remaining percent 60 \r\n"
+            + "  queue-limit 19 ms \r\n"
+            + " ! \r\n"
+            + " class map1\r\n"
+            + "  set precedence internet\r\n"
+            + " ! \r\n"
+            + " class class-default\r\n"
+            + " ! \r\n"
             + " end-policy-map\r\n"
             + "! \r\n";
 
@@ -51,18 +72,19 @@ public class OneRateTwoColorConfigReaderTest {
         ConfigBuilder builder = new ConfigBuilder();
         String finalOutput = OneRateTwoColorConfigReader.limitOutput(OUTPUT, "map1");
         OneRateTwoColorConfigReader.fillInConfig(finalOutput, builder);
-        Assert.assertEquals(4, builder.getAugmentation(QosMaxQueueDepthMsAug.class)
-                .getMaxQueueDepthMs()
-                .intValue());
+        Assert.assertNull(builder.getAugmentation(QosMaxQueueDepthMsAug.class));
         Assert.assertEquals(10, builder.getCirPctRemaining()
                 .getValue()
                 .intValue());
         Assert.assertEquals(15, builder.getCirPct()
                 .getValue()
                 .intValue());
+    }
 
+    @Test
+    public void testClassDefault() {
         ConfigBuilder builder1 = new ConfigBuilder();
-        finalOutput = OneRateTwoColorConfigReader.limitOutput(OUTPUT_DEFAULT, "class-default");
+        String finalOutput = OneRateTwoColorConfigReader.limitOutput(OUTPUT_DEFAULT, "class-default");
         OneRateTwoColorConfigReader.fillInConfig(finalOutput, builder1);
         Assert.assertEquals(3, builder1.getAugmentation(QosMaxQueueDepthMsAug.class)
                 .getMaxQueueDepthMs()
@@ -73,5 +95,11 @@ public class OneRateTwoColorConfigReaderTest {
         Assert.assertEquals(14, builder1.getCirPct()
                 .getValue()
                 .intValue());
+    }
+
+    @Test
+    public void testRandomOrder() {
+        String finalOutput = OneRateTwoColorConfigReader.limitOutput(OUTPUT_RANDOM, "map1");
+        Assert.assertEquals(" class map1\n  set precedence internet\n ! ", finalOutput);
     }
 }
