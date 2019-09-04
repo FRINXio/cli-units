@@ -18,12 +18,12 @@ package io.frinx.cli.unit.iosxr.isis.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
-import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.Collections;
 import java.util.List;
@@ -83,6 +83,6 @@ public class IsisProtocolReader implements CliListReader<Protocol, ProtocolKey, 
 
     @Override
     public Check getCheck() {
-        return BasicCheck.emptyCheck();
+        return ChecksMap.PathCheck.Protocol.ISIS;
     }
 }
