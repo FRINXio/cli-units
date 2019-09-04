@@ -126,12 +126,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>ios-xr-isis-unit</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>ios-xr-acl-unit</artifactId>
             <version>${project.version}</version>
