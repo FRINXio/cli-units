@@ -198,15 +198,15 @@
                 <version>${yangtools.version}</version>
                 <dependencies>
                     <dependency>
-                        <groupId>io.frinx.translate.unit.commons</groupId>
+                        <groupId>io.frinx.yang.docs</groupId>
                         <artifactId>yang-docs-plugin-common</artifactId>
-                        <version>${translate.unit.commons.version}</version>
+                        <version>${project.version}</version>
                         <type>jar</type>
                     </dependency>
                     <dependency>
                         <groupId>io.frinx.cli</groupId>
                         <artifactId>yang-docs-plugin</artifactId>
-                        <version>4.2.3.rc8-frinx-SNAPSHOT</version>
+                        <version>${project.version}</version>
                         <type>jar</type>
                     </dependency>
                 </dependencies>
