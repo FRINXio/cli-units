@@ -29,8 +29,12 @@ import io.frinx.cli.unit.ios.mpls.handler.LdpInterfaceConfigWriter;
 import io.frinx.cli.unit.ios.mpls.handler.LdpInterfaceReader;
 import io.frinx.cli.unit.ios.mpls.handler.LoadShareConfigReader;
 import io.frinx.cli.unit.ios.mpls.handler.LoadShareConfigWriter;
+import io.frinx.cli.unit.ios.mpls.handler.NiMplsRsvpIfSubscripConfigReader;
+import io.frinx.cli.unit.ios.mpls.handler.NiMplsRsvpIfSubscripConfigWriter;
 import io.frinx.cli.unit.ios.mpls.handler.P2pAttributesConfigReader;
 import io.frinx.cli.unit.ios.mpls.handler.P2pAttributesConfigWriter;
+import io.frinx.cli.unit.ios.mpls.handler.RsvpInterfaceConfigReader;
+import io.frinx.cli.unit.ios.mpls.handler.RsvpInterfaceReader;
 import io.frinx.cli.unit.ios.mpls.handler.TunnelConfigReader;
 import io.frinx.cli.unit.ios.mpls.handler.TunnelConfigWriter;
 import io.frinx.cli.unit.ios.mpls.handler.TunnelReader;
@@ -92,6 +96,13 @@ public class MplsUnit extends AbstractUnit {
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.NE_NE_MPLS);
+        // RSVP
+        writeRegistry.addNoop(IIDs.NE_NE_MP_SI_RSVPTE);
+        writeRegistry.addNoop(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE);
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, new NiMplsRsvpIfSubscripConfigWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CO_AUG_NIMPLSRSVPIFSUBSCRIPAUG),
+                IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG
+        );
 
         // LDP
         writeRegistry.addNoop(IIDs.NE_NE_MP_SI_LDP);
@@ -115,6 +126,12 @@ public class MplsUnit extends AbstractUnit {
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
+        // RSVP
+        readRegistry.add(IIDs.NE_NE_MP_SI_RS_IN_INTERFACE, new RsvpInterfaceReader(cli));
+        readRegistry.add(IIDs.NE_NE_MP_SI_RS_IN_IN_CONFIG, new RsvpInterfaceConfigReader());
+        readRegistry.subtreeAdd(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CONFIG, new NiMplsRsvpIfSubscripConfigReader(cli),
+                Sets.newHashSet(IIDs.NE_NE_MP_SI_RS_IN_IN_SU_CO_AUG_NIMPLSRSVPIFSUBSCRIPAUG));
+
         // LDP
         readRegistry.add(IIDs.NE_NE_MP_SI_LD_IN_IN_INTERFACE, new LdpInterfaceReader(cli));
         readRegistry.add(IIDs.NE_NE_MP_SI_LD_IN_IN_IN_CONFIG, new LdpInterfaceConfigReader());
