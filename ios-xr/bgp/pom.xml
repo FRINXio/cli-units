@@ -19,13 +19,13 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.10.rc1-frinx</version>
+        <version>3.1.10.rc2-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-xr-bgp-unit</artifactId>
-    <version>3.1.10.rc1-frinx</version>
+    <version>3.1.10.rc2-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
