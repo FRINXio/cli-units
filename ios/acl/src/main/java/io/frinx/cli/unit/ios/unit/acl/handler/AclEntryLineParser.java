@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.net.InetAddresses;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
@@ -136,7 +137,7 @@ final class AclEntryLineParser {
         Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
         // ipv4 access lists have sequence number in the beginning of the line, ipv6 access lists have it at the end
         if (ACLIPV4.class.equals(aclType)) {
-            parseSequenceId(builder, words);
+            parseSequenceId(builder, words.poll());
         }
         // fwd action
         Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
@@ -157,17 +158,23 @@ final class AclEntryLineParser {
             builder.setIpv6(ipv6Builder.build());
             builder.setTransport(parseIpv6LineResult.transport);
             builder.addAugmentation(AclEntry1.class, parseIpv6LineResult.icmpMsgTypeAugment);
-            // skip the word 'sequence', and only parse sequence ID if it's present
-            String maybeSequence = words.peek();
-            if ("sequence".equals(maybeSequence)) {
-                words.poll();
-                parseSequenceId(builder, words);
+            // skip the word 'sequence' and any other non-supported words, and only parse sequence ID if it's present
+            Iterator<String> waitingQueueIterator = words.iterator();
+            while (waitingQueueIterator.hasNext()) {
+                String next = waitingQueueIterator.next();
+                if ("sequence" .equals(next)) {
+                    waitingQueueIterator.remove();
+                    parseSequenceId(builder, waitingQueueIterator.next());
+                    return;
+                }
+                LOG.warn("Unsupported ACL keyword: " + next);
+                waitingQueueIterator.remove();
             }
         }
     }
 
-    private static void parseSequenceId(final AclEntryBuilder builder, Queue<String> words) {
-        long sequenceId = Long.parseLong(Objects.requireNonNull(words.poll()));
+    private static void parseSequenceId(final AclEntryBuilder builder, String sequence) {
+        long sequenceId = Long.parseLong(Objects.requireNonNull(sequence));
         // sequence id
         builder.setSequenceId(sequenceId);
         builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list
