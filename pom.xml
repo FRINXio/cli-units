@@ -44,6 +44,7 @@
         <module>unit-parent</module>
         <module>nexus</module>
         <module>dasan</module>
+        <module>sros</module>
         <module>yang-docs-plugin</module>
         <module>interface-base</module>
         <module>network-instance-base</module>
