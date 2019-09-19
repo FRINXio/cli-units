@@ -73,6 +73,20 @@ public class BundleEtherLacpIntervalConfigWriter implements CliWriter<Config>, C
     public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                                   @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
-        return writeCurrentAttributesWResult(id, dataAfter, writeContext);
+        String ifcName = id.firstKeyOf(Interface.class).getName();
+        LacpEthConfigAug cfg1 = dataAfter.getAugmentation(LacpEthConfigAug.class);
+
+        String delCmd = "";
+        String interval = " short";
+        if (cfg1 == null || cfg1.getInterval() == null) {
+            delCmd = "no ";
+            interval = "";
+        } else if (!cfg1.getInterval().equals(LacpPeriodType.FAST)) { //only support FAST know
+            return false;
+        }
+
+        blockingWriteAndRead(cli, id, dataAfter, "configure terminal", "bridge",
+                f("%slacp port timeout %s%s", delCmd, ifcName.replace("Ethernet", ""), interval), "end");
+        return true;
     }
 }
