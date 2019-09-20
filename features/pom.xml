@@ -456,5 +456,10 @@
       <artifactId>sros-cli-init-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>sros-configuration-metadata-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>
