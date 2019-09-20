@@ -34,6 +34,7 @@
   <modules>
     <module>init</module>
     <module>configuration-metadata</module>
+    <module>ipsec</module>
   </modules>
 
   <build>
