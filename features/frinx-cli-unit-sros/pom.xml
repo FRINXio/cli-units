@@ -67,6 +67,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>sros-configuration-metadata-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sros-ipsec-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
