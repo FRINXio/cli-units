@@ -47,7 +47,7 @@ public class BundleEtherLacpIntervalConfigWriterTest {
             + "end\n";
     private static final String DELETE_INPUT = "configure terminal\n"
             + "bridge\n"
-            + "no lacp port timeout 4/12\n"
+            + "no lacp port timeout 4/10\n"
             + "end\n";
 
     @Mock
@@ -87,8 +87,48 @@ public class BundleEtherLacpIntervalConfigWriterTest {
     }
 
     @Test
+    public void testUpdateCurrentAttributes_001() throws Exception {
+        //run as delete
+        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("Ethernet4/10"))
+            .augmentation(Interface1.class)
+            .child(Ethernet.class)
+            .child(Config.class);
+        LacpEthConfigAugBuilder lcaB = new LacpEthConfigAugBuilder();
+        lcaB.setInterval(LacpPeriodType.FAST);
+        Config dataAfter = new ConfigBuilder().build();
+        Config dataBefore = new ConfigBuilder()
+                .addAugmentation(LacpEthConfigAug.class, lcaB.build())
+                .build();
+        target.updateCurrentAttributesWResult(id, dataBefore, dataAfter, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+    }
+
+    @Test
+    public void testUpdateCurrentAttributes_002() throws Exception {
+        // run as write
+        id = InstanceIdentifier.create(Interfaces.class).child(Interface.class, new InterfaceKey("Ethernet4/10"))
+            .augmentation(Interface1.class)
+            .child(Ethernet.class)
+            .child(Config.class);
+        LacpEthConfigAugBuilder lcaBefore = new LacpEthConfigAugBuilder();
+        lcaBefore.setInterval(LacpPeriodType.SLOW);
+        LacpEthConfigAugBuilder lcaB = new LacpEthConfigAugBuilder();
+        lcaB.setInterval(LacpPeriodType.FAST);
+        Config dataAfter = new ConfigBuilder()
+                .addAugmentation(LacpEthConfigAug.class, lcaB.build())
+                .build();
+        Config dataBefore = new ConfigBuilder()
+                .addAugmentation(LacpEthConfigAug.class, lcaBefore.build())
+                .build();
+        target.updateCurrentAttributesWResult(id, dataBefore, dataAfter, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
+    }
+
+    @Test
     public void testDeleteCurrentAttributes_001() throws Exception {
-        prepare("Ethernet4/12");
+        prepare("Ethernet4/10");
         target.deleteCurrentAttributesWResult(id, data, context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
