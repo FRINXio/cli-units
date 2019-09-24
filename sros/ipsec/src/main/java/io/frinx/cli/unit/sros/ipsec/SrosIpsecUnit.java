@@ -22,9 +22,12 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.sros.init.SrosDevices;
+import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.ClientConfigReader;
+import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.ClientConfigWriter;
 import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.ClientGroupConfigReader;
 import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.ClientGroupConfigWriter;
 import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.ClientGroupReader;
+import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.ClientReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.ipsec.IIDs;
 import java.util.Set;
@@ -61,6 +64,9 @@ public class SrosIpsecUnit extends AbstractUnit {
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder rreg, Cli cli) {
         rreg.add(IIDs.IP_CL_CLIENTGROUP, new ClientGroupReader(cli));
         rreg.add(IIDs.IP_CL_CL_CONFIG, new ClientGroupConfigReader());
+        rreg.add(IIDs.IP_CL_CL_CL_CLIENT, new ClientReader(cli));
+        rreg.add(IIDs.IP_CL_CL_CL_CL_CONFIG, new ClientConfigReader(cli));
+
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder wreg, Cli cli) {
@@ -68,6 +74,8 @@ public class SrosIpsecUnit extends AbstractUnit {
         wreg.addNoop(IIDs.IP_CLIENTGROUPS);
         wreg.addNoop(IIDs.IP_CL_CLIENTGROUP);
         wreg.add(IIDs.IP_CL_CL_CONFIG, new ClientGroupConfigWriter(cli));
+        wreg.addNoop(IIDs.IP_CL_CL_CL_CLIENT);
+        wreg.addAfter(IIDs.IP_CL_CL_CL_CL_CONFIG, new ClientConfigWriter(cli), IIDs.IP_CL_CL_CONFIG);
     }
 
     @Override

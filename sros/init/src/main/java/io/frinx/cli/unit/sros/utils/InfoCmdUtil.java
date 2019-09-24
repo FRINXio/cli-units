@@ -45,6 +45,13 @@ public final class InfoCmdUtil {
         return genInfoCommand(settings.location, settings.pipe);
     }
 
+    public static String genInfoCommand(Settings settings, Object... values) {
+        String location = FORMAT.fT(settings.location, values);
+        String pipe = settings.pipe == null ? null : FORMAT.fT(settings.pipe, values);
+
+        return genInfoCommand(location, pipe);
+    }
+
     public static class Settings {
         private String location;
         private String pipe;
