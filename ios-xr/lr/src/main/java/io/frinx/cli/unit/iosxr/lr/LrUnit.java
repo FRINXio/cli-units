@@ -22,37 +22,35 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
 import io.frinx.cli.unit.iosxr.lr.handler.statics.StaticConfigReader;
 import io.frinx.cli.unit.iosxr.lr.handler.statics.StaticConfigWriter;
 import io.frinx.cli.unit.iosxr.lr.handler.statics.StaticListReader;
 import io.frinx.cli.unit.iosxr.lr.handler.statics.nexthop.NextHopListReader;
 import io.frinx.cli.unit.iosxr.lr.handler.statics.nexthop.NextHopListWriter;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.local.routing.rev170515.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class LrUnit implements TranslateUnit {
+public class LrUnit extends AbstractUnit {
 
-    private final TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration reg;
-
-    public LrUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+    public LrUnit(@Nonnull TranslationUnitCollector registry) {
+        super(registry);
     }
 
-    public void init() {
-        reg = registry.registerTranslateUnit(IosXrDevices.IOS_XR_ALL, this);
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return IosXrDevices.IOS_XR_ALL;
     }
 
-    public void close() {
-        if (reg != null) {
-            reg.close();
-        }
+    @Override
+    protected String getUnitName() {
+        return "IOS XR LOCAL-ROUTING unit";
     }
 
     @Override
@@ -99,10 +97,5 @@ public class LrUnit implements TranslateUnit {
                 .$YangModuleInfoImpl.getInstance(),
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang._static.types.rev190610
                 .$YangModuleInfoImpl.getInstance());
-    }
-
-    @Override
-    public String toString() {
-        return "IOS XR LOCAL-ROUTING unit";
     }
 }
