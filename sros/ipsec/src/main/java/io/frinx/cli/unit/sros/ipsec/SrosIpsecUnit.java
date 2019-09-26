@@ -30,6 +30,8 @@ import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.ClientGroupReader;
 import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.ClientIdentificationConfigReader;
 import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.ClientIdentificationConfigWriter;
 import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.ClientReader;
+import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.TunnelingConfigReader;
+import io.frinx.cli.unit.sros.ipsec.handler.clientgroup.TunnelingConfigWriter;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.ipsec.IIDs;
 import java.util.Set;
@@ -69,6 +71,7 @@ public class SrosIpsecUnit extends AbstractUnit {
         rreg.add(IIDs.IP_CL_CL_CL_CLIENT, new ClientReader(cli));
         rreg.add(IIDs.IP_CL_CL_CL_CL_CONFIG, new ClientConfigReader(cli));
         rreg.add(IIDs.IP_CL_CL_CL_CL_CL_CONFIG, new ClientIdentificationConfigReader(cli));
+        rreg.add(IIDs.IP_CL_CL_CL_CL_SE_TU_CONFIG, new TunnelingConfigReader(cli));
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder wreg, Cli cli) {
@@ -80,6 +83,10 @@ public class SrosIpsecUnit extends AbstractUnit {
         wreg.addAfter(IIDs.IP_CL_CL_CL_CL_CONFIG, new ClientConfigWriter(cli), IIDs.IP_CL_CL_CONFIG);
         wreg.addNoop(IIDs.IP_CL_CL_CL_CL_CLIENTIDENTIFICATION);
         wreg.addAfter(IIDs.IP_CL_CL_CL_CL_CL_CONFIG, new ClientIdentificationConfigWriter(cli),
+            IIDs.IP_CL_CL_CL_CL_CONFIG);
+        wreg.addNoop(IIDs.IP_CL_CL_CL_CL_SECURITYASSOCIATION);
+        wreg.addNoop(IIDs.IP_CL_CL_CL_CL_SE_TUNNELING);
+        wreg.addAfter(IIDs.IP_CL_CL_CL_CL_SE_TU_CONFIG, new TunnelingConfigWriter(cli),
             IIDs.IP_CL_CL_CL_CL_CONFIG);
     }
 
