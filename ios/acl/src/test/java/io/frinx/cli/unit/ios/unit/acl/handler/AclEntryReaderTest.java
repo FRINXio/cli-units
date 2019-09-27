@@ -34,7 +34,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.utils.IidUtils;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-
 public class AclEntryReaderTest {
 
     private static final String OUTPUT = "Fri Feb 23 15:25:27.410 UTC\n"
@@ -75,6 +74,7 @@ public class AclEntryReaderTest {
                                 .setForwardingAction(ACCEPT.class)
                                 .build())
                         .build())
+                .setTransport(AclEntryLineParserTest.defTransport())
                 .build();
 
         Assert.assertEquals(expected, aclEntryBuilder.build());

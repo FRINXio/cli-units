@@ -260,11 +260,7 @@ final class AclEntryLineParser {
         }
 
         // transport
-        Transport transport = null;
-        if (IP_PROTOCOL_TCP.equals(ipProtocolType) || IP_PROTOCOL_TCP_NUMBER.equals(ipProtocolType)
-                || IP_PROTOCOL_UDP.equals(ipProtocolType) || IP_PROTOCOL_UDP_NUMBER.equals(ipProtocolType)) {
-            transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
-        }
+        Transport transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
 
         //icmp
         final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words, true);
@@ -371,11 +367,7 @@ final class AclEntryLineParser {
         }
 
         // transport
-        Transport transport = null;
-        if (IP_PROTOCOL_TCP.equals(ipProtocolType) || IP_PROTOCOL_TCP_NUMBER.equals(ipProtocolType)
-                || IP_PROTOCOL_UDP.equals(ipProtocolType) || IP_PROTOCOL_UDP_NUMBER.equals(ipProtocolType)) {
-            transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
-        }
+        Transport transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
 
         //icmp
         final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words, false);
