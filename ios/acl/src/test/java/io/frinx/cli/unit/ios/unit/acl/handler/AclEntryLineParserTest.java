@@ -414,6 +414,7 @@ public class AclEntryLineParserTest {
                 + " remark foo sequence 11\n"
                 + " remark bar sequence 21\n"
                 + " remark baz2 sequence 31\n"
+                + " deny ipv6 any any fragments sequence 50\n"
                 + "!\n";
         LinkedHashMap<Long, AclEntry> expectedResults = new LinkedHashMap<>();
 
@@ -589,6 +590,17 @@ public class AclEntryLineParserTest {
             long sequenceId = 10;
             expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, ACCEPT.class, configBuilder.build(),
                     transportBuilder.build()));
+        }
+        {
+            // deny ipv6 any any fragments sequence 50
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields
+                    .top.ipv6.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
+                    .net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
+            configBuilder.setSourceAddress(AclEntryLineParser.IPV6_HOST_ANY);
+            configBuilder.setDestinationAddress(AclEntryLineParser.IPV6_HOST_ANY);
+            long sequenceId = 50;
+            expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, DROP.class, configBuilder.build(),
+                    null));
         }
 
         // verify expected results
