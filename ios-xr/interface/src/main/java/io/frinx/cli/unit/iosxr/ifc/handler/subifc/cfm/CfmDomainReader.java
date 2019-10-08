@@ -28,23 +28,17 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619.ethernet.cfm._interface.cfm.domains.Domain;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619.ethernet.cfm._interface.cfm.domains.DomainBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619.ethernet.cfm._interface.cfm.domains.DomainKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619.ethernet.cfm._interface.cfm.domains.domain.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619.ethernet.cfm._interface.cfm.domains.domain.MepBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619.ethernet.cfm._interface.cfm.domains.domain.mep.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class CfmDomainReader implements CliConfigListReader<Domain, DomainKey, DomainBuilder> {
-    private static final String SH_CFM_DOMAIN_LIST =
-        "show running-config interface %s ethernet cfm | include ^ {2}mep domain";
-    private static final String SH_CFM_DOMAIN =
-        "show running-config interface %s ethernet cfm | include ^ {2}mep domain %s ";
 
-    private static final String SH_CFM_DOMAIN_DETAILS =
-        "show running-config interface %s ethernet cfm mep domain %s service %s mep-id %d";
+    private static final String SH_INTERFACE_CFM = "show running-config interface %s ethernet cfm";
 
-    private static final Pattern CFM_DOMAIN_LINE =
-        Pattern.compile("mep domain (?<domain>\\S+) service (?<service>\\S+) mep-id (?<mepid>\\d+).*");
-
-    private static final Pattern CFM_DOMAIN_COS_LINE = Pattern.compile("cos (?<cos>\\d+)");
+    private static final Pattern MEP_DOMAIN_LINE = Pattern.compile("mep domain (?<domain>\\S+) .*");
+    private static final Pattern SQUASHED_CFM_DOMAIN_LINE = Pattern.compile(
+            "^domain (?<domain>\\S+) service (?<service>\\S+) mep-id (?<mepid>\\d+) (\\s*cos (?<cos>\\d+))?.*");
 
     private Cli cli;
 
@@ -59,7 +53,7 @@ public class CfmDomainReader implements CliConfigListReader<Domain, DomainKey, D
         @Nonnull ReadContext readContext) throws ReadFailedException {
 
         String ifcName = Util.getSubinterfaceName(id);
-        String output = blockingRead(f(SH_CFM_DOMAIN_LIST, ifcName), cli, id, readContext);
+        String output = blockingRead(f(SH_INTERFACE_CFM, ifcName), cli, id, readContext);
         return getDomainKeys(output);
     }
 
@@ -71,55 +65,45 @@ public class CfmDomainReader implements CliConfigListReader<Domain, DomainKey, D
 
         String ifcName = Util.getSubinterfaceName(id);
         String domain = id.firstKeyOf(Domain.class).getDomainName();
+        builder.setDomainName(domain);
 
-        String output = blockingRead(f(SH_CFM_DOMAIN, ifcName, domain), cli, id, readContext);
-        parseDomainLine(output, builder);
-
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619.ethernet.cfm._interface.cfm.domains
-            .domain.mep.Config ma = builder.getMep().getConfig();
-
-        output = blockingRead(f(SH_CFM_DOMAIN_DETAILS, ifcName, domain, ma.getMaName(), ma.getMepId()),
-            cli, id, readContext);
-        parseDomainCosLine(output, builder);
+        String output = blockingRead(f(SH_INTERFACE_CFM, ifcName), cli, id, readContext);
+        parseDomainLine(output, domain, builder);
     }
 
     private static List<DomainKey> getDomainKeys(String output) {
         return ParsingUtils.parseFields(output, 0,
-            CFM_DOMAIN_LINE::matcher,
+            MEP_DOMAIN_LINE::matcher,
             m -> m.group("domain"),
-            s -> new DomainKey(s));
+            DomainKey::new);
     }
 
-    private static void parseDomainLine(String output, DomainBuilder builder) {
-        ParsingUtils.parseField(output, 0,
-            CFM_DOMAIN_LINE::matcher,
-            m -> m,
+    private static void parseDomainLine(String output, String domainName, DomainBuilder builder) {
+        final String squashedOutput = output.replaceAll("[\\n\\r]", " ");
+        final String outputDividedByMepDomains = squashedOutput.replace("mep ", "\n");
+        ParsingUtils.parseField(outputDividedByMepDomains, 0,
+            SQUASHED_CFM_DOMAIN_LINE::matcher,
             m -> {
-                builder.setDomainName(m.group("domain"));
-                builder.setConfig(new ConfigBuilder()
-                    .setDomainName(m.group("domain"))
-                    .build());
-                builder.setMep(new MepBuilder()
-                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619.ethernet
-                        .cfm._interface.cfm.domains.domain.mep.ConfigBuilder()
+                // there is usually only one domain under interface, so this is not expense filtering
+                final String domain = m.group("domain");
+                if (domainName.equals(domain)) {
+                    return m;
+                } else {
+                    return null;
+                }
+            },
+            m -> {
+                final ConfigBuilder configBuilder = new ConfigBuilder()
                         .setMaName(m.group("service"))
-                        .setMepId(Integer.valueOf(m.group("mepid")))
-                        .build())
-                    .build());
-            });
-    }
+                        .setMepId(Integer.valueOf(m.group("mepid")));
 
-    private static void parseDomainCosLine(String output, DomainBuilder builder) {
-        ParsingUtils.parseField(output, 0,
-            CFM_DOMAIN_COS_LINE::matcher,
-            m -> Short.valueOf(m.group("cos")),
-            v -> {
-                builder.setMep(new MepBuilder(builder.getMep())
-                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619.ethernet
-                        .cfm._interface.cfm.domains.domain.mep.ConfigBuilder(builder.getMep().getConfig())
-                        .setCos(v)
-                        .build())
-                    .build());
+                final String cosField = m.group("cos");
+                if (cosField != null) {
+                    configBuilder.setCos(Short.valueOf(m.group("cos")));
+                }
+                builder.setMep(new MepBuilder()
+                        .setConfig(configBuilder.build())
+                        .build());
             });
     }
 }

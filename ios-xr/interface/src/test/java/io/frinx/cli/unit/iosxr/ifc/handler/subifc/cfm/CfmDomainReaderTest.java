@@ -21,7 +21,6 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.openconfig.openconfig.oam.IIDs;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,25 +38,30 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class CfmDomainReaderTest {
     private static final String SH_RUN_LIST =
-        "show running-config interface Bundle-Ether1000.100 ethernet cfm | include ^ {2}mep domain";
-    private static final String SH_RUN_LIST_OUTPUT = "  mep domain DML1 service MA-001 mep-id 3\n"
-        + "  mep domain DML2 service MA-002 mep-id 4 cos 1\n"
-        + "  mep domain DML9 service MA-009 mep-id 9 loss-measurement counters aggregate\n"
-        + "  mep domain DML4 service MA-004 mep-id 6 sla operation profile PPP target mep-id 2";
+            "show running-config interface Bundle-Ether103.102 ethernet cfm";
 
-    private static final String SH_RUN =
-        "show running-config interface Bundle-Ether1000.100 ethernet cfm | include ^ {2}mep domain DML1 ";
-    private static final String SH_RUN_OUTPUT = "  mep domain DML1 service MA-001 mep-id 3\n";
+    private static final String SH_RUN_LIST_OUTPUT_1 = "Tue Oct  8 06:10:39.968 UTC\n\r"
+            + "interface Bundle-Ether103.102\n\r"
+            + " ethernet cfm\n\r"
+            + "  mep domain DML1 service MA-001 mep-id 3\n\r"
+            + "  mep domain DML2 service MA-002 mep-id 4 cos 1\n\r"
+            + "  mep domain DML9 service MA-009 mep-id 9 loss-measurement counters aggregate\n\r"
+            + "  mep domain DML4 service MA-004 mep-id 6 sla operation profile PPP target mep-id 2\n\r"
+            + "  !\n\r"
+            + " !\n\r"
+            + "!\n\r";
 
-    private static final String SH_RUN_DETAILS =
-        "show running-config interface Bundle-Ether1000.100 ethernet cfm mep domain DML1 service MA-001 mep-id 3";
-    private static final String SH_RUN_DETAILS_OUTPUT = "interface Bundle-Ether1000.100"
-        + " ethernet cfm"
-        + "  mep domain DML1 service MA-001 mep-id 3\n"
-        + "   cos 1\n"
-        + "  !\n"
-        + " !\n"
-        + "!\n";
+    private static final String SH_RUN_LIST_OUTPUT_2 = "Tue Oct  8 06:38:30.342 UTC\n\r"
+            + "interface Bundle-Ether103.102\n\r"
+            + " ethernet cfm\n\r"
+            + "  mep domain DML1 service 502 mep-id 1\n\r"
+            + "   cos 6\n\r"
+            + "  mep domain DML2 service 503 mep-id 2\n\r"
+            + "   cos 3\n\r"
+            + "  mep domain DML3 service 504 mep-id 3\n\r"
+            + "  !\n\r"
+            + " !\n\r"
+            + "!\n\r";
 
     @Mock
     private Cli cli;
@@ -65,30 +69,25 @@ public class CfmDomainReaderTest {
     private ReadContext ctx;
     private CfmDomainReader target;
 
-    private static final String INTERFACE_NAME = "Bundle-Ether1000";
-    private static final Long SUBIFC_INDEX = Long.valueOf(100L);
+    private static final String INTERFACE_NAME = "Bundle-Ether103";
+    private static final Long SUBIFC_INDEX = 102L;
 
     private static final InterfaceKey INTERFACE_KEY = new InterfaceKey(INTERFACE_NAME);
     private static final SubinterfaceKey SUBIFC_KEY = new SubinterfaceKey(SUBIFC_INDEX);
 
-    private static final String DOMAIN_NAME = "DML1";
-    private static final DomainKey DOMAIN_KEY = new DomainKey(DOMAIN_NAME);
-    private static final InstanceIdentifier<Domain> IID_FOR_LIST =
-        IidUtils.createIid(IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DOMAINS, INTERFACE_KEY, SUBIFC_KEY)
-        .child(Domain.class);
-    private static final InstanceIdentifier<Domain> IID =
-        IidUtils.createIid(IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DOMAIN, INTERFACE_KEY, SUBIFC_KEY, DOMAIN_KEY);
+    private static final InstanceIdentifier<Domain> IID_FOR_LIST = IidUtils.createIid(
+            IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DOMAINS, INTERFACE_KEY, SUBIFC_KEY).child(Domain.class);
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         target = Mockito.spy(new CfmDomainReader(cli));
     }
 
     @Test
     public void testGetAllIds_001() throws ReadFailedException {
-        Mockito.doReturn(SH_RUN_LIST_OUTPUT).when(target)
-            .blockingRead(SH_RUN_LIST, cli, IID_FOR_LIST, ctx);
+        Mockito.doReturn(SH_RUN_LIST_OUTPUT_1).when(target)
+                .blockingRead(SH_RUN_LIST, cli, IID_FOR_LIST, ctx);
 
         List<DomainKey> result = target.getAllIds(IID_FOR_LIST, ctx);
 
@@ -101,19 +100,39 @@ public class CfmDomainReaderTest {
 
     @Test
     public void testReadCurrentAttributes() throws ReadFailedException {
-        Mockito.doReturn(SH_RUN_OUTPUT).when(target)
-            .blockingRead(SH_RUN, cli, IID, ctx);
-        Mockito.doReturn(SH_RUN_DETAILS_OUTPUT).when(target)
-            .blockingRead(SH_RUN_DETAILS, cli, IID, ctx);
+        final InstanceIdentifier<Domain> dml1 = getDomainIid("DML1");
+        final InstanceIdentifier<Domain> dml2 = getDomainIid("DML2");
+        final InstanceIdentifier<Domain> dml3 = getDomainIid("DML3");
 
-        final DomainBuilder builder = new DomainBuilder();
+        Mockito.doReturn(SH_RUN_LIST_OUTPUT_2).when(target).blockingRead(SH_RUN_LIST, cli, dml1, ctx);
+        Mockito.doReturn(SH_RUN_LIST_OUTPUT_2).when(target).blockingRead(SH_RUN_LIST, cli, dml2, ctx);
+        Mockito.doReturn(SH_RUN_LIST_OUTPUT_2).when(target).blockingRead(SH_RUN_LIST, cli, dml3, ctx);
 
-        target.readCurrentAttributes(IID, builder, ctx);
+        DomainBuilder builder = new DomainBuilder();
+        target.readCurrentAttributes(dml1, builder, ctx);
 
-        Assert.assertThat(builder.getDomainName(), CoreMatchers.equalTo(DOMAIN_NAME));
-        Assert.assertThat(builder.getConfig().getDomainName(), CoreMatchers.equalTo(DOMAIN_NAME));
-        Assert.assertThat(builder.getMep().getConfig().getMaName(), CoreMatchers.equalTo("MA-001"));
-        Assert.assertThat(builder.getMep().getConfig().getMepId(), CoreMatchers.equalTo(Integer.valueOf(3)));
-        Assert.assertThat(builder.getMep().getConfig().getCos(), CoreMatchers.equalTo((short) 1));
+        Assert.assertEquals(builder.getDomainName(), "DML1");
+        Assert.assertEquals(builder.getMep().getConfig().getMaName(), "502");
+        Assert.assertEquals(builder.getMep().getConfig().getMepId(), Integer.valueOf(1));
+        Assert.assertEquals(builder.getMep().getConfig().getCos(), Short.valueOf("6"));
+
+        builder = new DomainBuilder();
+        target.readCurrentAttributes(dml2, builder, ctx);
+        Assert.assertEquals(builder.getDomainName(), "DML2");
+        Assert.assertEquals(builder.getMep().getConfig().getMaName(), "503");
+        Assert.assertEquals(builder.getMep().getConfig().getMepId(), Integer.valueOf(2));
+        Assert.assertEquals(builder.getMep().getConfig().getCos(), Short.valueOf("3"));
+
+        builder = new DomainBuilder();
+        target.readCurrentAttributes(dml3, builder, ctx);
+        Assert.assertEquals(builder.getDomainName(), "DML3");
+        Assert.assertEquals(builder.getMep().getConfig().getMaName(), "504");
+        Assert.assertEquals(builder.getMep().getConfig().getMepId(), Integer.valueOf(3));
+        Assert.assertNull(builder.getMep().getConfig().getCos());
+    }
+
+    private static InstanceIdentifier<Domain> getDomainIid(final String domainName) {
+        return IidUtils.createIid(IIDs.IN_IN_SU_SU_AUG_IFSUBIFCFMAUG_CF_DO_DOMAIN, INTERFACE_KEY,
+                SUBIFC_KEY, new DomainKey(domainName));
     }
 }
