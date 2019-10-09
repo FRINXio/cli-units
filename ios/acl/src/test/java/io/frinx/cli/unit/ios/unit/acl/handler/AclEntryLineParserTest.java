@@ -600,7 +600,7 @@ public class AclEntryLineParserTest {
             configBuilder.setDestinationAddress(AclEntryLineParser.IPV6_HOST_ANY);
             long sequenceId = 50;
             expectedResults.put(sequenceId, createIpv6AclEntry(sequenceId, DROP.class, configBuilder.build(),
-                    null));
+                    defTransport()));
         }
 
         // verify expected results
