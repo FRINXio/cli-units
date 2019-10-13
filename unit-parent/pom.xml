@@ -24,21 +24,21 @@
     <parent>
         <groupId>io.frinx.translate.unit.commons</groupId>
         <artifactId>checkstyle-parent</artifactId>
-        <version>3.1.10.rc7-frinx</version>
+        <version>3.1.10.rc8-frinx-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>3.1.10.rc7-frinx</version>
+    <version>3.1.10.rc8-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
-        <cli.version>3.1.10.rc7-frinx</cli.version>
-        <openconfig.version>3.1.10.rc7-frinx</openconfig.version>
+        <cli.version>3.1.10.rc8-frinx-SNAPSHOT</cli.version>
+        <openconfig.version>3.1.10.rc8-frinx-SNAPSHOT</openconfig.version>
         <hc.version>1.17.10-Carbon-SR1.3_1_10_rc8-frinxodl-SNAPSHOT</hc.version>
         <controller.version>1.5.1-Carbon-SR1.3_1_10_rc8-frinxodl-SNAPSHOT</controller.version>
-        <translate.unit.commons.version>3.1.10.rc7-frinx</translate.unit.commons.version>
+        <translate.unit.commons.version>3.1.10.rc8-frinx-SNAPSHOT</translate.unit.commons.version>
     </properties>
 
     <dependencies>
@@ -135,7 +135,7 @@
                     <dependency>
                         <groupId>io.frinx.cli</groupId>
                         <artifactId>yang-docs-plugin</artifactId>
-                        <version>3.1.10.rc7-frinx</version>
+                        <version>3.1.10.rc8-frinx-SNAPSHOT</version>
                         <type>jar</type>
                     </dependency>
                 </dependencies>
