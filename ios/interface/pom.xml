@@ -24,12 +24,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.10.frinx</version>
+        <version>3.1.11.rc1-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>ios-interface-unit</artifactId>
-    <version>3.1.10.frinx</version>
+    <version>3.1.11.rc1-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
