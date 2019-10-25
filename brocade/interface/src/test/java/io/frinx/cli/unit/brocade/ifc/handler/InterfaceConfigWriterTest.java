@@ -63,21 +63,38 @@ public class InterfaceConfigWriterTest {
                 + "interface e 1\n"
                 + "enable\n"
                 + "end", output);
+
+        config = new ConfigBuilder()
+                .setEnabled(true)
+                .setName("e 1")
+                .build();
+        output = writer.updateTemplate(configBefore, config);
+        Assert.assertEquals("configure terminal\n"
+                + "interface e 1\n"
+                + "enable\n"
+                + "priority 0\n"
+                + "no priority force\n"
+                + "end", output);
     }
 
-    private Config getConfig(String name, int priority, boolean force) {
+    private IfBrocadePriorityAug getPriorityConfig(int priority, boolean force) {
         IfBrocadePriorityAugBuilder cfg;
-        Config config;
         cfg = new IfBrocadePriorityAugBuilder()
             .setPriority((short) priority);
         if (force) {
             cfg.setPriorityForce(force);
         }
-        config = new ConfigBuilder()
+        return cfg.build();
+    }
+
+    private Config getConfig(String name, int priority, boolean force) {
+        ConfigBuilder configBuilder = new ConfigBuilder();
+        if (priority > 0 || force) {
+            configBuilder.addAugmentation(IfBrocadePriorityAug.class, getPriorityConfig(priority, force));
+        }
+        return configBuilder
             .setEnabled(true)
             .setName(name)
-            .addAugmentation(IfBrocadePriorityAug.class, cfg.build())
             .build();
-        return config;
     }
 }
