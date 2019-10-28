@@ -82,6 +82,7 @@ public class OspfUnit extends AbstractUnit {
         writeRegistry.add(
                 io.frinx.openconfig.openconfig.bfd.IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_AUG_OSPFAREAIFBFDCONFAUG_BF_CONFIG,
                 new AreaInterfaceBfdConfigWriter(cli));
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_TIMERS);
         writeRegistry.add(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_TI_CONFIG, new AreaInterfaceTimersConfigWriter(cli));
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_INTERFACEREF);
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_IN_IN_CONFIG);
