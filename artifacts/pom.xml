@@ -406,6 +406,11 @@
                 <artifactId>sros-cli-init-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sros-configuration-metadata-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Features -->
             <dependency>
