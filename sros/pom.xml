@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ Copyright © 2018 Frinx and others.
+  ~ Copyright © 2019 Frinx and others.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,36 +16,23 @@
   ~ limitations under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+              xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>odlparent</artifactId>
-    <version>1.8.1-Carbon-SR1.3_1_11_rc3-frinxodl-SNAPSHOT</version>
+    <version>1.8.1-Carbon-SR1.3_1_10_rc9-frinxodl-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
   <groupId>io.frinx.cli</groupId>
-  <artifactId>cli-units-aggregator</artifactId>
-  <version>3.1.11.rc3-frinx-SNAPSHOT</version>
+  <artifactId>cli-units-sros</artifactId>
+  <version>3.1.10.rc9-frinx-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
-    <module>ios-common</module>
-    <module>ios</module>
-    <module>ios-xr</module>
-    <module>brocade</module>
-    <module>junos</module>
-    <module>huawei</module>
-    <module>features</module>
-    <module>unit-parent</module>
-    <module>yang-docs-plugin</module>
-    <module>nexus</module>
-    <module>dasan</module>
-    <module>sros</module>
-    <module>network-instance-base</module>
-    <module>interface-base</module>
+    <module>init</module>
   </modules>
 
   <build>
@@ -68,16 +55,6 @@
   </build>
 
   <profiles>
-    <profile>
-      <id>karaf</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>karaf</module>
-      </modules>
-    </profile>
-
     <profile>
       <!--
           This profile is to ensure we only build javadocs reports
