@@ -63,6 +63,7 @@ public final class JunosInterfaceUnit extends AbstractUnit {
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_INTERFACES,
                 IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
+                io.frinx.openconfig.openconfig.lacp.IIDs.FRINX_LACP_LAG_MEMBER,
                 io.frinx.openconfig.openconfig.vlan.IIDs.FRINX_OPENCONFIG_VLAN,
                 $YangModuleInfoImpl.getInstance());
     }
