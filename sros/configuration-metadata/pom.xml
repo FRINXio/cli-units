@@ -24,12 +24,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.3.rc15-frinx-SNAPSHOT</version>
+        <version>4.2.3.rc15-frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>sros-configuration-metadata-unit</artifactId>
-    <version>4.2.3.rc15-frinx-SNAPSHOT</version>
+    <version>4.2.3.rc15-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
