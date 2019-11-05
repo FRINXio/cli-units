@@ -65,8 +65,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
         if (before != null) {
             priorityAugBefore = before.getAugmentation(IfBrocadePriorityAug.class);
         }
-        boolean update = priorityAug != null && priorityAugBefore != null
-                && !getPriorityForce(priorityAug).equals(getPriorityForce(priorityAugBefore));
+        boolean update = !getPriorityForce(priorityAug).equals(getPriorityForce(priorityAugBefore));
         return fT(PRIORITY_TEMPLATE, "before", priorityAugBefore, "priority", priorityAug,
                 "forced", (priorityAug != null && priorityAug.isPriorityForce() != null
                         && priorityAug.isPriorityForce()) ? Chunk.TRUE : null,
@@ -74,7 +73,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
     }
 
     private Boolean getPriorityForce(IfBrocadePriorityAug priority) {
-        return priority.isPriorityForce() != null && priority.isPriorityForce();
+        return priority != null && priority.isPriorityForce() != null && priority.isPriorityForce();
     }
 
     @Override
