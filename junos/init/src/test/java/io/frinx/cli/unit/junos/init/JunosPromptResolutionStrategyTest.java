@@ -29,7 +29,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class JunosPromptResolutionStrategyTest {
-    private static final String EXPECTED_PROMPT = "root@VS999#";
+    private static final String EXPECTED_PROMPT = "\r\nroot@VS999#";
 
     private static final String OUTPUT_EMPTY = "";
     private static final String OUTPUT_UNEXPECTED = "root@VS002#\n"

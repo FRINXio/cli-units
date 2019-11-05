@@ -63,7 +63,7 @@ public final class JunosPromptResolutionStrategy implements PromptResolutionStra
                         .collect(Collectors.toList());
 
                 if (split.size() == 2 && split.get(0).equals(split.get(1))) {
-                    return split.get(0);
+                    return "\r\n" + split.get(0);
                 }
 
                 waitTime++;
