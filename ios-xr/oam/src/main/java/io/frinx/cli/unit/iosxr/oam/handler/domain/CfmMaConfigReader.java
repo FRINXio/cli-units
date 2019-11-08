@@ -38,8 +38,6 @@ public class CfmMaConfigReader implements CliConfigReader<Config, ConfigBuilder>
         Pattern.compile("continuity-check interval (?<interval>\\S+) loss-threshold (?<threshold>\\d)");
     private static final Pattern EFD_LINE = Pattern.compile("efd");
 
-    private static final String SH_CFM_MEP_CROSSCHECK =
-        "show running-config ethernet cfm domain %s level %d service %s down-meps mep crosscheck";
     private static final Pattern CROSSCHECK_MEPID_LINE = Pattern.compile("mep-id (?<id>\\d+)");
 
     private Cli cli;
@@ -60,8 +58,8 @@ public class CfmMaConfigReader implements CliConfigReader<Config, ConfigBuilder>
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619.oam.top.oam.cfm.domains.domain
             .Config domain = CfmMaReader.readDomainConfig(id, readContext);
 
-        String output = blockingRead(f(SH_CFM_DOMAIN_SERVICE, domain.getDomainName(), domain.getLevel().getValue(), ma),
-            cli, id, readContext);
+        final String output = blockingRead(f(SH_CFM_DOMAIN_SERVICE, domain.getDomainName(),
+                domain.getLevel().getValue(), ma), cli, id, readContext);
 
         ParsingUtils.parseField(output, 0,
             CONTINUITY_CHECK_LINE::matcher,
@@ -72,9 +70,6 @@ public class CfmMaConfigReader implements CliConfigReader<Config, ConfigBuilder>
             });
 
         ParsingUtils.findMatch(output, EFD_LINE, builder::setEfd);
-
-        output = blockingRead(f(SH_CFM_MEP_CROSSCHECK, domain.getDomainName(), domain.getLevel().getValue(), ma),
-            cli, id, readContext);
 
         List<Integer> mepIds = ParsingUtils.parseFields(output, 0,
             CROSSCHECK_MEPID_LINE::matcher,
