@@ -36,7 +36,7 @@ public class LdpInterfaceReader implements CliConfigListReader<Interface, Interf
     private Cli cli;
 
     private static final String SH_LDP_INT = "show mpls interfaces | exclude Interface\n";
-    static final Pattern INTF_LINE = Pattern.compile("(?<id>\\S+)(.*)");
+    static final Pattern INTF_LINE = Pattern.compile("(?<id>\\S+)(Yes|No|\\s)+");
 
     public LdpInterfaceReader(Cli cli) {
         this.cli = cli;
