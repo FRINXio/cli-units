@@ -29,6 +29,10 @@ public class LdpInterfaceReaderTest {
     private static final String OUTPUT = "Tunnel2                Yes           No       No  No     No\n"
             + "Tunnel100              Yes           No       No  No     No\n\n";
 
+    private static final String INVALID_OUTPUT = "show mpls interfaces | exclude Interface\n"
+            + "          ^\n"
+            + "% Invalid input detected at '^' marker.\n";
+
     @Test
     public void testIds() {
         List<InterfaceKey> keys = LdpInterfaceReader.getInterfaceKeys(OUTPUT);
@@ -39,4 +43,11 @@ public class LdpInterfaceReaderTest {
                         .map(InterfaceId::getValue)
                         .collect(Collectors.toList()));
     }
+
+    @Test
+    public void testInvalidIds() {
+        List<InterfaceKey> keys = LdpInterfaceReader.getInterfaceKeys(INVALID_OUTPUT);
+        Assert.assertTrue(keys.isEmpty());
+    }
+
 }
