@@ -68,9 +68,11 @@ public class AclInterfaceReaderTest {
 
         List<InterfaceKey> result = target.getAllIds(IIDs.AC_IN_INTERFACE, readContext);
 
-        Assert.assertThat(result.stream()
-            .map(m -> m.getId().getValue())
-            .collect(Collectors.toList()), CoreMatchers.equalTo(EXPECTED_IFACES));
+        List<String> resultList = result.stream()
+                .map(m -> m.getId().getValue())
+                .collect(Collectors.toList());
+        Assert.assertTrue(resultList.containsAll(EXPECTED_IFACES));
+        Assert.assertEquals(resultList.size(), EXPECTED_IFACES.size());
     }
 
     @Test

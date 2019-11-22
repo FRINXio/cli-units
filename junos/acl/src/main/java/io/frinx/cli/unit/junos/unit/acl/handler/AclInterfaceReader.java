@@ -17,13 +17,16 @@
 package io.frinx.cli.unit.junos.unit.acl.handler;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -39,8 +42,7 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
     @VisibleForTesting
     static final String SH_IFACES = "show configuration interfaces | display set";
     private static final Pattern IFACE_LINE = Pattern.compile(
-        "set interfaces (?<ifcname>\\S+) unit (?<unit>\\S+) family inet filter "
-        + "(input|output) (?<filter>\\S+)");
+        "set interfaces (?<ifcname>\\S+) unit (?<unit>\\S+) family inet(6)? filter (input|output) (?<filter>\\S+)");
 
     private final Cli cli;
 
@@ -70,19 +72,20 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
         interfaceBuilder.setId(key.getId());
     }
 
-    public static <O extends DataObject, B extends Builder<O>> List<String> getInterfaceIds(
-        CliReader<O, B> cliReader,
-        Cli cli,
-        InstanceIdentifier<O> instanceIdentifier,
-        ReadContext readContext) throws ReadFailedException {
+    private static <O extends DataObject, B extends Builder<O>> List<String> getInterfaceIds(
+            CliReader<O, B> cliReader,
+            Cli cli,
+            InstanceIdentifier<O> instanceIdentifier,
+            ReadContext readContext) throws ReadFailedException {
 
         String output = cliReader.blockingRead(SH_IFACES, cli, instanceIdentifier, readContext);
 
         // In Junos we can set ACLs(inet filter) only for subinterfaces,
         // so the format of interface-id is fixed to <interface-name>.<unit-number>.
-        return ParsingUtils.parseFields(output, 0,
+        Set<String> interfaceIds = new HashSet<>(ParsingUtils.parseFields(output, 0,
             IFACE_LINE::matcher,
             matcher -> String.format("%s.%s", matcher.group("ifcname"), matcher.group("unit")),
-            s -> s);
+            s -> s));
+        return Lists.newArrayList(interfaceIds);
     }
 }
