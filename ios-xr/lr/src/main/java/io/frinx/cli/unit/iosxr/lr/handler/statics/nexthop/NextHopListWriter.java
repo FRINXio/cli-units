@@ -56,7 +56,8 @@ public class NextHopListWriter implements CliListWriter<NextHop, NextHopKey> {
         Optional<Static> staticOptional = context.readAfter(RWUtils.cutId(iid, Static.class));
         Preconditions.checkArgument(staticOptional.isPresent());
         Config staticConfig = Preconditions.checkNotNull(staticOptional.get().getConfig());
-        AfiSafiAug afisafi = staticConfig.getAugmentation(AfiSafiAug.class);
+        AfiSafiAug afisafi = Preconditions.checkNotNull(staticConfig.getAugmentation(AfiSafiAug.class));
+        Preconditions.checkNotNull(afisafi.getAfiSafiType());
 
         blockingWriteAndRead(cli, iid, nexthop,
             fT(COMMAND_TEMPLATE,

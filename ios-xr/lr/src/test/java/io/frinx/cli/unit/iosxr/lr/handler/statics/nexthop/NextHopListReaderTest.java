@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.iosxr.lr.handler.statics;
+package io.frinx.cli.unit.iosxr.lr.handler.statics.nexthop;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.iosxr.lr.handler.statics.nexthop.NextHopListReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.List;
