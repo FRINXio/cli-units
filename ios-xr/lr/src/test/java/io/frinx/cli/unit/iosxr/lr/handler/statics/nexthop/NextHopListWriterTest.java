@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.iosxr.lr.handler.statics;
+package io.frinx.cli.unit.iosxr.lr.handler.statics.nexthop;
 
 import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
-import io.frinx.cli.unit.iosxr.lr.handler.statics.nexthop.NextHopListWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.concurrent.CompletableFuture;

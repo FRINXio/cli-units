@@ -23,8 +23,8 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.iosxr.init.IosXrDevices;
+import io.frinx.cli.unit.iosxr.lr.handler.statics.AfisafiAugWriter;
 import io.frinx.cli.unit.iosxr.lr.handler.statics.StaticConfigReader;
-import io.frinx.cli.unit.iosxr.lr.handler.statics.StaticConfigWriter;
 import io.frinx.cli.unit.iosxr.lr.handler.statics.StaticListReader;
 import io.frinx.cli.unit.iosxr.lr.handler.statics.nexthop.NextHopListReader;
 import io.frinx.cli.unit.iosxr.lr.handler.statics.nexthop.NextHopListWriter;
@@ -70,15 +70,16 @@ public class LrUnit extends AbstractUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_STATICROUTES);
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_ST_STATIC);
-        writeRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_ST_ST_CONFIG, new StaticConfigWriter(cli),
-                Sets.newHashSet(IIDs.NE_NE_PR_PR_ST_ST_CO_AUG_AFISAFIAUG));
+        writeRegistry.addNoop(IIDs.NE_NE_PR_PR_ST_ST_CONFIG);
+        writeRegistry.add(IIDs.NE_NE_PR_PR_ST_ST_CO_AUG_AFISAFIAUG, new AfisafiAugWriter());
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_ST_ST_NEXTHOPS);
-        writeRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_ST_ST_NE_NEXTHOP,
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_PR_PR_ST_ST_NE_NEXTHOP,
                 new NextHopListWriter(cli),
                 Sets.newHashSet(IIDs.NE_NE_PR_PR_ST_ST_NE_NE_CONFIG,
                         IIDs.NE_NE_PR_PR_ST_ST_NE_NE_INTERFACEREF,
                         IIDs.NE_NE_PR_PR_ST_ST_NE_NE_IN_CONFIG,
-                        IIDs.NE_NE_PR_PR_ST_ST_NE_NE_CO_AUG_SETTAGAUG));
+                        IIDs.NE_NE_PR_PR_ST_ST_NE_NE_CO_AUG_SETTAGAUG),
+                IIDs.NE_NE_PR_PR_ST_ST_CO_AUG_AFISAFIAUG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
