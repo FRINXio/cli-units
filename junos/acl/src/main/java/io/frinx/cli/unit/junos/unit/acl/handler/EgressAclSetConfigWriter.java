@@ -23,17 +23,17 @@ import io.frinx.cli.unit.junos.unit.acl.handler.util.AclUtil;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.regex.Matcher;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.egress.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class IngressAclSetConfigWriter implements CliWriter<Config> {
-    private static final String CREATE_TEMPLATE = "set interfaces %s unit %s family %s filter input %s";
-    private static final String DELETE_TEMPLATE = "delete interfaces %s unit %s family %s filter input %s";
+public class EgressAclSetConfigWriter implements CliWriter<Config> {
+    private static final String CREATE_TEMPLATE = "set interfaces %s unit %s family %s filter output %s";
+    private static final String DELETE_TEMPLATE = "delete interfaces %s unit %s family %s filter output %s";
 
     private final Cli cli;
 
-    public IngressAclSetConfigWriter(Cli cli) {
+    public EgressAclSetConfigWriter(Cli cli) {
         this.cli = cli;
     }
 
@@ -46,8 +46,7 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
         writeOrDelete(instanceIdentifier, config, CREATE_TEMPLATE);
     }
 
-    private void writeOrDelete(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                 @Nonnull Config config,
+    private void writeOrDelete(@Nonnull InstanceIdentifier<Config> instanceIdentifier, @Nonnull Config config,
                                  String command) throws WriteFailedException.CreateFailedException {
         String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
         Matcher matcher = AclInterfaceWriter.INTERFACE_ID_PATTERN.matcher(interfaceName);

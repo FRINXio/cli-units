@@ -26,52 +26,51 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSet;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSet;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSetBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, IngressAclSetKey, IngressAclSetBuilder> {
+public class EgressAclSetReader implements CliConfigListReader<EgressAclSet, EgressAclSetKey, EgressAclSetBuilder> {
 
     private static final String SH_IFACE_FILTERS = "show configuration interfaces %s unit %s | display set";
     private static final Pattern IFACE_FILTER_LINE = Pattern.compile(
-        "set interfaces (?<ifcname>\\S+) unit (?<unit>\\S+) family (?<type>\\S+) filter input (?<name>\\S+)");
+            "set interfaces (?<ifcname>\\S+) unit (?<unit>\\S+) family (?<type>\\S+) filter output (?<name>\\S+)");
 
     private final Cli cli;
 
-    public IngressAclSetReader(Cli cli) {
+    public EgressAclSetReader(Cli cli) {
         this.cli = cli;
     }
 
     @Nonnull
     @Override
-    public List<IngressAclSetKey> getAllIds(
-        @Nonnull InstanceIdentifier<IngressAclSet> instanceIdentifier,
-        @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<EgressAclSetKey> getAllIds(
+            @Nonnull InstanceIdentifier<EgressAclSet> instanceIdentifier,
+            @Nonnull ReadContext readContext) throws ReadFailedException {
 
         String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
         Matcher matcher = AclInterfaceWriter.INTERFACE_ID_PATTERN.matcher(interfaceName);
 
         // always return true. (already checked at IIDs.AC_IN_INTERFACE)
         matcher.matches();
-
         String output = blockingRead(f(SH_IFACE_FILTERS, matcher.group("interface"), matcher.group("unit")),
                 cli, instanceIdentifier, readContext);
 
         return ParsingUtils.parseFields(output, 0,
             IFACE_FILTER_LINE::matcher,
             NameTypeEntry::fromMatcher,
-            e -> new IngressAclSetKey(e.getName(), e.getType()));
+            e -> new EgressAclSetKey(e.getName(), e.getType()));
     }
 
     @Override
     public void readCurrentAttributes(
-        @Nonnull InstanceIdentifier<IngressAclSet> instanceIdentifier,
-        @Nonnull IngressAclSetBuilder builder,
-        @Nonnull ReadContext readContext) throws ReadFailedException {
+            @Nonnull InstanceIdentifier<EgressAclSet> instanceIdentifier,
+            @Nonnull EgressAclSetBuilder builder,
+            @Nonnull ReadContext readContext) throws ReadFailedException {
 
-        IngressAclSetKey key = instanceIdentifier.firstKeyOf(IngressAclSet.class);
+        EgressAclSetKey key = instanceIdentifier.firstKeyOf(EgressAclSet.class);
         builder.setType(key.getType());
         builder.setSetName(key.getSetName());
     }

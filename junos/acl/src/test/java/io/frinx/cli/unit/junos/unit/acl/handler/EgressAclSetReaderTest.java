@@ -32,53 +32,52 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSets;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSet;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.EgressAclSets;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSet;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSetBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.egress.acl.top.egress.acl.sets.EgressAclSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.InterfaceId;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class IngressAclSetReaderTest {
+public class EgressAclSetReaderTest {
     private static final String INTERFACE_NAME = "ge-0/0/1";
     private static final String UNIT_NUMBER = "9999";
 
     private static final String OUTPUT_IFACE_FILTERS =
-        "set interfaces " + INTERFACE_NAME + " unit " + UNIT_NUMBER + " family inet filter input FILTER01\n"
-        + "set interfaces " + INTERFACE_NAME + " unit " + UNIT_NUMBER + " family inet filter input FILTER02\n";
+        "set interfaces " + INTERFACE_NAME + " unit " + UNIT_NUMBER + " family inet filter output FILTER01\n"
+        + "set interfaces " + INTERFACE_NAME + " unit " + UNIT_NUMBER + " family inet filter output FILTER02\n";
 
-    private static final List<IngressAclSetKey> EXPECTED_ACL_SET_KEY =
+    private static final List<EgressAclSetKey> EXPECTED_ACL_SET_KEY =
         Lists.newArrayList("FILTER01", "FILTER02").stream()
-        .map(f -> new IngressAclSetKey(f, ACLIPV4.class))
+        .map(f -> new EgressAclSetKey(f, ACLIPV4.class))
         .collect(Collectors.toList());
 
-    private static final InstanceIdentifier<IngressAclSets> IIDS_INGRESS_ROOT = IIDs.AC_INTERFACES
+    private static final InstanceIdentifier<EgressAclSets> IIDS_INGRESS_ROOT = IIDs.AC_INTERFACES
         .child(Interface.class, new InterfaceKey(new InterfaceId(INTERFACE_NAME + "." + UNIT_NUMBER)))
-        .child(IngressAclSets.class);
+        .child(EgressAclSets.class);
 
     @Mock
     private Cli cli;
     @Mock
     private ReadContext readContext;
 
-    private IngressAclSetReader target;
+    private EgressAclSetReader target;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        target = new IngressAclSetReader(cli);
+        target = new EgressAclSetReader(cli);
     }
 
     @Test
     public void testGetAllIds() throws Exception {
-        final InstanceIdentifier<IngressAclSet> iid = IIDS_INGRESS_ROOT.child(IngressAclSet.class);
-
+        final InstanceIdentifier<EgressAclSet> iid = IIDS_INGRESS_ROOT.child(EgressAclSet.class);
         Mockito.doReturn(CompletableFuture.completedFuture(OUTPUT_IFACE_FILTERS))
                 .when(cli).executeAndRead(Mockito.any());
 
-        List<IngressAclSetKey> result = target.getAllIds(iid, readContext);
+        List<EgressAclSetKey> result = target.getAllIds(iid, readContext);
 
         Assert.assertThat(result, CoreMatchers.equalTo(EXPECTED_ACL_SET_KEY));
     }
@@ -87,9 +86,9 @@ public class IngressAclSetReaderTest {
     public void testReadCurrentAttributes() throws Exception {
         final String filterName = "FILTER-001";
         final Class<? extends ACLTYPE> type = ACLIPV4.class;
-        final InstanceIdentifier<IngressAclSet> iid = IIDS_INGRESS_ROOT
-            .child(IngressAclSet.class, new IngressAclSetKey(filterName, type));
-        final IngressAclSetBuilder builder = new IngressAclSetBuilder();
+        final InstanceIdentifier<EgressAclSet> iid = IIDS_INGRESS_ROOT
+            .child(EgressAclSet.class, new EgressAclSetKey(filterName, type));
+        final EgressAclSetBuilder builder = new EgressAclSetBuilder();
 
         target.readCurrentAttributes(iid, builder , readContext);
 

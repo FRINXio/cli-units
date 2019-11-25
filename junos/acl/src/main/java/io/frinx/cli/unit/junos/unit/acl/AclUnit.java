@@ -22,14 +22,21 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.junos.init.JunosDevices;
+import io.frinx.cli.unit.junos.unit.acl.handler.AclEntriesWriter;
+import io.frinx.cli.unit.junos.unit.acl.handler.AclEntryReader;
 import io.frinx.cli.unit.junos.unit.acl.handler.AclInterfaceConfigReader;
 import io.frinx.cli.unit.junos.unit.acl.handler.AclInterfaceReader;
 import io.frinx.cli.unit.junos.unit.acl.handler.AclInterfaceWriter;
+import io.frinx.cli.unit.junos.unit.acl.handler.AclSetConfigReader;
+import io.frinx.cli.unit.junos.unit.acl.handler.AclSetConfigWriter;
+import io.frinx.cli.unit.junos.unit.acl.handler.AclSetReader;
+import io.frinx.cli.unit.junos.unit.acl.handler.EgressAclSetConfigReader;
+import io.frinx.cli.unit.junos.unit.acl.handler.EgressAclSetConfigWriter;
+import io.frinx.cli.unit.junos.unit.acl.handler.EgressAclSetReader;
 import io.frinx.cli.unit.junos.unit.acl.handler.IngressAclSetConfigReader;
 import io.frinx.cli.unit.junos.unit.acl.handler.IngressAclSetConfigWriter;
 import io.frinx.cli.unit.junos.unit.acl.handler.IngressAclSetReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.acl.IIDs;
 import java.util.Set;
@@ -55,7 +62,8 @@ public class AclUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_ACL);
+        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_ACL,
+                                IIDs.FRINX_ACL_EXTENSION);
     }
 
     @Override
@@ -76,10 +84,44 @@ public class AclUnit extends AbstractUnit {
             io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
 
         // ingress
-        writeRegistry.add(IIDs.AC_IN_IN_INGRESSACLSETS, new NoopCliWriter<>());
-        writeRegistry.add(IIDs.AC_IN_IN_IN_INGRESSACLSET, new NoopCliListWriter<>());
+        writeRegistry.addNoop(IIDs.AC_IN_IN_INGRESSACLSETS);
+        writeRegistry.addNoop(IIDs.AC_IN_IN_IN_INGRESSACLSET);
         writeRegistry.addAfter(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli),
             IIDs.AC_IN_IN_CONFIG);
+        // egress
+        writeRegistry.addNoop(IIDs.AC_IN_IN_EGRESSACLSETS);
+        writeRegistry.addNoop(IIDs.AC_IN_IN_EG_EGRESSACLSET);
+        writeRegistry.addAfter(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigWriter(cli),
+            IIDs.AC_IN_IN_CONFIG);
+
+        // sets
+        writeRegistry.addNoop(IIDs.AC_ACLSETS);
+        writeRegistry.add(IIDs.AC_AC_ACLSET, new AclSetConfigWriter(cli));
+
+        writeRegistry.addNoop(IIDs.AC_AC_AC_CONFIG);
+        writeRegistry.subtreeAdd(IIDs.AC_AC_AC_ACLENTRIES, new AclEntriesWriter(cli),
+                Sets.newHashSet(IIDs.AC_AC_AC_AC_ACLENTRY,
+                        IIDs.AC_AC_AC_AC_AC_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_CO_AUG_CONFIG2,
+
+                        IIDs.AC_AC_AC_AC_AC_IPV4,
+                        IIDs.AC_AC_AC_AC_AC_IP_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG3,
+
+                        IIDs.AC_AC_AC_AC_AC_IPV6,
+                        IIDs.ACL_ACL_ACL_ACL_ACL_IPV_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG4,
+
+                        IIDs.AC_AC_AC_AC_AC_TRANSPORT,
+                        IIDs.AC_AC_AC_AC_AC_TR_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_TR_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_TR_CO_AUG_ACLSETACLENTRYTRANSPORTPORTNAMEDAUG,
+
+                        IIDs.AC_AC_AC_AC_AC_ACTIONS,
+                        IIDs.AC_AC_AC_AC_AC_AC_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1,
+                        IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_ICMP,
+                        IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -90,5 +132,35 @@ public class AclUnit extends AbstractUnit {
         // ingress
         readRegistry.add(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli));
         readRegistry.add(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigReader());
+        // egress
+        readRegistry.add(IIDs.AC_IN_IN_EG_EGRESSACLSET, new EgressAclSetReader(cli));
+        readRegistry.add(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigReader());
+
+        // sets
+        readRegistry.add(IIDs.AC_AC_ACLSET, new AclSetReader(cli));
+        // acl-set/config
+        readRegistry.add(IIDs.AC_AC_AC_CONFIG, new AclSetConfigReader());
+
+        // ACL Entry subtree
+        readRegistry.subtreeAdd(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryReader(cli),
+                Sets.newHashSet(IIDs.AC_AC_AC_AC_AC_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_ACTIONS,
+                        IIDs.AC_AC_AC_AC_AC_AC_CONFIG,
+
+                        IIDs.AC_AC_AC_AC_AC_IPV4,
+                        IIDs.AC_AC_AC_AC_AC_IP_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG3,
+
+                        IIDs.AC_AC_AC_AC_AC_IPV6,
+                        IIDs.ACL_ACL_ACL_ACL_ACL_IPV_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG4,
+
+                        IIDs.AC_AC_AC_AC_AC_TRANSPORT,
+                        IIDs.AC_AC_AC_AC_AC_TR_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_TR_CO_AUG_ACLSETACLENTRYTRANSPORTPORTNAMEDAUG,
+
+                        IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1,
+                        IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_ICMP,
+                        IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG));
     }
 }
