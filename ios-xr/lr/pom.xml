@@ -20,12 +20,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.11.rc9-frinx-SNAPSHOT</version>
+        <version>3.1.11.frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>ios-xr-lr-unit</artifactId>
-    <version>3.1.11.rc9-frinx-SNAPSHOT</version>
+    <version>3.1.11.frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
