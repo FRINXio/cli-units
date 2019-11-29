@@ -37,11 +37,6 @@
             <artifactId>handlers</artifactId>
             <version>${translate.unit.commons.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>translation-registry-model</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
 
         <!-- Openconfig models -->
         <dependency>

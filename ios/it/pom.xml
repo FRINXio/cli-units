@@ -131,12 +131,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>translation-registry-model</artifactId>
-            <version>${cli.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.frinx.translate.unit.commons</groupId>
             <artifactId>utils</artifactId>
             <version>${translate.unit.commons.version}</version>

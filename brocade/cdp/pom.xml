@@ -32,12 +32,6 @@
     <packaging>bundle</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>io.frinx.cli</groupId>
-            <artifactId>translation-registry-model</artifactId>
-            <version>${cli.version}</version>
-        </dependency>
-
         <!-- Openconfig models -->
         <dependency>
             <groupId>io.frinx.openconfig</groupId>
