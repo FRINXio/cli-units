@@ -23,9 +23,13 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.junos.unit.acl.handler.util.AclUtil;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.AclEntries;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
@@ -50,6 +54,22 @@ public class AclEntriesWriter implements CliWriter<AclEntries> {
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         Preconditions.checkNotNull(aclEntries.getAclEntry(), "Empty access list entries");
 
+        Map<String, Set<Long>> aclKeysAfter = new HashMap<>();
+        for (AclEntry aclEntry : aclEntries.getAclEntry()) {
+            Set<Long> sequences = aclKeysAfter.computeIfAbsent(AclEntryWriter
+                    .getTermName(aclEntry), k -> new HashSet<>());
+            sequences.add(aclEntry.getSequenceId());
+        }
+        String wrongAcl = aclKeysAfter.entrySet().stream()
+                .filter(e -> e.getValue().size() > 1)
+                .map(e -> e.getKey() + " -> ("
+                        + e.getValue().stream().map(Object::toString).collect(Collectors.joining(",")) + ")")
+                .collect(Collectors.joining(", "));
+        if (wrongAcl.length() > 0) {
+            throw new IllegalStateException(f("Cannot set access list with the same term name"
+                    + " with different sequence IDs: %s", wrongAcl));
+        }
+
         for (AclEntry aclEntry : aclEntries.getAclEntry()) {
             InstanceIdentifier<AclEntry> iid = instanceIdentifier.builder()
                     .child(AclEntry.class, aclEntry.getKey()).build();
@@ -58,13 +78,13 @@ public class AclEntriesWriter implements CliWriter<AclEntries> {
 
         if (aclEntries.getAclEntry().size() > 1) {
             AclSetKey key = instanceIdentifier.firstKeyOf(AclSet.class);
-            List<AclEntry> aclEntry1 = aclEntries.getAclEntry();
-            aclEntry1.sort(Comparator.comparingLong(AclEntry::getSequenceId));
-            for (int i = 0; i < aclEntry1.size() - 1; i++) {
-                AclEntry aclEntry = aclEntry1.get(i);
-                AclEntry aclEntryNext = aclEntry1.get(i + 1);
-                String termName = aclEntry.getConfig().getAugmentation(Config2.class).getTermName();
-                String termNameNext = aclEntryNext.getConfig().getAugmentation(Config2.class).getTermName();
+            List<AclEntry> aclEntryList = aclEntries.getAclEntry();
+            aclEntryList.sort(Comparator.comparingLong(AclEntry::getSequenceId));
+            for (int i = 0; i < aclEntryList.size() - 1; i++) {
+                AclEntry aclEntry = aclEntryList.get(i);
+                AclEntry aclEntryNext = aclEntryList.get(i + 1);
+                String termName = AclEntryWriter.getTermName(aclEntry);
+                String termNameNext = AclEntryWriter.getTermName(aclEntryNext);
                 String order = f(COMMAND, AclUtil.getStringType(key.getType()), key.getName(), termName, termNameNext);
                 blockingWriteAndRead(order, cli, instanceIdentifier, aclEntries);
             }

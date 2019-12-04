@@ -52,7 +52,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPUDP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IpProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange.Enumeration;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 
@@ -133,8 +132,8 @@ public class AclEntryLineParserTest {
         transportBuilder.setConfig(
                 new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
                         .fields.top.transport.ConfigBuilder()
-                        .setSourcePort(new PortNumRange(Enumeration.ANY))
-                        .setDestinationPort(new PortNumRange(Enumeration.ANY))
+                        .setSourcePort(new PortNumRange(PortNumRange.Enumeration.ANY))
+                        .setDestinationPort(new PortNumRange(PortNumRange.Enumeration.ANY))
                         .build());
         return transportBuilder.build();
     }
@@ -165,8 +164,8 @@ public class AclEntryLineParserTest {
                 + "set firewall family inet filter inacl1 term 5 from ttl 0-10\n"
                 + "set firewall family inet filter inacl1 term 5 then discard\n"
 
-                + "set firewall family inet filter inacl1 term 6 from source-address 0.0.0.0/8\n"
-                + "set firewall family inet filter inacl1 term 6 from destination-address 0.0.0.0/8\n"
+                + "set firewall family inet filter inacl1 term 6 from address 0.0.0.0/8\n"
+                + "set firewall family inet filter inacl1 term 6 from port smtp\n"
                 + "set firewall family inet filter inacl1 term 6 from protocol udp\n"
                 + "set firewall family inet filter inacl1 term 6 from ttl 0-10\n"
                 + "set firewall family inet filter inacl1 term 6 then accept\n"
@@ -196,7 +195,7 @@ public class AclEntryLineParserTest {
                                     AclSetAclEntryTransportPortNamedAugBuilder()
                                     .setSourcePortNamed("ftp")
                                     .build())
-                            .setDestinationPort(new PortNumRange(Enumeration.ANY))
+                            .setDestinationPort(new PortNumRange(PortNumRange.Enumeration.ANY))
                             .build());
             String termName = "1";
             expectedResults.put(termName, createIpv4AclEntry(termName, DROP.class, configBuilder.build(),
@@ -227,7 +226,7 @@ public class AclEntryLineParserTest {
                                     AclSetAclEntryTransportPortNamedAugBuilder()
                                     .setSourcePortNamed("www")
                                     .build())
-                            .setDestinationPort(new PortNumRange(Enumeration.ANY))
+                            .setDestinationPort(new PortNumRange(PortNumRange.Enumeration.ANY))
                             .build());
             String termName = "4";
             expectedResults.put(termName, createIpv4AclEntry(termName, ACCEPT.class, configBuilder.build(),
@@ -260,8 +259,11 @@ public class AclEntryLineParserTest {
             transportBuilder.setConfig(
                     new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
                             .fields.top.transport.ConfigBuilder()
-                            .setSourcePort(new PortNumRange(Enumeration.ANY))
-                            .setDestinationPort(new PortNumRange(Enumeration.ANY))
+                            .addAugmentation(AclSetAclEntryTransportPortNamedAug.class, new
+                                    AclSetAclEntryTransportPortNamedAugBuilder()
+                                    .setSourcePortNamed("smtp")
+                                    .setDestinationPortNamed("smtp")
+                                    .build())
                             .build());
             String termName = "6";
             expectedResults.put(termName, createIpv4AclEntry(termName, ACCEPT.class, configBuilder.build(),
@@ -313,6 +315,7 @@ public class AclEntryLineParserTest {
             + "fe80:0000:0000:0000:0202:b3ff:fe1e:8329/128\n"
             + "set firewall family inet6 filter inacl1 term 8 from source-address f::a/64\n"
             + "set firewall family inet6 filter inacl1 term 8 from payload-protocol udp\n"
+            + "set firewall family inet6 filter inacl1 term 8 from port ftp\n"
             + "set firewall family inet6 filter inacl1 term 8 then accept\n";
 
         LinkedHashMap<String, AclEntry> expectedResults = new LinkedHashMap<>();
@@ -322,7 +325,7 @@ public class AclEntryLineParserTest {
                     .top.ipv6.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
                     .net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
             configBuilder.setProtocol(new IpProtocolType(IPICMP.class));
-            configBuilder.setSourceAddress(AclEntryLineParser.IPV6_HOST_ANY);
+            configBuilder.setSourceAddress(new Ipv6Prefix("::/0"));
             configBuilder.setDestinationAddress(new Ipv6Prefix("::1/128"));
             configBuilder.addAugmentation(Config4.class, new Config4Builder()
                     .setHopRange(new HopRange("11..9"))
@@ -340,7 +343,14 @@ public class AclEntryLineParserTest {
             configBuilder.setDestinationAddress(new Ipv6Prefix("fe80:0000:0000:0000:0202:b3ff:fe1e:8329/128"));
             String termName = "8";
             expectedResults.put(termName, createIpv6AclEntry(termName, ACCEPT.class, configBuilder.build(),
-                    defTransport()));
+                    new TransportBuilder().setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                            .header.fields.rev171215.transport.fields.top.transport.ConfigBuilder()
+                            .addAugmentation(AclSetAclEntryTransportPortNamedAug.class, new
+                                    AclSetAclEntryTransportPortNamedAugBuilder()
+                                    .setSourcePortNamed("ftp")
+                                    .setDestinationPortNamed("ftp")
+                                    .build())
+                            .build()).build()));
         }
 
         // verify expected results

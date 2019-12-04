@@ -21,7 +21,6 @@ import java.util.Map;
 
 public final class ServiceToPortMapping {
 
-    public static final Map<String, Integer> TCP_MAPPING;
     public static final Map<String, Short> ICMP_MAPPING;
     public static final Map<String, Short> ICMPV6_MAPPING;
 
@@ -30,44 +29,6 @@ public final class ServiceToPortMapping {
     }
 
     static {
-        Map<String, Integer> tcpMap = new HashMap<>();
-        // taken from XR 5.3.4 using ?
-        tcpMap.put("bgp", 179);
-        tcpMap.put("chargen", 19);
-        tcpMap.put("cmd", 514);
-        tcpMap.put("daytime", 13);
-        tcpMap.put("discard", 9);
-        tcpMap.put("domain", 53);
-        tcpMap.put("echo", 7);
-        tcpMap.put("exec", 512);
-        tcpMap.put("finger", 79);
-        tcpMap.put("ftp", 21);
-        tcpMap.put("ftp-data", 20);
-        tcpMap.put("gopher", 70);
-        tcpMap.put("hostname", 101);
-        tcpMap.put("http", 80);
-        tcpMap.put("ident", 113);
-        tcpMap.put("irc", 194);
-        tcpMap.put("klogin", 543);
-        tcpMap.put("kshell", 544);
-        tcpMap.put("ldp", 646);
-        tcpMap.put("login", 513);
-        tcpMap.put("lpd", 515);
-        tcpMap.put("nntp", 119);
-        tcpMap.put("pim-auto-rp", 496);
-        tcpMap.put("pop2", 109);
-        tcpMap.put("pop3", 110);
-        tcpMap.put("smtp", 25);
-        tcpMap.put("ssh", 22);
-        tcpMap.put("sunrpc", 111);
-        tcpMap.put("tacacs", 49);
-        tcpMap.put("talk", 517);
-        tcpMap.put("telnet", 23);
-        tcpMap.put("time", 37);
-        tcpMap.put("uucp", 540);
-        tcpMap.put("whois", 43);
-        tcpMap.put("www", 80);
-        TCP_MAPPING = Collections.unmodifiableMap(tcpMap);
 
         Map<String, Short> icmpMap = new HashMap<>();
         icmpMap.put("echo-reply", (short) 0);

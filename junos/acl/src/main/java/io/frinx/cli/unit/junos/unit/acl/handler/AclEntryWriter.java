@@ -50,6 +50,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.Ipv6ProtocolFieldsConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.Ipv4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.Ipv6;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPICMP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPPROTOCOL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPTCP;
@@ -67,27 +68,22 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             "incorrect range format, range parameter should contains two numbers separated by '%s', entered: %s",
             RANGE_SEPARATOR, rangeString);
 
-    private static final String ACL_ACTION_ENTRY = "set firewall family {$family} filter {$aclName} term "
-            + "{$aclTermName} then {$value}\n";
-    private static final String ACL_PROTOCOL_ENTRY = "set firewall family {$family} filter {$aclName} term "
-            + "{$aclTermName} from protocol {$value}\n";
-    private static final String ACL_PROTOCOL_ENTRY_IPV6 = "set firewall family {$family} filter {$aclName} term "
-            + "{$aclTermName} from payload-protocol {$value}\n";
-    private static final String ACL_SRC_ADDR_ENTRY = "set firewall family {$family} filter {$aclName} term "
-            + "{$aclTermName} from source-address {$value}\n";
-    private static final String ACL_SRC_PORT_ENTRY = "set firewall family {$family} filter {$aclName} term "
-            + "{$aclTermName} from source-port {$value}\n";
-    private static final String ACL_DST_ADDR_ENTRY = "set firewall family {$family} filter {$aclName} term "
-            + "{$aclTermName} from destination-address {$value}\n";
-    private static final String ACL_DST_PORT_ENTRY = "set firewall family {$family} filter {$aclName} term "
-            + "{$aclTermName} from destination-port {$value}\n";
-    private static final String ACL_TTL_ENTRY = "set firewall family {$family} filter {$aclName} term {$aclTermName}"
-            + " from ttl {$value}\n";
-    private static final String ACL_ICMP_TYPE_ENTRY = "set firewall family {$family} filter {$aclName} term "
-            + "{$aclTermName} from icmp-type {$value}\n";
+    private static final String ACL_ENTRY = "set firewall family {$family} filter {$aclName} term {$aclTermName} ";
+    private static final String ACL_ACTION_ENTRY = ACL_ENTRY + "then {$value}\n";
+    private static final String ACL_PROTOCOL_ENTRY = ACL_ENTRY + "from protocol {$value}\n";
+    private static final String ACL_PROTOCOL_ENTRY_IPV6 = ACL_ENTRY + "from payload-protocol {$value}\n";
+    private static final String ACL_ADDR_ENTRY = ACL_ENTRY + "from address {$value}\n";
+    private static final String ACL_PORT_ENTRY = ACL_ENTRY + "from port {$value}\n";
+    private static final String ACL_SRC_ADDR_ENTRY = ACL_ENTRY + "from source-address {$value}\n";
+    private static final String ACL_SRC_PORT_ENTRY = ACL_ENTRY + "from source-port {$value}\n";
+    private static final String ACL_DST_ADDR_ENTRY = ACL_ENTRY + "from destination-address {$value}\n";
+    private static final String ACL_DST_PORT_ENTRY = ACL_ENTRY + "from destination-port {$value}\n";
+    private static final String ACL_TTL_ENTRY = ACL_ENTRY + "from ttl {$value}\n";
+    private static final String ACL_ICMP_TYPE_ENTRY = ACL_ENTRY + "from icmp-type {$value}\n";
     private static final String ACL_DELETE_ENTRY =
             "delete firewall family {$family} filter {$aclName} term {$aclTermName}\n";
 
+    private static final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
     private static final Pattern IPV4_IN_IPV6_PATTERN =
             Pattern.compile("^(?<ipv6Part>.+:(ffff|FFFF):)(?<ipv4Part>[0-9a-fA-F]{1,4}:[0-9a-fA-F]{1,4})$");
 
@@ -120,8 +116,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                                @Nonnull AclEntry entry) throws WriteFailedException.CreateFailedException {
         AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
         String aclName = aclSetKey.getName();
-        Optional<Config2> config2 = Optional.ofNullable(entry.getConfig().getAugmentation(Config2.class));
-        String aclTermName = config2.isPresent() ? config2.get().getTermName() : entry.getSequenceId().toString();
+        String aclTermName = getTermName(entry);
         Map<CommandKey, String> entries = Maps.newHashMap();
         // ipv4|ipv6
         if (entry.getIpv4() != null) {
@@ -143,7 +138,13 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         }
     }
 
-    private void processIpv4(AclEntry entry, Map<CommandKey, String> commandVars) {
+    static String getTermName(@Nonnull AclEntry entry) {
+        Optional<Config2> config2 = Optional.ofNullable(entry.getConfig().getAugmentation(Config2.class));
+        return config2.isPresent() ? config2.get().getTermName() : entry.getSequenceId().toString();
+    }
+
+    @VisibleForTesting
+    static void processIpv4(AclEntry entry, Map<CommandKey, String> commandVars) {
         if (entry.getIpv4().getConfig().getAugmentation(Config3.class) != null
                 && entry.getIpv4().getConfig().getAugmentation(Config3.class).getHopRange() != null) {
             commandVars.put(CommandKey.ACL_TTL,
@@ -155,11 +156,16 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                     entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString());
         }
         // src address
-        Optional<String> ipv4PrefixOpt = getIpv4Prefix(entry, Ipv4ProtocolFieldsConfig::getSourceAddress);
-        ipv4PrefixOpt.ifPresent(s -> commandVars.put(CommandKey.ACL_SRC_ADDR, s));
+        Optional<String> ipv4PrefixOptSrc = getIpv4Prefix(entry, Ipv4ProtocolFieldsConfig::getSourceAddress);
         // dst address
-        ipv4PrefixOpt = getIpv4Prefix(entry, Ipv4ProtocolFieldsConfig::getDestinationAddress);
-        ipv4PrefixOpt.ifPresent(s -> commandVars.put(CommandKey.ACL_DST_ADDR, s));
+        Optional<String> ipv4PrefixOptDst = getIpv4Prefix(entry, Ipv4ProtocolFieldsConfig::getDestinationAddress);
+        if (ipv4PrefixOptSrc.isPresent() && ipv4PrefixOptDst.isPresent()
+                && ipv4PrefixOptSrc.get().equals(ipv4PrefixOptDst.get())) {
+            commandVars.put(CommandKey.ACL_ADDR, ipv4PrefixOptDst.get());
+        } else {
+            ipv4PrefixOptSrc.ifPresent(s -> commandVars.put(CommandKey.ACL_SRC_ADDR, s));
+            ipv4PrefixOptDst.ifPresent(s -> commandVars.put(CommandKey.ACL_DST_ADDR, s));
+        }
 
         IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv4().getConfig())
                 .map(IpProtocolFieldsCommonConfig::getProtocol)
@@ -167,7 +173,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         commandVars.put(CommandKey.ACL_PROTOCOL, formatProtocol(ipProtocolType, "ip"));
     }
 
-    private Optional<String> getIpv4Prefix(AclEntry entry, Function<Ipv4ProtocolFieldsConfig, Ipv4Prefix> mapper) {
+    private static Optional<String> getIpv4Prefix(AclEntry entry,
+                                                  Function<Ipv4ProtocolFieldsConfig, Ipv4Prefix> mapper) {
         return Optional.ofNullable(entry)
                 .map(AclEntry::getIpv4)
                 .map(Ipv4::getConfig)
@@ -175,7 +182,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 .map(Ipv4Prefix::getValue);
     }
 
-    private static void processIpv6(AclEntry entry, Map<CommandKey, String> commandVars) {
+    @VisibleForTesting
+    static void processIpv6(AclEntry entry, Map<CommandKey, String> commandVars) {
         if (entry.getIpv6().getConfig().getAugmentation(Config4.class) != null
                 && entry.getIpv6().getConfig().getAugmentation(Config4.class).getHopRange() != null) {
             commandVars.put(CommandKey.ACL_TTL,
@@ -187,11 +195,16 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                     entry.getAugmentation(AclEntry1.class).getIcmp().getConfig().getMsgType().getUint8().toString());
         }
         // src address
-        Optional<String> ipv6PrefixOpt = getIpv6Prefix(entry, Ipv6ProtocolFieldsConfig::getSourceAddress);
-        ipv6PrefixOpt.ifPresent(s -> commandVars.put(CommandKey.ACL_SRC_ADDR, tryTranslateIpv6ToIpv4InIpv6(s)));
+        Optional<String> ipv6PrefixOptSrc = getIpv6Prefix(entry, Ipv6ProtocolFieldsConfig::getSourceAddress);
         // dst address
-        ipv6PrefixOpt = getIpv6Prefix(entry, Ipv6ProtocolFieldsConfig::getDestinationAddress);
-        ipv6PrefixOpt.ifPresent(s -> commandVars.put(CommandKey.ACL_DST_ADDR, tryTranslateIpv6ToIpv4InIpv6(s)));
+        Optional<String> ipv6PrefixOptDst = getIpv6Prefix(entry, Ipv6ProtocolFieldsConfig::getDestinationAddress);
+        if (ipv6PrefixOptSrc.isPresent() && ipv6PrefixOptDst.isPresent()
+                && ipv6PrefixOptSrc.get().equals(ipv6PrefixOptDst.get())) {
+            commandVars.put(CommandKey.ACL_ADDR, ipv6PrefixOptDst.get());
+        } else {
+            ipv6PrefixOptSrc.ifPresent(s -> commandVars.put(CommandKey.ACL_SRC_ADDR, tryTranslateIpv6ToIpv4InIpv6(s)));
+            ipv6PrefixOptDst.ifPresent(s -> commandVars.put(CommandKey.ACL_DST_ADDR, tryTranslateIpv6ToIpv4InIpv6(s)));
+        }
 
         IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv6().getConfig())
                 .map(IpProtocolFieldsCommonConfig::getProtocol)
@@ -227,34 +240,66 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 .map(Ipv6Prefix::getValue);
     }
 
-    private void processTransport(AclEntry entry, Map<CommandKey, String> commandVars) {
+    @VisibleForTesting
+    static void processTransport(AclEntry entry, Map<CommandKey, String> commandVars) {
         if (entry.getTransport() != null && entry.getTransport().getConfig() != null) {
             AclSetAclEntryTransportPortNamedAug aug = entry.getTransport().getConfig()
                     .getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
 
-            if (entry.getTransport().getConfig().getSourcePort() != null) {
-                commandVars.put(CommandKey.ACL_SRC_PORT,
-                        formatPort(entry.getTransport().getConfig().getSourcePort()));
-            } else if (aug != null && aug.getSourcePortNamed() != null) {
-                commandVars.put(CommandKey.ACL_SRC_PORT, aug.getSourcePortNamed());
-            }
-
-            if (entry.getTransport().getConfig().getDestinationPort() != null) {
-                commandVars.put(CommandKey.ACL_DST_PORT,
-                        formatPort(entry.getTransport().getConfig().getDestinationPort()));
-            } else if (aug != null && aug.getDestinationPortNamed() != null) {
-                commandVars.put(CommandKey.ACL_DST_PORT, aug.getDestinationPortNamed());
+            if (aug != null) {
+                if (aug.getSourcePortNamed() != null
+                        && aug.getSourcePortNamed().equals(aug.getDestinationPortNamed())) {
+                    commandVars.put(CommandKey.ACL_PORT, aug.getSourcePortNamed());
+                } else {
+                    if (aug.getSourcePortNamed() != null) {
+                        commandVars.put(CommandKey.ACL_SRC_PORT, aug.getSourcePortNamed());
+                    }
+                    if (aug.getDestinationPortNamed() != null) {
+                        commandVars.put(CommandKey.ACL_DST_PORT, aug.getDestinationPortNamed());
+                    }
+                }
+            } else {
+                Config config = entry.getTransport().getConfig();
+                if (config.getSourcePort() != null && config.getSourcePort().equals(config.getDestinationPort())) {
+                    setPort(commandVars, CommandKey.ACL_PORT, config.getSourcePort());
+                } else {
+                    if (config.getSourcePort() != null) {
+                        setPort(commandVars, CommandKey.ACL_SRC_PORT, config.getSourcePort());
+                    }
+                    if (config.getDestinationPort() != null) {
+                        setPort(commandVars, CommandKey.ACL_DST_PORT, config.getDestinationPort());
+                    }
+                }
             }
         }
     }
 
-    private String formatPort(PortNumRange port) {
-        return port.getPortNumber() == null ? port.getString() : port.getPortNumber().toString();
+    private static void setPort(Map<CommandKey, String> commandVars, CommandKey key, PortNumRange port) {
+        String formattedPort = formatPort(port);
+        if (formattedPort != null) {
+            commandVars.put(key, formattedPort);
+        }
     }
 
-    private void processActions(AclEntry entry, Map<CommandKey, String> commandVars) {
+    private static String formatPort(PortNumRange port) {
+        if (port.getPortNumber() != null) {
+            return port.getPortNumber().getValue().toString();
+        } else if (port.getString() != null) {
+            Matcher matcher = PORT_RANGE_PATTERN.matcher(port.getString());
+            if (!matcher.find()) {
+                LOG.warn("Wrong protocol range value: {}", port.getString());
+            }
+            return port.getString().replace("..", "-");
+        } else if (PortNumRange.Enumeration.ANY.equals(port.getEnumeration())) {
+            return null;
+        }
+        throw new IllegalArgumentException("Missing port");
+    }
+
+    @VisibleForTesting
+    static void processActions(AclEntry entry, Map<CommandKey, String> commandVars) {
         if (entry.getActions() == null || entry.getActions().getConfig() == null) {
-            throw new IllegalStateException(f("No actions found for entry %s", entry));
+            throw new IllegalStateException(String.format("No actions found for entry %s", entry));
         }
         Class<? extends FORWARDINGACTION> action = entry.getActions().getConfig().getForwardingAction();
         if (action.equals(ACCEPT.class)) {
@@ -262,7 +307,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         } else if (action.equals(DROP.class)) {
             commandVars.put(CommandKey.ACL_ACTION, "discard");
         } else {
-            throw new IllegalStateException(f("No action found for entry %s", entry));
+            throw new IllegalStateException(String.format("No action found for entry %s", entry));
         }
     }
 
@@ -320,8 +365,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
 
     @VisibleForTesting
     enum CommandKey {
-        ACL_ACTION, ACL_PROTOCOL, ACL_PROTOCOL_IPV6, ACL_SRC_ADDR, ACL_SRC_PORT,
-        ACL_DST_ADDR, ACL_DST_PORT, ACL_ICMP_MSG_TYPE, ACL_TTL;
+        ACL_ACTION, ACL_PROTOCOL, ACL_PROTOCOL_IPV6, ACL_ADDR, ACL_PORT, ACL_SRC_ADDR,
+        ACL_SRC_PORT, ACL_DST_ADDR, ACL_DST_PORT, ACL_ICMP_MSG_TYPE, ACL_TTL;
     }
 
     private static Map<CommandKey, String> COMMANDS = new HashMap<>();
@@ -330,6 +375,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         COMMANDS.put(CommandKey.ACL_ACTION, ACL_ACTION_ENTRY);
         COMMANDS.put(CommandKey.ACL_PROTOCOL_IPV6, ACL_PROTOCOL_ENTRY_IPV6);
         COMMANDS.put(CommandKey.ACL_PROTOCOL, ACL_PROTOCOL_ENTRY);
+        COMMANDS.put(CommandKey.ACL_ADDR, ACL_ADDR_ENTRY);
+        COMMANDS.put(CommandKey.ACL_PORT, ACL_PORT_ENTRY);
         COMMANDS.put(CommandKey.ACL_SRC_ADDR, ACL_SRC_ADDR_ENTRY);
         COMMANDS.put(CommandKey.ACL_SRC_PORT, ACL_SRC_PORT_ENTRY);
         COMMANDS.put(CommandKey.ACL_DST_ADDR, ACL_DST_ADDR_ENTRY);

@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1Builder;
@@ -64,26 +65,19 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPUDP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IpProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange.Enumeration;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.PortNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 final class AclEntryLineParser {
     private static final Logger LOG = LoggerFactory.getLogger(AclEntryLineParser.class);
-    static final Ipv4Prefix IPV4_HOST_ANY = new Ipv4Prefix("0.0.0.0/0");
-    static final Ipv6Prefix IPV6_HOST_ANY = new Ipv6Prefix("::/0");
-    private static final int MAX_PORT_NUMBER = 65535;
-    private static final int MAX_TTL = 255;
     private static final IpProtocolType IP_PROTOCOL_ICMP = new IpProtocolType(IPICMP.class);
     private static final IpProtocolType IP_PROTOCOL_ICMP_NUMBER = new IpProtocolType((short) 1);
     private static final IpProtocolType IP_PROTOCOL_TCP = new IpProtocolType(IPTCP.class);
-    private static final IpProtocolType IP_PROTOCOL_TCP_NUMBER = new IpProtocolType((short) 6);
     private static final IpProtocolType IP_PROTOCOL_UDP = new IpProtocolType(IPUDP.class);
-    private static final IpProtocolType IP_PROTOCOL_UDP_NUMBER = new IpProtocolType((short) 17);
     private static final Pattern ZERO_TO_255_PATTERN = Pattern.compile("^2[0-5][0-5]|2[0-4][0-9]|1?[0-9]?[0-9]$");
-    private static long sequenceId = 1;
 
     private AclEntryLineParser() {
 
@@ -145,8 +139,8 @@ final class AclEntryLineParser {
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top
                 .transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
                 .openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
-        transportConfigBuilder.setSourcePort(new PortNumRange(Enumeration.ANY));
-        transportConfigBuilder.setDestinationPort(new PortNumRange(Enumeration.ANY));
+        transportConfigBuilder.setSourcePort(new PortNumRange(PortNumRange.Enumeration.ANY));
+        transportConfigBuilder.setDestinationPort(new PortNumRange(PortNumRange.Enumeration.ANY));
 
         Queue<String> ttlArgs = new LinkedList<>();
 
@@ -165,6 +159,14 @@ final class AclEntryLineParser {
 
             String poll = words.poll();
             switch (poll) {
+                case "address":
+                    // src or dst address
+                    Optional<Ipv4Prefix> ipv4Prefix = parseIpv4Prefix(words.poll());
+                    if (ipv4Prefix.isPresent()) {
+                        ipv4ProtocolFieldsConfigBuilder.setSourceAddress(ipv4Prefix.get());
+                        ipv4ProtocolFieldsConfigBuilder.setDestinationAddress(ipv4Prefix.get());
+                    }
+                    break;
                 case "source-address":
                     // src address
                     parseIpv4Prefix(words.poll()).ifPresent(ipv4ProtocolFieldsConfigBuilder::setSourceAddress);
@@ -182,6 +184,10 @@ final class AclEntryLineParser {
                     parseTransportDestinationPort(transportConfigBuilder, words.poll());
                     break;
                 case "port":
+                    // src or dst port
+                    String port = words.poll();
+                    parseTransportSourcePort(transportConfigBuilder, port);
+                    parseTransportDestinationPort(transportConfigBuilder, port);
                     break;
                 case "protocol":
                     IpProtocolType ipProtocolType = parseProtocol(words.poll());
@@ -249,13 +255,11 @@ final class AclEntryLineParser {
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top
                 .ipv6.ConfigBuilder ipv6ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
                 .openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
-        ipv6ProtocolFieldsConfigBuilder.setDestinationAddress(new Ipv6Prefix(IPV6_HOST_ANY));
-        ipv6ProtocolFieldsConfigBuilder.setSourceAddress(new Ipv6Prefix(IPV6_HOST_ANY));
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top
                 .transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
                 .openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
-        transportConfigBuilder.setSourcePort(new PortNumRange(Enumeration.ANY));
-        transportConfigBuilder.setDestinationPort(new PortNumRange(Enumeration.ANY));
+        transportConfigBuilder.setSourcePort(new PortNumRange(PortNumRange.Enumeration.ANY));
+        transportConfigBuilder.setDestinationPort(new PortNumRange(PortNumRange.Enumeration.ANY));
 
         Queue<String> ttlArgs = new LinkedList<>();
 
@@ -274,6 +278,14 @@ final class AclEntryLineParser {
 
             String poll = words.poll();
             switch (poll) {
+                case "address":
+                    // src or dst address
+                    Optional<Ipv6Prefix> ipv6Prefix = parseIpv6Prefix(words.poll());
+                    if (ipv6Prefix.isPresent()) {
+                        ipv6ProtocolFieldsConfigBuilder.setSourceAddress(ipv6Prefix.get());
+                        ipv6ProtocolFieldsConfigBuilder.setDestinationAddress(ipv6Prefix.get());
+                    }
+                    break;
                 case "source-address":
                     // src address
                     parseIpv6Prefix(words.poll()).ifPresent(ipv6ProtocolFieldsConfigBuilder::setSourceAddress);
@@ -291,6 +303,10 @@ final class AclEntryLineParser {
                     parseTransportDestinationPort(transportConfigBuilder, words.poll());
                     break;
                 case "port":
+                    // src or dst port
+                    String port = words.poll();
+                    parseTransportSourcePort(transportConfigBuilder, port);
+                    parseTransportDestinationPort(transportConfigBuilder, port);
                     break;
                 case "payload-protocol":
                     IpProtocolType ipProtocolType = parseProtocol(words.poll());
@@ -340,7 +356,6 @@ final class AclEntryLineParser {
             final String port) {
         if (!port.isEmpty()) {
             parsePortNum(port, transportConfigBuilder, true);
-            transportConfigBuilder.setSourcePort(null);
         }
     }
 
@@ -350,7 +365,6 @@ final class AclEntryLineParser {
             final String port) {
         if (!port.isEmpty()) {
             parsePortNum(port, transportConfigBuilder, false);
-            transportConfigBuilder.setDestinationPort(null);
         }
     }
 
@@ -373,16 +387,14 @@ final class AclEntryLineParser {
      * if exists more than 1 ttl config, use first one, ignore others
      */
     private static Entry<Integer, Integer> parseTTLRange(Queue<String> words) {
-
-        for (String ttl : words) {
-            if (ttl.contains("-")) {
-                String[] range = ttl.split("-");
-                return Maps.immutableEntry(Integer.parseInt(range[0]), Integer.parseInt(range[1]));
-            } else {
-                return Maps.immutableEntry(Integer.parseInt(ttl), Integer.parseInt(ttl));
-            }
+        String ttl = words.poll();
+        if (ttl.contains("-")) {
+            String[] range = ttl.split("-");
+            return Maps.immutableEntry(Integer.parseInt(range[0]), Integer.parseInt(range[1]));
+        } else {
+            int intTtl = Integer.parseInt(ttl);
+            return Maps.immutableEntry(intTtl, intTtl);
         }
-        throw new IllegalArgumentException("Cannot parse ttl range");
     }
 
     private static void parsePortNum(String port,
@@ -390,34 +402,43 @@ final class AclEntryLineParser {
                                                   .rev171215.transport.fields.top.transport.ConfigBuilder
                                                   transportConfigBuilder,
                                      boolean source) {
-        if (port.contains("-")) {
-            throw new IllegalArgumentException("Range is not supported.");
-        }
+        String[] ports = port.split("-");
+        boolean isRange = ports.length > 1;
+        boolean arePortsNumeric = isRange ? StringUtils.isNumeric(ports[0]) && StringUtils.isNumeric(ports[1])
+                : StringUtils.isNumeric(ports[0]);
 
-        AclSetAclEntryTransportPortNamedAug existingAug = transportConfigBuilder
-                .getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
-        AclSetAclEntryTransportPortNamedAugBuilder aclSetAclEntryTransportPortNamedAugBuilder = existingAug
-                != null ? new AclSetAclEntryTransportPortNamedAugBuilder(existingAug) : new
-                AclSetAclEntryTransportPortNamedAugBuilder();
-
-        if (source) {
-            aclSetAclEntryTransportPortNamedAugBuilder.setSourcePortNamed(parsePortNumNamed(port));
+        if (arePortsNumeric) {
+            if (source) {
+                transportConfigBuilder.setSourcePort(parsePortNumRangeNumbers(isRange, port));
+            } else {
+                transportConfigBuilder.setDestinationPort(parsePortNumRangeNumbers(isRange, port));
+            }
         } else {
-            aclSetAclEntryTransportPortNamedAugBuilder.setDestinationPortNamed(parsePortNumNamed(port));
-        }
+            AclSetAclEntryTransportPortNamedAug existingAug = transportConfigBuilder
+                    .getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
+            AclSetAclEntryTransportPortNamedAugBuilder aclSetAclEntryTransportPortNamedAugBuilder = existingAug
+                    != null ? new AclSetAclEntryTransportPortNamedAugBuilder(existingAug) : new
+                    AclSetAclEntryTransportPortNamedAugBuilder();
 
-        transportConfigBuilder.addAugmentation(AclSetAclEntryTransportPortNamedAug.class,
-                aclSetAclEntryTransportPortNamedAugBuilder
-                .build());
+            if (source) {
+                aclSetAclEntryTransportPortNamedAugBuilder.setSourcePortNamed(port);
+                transportConfigBuilder.setSourcePort(null);
+            } else {
+                aclSetAclEntryTransportPortNamedAugBuilder.setDestinationPortNamed(port);
+                transportConfigBuilder.setDestinationPort(null);
+            }
+
+            transportConfigBuilder.addAugmentation(AclSetAclEntryTransportPortNamedAug.class,
+                    aclSetAclEntryTransportPortNamedAugBuilder
+                            .build());
+        }
     }
 
-    private static String parsePortNumNamed(String port) {
-        Integer result = ServiceToPortMapping.TCP_MAPPING.get(port);
-        if (result == null) {
-            throw new IllegalArgumentException("Unknown named port " + port);
+    private static PortNumRange parsePortNumRangeNumbers(boolean isRange, String port) {
+        if (isRange) {
+            return new PortNumRange(port.replace("-", ".."));
         }
-
-        return port;
+        return new PortNumRange(new PortNumber(Integer.parseInt(port)));
     }
 
     @Nullable
