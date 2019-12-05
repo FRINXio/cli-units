@@ -87,6 +87,8 @@ public class AclUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.AC_AC_AC_ACLENTRIES);
         writeRegistry.subtreeAdd(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryWriter(cli),
             Sets.newHashSet(IIDs.AC_AC_AC_AC_AC_CONFIG,
+                IIDs.AC_AC_AC_AC_AC_CO_AUG_CONFIG2,
+
                 IIDs.AC_AC_AC_AC_AC_IPV4,
                 IIDs.AC_AC_AC_AC_AC_IP_CONFIG,
                 IIDs.AC_AC_AC_AC_AC_IP_CO_AUG_CONFIG3,

@@ -120,7 +120,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                                @Nonnull AclEntry entry) throws WriteFailedException.CreateFailedException {
         AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
         String aclName = aclSetKey.getName();
-        String aclTermName = entry.getConfig().getAugmentation(Config2.class).getTermName();
+        Optional<Config2> config2 = Optional.ofNullable(entry.getConfig().getAugmentation(Config2.class));
+        String aclTermName = config2.isPresent() ? config2.get().getTermName() : entry.getSequenceId().toString();
         Map<CommandKey, String> entries = Maps.newHashMap();
         // ipv4|ipv6
         if (entry.getIpv4() != null) {
