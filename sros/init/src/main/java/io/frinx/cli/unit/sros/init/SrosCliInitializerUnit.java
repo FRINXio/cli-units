@@ -27,6 +27,7 @@ import io.fd.honeycomb.translate.spi.write.PreCommitHook;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
+import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.topology.RemoteDeviceId;
@@ -176,5 +177,10 @@ public class SrosCliInitializerUnit extends AbstractUnit {
         return Sets.newLinkedHashSet(Arrays.asList(
                 Pattern.compile(".*(?i)Commit failed(?-i).*", Pattern.DOTALL)
             ));
+    }
+
+    @Override
+    public PromptResolutionStrategy getPromptResolver() {
+        return SrosPromptResolutionStrategy.ENTER_AND_READ;
     }
 }
