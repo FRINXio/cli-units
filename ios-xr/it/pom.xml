@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>bundle-parent</artifactId>
-        <version>1.8.1-Carbon-SR1.3_1_12_rc2-frinxodl</version>
+        <version>1.8.1-Carbon-SR1.3_1_12_rc3-frinxodl-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -30,12 +30,12 @@
     <properties>
         <cli.version>3.1.12.rc2-frinx</cli.version>
         <openconfig.version>3.1.12.rc2-frinx</openconfig.version>
-        <hc.version>1.17.10-Carbon-SR1.3_1_12_rc2-frinxodl</hc.version>
-        <controller.version>1.5.1-Carbon-SR1.3_1_12_rc2-frinxodl</controller.version>
+        <hc.version>1.17.10-Carbon-SR1.3_1_12_rc3-frinxodl-SNAPSHOT</hc.version>
+        <controller.version>1.5.1-Carbon-SR1.3_1_12_rc3-frinxodl-SNAPSHOT</controller.version>
         <translate.unit.commons.version>3.1.12.rc2-frinx</translate.unit.commons.version>
-        <yangtools.version>1.1.1-Carbon-SR1.3_1_12_rc2-frinxodl</yangtools.version>
-        <mdsal.version>2.2.1-Carbon-SR1.3_1_12_rc2-frinxodl</mdsal.version>
-        <mdsalmodel.version>0.10.1-Carbon-SR1.3_1_12_rc2-frinxodl</mdsalmodel.version>
+        <yangtools.version>1.1.1-Carbon-SR1.3_1_12_rc3-frinxodl-SNAPSHOT</yangtools.version>
+        <mdsal.version>2.2.1-Carbon-SR1.3_1_12_rc3-frinxodl-SNAPSHOT</mdsal.version>
+        <mdsalmodel.version>0.10.1-Carbon-SR1.3_1_12_rc3-frinxodl-SNAPSHOT</mdsalmodel.version>
     </properties>
 
     <dependencyManagement>
