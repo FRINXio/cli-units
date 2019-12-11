@@ -24,6 +24,8 @@ public final class NetUtils {
 
     private static final Pattern DOT = Pattern.compile("\\.");
 
+    public static final Pattern NO_MATCH = Pattern.compile("0^");
+
     private NetUtils() {}
 
     /**

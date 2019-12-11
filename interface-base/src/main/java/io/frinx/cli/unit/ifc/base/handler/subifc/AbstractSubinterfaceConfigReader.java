@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.util.NetUtils;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
@@ -77,7 +78,11 @@ public abstract class AbstractSubinterfaceConfigReader implements CliConfigReade
             builder::setDescription);
     }
 
-    protected abstract Pattern getShutdownLine();
+    protected Pattern getShutdownLine() {
+        return NetUtils.NO_MATCH;
+    }
 
-    protected abstract Pattern getDescriptionLine();
+    protected Pattern getDescriptionLine() {
+        return NetUtils.NO_MATCH;
+    }
 }

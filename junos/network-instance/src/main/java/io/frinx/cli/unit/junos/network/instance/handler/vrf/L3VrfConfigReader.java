@@ -21,7 +21,6 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfConfigReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
@@ -51,13 +50,4 @@ public class L3VrfConfigReader extends AbstractL3VrfConfigReader {
         return "";
     }
 
-    @Override
-    protected Pattern getRouteDistinguisherLine() {
-        return Pattern.compile("");
-    }
-
-    @Override
-    protected Pattern getDescriptionLine() {
-        return Pattern.compile("");
-    }
 }

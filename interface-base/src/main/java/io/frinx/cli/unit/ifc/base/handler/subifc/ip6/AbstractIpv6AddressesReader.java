@@ -21,6 +21,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceReader;
+import io.frinx.cli.unit.ifc.base.util.NetUtils;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
@@ -77,7 +78,9 @@ public abstract class AbstractIpv6AddressesReader implements CliConfigListReader
 
     protected abstract Pattern getLocalIpLine();
 
-    protected abstract Pattern getUnicastIpLine();
+    protected Pattern getUnicastIpLine() {
+        return NetUtils.NO_MATCH;
+    }
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Address> instanceIdentifier,

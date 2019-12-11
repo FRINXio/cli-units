@@ -38,9 +38,4 @@ public final class Ipv6AddressReader extends AbstractIpv6AddressesReader {
     protected Pattern getLocalIpLine() {
         return INTERFACE_IP_LINE;
     }
-
-    @Override
-    protected Pattern getUnicastIpLine() {
-        return Pattern.compile("");
-    }
 }

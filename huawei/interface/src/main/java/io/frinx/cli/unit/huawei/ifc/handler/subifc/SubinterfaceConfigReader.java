@@ -19,7 +19,6 @@ package io.frinx.cli.unit.huawei.ifc.handler.subifc;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceConfigReader;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
@@ -51,13 +50,4 @@ public final class SubinterfaceConfigReader extends AbstractSubinterfaceConfigRe
         return null;
     }
 
-    @Override
-    protected Pattern getShutdownLine() {
-        return null;
-    }
-
-    @Override
-    protected Pattern getDescriptionLine() {
-        return null;
-    }
 }
