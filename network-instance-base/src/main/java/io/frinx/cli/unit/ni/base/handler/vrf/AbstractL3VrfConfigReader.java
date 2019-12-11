@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.handlers.NetUtils;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
@@ -82,7 +83,11 @@ public abstract class AbstractL3VrfConfigReader implements CliConfigReader<Confi
         // TODO set other attributes
     }
 
-    protected abstract Pattern getRouteDistinguisherLine();
+    protected Pattern getRouteDistinguisherLine() {
+        return NetUtils.NO_MATCH;
+    }
 
-    protected abstract Pattern getDescriptionLine();
+    protected Pattern getDescriptionLine() {
+        return NetUtils.NO_MATCH;
+    }
 }

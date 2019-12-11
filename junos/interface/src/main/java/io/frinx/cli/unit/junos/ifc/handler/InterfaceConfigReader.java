@@ -46,12 +46,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     }
 
     @Override
-    protected Pattern getMtuLine() {
-        // mtu is not parsed
-        return Pattern.compile("");
-    }
-
-    @Override
     protected Pattern getDescriptionLine() {
         return DESCRIPTION_LINE;
     }

@@ -21,6 +21,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.handlers.NetUtils;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
@@ -70,5 +71,7 @@ public abstract class AbstractL2P2ConfigReader implements CliConfigReader<Config
             builder::setMtu);
     }
 
-    protected abstract Pattern getMtuLine();
+    protected Pattern getMtuLine() {
+        return NetUtils.NO_MATCH;
+    }
 }

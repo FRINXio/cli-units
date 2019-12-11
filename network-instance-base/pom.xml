@@ -37,6 +37,11 @@
             <artifactId>openconfig-network-instance</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common-handlers</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>

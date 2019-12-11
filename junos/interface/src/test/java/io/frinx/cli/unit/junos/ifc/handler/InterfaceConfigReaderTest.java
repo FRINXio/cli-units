@@ -36,6 +36,13 @@ public class InterfaceConfigReaderTest {
 
     private static final String OUTPUT_SINGLE1 = "set interfaces fxp0 unit 0 family inet address 192.168.254.254/24\n";
 
+    private static final String WRONG_OUTPUT = "set interfaces ge-0/0/3 vlan-tagging\n"
+            + "set interfaces ge-0/0/3 unit 0 description TEST_ge-0/0/3\n"
+            + "set interfaces ge-0/0/3 unit 0 vlan-id 100\n"
+            + "set interfaces ge-0/0/3 unit 0 family inet address 10.11.12.13/16\n"
+            + "\n"
+            + "{master:0}";
+
     private InterfaceConfigReader reader = new InterfaceConfigReader(Mockito.mock(Cli.class));
 
     @Test
@@ -72,5 +79,14 @@ public class InterfaceConfigReaderTest {
         Assert.assertTrue(builder.isEnabled());
         Assert.assertEquals(builder.getName(), interfaceName);
         Assert.assertEquals(builder.getType(), Other.class);
+    }
+
+    // should pass without exception
+    @Test
+    public void testParseWrongInterface() {
+        final String interfaceName = "ge-0/0/3";
+        final ConfigBuilder builder = new ConfigBuilder();
+
+        reader.parseInterface(WRONG_OUTPUT, builder, interfaceName);
     }
 }

@@ -26,7 +26,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 public final class L3VrfConfigReader extends AbstractL3VrfConfigReader {
 
     private static final Pattern RD_LINE = Pattern.compile(".*rd (?<rd>(\\S+):(\\S+)).*");
-    private static final Pattern DESCR_LINE = Pattern.compile("");
 
     public L3VrfConfigReader(Cli cli) {
         super(new L3VrfReader(cli), cli);
@@ -53,11 +52,6 @@ public final class L3VrfConfigReader extends AbstractL3VrfConfigReader {
     @Override
     protected Pattern getRouteDistinguisherLine() {
         return RD_LINE;
-    }
-
-    @Override
-    protected Pattern getDescriptionLine() {
-        return DESCR_LINE;
     }
 
     private static String realignOutput(String output) {
