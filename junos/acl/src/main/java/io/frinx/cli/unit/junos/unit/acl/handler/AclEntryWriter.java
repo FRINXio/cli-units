@@ -31,8 +31,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config2;
@@ -86,6 +86,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     private static final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
     private static final Pattern IPV4_IN_IPV6_PATTERN =
             Pattern.compile("^(?<ipv6Part>.+:(ffff|FFFF):)(?<ipv4Part>[0-9a-fA-F]{1,4}:[0-9a-fA-F]{1,4})$");
+    private static final String CHARS_NEED_TO_BE_QUOTED = "?()|\\&";
 
     private final Cli cli;
 
@@ -106,7 +107,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
         final String aclName = aclSetKey.getName();
-        final String aclTermName = dataBefore.getConfig().getAugmentation(Config2.class).getTermName();
+        final String aclTermName = getTermName(dataBefore);
 
         blockingWriteAndRead(fT(ACL_DELETE_ENTRY, "family", AclUtil.getStringType(aclSetKey.getType()),
                 "aclName", aclName, "aclTermName", aclTermName), cli, id, dataBefore);
@@ -140,7 +141,15 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
 
     static String getTermName(@Nonnull AclEntry entry) {
         Optional<Config2> config2 = Optional.ofNullable(entry.getConfig().getAugmentation(Config2.class));
-        return config2.isPresent() ? config2.get().getTermName() : entry.getSequenceId().toString();
+        String termName;
+        if (config2.isPresent()) {
+            termName = config2.get().getTermName();
+            termName = termName.contains(" ") || Stream.of(termName.split(""))
+                    .anyMatch(CHARS_NEED_TO_BE_QUOTED::contains) ? "\"" + termName + "\"" : termName;
+        } else {
+            termName = entry.getSequenceId().toString();
+        }
+        return termName;
     }
 
     @VisibleForTesting
@@ -167,10 +176,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             ipv4PrefixOptDst.ifPresent(s -> commandVars.put(CommandKey.ACL_DST_ADDR, s));
         }
 
-        IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv4().getConfig())
+        Optional.ofNullable(entry.getIpv4().getConfig())
                 .map(IpProtocolFieldsCommonConfig::getProtocol)
-                .orElse(null);
-        commandVars.put(CommandKey.ACL_PROTOCOL, formatProtocol(ipProtocolType, "ip"));
+                .ifPresent(ipProtocolType -> commandVars
+                        .put(CommandKey.ACL_PROTOCOL, formatProtocol(ipProtocolType, "ip")));
     }
 
     private static Optional<String> getIpv4Prefix(AclEntry entry,
@@ -179,6 +188,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 .map(AclEntry::getIpv4)
                 .map(Ipv4::getConfig)
                 .map(mapper)
+                .filter(ip -> !AclEntryLineParser.IPV4_HOST_ANY.equals(ip))
                 .map(Ipv4Prefix::getValue);
     }
 
@@ -206,10 +216,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             ipv6PrefixOptDst.ifPresent(s -> commandVars.put(CommandKey.ACL_DST_ADDR, tryTranslateIpv6ToIpv4InIpv6(s)));
         }
 
-        IpProtocolType ipProtocolType = Optional.ofNullable(entry.getIpv6().getConfig())
+        Optional.ofNullable(entry.getIpv6().getConfig())
                 .map(IpProtocolFieldsCommonConfig::getProtocol)
-                .orElse(null);
-        commandVars.put(CommandKey.ACL_PROTOCOL_IPV6, formatProtocol(ipProtocolType, "ipv6"));
+                .ifPresent(ipProtocolType -> commandVars
+                        .put(CommandKey.ACL_PROTOCOL_IPV6, formatProtocol(ipProtocolType, "ipv6")));
     }
 
     private static String tryTranslateIpv6ToIpv4InIpv6(String ipv6Prefix) {
@@ -237,6 +247,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 .map(AclEntry::getIpv6)
                 .map(Ipv6::getConfig)
                 .map(mapper)
+                .filter(ip -> !AclEntryLineParser.IPV6_HOST_ANY.equals(ip))
                 .map(Ipv6Prefix::getValue);
     }
 
@@ -282,7 +293,9 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     }
 
     private static String formatPort(PortNumRange port) {
-        if (port.getPortNumber() != null) {
+        if (PortNumRange.Enumeration.ANY.getName().equalsIgnoreCase(port.getString())) {
+            return null;
+        } else if (port.getPortNumber() != null) {
             return port.getPortNumber().getValue().toString();
         } else if (port.getString() != null) {
             Matcher matcher = PORT_RANGE_PATTERN.matcher(port.getString());
@@ -290,8 +303,6 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 LOG.warn("Wrong protocol range value: {}", port.getString());
             }
             return port.getString().replace("..", "-");
-        } else if (PortNumRange.Enumeration.ANY.equals(port.getEnumeration())) {
-            return null;
         }
         throw new IllegalArgumentException("Missing port");
     }
@@ -311,11 +322,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         }
     }
 
-    private static String formatProtocol(@Nullable IpProtocolType ipProtocolType, String type) {
-        if (ipProtocolType == null) {
-            return type;
-        }
-
+    private static String formatProtocol(IpProtocolType ipProtocolType, String type) {
         Class<? extends IPPROTOCOL> protocol = ipProtocolType.getIdentityref();
         if (protocol == null) {
             return String.valueOf(ipProtocolType.getUint8());

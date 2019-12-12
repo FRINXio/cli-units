@@ -127,7 +127,7 @@ public class AclEntryLineParserTest {
         return builder.build();
     }
 
-    static Transport defTransport() {
+    private static Transport defTransport() {
         TransportBuilder transportBuilder = new TransportBuilder();
         transportBuilder.setConfig(
                 new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
@@ -166,13 +166,13 @@ public class AclEntryLineParserTest {
 
                 + "set firewall family inet filter inacl1 term 6 from address 0.0.0.0/8\n"
                 + "set firewall family inet filter inacl1 term 6 from port smtp\n"
-                + "set firewall family inet filter inacl1 term 6 from protocol udp\n"
+                + "set firewall family inet filter inacl1 term 6 from protocol ipip\n"
                 + "set firewall family inet filter inacl1 term 6 from ttl 0-10\n"
                 + "set firewall family inet filter inacl1 term 6 then accept\n"
 
                 + "set firewall family inet filter inacl1 term 12 from source-address 1.1.1.1\n"
                 + "set firewall family inet filter inacl1 term 12 from destination-address 0.0.0.0/8\n"
-                + "set firewall family inet filter inacl1 term 12 from protocol udp\n"
+                + "set firewall family inet filter inacl1 term 12 from protocol ipv6\n"
                 + "set firewall family inet filter inacl1 term 12 from source-port www\n"
                 + "set firewall family inet filter inacl1 term 12 from destination-port http\n"
                 + "set firewall family inet filter inacl1 term 12 then accept\n";
@@ -218,6 +218,7 @@ public class AclEntryLineParserTest {
                     .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
             configBuilder.setProtocol(new IpProtocolType(IPTCP.class));
             configBuilder.setSourceAddress(new Ipv4Prefix("1.2.3.4/32"));
+            configBuilder.setDestinationAddress(AclEntryLineParser.IPV4_HOST_ANY);
             TransportBuilder transportBuilder = new TransportBuilder();
             transportBuilder.setConfig(
                     new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
@@ -249,8 +250,7 @@ public class AclEntryLineParserTest {
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields
                     .top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
                     .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
-            configBuilder.setProtocol(new IpProtocolType(IPUDP.class))
-                    .setDestinationAddress(new Ipv4Prefix("0.0.0.0/8"))
+            configBuilder.setDestinationAddress(new Ipv4Prefix("0.0.0.0/8"))
                     .setSourceAddress(new Ipv4Prefix("0.0.0.0/8"))
                     .addAugmentation(Config3.class, new Config3Builder().setHopRange(new HopRange("0..10"))
                         .build())
@@ -273,7 +273,6 @@ public class AclEntryLineParserTest {
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields
                     .top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
                     .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
-            configBuilder.setProtocol(new IpProtocolType(IPUDP.class));
             configBuilder.setSourceAddress(new Ipv4Prefix("1.1.1.1/32"));
             configBuilder.setDestinationAddress(new Ipv4Prefix("0.0.0.0/8"));
             TransportBuilder transportBuilder = new TransportBuilder();
@@ -296,7 +295,7 @@ public class AclEntryLineParserTest {
             String termName = entry.getValue().getConfig().getAugmentation(Config2.class).getTermName();
             List<String> line = AclEntryLineParser.findLinesWithTermName(termName, lines);
             AclEntryBuilder resultBuilder = new AclEntryBuilder();
-            AclEntryLineParser.parseLines(resultBuilder, line, ACLIPV4.class, entry.getValue().getKey());
+            AclEntryLineParser.parseLines(resultBuilder, line, ACLIPV4.class, entry.getValue().getKey(), termName);
             Assert.assertEquals(entry.getValue(), resultBuilder.build());
         }
     }
@@ -304,8 +303,7 @@ public class AclEntryLineParserTest {
     @Test
     public void parseIpv6() {
 
-        String lines = "set firewall family inet6 filter inacl1 term 7 from source-address ::/0\n"
-            + "set firewall family inet6 filter inacl1 term 7 from destination-address ::1/128\n"
+        String lines = "set firewall family inet6 filter inacl1 term 7 from destination-address ::1/128\n"
             + "set firewall family inet6 filter inacl1 term 7 from payload-protocol icmp\n"
             + "set firewall family inet6 filter inacl1 term 7 from icmp-type echo-request\n"
             + "set firewall family inet6 filter inacl1 term 7 from ttl 11-9\n"
@@ -325,7 +323,7 @@ public class AclEntryLineParserTest {
                     .top.ipv6.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
                     .net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
             configBuilder.setProtocol(new IpProtocolType(IPICMP.class));
-            configBuilder.setSourceAddress(new Ipv6Prefix("::/0"));
+            configBuilder.setSourceAddress(AclEntryLineParser.IPV6_HOST_ANY);
             configBuilder.setDestinationAddress(new Ipv6Prefix("::1/128"));
             configBuilder.addAugmentation(Config4.class, new Config4Builder()
                     .setHopRange(new HopRange("11..9"))
@@ -358,7 +356,7 @@ public class AclEntryLineParserTest {
             String termName = entry.getValue().getConfig().getAugmentation(Config2.class).getTermName();
             List<String> line = AclEntryLineParser.findLinesWithTermName(termName, lines);
             AclEntryBuilder resultBuilder = new AclEntryBuilder();
-            AclEntryLineParser.parseLines(resultBuilder, line, ACLIPV6.class, entry.getValue().getKey());
+            AclEntryLineParser.parseLines(resultBuilder, line, ACLIPV6.class, entry.getValue().getKey(), termName);
             Assert.assertEquals(entry.getValue(), resultBuilder.build());
         }
     }
