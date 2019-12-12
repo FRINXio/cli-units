@@ -47,6 +47,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.Ipv6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.Ipv6Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top.TransportBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPPROTOCOL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPUDP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IpProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange;
@@ -55,6 +56,25 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.PortNumber;
 
 public class AclEntryWriterTest {
+
+    @Test
+    public void termNameTest() {
+        AclEntry entry = getAclEntry(1L, "testTerm", null, null, null, 0, null, null, null, null, null, null, false);
+        String termName = AclEntryWriter.getTermName(entry);
+        Assert.assertEquals("testTerm", termName);
+
+        entry = getAclEntry(1L, null, null, null, null, 0, null, null, null, null, null, null, false);
+        termName = AclEntryWriter.getTermName(entry);
+        Assert.assertEquals("1", termName);
+
+        entry = getAclEntry(1L, "(klasd&!", null, null, null, 0, null, null, null, null, null, null, false);
+        termName = AclEntryWriter.getTermName(entry);
+        Assert.assertEquals("\"(klasd&!\"", termName);
+
+        entry = getAclEntry(1L, "haha hah", null, null, null, 0, null, null, null, null, null, null, false);
+        termName = AclEntryWriter.getTermName(entry);
+        Assert.assertEquals("\"haha hah\"", termName);
+    }
 
     @Test
     public void processIpv4() {
@@ -70,15 +90,14 @@ public class AclEntryWriterTest {
         Assert.assertEquals(wanted, commandVars.keySet());
         Assert.assertEquals(values, Sets.newHashSet(commandVars.values()));
 
-        entry = getAclEntry(1L, "testTerm", "2.2.2.3/32", "2.2.2.2/32", IPUDP.class, 8, DROP.class,
+        entry = getAclEntry(1L, "[(?test", "2.2.2.3/32", "2.2.2.2/32", null, 8, DROP.class,
                 null, null, null, null, null, false);
         commandVars = new HashMap<>();
         AclEntryWriter.processIpv4(entry, commandVars);
 
         wanted = Sets.newHashSet(AclEntryWriter.CommandKey.ACL_SRC_ADDR, AclEntryWriter.CommandKey.ACL_DST_ADDR,
-                AclEntryWriter.CommandKey.ACL_ICMP_MSG_TYPE,
-                AclEntryWriter.CommandKey.ACL_PROTOCOL);
-        values = Sets.newHashSet("2.2.2.2/32", "2.2.2.3/32", "8", "udp");
+                AclEntryWriter.CommandKey.ACL_ICMP_MSG_TYPE);
+        values = Sets.newHashSet("2.2.2.2/32", "2.2.2.3/32", "8");
         Assert.assertEquals(wanted, commandVars.keySet());
         Assert.assertEquals(values, Sets.newHashSet(commandVars.values()));
     }
@@ -96,7 +115,7 @@ public class AclEntryWriterTest {
         Assert.assertEquals(wanted, commandVars.keySet());
         Assert.assertEquals(values, Sets.newHashSet(commandVars.values()));
 
-        entry = getAclEntry(1L, "testTerm", "2.2.2.2/32", "2.2.2.2/32", IPUDP.class, 8, DROP.class, null, null,
+        entry = getAclEntry(1L, "[(?test", "2.2.2.2/32", "2.2.2.2/32", IPUDP.class, 8, DROP.class, null, null,
                 "ftp", "ftp", null, false);
         commandVars = new HashMap<>();
         AclEntryWriter.processTransport(entry, commandVars);
@@ -109,7 +128,7 @@ public class AclEntryWriterTest {
 
     @Test
     public void processAction() {
-        AclEntry entry = getAclEntry(1L, "testTerm", "2.2.2.2/32", "2.2.2.2/32", IPUDP.class, 8, DROP.class,
+        AclEntry entry = getAclEntry(2L, "testTerm", "2.2.2.2/32", "2.2.2.2/32", IPUDP.class, 8, DROP.class,
                 new PortNumRange(new PortNumber(9)), new PortNumRange("4..8"), null, null, null, false);
         HashMap<AclEntryWriter.CommandKey, String> commandVars = new HashMap<>();
         AclEntryWriter.processActions(entry, commandVars);
@@ -130,10 +149,11 @@ public class AclEntryWriterTest {
         Assert.assertEquals(values, Sets.newHashSet(commandVars.values()));
     }
 
-    private AclEntry getAclEntry(long id, String termName, String dstAddr, String srcAddr, Class<IPUDP> protocol,
-                                 int icmpMsg, Class<? extends FORWARDINGACTION> action, PortNumRange dstPort,
-                                 PortNumRange srcPort, String dstNamedPort, String srcNamedPort, String hop,
-                                 boolean isIpv6) {
+    private AclEntry getAclEntry(long id, String termName, String dstAddr, String srcAddr,
+                                 Class<? extends IPPROTOCOL> protocol, int icmpMsg,
+                                 Class<? extends FORWARDINGACTION> action, PortNumRange dstPort,
+                                 PortNumRange srcPort, String dstNamedPort, String srcNamedPort,
+                                 String hop, boolean isIpv6) {
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top
                 .transport.ConfigBuilder transport = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
                 .header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
@@ -168,9 +188,9 @@ public class AclEntryWriterTest {
             build6 = new Ipv6Builder()
                     .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215
                             .ipv6.protocol.fields.top.ipv6.ConfigBuilder()
-                            .setDestinationAddress(new Ipv6Prefix(dstAddr))
-                            .setSourceAddress(new Ipv6Prefix(srcAddr))
-                            .setProtocol(new IpProtocolType(protocol))
+                            .setDestinationAddress(dstAddr == null ? null : new Ipv6Prefix(dstAddr))
+                            .setSourceAddress(srcAddr == null ? null : new Ipv6Prefix(srcAddr))
+                            .setProtocol(protocol == null ? null : new IpProtocolType(protocol))
                             .build())
                     .build();
         } else {
@@ -182,20 +202,23 @@ public class AclEntryWriterTest {
             }
             build = new Ipv4Builder()
                     .setConfig(configBuilder
-                            .setDestinationAddress(new Ipv4Prefix(dstAddr))
-                            .setSourceAddress(new Ipv4Prefix(srcAddr))
-                            .setProtocol(new IpProtocolType(protocol))
+                            .setDestinationAddress(dstAddr == null ? null : new Ipv4Prefix(dstAddr))
+                            .setSourceAddress(srcAddr == null ? null : new Ipv4Prefix(srcAddr))
+                            .setProtocol(protocol == null ? null : new IpProtocolType(protocol))
                             .build())
                     .build();
         }
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries
+                .acl.entry.ConfigBuilder termConfig = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                .acl.rev170526.access.list.entries.top.acl.entries.acl.entry.ConfigBuilder();
+        termConfig.setSequenceId(id);
+        if (termName != null) {
+            termConfig.addAugmentation(Config2.class, new Config2Builder()
+                    .setTermName(termName)
+                    .build());
+        }
         return new AclEntryBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list
-                        .entries.top.acl.entries.acl.entry.ConfigBuilder()
-                        .setSequenceId(id)
-                        .addAugmentation(Config2.class, new Config2Builder()
-                                .setTermName(termName)
-                                .build())
-                        .build())
+                .setConfig(termConfig.build())
                 .setKey(new AclEntryKey(id))
                 .setIpv4(build)
                 .setIpv6(build6)

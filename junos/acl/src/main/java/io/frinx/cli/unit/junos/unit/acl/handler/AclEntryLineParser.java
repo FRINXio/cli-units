@@ -30,6 +30,7 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -73,36 +74,45 @@ import org.slf4j.LoggerFactory;
 
 final class AclEntryLineParser {
     private static final Logger LOG = LoggerFactory.getLogger(AclEntryLineParser.class);
+    static final Ipv4Prefix IPV4_HOST_ANY = new Ipv4Prefix("0.0.0.0/0");
+    static final Ipv6Prefix IPV6_HOST_ANY = new Ipv6Prefix("::/0");
     private static final IpProtocolType IP_PROTOCOL_ICMP = new IpProtocolType(IPICMP.class);
     private static final IpProtocolType IP_PROTOCOL_ICMP_NUMBER = new IpProtocolType((short) 1);
     private static final IpProtocolType IP_PROTOCOL_TCP = new IpProtocolType(IPTCP.class);
     private static final IpProtocolType IP_PROTOCOL_UDP = new IpProtocolType(IPUDP.class);
     private static final Pattern ZERO_TO_255_PATTERN = Pattern.compile("^2[0-5][0-5]|2[0-4][0-9]|1?[0-9]?[0-9]$");
+    private static final String ESCAPE_REGEX_CHARS = "\"-\\^$+*?.()|[]{}";
 
     private AclEntryLineParser() {
 
     }
 
     static List<String> findLinesWithTermName(String termName, String lines) {
-        Pattern pattern = Pattern.compile("\\s* term (?<conf>" + termName + " .*)$", Pattern.MULTILINE);
+        termName = termName.contains("\"")
+                ? Stream.of(termName.split(""))
+                        .map(s -> ESCAPE_REGEX_CHARS.contains(s) ? "\\" + s : s)
+                        .collect(Collectors.joining()) : termName;
+        Pattern pattern = Pattern.compile("\\s* term " + termName + " (?<config>(then|from) .+)$", Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(lines);
         List<String> maybeLines = Lists.newArrayList();
         while (matcher.find()) {
-            maybeLines.add(matcher.group("conf"));
+            maybeLines.add(matcher.group("config"));
         }
         return maybeLines;
     }
 
     static void parseLines(final AclEntryBuilder builder, List<String> lines,
-                           Class<? extends ACLTYPE> aclType, AclEntryKey entryKey) {
+                           Class<? extends ACLTYPE> aclType, AclEntryKey entryKey, String termName) {
 
         Preconditions.checkArgument(ACLIPV4.class.equals(aclType) || ACLIPV6.class.equals(aclType),
                 "Unsupported ACL type" + aclType);
 
+        parseTermName(builder, entryKey, termName);
+
         if (ACLIPV4.class.equals(aclType)) {
-            parseIpv4line(builder, lines, entryKey);
+            parseIpv4line(builder, lines);
         } else if (ACLIPV6.class.equals(aclType)) {
-            parseIpv6line(builder, lines, entryKey);
+            parseIpv6line(builder, lines);
         }
     }
 
@@ -111,7 +121,7 @@ final class AclEntryLineParser {
         builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list
                 .entries.top.acl.entries.acl.entry.ConfigBuilder()
                 .setSequenceId(entryKey.getSequenceId())
-                .addAugmentation(Config2.class, new Config2Builder().setTermName(termName).build())
+                .addAugmentation(Config2.class, new Config2Builder().setTermName(termName.replace("\"", "")).build())
                 .build()
         );
     }
@@ -132,10 +142,12 @@ final class AclEntryLineParser {
         }
     }
 
-    private static void parseIpv4line(AclEntryBuilder builder, List<String> lines, AclEntryKey entryKey) {
+    private static void parseIpv4line(AclEntryBuilder builder, List<String> lines) {
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top
                 .ipv4.ConfigBuilder ipv4ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
                 .openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
+        ipv4ProtocolFieldsConfigBuilder.setSourceAddress(IPV4_HOST_ANY);
+        ipv4ProtocolFieldsConfigBuilder.setDestinationAddress(IPV4_HOST_ANY);
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top
                 .transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
                 .openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
@@ -149,7 +161,6 @@ final class AclEntryLineParser {
         AclEntry1 icmpMsg;
         for (String line : from) {
             Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
-            parseTermName(builder, entryKey, words.poll());
             //remove from
             words.poll();
 
@@ -208,7 +219,6 @@ final class AclEntryLineParser {
         for (String line : then) {
             Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
             words.poll();
-            words.poll();
             // fwd action
             Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
             builder.setActions(createActions(fwdAction));
@@ -250,11 +260,12 @@ final class AclEntryLineParser {
         return null;
     }
 
-    private static void parseIpv6line(AclEntryBuilder builder, List<String> lines, AclEntryKey entryKey) {
-
+    private static void parseIpv6line(AclEntryBuilder builder, List<String> lines) {
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top
                 .ipv6.ConfigBuilder ipv6ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
                 .openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
+        ipv6ProtocolFieldsConfigBuilder.setSourceAddress(IPV6_HOST_ANY);
+        ipv6ProtocolFieldsConfigBuilder.setDestinationAddress(IPV6_HOST_ANY);
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top
                 .transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
                 .openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
@@ -268,7 +279,6 @@ final class AclEntryLineParser {
         AclEntry1 icmpMsg;
         for (String line : from) {
             Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
-            parseTermName(builder, entryKey, words.poll());
             //remove from
             words.poll();
 
@@ -337,7 +347,6 @@ final class AclEntryLineParser {
 
         for (String line : then) {
             Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
-            words.poll();
             words.poll();
             // fwd action
             Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
@@ -444,7 +453,7 @@ final class AclEntryLineParser {
     @Nullable
     private static IpProtocolType parseProtocol(String protocol) {
         switch (protocol) {
-            case "ip":
+            case "ipip":
             case "ipv6":
                 LOG.debug("Skipping IP protocol {}", protocol);
                 return null;
@@ -453,7 +462,7 @@ final class AclEntryLineParser {
             case "tcp":
                 return IP_PROTOCOL_TCP;
             case "icmp":
-            case "icmpv6":
+            case "icmp6":
                 return IP_PROTOCOL_ICMP;
             default:
                 if (NumberUtils.isParsable(protocol)) {

@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey, AclEntryBuilder> {
 
     private static final String SH_FIREWALL = "show configuration firewall family %s filter %s | display set";
-    private static final Pattern TERM_PATTERN = Pattern.compile(".*term (?<termName>\\S+).*");
+    private static final Pattern TERM_PATTERN = Pattern.compile(".*term (?<termName>(\".+\"|\\S+)) .*");
 
     private static ImmutableMap<Long, String> sequenceTermMap;
     private final Cli cli;
@@ -94,6 +94,7 @@ public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey
         List<String> maybeLine = AclEntryLineParser
                 .findLinesWithTermName(sequenceTermMap.get(entryKey.getSequenceId()), output);
 
-        AclEntryLineParser.parseLines(aclEntryBuilder, maybeLine, aclSetKey.getType(), entryKey);
+        AclEntryLineParser.parseLines(aclEntryBuilder, maybeLine, aclSetKey.getType(), entryKey,
+                sequenceTermMap.get(entryKey.getSequenceId()));
     }
 }
