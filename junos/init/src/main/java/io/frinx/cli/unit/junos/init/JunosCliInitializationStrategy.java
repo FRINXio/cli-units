@@ -19,7 +19,6 @@ package io.frinx.cli.unit.junos.init;
 import com.google.common.base.Preconditions;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
-import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
 import io.frinx.cli.io.SessionInitializationStrategy;
@@ -59,20 +58,17 @@ public class JunosCliInitializationStrategy implements SessionInitializationStra
     private static final Predicate<String> IS_CONFIGURATION_PROMPT =
         s -> s.endsWith(CONFIG_PROMPT_SUFFIX) && !IS_SHELL_PROMPT.test(s);
 
-    private static final PromptResolutionStrategy PROMPT_RESOLUTION_STRATEGY =
-        JunosPromptResolutionStrategy.getInstance();
-
     @Override
     public void accept(Session session, String newline) {
         try {
-            String initialPrompt = PROMPT_RESOLUTION_STRATEGY.resolvePrompt(session, newline).trim();
+            String initialPrompt = JunosPromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
 
             if (IS_SHELL_PROMPT.test(initialPrompt)) {
                 // enable cli mode
                 tryToEnterCliMode(session, newline);
             }
 
-            String prompt = PROMPT_RESOLUTION_STRATEGY.resolvePrompt(session, newline).trim();
+            String prompt = JunosPromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
 
             Preconditions.checkState(IS_PRIVELEGE_PROMPT.test(prompt),
                     "%s: Junos cli session initialization failed to enter cli mode. Current prompt: %s",
