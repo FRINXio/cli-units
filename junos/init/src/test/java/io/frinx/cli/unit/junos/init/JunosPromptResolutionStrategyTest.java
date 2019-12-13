@@ -67,7 +67,7 @@ public class JunosPromptResolutionStrategyTest {
     @Mock
     private CompletableFuture future;
 
-    private PromptResolutionStrategy target = JunosPromptResolutionStrategy.getInstance();
+    private PromptResolutionStrategy target = JunosPromptResolutionStrategy.ENTER_AND_READ;
 
     private final String newline = "\n";
 
