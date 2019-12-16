@@ -52,9 +52,6 @@ public class JunosCliInitializerUnit extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(JunosCliInitializerUnit.class);
 
-    private static final PromptResolutionStrategy PROMPT_RESOLUTION_STRATEGY =
-        JunosPromptResolutionStrategy.getInstance();
-
     private static JunosCliInitializationStrategy INITIALIZER = new JunosCliInitializationStrategy();
 
     public JunosCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
@@ -177,6 +174,6 @@ public class JunosCliInitializerUnit extends AbstractUnit {
 
     @Override
     public PromptResolutionStrategy getPromptResolver() {
-        return PROMPT_RESOLUTION_STRATEGY;
+        return JunosPromptResolutionStrategy.ENTER_AND_READ;
     }
 }

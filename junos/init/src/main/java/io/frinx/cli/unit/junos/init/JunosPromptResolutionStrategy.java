@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.junos.init;
 
 import io.frinx.cli.io.PromptResolutionStrategy;
-import io.frinx.cli.io.Session;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -26,30 +25,19 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class JunosPromptResolutionStrategy implements PromptResolutionStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(JunosPromptResolutionStrategy.class);
+public interface JunosPromptResolutionStrategy extends PromptResolutionStrategy {
+    Logger LOG = LoggerFactory.getLogger(JunosPromptResolutionStrategy.class);
 
-    private static final int INITIAL_TIME_TO_WAIT = 1;
+    int INITIAL_TIME_TO_WAIT = 1;
 
-    private static final Pattern JUNOS_GUIDANCE_PATTERN =
-            Pattern.compile("^(\\{(master|backup)(:\\d)?})?(\\[edit.*])?$");
-
-    private static final PromptResolutionStrategy DEFAULT_INSTANCE = new JunosPromptResolutionStrategy();
-
-    private JunosPromptResolutionStrategy() {
-    }
-
-    public static PromptResolutionStrategy getInstance() {
-        return DEFAULT_INSTANCE;
-    }
+    Pattern JUNOS_GUIDANCE_PATTERN = Pattern.compile("^(\\{(master|backup)(:\\d)?})?(\\[edit.*])?$");
 
     /**
      * Simple resolution strategy writing newline and expecting a prompt to be printed.<br>
      * In configuration mode of Junos, it need to exclude a line of guidance from output.
      */
-    @Override
     @SuppressWarnings({"IllegalCatch", "ConstantName"})
-    public String resolvePrompt(Session session, String newline) {
+    JunosPromptResolutionStrategy ENTER_AND_READ = (session, newline) -> {
         int waitTime = INITIAL_TIME_TO_WAIT;
         String lastRead = "";
 
@@ -79,5 +67,5 @@ public final class JunosPromptResolutionStrategy implements PromptResolutionStra
             throw new IllegalStateException(session + ": Unable to parse prompt in " + waitTime
                 + " attempts, last output from device: " + lastRead, e);
         }
-    }
+    };
 }
