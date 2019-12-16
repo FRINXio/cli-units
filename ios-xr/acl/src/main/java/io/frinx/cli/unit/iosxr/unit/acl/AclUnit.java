@@ -79,16 +79,6 @@ public class AclUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.AC_IN_INTERFACE);
         writeRegistry.addNoop(IIDs.AC_IN_IN_CONFIG);
 
-        // ingress
-        writeRegistry.addNoop(IIDs.AC_IN_IN_IN_INGRESSACLSET);
-        writeRegistry.addAfter(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli),
-            io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
-
-        // egress
-        writeRegistry.addNoop(IIDs.AC_IN_IN_EG_EGRESSACLSET);
-        writeRegistry.addAfter(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigWriter(cli),
-            io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
-
         writeRegistry.addNoop(IIDs.AC_ACLSETS);
         writeRegistry.addNoop(IIDs.AC_AC_ACLSET);
         writeRegistry.addNoop(IIDs.AC_AC_AC_CONFIG);
@@ -121,6 +111,16 @@ public class AclUnit extends AbstractUnit {
                 IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1,
                 IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_ICMP,
                 IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG));
+
+        // ingress
+        writeRegistry.addNoop(IIDs.AC_IN_IN_IN_INGRESSACLSET);
+        writeRegistry.addAfter(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli),
+                io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
+
+        // egress
+        writeRegistry.addNoop(IIDs.AC_IN_IN_EG_EGRESSACLSET);
+        writeRegistry.addAfter(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigWriter(cli),
+                io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
