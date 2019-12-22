@@ -19,16 +19,16 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.12.rc4-frinx</version>
+        <version>3.1.12.rc5-frinx-SNAPSHOT</version>
         <relativePath>../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>it</artifactId>
-    <version>3.1.12.rc4-frinx</version>
+    <version>3.1.12.rc5-frinx-SNAPSHOT</version>
 
     <properties>
-        <cli.version>3.1.12.rc4-frinx</cli.version>
+        <cli.version>3.1.12.rc5-frinx-SNAPSHOT</cli.version>
         <yangtools.version>1.1.1-Carbon-SR1.3_1_12_rc5-frinxodl-SNAPSHOT</yangtools.version>
     </properties>
 
