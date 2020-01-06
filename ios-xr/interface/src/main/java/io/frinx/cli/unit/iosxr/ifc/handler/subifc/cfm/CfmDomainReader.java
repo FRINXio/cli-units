@@ -66,6 +66,10 @@ public class CfmDomainReader implements CliConfigListReader<Domain, DomainKey, D
         String ifcName = Util.getSubinterfaceName(id);
         String domain = id.firstKeyOf(Domain.class).getDomainName();
         builder.setDomainName(domain);
+        builder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.oam.rev190619
+            .ethernet.cfm._interface.cfm.domains.domain.ConfigBuilder()
+            .setDomainName(domain)
+            .build());
 
         String output = blockingRead(f(SH_INTERFACE_CFM, ifcName), cli, id, readContext);
         parseDomainLine(output, domain, builder);
