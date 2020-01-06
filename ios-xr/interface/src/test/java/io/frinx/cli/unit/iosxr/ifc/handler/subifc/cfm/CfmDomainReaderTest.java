@@ -112,6 +112,7 @@ public class CfmDomainReaderTest {
         target.readCurrentAttributes(dml1, builder, ctx);
 
         Assert.assertEquals(builder.getDomainName(), "DML1");
+        Assert.assertEquals(builder.getConfig().getDomainName(), "DML1");
         Assert.assertEquals(builder.getMep().getConfig().getMaName(), "502");
         Assert.assertEquals(builder.getMep().getConfig().getMepId(), Integer.valueOf(1));
         Assert.assertEquals(builder.getMep().getConfig().getCos(), Short.valueOf("6"));
@@ -119,6 +120,7 @@ public class CfmDomainReaderTest {
         builder = new DomainBuilder();
         target.readCurrentAttributes(dml2, builder, ctx);
         Assert.assertEquals(builder.getDomainName(), "DML2");
+        Assert.assertEquals(builder.getConfig().getDomainName(), "DML2");
         Assert.assertEquals(builder.getMep().getConfig().getMaName(), "503");
         Assert.assertEquals(builder.getMep().getConfig().getMepId(), Integer.valueOf(2));
         Assert.assertEquals(builder.getMep().getConfig().getCos(), Short.valueOf("3"));
@@ -126,6 +128,7 @@ public class CfmDomainReaderTest {
         builder = new DomainBuilder();
         target.readCurrentAttributes(dml3, builder, ctx);
         Assert.assertEquals(builder.getDomainName(), "DML3");
+        Assert.assertEquals(builder.getConfig().getDomainName(), "DML3");
         Assert.assertEquals(builder.getMep().getConfig().getMaName(), "504");
         Assert.assertEquals(builder.getMep().getConfig().getMepId(), Integer.valueOf(3));
         Assert.assertNull(builder.getMep().getConfig().getCos());
