@@ -99,7 +99,8 @@ public class IosCliInitializerUnit extends AbstractUnit {
         return Sets.newLinkedHashSet(Arrays.asList(
                 Pattern.compile("(^|\\n)^\\s+\\^.*", Pattern.DOTALL),
                 Pattern.compile("(^|\\n)% (?i)invalid input(?-i).*", Pattern.DOTALL),
-                Pattern.compile("(^|\\n)% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
+                Pattern.compile("(^|\\n)% (?i)Incomplete command(?-i).*", Pattern.DOTALL),
+                Pattern.compile("% .* overlaps with \\w")
         ));
     }
 
