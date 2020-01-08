@@ -40,6 +40,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.FORWARDINGACTION;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.acl.entry.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.action.top.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.Ipv4Builder;
@@ -144,7 +145,6 @@ public class AclEntryLineParserTest {
                 + "set firewall family inet filter inacl1 term 1 from source-address 0.0.0.2/32\n"
                 + "set firewall family inet filter inacl1 term 1 from destination-address 0.0.0.254/32\n"
                 + "set firewall family inet filter inacl1 term 1 from ttl 70-80\n"
-                + "set firewall family inet filter inacl1 term 1 from source-port http\n"
                 + "set firewall family inet filter inacl1 term 1 from source-port ftp\n"
                 + "set firewall family inet filter inacl1 term 1 then discard\n"
 
@@ -359,5 +359,79 @@ public class AclEntryLineParserTest {
             AclEntryLineParser.parseLines(resultBuilder, line, ACLIPV6.class, entry.getValue().getKey(), termName);
             Assert.assertEquals(entry.getValue(), resultBuilder.build());
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUnsupportedIpv4AclWithMultSourceAddresses() {
+        final String lines = "Mon May 14 14:36:55.408 UTC\n"
+                + "set firewall family inet filter inacl1 term 1 from source-address 0.0.0.2/32\n"
+                + "set firewall family inet filter inacl1 term 1 from source-address 1.2.3.4/32\n"
+                + "set firewall family inet filter inacl1 term 1 from destination-address 0.0.0.254/32\n"
+                + "set firewall family inet filter inacl1 term 1 from ttl 70-80\n"
+                + "set firewall family inet filter inacl1 term 1 from source-port ftp\n"
+                + "set firewall family inet filter inacl1 term 1 then discard\n";
+        final String termName = "1";
+
+        List<String> line = AclEntryLineParser.findLinesWithTermName(termName, lines);
+        AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLines(resultBuilder, line, ACLIPV4.class, new AclEntryKey(1L), termName);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUnsupportedIpv4AclWithMultSourcePorts() {
+        final String lines = "Mon May 14 14:36:55.408 UTC\n"
+                + "set firewall family inet filter inacl1 term 1 from source-address 0.0.0.2/32\n"
+                + "set firewall family inet filter inacl1 term 1 from source-port ftp\n"
+                + "set firewall family inet filter inacl1 term 1 from source-port 123\n"
+                + "set firewall family inet filter inacl1 term 1 then discard\n";
+        final String termName = "1";
+
+        List<String> line = AclEntryLineParser.findLinesWithTermName(termName, lines);
+        AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLines(resultBuilder, line, ACLIPV4.class, new AclEntryKey(1L), termName);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUnsupportedIpv6AclWithMultDestinationPorts() {
+        final String lines = "Mon May 14 14:36:55.408 UTC\n"
+                + "set firewall family inet filter inacl1 term 1 from destination-address ::1/128\n"
+                + "set firewall family inet filter inacl1 term 1 from destination-port 122\n"
+                + "set firewall family inet filter inacl1 term 1 from destination-port 123\n"
+                + "set firewall family inet filter inacl1 term 1 then discard\n";
+        final String termName = "1";
+
+        List<String> line = AclEntryLineParser.findLinesWithTermName(termName, lines);
+        AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLines(resultBuilder, line, ACLIPV6.class, new AclEntryKey(1L), termName);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUnsupportedIpv6AclWithMultProtocols() {
+        final String lines = "Mon May 14 14:36:55.408 UTC\n"
+                + "set firewall family inet filter inacl1 term 1 from destination-address ::1/128\n"
+                + "set firewall family inet filter inacl1 term 1 from destination-port 122\n"
+                + "set firewall family inet filter inacl1 term 1 from payload-protocol udp\n"
+                + "set firewall family inet filter inacl1 term 1 from payload-protocol tcp\n"
+                + "set firewall family inet filter inacl1 term 1 then discard\n";
+        final String termName = "1";
+
+        List<String> line = AclEntryLineParser.findLinesWithTermName(termName, lines);
+        AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLines(resultBuilder, line, ACLIPV6.class, new AclEntryKey(1L), termName);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUnsupportedIpv6AclWithUnknownOption() {
+        final String lines = "Mon May 14 14:36:55.408 UTC\n"
+                + "set firewall family inet filter inacl1 term 1 from destination-address 10.10.10.10\n"
+                + "set firewall family inet filter inacl1 term 1 from destination-port 22\n"
+                + "set firewall family inet filter inacl1 term 1 from protocol tcp\n"
+                + "set firewall family inet filter inacl1 term 1 from dscp cs3\n"
+                + "set firewall family inet filter inacl1 term 1 then accept\n";
+        final String termName = "1";
+
+        List<String> line = AclEntryLineParser.findLinesWithTermName(termName, lines);
+        AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLines(resultBuilder, line, ACLIPV4.class, new AclEntryKey(1L), termName);
     }
 }

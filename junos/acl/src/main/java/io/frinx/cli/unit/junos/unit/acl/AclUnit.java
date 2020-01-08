@@ -23,11 +23,9 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.junos.init.JunosDevices;
 import io.frinx.cli.unit.junos.unit.acl.handler.AclEntriesWriter;
-import io.frinx.cli.unit.junos.unit.acl.handler.AclEntryReader;
 import io.frinx.cli.unit.junos.unit.acl.handler.AclInterfaceConfigReader;
 import io.frinx.cli.unit.junos.unit.acl.handler.AclInterfaceReader;
 import io.frinx.cli.unit.junos.unit.acl.handler.AclInterfaceWriter;
-import io.frinx.cli.unit.junos.unit.acl.handler.AclSetConfigReader;
 import io.frinx.cli.unit.junos.unit.acl.handler.AclSetConfigWriter;
 import io.frinx.cli.unit.junos.unit.acl.handler.AclSetReader;
 import io.frinx.cli.unit.junos.unit.acl.handler.EgressAclSetConfigReader;
@@ -136,14 +134,12 @@ public class AclUnit extends AbstractUnit {
         readRegistry.add(IIDs.AC_IN_IN_EG_EGRESSACLSET, new EgressAclSetReader(cli));
         readRegistry.add(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigReader());
 
-        // sets
-        readRegistry.add(IIDs.AC_AC_ACLSET, new AclSetReader(cli));
-        // acl-set/config
-        readRegistry.add(IIDs.AC_AC_AC_CONFIG, new AclSetConfigReader());
+        // ACL sets with ACL configs and ACL entries
+        readRegistry.subtreeAdd(IIDs.AC_AC_ACLSET, new AclSetReader(cli),
+                Sets.newHashSet(IIDs.AC_AC_ACLSET,
+                        IIDs.AC_AC_AC_CONFIG,
 
-        // ACL Entry subtree
-        readRegistry.subtreeAdd(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryReader(cli),
-                Sets.newHashSet(IIDs.AC_AC_AC_AC_AC_CONFIG,
+                        IIDs.AC_AC_AC_AC_AC_CONFIG,
                         IIDs.AC_AC_AC_AC_AC_ACTIONS,
                         IIDs.AC_AC_AC_AC_AC_AC_CONFIG,
 
