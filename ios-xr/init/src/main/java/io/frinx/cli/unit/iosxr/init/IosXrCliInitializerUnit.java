@@ -39,7 +39,9 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -59,15 +61,19 @@ import org.slf4j.LoggerFactory;
  */
 public class IosXrCliInitializerUnit extends AbstractUnit {
 
+    private static final Command CONFIG_COMMAND = Command.writeCommand("configure terminal");
+    private static final String CONFIG_PROMPT_SUFFIX = "(config)#";
+    private static final Predicate<String> IS_CONFIGURATION_PROMPT = s -> s.endsWith(CONFIG_PROMPT_SUFFIX);
     private static final Logger LOG = LoggerFactory.getLogger(IosXrCliInitializerUnit.class);
 
     private static final Command ABORT = Command.writeCommand("abort");
+    private static final Command END_COMMAND = Command.writeCommand("end");
+    private static final Predicate<String> IS_PRIVELEGE_PROMPT =
+        s -> s.endsWith(IosXrCliInitializer.PRIVILEGED_PROMPT_SUFFIX) && !s
+        .endsWith(CONFIG_PROMPT_SUFFIX);
 
     @VisibleForTesting
     static final Command SH_CONF_FAILED = Command.showCommandNoCaching("show configuration failed inheritance");
-
-    private IosXrCliInitializer initializer;
-    private RemoteDeviceId deviceId;
 
     public IosXrCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
         super(registry);
@@ -76,7 +82,6 @@ public class IosXrCliInitializerUnit extends AbstractUnit {
     @Override
     protected Set<Device> getSupportedVersions() {
         return Collections.singleton(IosXrDevices.IOS_XR_GENERIC);
-
     }
 
     @Override
@@ -92,9 +97,7 @@ public class IosXrCliInitializerUnit extends AbstractUnit {
     @Override
     public SessionInitializationStrategy getInitializer(@Nonnull final RemoteDeviceId id,
                                                         @Nonnull final CliNode cliNodeConfiguration) {
-        this.deviceId = id;
-        this.initializer = new IosXrCliInitializer(cliNodeConfiguration, id);
-        return initializer;
+        return new IosXrCliInitializer(cliNodeConfiguration, id);
     }
 
     @Override
@@ -108,12 +111,12 @@ public class IosXrCliInitializerUnit extends AbstractUnit {
     @Override
     public PreCommitHook getPreCommitHook(Context context) {
         return () -> {
+            Cli cli = context.getTransport();
             try {
-                Cli cli = context.getTransport();
-                initializer.tryToEnterConfigurationMode(cli);
+                tryToEnterConfigurationMode(cli, cli.getDeviceId());
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                LOG.warn("{}: Unable to enter configuration mode", deviceId, e);
-                throw new IllegalStateException(deviceId + ": Unable to enter configuration mode", e);
+                LOG.warn("{}: Unable to enter configuration mode", cli.getDeviceId(), e);
+                throw new IllegalStateException(cli.getDeviceId() + ": Unable to enter configuration mode", e);
             }
         };
     }
@@ -122,30 +125,30 @@ public class IosXrCliInitializerUnit extends AbstractUnit {
     @SuppressWarnings({"IllegalCatch", "AvoidHidingCauseException"})
     public PostCommitHook getCommitHook(Context context, Set<Pattern> errorCommitPatterns) {
         return () -> {
+            Cli cli = context.getTransport();
             try {
-                Cli cli = context.getTransport();
                 try {
                     final Command commit = Command.writeCommandCustomChecks("commit", errorCommitPatterns);
                     cli.executeAndRead(commit)
                             .toCompletableFuture()
                             .get();
-                    LOG.debug("{}: Commit successful", deviceId);
+                    LOG.debug("{}: Commit successful", cli.getDeviceId());
                     try {
-                        initializer.tryToExitConfigurationMode(cli);
+                        tryToExitConfigurationMode(cli, cli.getDeviceId());
                     } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                        LOG.warn("{}: Unable to exit configuration mode", deviceId, e);
-                        throw new IllegalStateException(deviceId + ": Unable to exit configuration mode", e);
+                        LOG.warn("{}: Unable to exit configuration mode", cli.getDeviceId(), e);
+                        throw new IllegalStateException(cli.getDeviceId() + ": Unable to exit configuration mode", e);
                     }
                 } catch (Exception e) {
-                    LOG.warn("{}: Commit failed", deviceId);
+                    LOG.warn("{}: Commit failed", cli.getDeviceId());
                     String reason = cli.executeAndRead(SH_CONF_FAILED)
                             .toCompletableFuture()
                             .get();
-                    LOG.warn("{}: Reason of commit failure - {}", deviceId, reason);
+                    LOG.warn("{}: Reason of commit failure - {}", cli.getDeviceId(), reason);
                     throw new CommitFailedException(reason);
                 }
             } catch (InterruptedException | ExecutionException e) {
-                LOG.warn("{}: Sending commit failed. Reason: {}", deviceId, e.getMessage(), e);
+                LOG.warn("{}: Sending commit failed. Reason: {}", cli.getDeviceId(), e.getMessage(), e);
             }
         };
     }
@@ -157,22 +160,39 @@ public class IosXrCliInitializerUnit extends AbstractUnit {
             String message = Optional.ofNullable(causingException)
                     .map(this::getBottomErrorMessage)
                     .orElse("Unknown reason.");
-            LOG.warn("{}: Configuration failed: {}", deviceId, message);
+            LOG.warn("{}: Configuration failed: {}", cli.getDeviceId(), message);
 
             try {
                 // if this execution fails, the return to config mode was unsuccessful
                 // the check if we are again in config mode is done automatically, so if no exception
                 // is thrown, consider this as a success
-                cli.executeAndSwitchPrompt(ABORT, IosXrCliInitializer.IS_PRIVELEGE_PROMPT)
+                cli.executeAndSwitchPrompt(ABORT, IS_PRIVELEGE_PROMPT)
                         .toCompletableFuture()
                         .get();
-                LOG.debug("{}: Revert successful.", deviceId);
+                LOG.debug("{}: Revert successful.", cli.getDeviceId());
                 throw new RevertSuccessException(message);
             } catch (InterruptedException | ExecutionException e) {
-                LOG.warn("{}: Failed to abort commit. Reason: {}", deviceId, e.getMessage(), e);
+                LOG.warn("{}: Failed to abort commit. Reason: {}", cli.getDeviceId(), e.getMessage(), e);
                 throw new RevertFailedException(e);
             }
         };
+    }
+
+
+    private static void tryToEnterConfigurationMode(Cli cli, final String id)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        LOG.debug("Entering configuration mode on {}.", id);
+        cli.executeAndSwitchPrompt(CONFIG_COMMAND, IS_CONFIGURATION_PROMPT)
+                .toCompletableFuture()
+                .get(IosXrCliInitializer.WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+    }
+
+    private static void tryToExitConfigurationMode(Cli cli, final String id)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        LOG.debug("Exiting configuration mode on {}.", id);
+        cli.executeAndSwitchPrompt(END_COMMAND, IS_PRIVELEGE_PROMPT)
+                .toCompletableFuture()
+                .get(IosXrCliInitializer.WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     private @Nullable

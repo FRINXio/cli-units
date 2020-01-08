@@ -17,8 +17,6 @@
 package io.frinx.cli.unit.iosxr.init;
 
 import com.google.common.base.Preconditions;
-import io.frinx.cli.io.Cli;
-import io.frinx.cli.io.Command;
 import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
@@ -27,7 +25,6 @@ import io.frinx.cli.topology.RemoteDeviceId;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.PrivilegedModeCredentials;
@@ -43,23 +40,18 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
 
     private static final Logger LOG = LoggerFactory.getLogger(IosXrCliInitializer.class);
     private static final String PASSWORD_PROMPT = "Password:";
-    private static final String PRIVILEGED_PROMPT_SUFFIX = "#";
     private static final String ENABLE_COMMAND = "enable";
-    private static final String CONFIG_PROMPT_SUFFIX = "(config)#";
-    private static final Command CONFIG_COMMAND = Command.writeCommand("configure terminal");
-    private static final Command END_COMMAND = Command.writeCommand("end");
     private static final String SET_TERMINAL_LENGTH_COMMAND = "terminal length 0";
     private static final String SET_TERMINAL_WIDTH_COMMAND = "terminal width 0";
-    private static final int WRITE_TIMEOUT_SECONDS = 10;
     private static final int READ_TIMEOUT_SECONDS = 1;
-    public static final Predicate<String> IS_CONFIGURATION_PROMPT = s -> s.endsWith(CONFIG_PROMPT_SUFFIX);
-    public static final Predicate<String> IS_PRIVELEGE_PROMPT = s -> s.endsWith(PRIVILEGED_PROMPT_SUFFIX) && !s
-            .endsWith(CONFIG_PROMPT_SUFFIX);
+
+    static final String PRIVILEGED_PROMPT_SUFFIX = "#";
+    static final int WRITE_TIMEOUT_SECONDS = 10;
 
     private final CliNode context;
     private final RemoteDeviceId id;
 
-    public IosXrCliInitializer(CliNode context, RemoteDeviceId id) {
+    IosXrCliInitializer(CliNode context, RemoteDeviceId id) {
         this.context = context;
         this.id = id;
     }
@@ -153,23 +145,7 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
         }
     }
 
-    void tryToEnterConfigurationMode(Cli cli)
-            throws InterruptedException, ExecutionException, TimeoutException {
-        LOG.debug("Entering configuration mode on {}.", id);
-        cli.executeAndSwitchPrompt(CONFIG_COMMAND, IS_CONFIGURATION_PROMPT)
-                .toCompletableFuture()
-                .get(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-    }
-
-    void tryToExitConfigurationMode(Cli cli) throws InterruptedException, ExecutionException, TimeoutException {
-        LOG.debug("Exiting configuration mode on {}.", id);
-        cli.executeAndSwitchPrompt(END_COMMAND, IS_PRIVELEGE_PROMPT)
-                .toCompletableFuture()
-                .get(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-    }
-
     private String getEnablePasswordFromCliNode() {
-
         PrivilegedModeCredentials privilegedModeCredentials = context.getPrivilegedModeCredentials();
         if (privilegedModeCredentials != null) {
             if (context.getPrivilegedModeCredentials() instanceof IosEnablePassword) {
