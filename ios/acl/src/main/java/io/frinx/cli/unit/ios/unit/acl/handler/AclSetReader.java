@@ -23,14 +23,22 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.unit.acl.handler.util.NameTypeEntry;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.AclEntries;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.AclEntriesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.AclSetsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.acl.set.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.acl.set.ConfigBuilder;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -41,9 +49,11 @@ public class AclSetReader implements CliConfigListReader<AclSet, AclSetKey, AclS
     private static final Pattern ACL_LINE = Pattern.compile("(?<type>.+) access-list (extended )?(?<name>.+)");
 
     private final Cli cli;
+    private final AclEntryReader aclEntryReader;
 
     public AclSetReader(Cli cli) {
         this.cli = cli;
+        this.aclEntryReader = new AclEntryReader(cli, this);
     }
 
     @Nonnull
@@ -73,8 +83,42 @@ public class AclSetReader implements CliConfigListReader<AclSet, AclSetKey, AclS
         final String aclName = aclSetKey.getName();
         final Class<? extends ACLTYPE> aclType = aclSetKey.getType();
 
-        builder.setName(aclName);
-        builder.setType(aclType);
+        final AclEntries aclEntries;
+        try {
+            aclEntries = getAclEntries(id, ctx);
+        } catch (IllegalArgumentException e) {
+            LOG.warn("ACL set '{}' cannot be parsed. Skipping of the whole ACL.",
+                    id.firstKeyOf(AclSet.class).getName(), e);
+            return;
+        }
+
+        builder.setName(aclName)
+                .setType(aclType)
+                .setAclEntries(aclEntries)
+                .setConfig(getAclConfig(aclSetKey));
+    }
+
+    private AclEntries getAclEntries(@Nonnull InstanceIdentifier<AclSet> id, @Nonnull ReadContext ctx)
+            throws ReadFailedException {
+        final List<AclEntry> allAclEntries = new ArrayList<>();
+        final List<AclEntryKey> allEntryIds = aclEntryReader.getAllIds(id, ctx);
+        final AclEntriesBuilder aclEntriesBuilder = new AclEntriesBuilder();
+        for (final AclEntryKey aclEntryId : allEntryIds) {
+            final AclEntryBuilder aclEntryBuilder = new AclEntryBuilder();
+            aclEntryBuilder.setKey(aclEntryId);
+            aclEntryReader.readCurrentAttributes(id, aclEntryBuilder, ctx);
+            allAclEntries.add(aclEntryBuilder.build());
+        }
+
+        aclEntriesBuilder.setAclEntry(allAclEntries);
+        return aclEntriesBuilder.build();
+    }
+
+    private static Config getAclConfig(final AclSetKey aclSetKey) {
+        return new ConfigBuilder()
+                .setName(aclSetKey.getName())
+                .setType(aclSetKey.getType())
+                .build();
     }
 }
 
