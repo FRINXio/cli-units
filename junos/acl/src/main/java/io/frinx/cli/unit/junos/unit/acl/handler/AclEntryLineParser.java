@@ -66,6 +66,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IPUDP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.IpProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.packet.match.types.rev170526.PortNumRange.Enumeration;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.PortNumber;
@@ -76,6 +77,7 @@ final class AclEntryLineParser {
     private static final Logger LOG = LoggerFactory.getLogger(AclEntryLineParser.class);
     static final Ipv4Prefix IPV4_HOST_ANY = new Ipv4Prefix("0.0.0.0/0");
     static final Ipv6Prefix IPV6_HOST_ANY = new Ipv6Prefix("::/0");
+    private static final PortNumRange ANY_PORT = new PortNumRange(Enumeration.ANY);
     private static final IpProtocolType IP_PROTOCOL_ICMP = new IpProtocolType(IPICMP.class);
     private static final IpProtocolType IP_PROTOCOL_ICMP_NUMBER = new IpProtocolType((short) 1);
     private static final IpProtocolType IP_PROTOCOL_TCP = new IpProtocolType(IPTCP.class);
@@ -84,7 +86,6 @@ final class AclEntryLineParser {
     private static final String ESCAPE_REGEX_CHARS = "\"-\\^$+*?.()|[]{}";
 
     private AclEntryLineParser() {
-
     }
 
     static List<String> findLinesWithTermName(String termName, String lines) {
@@ -110,9 +111,11 @@ final class AclEntryLineParser {
         parseTermName(builder, entryKey, termName);
 
         if (ACLIPV4.class.equals(aclType)) {
-            parseIpv4line(builder, lines);
+            parseIpv4lines(builder, lines);
         } else if (ACLIPV6.class.equals(aclType)) {
-            parseIpv6line(builder, lines);
+            parseIpv6lines(builder, lines);
+        } else {
+            throw new IllegalArgumentException("Unsupported ACL type: " + aclType);
         }
     }
 
@@ -130,35 +133,26 @@ final class AclEntryLineParser {
         return new ActionsBuilder().setConfig(new ConfigBuilder().setForwardingAction(fwdAction).build()).build();
     }
 
-    private static Class<? extends FORWARDINGACTION> parseAction(String action) {
-        switch (action) {
-            case "accept":
-                return ACCEPT.class;
-            case "discard":
-                return DROP.class;
-            default:
-                LOG.warn("Did not match forwarding action for {}", action);
-                return null;
+    private static void parseIpv4lines(AclEntryBuilder builder, List<String> lines) {
+        List<String> unsupportedLines = lines.stream()
+                .filter(line -> !line.contains("from") && !line.contains("then") && !line.trim().isEmpty())
+                .collect(Collectors.toList());
+        if (!unsupportedLines.isEmpty()) {
+            throw new IllegalArgumentException("The following access-list lines are not supported:\n "
+                    + unsupportedLines);
         }
+
+        Ipv4AclEntrySupportedCheckingBuilder checkingBuilder = new Ipv4AclEntrySupportedCheckingBuilder(builder);
+        List<String> from = lines.stream().filter(s -> s.contains("from")).collect(Collectors.toList());
+        parseIpv4FromLines(checkingBuilder, from);
+
+        List<String> then = lines.stream().filter(s -> s.contains("then")).collect(Collectors.toList());
+        parseThenLines(then, checkingBuilder);
+        checkingBuilder.compile();
     }
 
-    private static void parseIpv4line(AclEntryBuilder builder, List<String> lines) {
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top
-                .ipv4.ConfigBuilder ipv4ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
-                .openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
-        ipv4ProtocolFieldsConfigBuilder.setSourceAddress(IPV4_HOST_ANY);
-        ipv4ProtocolFieldsConfigBuilder.setDestinationAddress(IPV4_HOST_ANY);
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top
-                .transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
-                .openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
-        transportConfigBuilder.setSourcePort(new PortNumRange(PortNumRange.Enumeration.ANY));
-        transportConfigBuilder.setDestinationPort(new PortNumRange(PortNumRange.Enumeration.ANY));
-
+    private static void parseIpv4FromLines(Ipv4AclEntrySupportedCheckingBuilder builder, List<String> from) {
         Queue<String> ttlArgs = new LinkedList<>();
-
-        List<String> from = lines.stream().filter(s -> s.contains("from")).collect(Collectors.toList());
-        List<String> then = lines.stream().filter(s -> s.contains("then")).collect(Collectors.toList());
-        AclEntry1 icmpMsg;
         for (String line : from) {
             Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
             //remove from
@@ -173,40 +167,40 @@ final class AclEntryLineParser {
                 case "address":
                     // src or dst address
                     Optional<Ipv4Prefix> ipv4Prefix = parseIpv4Prefix(words.poll());
-                    if (ipv4Prefix.isPresent()) {
-                        ipv4ProtocolFieldsConfigBuilder.setSourceAddress(ipv4Prefix.get());
-                        ipv4ProtocolFieldsConfigBuilder.setDestinationAddress(ipv4Prefix.get());
-                    }
+                    ipv4Prefix.ifPresent(prefix -> {
+                        builder.setSourceAddress(prefix);
+                        builder.setDestinationAddress(prefix);
+                    });
                     break;
                 case "source-address":
                     // src address
-                    parseIpv4Prefix(words.poll()).ifPresent(ipv4ProtocolFieldsConfigBuilder::setSourceAddress);
+                    parseIpv4Prefix(words.poll()).ifPresent(builder::setSourceAddress);
                     break;
                 case "source-port":
                     // src port
-                    parseTransportSourcePort(transportConfigBuilder, words.poll());
+                    parseTransportSourcePort(builder, words.poll());
                     break;
                 case "destination-address":
                     // dst address
-                    parseIpv4Prefix(words.poll()).ifPresent(ipv4ProtocolFieldsConfigBuilder::setDestinationAddress);
+                    parseIpv4Prefix(words.poll()).ifPresent(builder::setDestinationAddress);
                     break;
                 case "destination-port":
                     // dst port
-                    parseTransportDestinationPort(transportConfigBuilder, words.poll());
+                    parseTransportDestinationPort(builder, words.poll());
                     break;
                 case "port":
                     // src or dst port
                     String port = words.poll();
-                    parseTransportSourcePort(transportConfigBuilder, port);
-                    parseTransportDestinationPort(transportConfigBuilder, port);
+                    parseTransportSourcePort(builder, port);
+                    parseTransportDestinationPort(builder, port);
                     break;
                 case "protocol":
                     IpProtocolType ipProtocolType = parseProtocol(words.poll());
-                    ipv4ProtocolFieldsConfigBuilder.setProtocol(ipProtocolType);
+                    builder.setProtocol(ipProtocolType);
                     break;
                 case "icmp-type":
-                    icmpMsg = parseIcmpMsgType(ipv4ProtocolFieldsConfigBuilder.getProtocol(), words.poll(), true);
-                    builder.addAugmentation(AclEntry1.class, icmpMsg);
+                    AclEntry1 icmpMsg = parseIcmpMsgType(builder.getProtocol(), words.poll(), true);
+                    builder.setIcmpType(icmpMsg);
                     break;
                 case "ttl":
                     ttlArgs.add(words.poll());
@@ -216,14 +210,6 @@ final class AclEntryLineParser {
             }
         }
 
-        for (String line : then) {
-            Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
-            words.poll();
-            // fwd action
-            Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
-            builder.setActions(createActions(fwdAction));
-        }
-
         if (!ttlArgs.isEmpty()) {
             Config3Builder hopRangeAugment = new Config3Builder();
             Entry<Integer, Integer> ttlRange = parseTTLRange(ttlArgs);
@@ -231,14 +217,9 @@ final class AclEntryLineParser {
             int upperEndpoint = ttlRange.getValue();
             hopRangeAugment.setHopRange(new HopRange(lowerEndpoint + ".." + upperEndpoint));
             if (hopRangeAugment.getHopRange() != null) {
-                ipv4ProtocolFieldsConfigBuilder.addAugmentation(Config3.class, hopRangeAugment.build());
+                builder.setTtlConfig(hopRangeAugment.build());
             }
         }
-
-        Ipv4Builder ipv4Builder = new Ipv4Builder();
-        ipv4Builder.setConfig(ipv4ProtocolFieldsConfigBuilder.build());
-        builder.setIpv4(ipv4Builder.build());
-        builder.setTransport(new TransportBuilder().setConfig(transportConfigBuilder.build()).build());
     }
 
     private static AclEntry1 parseIcmpMsgType(final IpProtocolType ipProtocolType, final String msgType,
@@ -260,23 +241,18 @@ final class AclEntryLineParser {
         return null;
     }
 
-    private static void parseIpv6line(AclEntryBuilder builder, List<String> lines) {
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top
-                .ipv6.ConfigBuilder ipv6ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
-                .openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
-        ipv6ProtocolFieldsConfigBuilder.setSourceAddress(IPV6_HOST_ANY);
-        ipv6ProtocolFieldsConfigBuilder.setDestinationAddress(IPV6_HOST_ANY);
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport.fields.top
-                .transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
-                .openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
-        transportConfigBuilder.setSourcePort(new PortNumRange(PortNumRange.Enumeration.ANY));
-        transportConfigBuilder.setDestinationPort(new PortNumRange(PortNumRange.Enumeration.ANY));
-
-        Queue<String> ttlArgs = new LinkedList<>();
-
+    private static void parseIpv6lines(AclEntryBuilder builder, List<String> lines) {
+        Ipv6AclEntrySupportedCheckingBuilder dupsCheckingBuilder = new Ipv6AclEntrySupportedCheckingBuilder(builder);
         List<String> from = lines.stream().filter(s -> s.contains("from")).collect(Collectors.toList());
+        parseIpv6FromLines(dupsCheckingBuilder, from);
+
         List<String> then = lines.stream().filter(s -> s.contains("then")).collect(Collectors.toList());
-        AclEntry1 icmpMsg;
+        parseThenLines(then, dupsCheckingBuilder);
+        dupsCheckingBuilder.compile();
+    }
+
+    private static void parseIpv6FromLines(Ipv6AclEntrySupportedCheckingBuilder builder, List<String> from) {
+        Queue<String> ttlArgs = new LinkedList<>();
         for (String line : from) {
             Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
             //remove from
@@ -292,39 +268,39 @@ final class AclEntryLineParser {
                     // src or dst address
                     Optional<Ipv6Prefix> ipv6Prefix = parseIpv6Prefix(words.poll());
                     if (ipv6Prefix.isPresent()) {
-                        ipv6ProtocolFieldsConfigBuilder.setSourceAddress(ipv6Prefix.get());
-                        ipv6ProtocolFieldsConfigBuilder.setDestinationAddress(ipv6Prefix.get());
+                        builder.setSourceAddress(ipv6Prefix.get());
+                        builder.setDestinationAddress(ipv6Prefix.get());
                     }
                     break;
                 case "source-address":
                     // src address
-                    parseIpv6Prefix(words.poll()).ifPresent(ipv6ProtocolFieldsConfigBuilder::setSourceAddress);
+                    parseIpv6Prefix(words.poll()).ifPresent(builder::setSourceAddress);
                     break;
                 case "source-port":
                     // src port
-                    parseTransportSourcePort(transportConfigBuilder, words.poll());
+                    parseTransportSourcePort(builder, words.poll());
                     break;
                 case "destination-address":
                     // dst address
-                    parseIpv6Prefix(words.poll()).ifPresent(ipv6ProtocolFieldsConfigBuilder::setDestinationAddress);
+                    parseIpv6Prefix(words.poll()).ifPresent(builder::setDestinationAddress);
                     break;
                 case "destination-port":
                     // dst port
-                    parseTransportDestinationPort(transportConfigBuilder, words.poll());
+                    parseTransportDestinationPort(builder, words.poll());
                     break;
                 case "port":
                     // src or dst port
                     String port = words.poll();
-                    parseTransportSourcePort(transportConfigBuilder, port);
-                    parseTransportDestinationPort(transportConfigBuilder, port);
+                    parseTransportSourcePort(builder, port);
+                    parseTransportDestinationPort(builder, port);
                     break;
                 case "payload-protocol":
                     IpProtocolType ipProtocolType = parseProtocol(words.poll());
-                    ipv6ProtocolFieldsConfigBuilder.setProtocol(ipProtocolType);
+                    builder.setProtocol(ipProtocolType);
                     break;
                 case "icmp-type":
-                    icmpMsg = parseIcmpMsgType(ipv6ProtocolFieldsConfigBuilder.getProtocol(), words.poll(), false);
-                    builder.addAugmentation(AclEntry1.class, icmpMsg);
+                    AclEntry1 icmpMsg = parseIcmpMsgType(builder.getProtocol(), words.poll(), false);
+                    builder.setIcmpType(icmpMsg);
                     break;
                 case "ttl":
                     ttlArgs.add(words.poll());
@@ -341,39 +317,47 @@ final class AclEntryLineParser {
             int upperEndpoint = ttlRange.getValue();
             hopRangeAugment.setHopRange(new HopRange(lowerEndpoint + ".." + upperEndpoint));
             if (hopRangeAugment.getHopRange() != null) {
-                ipv6ProtocolFieldsConfigBuilder.addAugmentation(Config4.class, hopRangeAugment.build());
+                builder.setTtlConfig(hopRangeAugment.build());
+            }
+        }
+    }
+
+    private static void parseThenLines(final List<String> thenLines, final AclEntrySupportedCheckingBuilder builder) {
+        for (String line : thenLines) {
+            Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
+            words.poll();
+
+            final String thenKeyword = words.poll();
+            switch (thenKeyword) {
+                case "accept":
+                    builder.setAction(createActions(ACCEPT.class));
+                    break;
+                case "discard":
+                    builder.setAction(createActions(DROP.class));
+                    break;
+                default:
+                    throw new IllegalArgumentException(String.format("%s is not supported.", thenKeyword));
             }
         }
 
-        for (String line : then) {
-            Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
-            words.poll();
-            // fwd action
-            Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
-            builder.setActions(createActions(fwdAction));
-        }
-
-        Ipv6Builder ipv6Builder = new Ipv6Builder();
-        ipv6Builder.setConfig(ipv6ProtocolFieldsConfigBuilder.build());
-        builder.setIpv6(ipv6Builder.build());
-        builder.setTransport(new TransportBuilder().setConfig(transportConfigBuilder.build()).build());
-    }
-
-    private static void parseTransportSourcePort(
-            final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
-                    .fields.top.transport.ConfigBuilder transportConfigBuilder,
-            final String port) {
-        if (!port.isEmpty()) {
-            parsePortNum(port, transportConfigBuilder, true);
+        if (!builder.isActionSet()) {
+            // by default, the traffic that matches an ACL entry is accepted (see: https://www.juniper.net/
+            // documentation/en_US/junos/topics/concept/firewall-filter-ex-series-evaluation-understanding.html
+            builder.setAction(createActions(ACCEPT.class));
         }
     }
 
-    private static void parseTransportDestinationPort(
-            final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
-                    .fields.top.transport.ConfigBuilder transportConfigBuilder,
-            final String port) {
+    private static void parseTransportSourcePort(final AclEntrySupportedCheckingBuilder checkingBuilder,
+                                                 final String port) {
         if (!port.isEmpty()) {
-            parsePortNum(port, transportConfigBuilder, false);
+            parsePortNum(port, checkingBuilder, true);
+        }
+    }
+
+    private static void parseTransportDestinationPort(final AclEntrySupportedCheckingBuilder checkingBuilder,
+                                                      final String port) {
+        if (!port.isEmpty()) {
+            parsePortNum(port, checkingBuilder, false);
         }
     }
 
@@ -406,11 +390,8 @@ final class AclEntryLineParser {
         }
     }
 
-    private static void parsePortNum(String port,
-                                     org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields
-                                                  .rev171215.transport.fields.top.transport.ConfigBuilder
-                                                  transportConfigBuilder,
-                                     boolean source) {
+    private static void parsePortNum(final String port, final AclEntrySupportedCheckingBuilder checkingBuilder,
+                                     final boolean source) {
         String[] ports = port.split("-");
         boolean isRange = ports.length > 1;
         boolean arePortsNumeric = isRange ? StringUtils.isNumeric(ports[0]) && StringUtils.isNumeric(ports[1])
@@ -418,28 +399,16 @@ final class AclEntryLineParser {
 
         if (arePortsNumeric) {
             if (source) {
-                transportConfigBuilder.setSourcePort(parsePortNumRangeNumbers(isRange, port));
+                checkingBuilder.setSourcePort(parsePortNumRangeNumbers(isRange, port));
             } else {
-                transportConfigBuilder.setDestinationPort(parsePortNumRangeNumbers(isRange, port));
+                checkingBuilder.setDestinationPort(parsePortNumRangeNumbers(isRange, port));
             }
         } else {
-            AclSetAclEntryTransportPortNamedAug existingAug = transportConfigBuilder
-                    .getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
-            AclSetAclEntryTransportPortNamedAugBuilder aclSetAclEntryTransportPortNamedAugBuilder = existingAug
-                    != null ? new AclSetAclEntryTransportPortNamedAugBuilder(existingAug) : new
-                    AclSetAclEntryTransportPortNamedAugBuilder();
-
             if (source) {
-                aclSetAclEntryTransportPortNamedAugBuilder.setSourcePortNamed(port);
-                transportConfigBuilder.setSourcePort(null);
+                checkingBuilder.setNamedSourcePort(port);
             } else {
-                aclSetAclEntryTransportPortNamedAugBuilder.setDestinationPortNamed(port);
-                transportConfigBuilder.setDestinationPort(null);
+                checkingBuilder.setNamedDestinationPort(port);
             }
-
-            transportConfigBuilder.addAugmentation(AclSetAclEntryTransportPortNamedAug.class,
-                    aclSetAclEntryTransportPortNamedAugBuilder
-                            .build());
         }
     }
 
@@ -468,8 +437,7 @@ final class AclEntryLineParser {
                 if (NumberUtils.isParsable(protocol)) {
                     return new IpProtocolType(Integer.valueOf(protocol).shortValue());
                 }
-                LOG.warn("Unknown protocol {}", protocol);
-                return null;
+                throw new IllegalArgumentException("Unknown protocol: " + protocol);
         }
     }
 
@@ -500,4 +468,209 @@ final class AclEntryLineParser {
         return String.format("%02x%02x", first, second);
     }
 
+    private abstract static class AclEntrySupportedCheckingBuilder {
+        private static final String DUP_SOURCE_PORT_MESSAGE
+                = "ACL entry with multiple source port definitions is not supported.";
+        private static final String DUP_DESTINATION_PORT_MESSAGE
+                = "ACL entry with multiple destination port definitions is not supported.";
+        protected static final String DUP_SOURCE_ADDRESS_MESSAGE
+                = "ACL entry with multiple source addresses is not supported.";
+        protected static final String DUP_DESTINATION_ADDRESS_MESSAGE
+                = "ACL entry with multiple destination addresses is not supported.";
+        protected static final String DUP_PROTOCOL_MESSAGE
+                = "ACL entry with multiple protocols is not supported.";
+        protected static final String DUP_TTL_MESSAGE
+                = "ACL entry with multiple TTL configurations is not supported.";
+
+        protected AclEntryBuilder aclEntryBuilder;
+        protected final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
+                .fields.top.transport.ConfigBuilder transportConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
+                .openconfig.net.yang.header.fields.rev171215.transport.fields.top.transport.ConfigBuilder();
+
+        private boolean setSourcePort = false;
+        private boolean setDestinationPort = false;
+        private String namedSourcePort;
+        private String namedDestinationPort;
+
+        AclEntrySupportedCheckingBuilder(final AclEntryBuilder aclEntryBuilder) {
+            this.aclEntryBuilder = aclEntryBuilder;
+        }
+
+        void setSourcePort(final PortNumRange portNumRange) {
+            Preconditions.checkArgument(!setSourcePort, DUP_SOURCE_PORT_MESSAGE);
+            transportConfigBuilder.setSourcePort(portNumRange);
+            setSourcePort = true;
+        }
+
+        void setNamedSourcePort(final String namedSourcePort) {
+            Preconditions.checkArgument(!setSourcePort, DUP_SOURCE_PORT_MESSAGE);
+            this.namedSourcePort = namedSourcePort;
+            setSourcePort = true;
+        }
+
+        void setDestinationPort(final PortNumRange portNumRange) {
+            Preconditions.checkArgument(!setDestinationPort, DUP_DESTINATION_PORT_MESSAGE);
+            transportConfigBuilder.setDestinationPort(portNumRange);
+            setDestinationPort = true;
+        }
+
+        void setNamedDestinationPort(final String namedDestinationPort) {
+            Preconditions.checkArgument(!setDestinationPort, DUP_DESTINATION_PORT_MESSAGE);
+            this.namedDestinationPort = namedDestinationPort;
+            setDestinationPort = true;
+        }
+
+        void setIcmpType(final AclEntry1 icmpFields) {
+            Preconditions.checkArgument(aclEntryBuilder.getAugmentation(AclEntry1.class) == null,
+                    "ACL entry with multiple ICMP types is not supported.");
+            aclEntryBuilder.addAugmentation(AclEntry1.class, icmpFields);
+        }
+
+        void setAction(final Actions actions) {
+            Preconditions.checkArgument(aclEntryBuilder.getActions() == null,
+                    "ACL entry with multiple actions is not supported.");
+            aclEntryBuilder.setActions(actions);
+        }
+
+        boolean isActionSet() {
+            return aclEntryBuilder.getActions() != null;
+        }
+
+        void compile() {
+            AclSetAclEntryTransportPortNamedAugBuilder namedPortsBuilder = null;
+            if (namedSourcePort != null) {
+                namedPortsBuilder = new AclSetAclEntryTransportPortNamedAugBuilder();
+                namedPortsBuilder.setSourcePortNamed(namedSourcePort);
+            }
+            if (namedDestinationPort != null) {
+                if (namedPortsBuilder == null) {
+                    namedPortsBuilder = new AclSetAclEntryTransportPortNamedAugBuilder();
+                }
+                namedPortsBuilder.setDestinationPortNamed(namedDestinationPort);
+            }
+
+            if (transportConfigBuilder.getSourcePort() == null && namedSourcePort == null) {
+                transportConfigBuilder.setSourcePort(ANY_PORT);
+            }
+            if (transportConfigBuilder.getDestinationPort() == null && namedDestinationPort == null) {
+                transportConfigBuilder.setDestinationPort(ANY_PORT);
+            }
+            if (namedPortsBuilder != null) {
+                transportConfigBuilder.addAugmentation(AclSetAclEntryTransportPortNamedAug.class,
+                        namedPortsBuilder.build());
+            }
+        }
+    }
+
+    private static final class Ipv4AclEntrySupportedCheckingBuilder extends AclEntrySupportedCheckingBuilder {
+
+        private final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol
+                .fields.top.ipv4.ConfigBuilder ipv4ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http
+                .frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
+
+        Ipv4AclEntrySupportedCheckingBuilder(final AclEntryBuilder aclEntryBuilder) {
+            super(aclEntryBuilder);
+        }
+
+        void setSourceAddress(final Ipv4Prefix ipv4Prefix) {
+            Preconditions.checkArgument(ipv4ProtocolFieldsConfigBuilder.getSourceAddress() == null,
+                    DUP_SOURCE_ADDRESS_MESSAGE);
+            ipv4ProtocolFieldsConfigBuilder.setSourceAddress(ipv4Prefix);
+        }
+
+        void setDestinationAddress(final Ipv4Prefix ipv4Prefix) {
+            Preconditions.checkArgument(ipv4ProtocolFieldsConfigBuilder.getDestinationAddress() == null,
+                    DUP_DESTINATION_ADDRESS_MESSAGE);
+            ipv4ProtocolFieldsConfigBuilder.setDestinationAddress(ipv4Prefix);
+        }
+
+        void setProtocol(final IpProtocolType protocol) {
+            Preconditions.checkArgument(ipv4ProtocolFieldsConfigBuilder.getProtocol() == null, DUP_PROTOCOL_MESSAGE);
+            ipv4ProtocolFieldsConfigBuilder.setProtocol(protocol);
+        }
+
+        void setTtlConfig(final Config3 ttlConfig) {
+            Preconditions.checkArgument(ipv4ProtocolFieldsConfigBuilder.getAugmentation(Config3.class) == null,
+                    DUP_TTL_MESSAGE);
+            ipv4ProtocolFieldsConfigBuilder.addAugmentation(Config3.class, ttlConfig);
+        }
+
+        IpProtocolType getProtocol() {
+            return ipv4ProtocolFieldsConfigBuilder.getProtocol();
+        }
+
+        void compile() {
+            super.compile();
+
+            if (ipv4ProtocolFieldsConfigBuilder.getSourceAddress() == null) {
+                ipv4ProtocolFieldsConfigBuilder.setSourceAddress(IPV4_HOST_ANY);
+            }
+            if (ipv4ProtocolFieldsConfigBuilder.getDestinationAddress() == null) {
+                ipv4ProtocolFieldsConfigBuilder.setDestinationAddress(IPV4_HOST_ANY);
+            }
+
+            final Ipv4Builder ipv4Builder = new Ipv4Builder();
+            ipv4Builder.setConfig(ipv4ProtocolFieldsConfigBuilder.build());
+            aclEntryBuilder.setIpv4(ipv4Builder.build());
+            aclEntryBuilder.setTransport(new TransportBuilder()
+                    .setConfig(transportConfigBuilder.build())
+                    .build());
+        }
+    }
+
+    private static final class Ipv6AclEntrySupportedCheckingBuilder extends AclEntrySupportedCheckingBuilder {
+
+        private final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol
+                .fields.top.ipv6.ConfigBuilder ipv6ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http
+                .frinx.openconfig.net.yang.header.fields.rev171215.ipv6.protocol.fields.top.ipv6.ConfigBuilder();
+
+        Ipv6AclEntrySupportedCheckingBuilder(final AclEntryBuilder aclEntryBuilder) {
+            super(aclEntryBuilder);
+        }
+
+        void setSourceAddress(final Ipv6Prefix ipv6Prefix) {
+            Preconditions.checkArgument(ipv6ProtocolFieldsConfigBuilder.getSourceAddress() == null,
+                    DUP_SOURCE_ADDRESS_MESSAGE);
+            ipv6ProtocolFieldsConfigBuilder.setSourceAddress(ipv6Prefix);
+        }
+
+        void setDestinationAddress(final Ipv6Prefix ipv6Prefix) {
+            Preconditions.checkArgument(ipv6ProtocolFieldsConfigBuilder.getDestinationAddress() == null,
+                    DUP_DESTINATION_ADDRESS_MESSAGE);
+            ipv6ProtocolFieldsConfigBuilder.setDestinationAddress(ipv6Prefix);
+        }
+
+        void setProtocol(final IpProtocolType protocol) {
+            Preconditions.checkArgument(ipv6ProtocolFieldsConfigBuilder.getProtocol() == null, DUP_PROTOCOL_MESSAGE);
+            ipv6ProtocolFieldsConfigBuilder.setProtocol(protocol);
+        }
+
+        IpProtocolType getProtocol() {
+            return ipv6ProtocolFieldsConfigBuilder.getProtocol();
+        }
+
+        void setTtlConfig(final Config4 ttlConfig) {
+            Preconditions.checkArgument(ipv6ProtocolFieldsConfigBuilder.getAugmentation(Config4.class) == null,
+                    DUP_TTL_MESSAGE);
+            ipv6ProtocolFieldsConfigBuilder.addAugmentation(Config4.class, ttlConfig);
+        }
+
+        void compile() {
+            super.compile();
+
+            if (ipv6ProtocolFieldsConfigBuilder.getSourceAddress() == null) {
+                ipv6ProtocolFieldsConfigBuilder.setSourceAddress(IPV6_HOST_ANY);
+            }
+            if (ipv6ProtocolFieldsConfigBuilder.getDestinationAddress() == null) {
+                ipv6ProtocolFieldsConfigBuilder.setDestinationAddress(IPV6_HOST_ANY);
+            }
+
+            final Ipv6Builder ipv6Builder = new Ipv6Builder();
+            ipv6Builder.setConfig(ipv6ProtocolFieldsConfigBuilder.build());
+            aclEntryBuilder.setIpv6(ipv6Builder.build());
+            aclEntryBuilder.setTransport(new TransportBuilder()
+                    .setConfig(transportConfigBuilder.build())
+                    .build());
+        }
+    }
 }
