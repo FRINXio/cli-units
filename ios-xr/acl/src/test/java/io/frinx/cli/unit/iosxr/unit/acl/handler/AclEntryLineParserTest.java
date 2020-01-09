@@ -379,6 +379,20 @@ public class AclEntryLineParserTest {
         }
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void parseAclLineWithUnsupportedProtocolTest() {
+        final String line = "10 deny esp host 1.2.3.4 host 5.6.7.8";
+        final AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4.class);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIpv4WithUnsupportedOption() {
+        final String line = "permit tcp host 1.1.1.1 host 2.2.2.2 eq 69 established";
+        final AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4.class);
+    }
+
     @Test
     public void testFindLineWithSequenceId() {
         String lines = "a\n"
@@ -591,6 +605,20 @@ public class AclEntryLineParserTest {
             AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV6.class);
             Assert.assertEquals(entry.getValue(), resultBuilder.build());
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIpv6WithUnsupportedProtocol() {
+        final String line = "10 permit pcp host AB::1 host CD::2 eq 69";
+        final AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV6.class);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIpv6WithUnsupportedOption() {
+        final String line = "20 permit udp host AB::1 host CD::2 eq 69 time-range RANGE_1";
+        final AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV6.class);
     }
 
     @Test

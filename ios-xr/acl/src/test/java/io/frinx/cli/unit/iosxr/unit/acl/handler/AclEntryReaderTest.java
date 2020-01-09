@@ -26,6 +26,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.action.top.ActionsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.Ipv4Builder;
@@ -52,8 +53,9 @@ public class AclEntryReaderTest {
     @Test
     public void testParseAclBody() {
         AclEntryBuilder aclEntryBuilder = new AclEntryBuilder();
-        InstanceIdentifier<AclEntry> aclEntryInstanceIdentifier =  IidUtils.createIid(IIDs.AC_AC_AC_AC_ACLENTRY,
-                new AclSetKey("ipv4foo", ACLIPV4.class), ACL_ENTRY_KEY);
+        aclEntryBuilder.setKey(ACL_ENTRY_KEY);
+        InstanceIdentifier<AclSet> aclEntryInstanceIdentifier =  IidUtils.createIid(IIDs.AC_AC_ACLSET,
+                new AclSetKey("ipv4foo", ACLIPV4.class));
         AclEntryReader.parseACL(aclEntryInstanceIdentifier, aclEntryBuilder, OUTPUT);
 
         AclEntry expected = new AclEntryBuilder()
