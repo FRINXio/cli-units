@@ -55,7 +55,7 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
     @VisibleForTesting
     public static List<InterfaceKey> getInterfaceKeys(String output) {
         List<InterfaceKey> keys = new ArrayList<>();
-        List<String> candidates = Pattern.compile("!").splitAsStream(output).collect(Collectors.toList());
+        List<String> candidates = Pattern.compile("\n!").splitAsStream(output).collect(Collectors.toList());
         for (String candidate : candidates) {
             Optional<Boolean> maybeAcl = ParsingUtils.parseField(candidate, 0, Pattern.compile(".*access-group.*")
                     ::matcher, Matcher::matches);
