@@ -22,7 +22,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.junos.unit.acl.handler.util.AclUtil;
-import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -30,37 +30,39 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey, AclEntryBuilder> {
+public class AclEntryReader {
 
     private static final String SH_FIREWALL = "show configuration firewall family %s filter %s | display set";
-    private static final Pattern TERM_PATTERN = Pattern.compile(".*term (?<termName>(\".+\"|\\S+)) .*");
-
+    private static final String TERM_NAME_GROUP = "termName";
+    private static final Pattern TERM_PATTERN = Pattern.compile(".*term (?<" + TERM_NAME_GROUP + ">(\".+\"|\\S+)) .*");
     private static ImmutableMap<Long, String> sequenceTermMap;
-    private final Cli cli;
 
-    public AclEntryReader(Cli cli) {
+    private final Cli cli;
+    private final CliReader<AclSet, AclSetBuilder> cliReader;
+
+    public AclEntryReader(Cli cli, CliReader<AclSet, AclSetBuilder> cliReader) {
         this.cli = cli;
+        this.cliReader = cliReader;
     }
 
-    @Override
-    public List<AclEntryKey> getAllIds(@Nonnull final InstanceIdentifier<AclEntry> instanceIdentifier,
-                                              @Nonnull final ReadContext readContext) throws ReadFailedException {
+    public List<AclEntryKey> getAllIds(@Nonnull final InstanceIdentifier<AclSet> instanceIdentifier,
+                                       @Nonnull final ReadContext readContext) throws ReadFailedException {
         AclSetKey aclSetKey = instanceIdentifier.firstKeyOf(AclSet.class);
-        String command = f(SH_FIREWALL, AclUtil.getStringType(aclSetKey.getType()), aclSetKey.getName());
-        return parseAclEntryKey(blockingRead(command, cli, instanceIdentifier, readContext));
+        String command = cliReader.f(SH_FIREWALL, AclUtil.getStringType(aclSetKey.getType()), aclSetKey.getName());
+        return parseAclEntryKey(cliReader.blockingRead(command, cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting
     static List<AclEntryKey> parseAclEntryKey(String output) {
         Set<String> termNames = new LinkedHashSet<>();
-        ParsingUtils.parseFields(output, 0, TERM_PATTERN::matcher, m -> m.group("termName"), termNames::add);
+        ParsingUtils.parseFields(output, 0, TERM_PATTERN::matcher, m -> m.group(TERM_NAME_GROUP), termNames::add);
 
         long sequenceId = 0;
         List<AclEntryKey> result = new ArrayList<>();
@@ -73,28 +75,17 @@ public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey
         return result;
     }
 
-    @Override
-    public void readCurrentAttributes(@Nonnull final InstanceIdentifier<AclEntry> instanceIdentifier,
-                                             @Nonnull final AclEntryBuilder aclEntryBuilder,
-                                             @Nonnull final ReadContext readContext)
+    public void readCurrentAttributes(@Nonnull final InstanceIdentifier<AclSet> instanceIdentifier,
+            @Nonnull final AclEntryBuilder aclEntryBuilder, @Nonnull final ReadContext readContext)
             throws ReadFailedException {
-        AclSetKey aclSetKey = instanceIdentifier.firstKeyOf(AclSet.class);
-        String command = f(SH_FIREWALL, AclUtil.getStringType(aclSetKey.getType()), aclSetKey.getName());
-        String output = blockingRead(command, cli, instanceIdentifier, readContext);
+        final AclSetKey aclSetKey = instanceIdentifier.firstKeyOf(AclSet.class);
+        final String command = cliReader.f(SH_FIREWALL, AclUtil.getStringType(
+                aclSetKey.getType()), aclSetKey.getName());
+        final String output = cliReader.blockingRead(command, cli, instanceIdentifier, readContext);
 
-        parseACL(instanceIdentifier, aclEntryBuilder, output);
-    }
-
-    private static void parseACL(final @Nonnull InstanceIdentifier<AclEntry> iid,
-                                final @Nonnull AclEntryBuilder aclEntryBuilder,
-                                final String output) {
-
-        AclSetKey aclSetKey = iid.firstKeyOf(AclSet.class);
-        AclEntryKey entryKey = iid.firstKeyOf(AclEntry.class);
-        List<String> maybeLine = AclEntryLineParser
-                .findLinesWithTermName(sequenceTermMap.get(entryKey.getSequenceId()), output);
-
-        AclEntryLineParser.parseLines(aclEntryBuilder, maybeLine, aclSetKey.getType(), entryKey,
-                sequenceTermMap.get(entryKey.getSequenceId()));
+        final List<String> maybeLine = AclEntryLineParser.findLinesWithTermName(
+                sequenceTermMap.get(aclEntryBuilder.getKey().getSequenceId()), output);
+        AclEntryLineParser.parseLines(aclEntryBuilder, maybeLine, aclSetKey.getType(), aclEntryBuilder.getKey(),
+                sequenceTermMap.get(aclEntryBuilder.getKey().getSequenceId()));
     }
 }
