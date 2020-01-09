@@ -22,11 +22,9 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.ios.init.IosDevices;
-import io.frinx.cli.unit.ios.unit.acl.handler.AclEntryReader;
 import io.frinx.cli.unit.ios.unit.acl.handler.AclEntryWriter;
 import io.frinx.cli.unit.ios.unit.acl.handler.AclInterfaceConfigReader;
 import io.frinx.cli.unit.ios.unit.acl.handler.AclInterfaceReader;
-import io.frinx.cli.unit.ios.unit.acl.handler.AclSetConfigReader;
 import io.frinx.cli.unit.ios.unit.acl.handler.AclSetConfigWriter;
 import io.frinx.cli.unit.ios.unit.acl.handler.AclSetReader;
 import io.frinx.cli.unit.ios.unit.acl.handler.EgressAclSetConfigReader;
@@ -127,14 +125,11 @@ public class AclUnit extends AbstractUnit {
         readRegistry.add(IIDs.AC_IN_IN_EG_EGRESSACLSET, new EgressAclSetReader(cli));
         readRegistry.add(IIDs.AC_IN_IN_EG_EG_CONFIG, new EgressAclSetConfigReader(cli));
 
-        // sets
-        readRegistry.add(IIDs.AC_AC_ACLSET, new AclSetReader(cli));
-        // acl-set/config
-        readRegistry.add(IIDs.AC_AC_AC_CONFIG, new AclSetConfigReader());
-
         // ACL Entry subtree
-        readRegistry.subtreeAdd(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryReader(cli),
-            Sets.newHashSet(IIDs.AC_AC_AC_AC_AC_CONFIG,
+        readRegistry.subtreeAdd(IIDs.AC_AC_ACLSET, new AclSetReader(cli),
+            Sets.newHashSet(IIDs.AC_AC_AC_CONFIG,
+                IIDs.AC_AC_AC_AC_ACLENTRY,
+                IIDs.AC_AC_AC_AC_AC_CONFIG,
                 IIDs.AC_AC_AC_AC_AC_ACTIONS,
                 IIDs.AC_AC_AC_AC_AC_AC_CONFIG,
 
