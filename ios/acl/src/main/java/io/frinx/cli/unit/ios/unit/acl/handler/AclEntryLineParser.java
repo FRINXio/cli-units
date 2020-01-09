@@ -22,14 +22,12 @@ import com.google.common.collect.Maps;
 import com.google.common.net.InetAddresses;
 import java.net.InetAddress;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
@@ -59,7 +57,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.DROP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.FORWARDINGACTION;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.action.top.Actions;
@@ -81,7 +78,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Address;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.PortNumber;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,21 +89,18 @@ final class AclEntryLineParser {
     private static final int MAX_TTL = 255;
     private static final IpProtocolType IP_PROTOCOL_ICMP = new IpProtocolType(IPICMP.class);
     private static final IpProtocolType IP_PROTOCOL_ICMP_NUMBER = new IpProtocolType((short) 1);
+    private static final IpProtocolType IP_PROTOCOL_ICMP6_NUMBER = new IpProtocolType((short) 58);
     private static final IpProtocolType IP_PROTOCOL_TCP = new IpProtocolType(IPTCP.class);
-    private static final IpProtocolType IP_PROTOCOL_TCP_NUMBER = new IpProtocolType((short) 6);
     private static final IpProtocolType IP_PROTOCOL_UDP = new IpProtocolType(IPUDP.class);
-    private static final IpProtocolType IP_PROTOCOL_UDP_NUMBER = new IpProtocolType((short) 17);
     private static final Pattern ZERO_TO_255_PATTERN = Pattern.compile("^2[0-5][0-5]|2[0-4][0-9]|1?[0-9]?[0-9]$");
 
     private AclEntryLineParser() {
-
     }
 
-    static Optional<String> findAclEntryWithSequenceId(InstanceIdentifier<?> id, String lines,
+    static Optional<String> findAclEntryWithSequenceId(AclEntryKey aclEntryKey, String lines,
                                                        Class<? extends ACLTYPE> aclType) {
         // search for line containing current sequence number
-        AclEntryKey entryKey = id.firstKeyOf(AclEntry.class);
-        long sequenceId = entryKey.getSequenceId();
+        long sequenceId = aclEntryKey.getSequenceId();
         return ACLIPV4.class.equals(aclType) ? findIpv4LineWithSequenceId(sequenceId, lines)
                 : findIpv6LineWithSequenceId(sequenceId, lines);
     }
@@ -133,7 +126,7 @@ final class AclEntryLineParser {
     static void parseLine(final AclEntryBuilder builder, String line, Class<? extends ACLTYPE> aclType) {
 
         Preconditions.checkArgument(ACLIPV4.class.equals(aclType) || ACLIPV6.class.equals(aclType),
-                "Unsupported ACL type" + aclType);
+                "Unsupported ACL type: " + aclType);
         Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
         // ipv4 access lists have sequence number in the beginning of the line, ipv6 access lists have it at the end
         if (ACLIPV4.class.equals(aclType)) {
@@ -158,17 +151,17 @@ final class AclEntryLineParser {
             builder.setIpv6(ipv6Builder.build());
             builder.setTransport(parseIpv6LineResult.transport);
             builder.addAugmentation(AclEntry1.class, parseIpv6LineResult.icmpMsgTypeAugment);
-            // skip the word 'sequence' and any other non-supported words, and only parse sequence ID if it's present
-            Iterator<String> waitingQueueIterator = words.iterator();
-            while (waitingQueueIterator.hasNext()) {
-                String next = waitingQueueIterator.next();
-                if ("sequence" .equals(next)) {
-                    waitingQueueIterator.remove();
-                    parseSequenceId(builder, waitingQueueIterator.next());
-                    return;
-                }
-                LOG.warn("Unsupported ACL keyword: " + next);
-                waitingQueueIterator.remove();
+
+            // parse sequence ID if it's present
+            String nextWord = words.peek();
+            if ("sequence".equals(nextWord)) {
+                words.poll();
+                parseSequenceId(builder, words.poll());
+            }
+            // if there are some unsupported expressions, ACL cannot be parsed at all
+            if (!words.isEmpty()) {
+                throw new IllegalArgumentException("ACL entry contains unsupported expressions that cannot be parsed: "
+                        + words);
             }
         }
     }
@@ -195,8 +188,7 @@ final class AclEntryLineParser {
             case "deny":
                 return DROP.class;
             default:
-                LOG.warn("Did not match forwarding action for {}", action);
-                return null;
+                throw new IllegalArgumentException("Did not match forwarding action for: " + action);
         }
     }
 
@@ -262,29 +254,32 @@ final class AclEntryLineParser {
         // transport
         Transport transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
 
-        //icmp
+        // icmp
         final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words, true);
 
         // ttl
-        Config3Builder hopRangeAugment = new Config3Builder();
-        //noinspection Duplicates
         if (!words.isEmpty() && "ttl".equals(words.peek())) {
             Entry<Integer, Integer> ttlRange = parseTTLRange(words);
             int lowerEndpoint = ttlRange.getKey();
             int upperEndpoint = ttlRange.getValue();
+            Config3Builder hopRangeAugment = new Config3Builder();
             hopRangeAugment.setHopRange(new HopRange(lowerEndpoint + ".." + upperEndpoint));
-        }
-        if (hopRangeAugment.getHopRange() != null) {
             ipv4ProtocolFieldsConfigBuilder.addAugmentation(Config3.class, hopRangeAugment.build());
         }
 
+        // if there are some unsupported expressions, ACL cannot be parsed at all
+        if (!words.isEmpty()) {
+            throw new IllegalArgumentException("ACL entry contains unsupported expressions that cannot be parsed: "
+                    + words);
+        }
         return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);
     }
 
     private static AclEntry1 parseIcmpMsgType(final IpProtocolType ipProtocolType, final Queue<String> words, boolean
             isIpv4Acl) {
         final AclEntry1Builder icmpMsgTypeAugment = new AclEntry1Builder();
-        if (IP_PROTOCOL_ICMP.equals(ipProtocolType) || IP_PROTOCOL_ICMP_NUMBER.equals(ipProtocolType)) {
+        if (IP_PROTOCOL_ICMP.equals(ipProtocolType) || IP_PROTOCOL_ICMP_NUMBER.equals(ipProtocolType)
+                || IP_PROTOCOL_ICMP6_NUMBER.equals(ipProtocolType)) {
             Optional<Short> maybeMsgType = tryToParseIcmpType(words.peek(), isIpv4Acl);
             if (maybeMsgType.isPresent()) {
                 words.poll();
@@ -373,15 +368,12 @@ final class AclEntryLineParser {
         final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words, false);
 
         // ttl
-        Config4Builder hopRangeAugment = new Config4Builder();
-        //noinspection Duplicates
         if (!words.isEmpty() && "ttl".equals(words.peek())) {
             Entry<Integer, Integer> ttlRange = parseTTLRange(words);
             int lowerEndpoint = ttlRange.getKey();
             int upperEndpoint = ttlRange.getValue();
+            Config4Builder hopRangeAugment = new Config4Builder();
             hopRangeAugment.setHopRange(new HopRange(lowerEndpoint + ".." + upperEndpoint));
-        }
-        if (hopRangeAugment.getHopRange() != null) {
             ipv6ProtocolFieldsConfigBuilder.addAugmentation(Config4.class, hopRangeAugment.build());
         }
 
@@ -423,7 +415,6 @@ final class AclEntryLineParser {
         return Optional.ofNullable(ServiceToPortMapping.ICMPV6_MAPPING.get(word));
     }
 
-
     /**
      * Parse ttl (hop range).
      * If words contain ttl, return closed range 0-255..0-255.
@@ -459,7 +450,7 @@ final class AclEntryLineParser {
                 return Maps.immutableEntry(num, num2);
             }
             default:
-                throw new IllegalArgumentException("Cannot parse ttl range keyword:" + keyword);
+                throw new IllegalArgumentException("Cannot parse ttl range keyword: " + keyword);
         }
     }
 
@@ -467,7 +458,7 @@ final class AclEntryLineParser {
         try {
             return Integer.parseInt(portNumberOrServiceName);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Cannot parse port:" + portNumberOrServiceName, e);
+            throw new IllegalArgumentException("Cannot parse port: " + portNumberOrServiceName, e);
         }
     }
 
@@ -537,7 +528,7 @@ final class AclEntryLineParser {
                 int port2 = serviceToPortNumber(words.poll());
                 return createPortNumRange(String.valueOf(port1), String.valueOf(port2));
             default:
-                throw new IllegalArgumentException("Not a port range keyword:" + possiblePortRangeKeyword);
+                throw new IllegalArgumentException("Not a port range keyword: " + possiblePortRangeKeyword);
         }
     }
 
@@ -552,8 +543,7 @@ final class AclEntryLineParser {
                     // otherwise
                     // we fail
                     throw new IllegalArgumentException("Unknown named port, unable to translate to from 'neq' to "
-                            +
-                            "range:" + port1);
+                            + "range: " + port1);
                 }
 
                 // not 22 = 23-21
@@ -566,7 +556,7 @@ final class AclEntryLineParser {
                 String port2 = words.poll();
                 return createPortRangeString(port1, port2);
             default:
-                throw new IllegalArgumentException("Not a port range keyword:" + possiblePortRangeKeyword);
+                throw new IllegalArgumentException("Not a port range keyword: " + possiblePortRangeKeyword);
         }
     }
 
@@ -595,7 +585,6 @@ final class AclEntryLineParser {
         }
     }
 
-    @Nullable
     private static IpProtocolType parseProtocol(String protocol) {
         switch (protocol) {
             case "ip":
@@ -609,12 +598,16 @@ final class AclEntryLineParser {
             case "icmp":
             case "icmpv6":
                 return IP_PROTOCOL_ICMP;
+            case "1":
+                return IP_PROTOCOL_ICMP_NUMBER;
+            case "58":
+                return IP_PROTOCOL_ICMP6_NUMBER;
             default:
                 if (NumberUtils.isParsable(protocol)) {
                     return new IpProtocolType(Integer.valueOf(protocol).shortValue());
                 }
-                LOG.warn("Unknown protocol {}", protocol);
-                return null;
+                throw new IllegalArgumentException("IP protocol with following identifier is not supported: "
+                        + protocol);
         }
     }
 
@@ -692,5 +685,4 @@ final class AclEntryLineParser {
                 .setWildcardMask(new Ipv6Address(wildcard))
                 .build();
     }
-
 }

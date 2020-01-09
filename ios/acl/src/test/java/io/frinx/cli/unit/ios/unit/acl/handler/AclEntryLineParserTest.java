@@ -387,6 +387,20 @@ public class AclEntryLineParserTest {
         }
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void parseAclLineWithUnsupportedProtocolTest() {
+        final String line = "10 deny esp host 1.2.3.4 host 5.6.7.8";
+        final AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4.class);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIpv4WithUnsupportedOption() {
+        final String line = "permit tcp host 1.1.1.1 host 2.2.2.2 eq 69 established";
+        final AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4.class);
+    }
+
     @Test
     public void testFindLineWithSequenceId() {
         String lines = "a\n"
@@ -414,7 +428,7 @@ public class AclEntryLineParserTest {
                 + " remark foo sequence 11\n"
                 + " remark bar sequence 21\n"
                 + " remark baz2 sequence 31\n"
-                + " deny ipv6 any any fragments sequence 50\n"
+                + " deny ipv6 any any sequence 50\n"
                 + "!\n";
         LinkedHashMap<Long, AclEntry> expectedResults = new LinkedHashMap<>();
 
@@ -611,6 +625,20 @@ public class AclEntryLineParserTest {
             AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV6.class);
             Assert.assertEquals(entry.getValue(), resultBuilder.build());
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIpv6WithUnsupportedProtocol() {
+        final String line = "permit pcp host AB::1 host CD::2 eq 69 sequence 20";
+        final AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV6.class);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIpv6WithUnsupportedOption() {
+        final String line = "permit udp host AB::1 host CD::2 eq 69 time-range RANGE_1 sequence 20";
+        final AclEntryBuilder resultBuilder = new AclEntryBuilder();
+        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV6.class);
     }
 
     @Test
