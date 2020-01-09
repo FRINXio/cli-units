@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliConfigListReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,14 +31,13 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey, AclEntryBuilder> {
+public class AclEntryReader {
     private static final String SH_ACCESS_LISTS_IPV4 = "show running-config ipv4 access-list %s";
     private static final String SH_ACCESS_LISTS_IPV6 = "show running-config ipv6 access-list %s";
     private static final Map<Class<? extends ACLTYPE>, String> TYPES_TO_COMMANDS = ImmutableMap.of(
@@ -52,16 +50,17 @@ public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey
             .MULTILINE);
 
     private final Cli cli;
+    private final AclSetReader aclSetReader;
 
-    public AclEntryReader(Cli cli) {
+    public AclEntryReader(final Cli cli, final AclSetReader aclSetReader) {
         this.cli = cli;
+        this.aclSetReader = aclSetReader;
     }
 
-    @Override
-    public List<AclEntryKey> getAllIds(@Nonnull final InstanceIdentifier<AclEntry> instanceIdentifier,
-                                              @Nonnull final ReadContext readContext) throws ReadFailedException {
+    public List<AclEntryKey> getAllIds(@Nonnull final InstanceIdentifier<AclSet> instanceIdentifier,
+                                       @Nonnull final ReadContext readContext) throws ReadFailedException {
         String command = getAclCommand(instanceIdentifier);
-        return parseAclEntryKey(blockingRead(command, cli, instanceIdentifier, readContext));
+        return parseAclEntryKey(aclSetReader.blockingRead(command, cli, instanceIdentifier, readContext));
     }
 
     static String getAclCommand(InstanceIdentifier<?> id) {
@@ -81,27 +80,22 @@ public class AclEntryReader implements CliConfigListReader<AclEntry, AclEntryKey
         return result;
     }
 
-    @Override
-    public void readCurrentAttributes(@Nonnull final InstanceIdentifier<AclEntry> instanceIdentifier,
-                                             @Nonnull final AclEntryBuilder aclEntryBuilder,
-                                             @Nonnull final ReadContext readContext)
+    public void readCurrentAttributes(@Nonnull final InstanceIdentifier<AclSet> instanceIdentifier,
+            @Nonnull final AclEntryBuilder aclEntryBuilder, @Nonnull final ReadContext readContext)
             throws ReadFailedException {
 
         String command = getAclCommand(instanceIdentifier);
-        String output = blockingRead(command, cli, instanceIdentifier, readContext);
+        String output = aclSetReader.blockingRead(command, cli, instanceIdentifier, readContext);
 
         parseACL(instanceIdentifier, aclEntryBuilder, output);
     }
 
     @VisibleForTesting
-    public static void parseACL(final @Nonnull InstanceIdentifier<AclEntry> instanceIdentifier,
-                                final @Nonnull AclEntryBuilder aclEntryBuilder,
-                                final String output) {
+    static void parseACL(final InstanceIdentifier<AclSet> instanceIdentifier,
+                         final AclEntryBuilder aclEntryBuilder, final String output) {
 
         AclSetKey aclSetKey = instanceIdentifier.firstKeyOf(AclSet.class);
-
-        Optional<String> maybeLine = AclEntryLineParser.findAclEntryWithSequenceId(instanceIdentifier, output);
-
+        Optional<String> maybeLine = AclEntryLineParser.findAclEntryWithSequenceId(aclEntryBuilder.getKey(), output);
         maybeLine.ifPresent(s -> AclEntryLineParser.parseLine(aclEntryBuilder, s, aclSetKey.getType()));
     }
 }
