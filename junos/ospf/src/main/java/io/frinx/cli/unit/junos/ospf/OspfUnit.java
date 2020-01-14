@@ -31,6 +31,8 @@ import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceConfigWriter;
 import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceReader;
 import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceTimersConfigReader;
 import io.frinx.cli.unit.junos.ospf.handler.AreaInterfaceTimersConfigWriter;
+import io.frinx.cli.unit.junos.ospf.handler.MaxMetricConfigReader;
+import io.frinx.cli.unit.junos.ospf.handler.MaxMetricConfigWriter;
 import io.frinx.cli.unit.junos.ospf.handler.OspfAreaReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
@@ -66,6 +68,7 @@ public class OspfUnit extends AbstractUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
+        writeRegistry.add(IIDs.NE_NE_PR_PR_OS_GL_TI_MA_CONFIG, new MaxMetricConfigWriter(cli));
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_OS_AR_AREA);
         writeRegistry.addAfter(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigWriter(cli),
                 IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
@@ -89,6 +92,7 @@ public class OspfUnit extends AbstractUnit {
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.add(IIDs.NE_NE_PR_PR_OS_GL_TI_MA_CONFIG, new MaxMetricConfigReader(cli));
         readRegistry.add(IIDs.NE_NE_PR_PR_OS_AR_AREA, new OspfAreaReader(cli));
         readRegistry.add(IIDs.NE_NE_PR_PR_OS_AR_AR_CONFIG, new AreaConfigReader());
         readRegistry.add(IIDs.NE_NE_PR_PR_OS_AR_AR_IN_INTERFACE, new AreaInterfaceReader(cli));
