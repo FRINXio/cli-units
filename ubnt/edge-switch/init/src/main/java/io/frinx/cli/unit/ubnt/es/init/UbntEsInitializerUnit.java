@@ -19,7 +19,6 @@ package io.frinx.cli.unit.ubnt.es.init;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.rpc.RpcService;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.PromptResolutionStrategy;
@@ -27,8 +26,8 @@ import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
+import io.frinx.cli.unit.utils.AbstractUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -42,35 +41,28 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topo
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.PrivilegedModeCredentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.credentials.LoginPassword;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.credentials.privileged.mode.credentials.IosEnablePassword;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UbntEsInitializerUnit implements TranslateUnit {
+public class UbntEsInitializerUnit extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(UbntEsInitializerUnit.class);
-
-    private TranslationUnitCollector registry;
-    private TranslationUnitCollector.Registration iosReg;
     private Map<RemoteDeviceId, UbntEsInitializer> initializers;
 
     public UbntEsInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
-        this.registry = registry;
+        super(registry);
         this.initializers = Maps.newHashMap();
     }
 
-    public void init() {
-        iosReg = registry.registerTranslateUnit(UbntEsDevices.UBNT_ES_GENERIC, this);
-    }
-
-    public void close() {
-        if (iosReg != null) {
-            iosReg.close();
-        }
+    @Override
+    protected Set<Device> getSupportedVersions() {
+        return Collections.singleton(UbntEsDevices.UBNT_ES_GENERIC);
     }
 
     @Override
-    public String toString() {
+    protected String getUnitName() {
         return "Ubiquiti edgeswitch cli init (FRINX) translate unit";
     }
 
@@ -99,11 +91,6 @@ public class UbntEsInitializerUnit implements TranslateUnit {
                 Pattern.compile("(^|\\n)% (?i)invalid input(?-i).*", Pattern.DOTALL),
                 Pattern.compile("(^|\\n)% (?i)Incomplete command(?-i).*", Pattern.DOTALL)
         ));
-    }
-
-    @Override
-    public Set<RpcService<?, ?>> getRpcs(@Nonnull Context context) {
-        return Collections.emptySet();
     }
 
     @Override
