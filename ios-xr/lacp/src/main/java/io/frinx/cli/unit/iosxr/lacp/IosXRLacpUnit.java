@@ -60,8 +60,8 @@ public class IosXRLacpUnit extends AbstractUnit {
     public void provideHandlers(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry,
                                 @Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry, @Nonnull Context context) {
         Cli cli = context.getTransport();
-        // provideReaders(readRegistry, cli);
-        // provideWriters(writeRegistry, cli);
+        provideReaders(readRegistry, cli);
+        provideWriters(writeRegistry, cli);
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
