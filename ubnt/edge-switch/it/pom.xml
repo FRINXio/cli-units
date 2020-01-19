@@ -25,14 +25,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.cli</groupId>
     <artifactId>ubnt-es-it</artifactId>
-    <version>3.1.12.rc9-frinx</version>
+    <version>3.1.12.rc10-frinx-SNAPSHOT</version>
 
     <properties>
-        <cli.version>3.1.12.rc9-frinx</cli.version>
-        <openconfig.version>3.1.12.rc9-frinx</openconfig.version>
+        <cli.version>3.1.12.rc10-frinx-SNAPSHOT</cli.version>
+        <openconfig.version>3.1.12.rc10-frinx-SNAPSHOT</openconfig.version>
         <hc.version>1.17.10-Carbon-SR1.3_1_12_rc10-frinxodl-SNAPSHOT</hc.version>
         <controller.version>1.5.1-Carbon-SR1.3_1_12_rc10-frinxodl-SNAPSHOT</controller.version>
-        <translate.unit.commons.version>3.1.12.rc9-frinx</translate.unit.commons.version>
+        <translate.unit.commons.version>3.1.12.rc10-frinx-SNAPSHOT</translate.unit.commons.version>
         <yangtools.version>1.1.1-Carbon-SR1.3_1_12_rc10-frinxodl-SNAPSHOT</yangtools.version>
         <mdsal.version>2.2.1-Carbon-SR1.3_1_12_rc10-frinxodl-SNAPSHOT</mdsal.version>
         <mdsalmodel.version>0.10.1-Carbon-SR1.3_1_12_rc10-frinxodl-SNAPSHOT</mdsalmodel.version>
