@@ -45,6 +45,7 @@
         <module>nexus</module>
         <module>dasan</module>
         <module>sros</module>
+        <module>saos</module>
         <module>ubnt/edge-switch</module>
         <module>yang-docs-plugin</module>
         <module>interface-base</module>

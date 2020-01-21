@@ -400,6 +400,18 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- SAOS -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>saos-6-cli-init-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>saos-6-configuration-metadata-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- SROS -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -497,13 +509,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>frinx-cli-unit-ubnt-es</artifactId>
-                <type>xml</type>
-                <classifier>features</classifier>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>frinx-cli-unit-dasan</artifactId>
                 <type>xml</type>
                 <classifier>features</classifier>
@@ -512,6 +517,13 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>frinx-cli-unit-sros</artifactId>
+                <type>xml</type>
+                <classifier>features</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>frinx-cli-unit-saos</artifactId>
                 <type>xml</type>
                 <classifier>features</classifier>
                 <version>${project.version}</version>
