@@ -35,6 +35,7 @@
     <module>saos-6-init</module>
     <module>saos-6-configuration-metadata</module>
     <module>saos-6-it</module>
+    <module>saos-6-network-instance</module>
   </modules>
 
   <build>

@@ -67,6 +67,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>saos-6-configuration-metadata-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-network-instance-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
