@@ -57,7 +57,8 @@ public class AreaInterfaceConfigWriter implements CliWriter<Config> {
                 AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
         blockingWriteAndRead(cli, instanceIdentifier, data, cmd);
 
-        if (data.getAugmentation(OspfAreaIfConfAug.class).isEnabled()) {
+        if (data.getAugmentation(OspfAreaIfConfAug.class) != null
+                && data.getAugmentation(OspfAreaIfConfAug.class).isEnabled()) {
             String delcmd = f("delete%s protocols ospf area %s interface %s",
                     OspfProtocolReader.resolveVrfWithName(instanceIdentifier),
                     AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
@@ -100,7 +101,8 @@ public class AreaInterfaceConfigWriter implements CliWriter<Config> {
                 OspfProtocolReader.resolveVrfWithName(instanceIdentifier),
                 AreaInterfaceReader.areaIdToString(areaId), intfId.getId());
 
-        if (dataAfter.getAugmentation(OspfAreaIfConfAug.class).isEnabled()) {
+        if (dataAfter.getAugmentation(OspfAreaIfConfAug.class) != null
+                && dataAfter.getAugmentation(OspfAreaIfConfAug.class).isEnabled()) {
             blockingWriteAndRead(cli, instanceIdentifier, dataAfter, f("%s disable", delcmd));
         } else {
             blockingWriteAndRead(cli, instanceIdentifier, dataAfter, f("%s disable", cmd));
