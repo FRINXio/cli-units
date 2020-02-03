@@ -46,6 +46,7 @@
     <module>dasan</module>
     <module>sros</module>
     <module>ubnt/edge-switch</module>
+    <module>mikrotik</module>
     <module>network-instance-base</module>
     <module>interface-base</module>
     <module>saos</module>

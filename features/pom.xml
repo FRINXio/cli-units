@@ -552,5 +552,12 @@
       <artifactId>ubnt-es-cli-init-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- Microtik -->
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>mikrotik-cli-init-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>
