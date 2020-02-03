@@ -33,8 +33,6 @@ import io.fd.honeycomb.translate.read.registry.ReaderRegistry;
 import io.fd.honeycomb.translate.util.YangDAG;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.io.CliFlavour;
-import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.impl.IOConfigurationBuilder;
 import io.frinx.cli.io.impl.cli.KeepaliveCli;
 import io.frinx.cli.registry.api.TranslateContext;
@@ -191,10 +189,10 @@ public class IosAll {
 
         IOConfigurationBuilder ioConfigurationBuilder = new IOConfigurationBuilder()
                 .setId(remoteId)
-                .setCliFlavour(CliFlavour.CISCO)
+                .setCliFlavour(translateContext.getCliFlavour())
                 .setCliConfiguration(getCliNode())
                 .setInitializer(translateContext.getInitializer(remoteId, getCliNode()))
-                .setPromptResolver(PromptResolutionStrategy.ENTER_AND_READ)
+                .setPromptResolver(translateContext.getPromptResolver())
                 .setKeepaliveExecutor(EXECUTOR)
                 .setCliInitExecutor(ForkJoinPool.commonPool())
                 .setReconnectListener(RECONNECT_LISTENER)
@@ -325,11 +323,12 @@ public class IosAll {
             IOConfigurationBuilder ioConfigurationBuilder = new IOConfigurationBuilder()
                     .setId(remoteId)
                     .setCliConfiguration(getCliNode())
+                    .setCliFlavour(translateContext.getCliFlavour())
                     .setInitializer(translateContext.getInitializer(remoteId, getCliNode()))
                     .setKeepaliveExecutor(EXECUTOR)
                     .setCliInitExecutor(ForkJoinPool.commonPool())
                     .setReconnectListener(RECONNECT_LISTENER)
-                    .setPromptResolver(PromptResolutionStrategy.ENTER_AND_READ)
+                    .setPromptResolver(translateContext.getPromptResolver())
                     .setErrorPatterns(Collections.emptySet());
 
             Cli io = ioConfigurationBuilder.getIO()

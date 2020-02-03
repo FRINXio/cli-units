@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright © 2018 Frinx and others.
+  ~ Copyright © 2020 Frinx and others.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -441,6 +441,13 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- MIKROTIK -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>mikrotik-cli-init-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Features -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -536,6 +543,13 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>frinx-cli-unit-ubnt-es</artifactId>
+                <type>xml</type>
+                <classifier>features</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>frinx-cli-unit-mikrotik</artifactId>
                 <type>xml</type>
                 <classifier>features</classifier>
                 <version>${project.version}</version>
