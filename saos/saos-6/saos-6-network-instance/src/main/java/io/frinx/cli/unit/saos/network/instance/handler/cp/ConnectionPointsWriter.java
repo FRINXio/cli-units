@@ -28,7 +28,7 @@ public class ConnectionPointsWriter extends CompositeWriter<ConnectionPoints> im
     public ConnectionPointsWriter(Cli cli) {
         super(Lists.newArrayList(
                // new L2VSICPPointsWriter(cli),
-                new L2VSIPointsWriter(cli)));
+                new L2VSIPointsWriter()));
     }
 
 }

@@ -19,6 +19,7 @@ package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan;
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
@@ -70,6 +71,6 @@ public class DefaultVlanConfigReader implements CompositeReader.Child<Config, Co
     @Override
     public Check getCheck() {
         // TODO: fill in
-        return null;
+        return BasicCheck.emptyCheck();
     }
 }

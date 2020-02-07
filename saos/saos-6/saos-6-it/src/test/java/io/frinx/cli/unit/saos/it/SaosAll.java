@@ -19,6 +19,7 @@ import io.frinx.cli.registry.impl.TranslateRegistryImpl;
 import io.frinx.cli.unit.generic.GenericTranslateUnit;
 import io.frinx.cli.unit.saos.conf.ConfigurationUnit;
 import io.frinx.cli.unit.saos.init.SaosCliInitializerUnit;
+import io.frinx.cli.unit.saos.network.instance.SaosNetworkInstanceUnit;
 import java.net.InetSocketAddress;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -89,6 +90,7 @@ public class SaosAll extends io.frinx.cli.unit.ios.it.IosAll {
         new GenericTranslateUnit(reg).init();
         new SaosCliInitializerUnit(reg).init();
         new ConfigurationUnit(reg).init();
+        new SaosNetworkInstanceUnit(reg).init();
 
         return reg;
     }
@@ -105,7 +107,6 @@ public class SaosAll extends io.frinx.cli.unit.ios.it.IosAll {
         super.getInterfacesBA();
     }
 
-    @Ignore
     @Test
     public void getAllDOM() throws Exception {
         super.getAllDOM();

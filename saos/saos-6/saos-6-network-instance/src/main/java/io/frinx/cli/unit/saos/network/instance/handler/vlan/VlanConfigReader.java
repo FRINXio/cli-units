@@ -18,7 +18,6 @@ package io.frinx.cli.unit.saos.network.instance.handler.vlan;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.vlan.L2VSIVlanConfigReader;
 import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
@@ -30,9 +29,8 @@ public class VlanConfigReader extends CompositeReader<Config, ConfigBuilder>
 
     public VlanConfigReader(Cli cli) {
         super(Lists.newArrayList(
-                new DefaultVlanConfigReader(cli),
+                new DefaultVlanConfigReader(cli)
                 //new L2VSICPVlanConfigReader(),
-                new L2VSIVlanConfigReader()
         ));
     }
 }

@@ -16,44 +16,106 @@
 
 package io.frinx.cli.unit.saos.network.instance.handler.l2vsi.cp;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
-import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIReader;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.InstanceConnectionPointConfig;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.ConnectionPoint;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2VSIPointsWriter implements CompositeWriter.Child<ConnectionPoints>, CliWriter<ConnectionPoints> {
 
-    private Cli cli;
 
-    public L2VSIPointsWriter(Cli cli) {
-        this.cli = cli;
+    public L2VSIPointsWriter() {
     }
-
-    // TODO: fill in
 
     @Override
     public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<ConnectionPoints> iid,
                                                  @Nonnull ConnectionPoints data,
-                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
-        return false;
+                                                 @Nonnull WriteContext writeContext) {
+        if (!L2VSIReader.basicCheck_L2VSI.canProcess(iid, writeContext, false)) {
+            return false;
+        }
+        checkWriteData(iid, data, writeContext);
+
+        return true;
+    }
+
+    private void checkWriteData(@Nonnull InstanceIdentifier<ConnectionPoints> iid,
+                                @Nonnull ConnectionPoints data,
+                                @Nonnull WriteContext writeContext) {
+        boolean vsIdPresentVcNot = (data.getConnectionPoint() == null || data.getConnectionPoint().isEmpty())
+                && writeContext.readAfter(iid.firstIdentifierOf(NetworkInstance.class)).isPresent();
+        Preconditions.checkArgument(!vsIdPresentVcNot, "Cannot handle only connection point");
+
+        String cpId = Optional.ofNullable(data.getConnectionPoint())
+                 .orElse(Collections.emptyList())
+                 .stream()
+                 .map(ConnectionPoint::getConnectionPointId)
+                 .findFirst()
+                 .orElse(null);
+        Preconditions.checkNotNull(cpId, "Missing connection point id");
+        String cpConfigId = Optional.ofNullable(data.getConnectionPoint())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(ConnectionPoint::getConfig)
+                .map(InstanceConnectionPointConfig::getConnectionPointId)
+                .findFirst()
+                .orElse(null);
+        Preconditions.checkNotNull(cpConfigId, "Missing connection point id");
+
+        Preconditions.checkArgument(Objects.equals(cpId, cpConfigId),
+                "Connection point Id and Id from connection point config must be the same");
     }
 
     @Override
     public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<ConnectionPoints> iid,
                                                   @Nonnull ConnectionPoints dataBefore,
                                                   @Nonnull ConnectionPoints dataAfter,
-                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
-        return false;
+                                                  @Nonnull WriteContext writeContext) {
+        checkData(iid, dataAfter, writeContext);
+        return true;
+    }
+
+    private void checkData(@Nonnull InstanceIdentifier<ConnectionPoints> iid,
+                           @Nonnull ConnectionPoints data,
+                           @Nonnull WriteContext writeContext) {
+        boolean vcIdPresentVsNot = (data.getConnectionPoint() == null || data.getConnectionPoint().isEmpty())
+                && writeContext.readAfter(iid.firstIdentifierOf(NetworkInstance.class)).isPresent();
+        Preconditions.checkArgument(vcIdPresentVsNot, "Cannot handle only connection point");
+
+        String cpId = Optional.ofNullable(data.getConnectionPoint())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(ConnectionPoint::getConnectionPointId)
+                .findFirst()
+                .orElse(null);
+        Preconditions.checkNotNull(cpId, "Missing connection point id");
+        String cpConfigId = Optional.ofNullable(data.getConnectionPoint())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(ConnectionPoint::getConfig)
+                .map(InstanceConnectionPointConfig::getConnectionPointId)
+                .findFirst()
+                .orElse(null);
+        Preconditions.checkNotNull(cpConfigId, "Missing connection point id");
+
+        Preconditions.checkArgument(Objects.equals(cpId, cpConfigId),
+                "Connection point Id and Id from connection point config must be the same");
     }
 
     @Override
     public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<ConnectionPoints> iid,
                                                   @Nonnull ConnectionPoints dataBefore,
-                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
-        return false;
+                                                  @Nonnull WriteContext writeContext) {
+        return L2VSIReader.basicCheck_L2VSI.canProcess(iid, writeContext, true);
     }
 }

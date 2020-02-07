@@ -18,7 +18,6 @@ package io.frinx.cli.unit.saos.network.instance.handler.vlan;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.vlan.L2VSIVlanConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanConfigWriter;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
@@ -28,9 +27,8 @@ public final class VlanConfigWriter extends CompositeWriter<Config> implements C
 
     public VlanConfigWriter(Cli cli) {
         super(Lists.newArrayList(
-                new DefaultVlanConfigWriter(cli),
+                new DefaultVlanConfigWriter(cli)
                 //new L2PVSICPVlanConfigWriter(),
-                new L2VSIVlanConfigWriter()
         ));
     }
 }
