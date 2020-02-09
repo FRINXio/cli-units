@@ -25,9 +25,9 @@ import io.frinx.cli.unit.saos.init.SaosDevices;
 import io.frinx.cli.unit.saos.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.saos.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.NetworkInstanceReader;
-import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanConfigReader;
-import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanConfigWriter;
-import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanReader;
+import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanConfigReader;
+import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanConfigWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Set;
@@ -70,13 +70,13 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NETWORKINSTANCE);
         writeRegistry.addAfter(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli));
         writeRegistry.addNoop(IIDs.NE_NE_VL_VLAN);
-        writeRegistry.addAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli), IIDs.NE_NE_CONFIG);
+        writeRegistry.addAfter(IIDs.NE_NE_VL_VL_CONFIG, new DefaultVlanConfigWriter(cli), IIDs.NE_NE_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
         readRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli));
-        readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
-        readRegistry.add(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_VL_VLAN, new DefaultVlanReader(cli));
+        readRegistry.add(IIDs.NE_NE_VL_VL_CONFIG, new DefaultVlanConfigReader(cli));
     }
 }

@@ -16,64 +16,24 @@
 
 package io.frinx.cli.unit.saos.network.instance.handler.vlan;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
+import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.vlan.L2VSIVlanReader;
+import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.cli.unit.utils.CliReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import io.frinx.openconfig.network.instance.NetworInstance;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.Vlan;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.VlanBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.VlanKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VlanReader implements CliConfigListReader<Vlan, VlanKey, VlanBuilder> {
-
-    private static final Pattern VLAN_IDS = Pattern.compile("\\|\\s+(?<id>\\d+)\\|\\w+.*");
-    private static final String SHOW_VLANS = "vlan show";
-
-    private final Cli cli;
+public class VlanReader extends CompositeListReader<Vlan, VlanKey, VlanBuilder>
+        implements CliConfigListReader<Vlan, VlanKey, VlanBuilder> {
 
     public VlanReader(Cli cli) {
-        this.cli = cli;
-    }
-
-    @Nonnull
-    @Override
-    public List<VlanKey> getAllIds(@Nonnull InstanceIdentifier<Vlan> instanceIdentifier,
-                                   @Nonnull ReadContext readContext) throws ReadFailedException {
-        if (!instanceIdentifier.firstKeyOf(NetworkInstance.class).equals(NetworInstance.DEFAULT_NETWORK)) {
-            return Collections.emptyList();
-        }
-
-        return getAllIds(cli, this, instanceIdentifier, readContext);
-    }
-
-    @VisibleForTesting
-    static List<VlanKey> getAllIds(Cli cli, CliReader cliReader,
-                                   @Nonnull InstanceIdentifier<?> instanceIdentifier,
-                                   @Nonnull ReadContext readContext) throws ReadFailedException {
-
-        String output = cliReader.blockingRead(SHOW_VLANS, cli, instanceIdentifier, readContext);
-        return ParsingUtils.parseFields(output,
-            0,
-            VLAN_IDS::matcher,
-            matcher -> matcher.group("id"),
-            (id) -> new VlanKey(new VlanId(Integer.parseInt(id))));
-    }
-
-    @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Vlan> instanceIdentifier,
-                                      @Nonnull VlanBuilder vlanBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        vlanBuilder.setKey(instanceIdentifier.firstKeyOf(Vlan.class)).getVlanId();
+        super(Lists.newArrayList(
+                new DefaultVlanReader(cli),
+                //new L2VSICPVlanReader(cli),
+                new L2VSIVlanReader(cli)
+        ));
     }
 }

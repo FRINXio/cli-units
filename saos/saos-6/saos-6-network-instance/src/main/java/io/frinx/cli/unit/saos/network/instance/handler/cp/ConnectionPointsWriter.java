@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler;
+package io.frinx.cli.unit.saos.network.instance.handler.cp;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.handlers.def.DefaultConfigWriter;
-import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.cp.L2VSIPointsWriter;
+import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
 
-public class NetworkInstanceConfigWriter extends CompositeWriter<Config> {
+public class ConnectionPointsWriter extends CompositeWriter<ConnectionPoints> implements CliWriter<ConnectionPoints> {
 
-    public NetworkInstanceConfigWriter(Cli cli) {
+    public ConnectionPointsWriter(Cli cli) {
         super(Lists.newArrayList(
-                //new L2VSICPConfigWriter(cli),
-                new L2VSIConfigWriter(cli),
-                new DefaultConfigWriter()
-        ));
+               // new L2VSICPPointsWriter(cli),
+                new L2VSIPointsWriter(cli)));
     }
+
 }

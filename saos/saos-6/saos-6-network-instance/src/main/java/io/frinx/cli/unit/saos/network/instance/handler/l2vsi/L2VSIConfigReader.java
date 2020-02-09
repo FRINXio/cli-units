@@ -14,27 +14,38 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler;
+package io.frinx.cli.unit.saos.network.instance.handler.l2vsi;
 
+import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.handlers.def.DefaultConfigReader;
-import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
-import java.util.ArrayList;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigBuilder>
-        implements CliConfigReader<Config, ConfigBuilder> {
+public final class L2VSIConfigReader implements CliConfigReader<Config, ConfigBuilder>,
+        CompositeReader.Child<Config, ConfigBuilder> {
 
-    public NetworkInstanceConfigReader(Cli cli) {
-        super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {
-            {
-                //add(new L2VSICPConfigReader(cli));
-                add(new L2VSIConfigReader(cli));
-                add(new DefaultConfigReader());
-            }
-        });
+    private Cli cli;
+
+    public L2VSIConfigReader(Cli cli) {
+        this.cli = cli;
+    }
+
+    @Override
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
+                                      @Nonnull ConfigBuilder configBuilder,
+                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+        // TODO: fill in
+    }
+
+    @Override
+    public Check getCheck() {
+        return BasicCheck.emptyCheck();
     }
 }

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.vlan;
+package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 
-public class VlanConfigReaderTest {
+public class DefaultVlanConfigReaderTest {
 
     private static final String OUTPUT = "+---------------------- VLAN 1 INFO ----------------------+\n"
             + "| Parameter            | Value                            |\n"
@@ -55,7 +55,7 @@ public class VlanConfigReaderTest {
         ConfigBuilder configBuilder = new ConfigBuilder();
         VlanId vlanId = new VlanId(3);
 
-        VlanConfigReader.parseVlanConfig(OUTPUT, configBuilder, vlanId);
+        DefaultVlanConfigReader.parseVlanConfig(OUTPUT, configBuilder, vlanId);
 
         Assert.assertEquals(3, configBuilder.getVlanId().getValue().intValue());
         Assert.assertEquals("VLAN#3", configBuilder.getName());

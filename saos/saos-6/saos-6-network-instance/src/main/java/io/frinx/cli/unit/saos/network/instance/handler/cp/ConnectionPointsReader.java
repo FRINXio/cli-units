@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.vlan;
+package io.frinx.cli.unit.saos.network.instance.handler.cp;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.vlan.L2VSIVlanConfigReader;
-import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanConfigReader;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.cp.L2VSIPointsReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPointsBuilder;
 
-public class VlanConfigReader extends CompositeReader<Config, ConfigBuilder>
-        implements CliConfigReader<Config, ConfigBuilder> {
+public class ConnectionPointsReader extends CompositeReader<ConnectionPoints, ConnectionPointsBuilder>
+        implements CliConfigReader<ConnectionPoints, ConnectionPointsBuilder> {
 
-    public VlanConfigReader(Cli cli) {
+    public ConnectionPointsReader(Cli cli) {
         super(Lists.newArrayList(
-                new DefaultVlanConfigReader(cli),
-                //new L2VSICPVlanConfigReader(),
-                new L2VSIVlanConfigReader()
-        ));
+                //new L2VSICPPointsReader(cli),
+                new L2VSIPointsReader(cli)));
     }
+
 }

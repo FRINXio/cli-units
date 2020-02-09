@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.vlan;
+package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -29,7 +29,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev17071
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VlanReaderTest {
+public class DefaultVlanReaderTest {
 
     private static final String OUTPUT = "+------------ VLAN GLOBAL CONFIGURATION ------------+\n"
            + "| Parameter         | Value                         |\n"
@@ -71,6 +71,6 @@ public class VlanReaderTest {
                 new VlanKey(new VlanId(199))
         );
 
-        Assert.assertEquals(expected, VlanReader.getAllIds(null, cliReader, null, null));
+        Assert.assertEquals(expected, DefaultVlanReader.getAllIds(null, cliReader, null, null));
     }
 }

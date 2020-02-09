@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.vlan;
+package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.frinx.cli.io.Cli;
@@ -38,7 +38,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
-public class VlanConfigWriterTest {
+public class DefaultVlanConfigWriterTest {
 
     private static final InstanceIdentifier<Config> INSTANCE_IDENTIFIER =
             KeyedInstanceIdentifier.create(NetworkInstances.class)
@@ -52,12 +52,12 @@ public class VlanConfigWriterTest {
     @Mock
     private WriteContext writeContext;
 
-    private VlanConfigWriter target;
+    private DefaultVlanConfigWriter target;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        target = new VlanConfigWriter(cli);
+        target = new DefaultVlanConfigWriter(cli);
     }
 
     @Test

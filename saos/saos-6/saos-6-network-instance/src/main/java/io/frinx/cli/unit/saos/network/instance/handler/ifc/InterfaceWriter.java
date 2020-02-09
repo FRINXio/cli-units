@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler;
+package io.frinx.cli.unit.saos.network.instance.handler.ifc;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.handlers.def.DefaultConfigWriter;
-import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.ifc.L2VSIInterfaceWriter;
+import io.frinx.cli.unit.utils.CliListWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.InterfaceKey;
 
-public class NetworkInstanceConfigWriter extends CompositeWriter<Config> {
+public class InterfaceWriter extends CompositeWriter<Interface> implements CliListWriter<Interface, InterfaceKey> {
 
-    public NetworkInstanceConfigWriter(Cli cli) {
+    public InterfaceWriter(Cli cli) {
         super(Lists.newArrayList(
-                //new L2VSICPConfigWriter(cli),
-                new L2VSIConfigWriter(cli),
-                new DefaultConfigWriter()
-        ));
+                new L2VSIInterfaceWriter()));
     }
 }

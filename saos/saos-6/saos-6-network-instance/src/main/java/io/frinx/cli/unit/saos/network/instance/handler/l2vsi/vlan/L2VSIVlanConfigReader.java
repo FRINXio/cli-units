@@ -14,25 +14,31 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.vlan;
 
-import com.google.common.collect.Lists;
-import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.vlan.L2VSIVlanConfigReader;
-import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanConfigReader;
+package io.frinx.cli.unit.saos.network.instance.handler.l2vsi.vlan;
+
+import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VlanConfigReader extends CompositeReader<Config, ConfigBuilder>
-        implements CliConfigReader<Config, ConfigBuilder> {
+public class L2VSIVlanConfigReader implements CompositeReader.Child<Config, ConfigBuilder>,
+        CliConfigReader<Config, ConfigBuilder> {
 
-    public VlanConfigReader(Cli cli) {
-        super(Lists.newArrayList(
-                new DefaultVlanConfigReader(cli),
-                //new L2VSICPVlanConfigReader(),
-                new L2VSIVlanConfigReader()
-        ));
+    // TODO: fill in
+
+    @Override
+    public Check getCheck() {
+        return null;
+    }
+
+    @Override
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                      @Nonnull ConfigBuilder builder,
+                                      @Nonnull ReadContext ctx) {
     }
 }
