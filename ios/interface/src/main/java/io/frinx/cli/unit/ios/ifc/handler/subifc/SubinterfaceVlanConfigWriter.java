@@ -19,25 +19,39 @@ package io.frinx.cli.unit.ios.ifc.handler.subifc;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceVlanConfigWriter;
 import io.frinx.cli.unit.ios.ifc.Util;
-import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
+public class SubinterfaceVlanConfigWriter extends AbstractSubinterfaceVlanConfigWriter {
+    private static final String WRITE_TEMPLATE =
+            "configure terminal\n"
+                    + "interface %s\n"
+                    + "encapsulation dot1Q %s\n" + "end";
+    private static final String DELETE_TEMPLATE =
+            "configure terminal\n"
+                    + "interface %s\n"
+                    + "no encapsulation dot1Q %s\n" + "end";
 
     private final Cli cli;
 
     public SubinterfaceVlanConfigWriter(Cli cli) {
+        super(cli);
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n"
-            + "interface %s\n"
-            + "encapsulation dot1Q %s\n"
-            + "end";
+    @Override
+    protected String getSubinterfaceName(InstanceIdentifier<Config> instanceIdentifier) {
+        return Util.getSubinterfaceName(instanceIdentifier);
+    }
+
+    @Override
+    protected String getWriteTemplate() {
+        return WRITE_TEMPLATE;
+    }
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
@@ -50,26 +64,9 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
                     new IllegalArgumentException("Unable to manage Vlan for subinterface: "
                             + SubinterfaceReader.ZERO_SUBINTERFACE_ID));
         } else {
-            blockingWriteAndRead(cli, id, dataAfter,
-                    f(WRITE_TEMPLATE,
-                            Util.getSubinterfaceName(id),
-                            dataAfter.getVlanId().getVlanId().getValue()));
+            super.writeCurrentAttributes(id, dataAfter, writeContext);
         }
     }
-
-    @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                        @Nonnull Config dataBefore,
-                                        @Nonnull Config dataAfter,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributes(id, dataAfter, writeContext);
-    }
-
-    private static final String DELETE_TEMPLATE = "configure terminal\n"
-            + "interface %s\n"
-            + "no encapsulation dot1Q %s\n"
-            + "end";
-
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
