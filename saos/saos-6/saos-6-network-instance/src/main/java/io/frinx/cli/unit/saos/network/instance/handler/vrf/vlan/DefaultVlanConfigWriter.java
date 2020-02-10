@@ -17,19 +17,30 @@
 package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import io.fd.honeycomb.translate.spi.builder.BasicCheck;
+import io.fd.honeycomb.translate.spi.builder.Check;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
+import java.util.Optional;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.Vlan;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.Config1;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class DefaultVlanConfigWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
 
-    private static final String VLAN_WITH_NAME = "vlan create vlan %d name %s";
-    private static final String VLAN_DEFAULT = "vlan create vlan %d";
+    private static final String WRITE_TEMPLATE = "vlan create vlan {$data.vlan_id.value}"
+            + "{% if ($data.name) %} name {$data.name}{% endif %}\n"
+            + "{% if ($tpid) %}vlan set vlan {$data.vlan_id.value} egress-tpid {$tpid}\n{% endif %}";
+    private static final String UPDATE_TEMPLATE =
+            "{$data|update(name,vlan rename vlan `$data.vlan_id.value` name `$data.name`\n,)}"
+            + "{% if ($tpid) %}vlan set vlan {$data.vlan_id.value} egress-tpid {$tpid}\n{% endif %}";
 
     private final Cli cli;
 
@@ -42,43 +53,63 @@ public class DefaultVlanConfigWriter implements CompositeWriter.Child<Config>, C
                                               @Nonnull Config data,
                                               @Nonnull WriteContext writeContext) throws WriteFailedException {
 
-        blockingWriteAndRead(writeTemplate(data), cli, instanceIdentifier, data);
+        if (!getCheck().canProcess(instanceIdentifier, writeContext, false)) {
+            return false;
+        }
+        blockingWriteAndRead(cli, instanceIdentifier, data, writeTemplate(data));
         return true;
     }
 
     @VisibleForTesting
-    String writeTemplate(Config config) {
-        if (config.getName() == null) {
-            return f(VLAN_DEFAULT, config.getVlanId().getValue());
-        } else {
-            return f(VLAN_WITH_NAME, config.getVlanId().getValue(), config.getName());
-        }
+    String writeTemplate(Config data) {
+        Config1 dataAug = data.getAugmentation(Config1.class);
+        return fT(WRITE_TEMPLATE, "data", data,
+                "tpid", dataAug != null ? dataAug.getEgressTpid().getSimpleName().substring(6,10) : null);
     }
 
     @Override
     public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (dataAfter.getName() != null) {
-            if (!(dataAfter.getName().equals(dataBefore.getName()))) {
-                blockingWriteAndRead(
-                        f("vlan rename vlan %d name %s", dataAfter.getVlanId().getValue(), dataAfter.getName()),
-                        cli, id, dataAfter);
-            } else {
-                return false;
-            }
-        } else {
-            blockingWriteAndRead(f("vlan rename vlan %d", dataAfter.getVlanId().getValue()),
-                    cli, id, dataAfter);
+
+        if (!getCheck().canProcess(id, writeContext, false)) {
+            return false;
         }
+
+        blockingWriteAndRead(cli, id, dataAfter, updateTemplate(dataBefore, dataAfter));
         return true;
+    }
+
+    @VisibleForTesting
+    String updateTemplate(Config dataBefore, Config dataAfter) {
+        String tpidBefore = getTpid(dataBefore);
+        String tpidAfter = getTpid(dataAfter);
+        return fT(UPDATE_TEMPLATE, "data", dataAfter, "before", dataBefore,
+                "tpid", !tpidAfter.equals(tpidBefore) ? tpidAfter.substring(6, 10) : null);
+    }
+
+    private String getTpid(Config data) {
+        Preconditions.checkNotNull(data.getAugmentation(Config1.class),
+                "Missing egress-tpid in %s", data.getVlanId().getValue());
+        return Optional.ofNullable(data.getAugmentation(Config1.class)).orElse(null).getEgressTpid().getSimpleName();
     }
 
     @Override
     public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                                @Nonnull Config config,
                                                @Nonnull WriteContext writeContext) throws WriteFailedException {
-        blockingDeleteAndRead(f("vlan delete vlan %d", config.getVlanId().getValue()), cli, instanceIdentifier);
+
+        if (!getCheck().canProcess(instanceIdentifier, writeContext, false)) {
+            return false;
+        }
+        blockingDeleteAndRead(f("vlan delete vlan %d",
+                instanceIdentifier.firstKeyOf(Vlan.class).getVlanId().getValue()), cli, instanceIdentifier);
         return true;
+    }
+
+    public Check getCheck() {
+        return BasicCheck.checkData(
+            ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+            ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_DEFAULTINSTANCE);
     }
 }

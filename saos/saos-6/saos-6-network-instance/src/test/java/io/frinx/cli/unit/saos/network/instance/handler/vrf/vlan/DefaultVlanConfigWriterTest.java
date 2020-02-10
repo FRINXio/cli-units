@@ -16,141 +16,86 @@
 
 package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan;
 
-import io.fd.honeycomb.translate.write.WriteContext;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.io.Command;
-import io.frinx.openconfig.network.instance.NetworInstance;
-import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.NetworkInstances;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.Vlans;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.Vlan;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.VlanKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.Config1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.Config1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8100;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X88A8;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X9100;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPIDTYPES;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class DefaultVlanConfigWriterTest {
 
-    private static final InstanceIdentifier<Config> INSTANCE_IDENTIFIER =
-            KeyedInstanceIdentifier.create(NetworkInstances.class)
-                    .child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
-                    .child(Vlans.class)
-                    .child(Vlan.class, new VlanKey(new VlanId(2)))
-                    .child(Config.class);
-
-    @Mock
-    private Cli cli;
-    @Mock
-    private WriteContext writeContext;
-
-    private DefaultVlanConfigWriter target;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        target = new DefaultVlanConfigWriter(cli);
+    @Test
+    public void writeVlanTest() {
+        DefaultVlanConfigWriter writer = new DefaultVlanConfigWriter(Mockito.mock(Cli.class));
+        createWriteCommandAndTest(writer, createConfig(2, "VLAN#2", false, null),
+                "vlan create vlan 2 name VLAN#2\n");
+        createWriteCommandAndTest(writer, createConfig(2, null, false, null),
+                "vlan create vlan 2\n");
+        createWriteCommandAndTest(writer, createConfig(3, "VLAN#3", true, TPID0X8100.class),
+                "vlan create vlan 3 name VLAN#3\nvlan set vlan 3 egress-tpid 8100\n");
+        createWriteCommandAndTest(writer, createConfig(3, "VLAN#3", true, TPID0X9100.class),
+                "vlan create vlan 3 name VLAN#3\nvlan set vlan 3 egress-tpid 9100\n");
+        createWriteCommandAndTest(writer, createConfig(2, "VLAN#2", true, TPID0X88A8.class),
+                "vlan create vlan 2 name VLAN#2\nvlan set vlan 2 egress-tpid 88A8\n");
+        createWriteCommandAndTest(writer, createConfig(2, null, true, TPID0X8100.class),
+                "vlan create vlan 2\nvlan set vlan 2 egress-tpid 8100\n");
     }
 
     @Test
-    public void testWriteCurrentAttributes_001() throws Exception {
-        final Config config = Mockito.mock(Config.class, Mockito.RETURNS_DEEP_STUBS);
-        final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
-
-        Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
-        Mockito.when(config.getVlanId().getValue()).thenReturn(2);
-        Mockito.doReturn("VLAN").when(config).getName();
-
-        target.writeCurrentAttributes(INSTANCE_IDENTIFIER, config, writeContext);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
-        Assert.assertEquals("vlan create vlan 2 name VLAN",
-                commands.getValue().getContent());
+    public void updateVlanTest() {
+        DefaultVlanConfigWriter writer = new DefaultVlanConfigWriter(Mockito.mock(Cli.class));
+        createUpdateCommandAndTest(writer,
+                createConfig(2, "VLAN#2", true, TPID0X8100.class),
+                createConfig(2, "vlan#2", true, TPID0X8100.class),
+                "vlan rename vlan 2 name vlan#2\n");
+        createUpdateCommandAndTest(writer,
+                createConfig(2, "VLAN#2", true, TPID0X8100.class),
+                createConfig(2, "VLAN#2", true, TPID0X8100.class),
+                "");
+        createUpdateCommandAndTest(writer,
+                createConfig(2, "VLAN#2", true, TPID0X8100.class),
+                createConfig(2, "vlan#2", true, TPID0X9100.class),
+                "vlan rename vlan 2 name vlan#2\nvlan set vlan 2 egress-tpid 9100\n");
     }
 
-    @Test
-    public void testWriteCurrentAttributes_002() throws Exception {
-        final Config config = Mockito.mock(Config.class, Mockito.RETURNS_DEEP_STUBS);
-        final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
-
-        Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
-        Mockito.when(config.getVlanId().getValue()).thenReturn(2);
-        Mockito.doReturn(null).when(config).getName();
-
-        target.writeCurrentAttributes(INSTANCE_IDENTIFIER, config, writeContext);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
-        Assert.assertEquals("vlan create vlan 2", commands.getValue().getContent());
+    @Test(expected = NullPointerException.class)
+    public void testException() {
+        DefaultVlanConfigWriter writer = new DefaultVlanConfigWriter(Mockito.mock(Cli.class));
+        createUpdateCommandAndTest(writer,
+                createConfig(2, "VLAN#2", true, TPID0X8100.class),
+                createConfig(2, "VLAN#2", false, null),
+                "");
     }
 
-    @Test
-    public void testWriteTemplate_001() {
-        final Config config = Mockito.mock(Config.class, Mockito.RETURNS_DEEP_STUBS);
-        Mockito.doReturn("VLAN").when(config).getName();
-        Mockito.when(config.getVlanId().getValue()).thenReturn(2);
-
-        Assert.assertEquals("vlan create vlan 2 name VLAN", target.writeTemplate(config));
+    private void createWriteCommandAndTest(DefaultVlanConfigWriter writer, Config data, String expected) {
+        String command = writer.writeTemplate(data);
+        Assert.assertEquals(expected, command);
     }
 
-    @Test
-    public void testWriteTemplate_002() {
-        final Config config = Mockito.mock(Config.class, Mockito.RETURNS_DEEP_STUBS);
-        Mockito.doReturn(null).when(config).getName();
-        Mockito.when(config.getVlanId().getValue()).thenReturn(2);
-
-        Assert.assertEquals("vlan create vlan 2", target.writeTemplate(config));
+    private void createUpdateCommandAndTest(DefaultVlanConfigWriter writer,
+                                            Config before, Config after, String expected) {
+        String command = writer.updateTemplate(before, after);
+        Assert.assertEquals(expected, command);
     }
 
-    @Test
-    public void testUpdateCurrentAttributes_001() throws Exception {
-        final Config dataBefore = Mockito.mock(Config.class, Mockito.RETURNS_DEEP_STUBS);
-        final Config dataAfter = Mockito.mock(Config.class, Mockito.RETURNS_DEEP_STUBS);
-        final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
-
-        Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
-        Mockito.when(dataBefore.getVlanId().getValue()).thenReturn(2);
-        Mockito.when(dataAfter.getVlanId().getValue()).thenReturn(2);
-        Mockito.doReturn("OLD_VLAN").when(dataBefore).getName();
-        Mockito.doReturn("NEW_VLAN").when(dataAfter).getName();
-
-        target.updateCurrentAttributes(INSTANCE_IDENTIFIER, dataBefore, dataAfter, writeContext);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
-        Assert.assertEquals(commands.getValue().getContent(),
-                "vlan rename vlan 2 name NEW_VLAN");
-    }
-
-    @Test
-    public void testUpdateCurrentAttributes_002() throws Exception {
-        final Config dataBefore = Mockito.mock(Config.class, Mockito.RETURNS_DEEP_STUBS);
-        final Config dataAfter = Mockito.mock(Config.class, Mockito.RETURNS_DEEP_STUBS);
-        final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
-
-        Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
-        Mockito.when(dataAfter.getVlanId().getValue()).thenReturn(2);
-        Mockito.doReturn(null).when(dataAfter).getName();
-
-        target.updateCurrentAttributes(INSTANCE_IDENTIFIER, dataBefore, dataAfter, writeContext);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
-        Assert.assertEquals(commands.getValue().getContent(),
-                "vlan rename vlan 2");
-    }
-
-    @Test
-    public void testDeleteCurrentAttributes() throws Exception {
-        final Config config = Mockito.mock(Config.class, Mockito.RETURNS_DEEP_STUBS);
-        final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
-
-        Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
-        Mockito.when(config.getVlanId().getValue()).thenReturn(2);
-
-        target.deleteCurrentAttributes(INSTANCE_IDENTIFIER, config, writeContext);
-        Mockito.verify(cli, Mockito.times(1)).executeAndRead(commands.capture());
-        Assert.assertEquals(commands.getValue().getContent(), "vlan delete vlan 2");
+    private Config createConfig(int vlanId, String name, boolean addAugmentation,
+                                Class<? extends TPIDTYPES> egressTpid) {
+        ConfigBuilder configBuilder = new ConfigBuilder().setVlanId(new VlanId(vlanId));
+        if (name != null) {
+            configBuilder.setName(name);
+        }
+        if (addAugmentation) {
+            configBuilder.addAugmentation(Config1.class,
+                    new Config1Builder().setEgressTpid(egressTpid).build()).build();
+        }
+        return configBuilder.build();
     }
 }

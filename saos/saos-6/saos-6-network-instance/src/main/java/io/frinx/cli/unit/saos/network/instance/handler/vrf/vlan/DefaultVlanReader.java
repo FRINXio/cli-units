@@ -26,7 +26,9 @@ import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -41,8 +43,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class DefaultVlanReader implements CompositeListReader.Child<Vlan, VlanKey, VlanBuilder>,
         CliConfigListReader<Vlan, VlanKey, VlanBuilder> {
 
-    private static final Pattern VLAN_IDS = Pattern.compile("\\|\\s+(?<id>\\d+)\\|\\w+.*");
-    private static final String SHOW_VLANS = "vlan show";
+    private static final String SHOW_VLANS = "configuration search running-config string \"create vlan\"";
+    private static final Pattern VLAN_ONE = Pattern.compile("vlan create vlan (?<id>\\w+(-\\w+)?).*");
+    private static final Pattern VLANS_TWO = Pattern.compile("vlan create vlan .*,(?<id>\\w+(-\\w+)?)");
+    private static final Check CHECK = BasicCheck.checkData(
+            ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
+            ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_DEFAULTINSTANCE);
 
     private final Cli cli;
 
@@ -58,20 +64,7 @@ public class DefaultVlanReader implements CompositeListReader.Child<Vlan, VlanKe
             return Collections.emptyList();
         }
 
-        return getAllIds(cli, this, instanceIdentifier, readContext);
-    }
-
-    @VisibleForTesting
-    static List<VlanKey> getAllIds(Cli cli, CliReader cliReader,
-                                   @Nonnull InstanceIdentifier<?> instanceIdentifier,
-                                   @Nonnull ReadContext readContext) throws ReadFailedException {
-
-        String output = cliReader.blockingRead(SHOW_VLANS, cli, instanceIdentifier, readContext);
-        return ParsingUtils.parseFields(output,
-            0,
-            VLAN_IDS::matcher,
-            matcher -> matcher.group("id"),
-            (id) -> new VlanKey(new VlanId(Integer.parseInt(id))));
+        return getIds(cli, this, instanceIdentifier, readContext);
     }
 
     @Override
@@ -81,10 +74,41 @@ public class DefaultVlanReader implements CompositeListReader.Child<Vlan, VlanKe
         vlanBuilder.setKey(instanceIdentifier.firstKeyOf(Vlan.class)).getVlanId();
     }
 
+    @VisibleForTesting
+    static List<VlanKey> getIds(Cli cli, CliReader cliReader, @Nonnull InstanceIdentifier<?> instanceIdentifier,
+                                   @Nonnull ReadContext readContext) throws ReadFailedException {
+
+        String output = cliReader.blockingRead(SHOW_VLANS, cli, instanceIdentifier, readContext);
+        List<VlanKey> ids = new ArrayList<>();
+
+        ids.addAll(parseAllIds(output, VLAN_ONE));
+        ids.addAll(parseAllIds(output, VLANS_TWO));
+
+        return ids;
+    }
+
+    static List<VlanKey> parseAllIds(String output, Pattern pattern) {
+        List<VlanKey> list = new ArrayList<>();
+        ParsingUtils.parseFields(output,
+            0,
+            pattern::matcher,
+            matcher -> matcher.group("id"),
+            n -> {
+                if (n.contains("-")) {
+                    String[] split = n.split("-");
+                    for (int i = Integer.parseInt(split[0]); i <= Integer.parseInt(split[1]); i++) {
+                        list.add(new VlanKey(new VlanId(i)));
+                    }
+                } else {
+                    list.add(new VlanKey(new VlanId(Integer.parseInt(n))));
+                }
+                return null;
+            });
+        return list;
+    }
+
     @Override
     public Check getCheck() {
-
-        // TODO: fill in
-        return BasicCheck.emptyCheck();
+        return CHECK;
     }
 }

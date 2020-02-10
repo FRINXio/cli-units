@@ -31,31 +31,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class DefaultVlanReaderTest {
 
-    private static final String OUTPUT = "+------------ VLAN GLOBAL CONFIGURATION ------------+\n"
-           + "| Parameter         | Value                         |\n"
-           + "+-------------------+---------------+---------------+\n"
-           + "| Inner TPID State  | Disabled                      |\n"
-           + "|                   |                               |\n"
-           + "| Field             | Admin         | Oper          |\n"
-           + "+-------------------+---------------+---------------+\n"
-           + "| Inner TPID        | 8100          | 8100          |\n"
-           + "+-------------------+---------------+---------------+\n"
-           + "\n"
-           + "+----+--------------------------------+----------+\n"
-           + "|VLAN|                                |         1|\n"
-           + "| ID | VLAN Name                Ports |1234567890|\n"
-           + "+----+--------------------------------+----------+\n"
-           + "|   1|Default                         | xxxxxxxxx|\n"
-           + "|   2|VLAN#2                          |x        x|\n"
-           + "| 127|VLAN#127                        |          |\n"
-           + "| 199|Mgmt                            |        xx|\n"
-           + "+----+--------------------------------+----------+\n"
-           + "\n"
-           + "+----------------------------- CROSS CONNECTION TABLE ------------------------------+\n"
-           + "| OVID | IVID |                           Port-A |                           Port-B |\n"
-           + "+------+------+----------------------------------+----------------------------------+\n"
-           + "| No Entry Found                                                                    |\n"
-           + "+------+------+----------------------------------+----------------------------------+\n";
+    private static final String OUTPUT = "vlan create vlan 24,199\n"
+            + "vlan create vlan 2-3,5-12\n"
+            + "vlan create vlan 1234";
 
     @Test
     public void testGetAllIds() throws ReadFailedException {
@@ -64,13 +42,15 @@ public class DefaultVlanReaderTest {
         Mockito.when(cliReader.blockingRead(Mockito.anyString(), Mockito.any(Cli.class),
                 Mockito.any(InstanceIdentifier.class), Mockito.any(ReadContext.class))).thenReturn(OUTPUT);
 
-        List<VlanKey> expected = Arrays.asList(
-                new VlanKey(new VlanId(1)),
-                new VlanKey(new VlanId(2)),
-                new VlanKey(new VlanId(127)),
-                new VlanKey(new VlanId(199))
-        );
+        List<VlanKey> ids = Arrays.asList(new VlanKey(new VlanId(24)),
+                new VlanKey(new VlanId(2)), new VlanKey(new VlanId(3)),
+                new VlanKey(new VlanId(1234)), new VlanKey(new VlanId(199)),
+                new VlanKey(new VlanId(5)), new VlanKey(new VlanId(6)),
+                new VlanKey(new VlanId(7)), new VlanKey(new VlanId(8)),
+                new VlanKey(new VlanId(9)), new VlanKey(new VlanId(10)),
+                new VlanKey(new VlanId(11)), new VlanKey(new VlanId(12)));
 
-        Assert.assertEquals(expected, DefaultVlanReader.getAllIds(null, cliReader, null, null));
+        List<VlanKey> allIds = DefaultVlanReader.getIds(null, cliReader, null, null);
+        Assert.assertEquals(ids, allIds);
     }
 }

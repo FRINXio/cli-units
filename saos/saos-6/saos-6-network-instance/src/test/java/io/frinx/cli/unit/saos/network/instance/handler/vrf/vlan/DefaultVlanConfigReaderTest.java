@@ -19,45 +19,33 @@ package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.Config1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8100;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X9100;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 
 public class DefaultVlanConfigReaderTest {
 
-    private static final String OUTPUT = "+---------------------- VLAN 1 INFO ----------------------+\n"
-            + "| Parameter            | Value                            |\n"
-            + "+----------------------+----------------------------------+\n"
-            + "| VLAN ID              | 3                                |\n"
-            + "| Name                 | VLAN#3                           |\n"
-            + "| Features             | DFLT                             |\n"
-            + "| Translation VLAN     |                                  |\n"
-            + "| MAC Learning         | Enabled                          |\n"
-            + "| Egress TPID          | 8100                             |\n"
-            + "| Ingress ACL          |                                  |\n"
-            + "| PFG State            | Disabled                         |\n"
-            + "|     Fwd-Policies     | A -> AB  B -> A                  |\n"
-            + "+---------------------------------------------------------+\n"
-            + "+--------------------- VLAN Members ----------------------+\n"
-            + "| Port      | VTag      | Fwd Group | VS-Sub              |\n"
-            + "+-----------+-----------+-----------+---------------------+\n"
-            + "| 2         | 1         | A         | False               |\n"
-            + "| 3         | 1         | A         | False               |\n"
-            + "| 4         | 1         | A         | False               |\n"
-            + "| 5         | 1         | A         | False               |\n"
-            + "| 6         | 1         | A         | False               |\n"
-            + "| 7         | 1         | A         | False               |\n"
-            + "| 8         | 1         | A         | False               |\n"
-            + "| 9         | 1         | A         | False               |\n"
-            + "| 10        | 1         | A         | False               |\n"
-            + "+-----------+-----------+-----------+---------------------+";
+    private static final String DEFAULT_OUTPUT = "";
+    private static final String OUTPUT = "vlan rename vlan 5 name VLAN_5\n"
+           + "vlan set vlan 5 egress-tpid 9100";
 
     @Test
     public void testParseVlanConfig() {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        VlanId vlanId = new VlanId(3);
+        Config1Builder config1Builder = new Config1Builder();
+        VlanId vlanId = new VlanId(5);
 
-        DefaultVlanConfigReader.parseVlanConfig(OUTPUT, configBuilder, vlanId);
+        DefaultVlanConfigReader.parseVlanConfig(OUTPUT, configBuilder, config1Builder, vlanId);
 
-        Assert.assertEquals(3, configBuilder.getVlanId().getValue().intValue());
-        Assert.assertEquals("VLAN#3", configBuilder.getName());
+        Assert.assertEquals(5, configBuilder.getVlanId().getValue().intValue());
+        Assert.assertEquals("VLAN_5", configBuilder.getName());
+        Assert.assertEquals(TPID0X9100.class, config1Builder.getEgressTpid());
+
+        DefaultVlanConfigReader.parseVlanConfig(DEFAULT_OUTPUT, configBuilder, config1Builder, vlanId);
+
+        Assert.assertEquals(5, configBuilder.getVlanId().getValue().intValue());
+        Assert.assertEquals("VLAN#5", configBuilder.getName());
+        Assert.assertEquals(TPID0X8100.class, config1Builder.getEgressTpid());
     }
 }

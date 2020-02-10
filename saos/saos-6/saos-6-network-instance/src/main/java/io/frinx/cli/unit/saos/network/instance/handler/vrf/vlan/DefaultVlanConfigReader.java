@@ -32,14 +32,23 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.Vlan;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.Config1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.Config1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X8100;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X88A8;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X9100;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPIDTYPES;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class DefaultVlanConfigReader implements CompositeReader.Child<Config, ConfigBuilder>,
         CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_VLAN_COMMAND = "vlan show vlan %s";
-    private static final Pattern VLAN_NAME_PATTERN = Pattern.compile("\\|\\s*Name\\s*\\|\\s*(?<name>\\w+(.*\\d+)*).*");
+    private static final String SH_RENAMES = "configuration search running-config string \"rename vlan %d \"";
+    private static final String SH_TPID = "configuration search running-config string \"%d egress-tpid\"";
+    private static final Pattern VLAN_NAME_PATTERN =
+            Pattern.compile("vlan rename vlan \\d+ name (?<name>\\w+(.*\\w+)*)");
+    private static final Pattern VLAN_TPID_PATTERN = Pattern.compile("vlan set vlan \\d+ egress-tpid (?<tpid>\\w+)");
 
     private Cli cli;
 
@@ -51,26 +60,47 @@ public class DefaultVlanConfigReader implements CompositeReader.Child<Config, Co
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
+
         if (!instanceIdentifier.firstKeyOf(NetworkInstance.class).equals(NetworInstance.DEFAULT_NETWORK)) {
             return;
         }
 
         VlanId vlanId = instanceIdentifier.firstKeyOf(Vlan.class).getVlanId();
-        String output = blockingRead(f(SHOW_VLAN_COMMAND, vlanId.getValue()), cli, instanceIdentifier, readContext);
-        parseVlanConfig(output, configBuilder,vlanId);
+        String output = blockingRead(f(SH_RENAMES, vlanId.getValue()), cli, instanceIdentifier, readContext)
+                + "\n" + blockingRead(f(SH_TPID, vlanId.getValue()), cli, instanceIdentifier, readContext);
+
+        parseVlanConfig(output, configBuilder, new Config1Builder(), vlanId);
     }
 
     @VisibleForTesting
-    static void parseVlanConfig(String output, ConfigBuilder configBuilder, VlanId vlanId) {
+    static void parseVlanConfig(String output, ConfigBuilder configBuilder,
+                                Config1Builder builder, VlanId vlanId) {
         configBuilder.setVlanId(vlanId);
+        configBuilder.setName(String.format("VLAN#%d", vlanId.getValue()));
+        builder.setEgressTpid(parseTpid("8100"));
 
         ParsingUtils.parseField(output, VLAN_NAME_PATTERN::matcher, matcher -> matcher.group("name"),
-                configBuilder::setName);
+            configBuilder::setName);
+
+        ParsingUtils.parseField(output, VLAN_TPID_PATTERN::matcher, matcher -> matcher.group("tpid"),
+            tpid -> builder.setEgressTpid(parseTpid(tpid)));
+
+        configBuilder.addAugmentation(Config1.class, builder.build());
+    }
+
+    static Class<? extends TPIDTYPES> parseTpid(String tpid) {
+        switch (tpid) {
+            case "9100":
+                return TPID0X9100.class;
+            case "8100":
+                return TPID0X8100.class;
+            default:
+                return TPID0X88A8.class;
+        }
     }
 
     @Override
     public Check getCheck() {
-        // TODO: fill in
         return BasicCheck.emptyCheck();
     }
 }
