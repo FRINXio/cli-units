@@ -19,6 +19,7 @@ package io.frinx.cli.unit.saos.network.instance.handler.cp;
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.cp.L2VSIPointsWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsicp.cp.L2vsicpPointsWriter;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
@@ -27,7 +28,7 @@ public class ConnectionPointsWriter extends CompositeWriter<ConnectionPoints> im
 
     public ConnectionPointsWriter(Cli cli) {
         super(Lists.newArrayList(
-               // new L2VSICPPointsWriter(cli),
+                new L2vsicpPointsWriter(),
                 new L2VSIPointsWriter()));
     }
 

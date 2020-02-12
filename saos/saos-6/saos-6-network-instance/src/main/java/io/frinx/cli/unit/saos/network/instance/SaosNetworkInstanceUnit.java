@@ -64,6 +64,8 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
                 IIDs.FRINX_OPENCONFIG_INTERFACES,
                 IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE_TYPES,
                 IIDs.FRINX_SAOS_VS_EXTENSION,
+                IIDs.FRINX_SAOS_NETWORK_INSTANCE_TYPE_EXTENSION,
+                IIDs.FRINX_SAOS_VLAN_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -85,7 +87,9 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
 
         // vlan
         writeRegistry.addNoop(IIDs.NE_NE_VL_VLAN);
-        writeRegistry.addAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli), IIDs.NE_NE_CONFIG);
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
+                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1,
+                        IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2), IIDs.NE_NE_CONFIG);
 
         // virtual-switch
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_CONNECTIONPOINTS,
@@ -106,8 +110,9 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
         readRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli));
         readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
-        readRegistry.add(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli));
-
+        readRegistry.subtreeAdd(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli),
+                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1,
+                        IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2));
 
         // virtual-switch
         readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new InterfaceReader(cli));

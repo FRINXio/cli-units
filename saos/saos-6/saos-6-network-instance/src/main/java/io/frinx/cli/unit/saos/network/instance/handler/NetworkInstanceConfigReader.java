@@ -19,6 +19,7 @@ package io.frinx.cli.unit.saos.network.instance.handler;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.handlers.def.DefaultConfigReader;
 import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigReader;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsicp.L2vsicpConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigB
     public NetworkInstanceConfigReader(Cli cli) {
         super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {
             {
-                //add(new L2VSICPConfigReader(cli));
+                add(new L2vsicpConfigReader());
                 add(new L2VSIConfigReader(cli));
                 add(new DefaultConfigReader());
             }

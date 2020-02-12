@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.handlers.def.DefaultConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsicp.L2vsicpConfigWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 
@@ -27,7 +28,7 @@ public class NetworkInstanceConfigWriter extends CompositeWriter<Config> {
 
     public NetworkInstanceConfigWriter(Cli cli) {
         super(Lists.newArrayList(
-                //new L2VSICPConfigWriter(cli),
+                new L2vsicpConfigWriter(cli),
                 new L2VSIConfigWriter(cli),
                 new DefaultConfigWriter()
         ));

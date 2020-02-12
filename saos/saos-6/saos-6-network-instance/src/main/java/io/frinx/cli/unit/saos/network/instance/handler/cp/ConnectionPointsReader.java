@@ -19,6 +19,7 @@ package io.frinx.cli.unit.saos.network.instance.handler.cp;
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.cp.L2VSIPointsReader;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsicp.cp.L2vsicpPointsReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
@@ -29,7 +30,7 @@ public class ConnectionPointsReader extends CompositeReader<ConnectionPoints, Co
 
     public ConnectionPointsReader(Cli cli) {
         super(Lists.newArrayList(
-                //new L2VSICPPointsReader(cli),
+                new L2vsicpPointsReader(cli),
                 new L2VSIPointsReader(cli)));
     }
 

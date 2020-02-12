@@ -19,6 +19,7 @@ package io.frinx.cli.unit.saos.network.instance.handler;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.handlers.def.DefaultReader;
 import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIReader;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsicp.L2vsicpReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class NetworkInstanceReader
     public NetworkInstanceReader(Cli cli) {
         super(new ArrayList<CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>>() {
             {
-                //add(new L2VSICPReader(cli));
+                add(new L2vsicpReader(cli));
                 add(new L2VSIReader(cli));
                 add(new DefaultReader());
             }
