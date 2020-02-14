@@ -49,6 +49,7 @@ public class InterfaceConfigWriterTest {
             + "port set port 4 vs-ingress-filter off\n"
             + "vlan remove vlan 1234 port 4\n"
             + "virtual-circuit ethernet set port 4 vlan-ethertype-policy all\n"
+            + "configuration save\n"
             + "\n";
 
     private static final String UPDATE_CLEAN_INPUT = "port disable port 4\n"
@@ -59,6 +60,7 @@ public class InterfaceConfigWriterTest {
             + "port set port 4 vs-ingress-filter off\n"
             + "vlan remove vlan 25,50,1234 port 4\n"
             + "virtual-circuit ethernet set port 4 vlan-ethertype-policy all\n"
+            + "configuration save\n"
             + "\n";
 
     @Mock

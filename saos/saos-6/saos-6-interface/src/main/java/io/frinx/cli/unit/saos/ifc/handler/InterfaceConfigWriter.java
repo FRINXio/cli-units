@@ -56,7 +56,8 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
             + "{% if ($vlanAdd) %}vlan add vlan {$vlanAdd} port {$data.name}\n{% endif %}"
             // vlan-ethertype-policy
             + "{% if ($vep) %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy {$vep.name}\n"
-            + "{% else %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy all\n{% endif %}";
+            + "{% else %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy all\n{% endif %}"
+            + "configuration save\n";
 
     private Cli cli;
 
