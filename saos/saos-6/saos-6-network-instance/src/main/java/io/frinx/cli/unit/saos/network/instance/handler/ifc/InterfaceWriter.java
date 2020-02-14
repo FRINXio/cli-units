@@ -28,6 +28,6 @@ public class InterfaceWriter extends CompositeWriter<Interface> implements CliLi
 
     public InterfaceWriter(Cli cli) {
         super(Lists.newArrayList(
-                new L2VSIInterfaceWriter()));
+            new L2VSIInterfaceWriter(cli)));
     }
 }

@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.saos.network.instance.handler.ifc;
 
 import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.Interface;
@@ -27,13 +26,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    public InterfaceConfigReader() {
-    }
-
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+                                      @Nonnull ReadContext readContext) {
         String id = instanceIdentifier.firstKeyOf(Interface.class).getId();
         configBuilder.setId(id);
         configBuilder.setInterface(id);

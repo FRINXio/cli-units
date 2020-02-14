@@ -25,13 +25,20 @@ import io.frinx.cli.unit.saos.init.SaosDevices;
 import io.frinx.cli.unit.saos.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.saos.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.NetworkInstanceReader;
-import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanConfigReader;
-import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanConfigWriter;
-import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.DefaultVlanReader;
+import io.frinx.cli.unit.saos.network.instance.handler.cp.ConnectionPointsReader;
+import io.frinx.cli.unit.saos.network.instance.handler.cp.ConnectionPointsWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceConfigReader;
+import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceReader;
+import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanConfigReader;
+import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanConfigWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
@@ -53,7 +60,11 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE);
+        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE,
+                IIDs.FRINX_OPENCONFIG_INTERFACES,
+                IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE_TYPES,
+                IIDs.FRINX_SAOS_VS_EXTENSION,
+                $YangModuleInfoImpl.getInstance());
     }
 
     @Override
@@ -67,16 +78,43 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
+        // No handling required on the network instance level
         writeRegistry.addNoop(IIDs.NE_NETWORKINSTANCE);
-        writeRegistry.addAfter(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli));
+        writeRegistry.subtreeAdd(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli),
+                Collections.singleton(IIDs.NE_NE_CO_AUG_VSSAOSAUG));
+
+        // vlan
         writeRegistry.addNoop(IIDs.NE_NE_VL_VLAN);
-        writeRegistry.addAfter(IIDs.NE_NE_VL_VL_CONFIG, new DefaultVlanConfigWriter(cli), IIDs.NE_NE_CONFIG);
+        writeRegistry.addAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli), IIDs.NE_NE_CONFIG);
+
+        // virtual-switch
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_CONNECTIONPOINTS,
+                new ConnectionPointsWriter(cli),
+                Sets.newHashSet(
+                        IIDs.NE_NE_CO_CONNECTIONPOINT,
+                        IIDs.NE_NE_CO_CO_CONFIG),
+                /*handle after network instance configuration*/ IIDs.NE_NE_CONFIG);
+
+        writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
+        writeRegistry.addAfter(IIDs.NE_NE_IN_INTERFACE, new InterfaceWriter(cli),
+                IIDs.NE_NE_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_IN_IN_CONFIG);
+
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
         readRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli));
-        readRegistry.add(IIDs.NE_NE_VL_VLAN, new DefaultVlanReader(cli));
-        readRegistry.add(IIDs.NE_NE_VL_VL_CONFIG, new DefaultVlanConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
+        readRegistry.add(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli));
+
+
+        // virtual-switch
+        readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new InterfaceReader(cli));
+        readRegistry.add(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigReader());
+        readRegistry.subtreeAdd(IIDs.NE_NE_CONNECTIONPOINTS, new ConnectionPointsReader(cli),
+                Sets.newHashSet(
+                        IIDs.NE_NE_CO_CONNECTIONPOINT,
+                        IIDs.NE_NE_CO_CO_CONFIG));
     }
 }

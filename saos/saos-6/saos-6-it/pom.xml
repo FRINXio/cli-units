@@ -170,6 +170,12 @@
             <version>4.2.4.rc10-frinx-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>saos-6-network-instance-unit</artifactId>
+            <version>4.2.4.rc10-frinx-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

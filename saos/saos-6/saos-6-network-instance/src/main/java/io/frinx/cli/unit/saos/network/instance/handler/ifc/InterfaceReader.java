@@ -30,6 +30,6 @@ public class InterfaceReader extends CompositeListReader<Interface, InterfaceKey
 
     public InterfaceReader(Cli cli) {
         super(Lists.newArrayList(
-                new L2VSIInterfaceReader()));
+                new L2VSIInterfaceReader(cli)));
     }
 }
