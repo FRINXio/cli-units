@@ -20,65 +20,47 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceVlanConfigWriter;
 import io.frinx.cli.unit.nexus.ifc.Util;
-import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
+public class SubinterfaceVlanConfigWriter extends AbstractSubinterfaceVlanConfigWriter {
+    private static final String WRITE_TEMPLATE = "interface %s\n" + "encapsulation dot1q %s\n" + "root";
+    private static final String DELETE_TEMPLATE = "interface %s\n" + "no encapsulation dot1q %s\n" + "root";
 
     private final Cli cli;
 
     public SubinterfaceVlanConfigWriter(Cli cli) {
+        super(cli);
         this.cli = cli;
     }
 
-    private static final String WRITE_TEMPLATE =
-            "interface %s\n"
-                    + "encapsulation dot1q %s\n"
-                    + "root";
+    @Override
+    protected String getSubinterfaceName(InstanceIdentifier<Config> instanceIdentifier) {
+        return Util.getSubinterfaceName(instanceIdentifier);
+    }
+
+    @Override
+    protected String getWriteTemplate() {
+        return WRITE_TEMPLATE;
+    }
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config dataAfter,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         checkNotZeroSubinterface(id);
-
-        blockingWriteAndRead(cli, id, dataAfter,
-                f(WRITE_TEMPLATE,
-                        Util.getSubinterfaceName(id),
-                        dataAfter.getVlanId()
-                                .getVlanId()
-                                .getValue()));
-
+        super.writeCurrentAttributes(id, dataAfter, writeContext);
     }
-
-    @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                        @Nonnull Config dataBefore,
-                                        @Nonnull Config dataAfter,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (dataAfter.getVlanId() == null) {
-            deleteCurrentAttributes(id, dataBefore, writeContext);
-        } else {
-            writeCurrentAttributes(id, dataAfter, writeContext);
-        }
-    }
-
-    private static final String DELETE_TEMPLATE =
-            "interface %s\n"
-                    + "no encapsulation dot1q %s\n"
-                    + "root";
-
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         checkNotZeroSubinterface(id);
-
         blockingDeleteAndRead(cli, id,
                 f(DELETE_TEMPLATE,
                         Util.getSubinterfaceName(id),
@@ -92,7 +74,5 @@ public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
                 .getIndex();
         Preconditions.checkArgument(subifcIndex != SubinterfaceReader.ZERO_SUBINTERFACE_ID,
                 "Vlan configuration is not allowed for .%s subinterface", subifcIndex);
-
     }
-
 }

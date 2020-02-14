@@ -19,47 +19,36 @@ package io.frinx.cli.unit.junos.ifc.handler.subifc;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceVlanConfigWriter;
 import io.frinx.cli.unit.junos.ifc.Util;
-import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceVlanConfigWriter implements CliWriter<Config> {
-
+public class SubinterfaceVlanConfigWriter extends AbstractSubinterfaceVlanConfigWriter {
     private static final String WRITE_TEMPLATE = "set interfaces %s vlan-id %s";
     private static final String DELETE_TEMPLATE = "delete interfaces %s vlan-id";
 
     private final Cli cli;
 
     public SubinterfaceVlanConfigWriter(Cli cli) {
+        super(cli);
         this.cli = cli;
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
-        @Nonnull WriteContext writeContext) throws WriteFailedException {
-
-        String sbif = Util.getSubinterfaceName(id);
-
-        blockingWriteAndRead(cli, id, dataAfter,
-            f(WRITE_TEMPLATE, sbif, dataAfter.getVlanId().getVlanId().getValue()));
+    protected String getSubinterfaceName(InstanceIdentifier<Config> instanceIdentifier) {
+        return Util.getSubinterfaceName(instanceIdentifier);
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
-        @Nonnull Config dataAfter, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (dataAfter.getVlanId() == null) {
-            deleteCurrentAttributes(id, dataBefore, writeContext);
-        } else {
-            writeCurrentAttributes(id, dataAfter, writeContext);
-        }
+    protected String getWriteTemplate() {
+        return WRITE_TEMPLATE;
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
-        @Nonnull WriteContext writeContext) throws WriteFailedException {
-
+                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         String sbif = Util.getSubinterfaceName(id);
 
         blockingDeleteAndRead(cli, id, f(DELETE_TEMPLATE, sbif));

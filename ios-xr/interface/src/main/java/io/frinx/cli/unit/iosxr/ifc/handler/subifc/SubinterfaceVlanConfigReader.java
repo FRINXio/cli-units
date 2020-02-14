@@ -15,29 +15,40 @@
  */
 package io.frinx.cli.unit.iosxr.ifc.handler.subifc;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceVlanConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.Util;
-import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanLogicalConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceVlanConfigReader implements CliConfigReader<Config, ConfigBuilder> {
-
-    private final Cli cli;
+public class SubinterfaceVlanConfigReader extends AbstractSubinterfaceVlanConfigReader {
+    private static final Pattern VLAN_TAG_LINE = Pattern.compile("encapsulation dot1q (?<tag>[0-9]+)");
+    private static final String CONFIGURATION_INTERFACES = "show running-config interface %s";
 
     public SubinterfaceVlanConfigReader(Cli cli) {
-        this.cli = cli;
+        super(cli);
+    }
+
+    @Override
+    protected String getSubinterfaceName(InstanceIdentifier<Config> instanceIdentifier) {
+        return Util.getSubinterfaceName(instanceIdentifier);
+    }
+
+    @Override
+    protected Pattern getVlanTagLine() {
+        return VLAN_TAG_LINE;
+    }
+
+    @Override
+    protected String getReadCommand() {
+        return CONFIGURATION_INTERFACES;
     }
 
     @Override
@@ -46,24 +57,9 @@ public class SubinterfaceVlanConfigReader implements CliConfigReader<Config, Con
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
 
-        // Only parse configuration for non 0 subifc
         if (subKey.getIndex() == SubinterfaceReader.ZERO_SUBINTERFACE_ID) {
             return;
         }
-
-        String subIfcName = Util.getSubinterfaceName(id);
-
-        String output = blockingRead(String.format("show running-config interface %s", subIfcName), cli, id, ctx);
-        parseVlanTag(output, builder);
-    }
-
-    private static final Pattern VLAN_TAG_LINE = Pattern.compile("encapsulation dot1q (?<tag>[0-9]+)");
-
-    @VisibleForTesting
-    static void parseVlanTag(String output, ConfigBuilder builder) {
-        ParsingUtils.parseField(output,
-                VLAN_TAG_LINE::matcher,
-            matcher -> matcher.group("tag"),
-            tag -> builder.setVlanId(new VlanLogicalConfig.VlanId(new VlanId(Integer.valueOf(tag)))));
+        super.readCurrentAttributes(id, builder, ctx);
     }
 }

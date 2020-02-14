@@ -16,47 +16,35 @@
 
 package io.frinx.cli.unit.junos.ifc.handler.subifc;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceVlanConfigReader;
 import io.frinx.cli.unit.junos.ifc.Util;
-import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanLogicalConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.logical.top.vlan.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SubinterfaceVlanConfigReader implements CliConfigReader<Config, ConfigBuilder> {
-
+public class SubinterfaceVlanConfigReader extends AbstractSubinterfaceVlanConfigReader {
     private static final Pattern VLAN_TAG_LINE = Pattern
-        .compile("set interfaces (?<ifcId>.+) unit (?<subifcIndex>[0-9]+) vlan-id (?<tag>[0-9]+)");
+            .compile("set interfaces (?<ifcId>.+) unit (?<subifcIndex>[0-9]+) vlan-id (?<tag>[0-9]+)");
 
-    private final Cli cli;
+    private static final String CONFIGURATION_INTERFACES = "show configuration interfaces %s | display set";
 
     public SubinterfaceVlanConfigReader(Cli cli) {
-        this.cli = cli;
+        super(cli);
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
-        @Nonnull ReadContext ctx) throws ReadFailedException {
-
-        String subIfcName = Util.getSubinterfaceName(id);
-
-        String output = blockingRead(String.format("show configuration interfaces %s | display set", subIfcName), cli,
-            id, ctx);
-        parseVlanTag(output, builder);
+    protected String getSubinterfaceName(InstanceIdentifier<Config> instanceIdentifier) {
+        return Util.getSubinterfaceName(instanceIdentifier);
     }
 
-    @VisibleForTesting
-    static void parseVlanTag(String output, ConfigBuilder builder) {
-        ParsingUtils
-            .parseField(output, VLAN_TAG_LINE::matcher, matcher -> matcher.group("tag"),
-                tag -> builder.setVlanId(new VlanLogicalConfig.VlanId(new VlanId(Integer.valueOf(tag)))));
+    @Override
+    protected Pattern getVlanTagLine() {
+        return VLAN_TAG_LINE;
+    }
+
+    @Override
+    protected String getReadCommand() {
+        return CONFIGURATION_INTERFACES;
     }
 }

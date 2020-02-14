@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.nexus.ifc.handler.subifc;
+package io.frinx.cli.unit.iosxr.ifc.handler.subifc.ip6;
 
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceVlanConfigReader;
 import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,5 +45,6 @@ public class SubinterfaceVlanConfigReaderTest {
         SubinterfaceVlanConfigReader.parseVlanTag(SH_RUN_INT, actualConfig,
                 Pattern.compile("encapsulation dot1q (?<tag>[0-9]+)"));
         Assert.assertEquals(EXPECTED_CONFIG, actualConfig.build());
+
     }
 }
