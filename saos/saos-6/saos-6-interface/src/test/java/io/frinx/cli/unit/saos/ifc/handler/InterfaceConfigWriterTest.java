@@ -35,6 +35,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.IngressToEgressQmap;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -49,6 +50,7 @@ public class InterfaceConfigWriterTest {
             + "port set port 4 vs-ingress-filter off\n"
             + "vlan remove vlan 1234 port 4\n"
             + "virtual-circuit ethernet set port 4 vlan-ethertype-policy all\n"
+            + "port set port 4 ingress-to-egress-qmap NNI-NNI\n"
             + "configuration save\n"
             + "\n";
 
@@ -98,6 +100,7 @@ public class InterfaceConfigWriterTest {
                 .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
                         .setPhysicalType(PhysicalType.Rj45)
                         .setVlanIds(Arrays.asList("25", "50", "1234"))
+                        .setIngressToEgressQmap(IngressToEgressQmap.DefaultRCOS)
                         .build())
                 .build();
     }
@@ -121,6 +124,7 @@ public class InterfaceConfigWriterTest {
                 .setDescription("updated desc")
                 .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
                         .setVlanIds(Arrays.asList("25", "50"))
+                        .setIngressToEgressQmap(IngressToEgressQmap.NNINNI)
                         .build())
                 .build();
 
