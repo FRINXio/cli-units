@@ -41,8 +41,9 @@ public final class L2VSIReader implements
 
     public static final String SH_VIRTUAL_SWITCH_TEMPLATE =
             "configuration search running-config string virtual-switch";
+    // ignoring virtual-switch with no dependency on virtual-circuit
     private static final Pattern VIRTUAL_SWITCH_LINE_PATTERN =
-            Pattern.compile("virtual-switch ethernet create vs (?<vsid>\\S+).*");
+        Pattern.compile("virtual-switch ethernet create vs (?<vsid>\\S+)( encap-fixed-dot1dpri (\\d+))? (vc \\S+)?.*");
 
     public static Check basicCheck_L2VSI = BasicCheck.checkData(
                 ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,

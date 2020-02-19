@@ -46,7 +46,8 @@ public class VirtualSwitchReaderTest {
     private static final String SH_RUN_VS_ETHERNET_OUTPUT = "virtual-switch ethernet add vs VLAN111222 port 1\n"
         + "virtual-switch ethernet add vs VLAN111333 port 3\n"
         + "virtual-switch ethernet create vs VLAN111333 vc vc3 description EthernetCFMtest2\n"
-        + "virtual-switch ethernet create vs VLAN111222 encap-fixed-dot1dpri 1 vc vc2 description EthernetCFMtest\n";
+        + "virtual-switch ethernet create vs VLAN111222 encap-fixed-dot1dpri 1 vc vc2 description EthernetCFMtest\n"
+        + "virtual-switch ethernet create vs VLAN\n";
 
 
     @Test
