@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
-
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriter implements CliWriter<Config> {
@@ -57,6 +56,8 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
             // vlan-ethertype-policy
             + "{% if ($vep) %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy {$vep.name}\n"
             + "{% else %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy all\n{% endif %}"
+            // ingress-to-egress-qmap
+            + "{% if ($iteq) %}port set port {$data.name} ingress-to-egress-qmap {$iteq}\n{% endif %}"
             + "configuration save\n";
 
     private Cli cli;
@@ -109,7 +110,8 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
                     "vif", (saosAug.isVsIngressFilter() != null && saosAug.isVsIngressFilter()) ? Chunk.TRUE : null,
                     "vlanRemove", getVlansDiff(saosAugBefore, saosAug),
                     "vlanAdd", getVlansDiff(saosAug, saosAugBefore),
-                    "vep", saosAug.getVlanEthertypePolicy());
+                    "vep", saosAug.getVlanEthertypePolicy(),
+                    "iteq", getIngressDiff(saosAugBefore, saosAug));
         }
         return fT(WRITE_TEMPLATE_SAOS, "before", before,
                 "data", after,
@@ -117,6 +119,19 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
                 "desc", getDescription(after),
                 "vlanRemove", getVlansDiff(saosAugBefore, saosAug),
                 "vlanAdd", getVlansDiff(saosAug, saosAugBefore));
+    }
+
+    private String getIngressDiff(IfSaosAug before, IfSaosAug after) {
+        if (after.getIngressToEgressQmap() != null) {
+            if (before != null && before.getIngressToEgressQmap() != null) {
+                String nameBefore = before.getIngressToEgressQmap().getName();
+                String nameAfter = after.getIngressToEgressQmap().getName();
+                return !nameBefore.equals(nameAfter) ? nameAfter : null;
+            }
+            return after.getIngressToEgressQmap().getName();
+        } else {
+            return null;
+        }
     }
 
     private String getDescription(Config after) {

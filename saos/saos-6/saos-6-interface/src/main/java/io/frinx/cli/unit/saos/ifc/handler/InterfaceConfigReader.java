@@ -34,6 +34,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.AcceptableFrameType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.IngressToEgressQmap;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.VlanEthertypePolicy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
@@ -41,7 +42,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_SINGLE_INTERFACE_CFG = "configuration search running-config string \"port %s\"";
+    private static final String SH_SINGLE_INTERFACE_CFG = "configuration search running-config string \"port %s \"";
 
     private static final String PORT_DISABLE = "port disable port %s";
     private static final Pattern PORT_MTU = Pattern.compile("port set port.*max-frame-size (?<mtu>\\d+).*");
@@ -55,6 +56,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
     private static final Pattern PORT_VLAN = Pattern.compile("vlan add vlan (?<vlanID>\\S+).*");
     private static final Pattern VC_VEP =
             Pattern.compile("virtual-circuit ethernet.*vlan-ethertype-policy (?<vep>\\S+).*");
+    private static final Pattern PORT_ITEQ = Pattern.compile("port set port.*ingress-to-egress-qmap NNI-NNI.*");
 
     private Cli cli;
 
@@ -89,7 +91,13 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         setIngressVSFilter(output, ifSaosAugBuilder);
         setVlanEthertypePolicy(output, ifSaosAugBuilder);
         setVlanIds(output, ifSaosAugBuilder);
+        setIngressToEgressQmap(output, ifSaosAugBuilder);
         builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
+    }
+
+    private void setIngressToEgressQmap(String output, IfSaosAugBuilder ifSaosAugBuilder) {
+        ParsingUtils.parseField(output, PORT_ITEQ::matcher, matcher -> true,
+            iteq -> ifSaosAugBuilder.setIngressToEgressQmap(IngressToEgressQmap.NNINNI));
     }
 
     private void setDescription(String output, ConfigBuilder builder) {
