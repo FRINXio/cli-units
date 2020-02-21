@@ -57,6 +57,8 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
     private static final Pattern VC_VEP =
             Pattern.compile("virtual-circuit ethernet.*vlan-ethertype-policy (?<vep>\\S+).*");
     private static final Pattern PORT_ITEQ = Pattern.compile("port set port.*ingress-to-egress-qmap NNI-NNI.*");
+    private static final Pattern MAX_MACS = Pattern.compile(".*max-dynamic-macs (?<macs>\\d+).*");
+    private static final Pattern FORWARD_UNLEARNED = Pattern.compile(".*forward-unlearned (?<learning>\\S+)");
 
     private Cli cli;
 
@@ -73,7 +75,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
     }
 
     @VisibleForTesting
-    public void parseInterface(final String output, final ConfigBuilder builder, String name) {
+    void parseInterface(final String output, final ConfigBuilder builder, String name)  {
         parseEnabled(output, builder, name);
         builder.setName(name);
         builder.setType(EthernetCsmacd.class);
@@ -92,7 +94,29 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         setVlanEthertypePolicy(output, ifSaosAugBuilder);
         setVlanIds(output, ifSaosAugBuilder);
         setIngressToEgressQmap(output, ifSaosAugBuilder);
+
+        setAccessControlAttributes(output, ifSaosAugBuilder);
+
         builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
+    }
+
+    @VisibleForTesting
+    static IfSaosAug setAccessControlAttributes(String output, IfSaosAugBuilder ifSaosAugBuilder) {
+        if (output.contains("flow access-control")) {
+            ParsingUtils.parseFields(output, 0,
+                MAX_MACS::matcher,
+                m -> m.group("macs"),
+                s -> ifSaosAugBuilder.setMaxDynamicMacs(Integer.parseInt(s)));
+
+            // when group learning is not present, forward_unlearning si on
+            ifSaosAugBuilder.setForwardUnlearned(true);
+
+            ParsingUtils.parseFields(output, 0,
+                FORWARD_UNLEARNED::matcher,
+                m -> m.group("learning"),
+                s -> ifSaosAugBuilder.setForwardUnlearned(false));
+        }
+        return ifSaosAugBuilder.build();
     }
 
     private void setIngressToEgressQmap(String output, IfSaosAugBuilder ifSaosAugBuilder) {

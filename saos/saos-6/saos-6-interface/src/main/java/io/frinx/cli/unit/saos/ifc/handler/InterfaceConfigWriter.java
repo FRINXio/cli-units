@@ -58,6 +58,9 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
             + "{% else %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy all\n{% endif %}"
             // ingress-to-egress-qmap
             + "{% if ($iteq) %}port set port {$data.name} ingress-to-egress-qmap {$iteq}\n{% endif %}"
+            // flow access-control
+            + "{% if ($max_macs) %}flow access-control set port {$data.name} max-dynamic-macs {$max_macs}\n{% endif %}"
+            + "{% if ($fwd_un) %}flow access-control set port {$data.name} forward-unlearned {$fwd_un}\n{% endif %}"
             + "configuration save\n";
 
     private Cli cli;
@@ -111,14 +114,18 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
                     "vlanRemove", getVlansDiff(saosAugBefore, saosAug),
                     "vlanAdd", getVlansDiff(saosAug, saosAugBefore),
                     "vep", saosAug.getVlanEthertypePolicy(),
-                    "iteq", getIngressDiff(saosAugBefore, saosAug));
+                    "iteq", getIngressDiff(saosAugBefore, saosAug),
+                    "max_macs", saosAug.getMaxDynamicMacs(),
+                    "fwd_un", saosAug.isForwardUnlearned() != null
+                            ? (saosAug.isForwardUnlearned() ? "on" : "off") : "on");
         }
         return fT(WRITE_TEMPLATE_SAOS, "before", before,
                 "data", after,
                 "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
                 "desc", getDescription(after),
                 "vlanRemove", getVlansDiff(saosAugBefore, saosAug),
-                "vlanAdd", getVlansDiff(saosAug, saosAugBefore));
+                "vlanAdd", getVlansDiff(saosAug, saosAugBefore),
+                "fwd_un", "on");
     }
 
     private String getIngressDiff(IfSaosAug before, IfSaosAug after) {

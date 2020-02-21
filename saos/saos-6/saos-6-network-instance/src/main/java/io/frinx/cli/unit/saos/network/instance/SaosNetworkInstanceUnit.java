@@ -103,7 +103,6 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.addAfter(IIDs.NE_NE_IN_INTERFACE, new InterfaceWriter(cli),
                 IIDs.NE_NE_CONFIG);
         writeRegistry.addNoop(IIDs.NE_NE_IN_IN_CONFIG);
-
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {

@@ -51,6 +51,8 @@ public class InterfaceConfigWriterTest {
             + "vlan remove vlan 1234 port 4\n"
             + "virtual-circuit ethernet set port 4 vlan-ethertype-policy all\n"
             + "port set port 4 ingress-to-egress-qmap NNI-NNI\n"
+            + "flow access-control set port 4 max-dynamic-macs 200\n"
+            + "flow access-control set port 4 forward-unlearned off\n"
             + "configuration save\n"
             + "\n";
 
@@ -62,6 +64,7 @@ public class InterfaceConfigWriterTest {
             + "port set port 4 vs-ingress-filter off\n"
             + "vlan remove vlan 25,50,1234 port 4\n"
             + "virtual-circuit ethernet set port 4 vlan-ethertype-policy all\n"
+            + "flow access-control set port 4 forward-unlearned on\n"
             + "configuration save\n"
             + "\n";
 
@@ -101,6 +104,8 @@ public class InterfaceConfigWriterTest {
                         .setPhysicalType(PhysicalType.Rj45)
                         .setVlanIds(Arrays.asList("25", "50", "1234"))
                         .setIngressToEgressQmap(IngressToEgressQmap.DefaultRCOS)
+                        .setMaxDynamicMacs(200)
+                        .setForwardUnlearned(false)
                         .build())
                 .build();
     }
@@ -125,6 +130,8 @@ public class InterfaceConfigWriterTest {
                 .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
                         .setVlanIds(Arrays.asList("25", "50"))
                         .setIngressToEgressQmap(IngressToEgressQmap.NNINNI)
+                        .setMaxDynamicMacs(200)
+                        .setForwardUnlearned(false)
                         .build())
                 .build();
 
@@ -138,6 +145,9 @@ public class InterfaceConfigWriterTest {
     public void updateClean() throws WriteFailedException {
         // clean what we can
         Config newData = new ConfigBuilder().setEnabled(false).setName("4").setType(EthernetCsmacd.class)
+                .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
+                    .setForwardUnlearned(true)
+                    .build())
                 .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
