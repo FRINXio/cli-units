@@ -29,7 +29,7 @@
 
     <properties>
         <cli.version>3.1.13.rc5-frinx</cli.version>
-        <yangtools.version>1.1.1-Carbon-SR1.3_1_13_rc5-frinxodl</yangtools.version>
+        <yangtools.version>1.1.1-Carbon-SR1.3_1_13_rc6-frinxodl-SNAPSHOT</yangtools.version>
     </properties>
 
     <build>
