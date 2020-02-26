@@ -93,7 +93,7 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
 
         // virtual-switch
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_CONNECTIONPOINTS,
-                new ConnectionPointsWriter(cli),
+                new ConnectionPointsWriter(),
                 Sets.newHashSet(
                         IIDs.NE_NE_CO_CONNECTIONPOINT,
                         IIDs.NE_NE_CO_CO_CONFIG),
