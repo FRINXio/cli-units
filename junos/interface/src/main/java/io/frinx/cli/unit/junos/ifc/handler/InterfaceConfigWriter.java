@@ -31,9 +31,8 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
     private static final String DELETE_TEMPLATE = "delete interfaces {$data.name}";
 
     private static final String WRITE_TEMPLATE = "edit interfaces {$data.name}\n"
-            + "{$data|update(description,"
-            + "set description `$data.description`\n,"
-            + "delete description\n)}"
+            + "{% if ($desc) %}set description {$desc}\n"
+            + "{% else %}delete description\n{% endif %}"
             + "{% if ($enabled == TRUE) %}delete disable\n"
             + "{% elseIf ($enabled == FALSE) %}set disable\n{% endif %}"
             + "exit";
@@ -74,7 +73,15 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             enabled = null;
         }
 
-        return fT(WRITE_TEMPLATE, "before", before, "data", after, "enabled", enabled);
+        return fT(WRITE_TEMPLATE, "before", before, "data", after, "enabled", enabled,
+                "desc", getDescription(after));
+    }
+
+    private String getDescription(Config after) {
+        if (after.getDescription() != null && after.getDescription().contains(" ")) {
+            return String.format("\"%s\"", after.getDescription());
+        }
+        return after.getDescription();
     }
 
     private boolean isDisabled(Config after) {

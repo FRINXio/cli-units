@@ -23,6 +23,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.util.NetUtils;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -60,10 +61,21 @@ public abstract class AbstractInterfaceConfigReader implements CliConfigReader<C
             matcher -> Integer.valueOf(matcher.group("mtu")),
             builder::setMtu);
 
-        ParsingUtils.parseField(output,
+        setDescription(output, builder);
+    }
+
+    private void setDescription(String output, ConfigBuilder builder) {
+        Optional<String> desc = ParsingUtils.parseField(output, 0,
             getDescriptionLine()::matcher,
-            matcher -> matcher.group("desc"),
-            builder::setDescription);
+            matcher -> matcher.group("desc"));
+
+        if (desc.isPresent()) {
+            if (desc.get().substring(0, 1).equals("\"")) {
+                builder.setDescription(desc.get().substring(1, desc.get().length() - 1));
+            } else {
+                builder.setDescription(desc.get());
+            }
+        }
     }
 
     protected void parseEnabled(final String output, final ConfigBuilder builder) {
