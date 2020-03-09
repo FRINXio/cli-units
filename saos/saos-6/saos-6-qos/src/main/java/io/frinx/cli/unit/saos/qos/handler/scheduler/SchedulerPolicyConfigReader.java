@@ -53,12 +53,13 @@ public class SchedulerPolicyConfigReader implements CliConfigReader<Config, Conf
 
     @VisibleForTesting
     void parseSchedulerPolicyConfig(String output, ConfigBuilder builder, String policyName) {
-        SaosQosScPolicyIfcIdBuilder augBuilder = new SaosQosScPolicyIfcIdBuilder();
-
         builder.setName(policyName);
-        setIfcId(output, augBuilder, policyName);
 
-        builder.addAugmentation(SaosQosScPolicyIfcId.class, augBuilder.build());
+        if (!policyName.matches("\\d+")) {
+            SaosQosScPolicyIfcIdBuilder augBuilder = new SaosQosScPolicyIfcIdBuilder();
+            setIfcId(output, augBuilder, policyName);
+            builder.addAugmentation(SaosQosScPolicyIfcId.class, augBuilder.build());
+        }
     }
 
     private void setIfcId(String output, SaosQosScPolicyIfcIdBuilder augBuilder, String policyName) {

@@ -35,6 +35,13 @@ public class SchedulerPolicyConfigReaderTest {
             + "traffic-profiling standard-profile create port 4 profile 1 name Prof_1 cir 10048 eir 0 cbs 128 ebs 0\n"
             + "traffic-profiling standard-profile create port 5 profile 1 name Test1 cir 10048 eir 0 cbs 128 ebs 0\n"
             + "traffic-profiling standard-profile create port 5 profile 2 name Test2 cir 10048 eir 0 cbs 128 ebs 0\n"
+            + "traffic-services queuing egress-port-queue-group set port 1 shaper-rate 50048\n"
+            + "traffic-services queuing egress-port-queue-group set queue 0 port 3 scheduler-weight 5\n"
+            + "traffic-services queuing egress-port-queue-group set queue 0 port 4 eir 64 ebs 5 scheduler-weight 6\n"
+            + "traffic-services queuing egress-port-queue-group set queue 1 port 4 eir 128 ebs 4 scheduler-weight 3\n"
+            + "traffic-services queuing egress-port-queue-group set queue 2 port 4 eir 254 ebs 8 scheduler-weight 9\n"
+            + "traffic-services queuing egress-port-queue-group set queue 3 port 4 eir 512 ebs 12 scheduler-weight 2\n"
+            + "traffic-services queuing egress-port-queue-group set queue 0 port 7 scheduler-weight 6\n"
             + "traffic-profiling enable port 2\n"
             + "traffic-profiling enable port 6\n"
             + "traffic-profiling enable port 8\n"
@@ -45,8 +52,8 @@ public class SchedulerPolicyConfigReaderTest {
         SchedulerPolicyConfigReader reader = new SchedulerPolicyConfigReader(Mockito.mock(Cli.class));
         ConfigBuilder configBuilder = new ConfigBuilder();
 
-        reader.parseSchedulerPolicyConfig(OUTPUT, configBuilder, "Test1");
-        Assert.assertEquals("Test1", configBuilder.getName());
-        Assert.assertEquals("5", configBuilder.getAugmentation(SaosQosScPolicyIfcId.class).getInterfaceId());
+        reader.parseSchedulerPolicyConfig(OUTPUT, configBuilder, "V40");
+        Assert.assertEquals("V40", configBuilder.getName());
+        Assert.assertEquals("1", configBuilder.getAugmentation(SaosQosScPolicyIfcId.class).getInterfaceId());
     }
 }

@@ -34,15 +34,38 @@ public class SchedulerPolicyReaderTest {
            + "traffic-profiling standard-profile create port 5 profile 1 name Test1 cir 10048 eir 0 cbs 128 ebs 0\n"
            + "traffic-profiling standard-profile create port 5 profile 2 name Test2 cir 10048 eir 0 cbs 128 ebs 0\n"
            + "traffic-profiling enable port 2\n"
-           + "traffic-profiling enable\n";
+           + "traffic-profiling enable\n"
+           + "traffic-services queuing queue-map create rcos-map NNI-NNI\n"
+           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 1 queue 1\n"
+           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 2 queue 2\n"
+           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 3 queue 3\n"
+           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 4 queue 4\n"
+           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 5 queue 5\n"
+           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 6 queue 6\n"
+           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 7 queue 7\n"
+           + "log flash add filter default traffic-profiling-mgr info\n"
+           + "traffic-services queuing egress-port-queue-group set queue 3 port 4 scheduler-weight 6\n"
+           + "traffic-services queuing egress-port-queue-group set port 7 cir 101056\n"
+           + "traffic-services queuing egress-port-queue-group set queue 0 port 7 scheduler-weight 6\n"
+           + "traffic-services queuing egress-port-queue-group set queue 1 port 7 scheduler-weight 6\n"
+           + "traffic-services queuing egress-port-queue-group set queue 2 port 7 scheduler-weight 67\n"
+           + "traffic-services queuing egress-port-queue-group set queue 3 port 7 scheduler-weight 6\n"
+           + "traffic-services queuing egress-port-queue-group set queue 4 port 5 scheduler-weight 6\n"
+           + "traffic-services queuing egress-port-queue-group set queue 6 port 6 scheduler-weight 6\n"
+           + "traffic-services queuing egress-port-queue-group set queue 7 port 7 scheduler-weight 3\n"
+           + "traffic-profiling set port 1 mode advanced\n";
 
     @Test
     public void getAllIdsTest() {
         List<SchedulerPolicyKey> ids = Arrays.asList(
-                new SchedulerPolicyKey("CIA_CoS0"),
-                new SchedulerPolicyKey("V4096"),
+                new SchedulerPolicyKey("Test2"),
                 new SchedulerPolicyKey("Test1"),
-                new SchedulerPolicyKey("Test2"));
+                new SchedulerPolicyKey("4"),
+                new SchedulerPolicyKey("5"),
+                new SchedulerPolicyKey("6"),
+                new SchedulerPolicyKey("7"),
+                new SchedulerPolicyKey("CIA_CoS0"),
+                new SchedulerPolicyKey("V4096"));
 
         Assert.assertEquals(ids, SchedulerPolicyReader.getAllIds(OUTPUT));
     }

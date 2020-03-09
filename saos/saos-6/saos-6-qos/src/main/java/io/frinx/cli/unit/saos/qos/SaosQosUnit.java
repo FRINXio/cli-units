@@ -27,12 +27,12 @@ import io.frinx.cli.unit.saos.qos.handler.QosConfigWriter;
 import io.frinx.cli.unit.saos.qos.handler.ifc.InterfaceConfigReader;
 import io.frinx.cli.unit.saos.qos.handler.ifc.InterfaceConfigWriter;
 import io.frinx.cli.unit.saos.qos.handler.ifc.InterfaceReader;
-import io.frinx.cli.unit.saos.qos.handler.scheduler.OneRateTwoColorConfigReader;
 import io.frinx.cli.unit.saos.qos.handler.scheduler.SchedulerConfigReader;
 import io.frinx.cli.unit.saos.qos.handler.scheduler.SchedulerPolicyConfigReader;
 import io.frinx.cli.unit.saos.qos.handler.scheduler.SchedulerPolicyReader;
 import io.frinx.cli.unit.saos.qos.handler.scheduler.SchedulerPolicyWriter;
 import io.frinx.cli.unit.saos.qos.handler.scheduler.SchedulerReader;
+import io.frinx.cli.unit.saos.qos.handler.scheduler.TwoRateThreeColorConfigReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.qos.IIDs;
 import java.util.Set;
@@ -84,10 +84,13 @@ public class SaosQosUnit extends AbstractUnit {
         writeRegistry.subtreeAdd(IIDs.QO_SC_SCHEDULERPOLICY, new SchedulerPolicyWriter(cli),
                 Sets.newHashSet(IIDs.QO_SC_SC_CONFIG,
                         IIDs.QO_SC_SC_CO_AUG_SAOSQOSSCPOLICYIFCID,
+                        IIDs.QO_SC_SC_SCHEDULERS,
                         IIDs.QO_SC_SC_SC_SCHEDULER,
                         IIDs.QO_SC_SC_SC_SC_CONFIG,
                         IIDs.QO_SC_SC_SC_SC_CO_AUG_SAOSQOSSCHEDULERAUG,
-                        IIDs.QO_SC_SC_SC_SC_ON_CONFIG));
+                        IIDs.QO_SC_SC_SC_SC_TWORATETHREECOLOR,
+                        IIDs.QO_SC_SC_SC_SC_TW_CONFIG,
+                        IIDs.QO_SC_SC_SC_SC_TW_CO_AUG_SAOSQOS2R3CAUG));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -98,6 +101,6 @@ public class SaosQosUnit extends AbstractUnit {
         readRegistry.add(IIDs.QO_SC_SC_CONFIG, new SchedulerPolicyConfigReader(cli));
         readRegistry.add(IIDs.QO_SC_SC_SC_SCHEDULER, new SchedulerReader(cli));
         readRegistry.add(IIDs.QO_SC_SC_SC_SC_CONFIG, new SchedulerConfigReader(cli));
-        readRegistry.add(IIDs.QO_SC_SC_SC_SC_ON_CONFIG, new OneRateTwoColorConfigReader(cli));
+        readRegistry.add(IIDs.QO_SC_SC_SC_SC_TW_CONFIG, new TwoRateThreeColorConfigReader(cli));
     }
 }

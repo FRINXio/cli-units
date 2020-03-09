@@ -24,13 +24,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.OneRateTwoColorBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._2r3c.top.TwoRateThreeColorBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicy;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicyBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.SchedulersBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.Scheduler;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.SchedulerBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQos2r3cAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQos2r3cAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQosScPolicyIfcId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQosScPolicyIfcIdBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQosSchedulerAug;
@@ -38,6 +40,32 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.exte
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQosSchedulerConfig.Type;
 
 public class SchedulerPolicyWriterTest {
+
+    private static final String SERVICES =
+        "traffic-services queuing egress-port-queue-group set queue 0 port 1 eir 1212 scheduler-weight 495\n"
+        + "traffic-services queuing egress-port-queue-group set queue 1 port 1 eir 1214 scheduler-weight 501\n"
+        + "traffic-services queuing egress-port-queue-group set queue 2 port 1 eir 1216 scheduler-weight 507\n"
+        + "traffic-services queuing egress-port-queue-group set queue 3 port 1 eir 1218 scheduler-weight 513\n";
+
+    private static final String SERVICE_WITH_EBS =
+        "traffic-services queuing egress-port-queue-group set queue 0 port 1 eir 1458 ebs 35 scheduler-weight 478\n"
+        + "traffic-services queuing egress-port-queue-group set queue 1 port 1 eir 1460 ebs 39 scheduler-weight 484\n"
+        + "traffic-services queuing egress-port-queue-group set queue 2 port 1 eir 1462 ebs 43 scheduler-weight 490\n"
+        + "traffic-services queuing egress-port-queue-group set queue 3 port 1 eir 1464 ebs 47 scheduler-weight 496\n";
+
+    private static final String SERVICE_WITH_PROFILE =
+        "traffic-services queuing egress-port-queue-group set queue 0 port 1 eir 1458 ebs 35 scheduler-weight 478 "
+        + "congestion-avoidance-profile Default-0\n"
+        + "traffic-services queuing egress-port-queue-group set queue 1 port 1 eir 1460 ebs 39 scheduler-weight 484 "
+        + "congestion-avoidance-profile Default-1\n"
+        + "traffic-services queuing egress-port-queue-group set queue 2 port 1 eir 1462 ebs 43 scheduler-weight 490 "
+        + "congestion-avoidance-profile Default-2\n"
+        + "traffic-services queuing egress-port-queue-group set queue 3 port 1 eir 1464 ebs 47 scheduler-weight 496 "
+        + "congestion-avoidance-profile Default-3\n";
+
+    private static final String SERVICE_DELETE_PROFILE =
+        "traffic-services queuing egress-port-queue-group unset queue 0 port 1 congestion-avoidance-profile\n"
+        + "traffic-services queuing egress-port-queue-group unset queue 2 port 1 congestion-avoidance-profile\n";
 
     private SchedulerPolicyWriter writer;
 
@@ -50,26 +78,61 @@ public class SchedulerPolicyWriterTest {
     public void writeTemplateTest() {
         Assert.assertEquals("traffic-profiling standard-profile create port 2 name Prof_1 vs VLAN111222 cir 10042\n",
             writer.writeTemplate(createConfig("Prof_1","2",
-                    createScheduler("VLAN111222", "10042"))));
+                createOneScheduler("VLAN111222", "10042")), "Prof_1"));
 
         Assert.assertEquals("traffic-profiling standard-profile create port 2 name Prof_1 cir 10042\n",
             writer.writeTemplate(createConfig("Prof_1","2",
-                    createScheduler(null, "10042"))));
+                createOneScheduler(null, "10042")), "Prof_1"));
+
+        Assert.assertEquals(SERVICES,
+            writer.writeTemplate(createConfig("2", null,
+                createManySchedulers(null, "1212", "495", null, false)), "1"));
+
+        Assert.assertEquals(SERVICE_WITH_EBS,
+            writer.writeTemplate(createConfig("1", null,
+                createManySchedulers("35", "1458", "478", null, false)), "1"));
+
+        Assert.assertEquals(SERVICE_WITH_PROFILE,
+            writer.writeTemplate(createConfig("1", null,
+                createManySchedulers("35", "1458", "478", "Default-", false)), "1"));
     }
 
     @Test
     public void updateTemplateTest() {
-        Assert.assertEquals("traffic-profiling standard-profile set port 1 profile Prof_1 cir 20048\n",
-                writer.updateTemplate(
-                        createConfig("Prof_1", "1", createScheduler(null, "10048")),
-                        createConfig("Prof_1", "1", createScheduler(null, "20048"))));
+        Assert.assertEquals("traffic-profiling standard-profile set port 1 profile Prof_1 cir 20048",
+            writer.updateTemplate("Prof_1",
+                createConfig("Prof_1", "1", createOneScheduler(null, "10048")),
+                createConfig("Prof_1", "1", createOneScheduler(null, "20048"))));
+
+        Assert.assertEquals("",
+            writer.updateTemplate("1",
+                createConfig("1", null,
+                    createManySchedulers("25", "154", "1000", "Default", false)),
+                createConfig("1", null,
+                    createManySchedulers("25", "154", "1000", "Default", false))
+            )
+        );
+
+        Assert.assertEquals(SERVICE_WITH_PROFILE,
+            writer.updateTemplate("1",
+                createConfig("1", null,
+                    createManySchedulers("29", "4", "10", "Qts", false)),
+                createConfig("1", null,
+                    createManySchedulers("35", "1458", "478", "Default-", false))
+            )
+        );
     }
 
     @Test
     public void deleteTemplateTest() {
         Assert.assertEquals("traffic-profiling standard-profile delete port 1 profile Profil_1\n",
-                writer.deleteTemplate(
-                        createConfig("Profil_1", "1", createScheduler(null, "10043"))));
+                writer.deleteTemplate("Profil_1",
+                        createConfig("Profil_1", "1", createOneScheduler(null, "10043"))));
+
+        Assert.assertEquals(SERVICE_DELETE_PROFILE,
+            writer.deleteTemplate("1",
+                createConfig("1", null,
+                    createManySchedulers("35", "1458", "478", "Default-", true))));
     }
 
     private SchedulerPolicy createConfig(String policyName, String ifcId, List<Scheduler> schedulerList) {
@@ -87,17 +150,20 @@ public class SchedulerPolicyWriterTest {
             .build();
     }
 
-    private List<Scheduler> createScheduler(String vsName, String cir) {
+    private List<Scheduler> createOneScheduler(String vsName, String cir) {
         List<Scheduler> schedulerList = new ArrayList<>();
         schedulerList.add(new SchedulerBuilder()
             .setSequence(0L)
             .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos
                 .scheduler.top.scheduler.policies.scheduler.policy.schedulers.scheduler.ConfigBuilder()
-                .addAugmentation(SaosQosSchedulerAug.class, createSchedulerAug(vsName))
+                .addAugmentation(SaosQosSchedulerAug.class, new SaosQosSchedulerAugBuilder()
+                    .setVsName(vsName)
+                    .setType(Type.PortPolicy)
+                    .build())
                 .build())
-            .setOneRateTwoColor(new OneRateTwoColorBuilder()
-                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
-                    .qos.scheduler._1r2c.top.one.rate.two.color.ConfigBuilder()
+            .setTwoRateThreeColor(new TwoRateThreeColorBuilder()
+                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler
+                        ._2r3c.top.two.rate.three.color.ConfigBuilder()
                     .setCir(new BigInteger(cir))
                     .build())
                 .build())
@@ -105,8 +171,30 @@ public class SchedulerPolicyWriterTest {
         return schedulerList;
     }
 
-    private SaosQosSchedulerAug createSchedulerAug(String vsName) {
-        return vsName != null ? new SaosQosSchedulerAugBuilder().setVsName(vsName).setType(Type.PortPolicy).build()
-            : new SaosQosSchedulerAugBuilder().setType(Type.PortPolicy).build();
+    private List<Scheduler> createManySchedulers(String be, String pir, String weight, String con, boolean delVersion) {
+        List<Scheduler> schedulerList = new ArrayList<>();
+        for (int i = 0; i <= 3; i++) {
+            schedulerList.add(new SchedulerBuilder()
+                .setSequence((long) i)
+                .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos
+                    .scheduler.top.scheduler.policies.scheduler.policy.schedulers.scheduler.ConfigBuilder()
+                    .addAugmentation(SaosQosSchedulerAug.class, new SaosQosSchedulerAugBuilder()
+                        .setType(Type.QueueGroupPolicy).build())
+                    .build())
+                .setTwoRateThreeColor(new TwoRateThreeColorBuilder()
+                    .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
+                        .qos.scheduler._2r3c.top.two.rate.three.color.ConfigBuilder()
+                        .setBe(be != null ? (long) ((i * 4) + Integer.parseInt(be)) : null)
+                        .setPir(BigInteger.valueOf((i * 2) + Integer.parseInt(pir)))
+                        .addAugmentation(SaosQos2r3cAug.class, new SaosQos2r3cAugBuilder()
+                            .setWeight(weight != null ? (long)(i * 6) + Integer.parseInt(weight) : null)
+                            .setCongestionAvoidance(delVersion ? ((i % 2 == 0) ? (con + i) : null) :
+                                    (con != null) ? con + i : null)
+                            .build())
+                        .build())
+                    .build())
+                .build());
+        }
+        return schedulerList;
     }
 }
