@@ -75,6 +75,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>saos-6-interface-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-broadcast-containment-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
