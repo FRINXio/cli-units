@@ -91,7 +91,8 @@ public class InterfaceConfigWriterTest {
         writer.writeCurrentAttributes(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(String.format(WRITE_BASE, "delete disable\n"), response.getValue().getContent());
+        Assert.assertEquals(String.format(WRITE_BASE, "delete description\ndelete disable\n"),
+                response.getValue().getContent());
     }
 
     @Test
@@ -131,7 +132,7 @@ public class InterfaceConfigWriterTest {
         writer.updateCurrentAttributes(iid, beforedata, afterdata, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(String.format(WRITE_BASE, ""), response.getValue().getContent());
+        Assert.assertEquals(String.format(WRITE_BASE, "delete description\n"), response.getValue().getContent());
     }
 
     @Test
