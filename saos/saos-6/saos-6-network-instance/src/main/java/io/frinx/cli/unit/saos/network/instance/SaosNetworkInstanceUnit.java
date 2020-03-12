@@ -28,6 +28,7 @@ import io.frinx.cli.unit.saos.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.saos.network.instance.handler.cp.ConnectionPointsReader;
 import io.frinx.cli.unit.saos.network.instance.handler.cp.ConnectionPointsWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceConfigReader;
+import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceReader;
 import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanConfigReader;
@@ -66,6 +67,7 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
                 IIDs.FRINX_SAOS_VS_EXTENSION,
                 IIDs.FRINX_SAOS_NETWORK_INSTANCE_TYPE_EXTENSION,
                 IIDs.FRINX_SAOS_VLAN_EXTENSION,
+                IIDs.FRINX_L2_CFT_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -102,7 +104,9 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
         writeRegistry.addAfter(IIDs.NE_NE_IN_INTERFACE, new InterfaceWriter(cli),
                 IIDs.NE_NE_CONFIG);
-        writeRegistry.addNoop(IIDs.NE_NE_IN_IN_CONFIG);
+        writeRegistry.subtreeAdd(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_IN_IN_CO_AUG_L2CFTIFEXT,
+                        IIDs.NE_NE_IN_IN_CO_AUG_L2CFTIFEXT_INTERFACECFT));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -115,7 +119,7 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
 
         // virtual-switch
         readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new InterfaceReader(cli));
-        readRegistry.add(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigReader());
+        readRegistry.add(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigReader(cli));
         readRegistry.subtreeAdd(IIDs.NE_NE_CONNECTIONPOINTS, new ConnectionPointsReader(cli),
                 Sets.newHashSet(
                         IIDs.NE_NE_CO_CONNECTIONPOINT,
