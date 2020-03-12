@@ -31,6 +31,12 @@ import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceConfigReader
 import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceReader;
 import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigCftConfigReader;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigCftConfigWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigCftProtocolsReader;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigCftReader;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigCftsConfigReader;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigCftsConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanConfigReader;
 import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanReader;
@@ -104,6 +110,14 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
         writeRegistry.addAfter(IIDs.NE_NE_IN_INTERFACE, new InterfaceWriter(cli),
                 IIDs.NE_NE_CONFIG);
+        writeRegistry.addNoop(IIDs.NE_NE_IN_IN_CONFIG);
+
+        writeRegistry.addNoop(IIDs.NE_NE_CO_AUG_L2CFTEXT_CFTS);
+        writeRegistry.add(IIDs.NE_NE_CO_AUG_L2CFTEXT_CF_CONFIG, new L2VSIConfigCftsConfigWriter(cli));
+        writeRegistry.addNoop(IIDs.NE_NE_CO_AUG_L2CFTEXT_CF_CFT);
+        writeRegistry.subtreeAdd(IIDs.NE_NE_CO_AUG_L2CFTEXT_CF_CF_CONFIG, new L2VSIConfigCftConfigWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_CO_AUG_L2CFTEXT_CF_CF_CO_CTRLPROTOCOLS,
+                        IIDs.NE_NE_CO_AUG_L2CFTEXT_CF_CF_CO_CT_CTRLPROTOCOL));
         writeRegistry.subtreeAdd(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigWriter(cli),
                 Sets.newHashSet(IIDs.NE_NE_IN_IN_CO_AUG_L2CFTIFEXT,
                         IIDs.NE_NE_IN_IN_CO_AUG_L2CFTIFEXT_INTERFACECFT));
@@ -124,5 +138,11 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
                 Sets.newHashSet(
                         IIDs.NE_NE_CO_CONNECTIONPOINT,
                         IIDs.NE_NE_CO_CO_CONFIG));
+
+        readRegistry.add(IIDs.NE_NE_CO_AUG_L2CFTEXT_CF_CONFIG, new L2VSIConfigCftsConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_CO_AUG_L2CFTEXT_CF_CFT, new L2VSIConfigCftReader(cli));
+        readRegistry.add(IIDs.NE_NE_CO_AUG_L2CFTEXT_CF_CF_CONFIG, new L2VSIConfigCftConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_CO_AUG_L2CFTEXT_CF_CF_CO_CT_CTRLPROTOCOL,
+                new L2VSIConfigCftProtocolsReader(cli));
     }
 }
