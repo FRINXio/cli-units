@@ -21,6 +21,9 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliOperReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.Optional;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.configuration.metadata.rev180731.metadata.ConfigurationMetadata;
@@ -30,7 +33,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata, ConfigurationMetadataBuilder> {
 
     @VisibleForTesting
-    static final String SHOW_RUNNING_CONFIG = "configuration show brief";
+    private static final String SHOW_LAST_COMMIT_TIME = "command-log show verbose containing "
+            + "\"configuration save\" tail 2";
+    private static final Pattern PATTERN = Pattern.compile(".*configuration save (?<date>[A-Za-z]{3} [A-Za-z]{3} "
+            + "[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]{4}).*");
 
     private final Cli cli;
 
@@ -39,18 +45,26 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
     }
 
     @VisibleForTesting
-    static String getLastConfigurationFingerprint(String config) {
-        return DigestUtils.md5Hex(config);
+    static Optional<String> getLastConfigurationFingerprint(String output) {
+        output = output.replaceAll("[\\n\\r]", "")
+                .replaceAll("\\| {7}\\|", "")
+                .replace(" configuration save", "\n configuration save");
+
+        return ParsingUtils.parseField(output, 0, PATTERN::matcher, m -> m.group("date"));
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<ConfigurationMetadata> instanceIdentifier, @Nonnull
-            ConfigurationMetadataBuilder configurationMetadataBuilder, @Nonnull ReadContext readContext) throws
-            ReadFailedException {
-        String output = blockingRead(SHOW_RUNNING_CONFIG, cli, instanceIdentifier, readContext);
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<ConfigurationMetadata> instanceIdentifier,
+                                      @Nonnull ConfigurationMetadataBuilder configurationMetadataBuilder,
+                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+        String output = blockingRead(SHOW_LAST_COMMIT_TIME, cli, instanceIdentifier, readContext);
+        Optional<String> fingerPrint = getLastConfigurationFingerprint(output);
 
-        String fingerPrint = getLastConfigurationFingerprint(output);
-        configurationMetadataBuilder.setLastConfigurationFingerprint(fingerPrint);
+        if (fingerPrint.isPresent()) {
+            configurationMetadataBuilder.setLastConfigurationFingerprint(fingerPrint.get());
+        } else {
+            configurationMetadataBuilder.setLastConfigurationFingerprint(DigestUtils.md5Hex(output));
+        }
     }
 }
 
