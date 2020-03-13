@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class SchedulerConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SHOW_COMMAND = "configuration search running-config string \"traffic-profiling\"";
-    private static final String VS = "%s name %s %s vs %s";
+    private static final String VS_NAME = "%s name %s %s vs %s";
 
     private Cli cli;
 
@@ -59,14 +59,18 @@ public class SchedulerConfigReader implements CliConfigReader<Config, ConfigBuil
         SaosQosSchedulerAugBuilder augBuilder = new SaosQosSchedulerAugBuilder();
 
         builder.setSequence(sequence);
-        augBuilder.setType(Type.PortPolicy);
-        setVs(output, augBuilder, policyName);
-
-        builder.addAugmentation(SaosQosSchedulerAug.class, augBuilder.build());
+        if (!policyName.matches("\\d+")) {
+            augBuilder.setType(Type.PortPolicy);
+            setVsName(output, augBuilder, policyName);
+            builder.addAugmentation(SaosQosSchedulerAug.class, augBuilder.build());
+        } else {
+            augBuilder.setType(Type.QueueGroupPolicy);
+            builder.addAugmentation(SaosQosSchedulerAug.class, augBuilder.build());
+        }
     }
 
-    private void setVs(String output, SaosQosSchedulerAugBuilder augBuilder, String policyName) {
-        Pattern vs = Pattern.compile(f(VS, ".*", policyName, ".*", "(?<name>\\w+)"));
+    private void setVsName(String output, SaosQosSchedulerAugBuilder augBuilder, String policyName) {
+        Pattern vs = Pattern.compile(f(VS_NAME, ".*", policyName, ".*", "(?<name>\\S+)"));
         ParsingUtils.parseField(output,
             vs::matcher,
             matcher -> matcher.group("name"),

@@ -22,7 +22,10 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicy;
@@ -33,8 +36,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class SchedulerPolicyReader
         implements CliConfigListReader<SchedulerPolicy, SchedulerPolicyKey, SchedulerPolicyBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search running-config string \"traffic-profiling\"";
-    private static final Pattern ALL_IDS = Pattern.compile("traffic-profiling.*name (?<name>\\w+).*");
+    private static final String SHOW_COMMAND = "configuration search running-config string \"traffic\"";
+    private static final Pattern ALL_PROFILES = Pattern.compile("traffic-profiling.*name (?<name>\\S+).*");
+    private static final Pattern ALL_SERVICES = Pattern.compile("traffic-services.*\\d+ port (?<name>\\d+).*");
 
     private Cli cli;
 
@@ -51,10 +55,19 @@ public class SchedulerPolicyReader
 
     @VisibleForTesting
     static List<SchedulerPolicyKey> getAllIds(String output) {
-        return ParsingUtils.parseFields(output, 0,
-            ALL_IDS::matcher,
+        Set<SchedulerPolicyKey> allIds = new HashSet<>();
+
+        allIds.addAll(ParsingUtils.parseFields(output, 0,
+            ALL_PROFILES::matcher,
             matcher -> matcher.group("name"),
-            SchedulerPolicyKey::new);
+            SchedulerPolicyKey::new));
+
+        allIds.addAll(ParsingUtils.parseFields(output, 0,
+            ALL_SERVICES::matcher,
+            matcher -> matcher.group("name"),
+            SchedulerPolicyKey::new));
+
+        return new ArrayList<>(allIds);
     }
 
     @Override
