@@ -16,22 +16,16 @@
 
 package io.frinx.cli.unit.saos.network.instance.handler.ifc;
 
+import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.ifc.L2VSIInterfaceConfigReader;
-import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
-import java.util.ArrayList;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.ifc.L2VSIInterfaceConfigWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces._interface.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces._interface.ConfigBuilder;
 
-public class InterfaceConfigReader extends CompositeReader<Config, ConfigBuilder>
-        implements CliConfigReader<Config, ConfigBuilder> {
+public class InterfaceConfigWriter extends CompositeWriter<Config> {
 
-    public InterfaceConfigReader(Cli cli) {
-        super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {
-            {
-                add(new L2VSIInterfaceConfigReader(cli));
-            }
-        });
+    public InterfaceConfigWriter(Cli cli) {
+        super(Lists.newArrayList(
+                new L2VSIInterfaceConfigWriter(cli)));
     }
 }
