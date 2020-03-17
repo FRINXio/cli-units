@@ -231,6 +231,29 @@
       <artifactId>brocade-isis-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- CUBRO-->
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>cubro-cli-init-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>cubro-configuration-metadata-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>cubro-acl-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>cubro-interface-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>io.frinx.cli</groupId>
       <artifactId>ios-xr-interface-unit</artifactId>
