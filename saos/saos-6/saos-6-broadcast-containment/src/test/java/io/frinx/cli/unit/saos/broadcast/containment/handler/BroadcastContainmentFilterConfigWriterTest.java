@@ -108,7 +108,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
 
     @Test
     public void testUpdate() throws Exception {
-        writer.updateCurrentAttributes(iid, null, data, null);
+        writer.updateCurrentAttributes(iid, data2, data, null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
         Assert.assertEquals("broadcast-containment set filter filter1 kbps 64\n"

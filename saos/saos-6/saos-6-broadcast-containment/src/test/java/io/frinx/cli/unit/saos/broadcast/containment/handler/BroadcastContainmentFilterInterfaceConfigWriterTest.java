@@ -57,10 +57,8 @@ public class BroadcastContainmentFilterInterfaceConfigWriterTest {
     private final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
 
     private Config data1 = new ConfigBuilder().setName("3")
-            .setFilter("filter1")
             .build();
     private Config data2 = new ConfigBuilder().setName("4")
-            .setFilter("filter1")
             .build();
 
     @Before

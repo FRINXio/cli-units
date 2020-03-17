@@ -48,8 +48,6 @@ public class BroadcastContainmentFilterInterfaceConfigWriter implements CliWrite
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         String filterName = instanceIdentifier.firstKeyOf(Filter.class).getName();
         String port = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        Preconditions.checkArgument(Objects.equal(config.getFilter(), filterName),
-                "filter name should be in filter config");
         Preconditions.checkArgument(Objects.equal(config.getName(), port),
                 "port names should be the same");
         blockingWriteAndRead(cli, instanceIdentifier, config, getTemplate(true, filterName, port));
@@ -71,9 +69,6 @@ public class BroadcastContainmentFilterInterfaceConfigWriter implements CliWrite
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         String filterName = id.firstKeyOf(Filter.class).getName();
         String port = id.firstKeyOf(Interface.class).getName();
-        Preconditions.checkArgument(Objects.equal(Objects.equal(dataAfter.getFilter(), dataBefore.getFilter()),
-                Objects.equal(dataAfter.getFilter(), filterName)),
-                "Ports need to belongs to the same filter");
         Preconditions.checkArgument(Objects.equal(dataAfter.getName(), port),
                 "port names should be the same");
         writeCurrentAttributes(id, dataAfter, writeContext);

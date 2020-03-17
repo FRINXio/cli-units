@@ -19,7 +19,6 @@ package io.frinx.cli.unit.saos.broadcast.containment.handler;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.Filter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.filter.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.filter.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.filter.interfaces._interface.ConfigBuilder;
@@ -32,6 +31,5 @@ public class BroadcastContainmentFilterInterfaceConfigReader implements CliConfi
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) {
         configBuilder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
-        configBuilder.setFilter(instanceIdentifier.firstKeyOf(Filter.class).getName());
     }
 }

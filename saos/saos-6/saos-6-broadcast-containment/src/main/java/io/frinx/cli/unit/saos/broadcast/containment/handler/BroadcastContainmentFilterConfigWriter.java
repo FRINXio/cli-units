@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.saos.broadcast.containment.handler;
 
+import com.google.common.base.Preconditions;
 import com.x5.template.Chunk;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -53,6 +54,8 @@ public class BroadcastContainmentFilterConfigWriter implements CliWriter<Config>
         String filterName = instanceIdentifier.firstKeyOf(Filter.class).getName();
         String containList = parseContainList(Objects.requireNonNull(config.getContainmentClasification()));
         String rate = config.getRate() != null ? config.getRate().toString() : "0";
+        Preconditions.checkArgument(config.getName().equals(filterName),
+                "Filter names need to be equals");
         blockingWriteAndRead(cli, instanceIdentifier, config, getWriteTemplate(filterName, rate,
                 containList, true, !containList.isEmpty()));
     }
@@ -84,6 +87,10 @@ public class BroadcastContainmentFilterConfigWriter implements CliWriter<Config>
         String filterName = id.firstKeyOf(Filter.class).getName();
         String containList = parseContainList(Objects.requireNonNull(dataAfter.getContainmentClasification()));
         String rate = dataAfter.getRate() != null ? dataAfter.getRate().toString() : "0";
+        Preconditions.checkArgument(com.google.common.base.Objects.equal(com.google.common.base
+                        .Objects.equal(dataAfter.getName(), dataBefore.getName()),
+                com.google.common.base.Objects.equal(dataAfter.getName(), filterName)),
+                "Filter names need to be equals");
         blockingWriteAndRead(cli, id, dataAfter, getWriteTemplate(filterName, rate,
                 containList, false, !containList.isEmpty()));
     }

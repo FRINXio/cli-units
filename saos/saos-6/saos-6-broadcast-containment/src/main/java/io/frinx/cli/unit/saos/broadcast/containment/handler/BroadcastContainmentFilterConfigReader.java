@@ -54,6 +54,7 @@ public class BroadcastContainmentFilterConfigReader implements CliConfigReader<C
         String outputForFilter = "configuration search running-config string \"broadcast-containment create filter "
                 + filterName + "\"";
         String output = blockingRead(outputForFilter, cli, instanceIdentifier, readContext);
+        configBuilder.setName(filterName);
         parseAttributes(output, configBuilder);
     }
 
