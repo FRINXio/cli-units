@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright © 2018 Frinx and others.
+  ~ Copyright © 2020 Frinx and others.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -28,30 +28,14 @@
     </parent>
 
     <groupId>io.frinx.cli</groupId>
-    <artifactId>cli-units-aggregator</artifactId>
+    <artifactId>cli-units-cubra</artifactId>
     <version>4.2.4.rc15-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>artifacts</module>
-        <module>ios-common</module>
-        <module>ios</module>
-        <module>ios-xr</module>
-        <module>brocade</module>
-        <module>cubro</module>
-        <module>junos</module>
-        <module>huawei</module>
-        <module>features</module>
-        <module>unit-parent</module>
-        <module>nexus</module>
-        <module>dasan</module>
-        <module>sros</module>
-        <module>saos</module>
-        <module>ubnt/edge-switch</module>
-        <module>mikrotik</module>
-        <module>yang-docs-plugin</module>
-        <module>interface-base</module>
-        <module>network-instance-base</module>
+        <module>it</module>
+        <module>configuration-metadata</module>
+        <module>init</module>
     </modules>
 
     <build>
@@ -74,16 +58,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>karaf</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>karaf</module>
-            </modules>
-        </profile>
-
         <profile>
             <!--
                 This profile is to ensure we only build javadocs reports
