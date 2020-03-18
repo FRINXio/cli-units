@@ -16,101 +16,22 @@
 
 package io.frinx.cli.unit.saos.qos.handler.scheduler;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
+import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.saos.qos.handler.scheduler.profile.ProfileThreeColorConfigReader;
+import io.frinx.cli.unit.saos.qos.handler.scheduler.service.ServiceThreeColorConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import java.math.BigInteger;
-import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
+import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._2r3c.top.two.rate.three.color.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._2r3c.top.two.rate.three.color.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicy;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.Scheduler;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQos2r3cAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQos2r3cAugBuilder;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TwoRateThreeColorConfigReader implements CliConfigReader<Config, ConfigBuilder> {
-
-    private static final String SHOW_COMMAND = "configuration search running-config string \"traffic\"";
-    private static final String CIR = "%sname %s cir %s%s";
-    private static final String PIR = "%squeue %s port %s eir %s%s";
-    private static final String BE = "%squeue %s port %s%sebs %s%s";
-    private static final String WEIGHT = "%squeue %s port %s%sscheduler-weight %s%s";
-    private static final String CON_AVOID = "%squeue %s port %s%scongestion-avoidance-profile %s%s";
-
-    private Cli cli;
+public class TwoRateThreeColorConfigReader extends CompositeReader<Config, ConfigBuilder>
+        implements CliConfigReader<Config, ConfigBuilder> {
 
     public TwoRateThreeColorConfigReader(Cli cli) {
-        this.cli = cli;
-    }
-
-    @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                      @Nonnull ConfigBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
-        String sequenceId = instanceIdentifier.firstKeyOf(Scheduler.class).getSequence().toString();
-        String output = blockingRead(SHOW_COMMAND, cli, instanceIdentifier, readContext);
-        parseTwoRateThreeColorConfig(output, configBuilder, sequenceId, policyName);
-    }
-
-    @VisibleForTesting
-    void parseTwoRateThreeColorConfig(String output, ConfigBuilder builder, String sequenceId, String policyName) {
-        if (!policyName.matches("\\d+")) {
-            setCir(output, builder, policyName);
-        } else {
-            SaosQos2r3cAugBuilder augBuilder = new SaosQos2r3cAugBuilder();
-            setPir(output, builder, sequenceId, policyName);
-            setBe(output, builder, sequenceId, policyName);
-            setWeight(output, augBuilder, sequenceId, policyName);
-            setConAvoid(output, augBuilder, sequenceId, policyName);
-
-            builder.addAugmentation(SaosQos2r3cAug.class, augBuilder.build());
-        }
-    }
-
-    private void setCir(String output, ConfigBuilder builder, String policyName) {
-        Pattern cir = Pattern.compile(f(CIR, ".*", policyName, "(?<cir>\\d+)", ".*"));
-        ParsingUtils.parseField(output,
-            cir::matcher,
-            matcher -> matcher.group("cir"),
-            value -> builder.setCir(new BigInteger(value)));
-    }
-
-    private void setPir(String output, ConfigBuilder builder, String sequenceId, String policyName) {
-        Pattern pir = Pattern.compile(f(PIR, ".*", sequenceId, policyName, "(?<eir>\\d+)", ".*"));
-        ParsingUtils.parseField(output,
-            pir::matcher,
-            matcher -> matcher.group("eir"),
-            value -> builder.setPir(new BigInteger(value)));
-    }
-
-    private void setBe(String output, ConfigBuilder builder, String sequenceId, String policyName) {
-        Pattern be = Pattern.compile(f(BE, ".*", sequenceId, policyName, ".*", "(?<ebs>\\d+)", ".*"));
-        ParsingUtils.parseField(output,
-            be::matcher,
-            matcher -> matcher.group("ebs"),
-            value -> builder.setBe(Long.parseLong(value)));
-    }
-
-    private void setWeight(String output, SaosQos2r3cAugBuilder builder, String sequenceId, String policyName) {
-        Pattern weight = Pattern.compile(f(WEIGHT , ".*", sequenceId, policyName, ".*", "(?<weight>\\d+)", ".*"));
-        ParsingUtils.parseField(output,
-            weight::matcher,
-            matcher -> matcher.group("weight"),
-            value -> builder.setWeight(Long.parseLong(value)));
-    }
-
-    private void setConAvoid(String output, SaosQos2r3cAugBuilder builder, String sequenceId, String policyName) {
-        Pattern conAvoid = Pattern.compile(
-                f(CON_AVOID , ".*", sequenceId, policyName, ".*", "(?<con>\\S+)", ".*"));
-        ParsingUtils.parseField(output,
-            conAvoid::matcher,
-            matcher -> matcher.group("con"),
-            builder::setCongestionAvoidance);
+        super(Lists.newArrayList(
+                new ProfileThreeColorConfigReader(cli),
+                new ServiceThreeColorConfigReader(cli)
+        ));
     }
 }

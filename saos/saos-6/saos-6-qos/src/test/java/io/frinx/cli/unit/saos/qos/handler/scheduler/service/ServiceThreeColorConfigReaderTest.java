@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.qos.handler.scheduler;
+package io.frinx.cli.unit.saos.qos.handler.scheduler.service;
 
 import io.frinx.cli.io.Cli;
 import org.junit.Assert;
@@ -23,7 +23,7 @@ import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._2r3c.top.two.rate.three.color.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQos2r3cAug;
 
-public class TwoRateThreeColorConfigReaderTest {
+public class ServiceThreeColorConfigReaderTest {
 
     private static final String OUTPUT = "traffic-profiling set meter-provisioning eir\n"
         + "traffic-profiling set port 1 mode advanced\n"
@@ -48,13 +48,9 @@ public class TwoRateThreeColorConfigReaderTest {
 
     @Test
     public void parseTwoRateThreeColorConfigTest() {
-        TwoRateThreeColorConfigReader reader = new TwoRateThreeColorConfigReader(Mockito.mock(Cli.class));
+        ServiceThreeColorConfigReader reader = new ServiceThreeColorConfigReader(Mockito.mock(Cli.class));
         ConfigBuilder configBuilder = new ConfigBuilder();
-
-        reader.parseTwoRateThreeColorConfig(OUTPUT, configBuilder, "0", "Test1");
-        Assert.assertEquals("10048", configBuilder.getCir().toString());
-
-        reader.parseTwoRateThreeColorConfig(OUTPUT, configBuilder, "0", "4");
+        reader.parseThreeColorConfig(OUTPUT, configBuilder,"0", "4");
         Assert.assertEquals("64", configBuilder.getPir().toString());
         Assert.assertEquals("5", configBuilder.getBe().toString());
         Assert.assertEquals("6", configBuilder.getAugmentation(SaosQos2r3cAug.class).getWeight().toString());

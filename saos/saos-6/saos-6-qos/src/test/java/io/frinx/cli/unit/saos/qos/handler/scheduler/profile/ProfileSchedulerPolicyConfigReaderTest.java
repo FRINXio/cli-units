@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.qos.handler.scheduler;
+package io.frinx.cli.unit.saos.qos.handler.scheduler.profile;
 
 import io.frinx.cli.io.Cli;
 import org.junit.Assert;
@@ -23,7 +23,7 @@ import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQosScPolicyIfcId;
 
-public class SchedulerPolicyConfigReaderTest {
+public class ProfileSchedulerPolicyConfigReaderTest {
 
     private static final String OUTPUT = "traffic-profiling set meter-provisioning eir\n"
             + "traffic-profiling set port 1 mode advanced\n"
@@ -37,11 +37,6 @@ public class SchedulerPolicyConfigReaderTest {
             + "traffic-profiling standard-profile create port 5 profile 2 name Test2 cir 10048 eir 0 cbs 128 ebs 0\n"
             + "traffic-services queuing egress-port-queue-group set port 1 shaper-rate 50048\n"
             + "traffic-services queuing egress-port-queue-group set queue 0 port 3 scheduler-weight 5\n"
-            + "traffic-services queuing egress-port-queue-group set queue 0 port 4 eir 64 ebs 5 scheduler-weight 6\n"
-            + "traffic-services queuing egress-port-queue-group set queue 1 port 4 eir 128 ebs 4 scheduler-weight 3\n"
-            + "traffic-services queuing egress-port-queue-group set queue 2 port 4 eir 254 ebs 8 scheduler-weight 9\n"
-            + "traffic-services queuing egress-port-queue-group set queue 3 port 4 eir 512 ebs 12 scheduler-weight 2\n"
-            + "traffic-services queuing egress-port-queue-group set queue 0 port 7 scheduler-weight 6\n"
             + "traffic-profiling enable port 2\n"
             + "traffic-profiling enable port 6\n"
             + "traffic-profiling enable port 8\n"
@@ -49,7 +44,7 @@ public class SchedulerPolicyConfigReaderTest {
 
     @Test
     public void parseSchedulerPolicyConfigTest() {
-        SchedulerPolicyConfigReader reader = new SchedulerPolicyConfigReader(Mockito.mock(Cli.class));
+        ProfileSchedulerPolicyConfigReader reader = new ProfileSchedulerPolicyConfigReader(Mockito.mock(Cli.class));
         ConfigBuilder configBuilder = new ConfigBuilder();
 
         reader.parseSchedulerPolicyConfig(OUTPUT, configBuilder, "V40");

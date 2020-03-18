@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.qos.handler.scheduler;
+package io.frinx.cli.unit.saos.qos.handler.scheduler.service;
 
 import io.frinx.cli.io.Cli;
 import java.util.Arrays;
@@ -24,17 +24,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.SchedulerKey;
 
-public class SchedulerReaderTest {
+public class ServiceSchedulerReaderTest {
 
-    private static final String OUTPUT = "traffic-services queuing queue-map create rcos-map NNI-NNI\n"
-            + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 1 queue 1\n"
-            + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 2 queue 2\n"
-            + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 3 queue 3\n"
-            + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 4 queue 4\n"
-            + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 5 queue 5\n"
-            + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 6 queue 6\n"
-            + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 7 queue 7\n"
-            + "traffic-services queuing egress-port-queue-group set queue 3 port 4 scheduler-weight 6\n"
+    private static final String OUTPUT =
+            "traffic-services queuing egress-port-queue-group set queue 3 port 4 scheduler-weight 6\n"
             + "traffic-services queuing egress-port-queue-group set port 7 cir 101056\n"
             + "traffic-services queuing egress-port-queue-group set queue 0 port 7 scheduler-weight 6\n"
             + "traffic-services queuing egress-port-queue-group set queue 1 port 7 scheduler-weight 6\n"
@@ -46,7 +39,7 @@ public class SchedulerReaderTest {
 
     @Test
     public void getAllIdsTest() {
-        SchedulerReader reader = new SchedulerReader(Mockito.mock(Cli.class));
+        ServiceSchedulerReader reader = new ServiceSchedulerReader(Mockito.mock(Cli.class));
         List<SchedulerKey> expected = Arrays.asList(new SchedulerKey(Long.parseLong("0")),
                 new SchedulerKey(Long.parseLong("1")),
                 new SchedulerKey(Long.parseLong("2")),

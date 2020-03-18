@@ -32,6 +32,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQos2r3cAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQosScPolicyIfcId;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQosSchedulerAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQosSchedulerConfig.Type;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SchedulerPolicyWriter implements CliWriter<SchedulerPolicy> {
@@ -75,7 +76,10 @@ public class SchedulerPolicyWriter implements CliWriter<SchedulerPolicy> {
 
     @VisibleForTesting
     String writeTemplate(SchedulerPolicy config, String policyName) {
-        if (!policyName.matches("\\d+")) {
+        Type type = config.getSchedulers().getScheduler().get(0).getConfig()
+                .getAugmentation(SaosQosSchedulerAug.class).getType();
+
+        if (type.equals(Type.PortPolicy)) {
             String ifcId = config.getConfig().getAugmentation(SaosQosScPolicyIfcId.class).getInterfaceId();
             Scheduler scheduler = config.getSchedulers().getScheduler().get(0);
 
@@ -124,7 +128,10 @@ public class SchedulerPolicyWriter implements CliWriter<SchedulerPolicy> {
 
     @VisibleForTesting
     String updateTemplate(String policyName, SchedulerPolicy before, SchedulerPolicy after) {
-        if (!policyName.matches("\\d+")) {
+        Type type = after.getSchedulers().getScheduler().get(0).getConfig()
+                .getAugmentation(SaosQosSchedulerAug.class).getType();
+
+        if (type.equals(Type.PortPolicy)) {
             BigInteger beforeCir = before.getSchedulers().getScheduler().get(0)
                     .getTwoRateThreeColor().getConfig().getCir();
             BigInteger afterCir = after.getSchedulers().getScheduler().get(0)
@@ -173,7 +180,10 @@ public class SchedulerPolicyWriter implements CliWriter<SchedulerPolicy> {
 
     @VisibleForTesting
     String deleteTemplate(String policyName, SchedulerPolicy config) {
-        if (!policyName.matches("\\d+")) {
+        Type type = config.getSchedulers().getScheduler().get(0).getConfig()
+                .getAugmentation(SaosQosSchedulerAug.class).getType();
+
+        if (type.equals(Type.PortPolicy)) {
             String ifcId = config.getConfig().getAugmentation(SaosQosScPolicyIfcId.class)
                     .getInterfaceId();
             return f(DELETE_PROFILE, ifcId, config.getName());

@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.qos.handler.scheduler;
+package io.frinx.cli.unit.saos.qos.handler.scheduler.profile;
 
+import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliReader;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicyKey;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class SchedulerPolicyReaderTest {
+public class ProfileSchedulerPolicyReaderTest {
 
     private static final String OUTPUT = "traffic-profiling set meter-provisioning eir\n"
            + "traffic-profiling set port 1 mode advanced\n"
@@ -37,36 +43,26 @@ public class SchedulerPolicyReaderTest {
            + "traffic-profiling enable\n"
            + "traffic-services queuing queue-map create rcos-map NNI-NNI\n"
            + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 1 queue 1\n"
-           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 2 queue 2\n"
-           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 3 queue 3\n"
-           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 4 queue 4\n"
-           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 5 queue 5\n"
-           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 6 queue 6\n"
-           + "traffic-services queuing queue-map set rcos-map NNI-NNI rcos 7 queue 7\n"
            + "log flash add filter default traffic-profiling-mgr info\n"
            + "traffic-services queuing egress-port-queue-group set queue 3 port 4 scheduler-weight 6\n"
            + "traffic-services queuing egress-port-queue-group set port 7 cir 101056\n"
            + "traffic-services queuing egress-port-queue-group set queue 0 port 7 scheduler-weight 6\n"
-           + "traffic-services queuing egress-port-queue-group set queue 1 port 7 scheduler-weight 6\n"
-           + "traffic-services queuing egress-port-queue-group set queue 2 port 7 scheduler-weight 67\n"
-           + "traffic-services queuing egress-port-queue-group set queue 3 port 7 scheduler-weight 6\n"
-           + "traffic-services queuing egress-port-queue-group set queue 4 port 5 scheduler-weight 6\n"
-           + "traffic-services queuing egress-port-queue-group set queue 6 port 6 scheduler-weight 6\n"
-           + "traffic-services queuing egress-port-queue-group set queue 7 port 7 scheduler-weight 3\n"
            + "traffic-profiling set port 1 mode advanced\n";
 
     @Test
-    public void getAllIdsTest() {
-        List<SchedulerPolicyKey> ids = Arrays.asList(
-                new SchedulerPolicyKey("Test2"),
-                new SchedulerPolicyKey("Test1"),
-                new SchedulerPolicyKey("4"),
-                new SchedulerPolicyKey("5"),
-                new SchedulerPolicyKey("6"),
-                new SchedulerPolicyKey("7"),
-                new SchedulerPolicyKey("CIA_CoS0"),
-                new SchedulerPolicyKey("V4096"));
+    public void getAllIdsTest() throws ReadFailedException {
+        CliReader cliReader = Mockito.mock(CliReader.class);
 
-        Assert.assertEquals(ids, SchedulerPolicyReader.getAllIds(OUTPUT));
+        Mockito.when(cliReader.blockingRead(Mockito.anyString(), Mockito.any(Cli.class),
+                Mockito.any(InstanceIdentifier.class), Mockito.any(ReadContext.class)))
+                .thenReturn(OUTPUT);
+
+        List<SchedulerPolicyKey> ids = Arrays.asList(
+                new SchedulerPolicyKey("CIA_CoS0"),
+                new SchedulerPolicyKey("V4096"),
+                new SchedulerPolicyKey("Test1"),
+                new SchedulerPolicyKey("Test2"));
+
+        Assert.assertEquals(ids, ProfileSchedulerPolicyReader.getAllIds(null, cliReader, null, null));
     }
 }

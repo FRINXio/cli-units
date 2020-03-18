@@ -16,64 +16,24 @@
 
 package io.frinx.cli.unit.saos.qos.handler.scheduler;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
+import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.saos.qos.handler.scheduler.profile.ProfileSchedulerPolicyReader;
+import io.frinx.cli.unit.saos.qos.handler.scheduler.service.ServiceSchedulerPolicyReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicy;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicyBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicyKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SchedulerPolicyReader
+        extends CompositeListReader<SchedulerPolicy, SchedulerPolicyKey, SchedulerPolicyBuilder>
         implements CliConfigListReader<SchedulerPolicy, SchedulerPolicyKey, SchedulerPolicyBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search running-config string \"traffic\"";
-    private static final Pattern ALL_PROFILES = Pattern.compile("traffic-profiling.*name (?<name>\\S+).*");
-    private static final Pattern ALL_SERVICES = Pattern.compile("traffic-services.*\\d+ port (?<name>\\d+).*");
-
-    private Cli cli;
-
     public SchedulerPolicyReader(Cli cli) {
-        this.cli = cli;
-    }
-
-    @Nonnull
-    @Override
-    public List<SchedulerPolicyKey> getAllIds(@Nonnull InstanceIdentifier<SchedulerPolicy> instanceIdentifier,
-                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        return getAllIds(blockingRead(SHOW_COMMAND, cli, instanceIdentifier, readContext));
-    }
-
-    @VisibleForTesting
-    static List<SchedulerPolicyKey> getAllIds(String output) {
-        Set<SchedulerPolicyKey> allIds = new HashSet<>();
-
-        allIds.addAll(ParsingUtils.parseFields(output, 0,
-            ALL_PROFILES::matcher,
-            matcher -> matcher.group("name"),
-            SchedulerPolicyKey::new));
-
-        allIds.addAll(ParsingUtils.parseFields(output, 0,
-            ALL_SERVICES::matcher,
-            matcher -> matcher.group("name"),
-            SchedulerPolicyKey::new));
-
-        return new ArrayList<>(allIds);
-    }
-
-    @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<SchedulerPolicy> instanceIdentifier,
-                                      @Nonnull SchedulerPolicyBuilder schedulerPolicyBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        schedulerPolicyBuilder.setName(instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName());
+        super(Lists.newArrayList(
+                new ProfileSchedulerPolicyReader(cli),
+                new ServiceSchedulerPolicyReader(cli)
+        ));
     }
 }
