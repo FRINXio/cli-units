@@ -72,12 +72,13 @@ public class SaosBroadcastContainmentUnit extends AbstractUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.addAfter(IIDs.FILTERS, new BroadcastContainmentWriter(cli));
+        writeRegistry.add(IIDs.FILTERS, new BroadcastContainmentWriter(cli));
         writeRegistry.addNoop(IIDs.FI_FILTER);
-        writeRegistry.addAfter(IIDs.FI_FI_CONFIG, new BroadcastContainmentFilterConfigWriter(cli));
+        writeRegistry.add(IIDs.FI_FI_CONFIG, new BroadcastContainmentFilterConfigWriter(cli));
         writeRegistry.addNoop(IIDs.FI_FI_INTERFACES);
         writeRegistry.addNoop(IIDs.FI_FI_IN_INTERFACE);
-        writeRegistry.addAfter(IIDs.FI_FI_IN_IN_CONFIG, new BroadcastContainmentFilterInterfaceConfigWriter(cli));
+        writeRegistry.addAfter(IIDs.FI_FI_IN_IN_CONFIG, new BroadcastContainmentFilterInterfaceConfigWriter(cli),
+                IIDs.FI_FI_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {

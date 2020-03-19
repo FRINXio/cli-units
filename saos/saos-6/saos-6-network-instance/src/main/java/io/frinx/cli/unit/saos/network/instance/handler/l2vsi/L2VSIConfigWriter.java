@@ -50,9 +50,7 @@ public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWrit
 
     private static final String DELETE_TEMPLATE =  "virtual-switch ethernet delete vs {$vsi_ni_name}\n"
             + "configuration save";
-         /*   + "virtual-switch ethernet unset vs {$vsi_ni_name} description\n"
-            + "virtual-switch ethernet set vs {$vsi_ni_name} encap-cos-policy fixed\n"
-            + "virtual-switch ethernet set vs {$vsi_ni_name} encap-fixed-dot1dpri 2";*/
+
 
     private Cli cli;
 

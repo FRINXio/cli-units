@@ -61,7 +61,7 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
             // flow access-control
             + "{% if ($max_macs) %}flow access-control set port {$data.name} max-dynamic-macs {$max_macs}\n{% endif %}"
             + "{% if ($fwd_un) %}flow access-control set port {$data.name} forward-unlearned {$fwd_un}\n{% endif %}"
-            + "configuration save\n";
+            + "configuration save";
 
     private Cli cli;
 
@@ -124,8 +124,7 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
                 "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
                 "desc", getDescription(after),
                 "vlanRemove", getVlansDiff(saosAugBefore, saosAug),
-                "vlanAdd", getVlansDiff(saosAug, saosAugBefore),
-                "fwd_un", "on");
+                "vlanAdd", getVlansDiff(saosAug, saosAugBefore));
     }
 
     private String getIngressDiff(IfSaosAug before, IfSaosAug after) {

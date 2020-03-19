@@ -21,28 +21,21 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ConfigMetadataReaderTest {
-    private static final String COMMAND_LOG =
-            "+---------------------------------------------------------- COMMAND LOG --------------+\n"
-                    +   "|  ID   |   Date & Time (Local)    | User(privilege) on Terminal / Exit Status         |\n"
-                    +   "+-------+--------------------------+---------------------------------------------------+\n"
-                    +   "| 92898 | Sat Jul 22 16:50:30 2000 | ciena(diag) /ssh_shell_172.30.100.2:51072         |\n"
-                    +   "| configuration save\n"
-                    +   "|       | Sat Jul 22 16:50:30 2000 | Status: 0                                         |\n"
-                    +   "+-------+--------------------------+---------------------------------------------------+\n"
-                    +   "| 92899 | Sat Jul 22 16:50:33 2000 | ciena(diag) /ssh_shell_172.30.100.2:51072         |\n"
-                    +   "| command-log show verbose containing \"configuration save\" tail 2\n"
-                    +   "|       | Sat Jul 22 16:50:33 2000 | Status: 0                                         |\n"
-                    +   "+-------+--------------------------+---------------------------------------------------+\n";
+    private static final String OUTPUT = "diff -b startup-config /tmp/20221.out\n"
+            + "4c4\n"
+            + "< ! Created:       Fri Jul 28 18:31:43 2000\n"
+            + "---\n"
+            + "> ! Created:       Fri Jul 28 18:34:08 2000\n";
 
-    private static final String EXCEPTED_DATE = "Sat Jul 22 16:50:30 2000";
-    private static final String WRONG_DATE = "Sat Jul 22 16:50:33 2000";
+    private static final String EXCEPTED_DATE = "Fri Jul 28 18:31:43 2000";
+    private static final String WRONG_DATE = "Fri Jul 28 18:34:08 2000";
 
     @Test
     public void testParse() {
-        Optional<String> date = ConfigMetadataReader.getLastConfigurationFingerprint(COMMAND_LOG);
+        Optional<String> date = ConfigMetadataReader.getLastConfigurationFingerprint(OUTPUT);
         Assert.assertEquals(date.get(), EXCEPTED_DATE);
 
-        Optional<String> date1 = ConfigMetadataReader.getLastConfigurationFingerprint(COMMAND_LOG);
+        Optional<String> date1 = ConfigMetadataReader.getLastConfigurationFingerprint(OUTPUT);
         Assert.assertNotEquals(date1.get(), WRONG_DATE);
 
         Optional<String> date2 = ConfigMetadataReader.getLastConfigurationFingerprint("");

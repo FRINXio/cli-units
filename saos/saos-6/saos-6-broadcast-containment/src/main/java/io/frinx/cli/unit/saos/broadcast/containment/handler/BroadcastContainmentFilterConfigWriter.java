@@ -33,9 +33,9 @@ public class BroadcastContainmentFilterConfigWriter implements CliWriter<Config>
 
     private static final String WRITE_TEMPLATE =
                 "{% if ($write) %}broadcast-containment create filter {$filter_name}\n{% endif %}"
-                + "broadcast-containment set filter {$filter_name} kbps {$kbps}\n"
-                + "{% if ($listPresent) %}broadcast-containment set filter {$filter_name} "
-                + "containment-classification {$containList}\n{% endif %}"
+                + "{% if ($listPresent) %}broadcast-containment set filter {$filter_name} kbps {$kbps}\n"
+                + "broadcast-containment set filter {$filter_name} containment-classification {$containList}\n"
+                + "{% else %}broadcast-containment set filter {$filter_name} kbps {$kbps}\n{% endif %}"
                 + "configuration save";
 
     private static final String DELETE_TEMPLATE = "broadcast-containment delete filter {$filter_name}\n"
