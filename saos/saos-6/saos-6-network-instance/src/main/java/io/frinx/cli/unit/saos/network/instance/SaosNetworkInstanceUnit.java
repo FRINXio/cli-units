@@ -40,6 +40,9 @@ import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.L2VSIConfigCftsConf
 import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanConfigReader;
 import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.vlan.VlanReader;
+import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.ring.VirtualRingConfigReader;
+import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.ring.VirtualRingConfigWriter;
+import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.ring.VirtualRingReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
@@ -73,6 +76,7 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
                 IIDs.FRINX_SAOS_VS_EXTENSION,
                 IIDs.FRINX_SAOS_NETWORK_INSTANCE_TYPE_EXTENSION,
                 IIDs.FRINX_SAOS_VLAN_EXTENSION,
+                IIDs.FRINX_SAOS_VIRTUAL_RING_EXTENSION,
                 IIDs.FRINX_L2_CFT_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
@@ -98,6 +102,9 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
                 Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1,
                         IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2), IIDs.NE_NE_CONFIG);
+
+        writeRegistry.addNoop(IIDs.NE_NE_VL_VL_AUG_SAOS6VRAUG_RI_RING);
+        writeRegistry.add(IIDs.NE_NE_VL_VL_AUG_SAOS6VRAUG_RI_RI_CONFIG, new VirtualRingConfigWriter(cli));
 
         // virtual-switch
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_CONNECTIONPOINTS,
@@ -129,6 +136,9 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         readRegistry.subtreeAdd(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli),
                 Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1,
                         IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2));
+
+        readRegistry.add(IIDs.NE_NE_VL_VL_AUG_SAOS6VRAUG_RI_RING, new VirtualRingReader(cli));
+        readRegistry.add(IIDs.NE_NE_VL_VL_AUG_SAOS6VRAUG_RI_RI_CONFIG, new VirtualRingConfigReader(cli));
 
         // virtual-switch
         readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new InterfaceReader(cli));
