@@ -36,6 +36,7 @@
         <module>it</module>
         <module>configuration-metadata</module>
         <module>init</module>
+        <module>acl</module>
     </modules>
 
     <build>

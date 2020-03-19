@@ -67,6 +67,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>cubro-configuration-metadata-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cubro-acl-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>

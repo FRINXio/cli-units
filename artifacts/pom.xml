@@ -97,6 +97,11 @@
                 <artifactId>cubro-configuration-metadata-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>cubro-acl-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Huawei -->
             <dependency>
