@@ -37,6 +37,7 @@
         <module>cli-units-features</module>
         <module>frinx-cli-unit-all-units</module>
         <module>frinx-cli-unit-brocade</module>
+        <module>frinx-cli-unit-cubro</module>
         <module>frinx-cli-unit-huawei</module>
         <module>frinx-cli-unit-ios</module>
         <module>frinx-cli-unit-ios-initializer</module>
