@@ -33,10 +33,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata, ConfigurationMetadataBuilder> {
 
     @VisibleForTesting
-    private static final String SHOW_LAST_COMMIT_TIME = "command-log show verbose containing "
-            + "\"configuration save\" tail 2";
-    private static final Pattern PATTERN = Pattern.compile(".*configuration save (?<date>[A-Za-z]{3} [A-Za-z]{3} "
-            + "[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]{4}).*");
+    private static final String SHOW_LAST_COMMIT_TIME = "configuration show differences-from-saved";
+    private static final Pattern PATTERN = Pattern.compile(".*< ! Created: {7}(?<date>[A-Za-z]{3} [A-Za-z]{3} [0-9]{2} "
+            + "[0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]{4}).*");
 
     private final Cli cli;
 
@@ -46,10 +45,7 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
 
     @VisibleForTesting
     static Optional<String> getLastConfigurationFingerprint(String output) {
-        output = output.replaceAll("[\\n\\r]", "")
-                .replaceAll("\\| {7}\\|", "")
-                .replace(" configuration save", "\n configuration save");
-
+        output = output.replaceAll("[\\n\\r]", "");
         return ParsingUtils.parseField(output, 0, PATTERN::matcher, m -> m.group("date"));
     }
 

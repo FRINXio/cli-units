@@ -110,9 +110,9 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
         writeRegistry.addAfter(IIDs.NE_NE_IN_INTERFACE, new InterfaceWriter(cli),
                 IIDs.NE_NE_CONFIG);
-        writeRegistry.subtreeAdd(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigWriter(cli),
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigWriter(cli),
                 Sets.newHashSet(IIDs.NE_NE_IN_IN_CO_AUG_L2CFTIFEXT,
-                        IIDs.NE_NE_IN_IN_CO_AUG_L2CFTIFEXT_INTERFACECFT));
+                        IIDs.NE_NE_IN_IN_CO_AUG_L2CFTIFEXT_INTERFACECFT), IIDs.NE_NE_IN_INTERFACE);
 
         writeRegistry.addNoop(IIDs.NE_NE_CO_AUG_L2CFTEXT_CFTS);
         writeRegistry.add(IIDs.NE_NE_CO_AUG_L2CFTEXT_CF_CONFIG, new L2VSIConfigCftsConfigWriter(cli));

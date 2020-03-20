@@ -53,7 +53,7 @@ public class InterfaceConfigWriterTest {
             + "port set port 4 ingress-to-egress-qmap NNI-NNI\n"
             + "flow access-control set port 4 max-dynamic-macs 200\n"
             + "flow access-control set port 4 forward-unlearned off\n"
-            + "configuration save\n"
+            + "configuration save"
             + "\n";
 
     private static final String UPDATE_CLEAN_INPUT = "port disable port 4\n"
@@ -65,7 +65,7 @@ public class InterfaceConfigWriterTest {
             + "vlan remove vlan 25,50,1234 port 4\n"
             + "virtual-circuit ethernet set port 4 vlan-ethertype-policy all\n"
             + "flow access-control set port 4 forward-unlearned on\n"
-            + "configuration save\n"
+            + "configuration save"
             + "\n";
 
     @Mock
