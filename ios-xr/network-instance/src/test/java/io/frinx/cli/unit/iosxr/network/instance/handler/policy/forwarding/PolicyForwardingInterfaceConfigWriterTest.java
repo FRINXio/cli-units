@@ -53,6 +53,7 @@ public class PolicyForwardingInterfaceConfigWriterTest {
             + "root\n";
 
     private static final String UPDATE_INPUT = "interface Loopback0\n"
+            + "no service-policy input\n"
             + "service-policy input input-pol1\n"
             + "no service-policy output\n"
             + "root\n";
@@ -145,14 +146,11 @@ public class PolicyForwardingInterfaceConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
 
-        Mockito.verify(cli, Mockito.times(2))
+        Mockito.verify(cli, Mockito.times(1))
                 .executeAndRead(response.capture());
 
-        Assert.assertEquals(DELETE_INPUT, response.getAllValues()
-                .get(0)
-                .getContent());
         Assert.assertEquals(UPDATE_INPUT, response.getAllValues()
-                .get(1)
+                .get(0)
                 .getContent());
     }
 
@@ -167,14 +165,11 @@ public class PolicyForwardingInterfaceConfigWriterTest {
 
         this.writer.updateCurrentAttributes(iidSubif, data, newData, context);
 
-        Mockito.verify(cli, Mockito.times(2))
+        Mockito.verify(cli, Mockito.times(1))
                 .executeAndRead(response.capture());
 
-        Assert.assertEquals(DELETE_INPUT_SUBIF, response.getAllValues()
-                .get(0)
-                .getContent());
         Assert.assertEquals(UPDATE_INPUT_SUBIF, response.getAllValues()
-                .get(1)
+                .get(0)
                 .getContent());
     }
 
