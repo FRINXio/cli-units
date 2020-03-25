@@ -430,6 +430,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>saos-8-network-instance-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>saos-6-interface-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>

@@ -46,6 +46,7 @@ import io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.ring.VirtualRing
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.$YangModuleInfoImpl;
@@ -60,7 +61,11 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
 
     @Override
     protected Set<Device> getSupportedVersions() {
-        return SaosDevices.SAOS_ALL;
+        return new HashSet<Device>() {
+            {
+                add(SaosDevices.SAOS_6);
+            }
+        };
     }
 
     @Override

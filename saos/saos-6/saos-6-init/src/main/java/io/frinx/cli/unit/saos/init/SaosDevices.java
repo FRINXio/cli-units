@@ -32,6 +32,16 @@ public final class SaosDevices {
         .setDeviceVersion("*")
         .build();
 
+    public static final Device SAOS_6 = new DeviceIdBuilder()
+            .setDeviceType("saos")
+            .setDeviceVersion("6")
+            .build();
+
+    public static final Device SAOS_8 = new DeviceIdBuilder()
+            .setDeviceType("saos")
+            .setDeviceVersion("8")
+            .build();
+
     public static final Set<Device> SAOS_ALL = new HashSet<Device>() {
         {
             add(SAOS_GENERIC);
