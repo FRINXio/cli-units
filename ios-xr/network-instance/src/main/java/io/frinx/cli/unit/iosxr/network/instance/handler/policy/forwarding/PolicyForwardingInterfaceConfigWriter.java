@@ -42,11 +42,11 @@ public class PolicyForwardingInterfaceConfigWriter implements CliWriter<Config> 
     private static final String UPDATE_TEMPLATE = "interface {$ifcName}\n"
             + "{$pfAug|update(input_service_policy,"
             + "service-policy input `$pfAug.input_service_policy`\n,"
-            + "no service-policy input\n, true)}"
+            + "no service-policy input `$before.input_service_policy`\n, true)}"
 
             + "{$pfAug|update(output_service_policy,"
             + "service-policy output `$pfAug.output_service_policy`\n,"
-            + "no service-policy output\n, true)}"
+            + "no service-policy output `$before.output_service_policy`\n, true)}"
             + "root";
 
     public PolicyForwardingInterfaceConfigWriter(Cli cli) {
