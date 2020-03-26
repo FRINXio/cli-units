@@ -208,7 +208,6 @@
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/sros-cli-init-unit/{{VERSION}}</bundle>
-        <bundle>mvn:io.frinx.cli/sros-configuration-metadata-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/sros-ipsec-unit/{{VERSION}}</bundle>
     </feature>
 
