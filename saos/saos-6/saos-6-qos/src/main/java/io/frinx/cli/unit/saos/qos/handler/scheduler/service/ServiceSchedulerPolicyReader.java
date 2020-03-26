@@ -38,7 +38,7 @@ public class ServiceSchedulerPolicyReader
         implements CompositeListReader.Child<SchedulerPolicy, SchedulerPolicyKey, SchedulerPolicyBuilder>,
         CliConfigListReader<SchedulerPolicy, SchedulerPolicyKey, SchedulerPolicyBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search running-config string \"traffic-services\"";
+    private static final String SHOW_COMMAND = "configuration search string \"traffic-services\"";
     private static final Pattern ALL_IDS = Pattern.compile("traffic-services.*\\d+ port (?<name>\\d+).*");
 
     private Cli cli;

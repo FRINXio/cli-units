@@ -44,8 +44,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class DefaultVlanConfigReader implements CompositeReader.Child<Config, ConfigBuilder>,
         CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_RENAMES = "configuration search running-config string \"rename vlan %d \"";
-    private static final String SH_TPID = "configuration search running-config string \"%d egress-tpid\"";
+    private static final String SH_RENAMES = "configuration search string \"rename vlan %d \"";
+    private static final String SH_TPID = "configuration search string \"%d egress-tpid\"";
     private static final Pattern VLAN_NAME_PATTERN =
             Pattern.compile("vlan rename vlan \\d+ name (?<name>\\w+(.*\\w+)*)");
     private static final Pattern VLAN_TPID_PATTERN = Pattern.compile("vlan set vlan \\d+ egress-tpid (?<tpid>\\w+)");

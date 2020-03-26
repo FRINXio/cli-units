@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_SINGLE_INTERFACE_CFG = "configuration search running-config string \"port %s \"";
+    private static final String SH_SINGLE_INTERFACE_CFG = "configuration search string \"port %s \"";
 
     private static final String PORT_DISABLE = "port disable port %s";
     private static final Pattern PORT_MTU = Pattern.compile("port set port.*max-frame-size (?<mtu>\\d+).*");

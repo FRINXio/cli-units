@@ -39,7 +39,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class ServiceThreeColorConfigReader implements CompositeReader.Child<Config, ConfigBuilder>,
         CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search running-config string \"traffic\"";
+    private static final String SHOW_COMMAND = "configuration search string \"traffic\"";
     private static final String PIR = "%squeue %s port %s eir %s%s";
     private static final String BE = "%squeue %s port %s%sebs %s%s";
     private static final String WEIGHT = "%squeue %s port %s%sscheduler-weight %s%s";

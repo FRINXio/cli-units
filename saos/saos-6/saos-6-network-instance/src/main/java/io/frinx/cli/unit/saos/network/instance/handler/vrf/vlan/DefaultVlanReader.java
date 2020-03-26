@@ -43,7 +43,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class DefaultVlanReader implements CompositeListReader.Child<Vlan, VlanKey, VlanBuilder>,
         CliConfigListReader<Vlan, VlanKey, VlanBuilder> {
 
-    private static final String SHOW_VLANS = "configuration search running-config string \"create vlan\"";
+    private static final String SHOW_VLANS = "configuration search string \"create vlan\"";
     private static final Pattern VLAN_ONE = Pattern.compile("vlan create vlan (?<id>\\w+(-\\w+)?).*");
     private static final Pattern VLANS_TWO = Pattern.compile("vlan create vlan .*,(?<id>\\w+(-\\w+)?)");
     private static final Check CHECK = BasicCheck.checkData(

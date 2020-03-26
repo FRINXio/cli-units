@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2VSIConfigCftsConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    public static final String SH_CFTS_CONFIG = "configuration search running-config string \"l2-cft set mode\"";
+    public static final String SH_CFTS_CONFIG = "configuration search string \"l2-cft set mode\"";
     private static final Pattern CFTS_MODE = Pattern.compile("l2-cft set mode (?<mode>\\S+).*");
 
     private Cli cli;

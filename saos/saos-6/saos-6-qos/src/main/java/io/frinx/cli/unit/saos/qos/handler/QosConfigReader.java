@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class QosConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SHOW_COMMAND =
-            "configuration search running-config string \"traffic-profiling\"";
+            "configuration search string \"traffic-profiling\"";
     private static final Pattern ENABLE = Pattern.compile("traffic-profiling enable");
 
     private Cli cli;

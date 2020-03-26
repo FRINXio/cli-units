@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2VSIConfigCftReader implements CliConfigListReader<Cft, CftKey, CftBuilder> {
 
-    private static final String SH_CFT = "configuration search running-config string \"l2-cft create profile\"";
+    private static final String SH_CFT = "configuration search string \"l2-cft create profile\"";
     private static final Pattern CFT_PROFILE = Pattern.compile("l2-cft create profile (?<profile>\\S+).*");
 
     private Cli cli;

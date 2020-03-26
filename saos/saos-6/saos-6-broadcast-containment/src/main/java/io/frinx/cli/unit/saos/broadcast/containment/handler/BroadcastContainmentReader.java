@@ -31,7 +31,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class BroadcastContainmentReader implements CliConfigReader<Filters, FiltersBuilder> {
 
     public static final String SH_BROADCAST_CONTAINMENT =
-            "configuration search running-config string \"broadcast-containment\"";
+            "configuration search string \"broadcast-containment\"";
 
     private static final Pattern BC_ENABLE =
             Pattern.compile("(?<enable>broadcast-containment enable)?");

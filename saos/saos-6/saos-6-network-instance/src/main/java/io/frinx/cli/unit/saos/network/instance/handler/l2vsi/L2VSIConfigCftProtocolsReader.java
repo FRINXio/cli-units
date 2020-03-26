@@ -38,7 +38,7 @@ public class L2VSIConfigCftProtocolsReader implements
         CliConfigListReader<CtrlProtocol, CtrlProtocolKey, CtrlProtocolBuilder> {
 
     private static final String SH_CFT_PROTOCOLS =
-            "configuration search running-config string \"l2-cft protocol add profile %s\"";
+            "configuration search string \"l2-cft protocol add profile %s\"";
 
     private Cli cli;
 

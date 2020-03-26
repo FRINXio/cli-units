@@ -39,7 +39,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class L2VSIInterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         CompositeReader.Child<Config, ConfigBuilder> {
 
-    private static final String SH_IF_CFT = "configuration search running-config string \"l2-cft\"";
+    private static final String SH_IF_CFT = "configuration search string \"l2-cft\"";
 
     private Cli cli;
 

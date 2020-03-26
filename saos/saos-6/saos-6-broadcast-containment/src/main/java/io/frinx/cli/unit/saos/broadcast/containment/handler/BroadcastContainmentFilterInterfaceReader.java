@@ -57,7 +57,7 @@ public class BroadcastContainmentFilterInterfaceReader
     static List<InterfaceKey> getAllIds(Cli cli, CliReader cliReader, String filterName,
                                      @Nonnull InstanceIdentifier<?> id,
                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        String outputForFilter = "configuration search running-config string \"broadcast-containment add filter "
+        String outputForFilter = "configuration search string \"broadcast-containment add filter "
                 + filterName + "\"";
         String output = cliReader.blockingRead(outputForFilter, cli, id, readContext);
         List<String> interfaceKeys = new ArrayList<>();

@@ -42,8 +42,7 @@ public final class L2vsicpReader implements
             ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
             ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2VSICP);
 
-    public static final String SHOW_VC = "configuration search running-config string "
-            + "\"virtual-circuit ethernet create vc\"";
+    public static final String SHOW_VC = "configuration search string \"virtual-circuit ethernet create vc\"";
     private static Pattern L2VSICP_IDS = Pattern
             .compile("virtual-circuit ethernet create vc (?<name>\\S+) vlan (\\S+).*");
     private final Cli cli;

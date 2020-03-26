@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class ServiceSchedulerReader implements CompositeListReader.Child<Scheduler, SchedulerKey,
         SchedulerBuilder>, CliConfigListReader<Scheduler, SchedulerKey, SchedulerBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search running-config string \"traffic-services\"";
+    private static final String SHOW_COMMAND = "configuration search string \"traffic-services\"";
 
     private Cli cli;
 

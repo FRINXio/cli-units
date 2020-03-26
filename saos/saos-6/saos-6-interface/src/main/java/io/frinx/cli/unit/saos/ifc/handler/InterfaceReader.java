@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
-    public static final String SH_PORTS = "configuration search running-config string \"port \"";
+    public static final String SH_PORTS = "configuration search string \"port \"";
     private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\d+).*");
 
     private Cli cli;

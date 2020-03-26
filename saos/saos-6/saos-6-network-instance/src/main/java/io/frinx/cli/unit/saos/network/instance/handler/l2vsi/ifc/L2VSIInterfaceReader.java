@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class L2VSIInterfaceReader implements CompositeListReader.Child<Interface, InterfaceKey, InterfaceBuilder>,
         CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
-    public static final String SH_VIRTUAL_SWITCH_TEMPLATE = "configuration search running-config string virtual-switch";
+    public static final String SH_VIRTUAL_SWITCH_TEMPLATE = "configuration search string virtual-switch";
 
     private final Cli cli;
 

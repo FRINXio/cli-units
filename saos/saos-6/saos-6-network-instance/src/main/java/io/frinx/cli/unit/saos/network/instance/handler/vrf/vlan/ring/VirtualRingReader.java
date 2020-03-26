@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class VirtualRingReader implements CliConfigListReader<Ring, RingKey, RingBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search running-config string \"ring-protection\"";
+    private static final String SHOW_COMMAND = "configuration search string \"ring-protection\"";
 
     private Cli cli;
 

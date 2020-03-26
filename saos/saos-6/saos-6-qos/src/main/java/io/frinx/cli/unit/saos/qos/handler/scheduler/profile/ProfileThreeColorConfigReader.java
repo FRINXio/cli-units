@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class ProfileThreeColorConfigReader implements CompositeReader.Child<Config, ConfigBuilder>,
         CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search running-config string \"traffic-profiling\"";
+    private static final String SHOW_COMMAND = "configuration search string \"traffic-profiling\"";
 
     private Cli cli;
 
