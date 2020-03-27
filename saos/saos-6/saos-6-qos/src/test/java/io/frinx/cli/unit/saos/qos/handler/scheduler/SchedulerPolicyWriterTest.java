@@ -80,10 +80,6 @@ public class SchedulerPolicyWriterTest {
             writer.writeTemplate(createConfig("Prof_1","2",
                 createOneScheduler("VLAN111222", "10042")), "Prof_1"));
 
-        Assert.assertEquals("traffic-profiling standard-profile create port 2 name Prof_1 cir 10042\n",
-            writer.writeTemplate(createConfig("Prof_1","2",
-                createOneScheduler(null, "10042")), "Prof_1"));
-
         Assert.assertEquals(SERVICES,
             writer.writeTemplate(createConfig("2", null,
                 createManySchedulers(null, "1212", "495", null, false)), "1"));
@@ -101,8 +97,8 @@ public class SchedulerPolicyWriterTest {
     public void updateTemplateTest() {
         Assert.assertEquals("traffic-profiling standard-profile set port 1 profile Prof_1 cir 20048",
             writer.updateTemplate("Prof_1",
-                createConfig("Prof_1", "1", createOneScheduler(null, "10048")),
-                createConfig("Prof_1", "1", createOneScheduler(null, "20048"))));
+                createConfig("Prof_1", "1", createOneScheduler("VLAN111222", "10048")),
+                createConfig("Prof_1", "1", createOneScheduler("VLAN111222", "20048"))));
 
         Assert.assertEquals("",
             writer.updateTemplate("1",
@@ -127,7 +123,7 @@ public class SchedulerPolicyWriterTest {
     public void deleteTemplateTest() {
         Assert.assertEquals("traffic-profiling standard-profile delete port 1 profile Profil_1\n",
                 writer.deleteTemplate("Profil_1",
-                        createConfig("Profil_1", "1", createOneScheduler(null, "10043"))));
+                        createConfig("Profil_1", "1", createOneScheduler("VLAN111222", "10043"))));
 
         Assert.assertEquals(SERVICE_DELETE_PROFILE,
             writer.deleteTemplate("1",

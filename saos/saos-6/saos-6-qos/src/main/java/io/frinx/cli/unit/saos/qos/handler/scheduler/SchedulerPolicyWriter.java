@@ -38,9 +38,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class SchedulerPolicyWriter implements CliWriter<SchedulerPolicy> {
 
     private static final String WRITE_PROFILE =
-            "traffic-profiling standard-profile create port {$ifcId} name {$data.name} "
-            + "{% if ($vs) %}vs {$vs} cir {$cir}"
-            + "{% else %}cir {$cir}{% endif %}\n";
+            "traffic-profiling standard-profile create port {$ifcId} name {$data.name} vs {$vs} cir {$cir}\n";
 
     private static final String UPDATE_PROFILE =
             "{% if ($cir) %}traffic-profiling standard-profile set port "
