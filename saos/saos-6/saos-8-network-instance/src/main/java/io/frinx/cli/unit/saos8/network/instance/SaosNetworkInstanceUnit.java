@@ -25,6 +25,9 @@ import io.frinx.cli.unit.saos.init.SaosDevices;
 import io.frinx.cli.unit.saos8.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.saos8.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.saos8.network.instance.handler.NetworkInstanceReader;
+import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.VirtualRingConfigReader;
+import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.VirtualRingConfigWriter;
+import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.VirtualRingReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.HashSet;
@@ -60,6 +63,7 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
                 IIDs.FRINX_OPENCONFIG_INTERFACES,
                 IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE_TYPES,
                 IIDs.FRINX_SAOS_NETWORK_INSTANCE_TYPE_EXTENSION,
+                IIDs.FRINX_SAOS_VIRTUAL_RING_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -76,10 +80,16 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.NE_NETWORKINSTANCE);
         writeRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli));
+
+        writeRegistry.addNoop(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RING);
+        writeRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RI_CONFIG, new VirtualRingConfigWriter(cli));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
         readRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli));
+
+        readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RING, new VirtualRingReader(cli));
+        readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RI_CONFIG, new VirtualRingConfigReader(cli));
     }
 }
