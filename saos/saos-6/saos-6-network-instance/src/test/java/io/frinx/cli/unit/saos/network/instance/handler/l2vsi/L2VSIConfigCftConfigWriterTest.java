@@ -33,15 +33,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension
 public class L2VSIConfigCftConfigWriterTest {
 
     private static final String PROFILES =
-            "l2-cft protocol add profile CTB ctrl-protocol 802.1x untagged-disposition DISCARD\n"
-            + "l2-cft protocol add profile CTB ctrl-protocol cisco-dtp untagged-disposition DISCARD\n"
-            + "l2-cft protocol add profile CTB ctrl-protocol all-bridges-block untagged-disposition DISCARD\n";
+            "l2-cft protocol add profile CTB ctrl-protocol 802.1x untagged-disposition discard\n"
+            + "l2-cft protocol add profile CTB ctrl-protocol cisco-dtp untagged-disposition discard\n"
+            + "l2-cft protocol add profile CTB ctrl-protocol all-bridges-block untagged-disposition discard\n";
 
     private static final String UPDATE_PROTOCOLS =
-            "l2-cft protocol set profile CTB ctrl-protocol cisco-stp-uplink-fast untagged-disposition FORWARD\n"
-            + "l2-cft protocol set profile CTB ctrl-protocol all-bridges-block untagged-disposition FORWARD\n"
-            + "l2-cft protocol add profile CTB ctrl-protocol garp-block untagged-disposition DISCARD\n"
-            + "l2-cft protocol add profile CTB ctrl-protocol gvrp untagged-disposition DISCARD\n"
+            "l2-cft protocol set profile CTB ctrl-protocol cisco-stp-uplink-fast untagged-disposition forward\n"
+            + "l2-cft protocol set profile CTB ctrl-protocol all-bridges-block untagged-disposition forward\n"
+            + "l2-cft protocol add profile CTB ctrl-protocol garp-block untagged-disposition discard\n"
+            + "l2-cft protocol add profile CTB ctrl-protocol gvrp untagged-disposition discard\n"
             + "l2-cft protocol remove profile CTB ctrl-protocol 802.1x\n"
             + "l2-cft protocol remove profile CTB ctrl-protocol cisco-dtp\n";
 
@@ -68,11 +68,11 @@ public class L2VSIConfigCftConfigWriterTest {
         Assert.assertEquals("l2-cft create profile CTB\n" + PROFILES, writer.writeTemplate(
             createConfig("CTB", Arrays.asList(
                     new CtrlProtocolBuilder().setName(Name._8021x)
-                            .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                            .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                     new CtrlProtocolBuilder().setName(Name.CiscoDtp)
-                            .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                            .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                     new CtrlProtocolBuilder().setName(Name.AllBridgesBlock)
-                            .setDisposition(CtrlProtocol.Disposition.DISCARD).build()))));
+                            .setDisposition(CtrlProtocol.Disposition.Discard).build()))));
     }
 
     @Test
@@ -82,45 +82,45 @@ public class L2VSIConfigCftConfigWriterTest {
                 createConfig("CTB", null),
                 createConfig("CTB", Arrays.asList(
                         new CtrlProtocolBuilder().setName(Name._8021x)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                         new CtrlProtocolBuilder().setName(Name.CiscoDtp)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                         new CtrlProtocolBuilder().setName(Name.AllBridgesBlock)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build()))));
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build()))));
 
         // update protocols: delete all protocols
         Assert.assertEquals(REMOVE_PROTOCOLS, writer.updateTemplate(
                 createConfig("CTB", Arrays.asList(
                         new CtrlProtocolBuilder().setName(Name._8021x)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                         new CtrlProtocolBuilder().setName(Name.CiscoDtp)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                         new CtrlProtocolBuilder().setName(Name.CiscoStpUplinkFast)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                         new CtrlProtocolBuilder().setName(Name.AllBridgesBlock)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build())),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build())),
                 createConfig("CTB", null)));
 
         // update protocols: delete two protocols, update two protocols, create two protocols
         Assert.assertEquals(UPDATE_PROTOCOLS, writer.updateTemplate(
                 createConfig("CTB", Arrays.asList(
                         new CtrlProtocolBuilder().setName(Name._8021x)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                         new CtrlProtocolBuilder().setName(Name.CiscoDtp)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                         new CtrlProtocolBuilder().setName(Name.CiscoStpUplinkFast)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                         new CtrlProtocolBuilder().setName(Name.AllBridgesBlock)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build())),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build())),
                 createConfig("CTB", Arrays.asList(
                         new CtrlProtocolBuilder().setName(Name.CiscoStpUplinkFast)
-                                .setDisposition(CtrlProtocol.Disposition.FORWARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Forward).build(),
                         new CtrlProtocolBuilder().setName(Name.AllBridgesBlock)
-                                .setDisposition(CtrlProtocol.Disposition.FORWARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Forward).build(),
                         new CtrlProtocolBuilder().setName(Name.GarpBlock)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build(),
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build(),
                         new CtrlProtocolBuilder().setName(Name.Gvrp)
-                                .setDisposition(CtrlProtocol.Disposition.DISCARD).build()))));
+                                .setDisposition(CtrlProtocol.Disposition.Discard).build()))));
     }
 
     private Config createConfig(String cftName, List<CtrlProtocol> protocolList) {

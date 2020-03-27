@@ -67,10 +67,10 @@ public class L2VSIConfigCftCtrlProtocolsReaderTest {
 
     @Test
     public void setProtocolTest() {
-        buildAndTest(Name.CiscoCdp, Disposition.FORWARD);
-        buildAndTest(Name.CiscoStpUplinkFast, Disposition.DISCARD);
-        buildAndTest(Name.LacpMarker, Disposition.DISCARD);
-        buildAndTest(Name.GarpBlock, Disposition.DISCARD);
+        buildAndTest(Name.CiscoCdp, Disposition.Forward);
+        buildAndTest(Name.CiscoStpUplinkFast, Disposition.Discard);
+        buildAndTest(Name.LacpMarker, Disposition.Discard);
+        buildAndTest(Name.GarpBlock, Disposition.Discard);
     }
 
     private void buildAndTest(Name protocolName, Disposition expected) {
