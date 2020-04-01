@@ -29,7 +29,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.AclCubroAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.COUNT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.ELAG;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.FORWARD;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.IPANY;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAugBuilder;
@@ -38,9 +37,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.DestinationAddressWildcardedBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcardedBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.DROP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.FORWARDINGACTION;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
@@ -55,20 +55,19 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 
 public final class AclEntryLineParser {
 
-    static final Ipv4Prefix IPV4_HOST_ANY = new Ipv4Prefix("0.0.0.0/0");
+    private static final Ipv4Prefix IPV4_HOST_ANY = new Ipv4Prefix("0.0.0.0/0");
     private static final IpProtocolType IP_PROTOCOL_ANY = new IpProtocolType(IPANY.class);
 
     private AclEntryLineParser() {
     }
 
-    static Optional<String> findAclEntryWithSequenceId(AclEntryKey aclEntryKey, String lines,
-                                                       Class<? extends ACLTYPE> aclType) {
+    static Optional<String> findAclEntryWithSequenceId(AclEntryKey aclEntryKey, String lines) {
         // search for line containing current sequence number
         long sequenceId = aclEntryKey.getSequenceId();
         return findIpv4LineWithSequenceId(sequenceId, lines);
     }
 
-    static Optional<String> findIpv4LineWithSequenceId(long sequenceId, String lines) {
+    private static Optional<String> findIpv4LineWithSequenceId(long sequenceId, String lines) {
         Pattern pattern = Pattern.compile("^\\s*(" + sequenceId + " .*)$", Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(lines);
         if (matcher.find()) {
@@ -87,33 +86,26 @@ public final class AclEntryLineParser {
 
         // fwd action
         Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
-        AclCubroAugBuilder aclCubroAugBuilder = new AclCubroAugBuilder();
 
-        if (fwdAction.equals(FORWARD.class)) {
-            String word = words.poll();
-            if (word.equals("elag")) {
-                aclCubroAugBuilder.setEgressType(ELAG.class);
-                aclCubroAugBuilder.setEgressValue(Long.parseLong(words.poll()));
-            } else {
-                throw new IllegalArgumentException("Unsupported egress type: " + word);
-            }
+        AclCubroAugBuilder aclCubroAugBuilder = new AclCubroAugBuilder();
+        builder.setActions(createActions(fwdAction, aclCubroAugBuilder));
+
+        String word = words.poll();
+        if ("elag".equals(word)) {
+            aclCubroAugBuilder.setEgressType(ELAG.class);
+            aclCubroAugBuilder.setEgressValue(Long.parseLong(words.poll()));
         } else {
-            throw new IllegalArgumentException("Unsupported forwarding action: " + fwdAction);
+            throw new IllegalArgumentException("Unsupported egress type: " + word);
         }
 
         // protocol
         IpProtocolType ipProtocolType = parseProtocol(words.poll());
 
-        if (ACLIPV4.class.equals(aclType)) {
-            Ipv4Builder ipv4Builder = new Ipv4Builder();
-            ParseIpv4LineResult parseIpv4LineResult = parseIpv4Line(ipProtocolType, words, aclCubroAugBuilder);
-            ipv4Builder.setConfig(parseIpv4LineResult.ipv4ProtocolFieldsConfig);
-            builder.setIpv4(ipv4Builder.build());
-        } else if (ACLIPV6.class.equals(aclType)) {
-            throw new IllegalArgumentException("IPV6 is unsupported");
-        }
+        Ipv4Builder ipv4Builder = new Ipv4Builder();
+        ParseIpv4LineResult parseIpv4LineResult = parseIpv4Line(ipProtocolType, words, aclCubroAugBuilder);
+        ipv4Builder.setConfig(parseIpv4LineResult.ipv4ProtocolFieldsConfig);
+        builder.setIpv4(ipv4Builder.build());
 
-        builder.setActions(createActions(fwdAction, aclCubroAugBuilder));
         // if there are some unsupported expressions, ACL cannot be parsed at all
         if (!words.isEmpty()) {
             throw new IllegalArgumentException("ACL entry contains unsupported expressions that cannot be parsed: "
@@ -142,7 +134,9 @@ public final class AclEntryLineParser {
     private static Class<? extends FORWARDINGACTION> parseAction(String action) {
         switch (action) {
             case "forward":
-                return FORWARD.class;
+                return ACCEPT.class;
+            case "deny":
+                return DROP.class;
             default:
                 throw new IllegalArgumentException("Did not match forwarding action for: " + action);
         }

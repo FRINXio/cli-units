@@ -42,12 +42,12 @@ public class AclEntryReader {
     private final Cli cli;
     private final AclSetReader aclSetReader;
 
-    public AclEntryReader(final Cli cli, final AclSetReader aclSetReader) {
+    AclEntryReader(final Cli cli, final AclSetReader aclSetReader) {
         this.cli = cli;
         this.aclSetReader = aclSetReader;
     }
 
-    public List<AclEntryKey> getAllIds(@Nonnull final InstanceIdentifier<AclSet> instanceIdentifier,
+    List<AclEntryKey> getAllIds(@Nonnull final InstanceIdentifier<AclSet> instanceIdentifier,
                                        @Nonnull final ReadContext readContext) throws ReadFailedException {
         AclSetKey aclSetKey = instanceIdentifier.firstKeyOf(AclSet.class);
         return parseAclEntryKey(aclSetReader.blockingRead(SH_CONFIGURATION, cli, instanceIdentifier, readContext),
@@ -55,7 +55,7 @@ public class AclEntryReader {
     }
 
     @VisibleForTesting
-    static List<AclEntryKey> parseAclEntryKey(String output, AclSetKey aclSetKey) {
+    public static List<AclEntryKey> parseAclEntryKey(String output, AclSetKey aclSetKey) {
         String accessListLine = String.format("access-list %s %s",
                 AclUtil.getName(aclSetKey.getType()), aclSetKey.getName());
 
@@ -72,7 +72,7 @@ public class AclEntryReader {
         throw new IllegalArgumentException("ACL of name " + aclSetKey.getName() + "not found");
     }
 
-    public void readCurrentAttributes(@Nonnull final InstanceIdentifier<AclSet> instanceIdentifier,
+    void readCurrentAttributes(@Nonnull final InstanceIdentifier<AclSet> instanceIdentifier,
                                       @Nonnull final AclEntryBuilder aclEntryBuilder,
                                       @Nonnull final ReadContext readContext) throws ReadFailedException {
         String output = aclSetReader.blockingRead(SH_CONFIGURATION, cli, instanceIdentifier, readContext);
@@ -85,8 +85,7 @@ public class AclEntryReader {
                          final String output) {
 
         AclSetKey aclSetKey = instanceIdentifier.firstKeyOf(AclSet.class);
-        Optional<String> maybeLine = AclEntryLineParser.findAclEntryWithSequenceId(aclEntryBuilder.getKey(),
-                output, aclSetKey.getType());
+        Optional<String> maybeLine = AclEntryLineParser.findAclEntryWithSequenceId(aclEntryBuilder.getKey(), output);
         maybeLine.ifPresent(s -> AclEntryLineParser.parseLine(aclEntryBuilder, s, aclSetKey.getType()));
     }
 }

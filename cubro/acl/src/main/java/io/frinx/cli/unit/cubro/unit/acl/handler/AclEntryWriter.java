@@ -32,12 +32,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.COUNT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.EGRESSTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.ELAG;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.FORWARD;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.IPANY;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.OPERATIONTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv4AddressWildcarded;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.DROP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.FORWARDINGACTION;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
@@ -275,8 +276,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             throw new IllegalStateException(f("No actions found for entry %s", entry));
         }
         Class<? extends FORWARDINGACTION> action = entry.getActions().getConfig().getForwardingAction();
-        if (action.equals(FORWARD.class)) {
+        if (action.equals(ACCEPT.class)) {
             commandVars.aclFwdAction = "forward";
+        } else if (action.equals(DROP.class)) {
+            commandVars.aclFwdAction = "deny";
         } else {
             throw new IllegalStateException(f("No action found for entry %s", entry));
         }
