@@ -25,20 +25,18 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.ACLIP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, IngressAclSetKey, IngressAclSetBuilder> {
 
-    public static final String SH_CONFIGURATION = "show running-config";
+    static final String SH_CONFIGURATION = "show running-config";
 
-    public static final Pattern INGRESS_ACLS_LINE =
+    static final Pattern INGRESS_ACLS_LINE =
             Pattern.compile("\\s*apply access-list ip (?<name>.+) in.*", Pattern.DOTALL);
 
     private final Cli cli;
@@ -55,7 +53,7 @@ public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, I
     }
 
     @VisibleForTesting
-    private List<IngressAclSetKey> parseAclKeys(String output) {
+    public static List<IngressAclSetKey> parseAclKeys(String output) {
         List<IngressAclSetKey> keys = new ArrayList<>();
         keys.addAll(ParsingUtils.parseFields(output, 0,
             INGRESS_ACLS_LINE::matcher,
@@ -68,31 +66,8 @@ public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, I
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<IngressAclSet> instanceIdentifier,
                                       @Nonnull IngressAclSetBuilder ingressAclSetBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
-        final String setName = instanceIdentifier.firstKeyOf(IngressAclSet.class).getSetName();
-        final String readConfig = blockingRead(SH_CONFIGURATION, cli, instanceIdentifier, readContext);
-
-        setIngressAclSet(ingressAclSetBuilder, readConfig, interfaceName);
-    }
-
-    private void setIngressAclSet(IngressAclSetBuilder ingressAclSetBuilder, String readConfig, String setName) {
-        final String interfaceRegex = String.format("interface %s \r", setName);
-        Pattern interfacePattern = Pattern.compile(interfaceRegex);
-
-        List<String> candidates = AclInterfaceReader.INTERFACE_SPLIT_PATTERN.splitAsStream(readConfig)
-                .collect(Collectors.toList());
-        for (String candidate : candidates) {
-            if (candidate.startsWith(interfaceRegex)) {
-                ParsingUtils.parseField(candidate,
-                    INGRESS_ACLS_LINE::matcher,
-                    matcher -> matcher.group("name"),
-                    ingressAclSetBuilder::setSetName);
-                ingressAclSetBuilder.setType(ACLIP.class);
-                return;
-            }
-        }
-
-        throw new IllegalArgumentException("ACL of name " + setName + "not found");
+                                      @Nonnull ReadContext readContext) {
+        ingressAclSetBuilder.setType(ACLIP.class);
+        ingressAclSetBuilder.setSetName(instanceIdentifier.firstKeyOf(IngressAclSet.class).getSetName());
     }
 }
