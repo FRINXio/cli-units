@@ -450,6 +450,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>saos-8-interface-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>saos-6-broadcast-containment-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>

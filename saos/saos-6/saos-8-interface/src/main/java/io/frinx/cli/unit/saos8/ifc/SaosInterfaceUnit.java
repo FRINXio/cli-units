@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.ifc;
+package io.frinx.cli.unit.saos8.ifc;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.unit.saos.ifc.handler.InterfaceConfigReader;
-import io.frinx.cli.unit.saos.ifc.handler.InterfaceConfigWriter;
-import io.frinx.cli.unit.saos.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.saos.init.SaosDevices;
+import io.frinx.cli.unit.saos8.ifc.handler.InterfaceConfigReader;
+import io.frinx.cli.unit.saos8.ifc.handler.InterfaceReader;
+import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortConfigReader;
+import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortReader;
+import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortVlanConfigReader;
+import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortVlanReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -45,23 +47,22 @@ public class SaosInterfaceUnit extends AbstractUnit {
     protected Set<Device> getSupportedVersions() {
         return new HashSet<Device>() {
             {
-                add(SaosDevices.SAOS_6);
+                add(SaosDevices.SAOS_8);
             }
         };
     }
 
     @Override
     protected String getUnitName() {
-        return "SAOS Interface unit";
+        return "SAOS-8 Interface (Openconfig) translate unit";
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_INTERFACES,
-                IIDs.FRINX_SAOS_IF_EXTENSION,
-                IIDs.FRINX_OPENCONFIG_INTERFACES,
-                IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
+                IIDs.FRINX_IF_AGGREGATE_EXTENSION,
                 io.frinx.openconfig.openconfig.vlan.IIDs.FRINX_OPENCONFIG_VLAN,
+                io.frinx.openconfig.openconfig.network.instance.IIDs.FRINX_SAOS_VLAN_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -74,14 +75,19 @@ public class SaosInterfaceUnit extends AbstractUnit {
         provideWriters(writeRegistry, cli);
     }
 
+    private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
+
+    }
+
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
         readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli));
-    }
+        readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubPortReader(cli));
+        readRegistry.add(IIDs.IN_IN_SU_SU_CONFIG, new SubPortConfigReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VLAN,
+                new SubPortVlanReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
+                new SubPortVlanConfigReader(cli));
 
-    private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.addNoop(IIDs.IN_INTERFACE);
-        writeRegistry.subtreeAdd(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli),
-                Collections.singleton(IIDs.IN_IN_CO_AUG_IFSAOSAUG));
     }
 }

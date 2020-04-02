@@ -81,6 +81,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>saos-8-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>saos-6-qos-unit</artifactId>
         </dependency>
         <dependency>
