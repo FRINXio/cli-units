@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.cubro.ifc.handler;
 
+import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -39,28 +40,37 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriterTest {
 
-    private static final String WRITE_INPUT = "interface 9\n"
+    private static final String WRITE_INPUT = "configure\n"
+            + "interface 9\n"
             + "shutdown\n"
-            + "interface comment bla bla\n";
-    private static final String UPDATE_INPUT_1 = "interface 44\n"
+            + "interface comment bla bla\n"
+            + "end\n";
+    private static final String UPDATE_INPUT_1 = "configure\n"
+            + "interface 44\n"
             + "no shutdown\n"
             + "interface comment updated desc\n"
             + "mtu 1999\n"
             + "speed 9999\n"
             + "vxlanterminated enable\n"
             + "elag 1\n"
-            + "elag 10\n";
-    private static final String UPDATE_CLEAN_INPUT = "interface 44\n"
+            + "elag 10\n"
+            + "end\n";
+    private static final String UPDATE_CLEAN_INPUT = "configure\n"
+            + "interface 44\n"
             + "shutdown\n"
-            + "inneracl enable\n";
-    private static final String DELETE_INPUT = "interface 44\n"
-            + "shutdown\n"
-            + "mtu 1500\n"
+            + "inneracl enable\n"
+            + "end\n";
+    private static final String DELETE_INPUT = "configure\n"
+            + "interface 44\n"
+            + "no shutdown\n"
+            + "no mtu\n"
             + "rx off\n"
             + "no speed\n"
             + "no innerhash enable\n"
             + "no inneracl enable\n"
-            + "no vxlanterminated\n";
+            + "no vxlanterminated enable\n"
+            + "no elag 5\n"
+            + "end\n";
 
     @Mock
     private Cli cli;
@@ -154,7 +164,10 @@ public class InterfaceConfigWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
-        data = new ConfigBuilder().setName("44").setType(EthernetCsmacd.class).build();
+        data = new ConfigBuilder().setName("44")
+                .addAugmentation(IfCubroAug.class,
+                new IfCubroAugBuilder().setElag(Lists.newArrayList((short)5)).build())
+                .setType(EthernetCsmacd.class).build();
 
         writer.deleteCurrentAttributes(iid, data, context);
 

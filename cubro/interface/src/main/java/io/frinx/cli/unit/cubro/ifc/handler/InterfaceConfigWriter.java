@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import java.util.Collections;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cubro.extension.rev200317.IfCubroAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
@@ -29,25 +30,31 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriter implements CliWriter<Config> {
 
-    private static final String WRITE_TEMPLATE_CUBRO = "interface {$data.name}\n"
+    private static final String WRITE_TEMPLATE_CUBRO = "configure\n"
+            + "interface {$data.name}\n"
             + "{% if ($enabled) %}shutdown\n"
             + "{% else %}no shutdown\n{% endif %}"
-            + "{% if ($desc) %}interface comment {$desc}\n{% endif %}"
-            + "{% if ($mtu) %}mtu {$mtu}\n{% endif %}"
+            + "{% if ($data.description) %}interface comment {$data.description}\n{% endif %}"
+            + "{% if ($data.mtu) %}mtu {$data.mtu}\n{% endif %}"
             + "{% if ($rx) %}rx on \n{% endif %}"
             + "{% if ($speed) %}speed {$speed}\n{% endif %}"
             + "{% if ($innerhash) %}innerhash enable\n{% endif %}"
             + "{% if ($inneracl) %}inneracl enable\n{% endif %}"
-            + "{% if ($vxlanterminated) %}vxlanterminated enable\n{% endif %}";
+            + "{% if ($vxlanterminated) %}vxlanterminated enable\n{% endif %}"
+            + "{% loop in $elags as $elag}elag {$elag}\n{% onEmpty %}{% endloop %}"
+            + "end\n";
 
-    private static final String DELETE_TEMPLATE_CUBRO = "interface {$data.name}\n"
-            + "shutdown\n"
-            + "mtu 1500\n"
+    private static final String DELETE_TEMPLATE_CUBRO = "configure\n"
+            + "interface {$data.name}\n"
+            + "no shutdown\n"
+            + "no mtu\n"
             + "rx off\n"
             + "no speed\n"
             + "no innerhash enable\n"
             + "no inneracl enable\n"
-            + "no vxlanterminated\n";
+            + "no vxlanterminated enable\n"
+            + "{% loop in $elags as $elag}no elag {$elag}\n{% onEmpty %}{% endloop %}"
+            + "end\n";
 
 
     private Cli cli;
@@ -59,7 +66,6 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config data,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        // cubro allows creating of physical interfaces
         blockingWriteAndRead(cli, id, data, updateTemplate(null, data));
 
     }
@@ -82,14 +88,11 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String deleteTemp = fT(DELETE_TEMPLATE_CUBRO, "data", config);
-        if (config.getAugmentation(IfCubroAug.class) != null
-                && config.getAugmentation(IfCubroAug.class).getElag() != null) {
-            for (short elag: config.getAugmentation(IfCubroAug.class).getElag()) {
-                deleteTemp += f("no elag %d\n", elag);
-            }
-        }
-        // cubro allows deleting of physical interfaces
+        IfCubroAug cubroAug = config.getAugmentation(IfCubroAug.class);
+        String deleteTemp = fT(DELETE_TEMPLATE_CUBRO, "data", config,
+                "elags", (cubroAug != null && cubroAug.getElag() != null) ? cubroAug.getElag() :
+                        Collections.emptyList());
+
         blockingDeleteAndRead(cli, id, deleteTemp.trim());
     }
 
@@ -99,24 +102,16 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
         if (cubroAug != null) {
             writeTemp = fT(WRITE_TEMPLATE_CUBRO, "before", before, "data", after,
                     "enabled", (after.isEnabled() != null && !after.isEnabled()) ? Chunk.TRUE : null,
-                    "desc", after.getDescription(),
-                    "mtu", after.getMtu(),
                     "rx", (cubroAug.isRx() != null && cubroAug.isRx()) ? Chunk.TRUE : null,
                     "speed", cubroAug.getSpeed(),
                     "innerhash", (cubroAug.isInnerhash() != null && cubroAug.isInnerhash()) ? Chunk.TRUE : null,
                     "inneracl", (cubroAug.isInneracl() != null && cubroAug.isInneracl()) ? Chunk.TRUE : null,
                     "vxlanterminated", (cubroAug.isVxlanterminated() != null && cubroAug.isVxlanterminated())
-                            ? Chunk.TRUE : null);
-            if (cubroAug.getElag() != null) {
-                for (short elag: cubroAug.getElag()) {
-                    writeTemp += f("elag %d\n", elag);
-                }
-            }
+                            ? Chunk.TRUE : null,
+                    "elags", (cubroAug.getElag() != null) ? cubroAug.getElag() : Collections.emptyList());
         } else {
-            writeTemp = fT(WRITE_TEMPLATE_CUBRO, "data", after,
-                    "enabled", (after.isEnabled() != null && !after.isEnabled()) ? Chunk.TRUE : null,
-                    "desc", after.getDescription(),
-                    "mtu", after.getMtu());
+            writeTemp = fT(WRITE_TEMPLATE_CUBRO, "before", before, "data", after,
+                    "enabled", (after.isEnabled() != null && !after.isEnabled()) ? Chunk.TRUE : null);
         }
         return writeTemp.trim();
     }
