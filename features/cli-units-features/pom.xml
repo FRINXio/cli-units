@@ -29,7 +29,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-features</artifactId>
-    <version>4.2.4.rc17-frinx</version>
+    <version>4.2.4.rc18-frinx-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <packaging>feature</packaging>
 
