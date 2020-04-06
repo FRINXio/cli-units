@@ -40,7 +40,9 @@ import io.frinx.cli.registry.impl.TranslateRegistryImpl;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
 import io.frinx.cli.unit.cubro.conf.ConfigurationUnit;
+import io.frinx.cli.unit.cubro.ifc.CubroInterfaceUnit;
 import io.frinx.cli.unit.cubro.init.CubroCliInitializerUnit;
+import io.frinx.cli.unit.cubro.unit.acl.AclUnit;
 import io.frinx.cli.unit.generic.GenericTranslateUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import io.frinx.translate.unit.commons.utils.NoopDataBroker;
@@ -253,6 +255,8 @@ public class CubroAll {
         new GenericTranslateUnit(reg).init();
         new CubroCliInitializerUnit(reg).init();
         new ConfigurationUnit(reg).init();
+        new CubroInterfaceUnit(reg).init();
+        new AclUnit(reg).init();
         return reg;
     }
 
