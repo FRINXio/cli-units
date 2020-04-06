@@ -64,7 +64,7 @@ public class AclSetReader implements CliConfigListReader<AclSet, AclSetKey, AclS
     }
 
     @VisibleForTesting
-    private List<AclSetKey> parseAccessLists(String output) {
+    public static List<AclSetKey> parseAccessLists(String output) {
         return ParsingUtils.parseFields(output, 0,
             ACL_LINE::matcher,
             NameTypeEntry::fromMatcher,

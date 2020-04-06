@@ -17,19 +17,13 @@
 package io.frinx.cli.unit.cubro.unit.acl.handler;
 
 import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.cubro.rev200320.ACLIP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.ingress.acl.set.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class IngressAclSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
@@ -43,33 +37,13 @@ public class IngressAclSetConfigReader implements CliConfigReader<Config, Config
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String interfaceName = instanceIdentifier.firstKeyOf(Interface.class).getId().getValue();
+                                      @Nonnull ReadContext readContext) {
         final String setName = instanceIdentifier.firstKeyOf(IngressAclSet.class).getSetName();
-
-        final String readCommand = f(IngressAclSetReader.SH_CONFIGURATION, interfaceName);
-        final String readConfig = blockingRead(readCommand, cli, instanceIdentifier, readContext);
-
-        setIngressAclSet(configBuilder, readConfig, interfaceName);
+        setIngressAclSet(configBuilder, setName);
     }
 
-    private void setIngressAclSet(ConfigBuilder configBuilder, String readConfig, String setName) {
-        final String interfaceRegex = String.format("interface %s \r", setName);
-        Pattern interfacePattern = Pattern.compile(interfaceRegex);
-
-        List<String> candidates = AclInterfaceReader.INTERFACE_SPLIT_PATTERN.splitAsStream(readConfig)
-                .collect(Collectors.toList());
-        for (String candidate : candidates) {
-            if (candidate.startsWith(interfaceRegex)) {
-                ParsingUtils.parseField(candidate,
-                    IngressAclSetReader.INGRESS_ACLS_LINE::matcher,
-                    matcher -> matcher.group("name"),
-                    configBuilder::setSetName);
-                configBuilder.setType(ACLIP.class);
-                return;
-            }
-        }
-
-        throw new IllegalArgumentException("ACL of name " + setName + "not found");
+    private void setIngressAclSet(ConfigBuilder configBuilder, String setName) {
+        configBuilder.setSetName(setName);
+        configBuilder.setType(ACLIP.class);
     }
 }

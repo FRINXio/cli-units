@@ -85,10 +85,8 @@ public final class AclEntryLineParser {
         parseSequenceId(builder, words.poll());
 
         // fwd action
-        Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
-
+        final Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
         AclCubroAugBuilder aclCubroAugBuilder = new AclCubroAugBuilder();
-        builder.setActions(createActions(fwdAction, aclCubroAugBuilder));
 
         String word = words.poll();
         if ("elag".equals(word)) {
@@ -102,14 +100,24 @@ public final class AclEntryLineParser {
         IpProtocolType ipProtocolType = parseProtocol(words.poll());
 
         Ipv4Builder ipv4Builder = new Ipv4Builder();
-        ParseIpv4LineResult parseIpv4LineResult = parseIpv4Line(ipProtocolType, words, aclCubroAugBuilder);
+        ParseIpv4LineResult parseIpv4LineResult = parseIpv4Line(ipProtocolType, words);
         ipv4Builder.setConfig(parseIpv4LineResult.ipv4ProtocolFieldsConfig);
         builder.setIpv4(ipv4Builder.build());
+
+        setOperation(words, aclCubroAugBuilder);
+        builder.setActions(createActions(fwdAction, aclCubroAugBuilder));
 
         // if there are some unsupported expressions, ACL cannot be parsed at all
         if (!words.isEmpty()) {
             throw new IllegalArgumentException("ACL entry contains unsupported expressions that cannot be parsed: "
                     + words);
+        }
+    }
+
+    private static void setOperation(Queue<String> words, AclCubroAugBuilder aclCubroAugBuilder) {
+        // cubro-operations
+        if (Objects.equals(words.poll(), "count")) {
+            aclCubroAugBuilder.setOperation(COUNT.class);
         }
     }
 
@@ -152,8 +160,7 @@ public final class AclEntryLineParser {
         }
     }
 
-    private static ParseIpv4LineResult parseIpv4Line(IpProtocolType ipProtocolType,
-                                                     Queue<String> words, AclCubroAugBuilder aclCubroAugBuilder) {
+    private static ParseIpv4LineResult parseIpv4Line(IpProtocolType ipProtocolType, Queue<String> words) {
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top
                 .ipv4.ConfigBuilder ipv4ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
                 .openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
@@ -187,16 +194,6 @@ public final class AclEntryLineParser {
                     ipv4WildcardedAugBuilder.build());
         }
 
-        // cubro-operations
-        if (Objects.equals(words.poll(), "count")) {
-            aclCubroAugBuilder.setOperation(COUNT.class);
-        }
-
-        // if there are some unsupported expressions, ACL cannot be parsed at all
-        if (!words.isEmpty()) {
-            throw new IllegalArgumentException("ACL entry contains unsupported expressions that cannot be parsed: "
-                    + words);
-        }
         return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build());
     }
 

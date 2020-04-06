@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.cubro.unit.acl;
+package io.frinx.cli.unit.cubro.unit.acl.handler;
 
 import com.google.common.collect.Lists;
-import io.frinx.cli.unit.cubro.unit.acl.handler.IngressAclSetReader;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;

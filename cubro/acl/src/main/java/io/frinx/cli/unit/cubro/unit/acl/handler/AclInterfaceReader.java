@@ -51,11 +51,11 @@ public class AclInterfaceReader implements CliConfigListReader<Interface, Interf
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
-        return getIntefraceKeys(blockingRead(SH_CONFIGURATION, cli, instanceIdentifier, readContext));
+        return getInterfaceKeys(blockingRead(SH_CONFIGURATION, cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting
-    public static List<InterfaceKey> getIntefraceKeys(String output) {
+    public static List<InterfaceKey> getInterfaceKeys(String output) {
         List<InterfaceKey> keys = new ArrayList<>();
         List<String> candidates = INTERFACE_SPLIT_PATTERN.splitAsStream(output).collect(Collectors.toList());
         for (String candidate : candidates) {
