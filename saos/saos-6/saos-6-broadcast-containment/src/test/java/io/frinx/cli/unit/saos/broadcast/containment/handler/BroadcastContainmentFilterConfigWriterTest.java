@@ -25,7 +25,9 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -125,5 +127,32 @@ public class BroadcastContainmentFilterConfigWriterTest {
         Assert.assertEquals("broadcast-containment delete filter filter1\n"
                         + "configuration save\n",
                 commands.getValue().getContent());
+    }
+
+    private Config data4 = new ConfigBuilder()
+            .setRate(BigInteger.valueOf(64))
+            .setContainmentClasification(Collections.emptyList())
+            .build();
+
+    private Config data5 = new ConfigBuilder().setName("")
+            .setRate(BigInteger.valueOf(64))
+            .setContainmentClasification(Collections.emptyList())
+            .build();
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void testWriteWithoutSetName() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Filter names must be set");
+        writer.writeCurrentAttributes(iid, data4, null);
+    }
+
+    @Test
+    public void testWriteWithEmptyName() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Filter names must not be empty");
+        writer.writeCurrentAttributes(iid, data5, null);
     }
 }

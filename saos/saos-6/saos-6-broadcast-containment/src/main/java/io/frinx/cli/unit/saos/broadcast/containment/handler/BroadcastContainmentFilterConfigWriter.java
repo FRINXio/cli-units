@@ -52,10 +52,18 @@ public class BroadcastContainmentFilterConfigWriter implements CliWriter<Config>
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         String filterName = instanceIdentifier.firstKeyOf(Filter.class).getName();
-        String containList = parseContainList(Objects.requireNonNull(config.getContainmentClasification()));
-        String rate = config.getRate() != null ? config.getRate().toString() : "0";
+
+        Preconditions.checkArgument(config.getName() != null,
+                "Filter names must be set");
+
+        Preconditions.checkArgument(!config.getName().isEmpty(),
+                "Filter names must not be empty");
+
         Preconditions.checkArgument(config.getName().equals(filterName),
                 "Filter names need to be equals");
+
+        String containList = parseContainList(Objects.requireNonNull(config.getContainmentClasification()));
+        String rate = config.getRate() != null ? config.getRate().toString() : "0";
         blockingWriteAndRead(cli, instanceIdentifier, config, getWriteTemplate(filterName, rate,
                 containList, true, !containList.isEmpty()));
     }
