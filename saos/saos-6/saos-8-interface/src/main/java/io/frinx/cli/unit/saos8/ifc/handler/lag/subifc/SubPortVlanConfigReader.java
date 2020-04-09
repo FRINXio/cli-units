@@ -63,7 +63,9 @@ public class SubPortVlanConfigReader implements CliConfigReader<Config, ConfigBu
         setIngressTransform(output, augBuilder, parentPort);
         setEgressTransform(output, augBuilder, parentPort);
 
-        builder.addAugmentation(Saos8VlanLogicalAug.class, augBuilder.build());
+        if (augBuilder.getIngressL2Transform() != null || augBuilder.getEgressL2Transform() != null) {
+            builder.addAugmentation(Saos8VlanLogicalAug.class, augBuilder.build());
+        }
     }
 
     private void setIngressTransform(String output, Saos8VlanLogicalAugBuilder builder,

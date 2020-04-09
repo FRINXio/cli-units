@@ -33,7 +33,7 @@ public class SubPortVlanReaderTest {
 
     private static final String OUTPUT =
             "sub-port add sub-port LAG=LS02W_100_1 class-element 100 vtag-stack 100\n"
-            + "sub-port add sub-port LAG=LS02W_100_1 class-element 32 vtag-stack 55";
+            + "sub-port add sub-port LAG=LS02W_100_1 class-element 32 vtag-stack *";
 
     private final ClassElements expecredElements =
             new ClassElementsBuilder()
@@ -50,7 +50,7 @@ public class SubPortVlanReaderTest {
                             .setKey(new ClassElementKey("32"))
                             .setConfig(new ConfigBuilder()
                                 .setId("32")
-                                .setVtagStack("55")
+                                .setVtagStack("*")
                                 .build())
                             .build()
                     )
