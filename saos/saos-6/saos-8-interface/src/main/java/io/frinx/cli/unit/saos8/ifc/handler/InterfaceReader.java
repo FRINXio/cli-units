@@ -17,6 +17,7 @@
 package io.frinx.cli.unit.saos8.ifc.handler;
 
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.saos8.ifc.handler.l2vlan.L2VLANInterfaceReader;
 import io.frinx.cli.unit.saos8.ifc.handler.lag.LAGInterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
@@ -32,7 +33,9 @@ public class InterfaceReader extends CompositeListReader<Interface, InterfaceKey
         super(new ArrayList<Child<Interface, InterfaceKey, InterfaceBuilder>>() {
             {
                 add(new LAGInterfaceReader(cli));
+                add(new L2VLANInterfaceReader(cli));
             }
         });
     }
 }
+
