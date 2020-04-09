@@ -16,5 +16,14 @@
 
 package io.frinx.cli.unit.saos8.ifc.handler;
 
-public class InterfaceConfigWriter {
+import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
+
+public class InterfaceConfigWriter extends CompositeWriter<Config> {
+
+    public InterfaceConfigWriter(Cli cli) {
+        super(Lists.newArrayList());
+    }
 }

@@ -76,7 +76,9 @@ public class SubPortVlanReader implements CliConfigReader<Vlan, VlanBuilder> {
 
         elementsAugBuilder.setClassElements(setVlanClassElements(output));
 
-        builder.addAugmentation(Saos8VlanLogicalElementsAug.class, elementsAugBuilder.build()).build();
+        if (elementsAugBuilder.getClassElements() != null) {
+            builder.addAugmentation(Saos8VlanLogicalElementsAug.class, elementsAugBuilder.build()).build();
+        }
     }
 
     private Optional<String> getSubPortName(String output) {
@@ -91,7 +93,7 @@ public class SubPortVlanReader implements CliConfigReader<Vlan, VlanBuilder> {
         ClassElementsBuilder classElementsBuilder = new ClassElementsBuilder();
         List<ClassElement> classElements = new ArrayList<>();
 
-        Pattern allIdsPattern = Pattern.compile(".* class-element (?<id>\\d+) .*");
+        Pattern allIdsPattern = Pattern.compile(".* class-element (?<id>\\d+) vtag-stack .*");
 
         List<String> allIds = ParsingUtils.parseFields(output, 0,
             allIdsPattern::matcher,
@@ -107,7 +109,7 @@ public class SubPortVlanReader implements CliConfigReader<Vlan, VlanBuilder> {
                     .yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.saos.vlan.logical.extension.elements
                     ._class.elements._class.element.ConfigBuilder();
 
-            Pattern vtagPattern = Pattern.compile(".* class-element " + id + " vtag-stack (?<vtag>\\d+)");
+            Pattern vtagPattern = Pattern.compile(".* class-element " + id + " vtag-stack (?<vtag>\\S+)");
 
             elementConfigBuilder.setId(id);
             ParsingUtils.parseField(output, 0,
@@ -119,7 +121,7 @@ public class SubPortVlanReader implements CliConfigReader<Vlan, VlanBuilder> {
             classElements.add(elementBuilder.build());
         }
 
-        return classElementsBuilder.setClassElement(classElements).build();
+        return !classElements.isEmpty() ? classElementsBuilder.setClassElement(classElements).build() : null;
     }
 
     private boolean isLag(InstanceIdentifier<Vlan> id, ReadContext readContext) throws ReadFailedException {

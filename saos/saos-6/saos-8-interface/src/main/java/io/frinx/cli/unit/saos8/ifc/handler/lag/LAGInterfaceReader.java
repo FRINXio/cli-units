@@ -25,6 +25,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -40,6 +41,9 @@ public final class LAGInterfaceReader implements
 
     private static final String SHOW_COMMAND = "configuration search string \"sub-port create sub-port\"";
     private static final Pattern ALL_IDS = Pattern.compile("sub-port.*parent-port (?<name>\\S+).*");
+    public static Check basicCheck_LAG = BasicCheck.checkData(
+            ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
+            ChecksMap.DataCheck.InterfaceConfig.TYPE_IEEE802AD_LAG);
 
     private Cli cli;
 
