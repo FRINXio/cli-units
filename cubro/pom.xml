@@ -28,7 +28,7 @@
     </parent>
 
     <groupId>io.frinx.cli</groupId>
-    <artifactId>cli-units-cubra</artifactId>
+    <artifactId>cli-units-cubro</artifactId>
     <version>4.2.4.rc18-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
