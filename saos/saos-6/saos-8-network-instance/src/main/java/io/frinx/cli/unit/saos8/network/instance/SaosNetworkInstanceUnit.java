@@ -25,6 +25,9 @@ import io.frinx.cli.unit.saos.init.SaosDevices;
 import io.frinx.cli.unit.saos8.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.saos8.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.saos8.network.instance.handler.NetworkInstanceReader;
+import io.frinx.cli.unit.saos8.network.instance.handler.ifc.InterfaceConfigReader;
+import io.frinx.cli.unit.saos8.network.instance.handler.ifc.InterfaceConfigWriter;
+import io.frinx.cli.unit.saos8.network.instance.handler.ifc.InterfaceReader;
 import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.VirtualRingConfigReader;
 import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.VirtualRingConfigWriter;
 import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.VirtualRingReader;
@@ -64,6 +67,7 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
                 IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE_TYPES,
                 IIDs.FRINX_SAOS_NETWORK_INSTANCE_TYPE_EXTENSION,
                 IIDs.FRINX_SAOS_VIRTUAL_RING_EXTENSION,
+                IIDs.FRINX_SAOS_NI_IF_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -83,6 +87,11 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
 
         writeRegistry.addNoop(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RING);
         writeRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RI_CONFIG, new VirtualRingConfigWriter(cli));
+
+        writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
+        writeRegistry.addNoop(IIDs.NE_NE_IN_INTERFACE);
+        writeRegistry.subtreeAdd(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_IN_IN_CO_AUG_SAOS8NIIFCAUG));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -91,5 +100,8 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
 
         readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RING, new VirtualRingReader(cli));
         readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RI_CONFIG, new VirtualRingConfigReader(cli));
+
+        readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new InterfaceReader(cli));
+        readRegistry.add(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigReader(cli));
     }
 }

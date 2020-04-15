@@ -58,7 +58,7 @@ public final class L2VSIReader implements
     }
 
     @VisibleForTesting
-    static List<NetworkInstanceKey> getAllIds(Cli cli, CliReader cliReader,
+    public static List<NetworkInstanceKey> getAllIds(Cli cli, CliReader cliReader,
                                               @Nonnull InstanceIdentifier<?> id,
                                               @Nonnull ReadContext readContext) throws ReadFailedException {
 

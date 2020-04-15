@@ -22,28 +22,28 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos8.ifc.handler.l2vlan.L2VLANInterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.InterfaceBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L2VSIInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder>,
+public class L2VSISubPortReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder>,
         CompositeListReader.Child<Interface, InterfaceKey, InterfaceBuilder> {
 
     public static final String SHOW_COMMAND =
-            "configuration search string \"virtual-switch interface attach cpu-subinterface\"";
+            "configuration search string \"virtual-switch interface attach sub-port\"";
+
     private final Cli cli;
 
-    public L2VSIInterfaceReader(Cli cli) {
+    public L2VSISubPortReader(Cli cli) {
         this.cli = cli;
     }
 
@@ -51,22 +51,22 @@ public class L2VSIInterfaceReader implements CliConfigListReader<Interface, Inte
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
-        if (isL2VLAN(instanceIdentifier, readContext)) {
-            String vsName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-            String output = blockingRead(SHOW_COMMAND, cli, instanceIdentifier, readContext);
-            return getAllIds(output, vsName);
-        }
-        return Collections.emptyList();
+        String vsName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
+        return getAllIds(cli, this, instanceIdentifier, readContext, vsName);
     }
 
     @VisibleForTesting
-    static List<InterfaceKey> getAllIds(String output, String vsName) {
-
-        Pattern vrPattern = Pattern.compile("virtual-switch interface attach cpu-subinterface (?<name>\\S+)"
+    static List<InterfaceKey> getAllIds(Cli cli, CliReader cliReader,
+                                                     @Nonnull InstanceIdentifier<?> id,
+                                                     @Nonnull ReadContext readContext,
+                                                     String vsName) throws ReadFailedException {
+        String output = cliReader.blockingRead(SHOW_COMMAND, cli, id, readContext);
+        Pattern subPortPattern = Pattern.compile("virtual-switch interface attach sub-port (?<name>\\S+)"
                 + " vs " + vsName);
+
         return ParsingUtils.parseFields(output, 0,
-            vrPattern::matcher,
-            matcher -> matcher.group("name"),
+            subPortPattern::matcher,
+            m -> m.group("name"),
             InterfaceKey::new);
     }
 
@@ -74,18 +74,11 @@ public class L2VSIInterfaceReader implements CliConfigListReader<Interface, Inte
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                       @Nonnull InterfaceBuilder interfaceBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        if (isL2VLAN(instanceIdentifier, readContext)) {
-            interfaceBuilder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
-        }
+        interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class).getId());
     }
 
     @Override
     public Check getCheck() {
         return BasicCheck.emptyCheck();
-    }
-
-    private boolean isL2VLAN(InstanceIdentifier<Interface> id, ReadContext readContext) throws ReadFailedException {
-        return L2VLANInterfaceReader.getAllIds(cli, this, id, readContext)
-                .contains(id.firstKeyOf(Interface.class));
     }
 }
