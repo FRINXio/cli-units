@@ -22,9 +22,6 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -41,8 +38,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
-
-    private static final String SH_SINGLE_INTERFACE_CFG = "configuration search string \"port %s \"";
+    public static final String SH_SINGLE_INTERFACE_CFG = "configuration search string \"port %s \"";
 
     private static final String PORT_DISABLE = "port disable port %s";
     private static final Pattern PORT_MTU = Pattern.compile("port set port.*max-frame-size (?<mtu>\\d+).*");
@@ -92,7 +88,6 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         setAcceptableFrameType(output, ifSaosAugBuilder);
         setIngressVSFilter(output, ifSaosAugBuilder);
         setVlanEthertypePolicy(output, ifSaosAugBuilder);
-        setVlanIds(output, ifSaosAugBuilder);
         setIngressToEgressQmap(output, ifSaosAugBuilder);
 
         setAccessControlAttributes(output, ifSaosAugBuilder);
@@ -135,19 +130,6 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
                 PORT_DESCRIPTION_SHORT::matcher,
                 matcher -> matcher.group("desc"),
                 builder::setDescription);
-        }
-    }
-
-    private void setVlanIds(String output, IfSaosAugBuilder ifSaosAugBuilder) {
-        List<String> vlanIdFromRead = ParsingUtils.parseFields(output, 0,
-            PORT_VLAN::matcher,
-            matcher -> matcher.group("vlanID"),
-            value -> value);
-
-        if (!vlanIdFromRead.isEmpty()) {
-            List<String> vlanId = new ArrayList<>();
-            vlanIdFromRead.forEach(vlanIdRow -> vlanId.addAll(Arrays.asList(vlanIdRow.split(","))));
-            ifSaosAugBuilder.setVlanIds(vlanId);
         }
     }
 

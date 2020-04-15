@@ -22,8 +22,6 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import java.util.List;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
@@ -50,9 +48,6 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
             // vs-ingress-filter
             + "{% if ($vif) %}port set port {$data.name} vs-ingress-filter on\n"
             + "{% else %}port set port {$data.name} vs-ingress-filter off\n{% endif %}"
-            // vlan
-            + "{% if ($vlanRemove) %}vlan remove vlan {$vlanRemove} port {$data.name}\n{% endif %}"
-            + "{% if ($vlanAdd) %}vlan add vlan {$vlanAdd} port {$data.name}\n{% endif %}"
             // vlan-ethertype-policy
             + "{% if ($vep) %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy {$vep.name}\n"
             + "{% else %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy all\n{% endif %}"
@@ -111,8 +106,6 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
                     "pt", saosAug.getPhysicalType(),
                     "aft", saosAug.getAcceptableFrameType(),
                     "vif", (saosAug.isVsIngressFilter() != null && saosAug.isVsIngressFilter()) ? Chunk.TRUE : null,
-                    "vlanRemove", getVlansDiff(saosAugBefore, saosAug),
-                    "vlanAdd", getVlansDiff(saosAug, saosAugBefore),
                     "vep", saosAug.getVlanEthertypePolicy(),
                     "iteq", getIngressDiff(saosAugBefore, saosAug),
                     "max_macs", saosAug.getMaxDynamicMacs(),
@@ -122,9 +115,7 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
         return fT(WRITE_TEMPLATE_SAOS, "before", before,
                 "data", after,
                 "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
-                "desc", getDescription(after),
-                "vlanRemove", getVlansDiff(saosAugBefore, saosAug),
-                "vlanAdd", getVlansDiff(saosAug, saosAugBefore));
+                "desc", getDescription(after));
     }
 
     private String getIngressDiff(IfSaosAug before, IfSaosAug after) {
@@ -145,25 +136,5 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
             return String.format("\"%s\"", after.getDescription());
         }
         return after.getDescription();
-    }
-
-    private Object getVlansDiff(IfSaosAug first, IfSaosAug second) {
-        if (first != null && first.getVlanIds() != null) {
-            if (second != null && second.getVlanIds() != null) {
-                List<String> vlanIds = first.getVlanIds().stream()
-                        .filter(vlan_id -> !second.getVlanIds().contains(vlan_id))
-                        .collect(Collectors.toList());
-                if (vlanIds.isEmpty()) {
-                    return null;
-                }
-                return getVlansString(vlanIds);
-            }
-            return getVlansString(first.getVlanIds());
-        }
-        return null;
-    }
-
-    private String getVlansString(List<String> vlanIds) {
-        return vlanIds.toString().replaceAll("[\\[\\] ]", "");
     }
 }
