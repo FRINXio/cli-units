@@ -17,6 +17,7 @@
 package io.frinx.cli.unit.saos8.network.instance.handler.ifc;
 
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ifc.L2VSICpuSubinterfaceConfigReader;
 import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ifc.L2VSISubPortConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
@@ -31,6 +32,7 @@ public class InterfaceConfigReader extends CompositeReader<Config, ConfigBuilder
         super(new ArrayList<Child<Config, ConfigBuilder>>() {
             {
                 add(new L2VSISubPortConfigReader(cli));
+                add(new L2VSICpuSubinterfaceConfigReader(cli));
             }
         });
     }

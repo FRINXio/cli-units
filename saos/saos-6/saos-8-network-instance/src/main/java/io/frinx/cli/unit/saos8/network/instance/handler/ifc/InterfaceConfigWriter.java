@@ -18,6 +18,7 @@ package io.frinx.cli.unit.saos8.network.instance.handler.ifc;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ifc.L2VSICpuSubinterfaceConfigWriter;
 import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ifc.L2VSISubPortConfigWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces._interface.Config;
@@ -25,7 +26,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 public class InterfaceConfigWriter extends CompositeWriter<Config> {
     public InterfaceConfigWriter(Cli cli) {
         super(Lists.newArrayList(
-                new L2VSISubPortConfigWriter(cli)
+                new L2VSISubPortConfigWriter(cli),
+                new L2VSICpuSubinterfaceConfigWriter(cli)
         ));
     }
 }
