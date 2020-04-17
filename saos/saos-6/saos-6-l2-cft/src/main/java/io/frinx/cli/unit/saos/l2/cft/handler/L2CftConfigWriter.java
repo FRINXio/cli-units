@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.l2vsi;
+package io.frinx.cli.unit.saos.l2.cft.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.l2.cft.rev200416.l2.cft.top.l2.cft.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L2VSIConfigCftsConfigWriter implements CliWriter<Config> {
-
-    public L2VSIConfigCftsConfigWriter(Cli cli) {
-        this.cli = cli;
-    }
+public class L2CftConfigWriter implements CliWriter<Config> {
 
     private Cli cli;
+
+    public L2CftConfigWriter(Cli cli) {
+        this.cli = cli;
+    }
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (config != null && config.getMode().equals("mef-ce2")) {
-            blockingWriteAndRead("l2-cft set mode mef-ce2\n",
+            blockingWriteAndRead("l2-cft set mode mef-ce2\nconfiguration save",
                     cli, instanceIdentifier, config);
         }
     }
@@ -58,6 +58,6 @@ public class L2VSIConfigCftsConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        blockingDeleteAndRead("l2-cft set mode mef-ce1\n", cli, instanceIdentifier);
+        blockingDeleteAndRead("l2-cft set mode mef-ce1\nconfiguration save", cli, instanceIdentifier);
     }
 }

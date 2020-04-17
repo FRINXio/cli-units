@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.l2vsi;
+package io.frinx.cli.unit.saos.l2.cft.handler.profile;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -25,41 +25,41 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.Cft;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.CftBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.CftKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.l2.cft.rev200416.l2.cft.top.l2.cft.profiles.Profile;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.l2.cft.rev200416.l2.cft.top.l2.cft.profiles.ProfileBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.l2.cft.rev200416.l2.cft.top.l2.cft.profiles.ProfileKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L2VSIConfigCftReader implements CliConfigListReader<Cft, CftKey, CftBuilder> {
+public class L2CftProfileReader implements CliConfigListReader<Profile, ProfileKey, ProfileBuilder> {
 
-    private static final String SH_CFT = "configuration search string \"l2-cft create profile\"";
+    private static final String SHOW_COMMAND = "configuration search string \"l2-cft create profile\"";
     private static final Pattern CFT_PROFILE = Pattern.compile("l2-cft create profile (?<profile>\\S+).*");
 
     private Cli cli;
 
-    public L2VSIConfigCftReader(Cli cli) {
+    public L2CftProfileReader(Cli cli) {
         this.cli = cli;
     }
 
     @Nonnull
     @Override
-    public List<CftKey> getAllIds(@Nonnull InstanceIdentifier<Cft> instanceIdentifier,
-                                  @Nonnull ReadContext readContext) throws ReadFailedException {
-        return getAllIds(blockingRead(SH_CFT, cli, instanceIdentifier, readContext));
+    public List<ProfileKey> getAllIds(@Nonnull InstanceIdentifier<Profile> instanceIdentifier,
+                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+        return getAllIds(blockingRead(SHOW_COMMAND, cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting
-    static List<CftKey> getAllIds(String output) {
+    static List<ProfileKey> getAllIds(String output) {
         return ParsingUtils.parseFields(output, 0,
             CFT_PROFILE::matcher,
             matcher -> matcher.group("profile"),
-            CftKey::new);
+            ProfileKey::new);
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Cft> instanceIdentifier,
-                                      @Nonnull CftBuilder cftBuilder,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Profile> instanceIdentifier,
+                                      @Nonnull ProfileBuilder profileBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        cftBuilder.setCftName(instanceIdentifier.firstKeyOf(Cft.class).getCftName());
+        profileBuilder.setName(instanceIdentifier.firstKeyOf(Profile.class).getName());
     }
 }

@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.l2vsi;
+package io.frinx.cli.unit.saos.l2.cft.handler;
 
-import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.l2.cft.rev200416.l2.cft.top.l2.cft.ConfigBuilder;
 
-public class L2VSIConfigCftsConfigReaderTest {
+public class L2CftConfigReaderTest {
 
     @Test
-    public void parseCftsConfigTest() {
-        L2VSIConfigCftsConfigReader reader = new L2VSIConfigCftsConfigReader(Mockito.mock(Cli.class));
+    public void parseCftConfigTest() {
         ConfigBuilder builder = new ConfigBuilder();
-
-        reader.parseCftsConfig("l2-cft set mode mef-ce1", builder);
+        L2CftConfigReader.parseCftConfig("l2-cft set mode mef-ce1", builder);
         Assert.assertEquals("mef-ce1", builder.getMode());
     }
 }

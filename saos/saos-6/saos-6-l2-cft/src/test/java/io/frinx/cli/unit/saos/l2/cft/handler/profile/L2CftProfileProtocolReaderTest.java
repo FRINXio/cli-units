@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.l2vsi;
+package io.frinx.cli.unit.saos.l2.cft.handler.profile;
 
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.cft.config.ctrl.protocols.CtrlProtocol.Disposition;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.cft.config.ctrl.protocols.CtrlProtocol.Name;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.cft.config.ctrl.protocols.CtrlProtocolBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.cft.config.ctrl.protocols.CtrlProtocolKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.l2.cft.rev200416.ProtocolConfig.Name;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.l2.cft.rev200416.l2.cft.top.l2.cft.profiles.profile.protocols.ProtocolKey;
 
-public class L2VSIConfigCftCtrlProtocolsReaderTest {
+public class L2CftProfileProtocolReaderTest {
 
     private static final String OUTPUT =
             "l2-cft protocol add profile L2Test2 ctrl-protocol cisco-cdp untagged-disposition forward\n"
@@ -50,33 +48,18 @@ public class L2VSIConfigCftCtrlProtocolsReaderTest {
 
     @Test
     public void getAllIdsTest() {
-        List<CtrlProtocolKey> allIds = Arrays.asList(
-                new CtrlProtocolKey(Name.CiscoCdp), new CtrlProtocolKey(Name.CiscoDtp),
-                new CtrlProtocolKey(Name.CiscoPagp), new CtrlProtocolKey(Name.CiscoUdld),
-                new CtrlProtocolKey(Name.CiscoVtp), new CtrlProtocolKey(Name.CiscoPvst),
-                new CtrlProtocolKey(Name.CiscoStpUplinkFast), new CtrlProtocolKey(Name.VlanBridge),
-                new CtrlProtocolKey(Name.Xstp), new CtrlProtocolKey(Name.Lacp),
-                new CtrlProtocolKey(Name.LacpMarker), new CtrlProtocolKey(Name.Oam),
-                new CtrlProtocolKey(Name.Lldp), new CtrlProtocolKey(Name._8021x),
-                new CtrlProtocolKey(Name.Gmrp), new CtrlProtocolKey(Name.Gvrp),
-                new CtrlProtocolKey(Name.BridgeBlock), new CtrlProtocolKey(Name.AllBridgesBlock),
-                new CtrlProtocolKey(Name.GarpBlock));
+        List<ProtocolKey> allIds = Arrays.asList(
+                new ProtocolKey(Name.CiscoCdp.getName()), new ProtocolKey(Name.CiscoDtp.getName()),
+                new ProtocolKey(Name.CiscoPagp.getName()), new ProtocolKey(Name.CiscoUdld.getName()),
+                new ProtocolKey(Name.CiscoVtp.getName()), new ProtocolKey(Name.CiscoPvst.getName()),
+                new ProtocolKey(Name.CiscoStpUplinkFast.getName()), new ProtocolKey(Name.VlanBridge.getName()),
+                new ProtocolKey(Name.Xstp.getName()), new ProtocolKey(Name.Lacp.getName()),
+                new ProtocolKey(Name.LacpMarker.getName()), new ProtocolKey(Name.Oam.getName()),
+                new ProtocolKey(Name.Lldp.getName()), new ProtocolKey(Name._8021x.getName()),
+                new ProtocolKey(Name.Gmrp.getName()), new ProtocolKey(Name.Gvrp.getName()),
+                new ProtocolKey(Name.BridgeBlock.getName()), new ProtocolKey(Name.AllBridgesBlock.getName()),
+                new ProtocolKey(Name.GarpBlock.getName()));
 
-        Assert.assertEquals(allIds, L2VSIConfigCftProtocolsReader.getAllIds(OUTPUT, "L2Test2"));
-    }
-
-    @Test
-    public void setProtocolTest() {
-        buildAndTest(Name.CiscoCdp, Disposition.Forward);
-        buildAndTest(Name.CiscoStpUplinkFast, Disposition.Discard);
-        buildAndTest(Name.LacpMarker, Disposition.Discard);
-        buildAndTest(Name.GarpBlock, Disposition.Discard);
-    }
-
-    private void buildAndTest(Name protocolName, Disposition expected) {
-        CtrlProtocolBuilder builder = new CtrlProtocolBuilder();
-        L2VSIConfigCftProtocolsReader.setProtocol(OUTPUT, protocolName, "L2Test2", builder);
-
-        Assert.assertEquals(expected, builder.getDisposition());
+        Assert.assertEquals(allIds, L2CftProfileProtocolReader.getAllIds(OUTPUT));
     }
 }

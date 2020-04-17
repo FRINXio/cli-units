@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance;
+package io.frinx.cli.unit.saos.l2.cft;
 
 import java.util.HashMap;
 
@@ -31,7 +31,7 @@ public final class Util {
         return disposition.get(dispositionName);
     }
 
-    public static int getCtrlProtocolValue(String protocolName) {
+    public static int getProtocolValue(String protocolName) {
         HashMap<String, Integer> name = new HashMap<>();
         name.put("802.1x", 0);
         name.put("all-bridges-block", 1);

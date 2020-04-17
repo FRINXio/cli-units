@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.l2vsi;
+package io.frinx.cli.unit.saos.l2.cft.handler;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -24,18 +24,18 @@ import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.cft.extension.rev200220.l2.cft.extension.cfts.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.l2.cft.rev200416.l2.cft.top.l2.cft.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.l2.cft.rev200416.l2.cft.top.l2.cft.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L2VSIConfigCftsConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public class L2CftConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    public static final String SH_CFTS_CONFIG = "configuration search string \"l2-cft set mode\"";
+    public static final String SHOW_COMMAND = "configuration search string \"l2-cft set mode\"";
     private static final Pattern CFTS_MODE = Pattern.compile("l2-cft set mode (?<mode>\\S+).*");
 
     private Cli cli;
 
-    public L2VSIConfigCftsConfigReader(Cli cli) {
+    public L2CftConfigReader(Cli cli) {
         this.cli = cli;
     }
 
@@ -43,11 +43,11 @@ public class L2VSIConfigCftsConfigReader implements CliConfigReader<Config, Conf
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        parseCftsConfig(blockingRead(SH_CFTS_CONFIG, cli, instanceIdentifier, readContext), configBuilder);
+        parseCftConfig(blockingRead(SHOW_COMMAND, cli, instanceIdentifier, readContext), configBuilder);
     }
 
     @VisibleForTesting
-    void parseCftsConfig(String output, ConfigBuilder builder) {
+    static void parseCftConfig(String output, ConfigBuilder builder) {
         ParsingUtils.parseField(output, 0,
             CFTS_MODE::matcher,
             matcher -> matcher.group("mode"),

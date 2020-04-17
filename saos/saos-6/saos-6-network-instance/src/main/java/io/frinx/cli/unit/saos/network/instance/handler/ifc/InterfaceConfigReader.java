@@ -30,7 +30,7 @@ public class InterfaceConfigReader extends CompositeReader<Config, ConfigBuilder
     public InterfaceConfigReader(Cli cli) {
         super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {
             {
-                add(new L2VSIInterfaceConfigReader(cli));
+                add(new L2VSIInterfaceConfigReader());
             }
         });
     }
