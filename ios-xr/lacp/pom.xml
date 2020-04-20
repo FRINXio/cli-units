@@ -24,12 +24,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.14.rc4-frinx</version>
+        <version>3.1.14.rc5-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>ios-xr-lacp-unit</artifactId>
-    <version>3.1.14.rc4-frinx</version>
+    <version>3.1.14.rc5-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
