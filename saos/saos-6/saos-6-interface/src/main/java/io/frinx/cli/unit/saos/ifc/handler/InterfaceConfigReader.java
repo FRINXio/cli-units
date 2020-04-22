@@ -38,23 +38,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
-    public static final String SH_SINGLE_INTERFACE_CFG = "configuration search string \"port %s \"";
 
-    private static final String PORT_DISABLE = "port disable port %s";
-    private static final Pattern PORT_MTU = Pattern.compile("port set port.*max-frame-size (?<mtu>\\d+).*");
-    private static final Pattern PORT_DESCRIPTION_LONG =
-            Pattern.compile("port set port.*description \"(?<desc>\\S+.*)\".*");
-    private static final Pattern PORT_DESCRIPTION_SHORT =
-            Pattern.compile("port set port.*description (?<desc>\\S+).*");
-    private static final Pattern PORT_MODE = Pattern.compile("port set port.*mode (?<mode>\\S+).*");
-    private static final Pattern PORT_AFT = Pattern.compile("port set port.*acceptable-frame-type (?<aft>\\S+).*");
-    private static final Pattern PORT_VIF = Pattern.compile("port set port.*vs-ingress-filter (?<vif>\\S+).*");
-    private static final Pattern PORT_VLAN = Pattern.compile("vlan add vlan (?<vlanID>\\S+).*");
-    private static final Pattern VC_VEP =
-            Pattern.compile("virtual-circuit ethernet.*vlan-ethertype-policy (?<vep>\\S+).*");
-    private static final Pattern PORT_ITEQ = Pattern.compile("port set port.*ingress-to-egress-qmap NNI-NNI.*");
-    private static final Pattern MAX_MACS = Pattern.compile(".*max-dynamic-macs (?<macs>\\d+).*");
-    private static final Pattern FORWARD_UNLEARNED = Pattern.compile(".*forward-unlearned (?<learning>\\S+)");
+    public static final String SH_SINGLE_INTERFACE_CFG = "configuration search string \"port %s\"";
 
     private Cli cli;
 
@@ -76,132 +61,49 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         builder.setName(name);
         builder.setType(EthernetCsmacd.class);
 
-        ParsingUtils.parseField(output,
-            PORT_MTU::matcher,
-            matcher -> Integer.valueOf(matcher.group("mtu")),
-            builder::setMtu);
-
-        setDescription(output, builder);
+        setMtu(output, builder, name);
+        setDescription(output, builder, name);
 
         IfSaosAugBuilder ifSaosAugBuilder = new IfSaosAugBuilder();
-        setMode(output, ifSaosAugBuilder);
-        setAcceptableFrameType(output, ifSaosAugBuilder);
-        setIngressVSFilter(output, ifSaosAugBuilder);
-        setVlanEthertypePolicy(output, ifSaosAugBuilder);
-        setIngressToEgressQmap(output, ifSaosAugBuilder);
-
-        setAccessControlAttributes(output, ifSaosAugBuilder);
+        setMode(output, ifSaosAugBuilder, name);
+        setAcceptableFrameType(output, ifSaosAugBuilder, name);
+        setIngressVSFilter(output, ifSaosAugBuilder, name);
+        setVlanEthertypePolicy(output, ifSaosAugBuilder, name);
+        setIngressToEgressQmap(output, ifSaosAugBuilder, name);
+        setAccessControlAttributes(output, ifSaosAugBuilder, name);
 
         builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
     }
 
-    @VisibleForTesting
-    static IfSaosAug setAccessControlAttributes(String output, IfSaosAugBuilder ifSaosAugBuilder) {
-        if (output.contains("flow access-control")) {
-            ParsingUtils.parseFields(output, 0,
-                MAX_MACS::matcher,
-                m -> m.group("macs"),
-                s -> ifSaosAugBuilder.setMaxDynamicMacs(Integer.parseInt(s)));
+    private void setMtu(final String output, ConfigBuilder builder, String name) {
+        Pattern portMtu = Pattern.compile("port set port " + name + " .*max-frame-size (?<mtu>\\d+).*");
 
-            // when group learning is not present, forward_unlearning si on
-            ifSaosAugBuilder.setForwardUnlearned(true);
-
-            ParsingUtils.parseFields(output, 0,
-                FORWARD_UNLEARNED::matcher,
-                m -> m.group("learning"),
-                s -> ifSaosAugBuilder.setForwardUnlearned(false));
-        }
-        return ifSaosAugBuilder.build();
+        ParsingUtils.parseField(output,
+            portMtu::matcher,
+            matcher -> Integer.valueOf(matcher.group("mtu")),
+            builder::setMtu);
     }
 
-    private void setIngressToEgressQmap(String output, IfSaosAugBuilder ifSaosAugBuilder) {
-        ParsingUtils.parseField(output, PORT_ITEQ::matcher, matcher -> true,
-            iteq -> ifSaosAugBuilder.setIngressToEgressQmap(IngressToEgressQmap.NNINNI));
-    }
-
-    private void setDescription(String output, ConfigBuilder builder) {
+    private void setDescription(String output, ConfigBuilder builder, String name) {
         if (output.contains("\"")) {
+            Pattern portDescLong = Pattern.compile("port set port " + name + " .*description \"(?<desc>\\S+.*)\".*");
             ParsingUtils.parseField(output,
-                PORT_DESCRIPTION_LONG::matcher,
+                portDescLong::matcher,
                 matcher -> matcher.group("desc"),
                 builder::setDescription);
         } else {
+            Pattern portDescShort = Pattern.compile("port set port " + name + " .*description (?<desc>\\S+).*");
             ParsingUtils.parseField(output,
-                PORT_DESCRIPTION_SHORT::matcher,
+                portDescShort::matcher,
                 matcher -> matcher.group("desc"),
                 builder::setDescription);
         }
     }
 
-    private void setVlanEthertypePolicy(String output, IfSaosAugBuilder ifSaosAugBuilder) {
-        Optional<String> vep = ParsingUtils.parseField(output, 0,
-            VC_VEP::matcher,
-            matcher -> matcher.group("vep"));
-
-        if (vep.isPresent()) {
-            VlanEthertypePolicy vlanEthertypePolicy;
-            switch (vep.get()) {
-                case "all":
-                    vlanEthertypePolicy = VlanEthertypePolicy.All;
-                    break;
-                case "vlan-tpid":
-                    vlanEthertypePolicy = VlanEthertypePolicy.VlanTpid;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Cannot parse Vlan Ethertype Policy value: " + vep.get());
-            }
-            ifSaosAugBuilder.setVlanEthertypePolicy(vlanEthertypePolicy);
-        }
-    }
-
-    private void setIngressVSFilter(String output, IfSaosAugBuilder ifSaosAugBuilder) {
-        Optional<String> ingressFilter = ParsingUtils.parseField(output, 0,
-            PORT_VIF::matcher,
-            matcher -> matcher.group("vif"));
-
-        if (ingressFilter.isPresent()) {
-            boolean value;
-            switch (ingressFilter.get()) {
-                case "on":
-                    value = true;
-                    break;
-                case "off":
-                    value = false;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Cannot parse Ingress VS Filter value: " + ingressFilter.get());
-            }
-            ifSaosAugBuilder.setVsIngressFilter(value);
-        }
-    }
-
-    private void setAcceptableFrameType(String output, IfSaosAugBuilder ifSaosAugBuilder) {
-        Optional<String> aft = ParsingUtils.parseField(output, 0,
-            PORT_AFT::matcher,
-            matcher -> matcher.group("aft"));
-
-        if (aft.isPresent()) {
-            AcceptableFrameType acceptableFrameType;
-            switch (aft.get()) {
-                case "all":
-                    acceptableFrameType = AcceptableFrameType.All;
-                    break;
-                case "tagged-only":
-                    acceptableFrameType = AcceptableFrameType.TaggedOnly;
-                    break;
-                case "untagged-only":
-                    acceptableFrameType = AcceptableFrameType.UntaggedOnly;
-                    break;
-                default:
-                    throw new IllegalArgumentException("Cannot parse Acceptable Frame Type value: " + aft.get());
-            }
-            ifSaosAugBuilder.setAcceptableFrameType(acceptableFrameType);
-        }
-    }
-
-    private void setMode(String output, IfSaosAugBuilder ifSaosAugBuilder) {
+    private void setMode(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+        Pattern portMode = Pattern.compile("port set port " + name + " .*mode (?<mode>\\S+).*");
         Optional<String> mode = ParsingUtils.parseField(output, 0,
-            PORT_MODE::matcher,
+            portMode::matcher,
             matcher -> matcher.group("mode"));
 
         if (mode.isPresent()) {
@@ -223,12 +125,104 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         }
     }
 
-    protected void parseEnabled(final String output, final ConfigBuilder builder, String name) {
-        // Set enabled unless proven otherwise
-        builder.setEnabled(true);
+    private void setAcceptableFrameType(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+        Pattern portAft = Pattern.compile("port set port " + name + " .*acceptable-frame-type (?<aft>\\S+).*");
+        Optional<String> aft = ParsingUtils.parseField(output, 0,
+            portAft::matcher,
+            matcher -> matcher.group("aft"));
 
-        if (output.contains(f(PORT_DISABLE, name))) {
-            builder.setEnabled(false);
+        if (aft.isPresent()) {
+            AcceptableFrameType acceptableFrameType;
+            switch (aft.get()) {
+                case "all":
+                    acceptableFrameType = AcceptableFrameType.All;
+                    break;
+                case "tagged-only":
+                    acceptableFrameType = AcceptableFrameType.TaggedOnly;
+                    break;
+                case "untagged-only":
+                    acceptableFrameType = AcceptableFrameType.UntaggedOnly;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Cannot parse Acceptable Frame Type value: " + aft.get());
+            }
+            ifSaosAugBuilder.setAcceptableFrameType(acceptableFrameType);
         }
+    }
+
+    private void setIngressVSFilter(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+        Pattern portVif = Pattern.compile("port set port " + name + " .*vs-ingress-filter (?<vif>\\S+).*");
+        Optional<String> ingressFilter = ParsingUtils.parseField(output, 0,
+            portVif::matcher,
+            matcher -> matcher.group("vif"));
+
+        if (ingressFilter.isPresent()) {
+            boolean value;
+            switch (ingressFilter.get()) {
+                case "on":
+                    value = true;
+                    break;
+                case "off":
+                    value = false;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Cannot parse Ingress VS Filter value: " + ingressFilter.get());
+            }
+            ifSaosAugBuilder.setVsIngressFilter(value);
+        }
+    }
+
+    private void setVlanEthertypePolicy(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+        Pattern vcVep = Pattern.compile("virtual-circuit ethernet set port "
+                + name + " vlan-ethertype-policy (?<vep>\\S+).*");
+        Optional<String> vep = ParsingUtils.parseField(output, 0,
+            vcVep::matcher,
+            matcher -> matcher.group("vep"));
+
+        if (vep.isPresent()) {
+            VlanEthertypePolicy vlanEthertypePolicy;
+            switch (vep.get()) {
+                case "all":
+                    vlanEthertypePolicy = VlanEthertypePolicy.All;
+                    break;
+                case "vlan-tpid":
+                    vlanEthertypePolicy = VlanEthertypePolicy.VlanTpid;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Cannot parse Vlan Ethertype Policy value: " + vep.get());
+            }
+            ifSaosAugBuilder.setVlanEthertypePolicy(vlanEthertypePolicy);
+        }
+    }
+
+    private void setIngressToEgressQmap(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+        Pattern portIteq = Pattern.compile("port set port " + name + ".*ingress-to-egress-qmap NNI-NNI.*");
+        ParsingUtils.parseField(output,
+            portIteq::matcher,
+            matcher -> true,
+            iteq -> ifSaosAugBuilder.setIngressToEgressQmap(IngressToEgressQmap.NNINNI));
+    }
+
+    private void setAccessControlAttributes(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+        Pattern maxMacs = Pattern.compile("flow access-control set port " + name + " max-dynamic-macs (?<macs>\\d+).*");
+        Pattern unlearned = Pattern.compile("flow access-control set port " + name + ".*forward-unlearned.*");
+
+        ParsingUtils.parseFields(output, 0,
+            maxMacs::matcher,
+            m -> m.group("macs"),
+            s -> ifSaosAugBuilder.setMaxDynamicMacs(Integer.parseInt(s)));
+
+        ParsingUtils.parseFields(output, 0,
+            unlearned::matcher,
+            matcher -> true,
+            s -> ifSaosAugBuilder.setForwardUnlearned(false));
+    }
+
+    protected void parseEnabled(final String output, final ConfigBuilder builder, String name) {
+        Pattern portEnabled = Pattern.compile("port disable port " + name);
+        ParsingUtils.parseField(output, 0,
+            portEnabled::matcher,
+            matcher -> true,
+            mode -> builder.setEnabled(false));
     }
 }
