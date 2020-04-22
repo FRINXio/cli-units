@@ -21,7 +21,6 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import junit.framework.TestCase;
 import org.junit.Assert;
@@ -100,7 +99,6 @@ public class InterfaceConfigWriterTest {
                 .setDescription("test")
                 .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
                         .setPhysicalType(PhysicalType.Rj45)
-                        .setVlanIds(Arrays.asList("25", "50", "1234"))
                         .setIngressToEgressQmap(IngressToEgressQmap.DefaultRCOS)
                         .setMaxDynamicMacs(200)
                         .setForwardUnlearned(false)
@@ -126,7 +124,6 @@ public class InterfaceConfigWriterTest {
                 .setMtu(50)
                 .setDescription("updated desc")
                 .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
-                        .setVlanIds(Arrays.asList("25", "50"))
                         .setIngressToEgressQmap(IngressToEgressQmap.NNINNI)
                         .setMaxDynamicMacs(200)
                         .setForwardUnlearned(false)

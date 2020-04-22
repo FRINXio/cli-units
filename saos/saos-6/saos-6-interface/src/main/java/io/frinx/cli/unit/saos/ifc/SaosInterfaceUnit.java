@@ -24,6 +24,8 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.saos.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.saos.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.saos.ifc.handler.InterfaceReader;
+import io.frinx.cli.unit.saos.ifc.handler.l2cft.InterfaceCftProfileConfigReader;
+import io.frinx.cli.unit.saos.ifc.handler.l2cft.InterfaceCftProfileConfigWriter;
 import io.frinx.cli.unit.saos.ifc.handler.vlan.InterfaceVlanReader;
 import io.frinx.cli.unit.saos.ifc.handler.vlan.InterfaceVlanWriter;
 import io.frinx.cli.unit.saos.init.SaosDevices;
@@ -82,6 +84,8 @@ public class SaosInterfaceUnit extends AbstractUnit {
 
         readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
                 new InterfaceVlanReader(cli));
+
+        readRegistry.add(IIDs.IN_IN_AUG_SAOS6IFCFTAUG_CF_CONFIG, new InterfaceCftProfileConfigReader(cli));
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
@@ -92,5 +96,8 @@ public class SaosInterfaceUnit extends AbstractUnit {
         writeRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
                 new InterfaceVlanWriter(cli), IIDs.IN_IN_CONFIG,
                 io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_VL_VL_CONFIG);
+
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_SAOS6IFCFTAUG_CFTPROFILE);
+        writeRegistry.add(IIDs.IN_IN_AUG_SAOS6IFCFTAUG_CF_CONFIG, new InterfaceCftProfileConfigWriter(cli));
     }
 }
