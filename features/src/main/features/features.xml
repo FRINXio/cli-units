@@ -203,6 +203,15 @@
         <bundle>mvn:io.frinx.cli/dasan-configuration-metadata-unit/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='cli-southbound-unit-saos' version='${project.version}'>
+        <feature version='${cli.version}'>cli-topology</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
+        <bundle>mvn:commons-codec/commons-codec/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/saos-6-cli-init-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/saos-6-configuration-metadata-unit/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-sros' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
@@ -225,6 +234,7 @@
         <feature version='${project.version}'>cli-southbound-unit-huawei</feature>
         <feature version='${project.version}'>cli-southbound-unit-nexus</feature>
         <feature version='${project.version}'>cli-southbound-unit-dasan</feature>
+        <feature version='${project.version}'>cli-southbound-unit-saos</feature>
         <feature version='${project.version}'>cli-southbound-unit-sros</feature>
         <feature version='${project.version}'>cli-southbound-unit-ubnt-es</feature>
     </feature>
