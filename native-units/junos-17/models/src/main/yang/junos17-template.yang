@@ -1,0 +1,18 @@
+module junos17-template {
+    yang-version 1.1;
+    namespace "http://frinx.io/yang/native/junos17/template";
+    prefix junos17-template;
+
+    import cli-native-extensions {
+        revision-date "2020-03-09";
+        prefix cne;
+    }
+
+    revision "2020-04-17" {
+        description "Initial revision";
+    }
+
+    cne:show-command "show configuration";
+    cne:config-pattern "set #{command}";
+    cne:delete-pattern "delete #{command}";
+}

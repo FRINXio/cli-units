@@ -32,7 +32,7 @@ import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
 import io.frinx.cli.topology.RemoteDeviceId;
-import io.frinx.cli.unit.utils.AbstractUnit;
+import io.frinx.cli.unit.utils.AbstractUnitWithNativeSupport;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,7 +49,7 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JunosCliInitializerUnit extends AbstractUnit {
+public class JunosCliInitializerUnit extends AbstractUnitWithNativeSupport {
 
     private static final Logger LOG = LoggerFactory.getLogger(JunosCliInitializerUnit.class);
 

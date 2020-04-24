@@ -32,7 +32,7 @@ import io.frinx.cli.io.Command;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.topology.RemoteDeviceId;
-import io.frinx.cli.unit.utils.AbstractUnit;
+import io.frinx.cli.unit.utils.AbstractUnitWithNativeSupport;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * session. That is, upon establishing connection to IOS-XR device, enter Privileged
  * EXEC mode by issuing the 'enable' command.
  */
-public class IosXrCliInitializerUnit extends AbstractUnit {
+public class IosXrCliInitializerUnit extends AbstractUnitWithNativeSupport {
 
     private static final Command CONFIG_COMMAND = Command.writeCommand("configure terminal");
     private static final String CONFIG_PROMPT_SUFFIX = "(config)#";

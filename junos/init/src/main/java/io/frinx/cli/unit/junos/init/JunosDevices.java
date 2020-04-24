@@ -37,6 +37,11 @@ public final class JunosDevices {
             .setDeviceVersion("14.*")
             .build();
 
+    public static final Device JUNOS_17 = new DeviceIdBuilder()
+            .setDeviceType("junos")
+            .setDeviceVersion("17.*")
+            .build();
+
     public static final Set<Device> JUNOS_ALL = new HashSet<Device>() {
         {
             // exclude JUNOS_GENERIC
