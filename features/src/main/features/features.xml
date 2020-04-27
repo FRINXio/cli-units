@@ -136,6 +136,24 @@
         <bundle>mvn:io.frinx.cli/brocade-configuration-metadata-unit/{{VERSION}}</bundle>
     </feature>
 
+    <feature name='cli-southbound-unit-cubro' version='${project.version}'>
+        <feature version='${cli.version}'>cli-topology</feature>
+        <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
+        <feature version='${project.version}'>cli-southbound-unit-ios-common-cli-initializer</feature>
+        <bundle>mvn:commons-net/commons-net/{{VERSION}}</bundle>
+        <bundle>wrap:mvn:org.tinyjee.jgraphx/jgraphx/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-core/{{VERSION}}</bundle>
+        <bundle>mvn:org.jgrapht/jgrapht-ext/{{VERSION}}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-utils/${hc.version}</bundle>
+        <bundle>wrap:mvn:io.fd.honeycomb/translate-impl/${hc.version}</bundle>
+        <bundle>mvn:io.frinx.cli/cubro-cli-init-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/interface-base/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/cubro-interface-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/cubro-configuration-metadata-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/cubro-acl-unit/{{VERSION}}</bundle>
+    </feature>
+
     <feature name='cli-southbound-unit-junos' version='${project.version}'>
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
@@ -231,6 +249,7 @@
         <feature version='${project.version}'>cli-southbound-unit-ios</feature>
         <feature version='${project.version}'>cli-southbound-unit-ios-xr</feature>
         <feature version='${project.version}'>cli-southbound-unit-brocade</feature>
+        <feature version='${project.version}'>cli-southbound-unit-cubro</feature>
         <feature version='${project.version}'>cli-southbound-unit-junos</feature>
         <feature version='${project.version}'>cli-southbound-unit-huawei</feature>
         <feature version='${project.version}'>cli-southbound-unit-nexus</feature>
