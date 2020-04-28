@@ -37,6 +37,7 @@
     <module>saos-6-it</module>
     <module>saos-6-interface</module>
     <module>saos-8-interface</module>
+    <module>saos-6-l2-cft</module>
   </modules>
 
   <build>

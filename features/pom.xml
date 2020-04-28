@@ -510,6 +510,11 @@
       <artifactId>saos-8-interface-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>saos-6-l2-cft-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>io.frinx.cli</groupId>
