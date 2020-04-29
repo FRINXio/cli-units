@@ -239,6 +239,7 @@
         <bundle>mvn:io.frinx.cli/saos-8-interface-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/saos-6-l2-cft-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/saos-6-broadcast-containment-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/saos-6-qos-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-sros' version='${project.version}'>
