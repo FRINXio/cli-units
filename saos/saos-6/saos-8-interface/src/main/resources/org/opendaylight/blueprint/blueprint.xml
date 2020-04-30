@@ -24,9 +24,9 @@
     <reference id="translationRegistry"
                interface="io.frinx.cli.registry.api.TranslationUnitCollector"/>
 
-    <bean id="saosConfigurationMetadataUnit"
-          class="io.frinx.cli.unit.saos.conf.ConfigurationUnit"
+    <bean id="saos8InterfaceUnit"
+          class="io.frinx.cli.unit.saos8.ifc.SaosInterfaceUnit"
           init-method="init" destroy-method="close">
-        <argument ref="translationRegistry" />
+        <argument ref="translationRegistry"/>
     </bean>
 </blueprint>

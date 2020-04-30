@@ -36,6 +36,7 @@
     <module>saos-6-init</module>
     <module>saos-6-it</module>
     <module>saos-6-interface</module>
+    <module>saos-8-interface</module>
   </modules>
 
   <build>
