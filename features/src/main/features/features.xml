@@ -225,6 +225,7 @@
         <feature version='${cli.version}'>cli-topology</feature>
         <feature version='${cli.version}'>cli-southbound-unit-generic</feature>
         <feature version='${cli.version}'>cli-southbound-io</feature>
+        <feature version='${project.version}'>cli-southbound-ios-common-handlers</feature>
         <feature version='${openconfig.version}'>openconfig-models</feature>
         <bundle>wrap:mvn:org.tinyjee.jgraphx/jgraphx/{{VERSION}}</bundle>
         <bundle>mvn:org.jgrapht/jgrapht-core/{{VERSION}}</bundle>
@@ -240,6 +241,8 @@
         <bundle>mvn:io.frinx.cli/saos-6-l2-cft-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/saos-6-broadcast-containment-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/saos-6-qos-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/network-instance-base/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/saos-8-network-instance-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-sros' version='${project.version}'>
