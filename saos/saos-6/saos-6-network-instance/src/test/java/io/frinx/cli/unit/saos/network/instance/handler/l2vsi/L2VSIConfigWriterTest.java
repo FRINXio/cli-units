@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.saos.network.instance.handler.l2vsi;
 
+import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
@@ -32,7 +33,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.L2VSI;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.saos.extension.rev200210.SaosVsExtension;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.saos.extension.rev200210.SaosVsExtension.EncapCosPolicy;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.saos.extension.rev200210.VsSaosAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.saos.extension.rev200210.VsSaosAugBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -54,14 +55,6 @@ public class L2VSIConfigWriterTest {
 
     private VsSaosAugBuilder config1Builder = new VsSaosAugBuilder();
 
-    private Config data = new ConfigBuilder().setType(L2VSI.class).setName("VLAN111444").setDescription("Testing")
-            .setEnabled(true)
-            .addAugmentation(VsSaosAug.class, config1Builder
-                    .setEncapCosPolicy(SaosVsExtension.EncapCosPolicy.Fixed)
-                    .setEncapFixedDot1dpri((short) 3)
-                    .build())
-            .build();
-
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -71,34 +64,42 @@ public class L2VSIConfigWriterTest {
 
     @Test
     public void testWrite() throws Exception {
-        writer.writeCurrentAttributesTesting(iid, data, VC_NAME, true);
-        Mockito.verify(cli).executeAndRead(commands.capture());
-
-        Assert.assertEquals("virtual-switch ethernet create vs VLAN111444 vc vc4\n"
-                        + "virtual-switch ethernet set vs VLAN111444 description Testing\n"
-                        + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy fixed\n"
-                        + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 3\n"
-                        + "configuration save\n",
-                commands.getValue().getContent());
+        createCommandAndTest(createConfig("Testing", (short) 3, EncapCosPolicy.Fixed, true),
+            "virtual-switch ethernet create vs VLAN111444 vc vc4\n"
+                    + "virtual-switch ethernet set vs VLAN111444 description Testing\n"
+                    + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy fixed\n"
+                    + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 3\n"
+                    + "l2-cft tagged-pvst-l2pt enable vs VLAN111444\n"
+                    + "configuration save\n");
     }
 
     @Test
-    public void testWriteWithNoDesc() throws Exception {
-        Config data1 = new ConfigBuilder().setType(L2VSI.class).setName("VLAN111444")
-                .setEnabled(true)
-                .addAugmentation(VsSaosAug.class, config1Builder
-                        .setEncapCosPolicy(SaosVsExtension.EncapCosPolicy.Fixed)
-                        .setEncapFixedDot1dpri((short) 3)
-                        .build())
-                .build();
-        writer.writeCurrentAttributesTesting(iid, data1, VC_NAME, true);
-        Mockito.verify(cli).executeAndRead(commands.capture());
-
-        Assert.assertEquals("virtual-switch ethernet create vs VLAN111444 vc vc4\n"
+    public void testWriteNoDesc() throws Exception {
+        createCommandAndTest(createConfig(null, (short) 3, EncapCosPolicy.Fixed, true),
+                "virtual-switch ethernet create vs VLAN111444 vc vc4\n"
                         + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy fixed\n"
                         + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 3\n"
-                        + "configuration save\n",
-                commands.getValue().getContent());
+                        + "l2-cft tagged-pvst-l2pt enable vs VLAN111444\n"
+                        + "configuration save\n");
+    }
+
+    @Test
+    public void testWriteDisableL2pt() throws Exception {
+        createCommandAndTest(createConfig(null, (short) 3, EncapCosPolicy.Fixed, false),
+                "virtual-switch ethernet create vs VLAN111444 vc vc4\n"
+                        + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy fixed\n"
+                        + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 3\n"
+                        + "l2-cft tagged-pvst-l2pt disable vs VLAN111444\n"
+                        + "configuration save\n");
+    }
+
+    @Test
+    public void testWriteNoL2pt() throws Exception {
+        createCommandAndTest(createConfig(null, (short) 3, EncapCosPolicy.Fixed, null),
+                "virtual-switch ethernet create vs VLAN111444 vc vc4\n"
+                        + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy fixed\n"
+                        + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 3\n"
+                        + "configuration save\n");
     }
 
     @Test
@@ -110,22 +111,31 @@ public class L2VSIConfigWriterTest {
                 + "configuration save", commands.getValue().getContent());
     }
 
-    @Test
-    public void testUpdate() throws Exception {
-        Config dataNew = new ConfigBuilder().setType(L2VSI.class).setName("VLAN111444").setDescription("Testing2")
-                .setEnabled(true)
-                .addAugmentation(VsSaosAug.class, config1Builder
-                        .setEncapCosPolicy(SaosVsExtension.EncapCosPolicy.PhbgInherit)
-                        .setEncapFixedDot1dpri((short) 4)
-                        .build())
-                .build();
-        writer.writeCurrentAttributesTesting(iid, dataNew, "", false);
-
+    private void createCommandAndTest(Config data, String expected) throws WriteFailedException {
+        writer.writeCurrentAttributesTesting(iid, data, VC_NAME, true);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("virtual-switch ethernet set vs VLAN111444 description Testing2\n"
-                + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy phbg-inherit\n"
-                + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 4\n"
-                + "configuration save\n", commands.getValue().getContent());
+        Assert.assertEquals(expected, commands.getValue().getContent());
+    }
+
+    private Config createConfig(String desc, Short encapDpri, EncapCosPolicy encapCosPolicy,
+                                Boolean l2pt) {
+        ConfigBuilder builder = new ConfigBuilder().setType(L2VSI.class).setName("VLAN111444").setEnabled(true);
+        VsSaosAugBuilder saosAugBuilder = new VsSaosAugBuilder();
+
+        if (desc != null) {
+            builder.setDescription(desc);
+        }
+        if (encapDpri != null) {
+            saosAugBuilder.setEncapFixedDot1dpri(encapDpri);
+        }
+        if (encapCosPolicy != null) {
+            saosAugBuilder.setEncapCosPolicy(encapCosPolicy);
+        }
+        if (l2pt != null) {
+            saosAugBuilder.setTaggedPvstL2pt(l2pt);
+        }
+
+        return builder.addAugmentation(VsSaosAug.class, saosAugBuilder.build()).build();
     }
 }

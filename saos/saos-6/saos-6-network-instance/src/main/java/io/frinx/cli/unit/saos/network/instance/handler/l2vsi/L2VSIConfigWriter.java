@@ -46,6 +46,9 @@ public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWrit
             + " description {$vsi_ni_description}\n{% endif %}"
             + "virtual-switch ethernet set vs {$vsi_ni_name} encap-cos-policy {$vsi_ni_encap_cos_policy}\n"
             + "virtual-switch ethernet set vs {$vsi_ni_name} encap-fixed-dot1dpri {$vsi_ni_encap_fixed_dot1dpri}\n"
+            + "{% if ($l2pt == TRUE) %}l2-cft tagged-pvst-l2pt enable vs {$vsi_ni_name}\n"
+            + "{% elseIf ($l2pt == FALSE) %}l2-cft tagged-pvst-l2pt disable vs {$vsi_ni_name}\n"
+            + "{% endif %}"
             + "configuration save";
 
     private static final String DELETE_TEMPLATE =  "virtual-switch ethernet delete vs {$vsi_ni_name}\n"
@@ -86,16 +89,18 @@ public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWrit
     }
 
     private String getWriteTemplate(String niName, String description, String encapCosPolicy,
-                                    String encapFixedDot1dpri, String vcName, Boolean desc, Boolean vc) {
+                                    String encapFixedDot1dpri, String taggedPvstL2pt,
+                                    String vcName, Boolean desc, Boolean vc) {
         if (vcName.isEmpty()) {
             return fT(WRITE_TEMPLATE, "vsi_ni_name", niName, "vsi_ni_description", description,
                     "vsi_ni_encap_cos_policy", encapCosPolicy, "vsi_ni_encap_fixed_dot1dpri", encapFixedDot1dpri,
-                    "description", desc ? Chunk.TRUE : null, "vc", vc ? Chunk.TRUE : null);
+                    "l2pt", taggedPvstL2pt, "description", desc ? Chunk.TRUE : null, "vc", vc ? Chunk.TRUE : null);
         }
         else {
             return fT(WRITE_TEMPLATE, "vsi_ni_name", niName, "vsi_ni_description", description,
                     "vsi_ni_encap_cos_policy", encapCosPolicy, "vsi_ni_encap_fixed_dot1dpri", encapFixedDot1dpri,
-                    "vsi_cp_name", vcName, "description", desc ? Chunk.TRUE : null, "vc", vc ? Chunk.TRUE : null);
+                    "l2pt", taggedPvstL2pt, "vsi_cp_name", vcName, "description", desc ? Chunk.TRUE : null, "vc",
+                    vc ? Chunk.TRUE : null);
         }
 
     }
@@ -137,23 +142,31 @@ public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWrit
 
         String niName = iid.firstKeyOf(NetworkInstance.class).getName();
         String description = data.getDescription() != null ? data.getDescription() : "";
+        String encapFixedDot1dpri = "2";
+        String encapCosPolicy = SaosVsExtension.EncapCosPolicy.Fixed.getName();
+        String taggedPvstL2pt = null;
 
-        String encapFixedDot1dpri = data.getAugmentation(VsSaosAug.class) != null
-                || data.getAugmentation(VsSaosAug.class).getEncapFixedDot1dpri() != null
-                ? String.valueOf(data.getAugmentation(VsSaosAug.class).getEncapFixedDot1dpri()) : String.valueOf(2);
+        VsSaosAug vsSaosAug = data.getAugmentation(VsSaosAug.class);
 
-        String encapCosPolicy = data.getAugmentation(VsSaosAug.class) != null
-                || data.getAugmentation(VsSaosAug.class).getEncapCosPolicy() != null
-                ? data.getAugmentation(VsSaosAug.class).getEncapCosPolicy().getName() :
-                String.valueOf(SaosVsExtension.EncapCosPolicy.Fixed);
+        if (vsSaosAug != null) {
+            if (vsSaosAug.getEncapFixedDot1dpri() != null) {
+                encapFixedDot1dpri = String.valueOf(vsSaosAug.getEncapFixedDot1dpri());
+            }
+            if (vsSaosAug.getEncapCosPolicy() != null) {
+                encapCosPolicy = vsSaosAug.getEncapCosPolicy().getName();
+            }
+            if (vsSaosAug.isTaggedPvstL2pt() != null) {
+                taggedPvstL2pt = vsSaosAug.isTaggedPvstL2pt() ? Chunk.TRUE : "FALSE";
+            }
+        }
 
         if (description.isEmpty()) {
             blockingWriteAndRead(cli, iid, data, getWriteTemplate(niName, description,
-                    encapCosPolicy, encapFixedDot1dpri, vcName, false, vc));
+                    encapCosPolicy, encapFixedDot1dpri, taggedPvstL2pt, vcName, false, vc));
         }
         else {
             blockingWriteAndRead(cli, iid, data, getWriteTemplate(niName, description,
-                    encapCosPolicy, encapFixedDot1dpri, vcName, true, vc));
+                    encapCosPolicy, encapFixedDot1dpri, taggedPvstL2pt, vcName, true, vc));
         }
 
     }

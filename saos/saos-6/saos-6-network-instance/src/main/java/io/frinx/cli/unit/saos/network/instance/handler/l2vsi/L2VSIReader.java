@@ -40,7 +40,7 @@ public final class L2VSIReader implements
         CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
     public static final String SH_VIRTUAL_SWITCH_TEMPLATE =
-            "configuration search string virtual-switch";
+            "configuration search string \" vs \"";
     // ignoring virtual-switch with no dependency on virtual-circuit
     private static final Pattern VIRTUAL_SWITCH_LINE_PATTERN =
         Pattern.compile("virtual-switch ethernet create vs (?<vsid>\\S+)( encap-fixed-dot1dpri (\\d+))? (vc \\S+)?.*");
