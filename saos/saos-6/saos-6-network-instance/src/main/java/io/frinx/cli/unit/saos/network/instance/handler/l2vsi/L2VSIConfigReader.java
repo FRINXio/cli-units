@@ -23,7 +23,6 @@ import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.regex.Pattern;
@@ -52,33 +51,28 @@ public final class L2VSIConfigReader implements CliConfigReader<Config, ConfigBu
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         if (isVSI(instanceIdentifier, readContext)) {
             String vsId = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-            configBuilder.setName(vsId);
-            configBuilder.setType(L2VSI.class);
-            configBuilder.setEnabled(true);
-            getAdditionalAttributes(instanceIdentifier, configBuilder, readContext, vsId);
+            String output = blockingRead(L2VSIReader.SH_VIRTUAL_SWITCH_TEMPLATE, cli, instanceIdentifier, readContext);
+
+            parseConfig(output, configBuilder, vsId);
         }
     }
 
-    private void getAdditionalAttributes(InstanceIdentifier<Config> instanceIdentifier,
-                                         ConfigBuilder configBuilder,
-                                         ReadContext readContext,
-                                         String vsId) throws ReadFailedException {
-        getDescForVS(cli, this, vsId, instanceIdentifier, readContext, configBuilder);
+    @VisibleForTesting
+    void parseConfig(String output, ConfigBuilder builder, String vsId) {
+        final VsSaosAugBuilder vsAug = new VsSaosAugBuilder();
 
-        VsSaosAugBuilder vsAug = new VsSaosAugBuilder();
-        // default value
+        builder.setName(vsId);
+        builder.setType(L2VSI.class);
+        builder.setEnabled(true);
+        getDescForVS(output, builder, vsId);
+        getDot1dpri(output, vsAug, vsId);
+        getL2pt(output, vsAug, vsId);
         vsAug.setEncapCosPolicy(SaosVsExtension.EncapCosPolicy.Fixed);
-        getDot1dpri(cli, this, vsId, instanceIdentifier, readContext, vsAug);
-        configBuilder.addAugmentation(VsSaosAug.class, vsAug.build());
+
+        builder.addAugmentation(VsSaosAug.class, vsAug.build());
     }
 
-    @VisibleForTesting
-    public static void getDescForVS(Cli cli, CliReader cliReader, String vsId,
-                                       @Nonnull InstanceIdentifier<?> id,
-                                       @Nonnull ReadContext readContext,
-                                                ConfigBuilder configBuilder) throws ReadFailedException {
-        String output = cliReader.blockingRead(L2VSIReader.SH_VIRTUAL_SWITCH_TEMPLATE, cli, id, readContext);
-
+    private void getDescForVS(String output, ConfigBuilder configBuilder, String vsId) {
         Pattern pattern = Pattern.compile("virtual-switch ethernet create vs "
                 + vsId + " (encap-fixed-dot1dpri (\\d+) )?vc (\\S+) description (?<desc>\\S+).*");
 
@@ -88,15 +82,10 @@ public final class L2VSIConfigReader implements CliConfigReader<Config, ConfigBu
             configBuilder::setDescription);
     }
 
-    @VisibleForTesting
-    public static void getDot1dpri(Cli cli, CliReader cliReader, String vsId,
-                                 @Nonnull InstanceIdentifier<?> id,
-                                 @Nonnull ReadContext readContext,
-                                   VsSaosAugBuilder vsAug) throws ReadFailedException {
+    private void getDot1dpri(String output, VsSaosAugBuilder vsAug, String vsId) {
         // default value
         vsAug.setEncapFixedDot1dpri((short) 2);
 
-        String output = cliReader.blockingRead(L2VSIReader.SH_VIRTUAL_SWITCH_TEMPLATE, cli, id, readContext);
         Pattern pattern = Pattern.compile("virtual-switch ethernet create vs "
                 + vsId + " encap-fixed-dot1dpri (?<dot1>\\d+).*");
 
@@ -104,6 +93,15 @@ public final class L2VSIConfigReader implements CliConfigReader<Config, ConfigBu
             pattern::matcher,
             m -> m.group("dot1"),
             s -> vsAug.setEncapFixedDot1dpri(Short.parseShort(s)));
+    }
+
+    private void getL2pt(String output, VsSaosAugBuilder vsAug, String vsId) {
+        Pattern pattern = Pattern.compile("l2-cft tagged-pvst-l2pt enable vs " + vsId);
+
+        ParsingUtils.parseField(output,
+            pattern::matcher,
+            matcher -> true,
+            enable -> vsAug.setTaggedPvstL2pt(true));
     }
 
     private boolean isVSI(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {

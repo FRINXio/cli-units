@@ -19,7 +19,6 @@ package io.frinx.cli.unit.saos.network.instance.handler.l2vsi;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.cp.L2VSIPointsReader;
 import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.ifc.L2VSIInterfaceReader;
 import io.frinx.cli.unit.utils.CliReader;
 import java.util.Arrays;
@@ -29,13 +28,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.ConnectionPointBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.InterfaceKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.saos.extension.rev200210.VsSaosAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.saos.extension.rev200210.VsSaosAugBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-
 
 public class VirtualSwitchReaderTest {
 
@@ -81,65 +75,5 @@ public class VirtualSwitchReaderTest {
         List<InterfaceKey> expected2 = Collections.singletonList(new InterfaceKey("3"));
         Assert.assertEquals(expected2, L2VSIInterfaceReader
                 .getAllIds(null, cliReader, VS_ID_2, null, null));
-    }
-
-    @Test
-    public void getDescForVS() throws ReadFailedException {
-        CliReader cliReader = Mockito.mock(CliReader.class);
-
-        Mockito.when(cliReader.blockingRead(Mockito.anyString(), Mockito.any(Cli.class),
-                Mockito.any(InstanceIdentifier.class), Mockito.any(ReadContext.class)))
-                .thenReturn(SH_RUN_VS_ETHERNET_OUTPUT);
-
-        ConfigBuilder configBuilder = new ConfigBuilder();
-
-        L2VSIConfigReader.getDescForVS(null, cliReader, VS_ID_2, null, null, configBuilder);
-        String expectedDescription = "EthernetCFMtest2";
-        Assert.assertEquals(expectedDescription, configBuilder.getDescription());
-
-        L2VSIConfigReader.getDescForVS(null, cliReader, VS_ID_1, null, null, configBuilder);
-        String expectedDescription2 = "EthernetCFMtest";
-        Assert.assertEquals(expectedDescription2, configBuilder.getDescription());
-    }
-
-    @Test
-    public void getDot1dpriVS() throws ReadFailedException {
-        CliReader cliReader = Mockito.mock(CliReader.class);
-
-        Mockito.when(cliReader.blockingRead(Mockito.anyString(), Mockito.any(Cli.class),
-                Mockito.any(InstanceIdentifier.class), Mockito.any(ReadContext.class)))
-                .thenReturn(SH_RUN_VS_ETHERNET_OUTPUT);
-
-        ConfigBuilder configBuilder = new ConfigBuilder();
-        VsSaosAugBuilder vsAug = new VsSaosAugBuilder();
-        L2VSIConfigReader.getDot1dpri(null, cliReader, VS_ID_1, null, null, vsAug);
-        configBuilder.addAugmentation(VsSaosAug.class, vsAug.build());
-        Short expectedDot1dpri = 1;
-        Assert.assertEquals(expectedDot1dpri, configBuilder.getAugmentation(VsSaosAug.class).getEncapFixedDot1dpri());
-
-        ConfigBuilder configBuilder2 = new ConfigBuilder();
-        VsSaosAugBuilder vsAug2 = new VsSaosAugBuilder();
-        L2VSIConfigReader.getDot1dpri(null, cliReader, VS_ID_2, null, null, vsAug2);
-        configBuilder2.addAugmentation(VsSaosAug.class, vsAug2.build());
-        Short expectedDot2dpri = 2;     // default value
-        Assert.assertEquals(expectedDot2dpri, configBuilder2.getAugmentation(VsSaosAug.class).getEncapFixedDot1dpri());
-    }
-
-    @Test
-    public void getVcIdForVs() throws ReadFailedException {
-        CliReader cliReader = Mockito.mock(CliReader.class);
-
-        Mockito.when(cliReader.blockingRead(Mockito.anyString(), Mockito.any(Cli.class),
-                Mockito.any(InstanceIdentifier.class), Mockito.any(ReadContext.class)))
-                .thenReturn(SH_RUN_VS_ETHERNET_OUTPUT);
-
-        ConnectionPointBuilder connectionPointBuilder = new ConnectionPointBuilder();
-        L2VSIPointsReader.getVcIdForVs(null, cliReader, VS_ID_2, null, null, connectionPointBuilder);
-        String expectedVcforVS = "vc3";
-        Assert.assertEquals(expectedVcforVS, connectionPointBuilder.getConfig().getConnectionPointId());
-
-        L2VSIPointsReader.getVcIdForVs(null, cliReader, VS_ID_1, null, null, connectionPointBuilder);
-        String expected2VcforVS = "vc2";
-        Assert.assertEquals(expected2VcforVS, connectionPointBuilder.getConfig().getConnectionPointId());
     }
 }
