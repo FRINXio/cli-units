@@ -23,12 +23,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.4.rc23-frinx</version>
+        <version>4.2.4.rc24-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>brocade-configuration-metadata-unit</artifactId>
-    <version>4.2.4.rc23-frinx</version>
+    <version>4.2.4.rc24-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
