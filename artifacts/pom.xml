@@ -468,6 +468,11 @@
                 <artifactId>saos-6-l2-cft-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>saos-6-acl-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- SROS -->
             <dependency>

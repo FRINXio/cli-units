@@ -42,6 +42,7 @@
     <module>saos-6-qos</module>
     <module>saos-6-broadcast-containment</module>
     <module>saos-6-l2-cft</module>
+    <module>saos-6-acl</module>
   </modules>
 
   <build>
