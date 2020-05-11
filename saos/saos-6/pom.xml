@@ -32,16 +32,17 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>saos-6-configuration-metadata</module>
     <module>saos-6-init</module>
+    <module>saos-6-configuration-metadata</module>
     <module>saos-6-it</module>
+    <module>saos-6-network-instance</module>
+    <module>saos-8-network-instance</module>
     <module>saos-6-interface</module>
     <module>saos-8-interface</module>
-    <module>saos-6-l2-cft</module>
-    <module>saos-6-broadcast-containment</module>
     <module>saos-6-qos</module>
-    <module>saos-8-network-instance</module>
-    <module>saos-6-network-instance</module>
+    <module>saos-6-broadcast-containment</module>
+    <module>saos-6-l2-cft</module>
+    <module>saos-6-acl</module>
   </modules>
 
   <build>
@@ -89,7 +90,7 @@
                   <goal>aggregate</goal>
                 </goals>
                 <phase>package</phase>
-              </execution>
+            </execution>
             </executions>
           </plugin>
         </plugins>
