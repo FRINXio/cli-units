@@ -29,6 +29,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.sa
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.VlanEthertypePolicy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 
 public class InterfaceConfigReaderTest {
 
@@ -44,7 +45,6 @@ public class InterfaceConfigReaderTest {
             + "flow access-control set port 4 max-dynamic-macs 200 forward-unlearned off\n";
 
     private static final Config EXPECTED_INTERFACE_4 = new ConfigBuilder()
-            .setType(EthernetCsmacd.class)
             .setEnabled(false)
             .setName("4")
             .setDescription("two words")
@@ -72,7 +72,6 @@ public class InterfaceConfigReaderTest {
             + "flow access-control set port 1 max-dynamic-macs 200\n";
 
     private static final Config EXPECTED_INTERFACE_1 = new ConfigBuilder()
-            .setType(EthernetCsmacd.class)
             .setEnabled(false)
             .setName("1")
             .setDescription("TEST123")
@@ -92,8 +91,8 @@ public class InterfaceConfigReaderTest {
             + "flow access-control set port 3 forward-unlearned off\n";
 
     private static final Config EXPECTED_INTERFACE_3 = new ConfigBuilder()
-            .setType(EthernetCsmacd.class)
             .setName("3")
+            .setEnabled(true)
             .setDescription("Space test")
             .setMtu(9216)
             .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
@@ -115,8 +114,7 @@ public class InterfaceConfigReaderTest {
             + "flow access-control set port 1 max-dynamic-macs 200\n";
 
     private static final Config EXPECTED_INTERFACE_1_NO_AC = new ConfigBuilder()
-            .setType(EthernetCsmacd.class)
-            .setEnabled(false)
+            .setEnabled(true)
             .setName("1")
             .setDescription("TEST123")
             .setMtu(9216)
@@ -127,6 +125,8 @@ public class InterfaceConfigReaderTest {
                     .setMaxDynamicMacs(200)
                     .build())
             .build();
+
+    private static final String SH_AGG = "aggregation create agg LAG_LMR-001_East\n";
 
     @Test
     public void testParseInterface() {
@@ -147,5 +147,17 @@ public class InterfaceConfigReaderTest {
         new InterfaceConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(SH_PORT_3, parsed, "3");
         Assert.assertEquals(EXPECTED_INTERFACE_3, parsed.build());
+    }
+
+    @Test
+    public void testParseInterfaceType() {
+        ConfigBuilder parsed = new ConfigBuilder();
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseType(SH_AGG, parsed,"24");
+        Assert.assertEquals(EthernetCsmacd.class, parsed.getType());
+
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseType(SH_AGG, parsed, "LAG_LMR-001_East");
+        Assert.assertEquals(Ieee8023adLag.class, parsed.getType());
     }
 }

@@ -23,7 +23,10 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
@@ -50,12 +53,17 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
 
     @VisibleForTesting
     List<InterfaceKey> parseInterfaceIds(String output) {
-        return ParsingUtils.parseFields(output, 0,
-            INTERFACE_ID_LINE::matcher,
-            matcher -> matcher.group("id"),
-            InterfaceKey::new,
-            // we need to filter out range from lldp command
-            t -> !t.contains("-"));
+        return ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .filter(l -> !l.startsWith("lldp"))
+                .filter(l -> !l.startsWith("port tdm"))
+                .map(INTERFACE_ID_LINE::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("id"))
+                .filter(Objects::nonNull)
+                .map(InterfaceKey::new)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     @Override
