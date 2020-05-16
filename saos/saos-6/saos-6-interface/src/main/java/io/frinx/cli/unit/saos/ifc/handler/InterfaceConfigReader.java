@@ -23,6 +23,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -35,11 +36,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.sa
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.VlanEthertypePolicy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     public static final String SH_SINGLE_INTERFACE_CFG = "configuration search string \"port %s\"";
+    private static final String SH_TYPE = "configuration search string \"aggregation create agg %s\"";
 
     private Cli cli;
 
@@ -53,13 +56,13 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
                                       @Nonnull final ReadContext ctx) throws ReadFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
         parseInterface(blockingRead(f(SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx), builder, ifcName);
+        parseType(blockingRead(f(SH_TYPE, ifcName), cli, id, ctx), builder, ifcName);
     }
 
     @VisibleForTesting
     void parseInterface(final String output, final ConfigBuilder builder, String name)  {
         parseEnabled(output, builder, name);
         builder.setName(name);
-        builder.setType(EthernetCsmacd.class);
 
         setMtu(output, builder, name);
         setDescription(output, builder, name);
@@ -73,6 +76,21 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         setAccessControlAttributes(output, ifSaosAugBuilder, name);
 
         builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
+    }
+
+
+    @VisibleForTesting
+    void parseType(final String output, ConfigBuilder builder, String name) {
+        builder.setType(EthernetCsmacd.class);
+
+        Pattern agg = Pattern.compile("aggregation create agg " + name + "$");
+
+        ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .map(agg::matcher)
+                .filter(Matcher::matches)
+                .skip(0)
+                .findFirst().ifPresent(v -> builder.setType(Ieee8023adLag.class));
     }
 
     private void setMtu(final String output, ConfigBuilder builder, String name) {
@@ -196,7 +214,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
     }
 
     private void setIngressToEgressQmap(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
-        Pattern portIteq = Pattern.compile("port set port " + name + ".*ingress-to-egress-qmap NNI-NNI.*");
+        Pattern portIteq = Pattern.compile("port set port " + name + " .*ingress-to-egress-qmap NNI-NNI.*");
         ParsingUtils.parseField(output,
             portIteq::matcher,
             matcher -> true,
@@ -205,7 +223,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
 
     private void setAccessControlAttributes(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
         Pattern maxMacs = Pattern.compile("flow access-control set port " + name + " max-dynamic-macs (?<macs>\\d+).*");
-        Pattern unlearned = Pattern.compile("flow access-control set port " + name + ".*forward-unlearned.*");
+        Pattern unlearned = Pattern.compile("flow access-control set port " + name + " .*forward-unlearned.*");
 
         ParsingUtils.parseFields(output, 0,
             maxMacs::matcher,
@@ -219,7 +237,8 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
     }
 
     protected void parseEnabled(final String output, final ConfigBuilder builder, String name) {
-        Pattern portEnabled = Pattern.compile("port disable port " + name);
+        Pattern portEnabled = Pattern.compile("port disable port " + name + "$");
+        builder.setEnabled(true);
         ParsingUtils.parseField(output, 0,
             portEnabled::matcher,
             matcher -> true,
