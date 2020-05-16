@@ -16,26 +16,52 @@
 
 package io.frinx.cli.unit.saos8.ifc.handler;
 
+import com.google.common.annotations.VisibleForTesting;
+import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos8.ifc.handler.l2vlan.L2VLANInterfaceReader;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.LAGInterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
-import java.util.ArrayList;
+import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.List;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class InterfaceReader extends CompositeListReader<Interface, InterfaceKey, InterfaceBuilder>
-        implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
+public class InterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
+
+    private static final String SH_PORTS = "configuration search string \" port \"";
+    private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\S+).*");
+
+    private Cli cli;
 
     public InterfaceReader(Cli cli) {
-        super(new ArrayList<Child<Interface, InterfaceKey, InterfaceBuilder>>() {
-            {
-                add(new LAGInterfaceReader(cli));
-                add(new L2VLANInterfaceReader(cli));
-            }
-        });
+        this.cli = cli;
+    }
+
+    @Nonnull
+    @Override
+    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+                                        @Nonnull ReadContext readContext) throws ReadFailedException {
+        return parseInterfaceIds(blockingRead(SH_PORTS, cli, instanceIdentifier, readContext));
+    }
+
+    @VisibleForTesting
+    List<InterfaceKey> parseInterfaceIds(String output) {
+        return ParsingUtils.parseFields(output, 0,
+            INTERFACE_ID_LINE::matcher,
+            matcher -> matcher.group("id"),
+            InterfaceKey::new,
+            // we need to filter out range from lldp command
+            t -> !t.contains("-"));
+    }
+
+    @Override
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
+                                      @Nonnull InterfaceBuilder builder, @Nonnull ReadContext readContext) {
+        builder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
     }
 }
 
