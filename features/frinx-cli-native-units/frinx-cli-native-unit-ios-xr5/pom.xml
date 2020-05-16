@@ -28,7 +28,7 @@
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-native-unit-ios-xr5</artifactId>
     <packaging>feature</packaging>
-    <version>4.2.4.rc24-frinx-SNAPSHOT</version>
+    <version>4.2.4.rc24-frinx</version>
     <name>Frinx :: Cli :: Native Unit :: IOS XR 5.*</name>
 
     <dependencyManagement>
@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>io.frinx.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
-                <version>4.2.4.rc24-frinx-SNAPSHOT</version>
+                <version>4.2.4.rc24-frinx</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
