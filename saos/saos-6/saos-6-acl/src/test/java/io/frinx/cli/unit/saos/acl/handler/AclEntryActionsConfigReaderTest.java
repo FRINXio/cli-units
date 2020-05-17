@@ -50,4 +50,13 @@ public class AclEntryActionsConfigReaderTest {
 
         Assert.assertEquals(expectedFwdAction, builder.getForwardingAction());
     }
+
+
+    @Test
+    public void parseConfig74Test() {
+        ConfigBuilder builder = new ConfigBuilder();
+        reader.parseConfig(AclSetReaderTest.OUTPUT_74, builder, "MGT-IN", 10L);
+
+        Assert.assertEquals(ACCEPT.class, builder.getForwardingAction());
+    }
 }
