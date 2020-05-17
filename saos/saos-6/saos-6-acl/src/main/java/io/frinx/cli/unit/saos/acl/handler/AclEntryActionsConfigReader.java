@@ -53,7 +53,7 @@ public class AclEntryActionsConfigReader implements CliConfigReader<Config, Conf
     @VisibleForTesting
     void parseConfig(String output, ConfigBuilder builder, String aclSetName, Long sequenceId) {
         Pattern pattern = Pattern.compile(".*" + aclSetName + " .* precedence " + sequenceId
-                + " filter-action (?<action>\\S+) any");
+                + " filter-action (?<action>\\S+).*");
 
         ParsingUtils.parseField(output,
             pattern::matcher,

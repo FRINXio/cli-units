@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.saos.acl.handler;
 
+import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
@@ -35,6 +36,13 @@ public class AclSetReaderTest {
         + "access-list add profile foo rule test1 precedence 2 filter-action allow any\n"
         + "access-list add profile foo rule test3 precedence 3 filter-action deny any\n";
 
+    static final String OUTPUT_74 =
+        "access-list set filter-mode l3-only\n"
+        + "access-list create acl-profile MGT-IN default-filter-action allow\n"
+        + "access-list add profile MGT-IN rule Allow-OSS-MGT precedence 10 filter-action allow src-ip 172.22.128.0/18\n"
+        + "access-list add profile MGT-IN rule Allow-TESTLAB precedence 20 filter-action allow src-ip 172.16.0.0/23\n"
+        + "access-list add profile MGT-IN rule ALLOW-1C precedence 30 filter-action allow src-ip 172.22.160.115\n";
+
     @Test
     public void getAllIdsTest() {
         List<AclSetKey> expected = Arrays.asList(
@@ -43,5 +51,8 @@ public class AclSetReaderTest {
                 new AclSetKey("foo", ACLTYPE.class));
 
         Assert.assertEquals(expected, AclSetReader.getAllIds(OUTPUT));
+
+        Assert.assertEquals(Lists.newArrayList(new AclSetKey("MGT-IN", ACLTYPE.class)),
+                AclSetReader.getAllIds(OUTPUT_74));
     }
 }
