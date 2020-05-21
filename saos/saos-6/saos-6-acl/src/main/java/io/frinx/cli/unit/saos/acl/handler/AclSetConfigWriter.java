@@ -68,15 +68,9 @@ public class AclSetConfigWriter implements CliWriter<Config> {
 
         Saos6AclSetAug aug = config.getAugmentation(Saos6AclSetAug.class);
 
-        if (aug.isEnabled() != null) {
-            Preconditions.checkArgument(!aug.isEnabled(),
-                    "\"frinx-acl-extension:enabled\": true. It is not necessary, because \"true\" is default value.",
-                    aug.isEnabled());
-        }
-
         return fT(WRITE_TEMPLATE, "data", config,
                 "action", Util.getFwdActionString(aug.getDefaultFwdAction()),
-                "enabled", aug.isEnabled() == null ? null : "FALSE");
+                "enabled", aug.isEnabled() == null || aug.isEnabled() ? null : "FALSE");
     }
 
     @Override
@@ -105,11 +99,7 @@ public class AclSetConfigWriter implements CliWriter<Config> {
     private String setEnabled(Boolean before, Boolean after) {
         if (!Objects.equals(before, after)) {
             if (before == null || before) {
-                if (after != null) {
-                    Preconditions.checkArgument(!after, "\"frinx-acl-extension:enabled\": true. "
-                            + "It is not necessary, because \"true\" is default value.", after);
-                }
-                return after == null ? null : "FALSE";
+                return after == null || after ? null : "FALSE";
             } else {
                 return Chunk.TRUE;
             }
