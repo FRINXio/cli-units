@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos8.ifc.handler;
+package io.frinx.cli.unit.saos8.ifc.handler.port;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -32,9 +32,10 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class InterfaceConfigWriterTest {
+public class PortConfigWriterTest {
 
     private static final String UPDATE_INPUT = "port disable port 4\n"
         + "port set port 4 description \"updated desc\"\n"
@@ -54,7 +55,7 @@ public class InterfaceConfigWriterTest {
     @Mock
     private WriteContext context;
 
-    private InterfaceConfigWriter writer;
+    private PortConfigWriter writer;
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
@@ -62,6 +63,7 @@ public class InterfaceConfigWriterTest {
 
     // test data
     private Config data;
+    private Config lagData;
 
     @Before
     public void setUp() {
@@ -69,8 +71,9 @@ public class InterfaceConfigWriterTest {
 
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
 
-        this.writer = new InterfaceConfigWriter(this.cli);
+        this.writer = new PortConfigWriter(this.cli);
         initializeData();
+        initializeLagData();
     }
 
     private void initializeData() {
@@ -83,10 +86,20 @@ public class InterfaceConfigWriterTest {
                 .build();
     }
 
+    private void initializeLagData() {
+        lagData = new ConfigBuilder()
+                .setEnabled(true)
+                .setName("Lag=FRINX_TEST")
+                .setType(Ieee8023adLag.class)
+                .setMtu(35)
+                .setDescription("lag interface")
+                .build();
+    }
+
     @Test
     public void write() {
         try {
-            this.writer.writeCurrentAttributes(iid, data, context);
+            this.writer.writeCurrentAttributesWResult(iid, data, context);
             Mockito.verify(cli).executeAndRead(response.capture());
             Assert.fail();
         } catch (WriteFailedException e) {
@@ -102,7 +115,7 @@ public class InterfaceConfigWriterTest {
                 .setDescription("updated desc")
                 .build();
 
-        this.writer.updateCurrentAttributes(iid, data, newData, context);
+        this.writer.updateCurrentAttributesWResult(iid, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
@@ -114,7 +127,7 @@ public class InterfaceConfigWriterTest {
         Config newData = new ConfigBuilder().setEnabled(false).setName("4").setType(EthernetCsmacd.class)
                 .build();
 
-        this.writer.updateCurrentAttributes(iid, data, newData, context);
+        this.writer.updateCurrentAttributesWResult(iid, data, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue().getContent());
@@ -123,11 +136,29 @@ public class InterfaceConfigWriterTest {
     @Test
     public void delete() {
         try {
-            this.writer.deleteCurrentAttributes(iid, data, context);
+            this.writer.deleteCurrentAttributesWResult(iid, data, context);
             Mockito.verify(cli).executeAndRead(response.capture());
             Assert.fail();
         } catch (WriteFailedException e) {
             // ok
         }
+    }
+
+    @Test(expected = WriteFailedException.CreateFailedException.class)
+    public void writeLag() throws WriteFailedException {
+        writer.writeCurrentAttributesWResult(iid, lagData, context);
+    }
+
+    @Test(expected = WriteFailedException.UpdateFailedException.class)
+    public void updateLag() throws WriteFailedException {
+        Config newData = new ConfigBuilder().setEnabled(true).setName("Lag=FRINX_TEST").setType(Ieee8023adLag.class)
+                .setMtu(35).setDescription("new lag interface desc").build();
+
+        writer.updateCurrentAttributesWResult(iid, lagData, newData, context);
+    }
+
+    @Test(expected = WriteFailedException.DeleteFailedException.class)
+    public void deleteLag() throws WriteFailedException {
+        writer.deleteCurrentAttributesWResult(iid, lagData, context);
     }
 }

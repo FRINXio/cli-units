@@ -48,7 +48,7 @@ public final class L2VLANInterfaceReader implements
     @Nonnull
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                               @Nonnull ReadContext readContext) throws ReadFailedException {
+                                        @Nonnull ReadContext readContext) throws ReadFailedException {
         return getAllIds(cli, this, instanceIdentifier, readContext);
     }
 
