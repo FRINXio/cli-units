@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos8.ifc.handler.lag;
+package io.frinx.cli.unit.saos8.ifc.handler.port;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -27,27 +27,38 @@ import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class LAGInterfaceReader implements
-        CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder>,
+public class PortReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder>,
         CompositeListReader.Child<Interface, InterfaceKey, InterfaceBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search string \"sub-port create sub-port\"";
-    private static final Pattern ALL_IDS = Pattern.compile("sub-port.*parent-port (?<name>\\S+).*");
-    public static Check basicCheck_LAG = BasicCheck.checkData(
+    public static final String SH_PORTS = "configuration search string \" port \"";
+    public static final String LAG_PORTS = "configuration search string \"aggregation create\"";
+    private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\S+).*");
+    private static final Pattern LAG_INTERFACE_ID_LINE = Pattern.compile(".*agg (?<id>\\S+)");
+
+    public static Check ethernetCheck = BasicCheck.checkData(
+            ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
+            ChecksMap.DataCheck.InterfaceConfig.TYPE_ETHERNET_CSMACD);
+
+    public static Check lagCheck = BasicCheck.checkData(
             ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
             ChecksMap.DataCheck.InterfaceConfig.TYPE_IEEE802AD_LAG);
 
     private Cli cli;
 
-    public LAGInterfaceReader(Cli cli) {
+    public PortReader(Cli cli) {
         this.cli = cli;
     }
 
@@ -59,22 +70,34 @@ public final class LAGInterfaceReader implements
     }
 
     @VisibleForTesting
-    public static List<InterfaceKey> getAllIds(Cli cli, CliReader cliReader,
-                                              InstanceIdentifier<?> id,
-                                              ReadContext context) throws ReadFailedException {
-        String output = cliReader.blockingRead(SHOW_COMMAND, cli, id, context);
+    public static List<InterfaceKey> getAllIds(Cli cli, CliReader reader,
+                                               @Nonnull InstanceIdentifier id,
+                                               @Nonnull ReadContext context) throws ReadFailedException {
 
-        return ParsingUtils.parseFields(output, 0,
-            ALL_IDS::matcher,
-            matcher -> matcher.group("name"),
-            InterfaceKey::new);
+        String portOutput = reader.blockingRead(SH_PORTS, cli, id, context);
+        String lagOutput = reader.blockingRead(SH_PORTS, cli, id, context);
+
+        List<Pattern> patterns = Arrays.asList(INTERFACE_ID_LINE, LAG_INTERFACE_ID_LINE);
+
+        return ParsingUtils.NEWLINE.splitAsStream(portOutput.concat(lagOutput))
+                .map(String::trim)
+                .filter(l -> !l.startsWith("lldp"))
+                .filter(l -> !l.startsWith("port tdm"))
+                .map(line -> patterns.stream().map(pattern -> pattern.matcher(line))
+                        .filter(Matcher::matches)
+                        .map(matcher -> matcher.group("id"))
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .map(InterfaceKey::new)
+                        .orElse(null))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                      @Nonnull InterfaceBuilder interfaceBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        interfaceBuilder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
+                                      @Nonnull InterfaceBuilder builder, @Nonnull ReadContext readContext) {
+        builder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
     }
 
     @Override
@@ -82,3 +105,4 @@ public final class LAGInterfaceReader implements
         return BasicCheck.emptyCheck();
     }
 }
+

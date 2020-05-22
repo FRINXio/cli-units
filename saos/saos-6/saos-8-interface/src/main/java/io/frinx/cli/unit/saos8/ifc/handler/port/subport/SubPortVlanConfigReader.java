@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos8.ifc.handler.lag.subifc;
+package io.frinx.cli.unit.saos8.ifc.handler.port.subport;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.LAGInterfaceReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.PortReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
@@ -47,7 +47,7 @@ public class SubPortVlanConfigReader implements CliConfigReader<Config, ConfigBu
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        if (isLag(instanceIdentifier, readContext)) {
+        if (isPort(instanceIdentifier, readContext)) {
             String parentPort = instanceIdentifier.firstKeyOf(Interface.class).getName();
             Long index = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
             String output = blockingRead(f(SHOW_COMMAND, index), cli, instanceIdentifier, readContext);
@@ -90,8 +90,8 @@ public class SubPortVlanConfigReader implements CliConfigReader<Config, ConfigBu
             builder::setEgressL2Transform);
     }
 
-    private boolean isLag(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {
-        return LAGInterfaceReader.getAllIds(cli, this, id, readContext)
+    private boolean isPort(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {
+        return PortReader.getAllIds(cli, this, id, readContext)
                 .contains(id.firstKeyOf(Interface.class));
     }
 }
