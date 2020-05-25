@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos8.ifc.handler.lag.subifc;
+package io.frinx.cli.unit.saos8.ifc.handler.port.subport;
 
 import java.util.Arrays;
 import java.util.List;

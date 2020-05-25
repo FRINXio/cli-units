@@ -23,14 +23,19 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.saos.init.SaosDevices;
 import io.frinx.cli.unit.saos8.ifc.handler.InterfaceConfigReader;
+import io.frinx.cli.unit.saos8.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.saos8.ifc.handler.InterfaceReader;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortConfigReader;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortConfigWriter;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortReader;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortVlanConfigReader;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortVlanConfigWriter;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortVlanElementConfigWriter;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.subifc.SubPortVlanReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.aggregate.AggregateConfigReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortConfigReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortConfigWriter;
+import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortPmInstanceConfigReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortPmInstanceConfigWriter;
+import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortPmInstanceReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortVlanConfigReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortVlanConfigWriter;
+import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortVlanElementConfigWriter;
+import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortVlanReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.HashSet;
@@ -64,6 +69,7 @@ public class SaosInterfaceUnit extends AbstractUnit {
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_INTERFACES,
                 IIDs.FRINX_IF_AGGREGATE_EXTENSION,
+                IIDs.FRINX_SAOS_IF_EXTENSION,
                 io.frinx.openconfig.openconfig.vlan.IIDs.FRINX_OPENCONFIG_VLAN,
                 io.frinx.openconfig.openconfig.network.instance.IIDs.FRINX_SAOS_VLAN_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
@@ -81,35 +87,46 @@ public class SaosInterfaceUnit extends AbstractUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.INTERFACES);
         writeRegistry.addNoop(IIDs.IN_INTERFACE);
-        writeRegistry.addNoop(IIDs.IN_IN_CONFIG);
+        writeRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli));
+
+        // sub-port of the lag interface
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
         writeRegistry.subtreeAdd(IIDs.IN_IN_SU_SU_CONFIG, new SubPortConfigWriter(cli),
                 Sets.newHashSet(IIDs.IN_IN_SU_SU_CO_AUG_SAOS8SUBIFNAMEAUG));
-        // vlan config
+
         writeRegistry.addNoop(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VLAN);
         writeRegistry.subtreeAdd(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
                 new SubPortVlanConfigWriter(cli), Sets.newHashSet(
                         io.frinx.openconfig.openconfig.network.instance.IIDs
                                 .IN_IN_SU_SU_VL_CO_AUG_SAOS8VLANLOGICALAUG));
-        // vlan class-element config
+
         writeRegistry.addNoop(io.frinx.openconfig.openconfig.network.instance.IIDs
                 .IN_IN_SU_SU_VL_AUG_SAOS8VLANLOGICALELEMENTSAUG_CLASSELEMENTS);
         writeRegistry.addNoop(io.frinx.openconfig.openconfig.network.instance.IIDs
                 .IN_IN_SU_SU_VL_AUG_SAOS8VLANLOGICALELEMENTSAUG_CL_CLASSELEMENT);
         writeRegistry.add(io.frinx.openconfig.openconfig.network.instance.IIDs
-                .IN_IN_SU_SU_VL_AUG_SAOS8VLANLOGICALELEMENTSAUG_CL_CL_CONFIG,
+                        .IN_IN_SU_SU_VL_AUG_SAOS8VLANLOGICALELEMENTSAUG_CL_CL_CONFIG,
                 new SubPortVlanElementConfigWriter(cli));
+
+        writeRegistry.addNoop(IIDs.IN_IN_SU_SU_AUG_SAOS8PMINSTANCEAUG_PMINSTANCES);
+        writeRegistry.addNoop(IIDs.IN_IN_SU_SU_AUG_SAOS8PMINSTANCEAUG_PM_PMINSTANCE);
+        writeRegistry.add(IIDs.IN_IN_SU_SU_AUG_SAOS8PMINSTANCEAUG_PM_PM_CONFIG,
+                new SubPortPmInstanceConfigWriter(cli));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
         readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli));
+        readRegistry.add(IIDs.IN_IN_ET_CO_AUG_CONFIG1, new AggregateConfigReader(cli));
+
+        // sub-port of the lag interface
         readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubPortReader(cli));
         readRegistry.add(IIDs.IN_IN_SU_SU_CONFIG, new SubPortConfigReader(cli));
         readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VLAN,
                 new SubPortVlanReader(cli));
         readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
                 new SubPortVlanConfigReader(cli));
-
+        readRegistry.add(IIDs.IN_IN_SU_SU_AUG_SAOS8PMINSTANCEAUG_PM_PMINSTANCE, new SubPortPmInstanceReader(cli));
+        readRegistry.add(IIDs.IN_IN_SU_SU_AUG_SAOS8PMINSTANCEAUG_PM_PM_CONFIG, new SubPortPmInstanceConfigReader(cli));
     }
 }

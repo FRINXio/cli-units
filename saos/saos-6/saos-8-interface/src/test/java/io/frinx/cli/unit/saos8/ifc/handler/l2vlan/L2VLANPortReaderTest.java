@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos8.ifc.handler.lag;
+package io.frinx.cli.unit.saos8.ifc.handler.l2vlan;
 
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -28,17 +28,12 @@ import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class LAGInterfaceReaderTest {
-
+public class L2VLANPortReaderTest {
     private static final String OUTPUT =
-            "sub-port create sub-port LAG=LS02W_FRINX009_2508_1 parent-port LS02W classifier-precedence 133 "
-            + "ingress-l2-transform pop egress-l2-transform push-88a8.2508.map\n"
-            + "sub-port create sub-port LAG=LS02W_FRINX010_2509_1 parent-port LP01 classifier-precedence 134 "
-            + "ingress-l2-transform pop egress-l2-transform push-88a8.2509.map\n"
-            + "sub-port create sub-port LAG=LS02W_FRINX003_2502_1 parent-port LM01W classifier-precedence 135 "
-            + "ingress-l2-transform pop egress-l2-transform push-88a8.2502.map\n"
-            + "sub-port create sub-port LAG=LS01W_FRINX001_2500_1 parent-port LM01E classifier-precedence 124 "
-            + "ingress-l2-transform pop egress-l2-transform push-88a8.2500.map\n";
+            "cpu-interface sub-interface create cpu-subinterface LS02W\n"
+            + "cpu-interface sub-interface create cpu-subinterface LP01\n"
+            + "cpu-interface sub-interface create cpu-subinterface LM01W\n "
+            + "cpu-interface sub-interface create cpu-subinterface LM01E\n ";
 
     @Test
     public void getAllIdsTest() throws ReadFailedException {
@@ -53,7 +48,6 @@ public class LAGInterfaceReaderTest {
                 new InterfaceKey("LP01"),
                 new InterfaceKey("LM01W"),
                 new InterfaceKey("LM01E"));
-
-        Assert.assertEquals(expected, LAGInterfaceReader.getAllIds(null, cliReader, null, null));
+        Assert.assertEquals(expected, L2VLANInterfaceReader.getAllIds(null, cliReader, null, null));
     }
 }
