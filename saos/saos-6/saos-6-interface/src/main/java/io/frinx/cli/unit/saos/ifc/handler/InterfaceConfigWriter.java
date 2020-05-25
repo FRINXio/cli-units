@@ -25,6 +25,8 @@ import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriter implements CliWriter<Config> {
@@ -68,8 +70,13 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config data,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        throw new WriteFailedException.CreateFailedException(id, data,
-                new IllegalArgumentException("Physical interface cannot be created"));
+        if (EthernetCsmacd.class.equals(data.getType())) {
+            throw new WriteFailedException.CreateFailedException(id, data,
+                    new IllegalArgumentException("Physical interface cannot be created"));
+        } else if (Ieee8023adLag.class.equals(data.getType())) {
+            throw new WriteFailedException.CreateFailedException(id, data,
+                    new IllegalArgumentException("Creating LAG interface is not permitted"));
+        }
     }
 
     @Override
@@ -77,13 +84,18 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        Preconditions.checkArgument(dataBefore.getType()
-                        .equals(dataAfter.getType()), "Changing interface type is not permitted. Before: %s, After: %s",
-                dataBefore.getType(), dataAfter.getType());
-        try {
-            blockingWriteAndRead(cli, id, dataAfter, updateTemplate(dataBefore, dataAfter));
-        } catch (WriteFailedException e) {
-            throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter, e);
+        if (EthernetCsmacd.class.equals(dataBefore.getType())) {
+            Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
+                    "Changing interface type is not permitted. Before: %s, After: %s",
+                    dataBefore.getType(), dataAfter.getType());
+            try {
+                blockingWriteAndRead(cli, id, dataAfter, updateTemplate(dataBefore, dataAfter));
+            } catch (WriteFailedException e) {
+                throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter, e);
+            }
+        } else if (Ieee8023adLag.class.equals(dataBefore.getType())) {
+            throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter,
+                    new IllegalArgumentException("Changing LAG interface is not permitted"));
         }
     }
 
@@ -91,8 +103,13 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                         @Nonnull Config dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        throw new WriteFailedException.DeleteFailedException(id,
-                new IllegalArgumentException("Physical interface cannot be deleted"));
+        if (EthernetCsmacd.class.equals(dataBefore.getType())) {
+            throw new WriteFailedException.DeleteFailedException(id,
+                    new IllegalArgumentException("Physical interface cannot be deleted"));
+        } else if (Ieee8023adLag.class.equals(dataBefore.getType())) {
+            throw new WriteFailedException.DeleteFailedException(id,
+                    new IllegalArgumentException("Deleting LAG interface is not permitted"));
+        }
     }
 
     private String updateTemplate(Config before, Config after) {

@@ -30,8 +30,8 @@ public class AggregateConfigReaderTest {
         Config1Builder builder = new Config1Builder();
         AggregateConfigReader reader = new AggregateConfigReader(Mockito.mock(Cli.class));
 
-        reader.parseConfig(InterfaceReaderTest.SH_AGG_IFACE, builder, "3");
+        reader.parseConfig(InterfaceReaderTest.OUTPUT, builder, "3");
 
-        Assert.assertEquals("LAG_LMR-001_West", builder.getAggregateId());
+        Assert.assertEquals("LS02E", builder.getAggregateId());
     }
 }
