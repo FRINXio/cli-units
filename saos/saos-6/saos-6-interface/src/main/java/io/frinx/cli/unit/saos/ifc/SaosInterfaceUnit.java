@@ -24,6 +24,7 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.saos.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.saos.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.saos.ifc.handler.InterfaceReader;
+import io.frinx.cli.unit.saos.ifc.handler.aggregate.AggregateConfigReader;
 import io.frinx.cli.unit.saos.ifc.handler.l2cft.InterfaceCftProfileConfigReader;
 import io.frinx.cli.unit.saos.ifc.handler.l2cft.InterfaceCftProfileConfigWriter;
 import io.frinx.cli.unit.saos.ifc.handler.vlan.InterfaceVlanReader;
@@ -81,6 +82,7 @@ public class SaosInterfaceUnit extends AbstractUnit {
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
         readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli));
+        readRegistry.add(IIDs.IN_IN_ET_CO_AUG_CONFIG1, new AggregateConfigReader(cli));
 
         readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
                 new InterfaceVlanReader(cli));
