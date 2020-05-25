@@ -49,6 +49,8 @@ public class InterfaceReaderTest {
             + "vlan remove vlan 127 port 9\n"
             + "vlan add vlan 2,199 port 10\n"
             + "vlan remove vlan 127 port 10\n"
+            + "aggregation add agg LP02 port 2\n"
+            + "aggregation add agg LS02E port 3\n"
             + "port set port 4 acceptable-frame-type tagged-only vs-ingress-filter on\n"
             + "port set port 7 acceptable-frame-type untagged-only\n"
             + "virtual-switch ethernet add vs VLAN111222 port 1\n"
@@ -76,51 +78,26 @@ public class InterfaceReaderTest {
             + "mstp disable port 10\n";
 
     public static final String SH_AGG_IFACE =
-            "port set port LAG_TO_BPE max-frame-size 9216 resolved-cos-remark-l2 true\n"
-            + "port set port LAG_LMR-001_East ingress-to-egress-qmap NNI-NNI resolved-cos-remark-l2 true\n"
-            + "port set port LAG_LSR-001_East max-frame-size 9216 ingress-to-egress-qmap "
-            + "NNI-NNI resolved-cos-remark-l2 true\n"
-            + "vlan add vlan 6,12 port LAG_TO_BPE\n"
-            + "vlan add vlan 14,30 port LAG_TO_BPE\n"
-            + "virtual-circuit ethernet set port 8 vlan-ethertype-policy vlan-tpid\n"
-            + "virtual-circuit ethernet set port LAG_TO_BPE vlan-ethertype 88A8 vlan-ethertype-policy vlan-tpid\n"
-            + "virtual-circuit ethernet set port LAG_LMR-001_East vlan-ethertype 88A8\n"
-            + "virtual-circuit ethernet set port LAG_LMR-001_West vlan-ethertype 88A8\n"
-            + "virtual-circuit ethernet set port LAG_LSR-001_East vlan-ethertype 88A8\n"
-            + "traffic-services queuing egress-port-queue-group set queue 0 port 10 eir 1000000 ebs 768\n"
-            + "traffic-services queuing egress-port-queue-group set queue 1 port 10 eir 800000\n"
-            + "traffic-services queuing egress-port-queue-group set queue 2 port 10 eir 1000000\n"
-            + "traffic-services queuing egress-port-queue-group set queue 3 port 10 eir 1000000\n"
-            + "traffic-services queuing egress-port-queue-group set queue 4 port 10 eir 1000000\n"
-            + "traffic-services queuing egress-port-queue-group set queue 6 port 10 eir 1000000\n"
-            + "traffic-services queuing egress-port-queue-group set queue 7 port 10 eir 1000000\n"
-            + "aggregation add agg LAG_TO_BPE port 1\n"
-            + "aggregation add agg LAG_LMR-001_East port 2\n"
-            + "aggregation add agg LAG_LMR-001_West port 3\n"
-            + "aggregation add agg LAG_LSR-001_East port 4\n";
+            "aggregation create agg LP01\n"
+            + "aggregation create agg LM01E\n"
+            + "aggregation create agg LM01W\n"
+            + "aggregation create agg LS01W\n"
+            + "aggregation create agg LS02W\n"
+            + "aggregation create agg LP02\n"
+            + "aggregation create agg JMEP\n"
+            + "aggregation create agg LSPIRENT01\n";
 
-    private static final List<InterfaceKey> IDS_EXPECTED = Lists.newArrayList("1", "2",
-            "3", "4", "5", "6", "8",  "10", "9", "7")
+    public static final String OUTPUT = SH_INTERFACE.concat(SH_AGG_IFACE);
+
+    private static final List<InterfaceKey> IDS_EXPECTED = Lists.newArrayList("1", "2", "3", "4", "5", "6",
+            "8",  "10", "9", "7", "LP01", "LM01E", "LM01W", "LS01W", "LS02W", "LP02", "JMEP", "LSPIRENT01")
             .stream()
             .map(InterfaceKey::new)
             .collect(Collectors.toList());
-
-    private static final List<InterfaceKey> IDS_AGG_EXPECTED = Lists.newArrayList("LAG_TO_BPE",
-            "LAG_LMR-001_East", "LAG_LSR-001_East", "8", "LAG_LMR-001_West", "10", "1", "2",
-            "3", "4")
-            .stream()
-            .map(InterfaceKey::new)
-            .collect(Collectors.toList());
-
-    @Test
-    public void testParseInterfaceIds() {
-        Assert.assertEquals(IDS_EXPECTED,
-                new InterfaceReader(Mockito.mock(Cli.class)).parseInterfaceIds(SH_INTERFACE));
-    }
 
     @Test
     public void testParseInterfaceAggIds() {
-        Assert.assertEquals(IDS_AGG_EXPECTED,
-                new InterfaceReader(Mockito.mock(Cli.class)).parseInterfaceIds(SH_AGG_IFACE));
+        Assert.assertEquals(IDS_EXPECTED,
+                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT));
     }
 }

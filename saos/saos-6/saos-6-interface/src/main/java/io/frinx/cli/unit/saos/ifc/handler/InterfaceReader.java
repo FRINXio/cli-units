@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -36,7 +37,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class InterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     public static final String SH_PORTS = "configuration search string \"port \"";
+    public static final String LAG_PORTS = "configuration search string \"aggregation create\"";
     private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\S+).*");
+    private static final Pattern LAG_INTERFACE_ID_LINE = Pattern.compile(".*agg (?<id>\\S+)");
 
     private Cli cli;
 
@@ -48,22 +51,26 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
-        return parseInterfaceIds(blockingRead(SH_PORTS, cli, instanceIdentifier, readContext));
+        return getAllIds(blockingRead(SH_PORTS + LAG_PORTS, cli, instanceIdentifier, readContext));
     }
 
     @VisibleForTesting
-    public List<InterfaceKey> parseInterfaceIds(String output) {
+    public List<InterfaceKey> getAllIds(String output) {
+        List<Pattern> patterns = Arrays.asList(INTERFACE_ID_LINE, LAG_INTERFACE_ID_LINE);
+
         return ParsingUtils.NEWLINE.splitAsStream(output)
-            .map(String::trim)
-            .filter(l -> !l.startsWith("lldp"))
-            .filter(l -> !l.startsWith("port tdm"))
-            .map(INTERFACE_ID_LINE::matcher)
-            .filter(Matcher::matches)
-            .map(matcher -> matcher.group("id"))
-            .filter(Objects::nonNull)
-            .map(InterfaceKey::new)
-            .distinct()
-            .collect(Collectors.toList());
+                .map(String::trim)
+                .filter(l -> !l.startsWith("lldp"))
+                .filter(l -> !l.startsWith("port tdm"))
+                .map(line -> patterns.stream().map(pattern -> pattern.matcher(line))
+                        .filter(Matcher::matches)
+                        .map(matcher -> matcher.group("id"))
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .map(InterfaceKey::new)
+                        .orElse(null))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     @Override

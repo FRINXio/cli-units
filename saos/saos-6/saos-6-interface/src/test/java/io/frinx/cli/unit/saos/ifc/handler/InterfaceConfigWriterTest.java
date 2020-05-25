@@ -37,6 +37,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.sa
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.IngressToEgressQmap;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriterTest {
@@ -79,6 +80,7 @@ public class InterfaceConfigWriterTest {
 
     // test data
     private Config data;
+    private Config lagData;
 
     @Before
     public void setUp() {
@@ -88,6 +90,7 @@ public class InterfaceConfigWriterTest {
 
         this.writer = new InterfaceConfigWriter(this.cli);
         initializeData();
+        initializeLagData();
     }
 
     private void initializeData() {
@@ -103,6 +106,16 @@ public class InterfaceConfigWriterTest {
                         .setMaxDynamicMacs(200)
                         .setForwardUnlearned(false)
                         .build())
+                .build();
+    }
+
+    private void initializeLagData() {
+        lagData = new ConfigBuilder()
+                .setEnabled(true)
+                .setName("Lag=FRINX_TEST")
+                .setType(Ieee8023adLag.class)
+                .setMtu(35)
+                .setDescription("lag interface")
                 .build();
     }
 
@@ -160,5 +173,23 @@ public class InterfaceConfigWriterTest {
         } catch (WriteFailedException e) {
             // ok
         }
+    }
+
+    @Test(expected = WriteFailedException.CreateFailedException.class)
+    public void writeLag() throws WriteFailedException {
+        writer.writeCurrentAttributes(iid, lagData, context);
+    }
+
+    @Test(expected = WriteFailedException.UpdateFailedException.class)
+    public void updateLag() throws WriteFailedException {
+        Config newData = new ConfigBuilder().setEnabled(true).setName("Lag=FRINX_TEST").setType(Ieee8023adLag.class)
+                .setMtu(35).setDescription("new lag interface desc").build();
+
+        writer.updateCurrentAttributes(iid, lagData, newData, context);
+    }
+
+    @Test(expected = WriteFailedException.DeleteFailedException.class)
+    public void deleteLag() throws WriteFailedException {
+        writer.deleteCurrentAttributes(iid, lagData, context);
     }
 }
