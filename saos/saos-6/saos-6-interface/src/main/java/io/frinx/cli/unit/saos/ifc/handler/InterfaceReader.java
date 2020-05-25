@@ -22,6 +22,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +52,12 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
-        return getAllIds(blockingRead(SH_PORTS + LAG_PORTS, cli, instanceIdentifier, readContext));
+        List<InterfaceKey> portIds = getAllIds(blockingRead(SH_PORTS, cli, instanceIdentifier, readContext));
+        List<InterfaceKey> aggIds = getAllIds(blockingRead(LAG_PORTS, cli, instanceIdentifier, readContext));
+        List<InterfaceKey> ids = new ArrayList<>();
+        ids.addAll(portIds);
+        ids.addAll(aggIds);
+        return ids;
     }
 
     @VisibleForTesting
