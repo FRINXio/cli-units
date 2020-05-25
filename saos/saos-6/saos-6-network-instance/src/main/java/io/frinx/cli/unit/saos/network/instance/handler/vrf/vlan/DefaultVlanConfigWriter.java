@@ -37,10 +37,12 @@ public class DefaultVlanConfigWriter implements CompositeWriter.Child<Config>, C
 
     private static final String WRITE_TEMPLATE = "vlan create vlan {$data.vlan_id.value}"
             + "{% if ($data.name) %} name {$data.name}{% endif %}\n"
-            + "{% if ($tpid) %}vlan set vlan {$data.vlan_id.value} egress-tpid {$tpid}\n{% endif %}";
+            + "{% if ($tpid) %}vlan set vlan {$data.vlan_id.value} egress-tpid {$tpid}\n{% endif %}"
+            + "configuration save";
     private static final String UPDATE_TEMPLATE =
             "{$data|update(name,vlan rename vlan `$data.vlan_id.value` name `$data.name`\n,)}"
-            + "{% if ($tpid) %}vlan set vlan {$data.vlan_id.value} egress-tpid {$tpid}\n{% endif %}";
+            + "{% if ($tpid) %}vlan set vlan {$data.vlan_id.value} egress-tpid {$tpid}\n{% endif %}"
+            + "configuration save";
 
     private final Cli cli;
 
@@ -102,7 +104,7 @@ public class DefaultVlanConfigWriter implements CompositeWriter.Child<Config>, C
         if (!getCheck().canProcess(instanceIdentifier, writeContext, false)) {
             return false;
         }
-        blockingDeleteAndRead(f("vlan delete vlan %d",
+        blockingDeleteAndRead(f("vlan delete vlan %d\nconfiguration save",
                 instanceIdentifier.firstKeyOf(Vlan.class).getVlanId().getValue()), cli, instanceIdentifier);
         return true;
     }
