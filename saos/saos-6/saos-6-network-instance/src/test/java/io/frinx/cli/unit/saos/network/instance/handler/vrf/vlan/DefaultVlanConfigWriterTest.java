@@ -32,21 +32,23 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.re
 
 public class DefaultVlanConfigWriterTest {
 
+    private static final String COMMIT = "configuration save";
+
     @Test
     public void writeVlanTest() {
         DefaultVlanConfigWriter writer = new DefaultVlanConfigWriter(Mockito.mock(Cli.class));
         createWriteCommandAndTest(writer, createConfig(2, "VLAN#2", false, null),
-                "vlan create vlan 2 name VLAN#2\n");
+                "vlan create vlan 2 name VLAN#2\n" + COMMIT);
         createWriteCommandAndTest(writer, createConfig(2, null, false, null),
-                "vlan create vlan 2\n");
+                "vlan create vlan 2\n" + COMMIT);
         createWriteCommandAndTest(writer, createConfig(3, "VLAN#3", true, TPID0X8100.class),
-                "vlan create vlan 3 name VLAN#3\nvlan set vlan 3 egress-tpid 8100\n");
+                "vlan create vlan 3 name VLAN#3\nvlan set vlan 3 egress-tpid 8100\n" + COMMIT);
         createWriteCommandAndTest(writer, createConfig(3, "VLAN#3", true, TPID0X9100.class),
-                "vlan create vlan 3 name VLAN#3\nvlan set vlan 3 egress-tpid 9100\n");
+                "vlan create vlan 3 name VLAN#3\nvlan set vlan 3 egress-tpid 9100\n" + COMMIT);
         createWriteCommandAndTest(writer, createConfig(2, "VLAN#2", true, TPID0X88A8.class),
-                "vlan create vlan 2 name VLAN#2\nvlan set vlan 2 egress-tpid 88A8\n");
+                "vlan create vlan 2 name VLAN#2\nvlan set vlan 2 egress-tpid 88A8\n" + COMMIT);
         createWriteCommandAndTest(writer, createConfig(2, null, true, TPID0X8100.class),
-                "vlan create vlan 2\nvlan set vlan 2 egress-tpid 8100\n");
+                "vlan create vlan 2\nvlan set vlan 2 egress-tpid 8100\n" + COMMIT);
     }
 
     @Test
@@ -55,15 +57,15 @@ public class DefaultVlanConfigWriterTest {
         createUpdateCommandAndTest(writer,
                 createConfig(2, "VLAN#2", true, TPID0X8100.class),
                 createConfig(2, "vlan#2", true, TPID0X8100.class),
-                "vlan rename vlan 2 name vlan#2\n");
+                "vlan rename vlan 2 name vlan#2\n" + COMMIT);
         createUpdateCommandAndTest(writer,
                 createConfig(2, "VLAN#2", true, TPID0X8100.class),
                 createConfig(2, "VLAN#2", true, TPID0X8100.class),
-                "");
+                COMMIT);
         createUpdateCommandAndTest(writer,
                 createConfig(2, "VLAN#2", true, TPID0X8100.class),
                 createConfig(2, "vlan#2", true, TPID0X9100.class),
-                "vlan rename vlan 2 name vlan#2\nvlan set vlan 2 egress-tpid 9100\n");
+                "vlan rename vlan 2 name vlan#2\nvlan set vlan 2 egress-tpid 9100\n" + COMMIT);
     }
 
     @Test(expected = NullPointerException.class)
