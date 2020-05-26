@@ -110,8 +110,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             + "end\n";
     private static final String ACL_ICMP_IP6_ENTRY = "configure terminal\n"
             + "ipv6 access-list {$aclName}\n"
-            + "{$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType} "
-            + "{$aclTtl} {$aclSeqId}\n"
+            + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr}\n"
             + "end\n";
     private static final String ACL_DELETE = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
@@ -220,19 +219,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                         cli, id, entry);
                 break;
             case "icmp":
-                blockingWriteAndRead(fT(ACL_ICMP_ENTRY,
-                        "aclName", commandVars.aclName,
-                        "aclSeqId", commandVars.aclSeqId,
-                        "aclFwdAction", commandVars.aclFwdAction,
-                        "aclProtocol", commandVars.aclProtocol,
-                        "aclSrcAddr", commandVars.aclSrcAddr,
-                        "aclDstAddr", commandVars.aclDstAddr,
-                        "aclIcmpMsgType", commandVars.aclIcmpMsgType,
-                        "aclTtl", commandVars.aclTtl),
-                        cli, id, entry);
-                break;
-            case "icmpv6":
-                blockingWriteAndRead(fT(ACL_ICMP_IP6_ENTRY,
+                blockingWriteAndRead(fT((entry.getIpv4() != null) ? ACL_ICMP_ENTRY : ACL_ICMP_IP6_ENTRY,
                         "aclName", commandVars.aclName,
                         "aclSeqId", commandVars.aclSeqId,
                         "aclFwdAction", commandVars.aclFwdAction,
@@ -456,16 +443,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         } else if (protocol.equals(IPTCP.class)) {
             return "tcp";
         } else if (protocol.equals(IPICMP.class)) {
-            switch (type) {
-                case "ip":
-                    return "icmp";
-                case "ipv6":
-                    return "icmpv6";
-                default:
-                    LOG.warn("Unknown protocol {}", protocol);
-                    throw new IllegalArgumentException("ACL contains unsupported protocol: "
-                            + protocol.getSimpleName());
-            }
+            return "icmp";
         }
         LOG.warn("Unknown protocol {}", protocol);
         throw new IllegalArgumentException("ACL contains unsupported protocol: " + protocol.getSimpleName());
