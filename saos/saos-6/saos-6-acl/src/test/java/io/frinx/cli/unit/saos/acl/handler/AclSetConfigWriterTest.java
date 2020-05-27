@@ -42,7 +42,7 @@ public class AclSetConfigWriterTest {
                 writer.writeTemplate(createConfig("test1", DROP.class, ACLTYPE.class, null)));
         Assert.assertEquals(
                 "access-list create acl-profile test2 default-filter-action allow\nconfiguration save",
-                writer.writeTemplate(createConfig("test2", ACCEPT.class, ACLTYPE.class, null)));
+                writer.writeTemplate(createConfig("test2", ACCEPT.class, ACLTYPE.class, true)));
         Assert.assertEquals(
                 "access-list create acl-profile test3 default-filter-action allow\n"
                 + "access-list disable profile test3\nconfiguration save",
@@ -52,18 +52,11 @@ public class AclSetConfigWriterTest {
     @Test(expected = IllegalArgumentException.class)
     public void writeTemplateTest_exceptions() {
         // incorrect type (ACLIPV4.class)
-        Assert.assertEquals(
-                "access-list create acl-profile test4 default-filter-action deny\nconfiguration save",
+        Assert.assertEquals("",
                 writer.writeTemplate(createConfig("test4", DROP.class, ACLIPV4.class, null)));
 
-        // enabled = true
-        Assert.assertEquals(
-                "",
-                writer.writeTemplate(createConfig("test4", DROP.class, ACLTYPE.class, true)));
-
         // incorrect action (REJECT.class)
-        Assert.assertEquals(
-                "access-list create acl-profile test4 default-filter-action deny\nconfiguration save",
+        Assert.assertEquals("",
                 writer.writeTemplate(createConfig("test4", REJECT.class, ACLTYPE.class, false)));
     }
 
@@ -88,11 +81,8 @@ public class AclSetConfigWriterTest {
         Assert.assertEquals("configuration save", writer.updateTemplate(
                 createConfig("test5", ACCEPT.class, ACLTYPE.class, true),
                 createConfig("test5", ACCEPT.class, ACLTYPE.class, null)));
-    }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void updateTemplate_exceptions() {
-        Assert.assertEquals("", writer.updateTemplate(
+        Assert.assertEquals("configuration save", writer.updateTemplate(
                 createConfig("test5", ACCEPT.class, ACLTYPE.class, null),
                 createConfig("test5", ACCEPT.class, ACLTYPE.class, true)));
     }
