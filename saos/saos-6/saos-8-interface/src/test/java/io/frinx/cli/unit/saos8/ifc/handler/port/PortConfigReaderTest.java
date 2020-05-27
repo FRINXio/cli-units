@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos8.ifc.handler;
+package io.frinx.cli.unit.saos8.ifc.handler.port;
 
 import io.frinx.cli.io.Cli;
 import org.junit.Assert;
@@ -25,7 +25,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 
-public class InterfaceConfigReaderTest {
+public class PortConfigReaderTest {
 
     private static final String SH_PORT_21 = "port set port 2/1 max-frame-size 9216\n"
         + "port set port 2/10 max-frame-size 9216 description \"to-meetkamer CPE21-Gi0/0/0\"\n"
@@ -79,22 +79,22 @@ public class InterfaceConfigReaderTest {
             .setName("3/13")
             .build();
 
-    private static final String SH_AGG = "aggregation create agg LS01E\n";
+    public static final String SH_AGG = "aggregation create agg LS01E\n";
 
     @Test
     public void testParseInterface() {
         ConfigBuilder parsed = new ConfigBuilder();
-        new InterfaceConfigReader(Mockito.mock(Cli.class))
+        new PortConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(SH_PORT_21, parsed,"2/1");
         Assert.assertEquals(EXPECTED_INTERFACE_21, parsed.build());
 
         parsed = new ConfigBuilder();
-        new InterfaceConfigReader(Mockito.mock(Cli.class))
+        new PortConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(SH_PORT_29, parsed, "2/9");
         Assert.assertEquals(EXPECTED_INTERFACE_29, parsed.build());
 
         parsed = new ConfigBuilder();
-        new InterfaceConfigReader(Mockito.mock(Cli.class))
+        new PortConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(SH_PORT_313, parsed, "3/13");
         Assert.assertEquals(EXPECTED_INTERFACE_313, parsed.build());
     }
@@ -102,11 +102,11 @@ public class InterfaceConfigReaderTest {
     @Test
     public void testParseInterfaceType() {
         ConfigBuilder parsed = new ConfigBuilder();
-        new InterfaceConfigReader(Mockito.mock(Cli.class))
+        new PortConfigReader(Mockito.mock(Cli.class))
                 .parseType(SH_AGG, parsed,"2/1");
         Assert.assertEquals(EthernetCsmacd.class, parsed.getType());
 
-        new InterfaceConfigReader(Mockito.mock(Cli.class))
+        new PortConfigReader(Mockito.mock(Cli.class))
                 .parseType(SH_AGG, parsed, "LS01E");
         Assert.assertEquals(Ieee8023adLag.class, parsed.getType());
     }

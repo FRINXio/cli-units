@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos8.ifc.handler.lag.subifc;
+package io.frinx.cli.unit.saos8.ifc.handler.port.subport;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.LAGInterfaceReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.PortReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.ext.rev180926.Saos8SubIfNameAug;
@@ -45,7 +46,7 @@ public class SubPortConfigReader implements CliConfigReader<Config, ConfigBuilde
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        if (isLag(instanceIdentifier, readContext)) {
+        if (isPort(instanceIdentifier, readContext)) {
             String parentPort = instanceIdentifier.firstKeyOf(Interface.class).getName();
             Long index = instanceIdentifier.firstKeyOf(Subinterface.class).getIndex();
             String output = blockingRead(SubPortReader.SHOW_COMMAND, cli, instanceIdentifier, readContext);
@@ -58,23 +59,23 @@ public class SubPortConfigReader implements CliConfigReader<Config, ConfigBuilde
         Saos8SubIfNameAugBuilder augBuilder = new Saos8SubIfNameAugBuilder();
 
         builder.setIndex(index);
-        setSubPortName(output, augBuilder, parentPort, index);
+        getSubPortName(output, parentPort, index).ifPresent(augBuilder::setSubinterfaceName);
 
         builder.addAugmentation(Saos8SubIfNameAug.class, augBuilder.build());
     }
 
-    private void setSubPortName(String output, Saos8SubIfNameAugBuilder augBuilder, String parentPort, Long index) {
-        Pattern subPortName = Pattern.compile(".* sub-port (?<name>\\S+) parent-port " + parentPort
+    @VisibleForTesting
+    static Optional<String> getSubPortName(String output, String parentPort, Long index) {
+        Pattern pattern = Pattern.compile(".* sub-port (?<name>\\S+) parent-port " + parentPort
                 + " classifier-precedence " + index + ".*");
 
-        ParsingUtils.parseField(output, 0,
-            subPortName::matcher,
-            matcher -> matcher.group("name"),
-            augBuilder::setSubinterfaceName);
+        return ParsingUtils.parseField(output, 0,
+            pattern::matcher,
+            matcher -> matcher.group("name"));
     }
 
-    private boolean isLag(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {
-        return LAGInterfaceReader.getAllIds(cli, this, id, readContext)
+    private boolean isPort(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {
+        return PortReader.getAllIds(cli, this, id, readContext)
                 .contains(id.firstKeyOf(Interface.class));
     }
 }

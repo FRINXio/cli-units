@@ -15,18 +15,22 @@
  */
 
 
-package io.frinx.cli.unit.saos8.ifc.handler;
+package io.frinx.cli.unit.saos8.ifc.handler.port;
 
 import com.google.common.collect.Lists;
+import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliReader;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class InterfaceReaderTest {
+public class PortReaderTest {
 
     private static final String SH_INTERFACE = "port set port 1/1 max-frame-size 9216\n"
         + "port set port 1/2 max-frame-size 9216\n"
@@ -84,18 +88,35 @@ public class InterfaceReaderTest {
         + "snmp port-traps disable port JMEP link-up-down-trap enhanced\n"
         + "snmp port-traps disable port JMEP link-up-down-trap standard\n";
 
+    private static final String SH_AGG_IFACE =
+        "aggregation create agg LP01\n"
+        + "aggregation create agg LM01E\n"
+        + "aggregation create agg LM01W\n"
+        + "aggregation create agg LS01W\n"
+        + "aggregation create agg LS02W\n"
+        + "aggregation create agg LP02\n"
+        + "aggregation create agg JMEP\n"
+        + "aggregation create agg LSPIRENT01\n";
+
+    public static final String OUTPUT = SH_INTERFACE.concat(SH_AGG_IFACE);
 
     private static final List<InterfaceKey> IDS_EXPECTED = Lists.newArrayList("1/1", "1/2",
         "2/1", "2/3", "2/4", "2/5", "2/6", "2/7", "2/8", "2/9", "2/10", "2/11",
         "3/1", "3/2", "3/3", "3/4",  "3/5", "3/6", "3/7", "3/8", "3/9",
-        "LP01", "LM01E", "LM01W", "LS01E", "LS02E", "LP02", "2/2", "JMEP")
+        "LP01", "LM01E", "LM01W", "LS01E", "LS02E", "LP02", "2/2", "JMEP", "LS01W", "LS02W", "LSPIRENT01")
         .stream()
         .map(InterfaceKey::new)
         .collect(Collectors.toList());
 
     @Test
-    public void testParseInterfaceIds() {
+    public void getAllIdsTest() throws ReadFailedException {
+        CliReader cliReader = Mockito.mock(CliReader.class);
+
+        Mockito.when(cliReader.blockingRead(Mockito.anyString(), Mockito.any(Cli.class),
+                Mockito.any(InstanceIdentifier.class), Mockito.any(ReadContext.class)))
+                .thenReturn(OUTPUT);
+
         Assert.assertEquals(IDS_EXPECTED,
-                new InterfaceReader(Mockito.mock(Cli.class)).parseInterfaceIds(SH_INTERFACE));
+                PortReader.getAllIds(null, cliReader, null, null));
     }
 }

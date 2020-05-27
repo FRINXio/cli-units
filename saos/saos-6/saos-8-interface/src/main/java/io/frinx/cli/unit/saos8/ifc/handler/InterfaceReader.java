@@ -16,60 +16,25 @@
 
 package io.frinx.cli.unit.saos8.ifc.handler;
 
-import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.read.ReadContext;
-import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.saos8.ifc.handler.l2vlan.L2VLANInterfaceReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.PortReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
+import java.util.ArrayList;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class InterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
-
-    private static final String SH_PORTS = "configuration search string \" port \"";
-    private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\S+).*");
-
-    private Cli cli;
+public class InterfaceReader extends CompositeListReader<Interface, InterfaceKey, InterfaceBuilder>
+        implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     public InterfaceReader(Cli cli) {
-        this.cli = cli;
-    }
-
-    @Nonnull
-    @Override
-    public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                        @Nonnull ReadContext readContext) throws ReadFailedException {
-        return parseInterfaceIds(blockingRead(SH_PORTS, cli, instanceIdentifier, readContext));
-    }
-
-    @VisibleForTesting
-    List<InterfaceKey> parseInterfaceIds(String output) {
-        return ParsingUtils.NEWLINE.splitAsStream(output)
-                .map(String::trim)
-                .filter(l -> !l.startsWith("lldp"))
-                .filter(l -> !l.startsWith("port tdm"))
-                .map(INTERFACE_ID_LINE::matcher)
-                .filter(Matcher::matches)
-                .map(matcher -> matcher.group("id"))
-                .filter(Objects::nonNull)
-                .map(InterfaceKey::new)
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
-                                      @Nonnull InterfaceBuilder builder, @Nonnull ReadContext readContext) {
-        builder.setName(instanceIdentifier.firstKeyOf(Interface.class).getName());
+        super(new ArrayList<CompositeListReader.Child<Interface, InterfaceKey, InterfaceBuilder>>() {
+            {
+                add(new PortReader(cli));
+                add(new L2VLANInterfaceReader(cli));
+            }
+        });
     }
 }
-

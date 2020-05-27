@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos8.ifc.handler.lag.subifc;
+package io.frinx.cli.unit.saos8.ifc.handler.port.subport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
@@ -23,7 +23,7 @@ import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.LAGInterfaceReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.PortReader;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.ext.rev180926.Saos8SubIfNameAug;
@@ -67,7 +67,7 @@ public class SubPortVlanConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (LAGInterfaceReader.basicCheck_LAG.canProcess(instanceIdentifier, writeContext, false)) {
+        if (PortReader.lagCheck.canProcess(instanceIdentifier, writeContext, false)) {
             final String subIfcName = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Subinterface.class))
                     .get().getConfig().getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
             blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, subIfcName));
@@ -89,7 +89,7 @@ public class SubPortVlanConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (LAGInterfaceReader.basicCheck_LAG.canProcess(id, writeContext, false)) {
+        if (PortReader.lagCheck.canProcess(id, writeContext, false)) {
             final String subIfcName = writeContext.readBefore(RWUtils.cutId(id, Subinterface.class))
                     .get().getConfig().getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
             blockingWriteAndRead(cli, id, dataAfter, updateTemplate(dataBefore, dataAfter, subIfcName));
@@ -138,7 +138,7 @@ public class SubPortVlanConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (LAGInterfaceReader.basicCheck_LAG.canProcess(instanceIdentifier, writeContext, false)) {
+        if (PortReader.lagCheck.canProcess(instanceIdentifier, writeContext, false)) {
             final String subIfcName = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Subinterface.class))
                     .get().getConfig().getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
             blockingDelete(deleteTemplate(config, subIfcName), cli, instanceIdentifier);

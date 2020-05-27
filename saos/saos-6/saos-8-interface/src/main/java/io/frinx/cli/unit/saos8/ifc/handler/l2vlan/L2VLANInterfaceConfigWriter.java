@@ -16,5 +16,64 @@
 
 package io.frinx.cli.unit.saos8.ifc.handler.l2vlan;
 
-public class L2VLANInterfaceConfigWriter {
+import io.fd.honeycomb.translate.write.WriteContext;
+import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliWriter;
+import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
+import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L2vlan;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+
+public class L2VLANInterfaceConfigWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
+
+    private static final String WRITE_TEMPLATE =
+            "cpu-interface sub-interface create cpu-subinterface {$data.name}\n"
+                    + "configuration save";
+    private static final String DELETE_TEMPLATE =
+            "cpu-interface sub-interface delete cpu-subinterface {$data.name}\n"
+                    + "configuration save";
+
+    private final Cli cli;
+
+    public L2VLANInterfaceConfigWriter(Cli cli) {
+        this.cli = cli;
+    }
+
+    @Override
+    public boolean writeCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
+                                                 @Nonnull Config data,
+                                                 @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (L2vlan.class.equals(data.getType())) {
+            blockingWriteAndRead(cli, iid, data, fT(WRITE_TEMPLATE, "data", data));
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull Config dataAfter,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+
+        if (L2vlan.class.equals(dataBefore.getType())) {
+            throw new WriteFailedException.UpdateFailedException(iid, dataBefore, dataAfter,
+                    new IllegalArgumentException("Updating interface is not permitted"));
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid,
+                                                  @Nonnull Config dataBefore,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
+        if (L2vlan.class.equals(dataBefore.getType())) {
+            blockingDeleteAndRead(cli, iid, fT(DELETE_TEMPLATE, "data", dataBefore));
+            return true;
+        }
+        return false;
+    }
 }

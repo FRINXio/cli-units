@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos8.ifc.handler.lag.subifc;
+package io.frinx.cli.unit.saos8.ifc.handler.port.subport;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos8.ifc.handler.lag.LAGInterfaceReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.PortReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class SubPortReader implements CliConfigListReader<Subinterface, Subinter
     @Override
     public List<SubinterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier,
                                            @Nonnull ReadContext readContext) throws ReadFailedException {
-        if (isLag(instanceIdentifier, readContext)) {
+        if (isPort(instanceIdentifier, readContext)) {
             String parentPort = instanceIdentifier.firstKeyOf(Interface.class).getName();
             String output = blockingRead(f(SHOW_COMMAND, parentPort), cli, instanceIdentifier, readContext);
             return getAllIds(output, parentPort);
@@ -68,13 +68,13 @@ public class SubPortReader implements CliConfigListReader<Subinterface, Subinter
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier,
                                       @Nonnull SubinterfaceBuilder subinterfaceBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        if (isLag(instanceIdentifier, readContext)) {
+        if (isPort(instanceIdentifier, readContext)) {
             subinterfaceBuilder.setIndex(instanceIdentifier.firstKeyOf(Subinterface.class).getIndex());
         }
     }
 
-    private boolean isLag(InstanceIdentifier<Subinterface> id, ReadContext readContext) throws ReadFailedException {
-        return LAGInterfaceReader.getAllIds(cli, this, id, readContext)
+    private boolean isPort(InstanceIdentifier<Subinterface> id, ReadContext readContext) throws ReadFailedException {
+        return PortReader.getAllIds(cli, this, id, readContext)
                 .contains(id.firstKeyOf(Interface.class));
     }
 }
