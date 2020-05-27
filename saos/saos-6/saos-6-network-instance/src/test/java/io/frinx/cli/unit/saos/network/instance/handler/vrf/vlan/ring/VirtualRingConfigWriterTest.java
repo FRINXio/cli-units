@@ -43,6 +43,8 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class VirtualRingConfigWriterTest {
 
+    private static final String COMMIT = "configuration save";
+
     @Mock
     private Cli cli;
     @Mock
@@ -70,7 +72,7 @@ public class VirtualRingConfigWriterTest {
         writer.writeCurrentAttributes(iid, config, context);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("ring-protection virtual-ring add ring v-ring1 vid 2\n",
+        Assert.assertEquals("ring-protection virtual-ring add ring v-ring1 vid 2\n" + COMMIT,
                 commands.getValue().getContent());
     }
 
@@ -79,7 +81,7 @@ public class VirtualRingConfigWriterTest {
         writer.deleteCurrentAttributes(iid, config, context);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("ring-protection virtual-ring remove ring v-ring1 vid 2\n",
+        Assert.assertEquals("ring-protection virtual-ring remove ring v-ring1 vid 2\n" + COMMIT,
                 commands.getValue().getContent());
     }
 }
