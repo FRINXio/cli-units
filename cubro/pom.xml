@@ -29,7 +29,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-cubro</artifactId>
-    <version>4.2.4.frinx</version>
+    <version>4.2.5.rc1-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
