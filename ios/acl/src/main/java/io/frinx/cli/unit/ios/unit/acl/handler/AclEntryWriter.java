@@ -110,7 +110,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             + "end\n";
     private static final String ACL_ICMP_IP6_ENTRY = "configure terminal\n"
             + "ipv6 access-list {$aclName}\n"
-            + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr}\n"
+            + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType}\n"
             + "end\n";
     private static final String ACL_DELETE = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
