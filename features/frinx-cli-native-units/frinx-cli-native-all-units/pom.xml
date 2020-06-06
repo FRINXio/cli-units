@@ -28,7 +28,7 @@
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-native-all-units</artifactId>
     <packaging>feature</packaging>
-    <version>4.2.5.rc2-frinx-SNAPSHOT</version>
+    <version>4.2.5.rc2-frinx</version>
     <name>Frinx :: Cli :: All Native Units</name>
 
     <dependencyManagement>
