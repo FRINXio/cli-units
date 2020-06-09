@@ -75,7 +75,7 @@ public class PortReader implements CliConfigListReader<Interface, InterfaceKey, 
                                                @Nonnull ReadContext context) throws ReadFailedException {
 
         String portOutput = reader.blockingRead(SH_PORTS, cli, id, context);
-        String lagOutput = reader.blockingRead(SH_PORTS, cli, id, context);
+        String lagOutput = reader.blockingRead(LAG_PORTS, cli, id, context);
 
         List<Pattern> patterns = Arrays.asList(INTERFACE_ID_LINE, LAG_INTERFACE_ID_LINE);
 

@@ -30,7 +30,7 @@ public class AggregateConfigReaderTest {
         Config1Builder builder = new Config1Builder();
         AggregateConfigReader reader = new AggregateConfigReader(Mockito.mock(Cli.class));
 
-        reader.parseConfig(PortReaderTest.OUTPUT, builder, "2/5");
+        reader.parseConfig(PortReaderTest.SH_INTERFACE, builder, "2/5");
 
         Assert.assertEquals("LP01", builder.getAggregateId());
     }
