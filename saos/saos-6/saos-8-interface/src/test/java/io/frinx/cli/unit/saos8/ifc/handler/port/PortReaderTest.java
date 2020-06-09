@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PortReaderTest {
 
-    private static final String SH_INTERFACE = "port set port 1/1 max-frame-size 9216\n"
+    public static final String SH_INTERFACE = "port set port 1/1 max-frame-size 9216\n"
         + "port set port 1/2 max-frame-size 9216\n"
         + "port disable port 2/1\n"
         + "port set port 2/1 max-frame-size 9216\n"
@@ -98,8 +98,6 @@ public class PortReaderTest {
         + "aggregation create agg JMEP\n"
         + "aggregation create agg LSPIRENT01\n";
 
-    public static final String OUTPUT = SH_INTERFACE.concat(SH_AGG_IFACE);
-
     private static final List<InterfaceKey> IDS_EXPECTED = Lists.newArrayList("1/1", "1/2",
         "2/1", "2/3", "2/4", "2/5", "2/6", "2/7", "2/8", "2/9", "2/10", "2/11",
         "3/1", "3/2", "3/3", "3/4",  "3/5", "3/6", "3/7", "3/8", "3/9",
@@ -114,7 +112,7 @@ public class PortReaderTest {
 
         Mockito.when(cliReader.blockingRead(Mockito.anyString(), Mockito.any(Cli.class),
                 Mockito.any(InstanceIdentifier.class), Mockito.any(ReadContext.class)))
-                .thenReturn(OUTPUT);
+                .thenReturn(SH_INTERFACE, SH_AGG_IFACE);
 
         Assert.assertEquals(IDS_EXPECTED,
                 PortReader.getAllIds(null, cliReader, null, null));
