@@ -22,6 +22,7 @@ import io.frinx.cli.io.Command;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -130,6 +131,7 @@ public class NiMplsRsvpIfSubscripConfigWriterTest {
         this.writer.writeCurrentAttributes(iid, data, context);
     }
 
+    @Ignore
     @Test
     public void update() throws Exception {
         Config data = new ConfigBuilder().addAugmentation(NiMplsRsvpIfSubscripAug.class,
