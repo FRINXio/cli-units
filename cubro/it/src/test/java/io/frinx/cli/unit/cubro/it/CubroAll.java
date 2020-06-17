@@ -105,7 +105,7 @@ public class CubroAll {
             .build();
 
     private static final String MOUNT_ID = "cubro-it";
-    private static final int PORT = 43300;
+    private static final int PORT = 56800;
 
     private static final String HOST = "213.143.110.252";
     private static final InetSocketAddress CUBRO_ADDR = new InetSocketAddress(HOST, PORT);

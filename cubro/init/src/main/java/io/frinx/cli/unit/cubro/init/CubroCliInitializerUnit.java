@@ -17,9 +17,12 @@
 package io.frinx.cli.unit.cubro.init;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
+import io.frinx.cli.io.CliFlavour;
+import io.frinx.cli.io.OutputFunction;
 import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
@@ -87,6 +90,20 @@ public class CubroCliInitializerUnit extends AbstractUnit {
                 Pattern.compile("(^|\\n)% (?i)Command incomplete(?-i).*", Pattern.DOTALL),
                 Pattern.compile("(^|\\n)Overlapping networks observed for(?-i).*")
         ));
+    }
+
+    @Override
+    public CliFlavour getCliFlavour() {
+        return new CliFlavour(Pattern.compile("^UNSUPPORTED"),
+                " ", "",
+                "!",
+                Pattern.compile("\\|"),
+                OutputFunction.ALL,
+                "!",
+                ImmutableList.of("end", "Building configuration", "Current configuration"),
+                "",
+                "\n",
+                "");
     }
 
     /**

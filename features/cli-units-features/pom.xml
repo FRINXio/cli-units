@@ -92,6 +92,13 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>frinx-cli-unit-cubro</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>frinx-cli-unit-huawei</artifactId>
             <version>${project.version}</version>
             <type>xml</type>
