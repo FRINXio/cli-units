@@ -19,13 +19,13 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.14.rc11-frinx-SNAPSHOT</version>
+        <version>3.1.14.rc11-frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-xr-ospfv3-unit</artifactId>
-    <version>3.1.14.rc11-frinx-SNAPSHOT</version>
+    <version>3.1.14.rc11-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
