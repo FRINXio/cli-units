@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.ring.logical;
+package io.frinx.cli.unit.saos.logical.ring.handler;
 
-import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.logical.ring.extension.logical.ring.cfm.service.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.rev200622.ring.top.logical.rings.logical.ring.ConfigBuilder;
 
-public class CfmServiceConfigReaderTest {
-
-    private static final String OUTPUT =
-            "ring-protection logical-ring set ring l-ring-test1 west-port-cfm-service-name foo\n"
-            + "ring-protection logical-ring set ring l-ring-test1 east-port-cfm-service-name VLAN111555\n";
-
-    private CfmServiceConfigReader reader = new CfmServiceConfigReader(Mockito.mock(Cli.class));
+public class LogicalRingConfigReaderTest {
 
     @Test
     public void parseConfigTest() {
         ConfigBuilder builder = new ConfigBuilder();
 
-        reader.parseConfig(OUTPUT, builder);
-
+        LogicalRingConfigReader.parseConfig(LogicalRingReaderTest.OUTPUT, builder, "l-ring-test1");
+        Assert.assertEquals("l-ring-test1", builder.getName());
+        Assert.assertEquals("1", builder.getRingId());
+        Assert.assertEquals("1", builder.getWestPort());
+        Assert.assertEquals("2", builder.getEastPort());
         Assert.assertEquals("foo", builder.getWestPortCfmService());
         Assert.assertEquals("VLAN111555", builder.getEastPortCfmService());
     }
 }
+

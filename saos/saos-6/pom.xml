@@ -43,6 +43,7 @@
     <module>saos-6-broadcast-containment</module>
     <module>saos-6-l2-cft</module>
     <module>saos-6-acl</module>
+    <module>saos-6-ring</module>
   </modules>
 
   <build>

@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -25,14 +26,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.rings.Ring;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.rings.RingBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.rings.RingKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.virtual.rings.VirtualRing;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.virtual.rings.VirtualRingBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.virtual.rings.VirtualRingKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VirtualRingReader implements CliConfigListReader<Ring, RingKey, RingBuilder> {
+public class VirtualRingReader implements CliConfigListReader<VirtualRing, VirtualRingKey, VirtualRingBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search string \"ring-protection\"";
+    private static final String SHOW_COMMAND = "configuration search string \"virtual-ring add\"";
 
     private Cli cli;
 
@@ -42,26 +43,27 @@ public class VirtualRingReader implements CliConfigListReader<Ring, RingKey, Rin
 
     @Nonnull
     @Override
-    public List<RingKey> getAllIds(@Nonnull InstanceIdentifier<Ring> instanceIdentifier,
-                                   @Nonnull ReadContext readContext) throws ReadFailedException {
+    public List<VirtualRingKey> getAllIds(@Nonnull InstanceIdentifier<VirtualRing> instanceIdentifier,
+                                          @Nonnull ReadContext readContext) throws ReadFailedException {
         String vsName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String output = blockingRead(SHOW_COMMAND, cli, instanceIdentifier, readContext);
         return getAllIds(output, vsName);
     }
 
-    static List<RingKey> getAllIds(String output, String vsName) {
+    @VisibleForTesting
+    static List<VirtualRingKey> getAllIds(String output, String vsName) {
         Pattern vrPattern = Pattern.compile("ring-protection virtual-ring add ring (?<name>\\S+)"
                 + " vs " + vsName);
         return ParsingUtils.parseFields(output, 0,
             vrPattern::matcher,
             matcher -> matcher.group("name"),
-            RingKey::new);
+            VirtualRingKey::new);
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Ring> instanceIdentifier,
-                                      @Nonnull RingBuilder ringBuilder,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<VirtualRing> instanceIdentifier,
+                                      @Nonnull VirtualRingBuilder virtualRingBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        ringBuilder.setKey(instanceIdentifier.firstKeyOf(Ring.class));
+        virtualRingBuilder.setKey(instanceIdentifier.firstKeyOf(VirtualRing.class));
     }
 }

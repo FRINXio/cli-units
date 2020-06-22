@@ -31,8 +31,6 @@ import io.frinx.cli.unit.saos8.network.instance.handler.ifc.InterfaceReader;
 import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.VirtualRingConfigReader;
 import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.VirtualRingConfigWriter;
 import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.VirtualRingReader;
-import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.logical.CfmServiceConfigReader;
-import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.logical.LogicalRingConfigReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.HashSet;
@@ -87,8 +85,8 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NETWORKINSTANCE);
         writeRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli));
 
-        writeRegistry.addNoop(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RING);
-        writeRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RI_CONFIG, new VirtualRingConfigWriter(cli));
+        writeRegistry.addNoop(IIDs.NE_NE_AUG_SAOS8VRAUG_VI_VIRTUALRING);
+        writeRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_VI_VI_CONFIG, new VirtualRingConfigWriter(cli));
 
         writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
         writeRegistry.addNoop(IIDs.NE_NE_IN_INTERFACE);
@@ -100,10 +98,8 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
         readRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli));
 
-        readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RING, new VirtualRingReader(cli));
-        readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RI_CONFIG, new VirtualRingConfigReader(cli));
-        readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RI_LO_CONFIG, new LogicalRingConfigReader(cli));
-        readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_RI_RI_LO_CF_CONFIG, new CfmServiceConfigReader(cli));
+        readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_VI_VIRTUALRING, new VirtualRingReader(cli));
+        readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_VI_VI_CONFIG, new VirtualRingConfigReader());
 
         readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new InterfaceReader(cli));
         readRegistry.add(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigReader(cli));

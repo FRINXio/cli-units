@@ -99,6 +99,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>saos-6-acl-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-ring-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
