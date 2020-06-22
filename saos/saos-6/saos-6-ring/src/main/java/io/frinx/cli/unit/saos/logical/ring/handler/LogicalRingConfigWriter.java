@@ -14,48 +14,39 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.ring;
+package io.frinx.cli.unit.saos.logical.ring.handler;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
-import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.virtual.rings.virtual.ring.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.Vlan;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.rev200622.ring.top.logical.rings.logical.ring.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class VirtualRingConfigWriter implements CliWriter<Config> {
-
-    private static final String WRITE_RING =
-            "ring-protection virtual-ring add ring {$data.name} vid {$vlanId}\n"
-            + "configuration save";
-
-    private static final String REMOVE_RING =
-            "ring-protection virtual-ring remove ring {$data.name} vid {$vlanId}\n"
-            + "configuration save";
-
-    private Cli cli;
-
-    public VirtualRingConfigWriter(Cli cli) {
-        this.cli = cli;
-    }
+public class LogicalRingConfigWriter implements CliWriter<Config> {
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String vlanId = instanceIdentifier.firstKeyOf(Vlan.class).getVlanId().getValue().toString();
-        blockingWriteAndRead(fT(WRITE_RING, "data", config, "vlanId", vlanId),
-                cli, instanceIdentifier, config);
+        throw new WriteFailedException.CreateFailedException(instanceIdentifier, config,
+                new IllegalArgumentException("Creating logical ring is not permitted"));
+    }
+
+    @Override
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                        @Nonnull Config dataBefore,
+                                        @Nonnull Config dataAfter,
+                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+        throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter,
+                new IllegalArgumentException("Updating logical ring is not permitted"));
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String vlanId = instanceIdentifier.firstKeyOf(Vlan.class).getVlanId().getValue().toString();
-        blockingDeleteAndRead(fT(REMOVE_RING, "data", config, "vlanId", vlanId),
-                cli, instanceIdentifier);
+        throw new WriteFailedException.DeleteFailedException(instanceIdentifier,
+                new IllegalArgumentException("Deleting logical ring is not permitted"));
     }
 }

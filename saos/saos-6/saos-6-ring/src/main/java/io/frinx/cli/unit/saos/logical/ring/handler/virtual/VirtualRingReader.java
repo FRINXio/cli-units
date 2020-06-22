@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan.ring;
+package io.frinx.cli.unit.saos.logical.ring.handler.virtual;
+
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
@@ -24,15 +25,15 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.virtual.rings.VirtualRing;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.virtual.rings.VirtualRingBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.virtual.rings.VirtualRingKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.Vlan;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.rev200622.ring.top.logical.rings.LogicalRing;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.rev200622.virtual.ring.top.virtual.rings.VirtualRing;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.rev200622.virtual.ring.top.virtual.rings.VirtualRingBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.rev200622.virtual.ring.top.virtual.rings.VirtualRingKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class VirtualRingReader implements CliConfigListReader<VirtualRing, VirtualRingKey, VirtualRingBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search string \"virtual-ring add\"";
+    private static final String SH_VIRTUAL_RING = "configuration search string \"virtual-ring create\"";
 
     private Cli cli;
 
@@ -44,17 +45,19 @@ public class VirtualRingReader implements CliConfigListReader<VirtualRing, Virtu
     @Override
     public List<VirtualRingKey> getAllIds(@Nonnull InstanceIdentifier<VirtualRing> instanceIdentifier,
                                           @Nonnull ReadContext readContext) throws ReadFailedException {
-        String vlanId = instanceIdentifier.firstKeyOf(Vlan.class).getVlanId().getValue().toString();
-        String output = blockingRead(SHOW_COMMAND, cli, instanceIdentifier, readContext);
-        return getAllIds(output, vlanId);
+        String logicalRingName = instanceIdentifier.firstKeyOf(LogicalRing.class).getName();
+        String output = blockingRead(SH_VIRTUAL_RING, cli, instanceIdentifier, readContext);
+
+        return getAllIds(output, logicalRingName);
     }
 
     @VisibleForTesting
-    static List<VirtualRingKey> getAllIds(String output, String vlanId) {
-        Pattern vrPattern = Pattern.compile("ring-protection virtual-ring add ring (?<name>\\S+)"
-                + " vid " + vlanId);
+    static List<VirtualRingKey> getAllIds(String output, String logicalRingKey) {
+        Pattern pattern = Pattern.compile(".*create virtual-ring-name (?<name>\\S+) logical-ring "
+                + logicalRingKey + ".*");
+
         return ParsingUtils.parseFields(output, 0,
-            vrPattern::matcher,
+            pattern::matcher,
             matcher -> matcher.group("name"),
             VirtualRingKey::new);
     }

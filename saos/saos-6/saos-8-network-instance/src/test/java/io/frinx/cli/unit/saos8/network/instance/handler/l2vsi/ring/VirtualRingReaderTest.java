@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.rings.RingKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.virtual.rings.VirtualRingKey;
 
 public class VirtualRingReaderTest {
 
@@ -48,7 +48,9 @@ public class VirtualRingReaderTest {
 
     @Test
     public void getAllIdsTest() {
-        List<RingKey> ringKeys = Arrays.asList(new RingKey("VSR990101"), new RingKey("VSR990102"));
+        List<VirtualRingKey> ringKeys = Arrays.asList(
+                new VirtualRingKey("VSR990101"),
+                new VirtualRingKey("VSR990102"));
 
         Assert.assertEquals(ringKeys, VirtualRingReader.getAllIds(OUTPUT, "FRINX007_2506"));
     }
