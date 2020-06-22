@@ -114,7 +114,8 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
                 /*handle after network instance configuration*/ IIDs.NE_NE_CONFIG);
 
         writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
-        writeRegistry.addAfter(IIDs.NE_NE_IN_INTERFACE, new InterfaceWriter(cli),
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_IN_INTERFACE, new InterfaceWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_IN_IN_CONFIG),
                 IIDs.NE_NE_CONFIG);
     }
 
