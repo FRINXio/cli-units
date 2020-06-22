@@ -23,9 +23,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPointsBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.ConnectionPointBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.connection.point.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.VlansBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.VlanBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
@@ -33,16 +30,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.re
 public class L2VsicpConfigWriterTest {
 
     private NetworkInstance getNIBuild(String niName, int vlanId) {
-        return getNIBuild(niName, niName, niName, niName, vlanId);
+        return getNIBuild(niName, niName, vlanId);
     }
 
-    private NetworkInstance getNIBuild(String niName, String niCfgName, String cpId, String cpCfgId, int vlanId) {
+    private NetworkInstance getNIBuild(String niName, String niCfgName, int vlanId) {
         NetworkInstanceBuilder networkInstanceBuilder = new NetworkInstanceBuilder().setName(niName).setConfig(
                 new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network
-                        .instance.top.network.instances.network.instance.ConfigBuilder().setName(niCfgName).build())
-                .setConnectionPoints(new ConnectionPointsBuilder().setConnectionPoint(Lists.newArrayList(
-                        new ConnectionPointBuilder().setConnectionPointId(cpId).setConfig(new ConfigBuilder()
-                                .setConnectionPointId(cpCfgId).build()).build())).build());
+                        .instance.top.network.instances.network.instance.ConfigBuilder().setName(niCfgName).build());
 
         if (vlanId > 0) {
             networkInstanceBuilder.setVlans(new VlansBuilder().setVlan(Lists.newArrayList(new VlanBuilder().setVlanId(
@@ -55,39 +49,9 @@ public class L2VsicpConfigWriterTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void createWriteCommandWithNPE1Test() {
+    public void createWriteCommandWithNPETest() {
         L2vsicpConfigWriter writer = new L2vsicpConfigWriter(Mockito.mock(Cli.class));
-        writer.createCommand(new NetworkInstanceBuilder().setName("").build(), "");
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void createWriteCommandWithNPE2Test() {
-        L2vsicpConfigWriter writer = new L2vsicpConfigWriter(Mockito.mock(Cli.class));
-        writer.createCommand(getNIBuild("test", "test", null, null, 1), "test");
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void createWriteCommandWithNPE3Test() {
-        L2vsicpConfigWriter writer = new L2vsicpConfigWriter(Mockito.mock(Cli.class));
-        writer.createCommand(getNIBuild("test", "test", "", null, 1), "test");
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void createWriteCommandWithNPE4Test() {
-        L2vsicpConfigWriter writer = new L2vsicpConfigWriter(Mockito.mock(Cli.class));
-        writer.createCommand(getNIBuild("test", 0), "test");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void createWriteCommandWithIAE1Test() {
-        L2vsicpConfigWriter writer = new L2vsicpConfigWriter(Mockito.mock(Cli.class));
-        writer.createCommand(getNIBuild("test", "test", "test", "", 1), "test");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void createWriteCommandWithIAE2Test() {
-        L2vsicpConfigWriter writer = new L2vsicpConfigWriter(Mockito.mock(Cli.class));
-        writer.createCommand(getNIBuild("test", "test", "", "test", 1), "test");
+        writer.createCommand(getNIBuild("test", "test", 0), "test");
     }
 
     @Test

@@ -27,11 +27,8 @@ import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
 import java.util.Collections;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.InstanceConnectionPointConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.ConnectionPoint;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.Vlans;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.Vlan;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -66,46 +63,10 @@ public class L2vsicpConfigWriter implements CompositeWriter.Child<Config>, CliWr
 
     @VisibleForTesting
     String createCommand(@Nonnull NetworkInstance networkInstance, String name) {
-        Preconditions.checkArgument(Objects.equals(networkInstance.getName(), name),
-                "Network instance name and connection point id must be the same");
-
-        String cpId = getCpId(networkInstance);
-        Preconditions.checkNotNull(cpId, "Missing connection point id to create virtual circuit");
-
-        String cpKey = getCpKey(networkInstance);
-        Preconditions.checkNotNull(cpKey, "Missing connection point id to create virtual circuit");
-        Preconditions.checkArgument(Objects.equals(name, cpId) && Objects.equals(name, cpKey),
-                "Network instance name and connection point id must be the same");
-
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config
                 config = getVlanId(networkInstance);
         Preconditions.checkNotNull(config, "Missing vlan config to create virtual circuit");
         return fT(L2VSICP_CREATE, "name", name, "vlan", config.getVlanId());
-    }
-
-    private String getCpId(NetworkInstance networkInstance) {
-        return java.util.Optional.of(networkInstance)
-                .map(NetworkInstance::getConnectionPoints)
-                .map(ConnectionPoints::getConnectionPoint)
-                .orElse(Collections.emptyList())
-                .stream()
-                .filter(Objects::nonNull)
-                .map(ConnectionPoint::getConnectionPointId)
-                .findFirst()
-                .orElse(null);
-    }
-
-    private String getCpKey(NetworkInstance networkInstance) {
-        return java.util.Optional.of(networkInstance)
-                .map(NetworkInstance::getConnectionPoints)
-                .map(ConnectionPoints::getConnectionPoint)
-                .orElse(Collections.emptyList())
-                .stream()
-                .filter(Objects::nonNull)
-                .map(ConnectionPoint::getConfig)
-                .map(InstanceConnectionPointConfig::getConnectionPointId)
-                .findFirst()
-                .orElse(null);
     }
 
     private org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config
