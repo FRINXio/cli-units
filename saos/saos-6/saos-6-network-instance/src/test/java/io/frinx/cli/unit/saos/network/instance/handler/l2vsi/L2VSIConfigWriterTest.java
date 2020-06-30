@@ -115,6 +115,45 @@ public class L2VSIConfigWriterTest {
                 + "configuration save", commands.getValue().getContent());
     }
 
+    @Test
+    public void testUpdateTemplate() {
+        // nothing
+        Assert.assertEquals("configuration save",
+                writer.updateTemplate(
+                createConfig("desc1", (short) 3, EncapCosPolicy.Fixed, false),
+                createConfig("desc1", (short) 3, EncapCosPolicy.Fixed, false), "VLAN111444"));
+
+        // description
+        Assert.assertEquals("virtual-switch ethernet set vs VLAN111444 description desc2\nconfiguration save",
+                writer.updateTemplate(
+                createConfig("desc1", (short) 3, EncapCosPolicy.Fixed, true),
+                createConfig("desc2", (short) 3, EncapCosPolicy.Fixed, true), "VLAN111444"));
+
+        // encap-fixed-dot1dpri
+        Assert.assertEquals("virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 5\n"
+                + "configuration save",
+                writer.updateTemplate(
+                createConfig("desc1", (short) 3, EncapCosPolicy.Fixed, true),
+                createConfig("desc1", (short) 5, EncapCosPolicy.Fixed, true), "VLAN111444"));
+
+        // encap-cos-policy
+        Assert.assertEquals("virtual-switch ethernet set vs VLAN111444 encap-cos-policy port-inherit\n"
+                + "configuration save",
+                writer.updateTemplate(
+                createConfig("desc1", (short) 3, EncapCosPolicy.Fixed, true),
+                createConfig("desc1", (short) 3, EncapCosPolicy.PortInherit, true), "VLAN111444"));
+
+        // all config parameters
+        Assert.assertEquals("virtual-switch ethernet set vs VLAN111444 description desc2\n"
+                + "l2-cft tagged-pvst-l2pt disable vs VLAN111444\n"
+                + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy phbg-inherit\n"
+                + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 4\n"
+                + "configuration save",
+                writer.updateTemplate(
+                createConfig("desc1", (short) 3, EncapCosPolicy.Fixed, true),
+                createConfig("desc2", (short) 4, EncapCosPolicy.PhbgInherit, false), "VLAN111444"));
+    }
+
     private void createCommandAndTest(Config data, String expected) throws WriteFailedException {
         writer.writeCurrentAttributesTesting(iid, data, VC_NAME, true);
         Mockito.verify(cli).executeAndRead(commands.capture());

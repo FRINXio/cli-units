@@ -16,43 +16,39 @@
 
 package io.frinx.cli.unit.saos.ifc.handler;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.x5.template.Chunk;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+
 
 public class InterfaceConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE_SAOS =
             // enable/disable port
-            "{% if ($enabled) %}port enable port {$data.name}\n"
-            + "{% else %}port disable port {$data.name}\n{% endif %}"
+            "{% if ($enabled) %}port {$enabled} port {$data.name}\n{% endif %}"
             // description
-            + "{% if ($desc) %}port set port {$data.name} description {$desc}\n"
-            + "{% else %}port unset port {$data.name} description\n{% endif %}"
+            + "{$data|update(description,port set port `$data.name` description \"`$data.description`\"\n,)}"
             // max-frame-size
-            + "{% if ($data.mtu) %}port set port {$data.name} max-frame-size {$data.mtu}\n"
-            + "{% else %}port set port {$data.name} max-frame-size 9216\n{% endif %}"
+            + "{$data|update(mtu,port set port `$data.name` max-frame-size `$data.mtu`\n,)}"
             // acceptable-frame-type
-            + "{% if ($aft) %}port set port {$data.name} acceptable-frame-type {$aft.name}\n"
-            + "{% else %}port set port {$data.name} acceptable-frame-type all\n{% endif %}"
+            + "{% if ($aft) %}port set port {$data.name} acceptable-frame-type {$aft}\n{% endif %}"
             // mode
-            + "{% if ($pt) %}port set port {$data.name} mode {$pt.name}\n"
-            + "{% else %}port set port {$data.name} mode default\n{% endif %}"
+            + "{% if ($pt) %}port set port {$data.name} mode {$pt}\n{% endif %}"
             // vs-ingress-filter
-            + "{% if ($vif) %}port set port {$data.name} vs-ingress-filter on\n"
-            + "{% else %}port set port {$data.name} vs-ingress-filter off\n{% endif %}"
+            + "{% if ($vif) %}port set port {$data.name} vs-ingress-filter {$vif}\n{% endif %}"
             // vlan-ethertype-policy
-            + "{% if ($vep) %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy {$vep.name}\n"
-            + "{% else %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy all\n{% endif %}"
+            + "{% if ($vep) %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy {$vep}\n{% endif %}"
             // ingress-to-egress-qmap
             + "{% if ($iteq) %}port set port {$data.name} ingress-to-egress-qmap {$iteq}\n{% endif %}"
             // flow access-control
@@ -84,18 +80,13 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (EthernetCsmacd.class.equals(dataBefore.getType())) {
-            Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
-                    "Changing interface type is not permitted. Before: %s, After: %s",
-                    dataBefore.getType(), dataAfter.getType());
-            try {
-                blockingWriteAndRead(cli, id, dataAfter, updateTemplate(dataBefore, dataAfter));
-            } catch (WriteFailedException e) {
-                throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter, e);
-            }
-        } else if (Ieee8023adLag.class.equals(dataBefore.getType())) {
-            throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter,
-                    new IllegalArgumentException("Changing LAG interface is not permitted"));
+        Preconditions.checkArgument(dataBefore.getType().equals(dataAfter.getType()),
+                "Changing interface type is not permitted. Before: %s, After: %s",
+                dataBefore.getType(), dataAfter.getType());
+        try {
+            blockingWriteAndRead(cli, id, dataAfter, updateTemplate(dataBefore, dataAfter));
+        } catch (WriteFailedException e) {
+            throw new WriteFailedException.UpdateFailedException(id, dataBefore, dataAfter, e);
         }
     }
 
@@ -112,46 +103,166 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
         }
     }
 
-    private String updateTemplate(Config before, Config after) {
-        IfSaosAug saosAugBefore = before.getAugmentation(IfSaosAug.class);
-        IfSaosAug saosAug = after.getAugmentation(IfSaosAug.class);
-        if (saosAug != null) {
-            return fT(WRITE_TEMPLATE_SAOS, "before", before,
-                    "data", after,
-                    "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
-                    "desc", getDescription(after),
-                    "pt", saosAug.getPhysicalType(),
-                    "aft", saosAug.getAcceptableFrameType(),
-                    "vif", (saosAug.isVsIngressFilter() != null && saosAug.isVsIngressFilter()) ? Chunk.TRUE : null,
-                    "vep", saosAug.getVlanEthertypePolicy(),
-                    "iteq", getIngressDiff(saosAugBefore, saosAug),
-                    "max_macs", saosAug.getMaxDynamicMacs(),
-                    "fwd_un", saosAug.isForwardUnlearned() != null
-                            ? (saosAug.isForwardUnlearned() ? "on" : "off") : "on");
-        }
-        return fT(WRITE_TEMPLATE_SAOS, "before", before,
-                "data", after,
-                "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
-                "desc", getDescription(after));
+    @VisibleForTesting
+    String updateTemplate(Config dateBefore, Config dataAfter) {
+        return fT(WRITE_TEMPLATE_SAOS, "before", dateBefore,
+                "data", dataAfter,
+                "enabled", updateEnabled(dateBefore, dataAfter),
+                "pt", updatePhysicalType(dateBefore, dataAfter),
+                "aft", updateAcceptableFrameType(dateBefore, dataAfter),
+                "vif", updateIngressFilter(dateBefore, dataAfter),
+                "vep", updateVlanEthertypePolicy(dateBefore, dataAfter),
+                "iteq", updateIngressQmap(dateBefore, dataAfter),
+                "max_macs", updateMaxDynamicMacs(dateBefore, dataAfter),
+                "fwd_un", updateForwardUnlearned(dateBefore, dataAfter));
     }
 
-    private String getIngressDiff(IfSaosAug before, IfSaosAug after) {
-        if (after.getIngressToEgressQmap() != null) {
-            if (before != null && before.getIngressToEgressQmap() != null) {
-                String nameBefore = before.getIngressToEgressQmap().getName();
-                String nameAfter = after.getIngressToEgressQmap().getName();
-                return !nameBefore.equals(nameAfter) ? nameAfter : null;
+    private String updateEnabled(Config dataBefore, Config dataAfter) {
+        Boolean enabledBefore = dataBefore.isEnabled();
+        Boolean enabledAfter = dataAfter.isEnabled();
+        if (!Objects.equals(enabledAfter, enabledBefore)) {
+            if (enabledAfter != null) {
+                return enabledAfter ? "enable" : "disable";
             }
-            return after.getIngressToEgressQmap().getName();
-        } else {
-            return null;
         }
+        return null;
     }
 
-    private String getDescription(Config after) {
-        if (after.getDescription() != null && after.getDescription().contains(" ")) {
-            return String.format("\"%s\"", after.getDescription());
+    private String updatePhysicalType(Config dataBefore, Config dataAfter) {
+        String typeBefore = setPhysicalType(dataBefore);
+        String typeAfter = setPhysicalType(dataAfter);
+        if (!Objects.equals(typeAfter, typeBefore)) {
+            if (typeAfter != null) {
+                return typeAfter;
+            }
         }
-        return after.getDescription();
+        return null;
+    }
+
+    private String setPhysicalType(Config config) {
+        IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
+        if (ifSaosAug != null) {
+            SaosIfExtensionConfig.PhysicalType physicalType = ifSaosAug.getPhysicalType();
+            return physicalType != null ? physicalType.getName() : null;
+        }
+        return null;
+    }
+
+    private String updateAcceptableFrameType(Config dataBefore, Config dataAfter) {
+        String typeBefore = setAcceptableFrameType(dataBefore);
+        String typeAfter = setAcceptableFrameType(dataAfter);
+        if (!Objects.equals(typeAfter, typeBefore)) {
+            if (typeAfter != null) {
+                return typeAfter;
+            }
+        }
+        return null;
+    }
+
+    private String setAcceptableFrameType(Config config) {
+        IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
+        if (ifSaosAug != null) {
+            SaosIfExtensionConfig.AcceptableFrameType acceptableFrameType = ifSaosAug.getAcceptableFrameType();
+            return acceptableFrameType != null ? acceptableFrameType.getName() : null;
+        }
+        return null;
+    }
+
+    private String updateIngressFilter(Config dataBefore, Config dataAfter) {
+        Boolean ingressBefore = setIngressFilter(dataBefore);
+        Boolean ingressAfter = setIngressFilter(dataAfter);
+        if (!Objects.equals(ingressAfter, ingressBefore)) {
+            if (ingressAfter != null) {
+                return ingressAfter ? "on" : "off";
+            }
+        }
+        return null;
+    }
+
+    private Boolean setIngressFilter(Config config) {
+        IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
+        if (ifSaosAug != null) {
+            return ifSaosAug.isVsIngressFilter();
+        }
+        return null;
+    }
+
+    private String updateVlanEthertypePolicy(Config dataBefore, Config dataAfter) {
+        String policyBefore = setVlanEthertypePolicy(dataBefore);
+        String policyAfter = setVlanEthertypePolicy(dataAfter);
+        if (!Objects.equals(policyAfter, policyBefore)) {
+            if (policyAfter != null) {
+                return policyAfter;
+            }
+        }
+        return null;
+    }
+
+    private String setVlanEthertypePolicy(Config config) {
+        IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
+        if (ifSaosAug != null) {
+            SaosIfExtensionConfig.VlanEthertypePolicy vlanEthertypePolicy = ifSaosAug.getVlanEthertypePolicy();
+            return vlanEthertypePolicy != null ? vlanEthertypePolicy.getName() : null;
+        }
+        return null;
+    }
+
+    private String updateIngressQmap(Config dataBefore, Config dataAfter) {
+        String qmapBefore = setIngressQmap(dataBefore);
+        String qmapAfter = setIngressQmap(dataAfter);
+        if (!Objects.equals(qmapAfter, qmapBefore)) {
+            if (qmapAfter != null) {
+                return qmapAfter;
+            }
+        }
+        return null;
+    }
+
+    private String setIngressQmap(Config config) {
+        IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
+        if (ifSaosAug != null) {
+            SaosIfExtensionConfig.IngressToEgressQmap qmap = ifSaosAug.getIngressToEgressQmap();
+            return qmap != null ? qmap.getName() : null;
+        }
+        return null;
+    }
+
+    private Integer updateMaxDynamicMacs(Config dataBefore, Config dataAfter) {
+        Integer dynamicMacsBefore = setMaxDynamicMacs(dataBefore);
+        Integer dynamicMacsAfter = setMaxDynamicMacs(dataAfter);
+        if (!Objects.equals(dynamicMacsAfter, dynamicMacsBefore)) {
+            if (dynamicMacsAfter != null) {
+                return dynamicMacsAfter;
+            }
+        }
+        return null;
+    }
+
+    private Integer setMaxDynamicMacs(Config config) {
+        IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
+        if (ifSaosAug != null) {
+            Integer maxDynamicMacs = ifSaosAug.getMaxDynamicMacs();
+            return maxDynamicMacs != null ? maxDynamicMacs : null;
+        }
+        return null;
+    }
+
+    private String updateForwardUnlearned(Config dataBefore, Config dataAfter) {
+        Boolean forwardBefore = setForwardUnlearned(dataBefore);
+        Boolean forwardAfter = setForwardUnlearned(dataAfter);
+        if (!Objects.equals(forwardAfter, forwardBefore)) {
+            if (forwardAfter != null) {
+                return forwardAfter ? "on" : "off";
+            }
+        }
+        return null;
+    }
+
+    private Boolean setForwardUnlearned(Config config) {
+        IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
+        if (ifSaosAug != null) {
+            return ifSaosAug.isForwardUnlearned();
+        }
+        return null;
     }
 }

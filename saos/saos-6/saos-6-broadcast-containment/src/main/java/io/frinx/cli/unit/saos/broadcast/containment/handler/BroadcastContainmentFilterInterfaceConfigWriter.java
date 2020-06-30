@@ -28,7 +28,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.con
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.filter.interfaces._interface.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-
 public class BroadcastContainmentFilterInterfaceConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE = "broadcast-containment add filter {$filter_name} port {$port}\n"
@@ -60,18 +59,6 @@ public class BroadcastContainmentFilterInterfaceConfigWriter implements CliWrite
         else {
             return fT(DELETE_TEMPLATE, "filter_name", filterName, "port", port);
         }
-    }
-
-    @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                        @Nonnull Config dataBefore,
-                                        @Nonnull Config dataAfter,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String filterName = id.firstKeyOf(Filter.class).getName();
-        String port = id.firstKeyOf(Interface.class).getName();
-        Preconditions.checkArgument(Objects.equal(dataAfter.getName(), port),
-                "port names should be the same");
-        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override

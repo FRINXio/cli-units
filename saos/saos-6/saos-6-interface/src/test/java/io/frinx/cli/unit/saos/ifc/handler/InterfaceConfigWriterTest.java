@@ -22,6 +22,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nonnull;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,35 +37,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.sa
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.IngressToEgressQmap;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.VlanEthertypePolicy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriterTest {
-
-    private static final String UPDATE_INPUT = "port disable port 4\n"
-            + "port set port 4 description \"updated desc\"\n"
-            + "port set port 4 max-frame-size 50\n"
-            + "port set port 4 acceptable-frame-type all\n"
-            + "port set port 4 mode default\n"
-            + "port set port 4 vs-ingress-filter off\n"
-            + "virtual-circuit ethernet set port 4 vlan-ethertype-policy all\n"
-            + "port set port 4 ingress-to-egress-qmap NNI-NNI\n"
-            + "flow access-control set port 4 max-dynamic-macs 200\n"
-            + "flow access-control set port 4 forward-unlearned off\n"
-            + "configuration save"
-            + "\n";
-
-    private static final String UPDATE_CLEAN_INPUT = "port disable port 4\n"
-            + "port unset port 4 description\n"
-            + "port set port 4 max-frame-size 9216\n"
-            + "port set port 4 acceptable-frame-type all\n"
-            + "port set port 4 mode default\n"
-            + "port set port 4 vs-ingress-filter off\n"
-            + "virtual-circuit ethernet set port 4 vlan-ethertype-policy all\n"
-            + "flow access-control set port 4 forward-unlearned on\n"
-            + "configuration save"
-            + "\n";
 
     @Mock
     private Cli cli;
@@ -79,8 +58,8 @@ public class InterfaceConfigWriterTest {
     private InstanceIdentifier iid = IIDs.IN_IN_CONFIG;
 
     // test data
-    private Config data;
-    private Config lagData;
+    private Config dataBefore;
+    private Config lagDataBefore;
 
     @Before
     public void setUp() {
@@ -90,84 +69,20 @@ public class InterfaceConfigWriterTest {
 
         this.writer = new InterfaceConfigWriter(this.cli);
         initializeData();
-        initializeLagData();
     }
 
     private void initializeData() {
-        data = new ConfigBuilder()
-                .setEnabled(true)
-                .setName("4")
-                .setType(EthernetCsmacd.class)
-                .setMtu(35)
-                .setDescription("test")
-                .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
-                        .setPhysicalType(PhysicalType.Rj45)
-                        .setIngressToEgressQmap(IngressToEgressQmap.DefaultRCOS)
-                        .setMaxDynamicMacs(200)
-                        .setForwardUnlearned(false)
-                        .build())
-                .build();
-    }
+        dataBefore = createConfig(true, EthernetCsmacd.class, 35, "test",
+                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
+                        VlanEthertypePolicy.VlanTpid,  false));
 
-    private void initializeLagData() {
-        lagData = new ConfigBuilder()
-                .setEnabled(true)
-                .setName("Lag=FRINX_TEST")
-                .setType(Ieee8023adLag.class)
-                .setMtu(35)
-                .setDescription("lag interface")
-                .build();
+        lagDataBefore = createConfig(true, Ieee8023adLag.class, 35, "lag interface", null);
     }
 
     @Test
     public void write() {
         try {
-            this.writer.writeCurrentAttributes(iid, data, context);
-            Mockito.verify(cli).executeAndRead(response.capture());
-            TestCase.fail();
-        } catch (WriteFailedException e) {
-            // ok
-        }
-    }
-
-    @Test
-    public void update() throws WriteFailedException {
-        // update values
-        Config newData = new ConfigBuilder().setEnabled(false).setName("4").setType(EthernetCsmacd.class)
-                .setMtu(50)
-                .setDescription("updated desc")
-                .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
-                        .setIngressToEgressQmap(IngressToEgressQmap.NNINNI)
-                        .setMaxDynamicMacs(200)
-                        .setForwardUnlearned(false)
-                        .build())
-                .build();
-
-        this.writer.updateCurrentAttributes(iid, data, newData, context);
-
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
-    }
-
-    @Test
-    public void updateClean() throws WriteFailedException {
-        // clean what we can
-        Config newData = new ConfigBuilder().setEnabled(false).setName("4").setType(EthernetCsmacd.class)
-                .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
-                    .setForwardUnlearned(true)
-                    .build())
-                .build();
-
-        this.writer.updateCurrentAttributes(iid, data, newData, context);
-
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_CLEAN_INPUT, response.getValue().getContent());
-    }
-
-    @Test
-    public void delete() {
-        try {
-            this.writer.deleteCurrentAttributes(iid, data, context);
+            this.writer.writeCurrentAttributes(iid, dataBefore, context);
             Mockito.verify(cli).executeAndRead(response.capture());
             TestCase.fail();
         } catch (WriteFailedException e) {
@@ -177,19 +92,155 @@ public class InterfaceConfigWriterTest {
 
     @Test(expected = WriteFailedException.CreateFailedException.class)
     public void writeLag() throws WriteFailedException {
-        writer.writeCurrentAttributes(iid, lagData, context);
+        writer.writeCurrentAttributes(iid, lagDataBefore, context);
     }
 
-    @Test(expected = WriteFailedException.UpdateFailedException.class)
-    public void updateLag() throws WriteFailedException {
-        Config newData = new ConfigBuilder().setEnabled(true).setName("Lag=FRINX_TEST").setType(Ieee8023adLag.class)
-                .setMtu(35).setDescription("new lag interface desc").build();
+    @Test
+    public void updateTemplateTest() throws WriteFailedException {
+        // nothing
+        Assert.assertEquals("configuration save",
+                writer.updateTemplate(dataBefore,
+                        createConfig(true, EthernetCsmacd.class, 35, "test",
+                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
+                                        VlanEthertypePolicy.VlanTpid,  false)))
+        );
 
-        writer.updateCurrentAttributes(iid, lagData, newData, context);
+        // enabled
+        Assert.assertEquals("port disable port test_name\nconfiguration save",
+                writer.updateTemplate(dataBefore,
+                        createConfig(false, EthernetCsmacd.class, 35, "test",
+                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
+                                        VlanEthertypePolicy.VlanTpid,  false))));
+
+        // mtu
+        Assert.assertEquals("port set port test_name max-frame-size 1500\nconfiguration save",
+                writer.updateTemplate(dataBefore,
+                        createConfig(true, EthernetCsmacd.class, 1500, "test",
+                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
+                                        VlanEthertypePolicy.VlanTpid,  false))));
+
+        // description
+        Assert.assertEquals("port set port test_name description \"new description\"\nconfiguration save",
+                writer.updateTemplate(dataBefore,
+                        createConfig(true, EthernetCsmacd.class, 35, "new description",
+                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
+                                        VlanEthertypePolicy.VlanTpid,  false))));
+
+        // physical type
+        Assert.assertEquals("port set port test_name mode sfp\nconfiguration save",
+                writer.updateTemplate(dataBefore,
+                        createConfig(true, EthernetCsmacd.class, 35, "test",
+                                createAugBuilder(PhysicalType.Sfp, IngressToEgressQmap.DefaultRCOS, 200, true,
+                                        VlanEthertypePolicy.VlanTpid,  false))));
+
+        // ingress to egress qmap
+        Assert.assertEquals("port set port test_name ingress-to-egress-qmap NNI-NNI\nconfiguration save",
+                writer.updateTemplate(dataBefore,
+                       createConfig(true, EthernetCsmacd.class, 35, "test",
+                               createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.NNINNI, 200, true,
+                                       VlanEthertypePolicy.VlanTpid,  false))));
+
+        // max dynamic
+        Assert.assertEquals("flow access-control set port test_name max-dynamic-macs 300\nconfiguration save",
+                writer.updateTemplate(dataBefore,
+                       createConfig(true, EthernetCsmacd.class, 35, "test",
+                               createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 300, true,
+                                       VlanEthertypePolicy.VlanTpid,  false))));
+
+        // ingress filter
+        Assert.assertEquals("port set port test_name vs-ingress-filter off\nconfiguration save",
+                writer.updateTemplate(dataBefore,
+                        createConfig(true, EthernetCsmacd.class, 35, "test",
+                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, false,
+                                        VlanEthertypePolicy.VlanTpid,  false))));
+
+        // ethertype policy
+        Assert.assertEquals("virtual-circuit ethernet set port test_name vlan-ethertype-policy all\n"
+                        + "configuration save",
+                writer.updateTemplate(dataBefore,
+                        createConfig(true, EthernetCsmacd.class, 35, "test",
+                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
+                                        VlanEthertypePolicy.All,  false))));
+
+        // forward unlearned
+        Assert.assertEquals("flow access-control set port test_name forward-unlearned on\nconfiguration save",
+                writer.updateTemplate(dataBefore,
+                        createConfig(true, EthernetCsmacd.class, 35, "test",
+                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
+                                        VlanEthertypePolicy.VlanTpid,  true))));
+
+        // all
+        Assert.assertEquals("port disable port test_name\n"
+                + "port set port test_name description \"new description\"\n"
+                + "port set port test_name max-frame-size 1500\n"
+                + "port set port test_name mode sfp\n"
+                + "port set port test_name vs-ingress-filter off\n"
+                + "virtual-circuit ethernet set port test_name vlan-ethertype-policy all\n"
+                + "port set port test_name ingress-to-egress-qmap NNI-NNI\n"
+                + "flow access-control set port test_name max-dynamic-macs 350\n"
+                + "flow access-control set port test_name forward-unlearned on\n"
+                + "configuration save",
+                writer.updateTemplate(dataBefore,
+                        createConfig(false, EthernetCsmacd.class, 1500, "new description",
+                                createAugBuilder(PhysicalType.Sfp, IngressToEgressQmap.NNINNI, 350, false,
+                                        VlanEthertypePolicy.All,  true))));
+    }
+
+    @Test
+    public void delete() {
+        try {
+            this.writer.deleteCurrentAttributes(iid, dataBefore, context);
+            Mockito.verify(cli).executeAndRead(response.capture());
+            TestCase.fail();
+        } catch (WriteFailedException e) {
+            // ok
+        }
     }
 
     @Test(expected = WriteFailedException.DeleteFailedException.class)
     public void deleteLag() throws WriteFailedException {
-        writer.deleteCurrentAttributes(iid, lagData, context);
+        writer.deleteCurrentAttributes(iid, lagDataBefore, context);
+    }
+
+    private IfSaosAugBuilder createAugBuilder(PhysicalType type, IngressToEgressQmap qmap, Integer maxDynamic,
+                                              Boolean ingressFilter, VlanEthertypePolicy etherTypePolicy,
+                                              Boolean fwUnlearned) {
+        IfSaosAugBuilder builder = new IfSaosAugBuilder();
+
+        if (type != null) {
+            builder.setPhysicalType(type);
+        }
+        if (qmap != null) {
+            builder.setIngressToEgressQmap(qmap);
+        }
+        if (maxDynamic != null) {
+            builder.setMaxDynamicMacs(maxDynamic);
+        }
+        if (ingressFilter != null) {
+            builder.setVsIngressFilter(ingressFilter);
+        }
+        if (etherTypePolicy != null) {
+            builder.setVlanEthertypePolicy(etherTypePolicy);
+        }
+        if (fwUnlearned != null) {
+            builder.setForwardUnlearned(fwUnlearned);
+        }
+
+        return builder;
+    }
+
+    private Config createConfig(@Nonnull Boolean enabled, @Nonnull Class<? extends InterfaceType> type,
+                                Integer mtu, String desc, IfSaosAugBuilder augBuilder) {
+        ConfigBuilder builder = new ConfigBuilder().setName("test_name").setEnabled(enabled).setType(type);
+
+        if (mtu != null) {
+            builder.setMtu(mtu);
+        }
+        if (desc != null) {
+            builder.setDescription(desc);
+        }
+
+        return augBuilder != null
+                ? builder.addAugmentation(IfSaosAug.class, augBuilder.build()).build() : builder.build();
     }
 }
