@@ -17,7 +17,7 @@
 package io.frinx.cli.unit.saos8.ifc.handler.port.subport;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.util.RWUtils;
+import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -48,10 +48,17 @@ public class SubPortPmInstanceConfigWriter implements CliWriter<Config> {
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (PortReader.lagCheck.canProcess(instanceIdentifier, writeContext, false)) {
-            final String subPortName = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Subinterface.class))
-                    .get().getConfig().getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
+            Optional<Subinterface> subPort = writeContext
+                    .readAfter(instanceIdentifier.firstIdentifierOf(Subinterface.class));
 
-            blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, subPortName));
+            if (subPort.isPresent()) {
+                final String subPortName = subPort.get().getConfig()
+                        .getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
+
+                blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, subPortName));
+            } else {
+                throw new IllegalStateException("Cannot read subinterface name");
+            }
         }
     }
 
@@ -66,7 +73,7 @@ public class SubPortPmInstanceConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (PortReader.lagCheck.canProcess(instanceIdentifier, writeContext, false)) {
-            blockingWriteAndRead(cli, instanceIdentifier, config, deleteTemplate(config));
+            blockingDelete(deleteTemplate(config), cli, instanceIdentifier);
         }
     }
 

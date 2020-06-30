@@ -94,11 +94,10 @@ public class SaosInterfaceUnit extends AbstractUnit {
         writeRegistry.subtreeAdd(IIDs.IN_IN_SU_SU_CONFIG, new SubPortConfigWriter(cli),
                 Sets.newHashSet(IIDs.IN_IN_SU_SU_CO_AUG_SAOS8SUBIFNAMEAUG));
 
-        writeRegistry.addNoop(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VLAN);
-        writeRegistry.subtreeAdd(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
+        writeRegistry.subtreeAddAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
                 new SubPortVlanConfigWriter(cli), Sets.newHashSet(
                         io.frinx.openconfig.openconfig.network.instance.IIDs
-                                .IN_IN_SU_SU_VL_CO_AUG_SAOS8VLANLOGICALAUG));
+                                .IN_IN_SU_SU_VL_CO_AUG_SAOS8VLANLOGICALAUG), IIDs.IN_IN_SU_SU_CONFIG);
 
         writeRegistry.addNoop(io.frinx.openconfig.openconfig.network.instance.IIDs
                 .IN_IN_SU_SU_VL_AUG_SAOS8VLANLOGICALELEMENTSAUG_CLASSELEMENTS);
