@@ -17,7 +17,7 @@
 package io.frinx.cli.unit.saos8.ifc.handler.port.subport;
 
 import com.google.common.annotations.VisibleForTesting;
-import io.fd.honeycomb.translate.util.RWUtils;
+import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -56,9 +56,17 @@ public class SubPortVlanElementConfigWriter implements CliWriter<Config> {
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (PortReader.lagCheck.canProcess(instanceIdentifier, writeContext, false)) {
-            final String subIfcName = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Subinterface.class))
-                    .get().getConfig().getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
-            blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, subIfcName));
+            Optional<Subinterface> subPort = writeContext
+                    .readAfter(instanceIdentifier.firstIdentifierOf(Subinterface.class));
+
+            if (subPort.isPresent()) {
+                final String subPortName = subPort.get().getConfig()
+                        .getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
+
+                blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, subPortName));
+            } else {
+                throw new IllegalStateException("Cannot read subinterface name");
+            }
         }
     }
 
@@ -73,11 +81,17 @@ public class SubPortVlanElementConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-
         if (PortReader.lagCheck.canProcess(id, writeContext, false)) {
-            final String subIfcName = writeContext.readBefore(RWUtils.cutId(id, Subinterface.class))
-                    .get().getConfig().getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
-            blockingWriteAndRead(cli, id, dataAfter, updateTemplate(dataBefore, dataAfter, subIfcName));
+            Optional<Subinterface> subPort = writeContext.readAfter(id.firstIdentifierOf(Subinterface.class));
+
+            if (subPort.isPresent()) {
+                final String subPortName = subPort.get().getConfig()
+                        .getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
+
+                blockingWriteAndRead(cli, id, dataAfter, updateTemplate(dataBefore, dataAfter, subPortName));
+            } else {
+                throw new IllegalStateException("Cannot read subinterface name");
+            }
         }
     }
 
@@ -92,9 +106,17 @@ public class SubPortVlanElementConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (PortReader.lagCheck.canProcess(instanceIdentifier, writeContext, false)) {
-            final String subIfcName = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Subinterface.class))
-                    .get().getConfig().getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
-            blockingDelete(deleteTemplate(config, subIfcName), cli, instanceIdentifier);
+            Optional<Subinterface> subPort = writeContext
+                    .readBefore(instanceIdentifier.firstIdentifierOf(Subinterface.class));
+
+            if (subPort.isPresent()) {
+                final String subPortName = subPort.get().getConfig()
+                        .getAugmentation(Saos8SubIfNameAug.class).getSubinterfaceName();
+
+                blockingDelete(deleteTemplate(config, subPortName), cli, instanceIdentifier);
+            } else {
+                throw new IllegalStateException("Cannot read subinterface name");
+            }
         }
     }
 
