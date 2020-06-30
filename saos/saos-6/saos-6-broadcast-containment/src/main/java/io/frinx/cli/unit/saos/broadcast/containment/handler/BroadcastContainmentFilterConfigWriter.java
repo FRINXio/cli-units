@@ -22,23 +22,34 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.Filter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.filter.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BroadcastContainmentFilterConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE =
-                "{% if ($write) %}broadcast-containment create filter {$filter_name}\n{% endif %}"
-                + "{% if ($listPresent) %}broadcast-containment set filter {$filter_name} kbps {$kbps}\n"
-                + "broadcast-containment set filter {$filter_name} containment-classification {$containList}\n"
-                + "{% else %}broadcast-containment set filter {$filter_name} kbps {$kbps}\n{% endif %}"
-                + "configuration save";
+            "broadcast-containment create filter {$data.name}\n"
+            + "{% if ($data.rate) %}broadcast-containment set filter {$data.name} kbps {$data.rate}\n{% endif %}"
+            + "{% if ($containList) %}"
+            + "broadcast-containment set filter {$data.name} containment-classification {$containList}\n"
+            + "{% endif %}"
+            + "configuration save";
 
-    private static final String DELETE_TEMPLATE = "broadcast-containment delete filter {$filter_name}\n"
+    private static final String UPDATE_TEMPLATE =
+            "{% if ($rateCompare) %}"
+            + "broadcast-containment set filter {$data.name} kbps {$data.rate}\n"
+            + "{% endif %}"
+            + "{% if ($classificationCompare) %}"
+            + "broadcast-containment set filter {$data.name} containment-classification {$containList}\n"
+            + "{% endif %}"
+            + "configuration save";
+
+    private static final String DELETE_TEMPLATE = "broadcast-containment delete filter %s\n"
             + "configuration save";
 
     private Cli cli;
@@ -51,40 +62,27 @@ public class BroadcastContainmentFilterConfigWriter implements CliWriter<Config>
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String filterName = instanceIdentifier.firstKeyOf(Filter.class).getName();
-
-        Preconditions.checkArgument(config.getName() != null,
-                "Filter names must be set");
-
-        Preconditions.checkArgument(!config.getName().isEmpty(),
-                "Filter names must not be empty");
-
-        Preconditions.checkArgument(config.getName().equals(filterName),
-                "Filter names need to be equals");
-
-        String containList = parseContainList(Objects.requireNonNull(config.getContainmentClasification()));
-        String rate = config.getRate() != null ? config.getRate().toString() : "0";
-        blockingWriteAndRead(cli, instanceIdentifier, config, getWriteTemplate(filterName, rate,
-                containList, true, !containList.isEmpty()));
+        blockingWriteAndRead(cli, instanceIdentifier, config, getWriteTemplate(config));
     }
 
     private String parseContainList(List<String> containmentClasification) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String part : containmentClasification) {
-            stringBuilder.append(part);
-            stringBuilder.append(",");
+        if (containmentClasification != null) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String part : containmentClasification) {
+                stringBuilder.append(part);
+                stringBuilder.append(",");
+            }
+
+            return stringBuilder.length() == 0 ? stringBuilder.toString()
+                    : stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString();
         }
 
-        return stringBuilder.length() == 0 ? stringBuilder.toString()
-                : stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString();
+        return null;
     }
 
-    private String getWriteTemplate(String filterName, String kbps, String containList,
-                                    Boolean write,
-                                    Boolean listPresent) {
-        return fT(WRITE_TEMPLATE, "filter_name", filterName, "kbps", kbps,
-                "containList", containList, "write", write ? Chunk.TRUE : null,
-                "listPresent" , listPresent ? Chunk.TRUE : null);
+    private String getWriteTemplate(Config config) {
+        return fT(WRITE_TEMPLATE, "data", config,
+                "containList", parseContainList(config.getContainmentClasification()));
     }
 
     @Override
@@ -92,27 +90,41 @@ public class BroadcastContainmentFilterConfigWriter implements CliWriter<Config>
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String filterName = id.firstKeyOf(Filter.class).getName();
-        String containList = parseContainList(Objects.requireNonNull(dataAfter.getContainmentClasification()));
-        String rate = dataAfter.getRate() != null ? dataAfter.getRate().toString() : "0";
-        Preconditions.checkArgument(com.google.common.base.Objects.equal(com.google.common.base
-                        .Objects.equal(dataAfter.getName(), dataBefore.getName()),
-                com.google.common.base.Objects.equal(dataAfter.getName(), filterName)),
-                "Filter names need to be equals");
-        blockingWriteAndRead(cli, id, dataAfter, getWriteTemplate(filterName, rate,
-                containList, false, !containList.isEmpty()));
+        blockingWriteAndRead(cli, id, dataAfter, getUpdateTemplate(dataBefore, dataAfter));
+    }
+
+    private String getUpdateTemplate(Config dataBefore, Config dataAfter) {
+        return fT(UPDATE_TEMPLATE, "data", dataAfter, "before", dataBefore,
+                "rateCompare", compareRate(dataBefore.getRate(), dataAfter.getRate()),
+                "classificationCompare", compareClassifications(dataBefore.getContainmentClasification(),
+                        dataAfter.getContainmentClasification()),
+                "containList", parseContainList(dataAfter.getContainmentClasification()));
+    }
+
+    private String compareClassifications(List<String> before, List<String> after) {
+        if (before != null) {
+            Preconditions.checkNotNull(after,
+                    "Containment classification parameter can not be empty.");
+
+            Collections.sort(after);
+            Collections.sort(before);
+        }
+
+        return Objects.equals(before, after) ? null : Chunk.TRUE;
+    }
+
+    private String compareRate(BigInteger before, BigInteger after) {
+        if (before != null) {
+            Preconditions.checkNotNull(after,
+                    "Rate parameter can not be empty.");
+        }
+        return Objects.equals(before, after) ? null : Chunk.TRUE;
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String filterName = instanceIdentifier.firstKeyOf(Filter.class).getName();
-        blockingDeleteAndRead(cli, instanceIdentifier, getDeleteTemplate(filterName));
+        blockingDeleteAndRead(cli, instanceIdentifier, f(DELETE_TEMPLATE, config.getName()));
     }
-
-    private String getDeleteTemplate(String filterName) {
-        return fT(DELETE_TEMPLATE, "filter_name", filterName);
-    }
-
 }

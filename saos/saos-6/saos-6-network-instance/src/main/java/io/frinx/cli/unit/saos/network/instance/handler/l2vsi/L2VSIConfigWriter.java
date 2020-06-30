@@ -36,8 +36,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.saos.extensio
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.saos.extension.rev200210.VsSaosAug;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-
-
 public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE = "{% if ($vc) %}virtual-switch ethernet create vs {$vsi_ni_name}"
@@ -48,6 +46,19 @@ public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWrit
             + "virtual-switch ethernet set vs {$vsi_ni_name} encap-fixed-dot1dpri {$vsi_ni_encap_fixed_dot1dpri}\n"
             + "{% if ($l2pt == TRUE) %}l2-cft tagged-pvst-l2pt enable vs {$vsi_ni_name}\n"
             + "{% elseIf ($l2pt == FALSE) %}l2-cft tagged-pvst-l2pt disable vs {$vsi_ni_name}\n"
+            + "{% endif %}"
+            + "configuration save";
+
+    private static final String UPDATE_TEMPLATE =
+            "{$data|update(description,virtual-switch ethernet set vs `$vsi_ni_name` "
+            + "description `$data.description`\n,)}"
+            + "{% if ($l2pt) %}"
+            + "l2-cft tagged-pvst-l2pt {$l2pt} vs {$vsi_ni_name}\n"
+            + "{% endif %}"
+            + "{% if ($encapPolicy) %}"
+            + "virtual-switch ethernet set vs {$vsi_ni_name} encap-cos-policy {$encapPolicy}\n"
+            + "{% endif %}"
+            + "{% if ($encapFixed) %}virtual-switch ethernet set vs {$vsi_ni_name} encap-fixed-dot1dpri {$encapFixed}\n"
             + "{% endif %}"
             + "configuration save";
 
@@ -180,9 +191,75 @@ public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWrit
         }
 
         checkWriteNIData(iid, dataAfter, writeContext);
-        writeCurrentAttributesTesting(iid, dataAfter, "", false);
+        String niName = iid.firstKeyOf(NetworkInstance.class).getName();
+        blockingWriteAndRead(cli, iid, dataAfter, updateTemplate(dataBefore, dataAfter, niName));
 
         return true;
+    }
+
+    @VisibleForTesting
+    String updateTemplate(Config dataBefore, Config dataAfter, String niName) {
+        return fT(UPDATE_TEMPLATE, "data", dataAfter, "before", dataBefore,
+                "vsi_ni_name", niName,
+                "l2pt", updateL2pt(dataBefore, dataAfter),
+                "encapPolicy", updateEncapCosPolicy(dataBefore, dataAfter),
+                "encapFixed", updateEncapFixed(dataBefore, dataAfter));
+    }
+
+    private String updateL2pt(Config dataBefore, Config dataAfter) {
+        Boolean l2ptBefore = setL2pt(dataBefore);
+        Boolean l2ptAfter = setL2pt(dataAfter);
+        if (!Objects.equals(l2ptAfter, l2ptBefore)) {
+            if (l2ptAfter != null) {
+                return l2ptAfter ? "enable" : "disable";
+            }
+        }
+        return null;
+    }
+
+    private Boolean setL2pt(Config config) {
+        VsSaosAug vsSaosAug = config.getAugmentation(VsSaosAug.class);
+        return vsSaosAug != null ? vsSaosAug.isTaggedPvstL2pt() : null;
+    }
+
+    private String updateEncapCosPolicy(Config dataBefore, Config dataAfter) {
+        String cosPolicyBefore = setEncapCosPolicy(dataBefore);
+        String cosPolicyAfter = setEncapCosPolicy(dataAfter);
+        if (!Objects.equals(cosPolicyAfter, cosPolicyBefore)) {
+            if (cosPolicyAfter != null) {
+                return cosPolicyAfter;
+            }
+        }
+        return null;
+    }
+
+    private String setEncapCosPolicy(Config config) {
+        VsSaosAug vsSaosAug = config.getAugmentation(VsSaosAug.class);
+        if (vsSaosAug != null) {
+            SaosVsExtension.EncapCosPolicy encapCosPolicy = vsSaosAug.getEncapCosPolicy();
+            return encapCosPolicy != null ? encapCosPolicy.getName() : null;
+        }
+        return null;
+    }
+
+    private String updateEncapFixed(Config dataBefore, Config dataAfter) {
+        String fixedBefore = setEncapFixed(dataBefore);
+        String fixedAfter = setEncapFixed(dataAfter);
+        if (!Objects.equals(fixedAfter, fixedBefore)) {
+            if (fixedAfter != null) {
+                return fixedAfter;
+            }
+        }
+        return null;
+    }
+
+    private String setEncapFixed(Config config) {
+        VsSaosAug vsSaosAug = config.getAugmentation(VsSaosAug.class);
+        if (vsSaosAug != null) {
+            Short fixedDot1dpri = vsSaosAug.getEncapFixedDot1dpri();
+            return fixedDot1dpri != null ? fixedDot1dpri.toString() : null;
+        }
+        return null;
     }
 
     @Override

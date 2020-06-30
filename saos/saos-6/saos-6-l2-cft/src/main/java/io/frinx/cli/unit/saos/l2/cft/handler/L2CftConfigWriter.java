@@ -26,6 +26,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2CftConfigWriter implements CliWriter<Config> {
 
+    private static final String UPDATE_TEMPLATE =
+            "{$data|update(mode,l2-cft set mode `$data.mode`\nconfiguration save,)}";
+
     private Cli cli;
 
     public L2CftConfigWriter(Cli cli) {
@@ -47,11 +50,8 @@ public class L2CftConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (dataBefore.getMode().equals("mef-ce2")) {
-            deleteCurrentAttributes(id, dataAfter, writeContext);
-        } else if (dataBefore.getMode().equals("mef-ce1")) {
-            writeCurrentAttributes(id, dataAfter, writeContext);
-        }
+        blockingWriteAndRead(fT(UPDATE_TEMPLATE, "data", dataAfter, "before", dataBefore),
+                cli, id, dataAfter);
     }
 
     @Override
