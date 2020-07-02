@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.ubnt.es.init;
+package io.frinx.cli.unit.arista.init;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -46,24 +46,24 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UbntEsInitializerUnit extends AbstractUnit {
+public class AristaCliInitializerUnit extends AbstractUnit {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UbntEsInitializerUnit.class);
-    private Map<RemoteDeviceId, UbntEsInitializer> initializers;
+    private static final Logger LOG = LoggerFactory.getLogger(AristaCliInitializerUnit.class);
+    private Map<RemoteDeviceId, AristaInitializer> initializers;
 
-    public UbntEsInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
+    public AristaCliInitializerUnit(@Nonnull final TranslationUnitCollector registry) {
         super(registry);
         this.initializers = Maps.newHashMap();
     }
 
     @Override
     protected Set<Device> getSupportedVersions() {
-        return Collections.singleton(UbntEsDevices.UBNT_ES_GENERIC);
+        return Collections.singleton(AristaDevices.ARISTA_GENERIC);
     }
 
     @Override
     protected String getUnitName() {
-        return "Ubiquiti edgeswitch cli init (FRINX) translate unit";
+        return "Arista cli init (FRINX) translate unit";
     }
 
     @Override
@@ -74,11 +74,11 @@ public class UbntEsInitializerUnit extends AbstractUnit {
     @Override
     public SessionInitializationStrategy getInitializer(@Nonnull final RemoteDeviceId id,
                                                         @Nonnull final CliNode cliNodeConfiguration) {
-        UbntEsInitializer initializer;
+        AristaInitializer initializer;
         if (initializers.containsKey(id)) {
             initializer = initializers.get(id);
         } else {
-            initializer = new UbntEsInitializer(cliNodeConfiguration, id);
+            initializer = new AristaInitializer(cliNodeConfiguration, id);
             initializers.put(id, initializer);
         }
         return initializer;
@@ -103,7 +103,7 @@ public class UbntEsInitializerUnit extends AbstractUnit {
     /**
      * Initialize IOS CLI session to be usable by various CRUD and RPC handlers.
      */
-    public static class UbntEsInitializer implements SessionInitializationStrategy {
+    public static class AristaInitializer implements SessionInitializationStrategy {
         private static final String PASSWORD_PROMPT = "Password:";
         private static final String PRIVILEGED_PROMPT_SUFFIX = "#";
         private static final String ENABLE_COMMAND = "enable";
@@ -114,7 +114,7 @@ public class UbntEsInitializerUnit extends AbstractUnit {
         private final CliNode context;
         private final RemoteDeviceId id;
 
-        public UbntEsInitializer(CliNode context, RemoteDeviceId id) {
+        public AristaInitializer(CliNode context, RemoteDeviceId id) {
             this.context = context;
             this.id = id;
         }
@@ -162,7 +162,7 @@ public class UbntEsInitializerUnit extends AbstractUnit {
         }
 
         protected String getOsNameForLogging() {
-            return "Ubiquiti edgeSwitch";
+            return "Arista";
         }
 
         private void tryToEnterPrivilegedMode(@Nonnull Session session, @Nonnull String newline)

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.frinx.cli.ubnt.es.it;
+package io.frinx.cli.ubnt.es;
 
 import io.frinx.cli.registry.impl.TranslateRegistryImpl;
 import io.frinx.cli.unit.generic.GenericTranslateUnit;
