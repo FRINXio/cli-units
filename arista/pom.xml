@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
-  ~ Copyright © 2018 Frinx and others.
+  ~ Copyright © 2020 Frinx and others.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,46 +15,25 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<!-- vi: set et smarttab sw=4 tabstop=4: -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_2_5_rc10-frinxodl-SNAPSHOT</version>
+        <version>3.1.1-Oxygen-SR2.4_2_5_rc6-frinxodl-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
-    <artifactId>cli-units-aggregator</artifactId>
-    <version>4.2.5.rc10-frinx-SNAPSHOT</version>
+    <artifactId>cli-units-arista</artifactId>
+    <version>4.2.5.rc6-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>artifacts</module>
-        <module>ios-common</module>
-        <module>ios</module>
-        <module>ios-xr</module>
-        <module>brocade</module>
-        <module>cubro</module>
-        <module>junos</module>
-        <module>huawei</module>
-        <module>features</module>
-        <module>unit-parent</module>
-        <module>nexus</module>
-        <module>dasan</module>
-        <module>sros</module>
-        <module>saos</module>
-        <module>ubnt/edge-switch</module>
-        <module>mikrotik</module>
-        <module>yang-docs-plugin</module>
-        <module>interface-base</module>
-        <module>network-instance-base</module>
-        <module>native-units</module>
-        <module>arista</module>
+        <module>init</module>
+        <module>it</module>
     </modules>
 
     <build>
@@ -76,16 +56,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>karaf</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>karaf</module>
-            </modules>
-        </profile>
-
         <profile>
             <!--
                 This profile is to ensure we only build javadocs reports
