@@ -83,9 +83,9 @@ public class LogicalRingConfigReader implements CliConfigReader<Config, ConfigBu
 
     private static void setServices(String output, ConfigBuilder builder, String logicalRingName) {
         Pattern westServicesPattern = Pattern.compile(".*" + logicalRingName
-                + " west-port-cfm-service-name (?<westPortService>\\S+).*");
+                + " (west-port-cfm-service-name|west-port-cfm-service) (?<westPortService>\\S+).*");
         Pattern eastServicesPattern = Pattern.compile(".*" + logicalRingName
-                + " east-port-cfm-service-name (?<eastPortService>\\S+).*");
+                + " (east-port-cfm-service-name|east-port-cfm-service) (?<eastPortService>\\S+).*");
 
         ParsingUtils.parseField(output, 0,
             westServicesPattern::matcher,

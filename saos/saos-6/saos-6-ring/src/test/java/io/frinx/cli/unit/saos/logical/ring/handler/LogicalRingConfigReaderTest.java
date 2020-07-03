@@ -22,8 +22,14 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.rev20062
 
 public class LogicalRingConfigReaderTest {
 
+    private static final String OUTPUT_SAOS_8 =
+            "ring-protection logical-ring create logical-ring-name LMR990100 ring-id 255 "
+            + "west-port LM01W east-port LM01E\n"
+            + "ring-protection logical-ring set ring LMR990100 west-port-cfm-service CFM990100_0190\n"
+            + "ring-protection logical-ring set ring LMR990100 east-port-cfm-service CFM990100_0191";
+
     @Test
-    public void parseConfigTest() {
+    public void parseConfigTest_01() {
         ConfigBuilder builder = new ConfigBuilder();
 
         LogicalRingConfigReader.parseConfig(LogicalRingReaderTest.OUTPUT, builder, "l-ring-test1");
@@ -33,6 +39,19 @@ public class LogicalRingConfigReaderTest {
         Assert.assertEquals("2", builder.getEastPort());
         Assert.assertEquals("foo", builder.getWestPortCfmService());
         Assert.assertEquals("VLAN111555", builder.getEastPortCfmService());
+    }
+
+    @Test
+    public void parseConfigTest_02() {
+        ConfigBuilder builder = new ConfigBuilder();
+
+        LogicalRingConfigReader.parseConfig(OUTPUT_SAOS_8, builder, "LMR990100");
+        Assert.assertEquals("LMR990100", builder.getName());
+        Assert.assertEquals("255", builder.getRingId());
+        Assert.assertEquals("LM01W", builder.getWestPort());
+        Assert.assertEquals("LM01E", builder.getEastPort());
+        Assert.assertEquals("CFM990100_0190", builder.getWestPortCfmService());
+        Assert.assertEquals("CFM990100_0191", builder.getEastPortCfmService());
     }
 }
 
