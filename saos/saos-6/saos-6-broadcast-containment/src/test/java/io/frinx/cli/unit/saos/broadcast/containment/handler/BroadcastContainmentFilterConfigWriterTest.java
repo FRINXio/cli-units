@@ -21,51 +21,34 @@ import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.broadcast.containment.IIDs;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.Filter;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.FilterKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.filter.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.broadcast.containment.rev200303.broadcast.containment.top.filters.filter.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BroadcastContainmentFilterConfigWriterTest {
+
     @Mock
     private Cli cli;
 
     private BroadcastContainmentFilterConfigWriter writer;
 
-    private final InstanceIdentifier<Config> iid = IIDs.FILTERS
-            .child(Filter.class, new FilterKey("filter1"))
-            .child(Config.class);
+    private final InstanceIdentifier iid = IIDs.FILTERS;
 
     private static final String B_CAST = "bcast";
     private static final String UNKNOWN_UCAST = "unknown-ucast";
+    private static final String L2_MCAST = "unknown-l2-mcast";
+    private static final String IP_MCAST = "unknown-ip-mcast";
 
     private final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
-
-    private Config data = new ConfigBuilder().setName("filter1")
-            .setRate(BigInteger.valueOf(64))
-            .setContainmentClasification(Arrays.asList(B_CAST, UNKNOWN_UCAST))
-            .build();
-
-    private Config data2 = new ConfigBuilder().setName("filter1")
-            .setRate(BigInteger.valueOf(64))
-            .setContainmentClasification(Collections.emptyList())
-            .build();
-
-    private Config data3 = new ConfigBuilder().setName("filter1")
-            .setContainmentClasification(Collections.emptyList())
-            .build();
 
     @Before
     public void setUp() {
@@ -76,19 +59,22 @@ public class BroadcastContainmentFilterConfigWriterTest {
 
     @Test
     public void testWrite() throws Exception {
-        writer.writeCurrentAttributes(iid, data, null);
+        writer.writeCurrentAttributes(iid,
+                createConfig("filter1", "64", Arrays.asList(B_CAST, UNKNOWN_UCAST)), null);
+
         Mockito.verify(cli).executeAndRead(commands.capture());
 
         Assert.assertEquals("broadcast-containment create filter filter1\n"
-                        + "broadcast-containment set filter filter1 kbps 64\n"
-                        + "broadcast-containment set filter filter1 containment-classification bcast,unknown-ucast\n"
-                        + "configuration save\n",
+                + "broadcast-containment set filter filter1 kbps 64\n"
+                + "broadcast-containment set filter filter1 containment-classification bcast,unknown-ucast\n"
+                + "configuration save\n",
                 commands.getValue().getContent());
     }
 
     @Test
     public void testWriteWithoutContainmentClassification() throws Exception {
-        writer.writeCurrentAttributes(iid, data2, null);
+        writer.writeCurrentAttributes(iid,
+                createConfig("filter1", "64", null), null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
         Assert.assertEquals("broadcast-containment create filter filter1\n"
@@ -99,60 +85,128 @@ public class BroadcastContainmentFilterConfigWriterTest {
 
     @Test
     public void testWriteWithoutContainmentClassificationAndKbps() throws Exception {
-        writer.writeCurrentAttributes(iid, data3, null);
+        writer.writeCurrentAttributes(iid,
+                createConfig("filter1", null, null), null);
+
         Mockito.verify(cli).executeAndRead(commands.capture());
 
         Assert.assertEquals("broadcast-containment create filter filter1\n"
-                        + "broadcast-containment set filter filter1 kbps 0\n"
                         + "configuration save\n",
                 commands.getValue().getContent());
     }
 
     @Test
     public void testUpdate() throws Exception {
-        writer.updateCurrentAttributes(iid, data2, data, null);
+        writer.updateCurrentAttributes(iid,
+                createConfig("filter1", "64", Arrays.asList(B_CAST, UNKNOWN_UCAST)),
+                createConfig("filter1", "128", Arrays.asList(B_CAST)), null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("broadcast-containment set filter filter1 kbps 64\n"
-                        + "broadcast-containment set filter filter1 containment-classification bcast,unknown-ucast\n"
+        Assert.assertEquals("broadcast-containment set filter filter1 kbps 128\n"
+                        + "broadcast-containment set filter filter1 containment-classification bcast\n"
                         + "configuration save\n",
                 commands.getValue().getContent());
+    }
+
+    @Test
+    public void testUpdateContainmentClassification_01() throws Exception {
+        writer.updateCurrentAttributes(iid,
+                createConfig("filter1", null, null),
+                createConfig("filter1", null, null), null);
+        Mockito.verify(cli).executeAndRead(commands.capture());
+
+        Assert.assertEquals("configuration save\n",
+                commands.getValue().getContent());
+    }
+
+    @Test
+    public void testUpdateContainmentClassification_02() throws Exception {
+        writer.updateCurrentAttributes(iid,
+                createConfig("filter1", null, Arrays.asList(B_CAST, UNKNOWN_UCAST)),
+                createConfig("filter1", null, Arrays.asList(B_CAST, UNKNOWN_UCAST)), null);
+        Mockito.verify(cli).executeAndRead(commands.capture());
+
+        Assert.assertEquals("configuration save\n", commands.getValue().getContent());
+    }
+
+    @Test
+    public void testUpdateContainmentClassification_03() throws Exception {
+        writer.updateCurrentAttributes(iid,
+                createConfig("filter1", null, Arrays.asList(B_CAST, UNKNOWN_UCAST)),
+                createConfig("filter1", null, Arrays.asList(L2_MCAST, IP_MCAST)), null);
+        Mockito.verify(cli).executeAndRead(commands.capture());
+
+        Assert.assertEquals("broadcast-containment set filter filter1 containment-classi"
+                + "fication unknown-ip-mcast,unknown-l2-mcast\n"
+                + "configuration save\n", commands.getValue().getContent());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testUpdateContainmentClassification_04() throws Exception {
+        writer.updateCurrentAttributes(iid,
+                createConfig("filter1", null, Arrays.asList(B_CAST, L2_MCAST)),
+                createConfig("filter1", null, null), null);
+    }
+
+    @Test
+    public void testUpdateKbps_01() throws Exception {
+        writer.updateCurrentAttributes(iid,
+                createConfig("filter1", null, null),
+                createConfig("filter1", null, null), null);
+        Mockito.verify(cli).executeAndRead(commands.capture());
+
+        Assert.assertEquals("configuration save\n", commands.getValue().getContent());
+    }
+
+    @Test
+    public void testUpdateKbps_02() throws Exception {
+        writer.updateCurrentAttributes(iid,
+                createConfig("filter1", "64", null),
+                createConfig("filter1", "64", null), null);
+        Mockito.verify(cli).executeAndRead(commands.capture());
+
+        Assert.assertEquals("configuration save\n",
+                commands.getValue().getContent());
+    }
+
+    @Test
+    public void testUpdateKbps_03() throws Exception {
+        writer.updateCurrentAttributes(iid,
+                createConfig("filter1", null, null),
+                createConfig("filter1", "64", null), null);
+        Mockito.verify(cli).executeAndRead(commands.capture());
+
+        Assert.assertEquals("broadcast-containment set filter filter1 kbps 64\nconfiguration save\n",
+                commands.getValue().getContent());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testUpdateKbps_04() throws Exception {
+        writer.updateCurrentAttributes(iid,
+                createConfig("filter1", "64", null),
+                createConfig("filter1", null, null), null);
     }
 
     @Test
     public void testDelete() throws Exception {
-        writer.deleteCurrentAttributes(iid, data, null);
+        writer.deleteCurrentAttributes(iid, createConfig("filter1", "64", null), null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("broadcast-containment delete filter filter1\n"
-                        + "configuration save\n",
+        Assert.assertEquals("broadcast-containment delete filter filter1\nconfiguration save\n",
                 commands.getValue().getContent());
     }
 
-    private Config data4 = new ConfigBuilder()
-            .setRate(BigInteger.valueOf(64))
-            .setContainmentClasification(Collections.emptyList())
-            .build();
+    private Config createConfig(String name, String rate, List<String> classification) {
+        ConfigBuilder configBuilder = new ConfigBuilder().setName(name);
 
-    private Config data5 = new ConfigBuilder().setName("")
-            .setRate(BigInteger.valueOf(64))
-            .setContainmentClasification(Collections.emptyList())
-            .build();
+        if (rate != null) {
+            configBuilder.setRate(new BigInteger(rate));
+        }
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+        if (classification != null) {
+            configBuilder.setContainmentClasification(classification);
+        }
 
-    @Test
-    public void testWriteWithoutSetName() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Filter names must be set");
-        writer.writeCurrentAttributes(iid, data4, null);
-    }
-
-    @Test
-    public void testWriteWithEmptyName() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Filter names must not be empty");
-        writer.writeCurrentAttributes(iid, data5, null);
+        return configBuilder.build();
     }
 }

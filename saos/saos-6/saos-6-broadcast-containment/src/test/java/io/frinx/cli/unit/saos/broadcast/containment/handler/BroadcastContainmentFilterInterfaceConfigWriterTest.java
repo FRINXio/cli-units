@@ -79,16 +79,6 @@ public class BroadcastContainmentFilterInterfaceConfigWriterTest {
     }
 
     @Test
-    public void testUpdate() throws Exception {
-        writer.updateCurrentAttributes(iid2, data1, data2, null);
-        Mockito.verify(cli).executeAndRead(commands.capture());
-
-        Assert.assertEquals("broadcast-containment add filter filter1 port 4\n"
-                        + "configuration save\n",
-                commands.getValue().getContent());
-    }
-
-    @Test
     public void testDelete() throws Exception {
         writer.deleteCurrentAttributes(iid1, data1, null);
         Mockito.verify(cli).executeAndRead(commands.capture());

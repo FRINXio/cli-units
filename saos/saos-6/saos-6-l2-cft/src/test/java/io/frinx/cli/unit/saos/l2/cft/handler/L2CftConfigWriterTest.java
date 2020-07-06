@@ -85,6 +85,14 @@ public class L2CftConfigWriterTest {
     }
 
     @Test
+    public void updateCurrentAttributesTest_03() throws WriteFailedException {
+        writer.updateCurrentAttributes(iid, createConfig("mef-ce1"), createConfig("mef-ce1"), null);
+
+        Mockito.verify(cli).executeAndRead(commands.capture());
+        Assert.assertEquals("", commands.getValue().getContent());
+    }
+
+    @Test
     public void deleteCurrentAttributesTest() throws WriteFailedException {
         writer.deleteCurrentAttributes(iid, createConfig("mef-ce2"), null);
 
