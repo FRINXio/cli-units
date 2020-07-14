@@ -19,17 +19,18 @@ package io.frinx.cli.unit.saos.network.instance.handler.cp;
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.saos.network.instance.handler.l2vsi.cp.L2VSIPointsReader;
-import io.frinx.cli.unit.utils.CliConfigReader;
-import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPoints;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConnectionPointsBuilder;
+import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.ConnectionPoint;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.ConnectionPointBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.connection.points.ConnectionPointKey;
 
-public class ConnectionPointsReader extends CompositeReader<ConnectionPoints, ConnectionPointsBuilder>
-        implements CliConfigReader<ConnectionPoints, ConnectionPointsBuilder> {
+public class ConnectionPointsReader
+        extends CompositeListReader<ConnectionPoint, ConnectionPointKey, ConnectionPointBuilder>
+        implements CliConfigListReader<ConnectionPoint, ConnectionPointKey, ConnectionPointBuilder> {
 
     public ConnectionPointsReader(Cli cli) {
         super(Lists.newArrayList(
                 new L2VSIPointsReader(cli)));
     }
-
 }
