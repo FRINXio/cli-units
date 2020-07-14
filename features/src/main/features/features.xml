@@ -245,6 +245,7 @@
         <bundle>mvn:io.frinx.cli/saos-8-network-instance-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/saos-6-network-instance-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/saos-6-acl-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/saos-6-ring-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-sros' version='${project.version}'>

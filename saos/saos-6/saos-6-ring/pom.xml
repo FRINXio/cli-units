@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
- <!--
+<!--
   ~ Copyright © 2020 Frinx and others.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,12 +22,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.5.rc5-frinx-SNAPSHOT</version>
+        <version>3.1.14.rc15-frinx-SNAPSHOT</version>
         <relativePath>../../../unit-parent</relativePath>
     </parent>
 
     <artifactId>saos-6-ring-unit</artifactId>
-    <version>4.2.5.rc5-frinx-SNAPSHOT</version>
+    <version>3.1.14.rc15-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
