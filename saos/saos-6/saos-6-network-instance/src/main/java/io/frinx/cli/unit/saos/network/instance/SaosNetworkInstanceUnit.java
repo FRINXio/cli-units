@@ -25,6 +25,7 @@ import io.frinx.cli.unit.saos.init.SaosDevices;
 import io.frinx.cli.unit.saos.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.saos.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.NetworkInstanceReader;
+import io.frinx.cli.unit.saos.network.instance.handler.cp.ConnectionPointsConfigReader;
 import io.frinx.cli.unit.saos.network.instance.handler.cp.ConnectionPointsReader;
 import io.frinx.cli.unit.saos.network.instance.handler.cp.ConnectionPointsWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.ifc.InterfaceConfigReader;
@@ -134,9 +135,8 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         // virtual-switch
         readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new InterfaceReader(cli));
         readRegistry.add(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigReader(cli));
-        readRegistry.subtreeAdd(IIDs.NE_NE_CONNECTIONPOINTS, new ConnectionPointsReader(cli),
-                Sets.newHashSet(
-                        IIDs.NE_NE_CO_CONNECTIONPOINT,
-                        IIDs.NE_NE_CO_CO_CONFIG));
+
+        readRegistry.add(IIDs.NE_NE_CO_CONNECTIONPOINT, new ConnectionPointsReader(cli));
+        readRegistry.add(IIDs.NE_NE_CO_CO_CONFIG, new ConnectionPointsConfigReader());
     }
 }
