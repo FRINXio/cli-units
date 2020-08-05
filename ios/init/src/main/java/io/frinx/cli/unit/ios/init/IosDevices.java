@@ -42,9 +42,15 @@ public final class IosDevices {
             .setDeviceVersion("15.*")
             .build();
 
+    public static final Device IOS_16 = new DeviceIdBuilder()
+            .setDeviceType("ios")
+            .setDeviceVersion("16.*")
+            .build();
+
     public static final Set<Device> IOS_ALL = new HashSet<Device>() {{
             add(IOS_12);
             add(IOS_15);
+            add(IOS_16);
         }
     };
 }

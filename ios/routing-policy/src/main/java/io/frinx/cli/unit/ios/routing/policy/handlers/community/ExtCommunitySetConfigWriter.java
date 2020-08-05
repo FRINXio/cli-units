@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.ios.routing.policy.handlers;
+package io.frinx.cli.unit.ios.routing.policy.handlers.community;
 
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
