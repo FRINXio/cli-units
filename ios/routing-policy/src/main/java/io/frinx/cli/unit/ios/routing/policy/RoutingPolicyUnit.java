@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Frinx and others.
+ * Copyright © 2020 Frinx and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,18 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.ios.init.IosDevices;
-import io.frinx.cli.unit.ios.routing.policy.handlers.ExtCommunitySetConfigWriter;
-import io.frinx.cli.unit.ios.routing.policy.handlers.ExtCommunitySetReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.PolicyConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.PolicyReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.PolicyWriter;
+import io.frinx.cli.unit.ios.routing.policy.handlers.StatementConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.StatementReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.action.BgpActionsConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.aspath.AsPathPrependConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.community.ExtCommunitySetConfigWriter;
+import io.frinx.cli.unit.ios.routing.policy.handlers.community.ExtCommunitySetReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.policy.IIDs;
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.$YangModuleInfoImpl;
@@ -40,7 +48,12 @@ public class RoutingPolicyUnit extends AbstractUnit {
 
     @Override
     protected Set<Device> getSupportedVersions() {
-        return IosDevices.IOS_ALL;
+        return new HashSet<Device>() {
+            {
+                add(IosDevices.IOS_12);
+                add(IosDevices.IOS_15);
+            }
+        };
     }
 
     @Override
@@ -76,11 +89,32 @@ public class RoutingPolicyUnit extends AbstractUnit {
         writerRegistryBuilder.addAfter(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_EX_EX_CONFIG,
                 new ExtCommunitySetConfigWriter(cli),
                 io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
+
+        writerRegistryBuilder.addNoop(IIDs.RO_POLICYDEFINITIONS);
+        writerRegistryBuilder.subtreeAdd(IIDs.RO_PO_POLICYDEFINITION, new PolicyWriter(cli),
+                Sets.newHashSet(IIDs.RO_PO_PO_CONFIG,
+                        IIDs.RO_PO_PO_STATEMENTS,
+                        IIDs.RO_PO_PO_ST_STATEMENT,
+                        IIDs.RO_PO_PO_ST_ST_CONFIG,
+                        IIDs.RO_PO_PO_ST_ST_ACTIONS,
+                        io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2,
+                        io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BGPACTIONS,
+                        io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_CONFIG,
+                        io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SETASPATHPREPEND,
+                        io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_CONFIG));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readerRegistryBuilder, Cli cli) {
+        readerRegistryBuilder.add(IIDs.RO_PO_POLICYDEFINITION, new PolicyReader(cli));
+        readerRegistryBuilder.add(IIDs.RO_PO_PO_CONFIG, new PolicyConfigReader());
+        readerRegistryBuilder.add(IIDs.RO_PO_PO_ST_STATEMENT, new StatementReader(cli));
+        readerRegistryBuilder.add(IIDs.RO_PO_PO_ST_ST_CONFIG, new StatementConfigReader());
+        readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
+                .RO_PO_PO_ST_ST_AC_AUG_ACTIONS1_BG_CONFIG, new BgpActionsConfigReader(cli));
+        readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
+                .RO_PO_PO_ST_ST_AC_AUG_ACTIONS1_BG_SE_CONFIG, new AsPathPrependConfigReader(cli));
+
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_EX_EXTCOMMUNITYSET,
                 new ExtCommunitySetReader(cli));
     }
-
 }
