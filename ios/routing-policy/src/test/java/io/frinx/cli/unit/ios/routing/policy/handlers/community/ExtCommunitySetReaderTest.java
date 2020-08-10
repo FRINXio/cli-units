@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.ios.routing.policy.handlers;
+package io.frinx.cli.unit.ios.routing.policy.handlers.community;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.ExtCommunitySetConfig;
