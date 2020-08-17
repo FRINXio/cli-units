@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder
 import io.fd.honeycomb.translate.spi.write.CommitFailedException;
 import io.fd.honeycomb.translate.spi.write.PostCommitHook;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.CliFlavour;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.Session;
@@ -110,6 +111,10 @@ public class SaosCliInitializerUnit extends AbstractUnit {
     @Override
     public PromptResolutionStrategy getPromptResolver() {
         return PromptResolutionStrategy.ENTER_AND_READ;
+    }
+
+    public CliFlavour getCliFlavour() {
+        return CliFlavour.SAOS;
     }
 
     public static class SaosCliInitializationStrategy implements SessionInitializationStrategy {
