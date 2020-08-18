@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpGlobalConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpGlobalBase;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpNeighborAfiSafiList;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpNeighborBase;
@@ -75,6 +76,8 @@ public class GlobalConfigWriter implements CliWriter<Config> {
                     f("router bgp %s", config.getAs().getValue()),
                     config.getRouterId() == null ? "no bgp router id" : f("bgp router-id %s", config.getRouterId()
                             .getValue()),
+                    config.getAugmentation(BgpGlobalConfigAug.class)
+                            .isLogNeighborChanges() ? "bgp log-neighbor-changes" : "no bgp log-neighbor-changes",
                     "end");
         } else {
             // Compare AS for global and current VRF. Must match for IOS

@@ -37,6 +37,7 @@ import io.frinx.cli.unit.ios.bgp.handler.neighbor.NeighborPolicyConfigReader;
 import io.frinx.cli.unit.ios.bgp.handler.neighbor.NeighborReader;
 import io.frinx.cli.unit.ios.bgp.handler.neighbor.NeighborRouteReflectorConfigReader;
 import io.frinx.cli.unit.ios.bgp.handler.neighbor.NeighborStateReader;
+import io.frinx.cli.unit.ios.bgp.handler.neighbor.NeighborTimersConfigReader;
 import io.frinx.cli.unit.ios.bgp.handler.neighbor.NeighborTransportConfigReader;
 import io.frinx.cli.unit.ios.bgp.handler.neighbor.NeighborWriter;
 import io.frinx.cli.unit.ios.bgp.handler.neighbor.PrefixesReader;
@@ -52,6 +53,7 @@ import io.frinx.cli.unit.ios.init.IosDevices;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -77,7 +79,8 @@ public class BgpUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet($YangModuleInfoImpl.getInstance());
+        return Sets.newHashSet(IIDs.FRINX_BGP_EXTENSION,
+                $YangModuleInfoImpl.getInstance());
     }
 
     @Override
@@ -100,11 +103,13 @@ public class BgpUnit extends AbstractUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigWriter(cli),
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_PR_PR_BG_GL_CONFIG, new GlobalConfigWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_PR_PR_BG_GL_CO_AUG_BGPGLOBALCONFIGAUG),
                 IIDs.NE_NE_CONFIG);
 
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI);
-        writeRegistry.addAfter(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, new GlobalAfiSafiConfigWriter(cli),
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, new GlobalAfiSafiConfigWriter(cli),
+                Collections.singleton(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CO_AUG_GLOBALAFISAFICONFIGAUG),
                 IIDs.NE_NE_PR_PR_BG_GL_CONFIG);
 
         // Peer group writer, handle also subtrees
@@ -141,7 +146,9 @@ public class BgpUnit extends AbstractUnit {
                         IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI,
                         IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG,
                         IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_APPLYPOLICY,
-                        IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG),
+                        IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG,
+                        IIDs.NE_NE_PR_PR_BG_NE_NE_TIMERS,
+                        IIDs.NE_NE_PR_PR_BG_NE_NE_TI_CONFIG),
                 IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP);
 
         writeRegistry.addAfter(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigWriter(cli),
@@ -165,6 +172,7 @@ public class BgpUnit extends AbstractUnit {
 
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader(cli));
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_STATE, new NeighborStateReader(cli));
+        readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_TI_CONFIG, new NeighborTimersConfigReader(cli));
         readRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, new NeighborAfiSafiReader(cli),
                 Sets.newHashSet(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_CONFIG));
 

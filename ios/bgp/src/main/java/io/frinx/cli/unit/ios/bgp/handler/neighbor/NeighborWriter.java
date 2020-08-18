@@ -18,6 +18,7 @@ package io.frinx.cli.unit.ios.bgp.handler.neighbor;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import com.x5.template.Chunk;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -32,6 +33,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupConfig;
@@ -40,6 +42,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflector;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.AfiSafis;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Timers;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.timers.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
@@ -77,6 +81,11 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
     public static final String NEIGHBOR_ENABLE_CONFIG = "{%if ($enabled) %}neighbor {$neighbor_id} activate\n"
             + "{% elseIf ($before_enabled) %}no neighbor {$neighbor_id} activate\n{% endif %}";
+
+    public static final String NEIGHBOR_TIMERS =
+            "{%if ($isTimers == TRUE) %}neighbor {$neighbor_id} timers {$timers}\n"
+            + "{% elseIf ($isTimers == FALSE) %}no neighbor {$neighbor_id} timers\n"
+            + "{% endif %}";
 
     public static final String NEIGHBOR_SEND_COMMUNITY_CONFIG = "{%if ($neighbor.config.send_community.name) "
             + "%}neighbor {$neighbor_id} send-community {$neighbor.config.send_community.name|lc}\n"
@@ -194,6 +203,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             + NEIGHBOR_POLICIES
             + NEIGHBOR_AFI_POLICIES
             + NEIGHBOR_ENABLE_CONFIG
+            + NEIGHBOR_TIMERS
             + "exit\n"
             + "{% onEmpty %}"
             + "{% endloop %}"
@@ -257,7 +267,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
         renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, null, enabled, null, vrfKey, bgpAs, neighAfiSafi, Collections.emptyMap(), neighborIp,
-                NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
+                getTimers(neighbor) == null ? null : Chunk.TRUE, getTimers(neighbor), NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
     }
 
     private static <T extends DataObject> void renderNeighbor(CliWriter<T> writer, Cli cli,
@@ -286,6 +296,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             Map<String, Object>
             beforeAfiSafi,
             String neighborId,
+            String isTimers,
+            String timers,
             String globalTemplate,
             String vrfTemplate)
             throws WriteFailedException.CreateFailedException {
@@ -317,7 +329,9 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     "route_reflect_client", isRouteReflectClient(neighbor),
                     "before_route_reflect_client", isRouteReflectClient(before),
                     "enabled", enabled,
-                    "before_enabled", beforeEnabled);
+                    "before_enabled", beforeEnabled,
+                    "isTimers", isTimers,
+                    "timers", timers);
         }
     }
 
@@ -466,7 +480,30 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         // Then update existing attributes
         renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, before, enabled, beforeEnabled, vrfKey, bgpAs, neighAfiSafi, neighAfiSafiBefore, neighborIp,
+                updateTimers(getTimers(before), getTimers(neighbor)), getTimers(neighbor),
                 NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
+    }
+
+    private static String getTimers(Neighbor neighbor) {
+        Timers timers = neighbor.getTimers();
+        Config timersConfig = timers != null ? timers.getConfig() : null;
+
+        if (timersConfig != null) {
+            return String.format("%s %s %s",
+                    timersConfig.getKeepaliveInterval().toString(),
+                    timersConfig.getHoldTime().toString(),
+                    timersConfig.getMinimumAdvertisementInterval() != null
+                            ? timersConfig.getMinimumAdvertisementInterval().toString() : "")
+                    .trim();
+        }
+        return null;
+    }
+
+    private static String updateTimers(String timersBefore, String timersAfter) {
+        if (!Objects.equals(timersBefore, timersAfter)) {
+            return timersAfter != null ? Chunk.TRUE : "FALSE";
+        }
+        return null;
     }
 
     private static boolean afiSafisHaveChanged(final Neighbor before, final Neighbor after) {

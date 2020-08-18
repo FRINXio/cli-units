@@ -18,6 +18,7 @@ package io.frinx.cli.unit.ios.bgp.handler.neighbor;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.x5.template.Chunk;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.unit.utils.CliFormatter;
@@ -158,8 +159,8 @@ public class NeighborWriterTest implements CliFormatter {
         NeighborWriter.renderNeighbor(writer, cli, id,
                 source, null, source.getConfig().isEnabled(), null, id.firstKeyOf(NetworkInstance.class), as,
                 afiSafisForNeighborSource, Collections.emptyMap(),
-                NeighborWriter.getNeighborIp(source.getNeighborAddress()), NeighborWriter.NEIGHBOR_GLOBAL,
-                NeighborWriter.NEIGHBOR_VRF);
+                NeighborWriter.getNeighborIp(source.getNeighborAddress()), Chunk.TRUE, "10 20 30",
+                NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
         String writeRender = getCommands(writer, false, 1);
         Assert.assertEquals(write, writeRender);
@@ -179,8 +180,8 @@ public class NeighborWriterTest implements CliFormatter {
             NeighborWriter.renderNeighbor(writer, cli, id,
                     after, source, after.getConfig().isEnabled(), source.getConfig().isEnabled(), id.firstKeyOf(
                             NetworkInstance.class), as, afiSafisForNeighborAfter, afiSafisForNeighborSource,
-                    NeighborWriter.getNeighborIp(after.getNeighborAddress()), NeighborWriter.NEIGHBOR_GLOBAL,
-                    NeighborWriter.NEIGHBOR_VRF);
+                    NeighborWriter.getNeighborIp(after.getNeighborAddress()), Chunk.TRUE, "30 10 10",
+                    NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
             String updateRender = updateAfiSafiRender + "\n" + getCommands(writer, false, 3);
             Assert.assertEquals(update, updateRender.trim());
@@ -498,6 +499,7 @@ public class NeighborWriterTest implements CliFormatter {
             + "neighbor 1.2.3.4 route-map export2 out\n"
             + "neighbor 1.2.3.4 route-map a in\n"
             + "neighbor 1.2.3.4 activate\n"
+            + "neighbor 1.2.3.4 timers 10 20 30\n"
             + "exit\n"
             + "address-family ipv6 vrf vrf1\n"
             + "neighbor 1.2.3.4 remote-as 45\n"
@@ -513,6 +515,7 @@ public class NeighborWriterTest implements CliFormatter {
             + "neighbor 1.2.3.4 route-map export1 out\n"
             + "neighbor 1.2.3.4 route-map export2 out\n"
             + "neighbor 1.2.3.4 activate\n"
+            + "neighbor 1.2.3.4 timers 10 20 30\n"
             + "exit\n"
             + "address-family vpnv4 vrf vrf1\n"
             + "neighbor 1.2.3.4 remote-as 45\n"
@@ -531,6 +534,7 @@ public class NeighborWriterTest implements CliFormatter {
             + "neighbor 1.2.3.4 route-map b in\n"
             + "neighbor 1.2.3.4 route-map c out\n"
             + "neighbor 1.2.3.4 activate\n"
+            + "neighbor 1.2.3.4 timers 10 20 30\n"
             + "exit\n"
             + "end";
 
@@ -576,6 +580,7 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor 1.2.3.4 route-map export2 out\n"
             + "no neighbor 1.2.3.4 route-map a in\n"
             + "no neighbor 1.2.3.4 activate\n"
+            + "neighbor 1.2.3.4 timers 30 10 10\n"
             + "exit\n"
             + "end";
 
@@ -622,6 +627,7 @@ public class NeighborWriterTest implements CliFormatter {
             + "neighbor 1.2.3.4 route-map export1 out\n"
             + "neighbor 1.2.3.4 route-map export2 out\n"
             + "neighbor 1.2.3.4 activate\n"
+            + "neighbor 1.2.3.4 timers 10 20 30\n"
             + "exit\n"
             + "end";
 
