@@ -21,6 +21,7 @@ import io.frinx.cli.unit.ios.bgp.handler.GlobalStateReader;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import org.junit.Assert;
 import org.junit.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpGlobalConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.StateBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
@@ -35,8 +36,14 @@ public class GlobalReadersTest {
             + " address-family ipv4 vrf vrf3\n"
             + "  bgp router-id 10.10.10.30\n";
 
+    private String shRunOutputBgpLog = "router bgp 65333\n"
+            + " bgp log-neighbor-changes\n";
+
+    private String shRunOutputNoBgpLog = "router bgp 65333\n"
+            + " no bgp log-neighbor-changes\n";
+
     @Test
-    public void testGlobal() {
+    public void testGlobal_01() {
         ConfigBuilder configBuilder = new ConfigBuilder();
         GlobalConfigReader.parseConfigAttributes(shRunOutput, configBuilder, new NetworkInstanceKey("vrf3"));
         Assert.assertEquals("10.10.10.30", configBuilder.getRouterId().getValue());
@@ -50,5 +57,20 @@ public class GlobalReadersTest {
         GlobalStateReader.parseGlobal(summOutput, stateBuilder);
         Assert.assertEquals("99.0.0.99", stateBuilder.getRouterId().getValue());
         Assert.assertEquals(Long.valueOf(65000L), stateBuilder.getAs().getValue());
+    }
+
+    @Test
+    public void testGlobal_02() {
+        ConfigBuilder configBuilder = new ConfigBuilder();
+
+        GlobalConfigReader.parseConfigAttributes(shRunOutputBgpLog, configBuilder, NetworInstance.DEFAULT_NETWORK);
+        Assert.assertEquals(Long.valueOf(65333L), configBuilder.getAs().getValue());
+
+        Assert.assertEquals(true, configBuilder.getAugmentation(BgpGlobalConfigAug.class)
+                .isLogNeighborChanges());
+
+        GlobalConfigReader.parseConfigAttributes(shRunOutputNoBgpLog, configBuilder, NetworInstance.DEFAULT_NETWORK);
+        Assert.assertEquals(false, configBuilder.getAugmentation(BgpGlobalConfigAug.class)
+                .isLogNeighborChanges());
     }
 }
