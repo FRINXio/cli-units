@@ -20,6 +20,8 @@ import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
@@ -31,6 +33,7 @@ public class InterfaceConfigReaderTest {
             .setType(EthernetCsmacd.class)
             .setDescription("asd fdsas'; dsa;d;fa'")
             .setMtu(1530)
+            .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder().build())
             .build();
     private static final String SH_INTERFACE_RUN = "interface GigabitEthernet1/0\n"
             + " mtu 1530\n"
@@ -44,6 +47,7 @@ public class InterfaceConfigReaderTest {
     private static final Config EXPECTED_INTERFACE2 = new ConfigBuilder().setEnabled(true)
             .setName("FastEthernet0/0")
             .setType(EthernetCsmacd.class)
+            .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder().build())
             .build();
     private static final String SH_INTERFACE_RUN2 = "interface FastEthernet0/0\n"
             + " ip address 192.168.56.121 255.255.255.0\n"
