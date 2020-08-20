@@ -41,32 +41,57 @@ public class InterfaceConfigWriterTest {
             + "mtu 35\n"
             + "description test desc\n"
             + "no shutdown\n"
-            + "end\n";
+            + "snmp trap link-status\n"
+            + "ip redirects\n"
+            + "ip unreachables\n"
+            + "ip proxy-arp\n"
+            + "end\n"
+            + "\n";
 
     private static final String WRITE_EMPTY_INPUT = "configure terminal\n"
             + "interface Bundle-Ether45\n"
             + "shutdown\n"
-            + "end\n";
+            + "snmp trap link-status\n"
+            + "ip redirects\n"
+            + "ip unreachables\n"
+            + "ip proxy-arp\n"
+            + "end\n"
+            + "\n";
 
     private static final String UPDATE_INPUT = "configure terminal\n"
             + "interface Bundle-Ether45\n"
             + "mtu 50\n"
             + "description updated desc\n"
             + "shutdown\n"
-            + "end\n";
+            + "snmp trap link-status\n"
+            + "ip redirects\n"
+            + "ip unreachables\n"
+            + "ip proxy-arp\n"
+            + "end\n"
+            + "\n";
 
     private static final String UPDATE_CLEAN_INPUT = "configure terminal\n"
             + "interface Bundle-Ether45\n"
             + "no mtu\n"
             + "no description\n"
             + "shutdown\n"
-            + "end\n";
+            + "snmp trap link-status\n"
+            + "ip redirects\n"
+            + "ip unreachables\n"
+            + "ip proxy-arp\n"
+            + "end\n"
+            + "\n";
 
     private static final String UPDATE_SOME_INPUT = "configure terminal\n"
             + "interface Bundle-Ether45\n"
             + "mtu 30\n"
             + "shutdown\n"
-            + "end\n";
+            + "snmp trap link-status\n"
+            + "ip redirects\n"
+            + "ip unreachables\n"
+            + "ip proxy-arp\n"
+            + "end\n"
+            + "\n";
 
     private static final String DELETE_INPUT = "configure terminal\n"
             + "no interface Bundle-Ether45\n"
