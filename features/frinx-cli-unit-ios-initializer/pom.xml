@@ -29,7 +29,7 @@
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-unit-ios-initializer</artifactId>
     <packaging>feature</packaging>
-    <version>4.2.5.rc13-frinx</version>
+    <version>4.2.5.rc14-frinx-SNAPSHOT</version>
     <name>Frinx :: Cli :: Unit :: IOS :: Initializer</name>
 
     <dependencyManagement>
@@ -45,7 +45,7 @@
                 <groupId>io.frinx.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.5.rc13-frinx</version>
+                <version>4.2.5.rc14-frinx-SNAPSHOT</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
