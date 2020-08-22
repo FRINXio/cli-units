@@ -21,12 +21,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>native-unit-parent</artifactId>
-        <version>4.2.5.rc13-frinx-SNAPSHOT</version>
+        <version>4.2.5.rc13-frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>junos-17-native-unit</artifactId>
-    <version>4.2.5.rc13-frinx-SNAPSHOT</version>
+    <version>4.2.5.rc13-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>

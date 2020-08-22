@@ -23,12 +23,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.5.rc13-frinx-SNAPSHOT</version>
+        <version>4.2.5.rc13-frinx</version>
         <relativePath>../unit-parent</relativePath>
     </parent>
 
     <artifactId>network-instance-base</artifactId>
-    <version>4.2.5.rc13-frinx-SNAPSHOT</version>
+    <version>4.2.5.rc13-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
