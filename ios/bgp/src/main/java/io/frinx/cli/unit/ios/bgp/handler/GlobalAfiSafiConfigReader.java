@@ -16,18 +16,41 @@
 
 package io.frinx.cli.unit.ios.bgp.handler;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.GlobalAfiSafiConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.GlobalAfiSafiConfigAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafi;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafiKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.afi.safi.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.afi.safi.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.AFISAFITYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.IPV4UNICAST;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+
+    private static final String SH_AUTO_SUMMARY = "show running-config "
+            + "| include ^router bgp"
+            + "|^  (auto-summary|no auto-summary)"
+            + "|^ *address-family"
+            + "|^  redistribute (connected|static)"
+            + "|^ exit-address-family";
+
+    private static final Pattern AUTO_SUMMARY_PATTERN = Pattern.compile("auto-summary");
+    private static final Pattern REDISTRIBUTE_CON_PATTERN = Pattern.compile("redistribute connected");
+    private static final Pattern REDISTRIBUTE_STAT_PATTERN = Pattern.compile("redistribute static");
 
     private Cli cli;
 
@@ -39,8 +62,71 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                              @Nonnull ConfigBuilder configBuilder,
                                              @Nonnull ReadContext readContext) throws ReadFailedException {
-        AfiSafiKey afiSafiKey = instanceIdentifier.firstKeyOf(AfiSafi.class);
-        configBuilder.setAfiSafiName(afiSafiKey.getAfiSafiName());
+        Class<? extends AFISAFITYPE> afiSafiName = instanceIdentifier.firstKeyOf(AfiSafi.class).getAfiSafiName();
+        NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
+        String output = blockingRead(SH_AUTO_SUMMARY, cli, instanceIdentifier, readContext);
+
+        parseConfig(output, vrfKey, afiSafiName, configBuilder);
     }
 
+    @VisibleForTesting
+    static void parseConfig(String output, NetworkInstanceKey vrfKey, Class<? extends AFISAFITYPE> afiSafiName,
+                            ConfigBuilder configBuilder) {
+        GlobalAfiSafiConfigAugBuilder augBuilder = new GlobalAfiSafiConfigAugBuilder();
+        configBuilder.setAfiSafiName(afiSafiName);
+
+        if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK) && afiSafiName.equals(IPV4UNICAST.class)) {
+            setAutoSummary(augBuilder, output);
+        } else if (afiSafiName.equals(IPV4UNICAST.class)) {
+            setRedistribute(augBuilder, output, vrfKey.getName());
+        }
+
+        configBuilder.addAugmentation(GlobalAfiSafiConfigAug.class, augBuilder.build());
+    }
+
+    private static void setAutoSummary(GlobalAfiSafiConfigAugBuilder builder, String output) {
+        // default value
+        builder.setAutoSummary(false);
+
+        ParsingUtils.parseField(output, 0,
+            AUTO_SUMMARY_PATTERN::matcher,
+            matcher -> matcher.find(),
+            value -> builder.setAutoSummary(true));
+    }
+
+    static void setRedistribute(GlobalAfiSafiConfigAugBuilder builder, String output, String vrfKey) {
+        Pattern pattern = Pattern.compile("address-family.*|redistribute connected|redistribute static"
+                + "|exit-address-family");
+        Pattern startPattern = Pattern.compile("address-family ipv4 vrf " + vrfKey);
+        Pattern endPattern = Pattern.compile("exit-address-family");
+
+        // default values
+        builder.setRedistributeConnected(false);
+        builder.setRedistributeStatic(false);
+
+        List<String> lines = ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .map(pattern::matcher)
+                .filter(Matcher::matches)
+                .map(Matcher::group)
+                .collect(Collectors.toList());
+
+        boolean run = false;
+        for (String line : lines) {
+            if (run) {
+                if (REDISTRIBUTE_CON_PATTERN.matcher(line).matches()) {
+                    builder.setRedistributeConnected(true);
+                }
+                if (REDISTRIBUTE_STAT_PATTERN.matcher(line).matches()) {
+                    builder.setRedistributeStatic(true);
+                }
+            }
+            if (startPattern.matcher(line).matches()) {
+                run = true;
+            }
+            if (endPattern.matcher(line).matches()) {
+                run = false;
+            }
+        }
+    }
 }

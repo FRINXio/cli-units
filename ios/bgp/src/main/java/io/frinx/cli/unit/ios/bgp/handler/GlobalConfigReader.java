@@ -26,6 +26,8 @@ import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpGlobalConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpGlobalConfigAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
@@ -36,13 +38,15 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_SUMM = "show running-config | include ^router bgp|^ *address-family|^ *bgp "
-            + "router-id";
+    private static final String SH_SUMM = "show running-config | include ^router bgp|^ "
+            + "(no bgp log-neighbor-changes|bgp log-neighbor-changes)|^ *address-family|^ *bgp router-id";
+
     private static final Pattern AS_PATTERN = Pattern.compile("router bgp (?<as>\\S*).*");
     private static final Pattern ROUTER_ID_PATTERN_GLOBAL = Pattern.compile("\\s*router bgp (?<as>\\S*)\\s+bgp "
             + "router-id (?<routerId>\\S*).*");
     private static final Pattern ROUTER_ID_PATTERN = Pattern.compile("\\s*address-family (?<family>\\S*) vrf "
             + "(?<vrf>\\S*)\\s+bgp router-id (?<routerId>\\S*).*");
+    private static final Pattern LOG_NEIGHBOR_PATTERN = Pattern.compile("bgp log-neighbor-changes");
 
     private Cli cli;
 
@@ -62,9 +66,14 @@ public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder
 
     @VisibleForTesting
     public static void parseConfigAttributes(String output, ConfigBuilder builder, NetworkInstanceKey vrfKey) {
+        BgpGlobalConfigAugBuilder augBuilder = new BgpGlobalConfigAugBuilder();
+
         parseGlobalAs(output, builder);
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             setGlobalRouterId(builder, output);
+            setBgpLogNeighborChanges(augBuilder, output);
+
+            builder.addAugmentation(BgpGlobalConfigAug.class, augBuilder.build());
         } else {
             setVrfRouterId(builder, output, vrfKey.getName());
         }
@@ -107,4 +116,14 @@ public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder
             (String value) -> configBuilder.setAs(new AsNumber(Long.valueOf(value))));
     }
 
+    @VisibleForTesting
+    static void setBgpLogNeighborChanges(BgpGlobalConfigAugBuilder builder, String output) {
+        // default value
+        builder.setLogNeighborChanges(false);
+
+        ParsingUtils.parseField(output, 0,
+            LOG_NEIGHBOR_PATTERN::matcher,
+            matcher -> matcher.find(),
+            value -> builder.setLogNeighborChanges(true));
+    }
 }

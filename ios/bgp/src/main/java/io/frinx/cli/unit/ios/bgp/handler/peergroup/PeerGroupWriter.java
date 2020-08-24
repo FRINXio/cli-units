@@ -123,7 +123,7 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
 
         NeighborWriter.renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, null, null, null, vrfKey, bgpAs, groupAfiSafi, Collections.emptyMap(), groupId,
-                PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
+                null, null, PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
     }
 
     static Map<String, Object> getAfiSafisForPeerGroup(AfiSafis afiSafis) {
@@ -159,7 +159,7 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
 
         NeighborWriter.renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, before, null, null, vrfKey, bgpAs, groupAfiSafi, groupAfiSafiBefore, groupId,
-                PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
+                null, null, PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
     }
 
     private static boolean afiSafisHaveChanged(final PeerGroup before, final PeerGroup after) {
