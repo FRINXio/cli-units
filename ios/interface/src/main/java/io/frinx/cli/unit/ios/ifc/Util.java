@@ -16,9 +16,22 @@
 
 package io.frinx.cli.unit.ios.ifc;
 
+import com.google.common.collect.HashBiMap;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
 import java.util.Collections;
 import java.util.Set;
+
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.ext.rev190724.SPEEDAUTO;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ETHERNETSPEED;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED100GB;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED100MB;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED10GB;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED10MB;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED1GB;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED25GB;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED40GB;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED50GB;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEEDUNKNOWN;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
@@ -60,4 +73,28 @@ public final class Util {
     public static boolean isPhysicalInterface(Config data) {
         return PHYS_IFC_TYPES.contains(data.getType());
     }
+
+    public static Class<? extends ETHERNETSPEED> parseSpeed(String name) {
+        Class<? extends ETHERNETSPEED> ethernetSpeed = getBiMap().get(name);
+        return ethernetSpeed == null ? SPEEDUNKNOWN.class : ethernetSpeed;
+    }
+
+    public static String getSpeedName(Class<? extends ETHERNETSPEED> ethernetSpeed) {
+        return ethernetSpeed == SPEEDUNKNOWN.class ? "auto" : getBiMap().inverse().get(ethernetSpeed);
+    }
+
+    private static HashBiMap<String, Class<? extends ETHERNETSPEED>> getBiMap() {
+        HashBiMap<String, Class<? extends ETHERNETSPEED>> biMap = HashBiMap.create();
+        biMap.put("10", SPEED10MB.class);
+        biMap.put("100", SPEED100MB.class);
+        biMap.put("1000", SPEED1GB.class);
+        biMap.put("10000", SPEED10GB.class);
+        biMap.put("25000", SPEED25GB.class);
+        biMap.put("40000", SPEED40GB.class);
+        biMap.put("50000", SPEED50GB.class);
+        biMap.put("100000", SPEED100GB.class);
+        biMap.put("auto", SPEEDAUTO.class);
+        return biMap;
+    }
+
 }

@@ -27,6 +27,8 @@ import io.frinx.cli.unit.ios.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceStatisticsConfigReader;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceStatisticsConfigWriter;
+import io.frinx.cli.unit.ios.ifc.handler.ethernet.EthernetConfigReader;
+import io.frinx.cli.unit.ios.ifc.handler.ethernet.EthernetConfigWriter;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceConfigReader;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceConfigWriter;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
@@ -70,6 +72,7 @@ public final class IosInterfaceUnit extends AbstractUnit {
                 IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
                 io.frinx.openconfig.openconfig.vlan.IIDs.FRINX_OPENCONFIG_VLAN,
                 IIDs.FRINX_CISCO_IF_EXTENSION,
+                IIDs.FRINX_IF_ETHERNET_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -106,6 +109,12 @@ public final class IosInterfaceUnit extends AbstractUnit {
         // cisco-if extensions
         writeRegistry.addAfter(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG,
                 new InterfaceStatisticsConfigWriter(cli), IIDs.IN_IN_CONFIG);
+
+        // if-ethernet
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET);
+        writeRegistry.subtreeAddAfter(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli),
+                Sets.newHashSet(IIDs.IN_IN_ET_CO_AUG_CONFIG1),
+                IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -132,5 +141,8 @@ public final class IosInterfaceUnit extends AbstractUnit {
 
         // cisco if-extensions
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG, new InterfaceStatisticsConfigReader(cli));
+
+        // if-ethernet
+        readRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli));
     }
 }
