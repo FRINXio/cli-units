@@ -29,7 +29,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-mikrotik</artifactId>
-    <version>3.1.14.rc22-frinx</version>
+    <version>3.1.14.rc23-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
