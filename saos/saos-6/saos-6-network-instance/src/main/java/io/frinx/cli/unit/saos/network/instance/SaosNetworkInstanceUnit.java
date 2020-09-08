@@ -94,7 +94,8 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NETWORKINSTANCE);
         writeRegistry.subtreeAddBefore(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli),
                 Collections.singleton(IIDs.NE_NE_CO_AUG_VSSAOSAUG),
-                IIDs.NE_NE_VL_VL_CONFIG);
+                IIDs.NE_NE_VL_VL_CONFIG,
+                io.frinx.openconfig.openconfig.qos.IIDs.QO_SC_SCHEDULERPOLICY);
 
         // vlan
         writeRegistry.addNoop(IIDs.NE_NE_VL_VLAN);
