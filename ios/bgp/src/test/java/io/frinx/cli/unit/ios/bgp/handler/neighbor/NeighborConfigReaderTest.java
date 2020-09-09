@@ -19,6 +19,9 @@ package io.frinx.cli.unit.ios.bgp.handler.neighbor;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import org.junit.Assert;
 import org.junit.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSION4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.CommunityType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedPassword;
@@ -33,7 +36,8 @@ public class NeighborConfigReaderTest {
             + " neighbor 1.2.3.4 peer-group group12\n"
             + " neighbor 1.2.3.4 description description\n"
             + " neighbor 1.2.3.4 send-community both\n"
-            + " neighbor 1.2.3.4 activate\n";
+            + " neighbor 1.2.3.4 activate\n"
+            + " neighbor 1.2.3.4 version 4\n";
 
     @Test
     public void testParse() throws Exception {
@@ -46,6 +50,9 @@ public class NeighborConfigReaderTest {
                         .setPeerGroup("group12")
                         .setEnabled(true)
                         .setSendCommunity(CommunityType.BOTH)
+                        .addAugmentation(BgpNeighborConfigAug.class, new BgpNeighborConfigAugBuilder()
+                                .setNeighborVersion(VERSION4.class)
+                                .build())
                         .build(),
                 configBuilder.build());
     }

@@ -39,6 +39,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.verification.VerificationModeFactory;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSION4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupTransportConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflectorBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafiBuilder;
@@ -119,6 +122,8 @@ public class NeighborWriterTest implements CliFormatter {
                 {"neighbor encrypted password", N_EMPTY_WITH_ENCRYPTED_PASSWORD, null,
                     NMIN_WRITE_WITH_ENCRYPTED_PASSWORD, null, NMIN_DELETE_WITH_ENCRYPTED_PASSWORD, EMPTY_BGP_CONFIG,
                     NetworInstance.DEFAULT_NETWORK_NAME},
+                {"neighbor BGP version", N_BGP_VERSION, null, N_WRITE_BGP_VERSION, null, N_DELETE_BGP_VERSION,
+                    EMPTY_BGP_CONFIG, NetworInstance.DEFAULT_NETWORK_NAME},
         });
     }
 
@@ -160,6 +165,7 @@ public class NeighborWriterTest implements CliFormatter {
                 source, null, source.getConfig().isEnabled(), null, id.firstKeyOf(NetworkInstance.class), as,
                 afiSafisForNeighborSource, Collections.emptyMap(),
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), Chunk.TRUE, "10 20 30",
+                NeighborWriter.getNeighborVersion(source), null,
                 NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
         String writeRender = getCommands(writer, false, 1);
@@ -181,6 +187,7 @@ public class NeighborWriterTest implements CliFormatter {
                     after, source, after.getConfig().isEnabled(), source.getConfig().isEnabled(), id.firstKeyOf(
                             NetworkInstance.class), as, afiSafisForNeighborAfter, afiSafisForNeighborSource,
                     NeighborWriter.getNeighborIp(after.getNeighborAddress()), Chunk.TRUE, "30 10 10",
+                    NeighborWriter.getNeighborVersion(after), NeighborWriter.getNeighborVersion(source),
                     NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
             String updateRender = updateAfiSafiRender + "\n" + getCommands(writer, false, 3);
@@ -190,8 +197,8 @@ public class NeighborWriterTest implements CliFormatter {
         NeighborWriter.deleteNeighbor(writer, cli, id,
                 source, id.firstKeyOf(NetworkInstance.class), as, NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
                         NeighborWriter.getAfiSafisForNeighbor(source.getAfiSafis())),
-                NeighborWriter.getNeighborIp(source.getNeighborAddress()), NeighborWriter.NEIGHBOR_GLOBAL_DELETE,
-                NeighborWriter.NEIGHBOR_VRF_DELETE);
+                NeighborWriter.getNeighborIp(source.getNeighborAddress()), NeighborWriter.getNeighborVersion(source),
+                NeighborWriter.NEIGHBOR_GLOBAL_DELETE, NeighborWriter.NEIGHBOR_VRF_DELETE);
 
         String deleteRender = getCommands(writer, true, 1);
         Assert.assertEquals(delete, deleteRender);
@@ -293,6 +300,15 @@ public class NeighborWriterTest implements CliFormatter {
 
     private static final Neighbor N_ALL_REMOVE_AFI_POLICY = new NeighborBuilder(N_ALL)
             .setAfiSafis(getAfiSafiNoPolicy())
+            .build();
+
+    private static final Neighbor N_BGP_VERSION = new NeighborBuilder()
+            .setNeighborAddress(new IpAddress(new Ipv4Address("1.2.3.4")))
+            .setConfig(new ConfigBuilder()
+                    .setNeighborAddress(new IpAddress(new Ipv4Address("1.2.3.4")))
+                    .addAugmentation(BgpNeighborConfigAug.class,
+                            new BgpNeighborConfigAugBuilder().setNeighborVersion(VERSION4.class).build())
+                    .build())
             .build();
 
     private static AfiSafis getAfiSafi() {
@@ -747,5 +763,15 @@ public class NeighborWriterTest implements CliFormatter {
             + "router bgp 484\n"
             + "no neighbor dead:beee::1 peer-group group12\n"
             + "no neighbor dead:beee::1 remote-as 45\n"
+            + "end";
+
+    public static final String N_WRITE_BGP_VERSION = "configure terminal\n"
+            + "router bgp 484\n"
+            + "neighbor 1.2.3.4 version 4\n"
+            + "end";
+
+    public static final String N_DELETE_BGP_VERSION = "configure terminal\n"
+            + "router bgp 484\n"
+            + "no neighbor 1.2.3.4 version\n"
             + "end";
 }
