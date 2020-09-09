@@ -36,6 +36,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BGPVERSION;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSION4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupRouteReflectorConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonStructureNeighborGroupRouteReflector;
@@ -72,7 +76,9 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             + "neighbor {$neighbor_id} password {$neighbor.config.auth_password.plain_string.value}\n"
             + "{% endif %}"
             + "{% elseIf ($before.config.auth_password) %}"
-            + "no neighbor {$neighbor_id} password\n{% endif %}";
+            + "no neighbor {$neighbor_id} password\n{% endif %}"
+            + "{%if ($neighbor_version) %}neighbor {$neighbor_id} version {$neighbor_version}\n"
+            + "{% elseIf ($before_neighbor_version) %}no neighbor {$neighbor_id} version\n{% endif %}";
 
     public static final String NEIGHBOR_RR_CONFIG = "{%if ($route_reflect_client) %}neighbor {$neighbor_id} "
             + "route-reflector-client\n"
@@ -101,7 +107,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
     private static final String NEIGHBOR_DELETE = "{%if ($neighbor.config.peer_group) %}no neighbor {$neighbor_id} "
             + "peer-group {$neighbor.config.peer_group}\n{% endif %}"
             + "{%if ($neighbor.config.peer_as.value) %}no neighbor {$neighbor_id} remote-as {$neighbor.config.peer_as"
-            + ".value}\n{% endif %}";
+            + ".value}\n{% endif %}"
+            + "{%if ($neighbor_version) %}no neighbor {$neighbor_id} version\n{% endif %}";
 
     public static final String NEIGHBOR_TRANSPORT =
             //Set update source
@@ -264,10 +271,12 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, afiSafisForNeighbor);
         String neighborIp = getNeighborIp(instanceIdentifier);
         Boolean enabled = neighbor.getConfig().isEnabled();
+        String version = getNeighborVersion(neighbor);
 
         renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, null, enabled, null, vrfKey, bgpAs, neighAfiSafi, Collections.emptyMap(), neighborIp,
-                getTimers(neighbor) == null ? null : Chunk.TRUE, getTimers(neighbor), NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
+                getTimers(neighbor) == null ? null : Chunk.TRUE, getTimers(neighbor), version, null,
+                NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
     }
 
     private static <T extends DataObject> void renderNeighbor(CliWriter<T> writer, Cli cli,
@@ -298,6 +307,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             String neighborId,
             String isTimers,
             String timers,
+            String neighborVersion,
+            String beforeNeighborVersion,
             String globalTemplate,
             String vrfTemplate)
             throws WriteFailedException.CreateFailedException {
@@ -313,7 +324,9 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     "route_reflect_client", isRouteReflectClient(neighbor),
                     "before_route_reflect_client", isRouteReflectClient(before),
                     "enabled", enabled,
-                    "before_enabled", beforeEnabled);
+                    "before_enabled", beforeEnabled,
+                    "neighbor_version", neighborVersion,
+                    "before_neighbor_version", beforeNeighborVersion);
         } else {
             String vrfName = vrfKey.getName();
             Preconditions.checkArgument(!neighAfiSafi.isEmpty(), "No afi safi defined for neighbor: %s in VRF: %s",
@@ -331,7 +344,9 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     "enabled", enabled,
                     "before_enabled", beforeEnabled,
                     "isTimers", isTimers,
-                    "timers", timers);
+                    "timers", timers,
+                    "neighbor_version", neighborVersion,
+                    "before_neighbor_version", beforeNeighborVersion);
         }
     }
 
@@ -386,6 +401,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             Map<String, Object>
                     neighAfiSafi,
             String neighborId,
+            String neighborVersion,
             String globalTemplate, String vrfTemplate) throws WriteFailedException.DeleteFailedException {
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             deleteNeighbor(writer, cli, globalTemplate, instanceIdentifier,
@@ -393,7 +409,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     "neighbor_id", neighborId,
                     "neighbor", neighbor,
                     "afis", neighAfiSafi,
-                    "route_reflect_client", isRouteReflectClient(neighbor));
+                    "route_reflect_client", isRouteReflectClient(neighbor),
+                    "neighbor_version", neighborVersion);
         } else {
             String vrfName = vrfKey.getName();
             deleteNeighbor(writer, cli, vrfTemplate, instanceIdentifier,
@@ -402,7 +419,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     "neighbor_id", neighborId,
                     "neighbor", neighbor,
                     "afis", neighAfiSafi,
-                    "route_reflect_client", isRouteReflectClient(neighbor));
+                    "route_reflect_client", isRouteReflectClient(neighbor),
+                    "neighbor_version", neighborVersion);
         }
     }
 
@@ -469,6 +487,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         String neighborIp = getNeighborIp(instanceIdentifier);
         Boolean enabled = neighbor.getConfig().isEnabled();
         Boolean beforeEnabled = before.getConfig().isEnabled();
+        String version = getNeighborVersion(neighbor);
+        String beforeVersion = getNeighborVersion(before);
 
         // This is a subtree writer which handles entire neighbor config. This means that if during update an AFI was
         // removed, it has to be detected and deleted here
@@ -480,7 +500,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         // Then update existing attributes
         renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, before, enabled, beforeEnabled, vrfKey, bgpAs, neighAfiSafi, neighAfiSafiBefore, neighborIp,
-                updateTimers(getTimers(before), getTimers(neighbor)), getTimers(neighbor),
+                updateTimers(getTimers(before), getTimers(neighbor)), getTimers(neighbor), version, beforeVersion,
                 NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
     }
 
@@ -507,14 +527,14 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
     }
 
     private static boolean afiSafisHaveChanged(final Neighbor before, final Neighbor after) {
-        final List<AfiSafi> afiSafisBefore = before.getAfiSafis().getAfiSafi();
-        final List<AfiSafi> afiSafisAfter = after.getAfiSafis().getAfiSafi();
+        final AfiSafis afiSafisBefore = before.getAfiSafis();
+        final AfiSafis afiSafisAfter = after.getAfiSafis();
         if (afiSafisBefore == null && afiSafisAfter != null || afiSafisBefore != null && afiSafisAfter == null) {
             return true;
         } else if (afiSafisAfter == null) {
             return false;
         } else {
-            return !(new HashSet<>(afiSafisAfter).equals(new HashSet<>(afiSafisBefore)));
+            return !(new HashSet<>(afiSafisAfter.getAfiSafi()).equals(new HashSet<>(afiSafisBefore.getAfiSafi())));
         }
     }
 
@@ -533,9 +553,10 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         }
         Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, afiSafisForNeighbor);
         String neighborIp = getNeighborIp(instanceIdentifier);
+        String neighborVersion = getNeighborVersion(neighbor);
 
         deleteNeighbor(this, cli, instanceIdentifier, neighbor, vrfKey, bgpAs, neighAfiSafi, neighborIp,
-                NEIGHBOR_GLOBAL_DELETE, NEIGHBOR_VRF_DELETE);
+                neighborVersion, NEIGHBOR_GLOBAL_DELETE, NEIGHBOR_VRF_DELETE);
     }
 
     public static String getNeighborIp(InstanceIdentifier<?> neigh) {
@@ -548,6 +569,17 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                 ?
                 addr.getIpv4Address().getValue() :
                 addr.getIpv6Address().getValue();
+    }
+
+    public static String getNeighborVersion(Neighbor neighbor) {
+        BgpNeighborConfigAug neighborConfigAug = neighbor.getConfig().getAugmentation(BgpNeighborConfigAug.class);
+        if (neighborConfigAug != null) {
+            Class<? extends BGPVERSION> version = neighborConfigAug.getNeighborVersion();
+            if (version == VERSION4.class) {
+                return "4";
+            }
+        }
+        return null;
     }
 
     public static void checkLocalAsAgainstRemoteAsWithinRoutReflector(

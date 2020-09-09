@@ -29,6 +29,12 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BGPVERSION;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSION4;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSIONUNKNOWN;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
@@ -57,6 +63,8 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
             Pattern.compile("neighbor (?<neighborIp>\\S*) description (?<description>.+)");
     private static final Pattern SEND_COMMUNITY_PATTERN =
             Pattern.compile("neighbor (?<neighborIp>\\S*) send-community (?<community>.+)");
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile("neighbor (?<neighborIp>\\S*) version (?<version>.+)");
     private static final Pattern PASSWORD_REGEX_FORM = Pattern.compile("^([\\d] )\\S+$");
 
     private final Cli cli;
@@ -105,6 +113,7 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
         setPeerGroup(configBuilder, output);
         setDescription(configBuilder, output);
         setCommunity(configBuilder, output);
+        setNeighborVersion(configBuilder, output);
     }
 
     private static void parseVrf(ConfigBuilder configBuilder, String vrfName, String[] output) {
@@ -148,6 +157,15 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
                         .toUpperCase())));
     }
 
+    private static void setNeighborVersion(ConfigBuilder configBuilder, String defaultInstance) {
+        ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, VERSION_PATTERN::matcher,
+            m -> findGroup(m, "version"),
+            groupsHashMap -> configBuilder.addAugmentation(BgpNeighborConfigAug.class,
+                    new BgpNeighborConfigAugBuilder()
+                            .setNeighborVersion(parseBgpVersion(groupsHashMap.get("version")))
+                            .build()));
+    }
+
     private static String preprocessOutput(String defaultInstance) {
         return defaultInstance
                 .replaceAll(" neighbor", "\n neighbor")
@@ -174,5 +192,9 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
             return new EncryptedPassword(new EncryptedString(String.format(PASSWORD_FORM, password)));
         }
         return new EncryptedPassword(new PlainString(password));
+    }
+
+    private static Class<? extends BGPVERSION> parseBgpVersion(String name) {
+        return (name.equals("4")) ? VERSION4.class : VERSIONUNKNOWN.class;
     }
 }
