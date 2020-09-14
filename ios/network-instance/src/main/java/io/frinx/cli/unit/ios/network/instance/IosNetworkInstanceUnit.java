@@ -28,6 +28,9 @@ import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigReade
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceStateReader;
+import io.frinx.cli.unit.ios.network.instance.handler.vlan.VlanConfigReader;
+import io.frinx.cli.unit.ios.network.instance.handler.vlan.VlanConfigWriter;
+import io.frinx.cli.unit.ios.network.instance.handler.vlan.VlanReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.ifc.VrfInterfaceWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.protocol.ProtocolConfigReader;
@@ -113,6 +116,11 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
                 /*add after protocol writers*/
                 IIDs.NE_NE_PR_PR_CONFIG, IIDs.NE_NE_PR_PR_BG_GL_CONFIG, IIDs.NE_NE_PR_PR_OS_GL_CONFIG);
 
+        // VLAN
+        writeRegistry.addNoop(IIDs.NE_NE_VL_VLAN);
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
+                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1, IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2),
+                IIDs.NE_NE_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -149,6 +157,11 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
                         IIDs.NE_NE_CO_CO_EN_EN_REMOTE,
                         IIDs.NE_NE_CO_CO_EN_EN_RE_CONFIG,
                         IIDs.NE_NE_CO_CO_EN_EN_RE_STATE));
+
+        // VLAN
+        readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
+        readRegistry.subtreeAdd(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli),
+                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1, IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2));
     }
 
     @Override
