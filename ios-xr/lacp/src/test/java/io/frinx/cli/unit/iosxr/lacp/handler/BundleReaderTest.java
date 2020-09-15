@@ -30,13 +30,15 @@ public class BundleReaderTest {
     private static final String SHOW_RUN_INTERFACES_LIST = "Wed Oct 31 16:37:56.954 UTC\n"
             + "interface Bundle-Ether1\n"
             + "interface Bundle-Ether100\n"
+            + "interface Bundle-Ether100.55\n"
             + "interface MgmtEth0/0/CPU0/0\n"
             + "interface GigabitEthernet0/0/0/0\n"
             + "interface GigabitEthernet0/0/0/1\n"
             + "interface GigabitEthernet0/0/0/2\n"
             + "interface GigabitEthernet0/0/0/3\n"
             + "interface GigabitEthernet0/0/0/4\n"
-            + "interface GigabitEthernet0/0/0/5\n";
+            + "interface GigabitEthernet0/0/0/5\n"
+            + "interface GigabitEthernet0/0/0/0.24\n";
 
     private static final String SHOW_RUN_BUNDLES_LIST = "Mon Nov 26 09:41:54.916 UTC\n"
             + " bundle id 100 mode on\n"

@@ -21,6 +21,7 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxr.ifc.handler.aggregate.AggregateConfigReader;
 import io.frinx.cli.unit.iosxr.ifc.handler.ethernet.EthernetConfigReader;
+import io.frinx.cli.unit.iosxr.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ public class BundleReader implements CliConfigListReader<Interface, InterfaceKey
             String::new
         ).stream()
                 .filter(new AggregateConfigReader(cli)::isLAGInterface)
+                .filter(name -> !SubinterfaceReader.isSubinterface(name))
                 .map(InterfaceKey::new)
                 .collect(Collectors.toCollection(HashSet::new));
     }
