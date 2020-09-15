@@ -59,7 +59,7 @@ public class MemberReader implements CliConfigListReader<Member, MemberKey, Memb
     static List<MemberKey> parseMemberKeys(@Nonnull String commandOutput, @Nonnull String bundleName) {
         final String bundleId = parseBundleIdFromBundleName(bundleName);
         final Pattern specificBundlePattern = Pattern.compile("\\s*bundle id " + bundleId
-                + "( mode (?<mode>active|passive))?.*");
+                + " mode (?<mode>active|passive|on).*");
         return INTERFACE_LINE_SEPARATOR.splitAsStream(commandOutput)
                 .filter(interfaceConfig -> isItIsInterfaceOfBundle(specificBundlePattern, interfaceConfig))
                 .map(MemberReader::parseInterfaceName)
