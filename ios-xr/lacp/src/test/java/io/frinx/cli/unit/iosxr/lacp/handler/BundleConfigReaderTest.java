@@ -32,10 +32,17 @@ public class BundleConfigReaderTest {
             + " lacp period short\n"
             + "!\n";
 
+    private static final String TEST_BUNDLE_EMPTY_CONFIG = TEST_BUNDLE_NAME + "\n";
+
     private static final Config EXPECTED_CONFIGURATION = new ConfigBuilder()
             .setLacpMode(LacpActivityType.ACTIVE)
             .setInterval(LacpPeriodType.FAST)
             .setName(TEST_BUNDLE_NAME)
+            .build();
+
+    private static final Config EXPECTED_EMPTY_CONFIGURATION = new ConfigBuilder()
+            .setName(TEST_BUNDLE_NAME)
+            .setInterval(LacpPeriodType.SLOW)
             .build();
 
     @Test
@@ -43,5 +50,10 @@ public class BundleConfigReaderTest {
         ConfigBuilder configBuilder = new ConfigBuilder();
         BundleConfigReader.readConfiguration(TEST_BUNDLE_NAME, TEST_BUNDLE_CONFIG, configBuilder);
         Assert.assertEquals(EXPECTED_CONFIGURATION, configBuilder.build());
+
+        configBuilder = new ConfigBuilder();
+        BundleConfigReader.readConfiguration(TEST_BUNDLE_NAME, TEST_BUNDLE_EMPTY_CONFIG, configBuilder);
+        Assert.assertEquals(EXPECTED_EMPTY_CONFIGURATION, configBuilder.build());
+
     }
 }
