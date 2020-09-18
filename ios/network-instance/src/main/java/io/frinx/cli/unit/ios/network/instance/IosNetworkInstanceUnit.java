@@ -28,6 +28,9 @@ import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigReade
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceStateReader;
+import io.frinx.cli.unit.ios.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceConfigReader;
+import io.frinx.cli.unit.ios.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceConfigWriter;
+import io.frinx.cli.unit.ios.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vlan.VlanConfigReader;
 import io.frinx.cli.unit.ios.network.instance.handler.vlan.VlanConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.vlan.VlanReader;
@@ -121,6 +124,13 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
                 Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1, IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2),
                 IIDs.NE_NE_CONFIG);
+        // PF
+        writeRegistry.addNoop(IIDs.NE_NE_PO_IN_INTERFACE);
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_PO_IN_IN_CO_AUG_NIPFIFCISCOAUG),
+                /*handle after sub-ifc configuration*/
+                io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
+
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -158,6 +168,10 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
                         IIDs.NE_NE_CO_CO_EN_EN_RE_CONFIG,
                         IIDs.NE_NE_CO_CO_EN_EN_RE_STATE));
 
+        // Policy Forwarding
+        readRegistry.add(IIDs.NE_NE_PO_IN_INTERFACE, new PolicyForwardingInterfaceReader(cli));
+        readRegistry.add(IIDs.NE_NE_PO_IN_IN_CONFIG, new PolicyForwardingInterfaceConfigReader(cli));
+
         // VLAN
         readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
         readRegistry.subtreeAdd(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli),
@@ -166,6 +180,7 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE);
+        return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE,
+                IIDs.FRINX_CISCO_PF_INTERFACES_EXTENSION);
     }
 }
