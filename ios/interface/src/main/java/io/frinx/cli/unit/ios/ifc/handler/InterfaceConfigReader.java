@@ -20,11 +20,14 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigReader;
 import io.frinx.cli.unit.ios.ifc.Util;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig.SwitchportMode;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
@@ -45,8 +48,10 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     public static final Pattern SWITCHPORT_MODE_LINE = Pattern.compile("\\s*switchport mode (?<mode>.+)");
     public static final Pattern SWITCHPORT_ACCESS_VLAN_LINE =
             Pattern.compile("\\s*switchport access vlan (?<switchportVlan>\\d+)");
-    public static final Pattern SWITCHPORT_TRUNK_ALLOWED_VLAN_ADD_LINE =
+    public static final Pattern SWITCHPORT_TRUNK_ALLOWED_VLAN_LINE =
             Pattern.compile("\\s*switchport trunk allowed vlan (?<allowedVlan>.+)");
+    public static final Pattern SWITCHPORT_TRUNK_ALLOWED_VLAN_ADD_LINE =
+            Pattern.compile("\\s*switchport trunk allowed vlan add (?<allowedVlan>.+)");
     public static final Pattern SERVICE_POLICY_INPUT_LINE = Pattern.compile("\\s*service-policy input (?<input>.+)");
     public static final Pattern SERVICE_POLICY_OUTPUT_LINE = Pattern.compile("\\s*service-policy output (?<output>.+)");
     public static final Pattern NO_IP_REDIRECTS_LINE = Pattern.compile("\\s*no ip redirects");
@@ -84,6 +89,12 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
             switch (modeVolue.get()) {
                 case "trunk":
                     switchportMode = SwitchportMode.Trunk;
+                    break;
+                case "access":
+                    switchportMode = SwitchportMode.Access;
+                    break;
+                case "dot1q-tunnel":
+                    switchportMode = SwitchportMode.Dot1qTunnel;
                     break;
                 default:
                     throw new IllegalArgumentException("Cannot parse switchport mode value: " + modeVolue.get());
@@ -146,15 +157,45 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
 
     private void setSwitchportTrunkAllowedVlanAdd(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
         Optional<String> allowedValues = ParsingUtils.parseField(output, 0,
+            SWITCHPORT_TRUNK_ALLOWED_VLAN_LINE::matcher,
+            matcher -> matcher.group("allowedVlan"));
+
+        if (allowedValues.isPresent()) {
+            List<Long> list = getSwitchportTrunkAllowedVlanList(allowedValues);
+            ifCiscoExtAugBuilder.setSwitchportTrunkAllowedVlanAdd(list);
+        }
+
+        allowedValues = ParsingUtils.parseField(output, 0,
             SWITCHPORT_TRUNK_ALLOWED_VLAN_ADD_LINE::matcher,
             matcher -> matcher.group("allowedVlan"));
 
         if (allowedValues.isPresent()) {
-            List<Long> list = Arrays.asList(allowedValues.get().split(","))
-                    .stream()
-                    .map(Long::parseLong)
-                    .collect(Collectors.toList());
-            ifCiscoExtAugBuilder.setSwitchportTrunkAllowedVlanAdd(list);
+            List<Long> list = getSwitchportTrunkAllowedVlanList(allowedValues);
+            ifCiscoExtAugBuilder.setSwitchportTrunkAllowedVlanAdd(
+                    Stream.concat(ifCiscoExtAugBuilder.getSwitchportTrunkAllowedVlanAdd().stream(), list.stream())
+                    .collect(Collectors.toList()));
+        }
+    }
+
+    private List<Long> getSwitchportTrunkAllowedVlanList(Optional<String> allowedValues) {
+        ArrayList<String> vlanStrings = new ArrayList<>(Arrays.asList(allowedValues.get().split(",")));
+        splitMultipleVlans(vlanStrings);
+        return vlanStrings
+                .stream()
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
+
+    private void splitMultipleVlans(ArrayList<String> vlanStrings) {
+        for (int index = 0; index < vlanStrings.size(); index++) {
+            if (vlanStrings.get(index).contains("-")) {
+                List<Integer> list = Arrays.stream(vlanStrings.get(index).split("-"))
+                        .map(Integer::parseInt)
+                        .collect(Collectors.toList());
+                IntStream stream = IntStream.range(list.get(0), list.get(1) + 1);
+                stream.forEach(i -> vlanStrings.add(String.valueOf(i)));
+                vlanStrings.remove(vlanStrings.get(index));
+            }
         }
     }
 
