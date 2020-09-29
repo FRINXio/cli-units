@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public final class SubinterfaceReader extends AbstractSubinterfaceReader {
 
     public static final String SEPARATOR = ".";
-    private static final Pattern SUBINTERFACE_NAME = Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
+    public static final Pattern SUBINTERFACE_NAME = Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
 
     private InterfaceReader ifaceReader;
     private Ipv4ConfigReader v4reader;
@@ -82,7 +82,7 @@ public final class SubinterfaceReader extends AbstractSubinterfaceReader {
             .collect(Collectors.toList());
     }
 
-    private boolean isSubinterface(String ifcName) {
+    public static boolean isSubinterface(String ifcName) {
         return SUBINTERFACE_NAME.matcher(ifcName).matches();
     }
 
