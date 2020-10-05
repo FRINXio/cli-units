@@ -28,6 +28,7 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -45,8 +46,16 @@ public class PortReader implements CliConfigListReader<Interface, InterfaceKey, 
 
     public static final String SH_PORTS = "configuration search string \" port \"";
     public static final String LAG_PORTS = "configuration search string \"aggregation create\"";
-    private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\S+).*");
+    private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id1>\\d+)/(?<id2>\\d+).*");
+    private static final Pattern INTERFACE_NAME_ID_LINE = Pattern.compile(".*port (?<id>[A-Z]{2}\\S+[^, \n]).*");
+    private static final Pattern LAST_INTERFACE_ID_LINE = Pattern.compile(".*,(?<id1>\\d+)/(?<id2>\\d+).*");
     private static final Pattern LAG_INTERFACE_ID_LINE = Pattern.compile(".*agg (?<id>\\S+)");
+    private static final Pattern INTERFACE_RANGE_ID_LINE =
+            Pattern.compile(".*port (?<id1>\\d+)/(?<id2>\\d+)-(?<id3>\\d+)/(?<id4>\\d+).*");
+    private static final Pattern NEXT_RANGE_ID_LINE =
+            Pattern.compile(".*,(?<id1>\\d+)/(?<id2>\\d+)-(?<id3>\\d+)/(?<id4>\\d+),\\d+.*");
+    private static final Pattern LAST_RANGE_ID_LINE =
+            Pattern.compile(".*,(?<id1>\\d+)/(?<id2>\\d+)-(?<id3>\\d+)/(?<id4>\\d+).*");
 
     public static Check ethernetCheck = BasicCheck.checkData(
             ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
@@ -76,20 +85,75 @@ public class PortReader implements CliConfigListReader<Interface, InterfaceKey, 
 
         String portOutput = reader.blockingRead(SH_PORTS, cli, id, context);
         String lagOutput = reader.blockingRead(LAG_PORTS, cli, id, context);
-
-        List<Pattern> patterns = Arrays.asList(INTERFACE_ID_LINE, LAG_INTERFACE_ID_LINE);
-
-        return ParsingUtils.NEWLINE.splitAsStream(portOutput.concat(lagOutput))
+        String output = portOutput.concat(lagOutput);
+        List<Pattern> patterns = Arrays.asList(LAST_INTERFACE_ID_LINE, INTERFACE_ID_LINE);
+        List<InterfaceKey> allIds = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(l -> !l.startsWith("lldp"))
                 .filter(l -> !l.startsWith("port tdm"))
                 .map(line -> patterns.stream().map(pattern -> pattern.matcher(line))
+                        .filter(Matcher::matches)
+                        .map(matcher -> (matcher.group("id1") + "/" + matcher.group("id2")))
+                        .findFirst()
+                        .map(InterfaceKey::new)
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        List<Pattern> patterns1 = Arrays.asList(INTERFACE_NAME_ID_LINE, LAG_INTERFACE_ID_LINE);
+        allIds.addAll(ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .filter(l -> !l.startsWith("lldp"))
+                .filter(l -> !l.startsWith("port tdm"))
+                .map(line -> patterns1.stream().map(pattern -> pattern.matcher(line))
                         .filter(Matcher::matches)
                         .map(matcher -> matcher.group("id"))
                         .filter(Objects::nonNull)
                         .findFirst()
                         .map(InterfaceKey::new)
                         .orElse(null))
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList()));
+        List<Pattern> patterns2 = Arrays.asList(INTERFACE_RANGE_ID_LINE, NEXT_RANGE_ID_LINE, LAST_RANGE_ID_LINE);
+        allIds.addAll(ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .filter(l -> !l.startsWith("lldp"))
+                .filter(l -> !l.startsWith("port tdm"))
+                .flatMap(line -> patterns2.stream().map(pattern -> pattern.matcher(line))
+                        .filter(Matcher::matches)
+                        .map(PortReader::getRangeOffIds)
+                        .flatMap(List::stream))
+                .distinct()
+                .collect(Collectors.toList()));
+        return allIds.stream().distinct().collect(Collectors.toList());
+    }
+
+    @VisibleForTesting
+    public static List<InterfaceKey> getRangeOffIds(Matcher matcher) {
+        List<String> rangeIds = new ArrayList<>();
+        if (matcher.groupCount() == 4) {
+            int id1 = Integer.parseInt(matcher.group("id1"));
+            int id2 = Integer.parseInt(matcher.group("id2"));
+            int id3 = Integer.parseInt(matcher.group("id3"));
+            int id4 = Integer.parseInt(matcher.group("id4"));
+            if (id3 > id1 || (id3 == id1 && id4 > id2)) {
+                while ((id3 > id1) || (id4 >= id2)) {
+                    rangeIds.add(id1 + "/" + id2);
+                    if (id2 == 20) {
+                        id2 = 1;
+                        id1++;
+                    } else {
+                        id2++;
+                    }
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid range for ports set: " + id1 + "/"
+                        + id2 + " - " + id3 + "/" + id4);
+            }
+        }
+        return rangeIds.stream()
+                .map(InterfaceKey::new)
                 .distinct()
                 .collect(Collectors.toList());
     }
@@ -105,4 +169,3 @@ public class PortReader implements CliConfigListReader<Interface, InterfaceKey, 
         return BasicCheck.emptyCheck();
     }
 }
-

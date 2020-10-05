@@ -24,8 +24,10 @@ import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,9 +41,12 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
 
     public static final String SH_PORTS = "configuration search string \"port \"";
     public static final String LAG_PORTS = "configuration search string \"aggregation create\"";
-    private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\S+).*");
+    private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\d+)($|\\s).*");
+    private static final Pattern LAST_INTERFACE_ID_LINE = Pattern.compile(".*,(?<id>\\d+)($|\\s).*");
     private static final Pattern LAG_INTERFACE_ID_LINE = Pattern.compile(".*agg (?<id>\\S+)");
-
+    private static final Pattern INTERFACE_RANGE_ID_LINE = Pattern.compile(".*port (?<id1>\\d+)-(?<id2>\\d+).*");
+    private static final Pattern NEXT_RANGE_ID_LINE = Pattern.compile(".*,(?<id1>\\d+)-(?<id2>\\d+),\\d+.*");
+    private static final Pattern LAST_RANGE_ID_LINE = Pattern.compile(".*,(?<id1>\\d+)-(?<id2>\\d+)[ \n].*");
     private Cli cli;
 
     public InterfaceReader(Cli cli) {
@@ -62,9 +67,8 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
 
     @VisibleForTesting
     public List<InterfaceKey> getAllIds(String output) {
-        List<Pattern> patterns = Arrays.asList(INTERFACE_ID_LINE, LAG_INTERFACE_ID_LINE);
-
-        return ParsingUtils.NEWLINE.splitAsStream(output)
+        List<Pattern> patterns = Arrays.asList(INTERFACE_ID_LINE, LAST_INTERFACE_ID_LINE, LAG_INTERFACE_ID_LINE);
+        List<InterfaceKey> allIds = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
                 .filter(l -> !l.startsWith("lldp"))
                 .filter(l -> !l.startsWith("port tdm"))
@@ -75,6 +79,41 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
                         .findFirst()
                         .map(InterfaceKey::new)
                         .orElse(null))
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        List<Pattern> patterns2 = Arrays.asList(INTERFACE_RANGE_ID_LINE, NEXT_RANGE_ID_LINE, LAST_RANGE_ID_LINE);
+        allIds.addAll(ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .filter(l -> !l.startsWith("lldp"))
+                .filter(l -> !l.startsWith("port tdm"))
+                .flatMap(line -> patterns2.stream().map(pattern -> pattern.matcher(line))
+                        .filter(Matcher::matches)
+                        .map(InterfaceReader::getRangeOffIds)
+                        .flatMap(List::stream))
+                .distinct()
+                .collect(Collectors.toList()));
+        return allIds.stream().distinct().collect(Collectors.toList());
+    }
+
+    @VisibleForTesting
+    public static List<InterfaceKey> getRangeOffIds(Matcher matcher) {
+        Set<Integer> rangeIds = new HashSet<>();
+        if (matcher.groupCount() == 2) {
+            int id1 = Integer.parseInt(matcher.group("id1"));
+            int id2 = Integer.parseInt(matcher.group("id2"));
+            if (id2 > id1) {
+                for (int i = id1; i <= id2; i++) {
+                    rangeIds.add(i);
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid range for ports set: " + id1 + "-" + id2);
+            }
+        }
+        return rangeIds.stream()
+                .sorted()
+                .map((Integer ids) -> Integer.toString(ids))
+                .map(InterfaceKey::new)
                 .distinct()
                 .collect(Collectors.toList());
     }
