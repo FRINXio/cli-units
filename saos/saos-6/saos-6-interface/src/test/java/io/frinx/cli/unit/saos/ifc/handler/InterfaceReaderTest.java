@@ -95,11 +95,15 @@ public class InterfaceReaderTest {
     public static final String OUTPUT_1 =
             "port set port 1-5,100 speed hundred auto-neg off mode rj45\n"
                     + "port set port 5-6,9-12 max-frame-size 9000 ingress-to-egress-qmap NNI-NNI\n"
+                    + "vlan create vlan 114 hundred\n"
+                    + "vlan create vlan 114,191-193 sd\n"
+                    + "vlan add vlan 127,190 port LS02W\n"
                     + "port set port 15-20,101 mode rj45\n";
 
     public static final String OUTPUT_2 =
             "port set port 1-5 speed hundred auto-neg off mode rj45\n"
                     + "port set port 4-7,9-12,54-59 max-frame-size 9000\n"
+                    + "vlan create vlan 114,191-193 hundred\n"
                     + "port set port 5-6,10-12,25 max-frame-size";
 
     private static final List<InterfaceKey> IDS_EXPECTED = Lists.newArrayList("1", "2", "3", "4", "5", "6",

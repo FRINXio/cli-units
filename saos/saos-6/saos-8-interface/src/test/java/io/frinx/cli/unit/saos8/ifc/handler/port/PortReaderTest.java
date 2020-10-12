@@ -66,6 +66,7 @@ public class PortReaderTest {
             + "port set port 2/10 speed gigabit auto-neg on\n"
             + "port set port 2/9 speed gigabit\n"
             + "port set port 3/2 auto-neg on\n"
+            + "vlan create vlan 114,191-193 on\n"
             + "aggregation add agg LP02 port 2/2\n"
             + "aggregation add agg LS02E port 2/3\n"
             + "aggregation add agg LP01 port 2/5\n"
@@ -100,10 +101,13 @@ public class PortReaderTest {
 
     public static final String SH_RANGE_INTERFACE =
             "port set port 1/1-1/5 max-frame-size 9216\n"
+                    + "vlan create vlan 114,3/5-3/7 on\n"
+                    + "vlan add vlan 127,190 port 1/1\n"
                     + "port set port 1/18-2/3\n";
 
     public static final String SH_DOUBLE_RANGE_INTERFACE =
             "port set port 1/1-1/5,2/3-2/8\n"
+                    + "vlan create vlan 114,3/5-3/7 on\n"
                     + "port set port 1/18-2/3,3/9 max-frame-size 9216\n";
 
     public static final String SH_TRIPLE_RANGE_INTERFACE =

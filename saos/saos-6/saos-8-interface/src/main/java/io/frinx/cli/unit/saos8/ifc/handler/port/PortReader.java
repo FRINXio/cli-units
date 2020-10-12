@@ -48,14 +48,14 @@ public class PortReader implements CliConfigListReader<Interface, InterfaceKey, 
     public static final String LAG_PORTS = "configuration search string \"aggregation create\"";
     private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id1>\\d+)/(?<id2>\\d+).*");
     private static final Pattern INTERFACE_NAME_ID_LINE = Pattern.compile(".*port (?<id>[A-Z]{2}\\S+[^, \n]).*");
-    private static final Pattern LAST_INTERFACE_ID_LINE = Pattern.compile(".*,(?<id1>\\d+)/(?<id2>\\d+).*");
+    private static final Pattern LAST_INTERFACE_ID_LINE = Pattern.compile(".*port.*,(?<id1>\\d+)/(?<id2>\\d+).*");
     private static final Pattern LAG_INTERFACE_ID_LINE = Pattern.compile(".*agg (?<id>\\S+)");
     private static final Pattern INTERFACE_RANGE_ID_LINE =
             Pattern.compile(".*port (?<id1>\\d+)/(?<id2>\\d+)-(?<id3>\\d+)/(?<id4>\\d+).*");
     private static final Pattern NEXT_RANGE_ID_LINE =
-            Pattern.compile(".*,(?<id1>\\d+)/(?<id2>\\d+)-(?<id3>\\d+)/(?<id4>\\d+),\\d+.*");
+            Pattern.compile(".*port.*,(?<id1>\\d+)/(?<id2>\\d+)-(?<id3>\\d+)/(?<id4>\\d+),\\d+.*");
     private static final Pattern LAST_RANGE_ID_LINE =
-            Pattern.compile(".*,(?<id1>\\d+)/(?<id2>\\d+)-(?<id3>\\d+)/(?<id4>\\d+).*");
+            Pattern.compile(".*port.*,(?<id1>\\d+)/(?<id2>\\d+)-(?<id3>\\d+)/(?<id4>\\d+).*");
 
     public static Check ethernetCheck = BasicCheck.checkData(
             ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
@@ -91,6 +91,7 @@ public class PortReader implements CliConfigListReader<Interface, InterfaceKey, 
                 .map(String::trim)
                 .filter(l -> !l.startsWith("lldp"))
                 .filter(l -> !l.startsWith("port tdm"))
+                .filter(l -> (l.contains("port") || l.contains("agg")))
                 .map(line -> patterns.stream().map(pattern -> pattern.matcher(line))
                         .filter(Matcher::matches)
                         .map(matcher -> (matcher.group("id1") + "/" + matcher.group("id2")))
@@ -105,6 +106,7 @@ public class PortReader implements CliConfigListReader<Interface, InterfaceKey, 
                 .map(String::trim)
                 .filter(l -> !l.startsWith("lldp"))
                 .filter(l -> !l.startsWith("port tdm"))
+                .filter(l -> (l.contains("port") || l.contains("agg")))
                 .map(line -> patterns1.stream().map(pattern -> pattern.matcher(line))
                         .filter(Matcher::matches)
                         .map(matcher -> matcher.group("id"))
@@ -120,6 +122,7 @@ public class PortReader implements CliConfigListReader<Interface, InterfaceKey, 
                 .map(String::trim)
                 .filter(l -> !l.startsWith("lldp"))
                 .filter(l -> !l.startsWith("port tdm"))
+                .filter(l -> (l.contains("port") || l.contains("agg")))
                 .flatMap(line -> patterns2.stream().map(pattern -> pattern.matcher(line))
                         .filter(Matcher::matches)
                         .map(PortReader::getRangeOffIds)

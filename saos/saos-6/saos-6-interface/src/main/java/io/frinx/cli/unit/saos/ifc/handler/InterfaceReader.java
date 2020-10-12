@@ -42,11 +42,11 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
     public static final String SH_PORTS = "configuration search string \"port \"";
     public static final String LAG_PORTS = "configuration search string \"aggregation create\"";
     private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\d+)($|\\s).*");
-    private static final Pattern LAST_INTERFACE_ID_LINE = Pattern.compile(".*,(?<id>\\d+)($|\\s).*");
+    private static final Pattern LAST_INTERFACE_ID_LINE = Pattern.compile(".*port.*,(?<id>\\d+)($|\\s).*");
     private static final Pattern LAG_INTERFACE_ID_LINE = Pattern.compile(".*agg (?<id>\\S+)");
     private static final Pattern INTERFACE_RANGE_ID_LINE = Pattern.compile(".*port (?<id1>\\d+)-(?<id2>\\d+).*");
-    private static final Pattern NEXT_RANGE_ID_LINE = Pattern.compile(".*,(?<id1>\\d+)-(?<id2>\\d+),\\d+.*");
-    private static final Pattern LAST_RANGE_ID_LINE = Pattern.compile(".*,(?<id1>\\d+)-(?<id2>\\d+)[ \n].*");
+    private static final Pattern NEXT_RANGE_ID_LINE = Pattern.compile(".*port.*,(?<id1>\\d+)-(?<id2>\\d+),\\d+.*");
+    private static final Pattern LAST_RANGE_ID_LINE = Pattern.compile(".*port.*,(?<id1>\\d+)-(?<id2>\\d+)[ \n].*");
     private Cli cli;
 
     public InterfaceReader(Cli cli) {
@@ -72,6 +72,7 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
                 .map(String::trim)
                 .filter(l -> !l.startsWith("lldp"))
                 .filter(l -> !l.startsWith("port tdm"))
+                .filter(l -> (l.contains("port") || l.contains("agg")))
                 .map(line -> patterns.stream().map(pattern -> pattern.matcher(line))
                         .filter(Matcher::matches)
                         .map(matcher -> matcher.group("id"))
@@ -87,6 +88,7 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
                 .map(String::trim)
                 .filter(l -> !l.startsWith("lldp"))
                 .filter(l -> !l.startsWith("port tdm"))
+                .filter(l -> (l.contains("port") || l.contains("agg")))
                 .flatMap(line -> patterns2.stream().map(pattern -> pattern.matcher(line))
                         .filter(Matcher::matches)
                         .map(InterfaceReader::getRangeOffIds)
