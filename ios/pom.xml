@@ -46,6 +46,7 @@
         <module>configuration-metadata</module>
         <module>acl</module>
         <module>init</module>
+        <module>qos</module>
     </modules>
   <build>
     <plugins>
