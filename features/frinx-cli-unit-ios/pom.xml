@@ -104,6 +104,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>ios-acl-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-qos-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>
