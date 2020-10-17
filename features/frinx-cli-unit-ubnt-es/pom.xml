@@ -27,7 +27,7 @@
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-unit-ubnt-es</artifactId>
     <packaging>feature</packaging>
-    <version>4.2.5.rc23-frinx-SNAPSHOT</version>
+    <version>4.2.5.rc23-frinx</version>
     <name>Frinx :: Cli :: Unit :: UBNT :: ES</name>
 
     <dependencyManagement>
@@ -43,7 +43,7 @@
                 <groupId>io.frinx.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.5.rc23-frinx-SNAPSHOT</version>
+                <version>4.2.5.rc23-frinx</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
