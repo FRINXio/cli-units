@@ -61,33 +61,11 @@ public class PortReaderTest {
             + "port set port LM01W max-frame-size 9216\n"
             + "port set port LS01E max-frame-size 9216\n"
             + "port set port LS02E max-frame-size 9216\n"
-            + "port set port LP02 max-frame-size 9216\n"
-            + "port set port 2/3 speed ten-gig\n"
-            + "port set port 2/10 speed gigabit auto-neg on\n"
-            + "port set port 2/9 speed gigabit\n"
-            + "port set port 3/2 auto-neg on\n"
-            + "vlan create vlan 114,191-193 on\n"
-            + "aggregation add agg LP02 port 2/2\n"
-            + "aggregation add agg LS02E port 2/3\n"
+            + "lldp set port 1-5 notification on\n"
+            + "port set port LS02E max-frame-size 9216\n"
+            + "port set port 1001 max-frame-size 9216\n"
             + "aggregation add agg LP01 port 2/5\n"
-            + "aggregation add agg LP01 port 2/6\n"
-            + "aggregation add agg LM01E port 2/9\n"
-            + "aggregation add agg LM01W port 2/11\n"
-            + "aggregation add agg LS01E port 3/1\n"
-            + "aggregation add agg JMEP port 3/7\n"
-            + "aggregation set port 3/6 agg-mode manual\n"
-            + "lldp set port 1/1-1/2 notification on\n"
-            + "lldp set port 2/1-2/20 notification on\n"
-            + "lldp set port 3/1-3/20 notification on\n"
-            + "snmp port-traps disable port 3/5 all\n"
-            + "snmp port-traps disable port 3/5 link-up-down-trap enhanced\n"
-            + "snmp port-traps disable port 3/5 link-up-down-trap standard\n"
-            + "snmp port-traps disable port 3/6 all\n"
-            + "snmp port-traps disable port 3/6 link-up-down-trap enhanced\n"
-            + "snmp port-traps disable port 3/6 link-up-down-trap standard\n"
-            + "snmp port-traps disable port JMEP all\n"
-            + "snmp port-traps disable port JMEP link-up-down-trap enhanced\n"
-            + "snmp port-traps disable port JMEP link-up-down-trap standard\n";
+            + "aggregation add agg LP01 port 2/6\n";
 
     private static final String SH_AGG_IFACE =
             "aggregation create agg LP01\n"
@@ -116,8 +94,8 @@ public class PortReaderTest {
                     + "port set port LP01\n";
     private static final List<InterfaceKey> IDS_EXPECTED = Lists.newArrayList("1/1", "1/2",
             "2/1", "2/3", "2/4", "2/5", "2/6", "2/7", "2/8", "2/9", "2/10", "2/11",
-            "3/1", "3/2", "3/3", "3/4", "3/5", "3/6", "3/7", "3/8", "3/9", "2/2",
-            "LP01", "LM01E", "LM01W", "LS01E", "LS02E", "LP02", "JMEP", "LS01W", "LS02W", "LSPIRENT01")
+            "3/1", "3/2", "3/3", "3/4", "3/5", "3/6", "3/7", "3/8", "3/9", "1", "2", "3", "4", "5",
+            "LP01", "LM01E", "LM01W", "LS01E", "LS02E", "1001", "LS01W", "LS02W", "LP02", "JMEP", "LSPIRENT01")
             .stream()
             .map(InterfaceKey::new)
             .distinct()
@@ -131,14 +109,14 @@ public class PortReaderTest {
             .collect(Collectors.toList());
 
     private static final List<InterfaceKey> IDS_DOUBLE_RANGE_EXPECTED = Lists.newArrayList("2/3", "3/9", "1/1",
-            "1/2", "1/3", "1/4", "1/5","2/4", "2/5", "2/6", "2/7", "2/8", "1/18", "1/19", "1/20", "2/1", "2/2")
+            "1/2", "1/3", "1/4", "1/5", "2/4", "2/5", "2/6", "2/7", "2/8", "1/18", "1/19", "1/20", "2/1", "2/2")
             .stream()
             .map(InterfaceKey::new)
             .distinct()
             .collect(Collectors.toList());
 
     private static final List<InterfaceKey> IDS_TRIPLE_RANGE_EXPECTED = Lists.newArrayList("2/8", "3/9",
-            "LP01", "1/1", "1/2", "1/3", "1/4", "1/5","2/3", "2/4", "2/5", "2/6", "2/7","2/9", "2/10", "2/11", "2/12",
+            "LP01", "1/1", "1/2", "1/3", "1/4", "1/5", "2/3", "2/4", "2/5", "2/6", "2/7", "2/9", "2/10", "2/11", "2/12",
             "2/13", "2/14", "2/15", "2/16", "2/17", "2/18", "2/19", "2/20", "3/1", "1/18", "1/19", "1/20", "2/1", "2/2")
             .stream()
             .map(InterfaceKey::new)
