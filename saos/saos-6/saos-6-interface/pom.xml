@@ -24,12 +24,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.5.rc25-frinx-SNAPSHOT</version>
+        <version>4.2.5.rc25-frinx</version>
         <relativePath>../../../unit-parent</relativePath>
     </parent>
 
     <artifactId>saos-6-interface-unit</artifactId>
-    <version>4.2.5.rc25-frinx-SNAPSHOT</version>
+    <version>4.2.5.rc25-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
