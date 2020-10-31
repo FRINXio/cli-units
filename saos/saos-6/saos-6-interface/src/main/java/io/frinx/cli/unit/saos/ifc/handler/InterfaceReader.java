@@ -70,7 +70,6 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
         List<Pattern> patterns = Arrays.asList(INTERFACE_ID_LINE, LAST_INTERFACE_ID_LINE, LAG_INTERFACE_ID_LINE);
         List<InterfaceKey> allIds = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
-                .filter(l -> !l.startsWith("lldp"))
                 .filter(l -> !l.startsWith("port tdm"))
                 .filter(l -> (l.contains("port") || l.contains("agg")))
                 .map(line -> patterns.stream().map(pattern -> pattern.matcher(line))
@@ -86,7 +85,6 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
         List<Pattern> patterns2 = Arrays.asList(INTERFACE_RANGE_ID_LINE, NEXT_RANGE_ID_LINE, LAST_RANGE_ID_LINE);
         allIds.addAll(ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
-                .filter(l -> !l.startsWith("lldp"))
                 .filter(l -> !l.startsWith("port tdm"))
                 .filter(l -> (l.contains("port") || l.contains("agg")))
                 .flatMap(line -> patterns2.stream().map(pattern -> pattern.matcher(line))
