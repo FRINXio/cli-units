@@ -28,7 +28,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-arista</artifactId>
-    <version>4.2.5.rc25-frinx</version>
+    <version>4.2.5.rc26-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
