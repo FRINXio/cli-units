@@ -28,12 +28,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 public class InterfaceReaderTest {
 
     public static final String SH_INTERFACE = "port tdm set mode ansi\n"
-            + "port set port 1 speed hundred auto-neg off mode rj45\n"
+            + "port set port 1-5 speed hundred auto-neg off mode rj45\n"
             + "port set port 1 max-frame-size 9000 ingress-to-egress-qmap NNI-NNI resolved-cos-remark-l2 true\n"
-            + "port set port 2 mode rj45\n"
+            + "port set port 15-20 mode rj45\n"
             + "port set port 2 description cau\n"
             + "port set port 3 speed hundred auto-neg off mode rj45\n"
-            + "port set port 3 max-frame-size 9216\n"
+            + "port set port 3-10 max-frame-size 9216\n"
             + "port disable port 4\n"
             + "port set port 4 max-frame-size 9216 ingress-to-egress-qmap NNI-NNI\n"
             + "port set port 5 max-frame-size 9130 description test\n"
@@ -79,18 +79,54 @@ public class InterfaceReaderTest {
 
     public static final String SH_AGG_IFACE =
             "aggregation create agg LP01\n"
-            + "aggregation create agg LM01E\n"
-            + "aggregation create agg LM01W\n"
-            + "aggregation create agg LS01W\n"
-            + "aggregation create agg LS02W\n"
-            + "aggregation create agg LP02\n"
-            + "aggregation create agg JMEP\n"
-            + "aggregation create agg LSPIRENT01\n";
+                    + "aggregation create agg LM01E\n"
+                    + "aggregation create agg LM01W\n"
+                    + "aggregation create agg LS01W\n"
+                    + "aggregation create agg LS02W\n"
+                    + "aggregation create agg LP02\n"
+                    + "aggregation create agg JMEP\n"
+                    + "aggregation create agg LSPIRENT01\n";
 
     public static final String OUTPUT = SH_INTERFACE.concat(SH_AGG_IFACE);
 
+    public static final String SH_INTERFACE_PARSE_ERROR = "port tdm set mode ansi\n"
+            + "port set port 5-1 mode rj45\n";
+
+    public static final String OUTPUT_1 =
+            "port set port 1-5,100 speed hundred auto-neg off mode rj45\n"
+                    + "port set port 5-6,9-12 max-frame-size 9000 ingress-to-egress-qmap NNI-NNI\n"
+                    + "vlan create vlan 114 hundred\n"
+                    + "vlan create vlan 114,191-193 sd\n"
+                    + "vlan add vlan 127,190 port LS02W\n"
+                    + "port set port 15-20,101 mode rj45\n";
+
+    public static final String OUTPUT_2 =
+            "port set port 1-5 speed hundred auto-neg off mode rj45\n"
+                    + "port set port 4-7,9-12,54-59 max-frame-size 9000\n"
+                    + "vlan create vlan 114,191-193 hundred\n"
+                    + "port set port 5-6,10-12,25 max-frame-size";
+
     private static final List<InterfaceKey> IDS_EXPECTED = Lists.newArrayList("1", "2", "3", "4", "5", "6",
-            "8",  "10", "9", "7", "LP01", "LM01E", "LM01W", "LS01W", "LS02W", "LP02", "JMEP", "LSPIRENT01")
+            "8", "10", "9", "7", "LP01", "LM01E", "LM01W", "LS01W", "LS02W", "LP02", "JMEP", "LSPIRENT01", "15",
+            "16", "17", "18", "19", "20")
+            .stream()
+            .map(InterfaceKey::new)
+            .collect(Collectors.toList());
+
+    private static final List<InterfaceKey> IDS_OF_RANGE_EXPECTED = Lists.newArrayList("1", "2", "3", "4",
+            "5", "6", "7", "8", "9", "10", "15", "16", "17", "18", "19", "20")
+            .stream()
+            .map(InterfaceKey::new)
+            .collect(Collectors.toList());
+
+    private static final List<InterfaceKey> IDS_OF_DOUBLE_RANGE_EXPECTED = Lists.newArrayList("100", "101",
+            "1", "2", "3", "4", "5", "6", "9", "10", "11", "12", "15", "16", "17", "18", "19", "20")
+            .stream()
+            .map(InterfaceKey::new)
+            .collect(Collectors.toList());
+
+    private static final List<InterfaceKey> IDS_OF_TRIPLE_RANGE_EXPECTED = Lists.newArrayList("25", "1", "2",
+            "3", "4", "5", "6", "7", "9", "10", "11", "12", "54", "55", "56", "57", "58", "59")
             .stream()
             .map(InterfaceKey::new)
             .collect(Collectors.toList());
@@ -99,5 +135,17 @@ public class InterfaceReaderTest {
     public void testParseInterfaceAggIds() {
         Assert.assertEquals(IDS_EXPECTED,
                 new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT));
+    }
+
+    @Test
+    public void testDoubleInterfaceRangeIds() {
+        Assert.assertEquals(IDS_OF_DOUBLE_RANGE_EXPECTED,
+                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT_1));
+    }
+
+    @Test
+    public void testTripleInterfaceIds() {
+        Assert.assertEquals(IDS_OF_TRIPLE_RANGE_EXPECTED,
+                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT_2));
     }
 }

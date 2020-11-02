@@ -22,12 +22,14 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
@@ -38,9 +40,12 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
 
     public static final String SH_PORTS = "configuration search string \"port \"";
     public static final String LAG_PORTS = "configuration search string \"aggregation create\"";
-    private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\S+).*");
+    private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\d+)($|\\s).*");
+    private static final Pattern LAST_INTERFACE_ID_LINE = Pattern.compile(".*port.*,(?<id>\\d+)($|\\s).*");
     private static final Pattern LAG_INTERFACE_ID_LINE = Pattern.compile(".*agg (?<id>\\S+)");
-
+    private static final Pattern INTERFACE_RANGE_ID_LINE = Pattern.compile(".*port (?<id1>\\d+)-(?<id2>\\d+).*");
+    private static final Pattern NEXT_RANGE_ID_LINE = Pattern.compile(".*port.*,(?<id1>\\d+)-(?<id2>\\d+),\\d+.*");
+    private static final Pattern LAST_RANGE_ID_LINE = Pattern.compile(".*port.*,(?<id1>\\d+)-(?<id2>\\d+)[ \n].*");
     private Cli cli;
 
     public InterfaceReader(Cli cli) {
@@ -51,17 +56,21 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
     @Override
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
-        return getAllIds(blockingRead(SH_PORTS + LAG_PORTS, cli, instanceIdentifier, readContext));
+        List<InterfaceKey> portIds = getAllIds(blockingRead(SH_PORTS, cli, instanceIdentifier, readContext));
+        List<InterfaceKey> aggIds = getAllIds(blockingRead(LAG_PORTS, cli, instanceIdentifier, readContext));
+        List<InterfaceKey> ids = new ArrayList<>();
+        ids.addAll(portIds);
+        ids.addAll(aggIds);
+        return ids;
     }
 
     @VisibleForTesting
     public List<InterfaceKey> getAllIds(String output) {
-        List<Pattern> patterns = Arrays.asList(INTERFACE_ID_LINE, LAG_INTERFACE_ID_LINE);
-
-        return ParsingUtils.NEWLINE.splitAsStream(output)
+        List<Pattern> patterns = Arrays.asList(INTERFACE_ID_LINE, LAST_INTERFACE_ID_LINE, LAG_INTERFACE_ID_LINE);
+        List<InterfaceKey> allIds = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
-                .filter(l -> !l.startsWith("lldp"))
                 .filter(l -> !l.startsWith("port tdm"))
+                .filter(l -> (l.contains("port") || l.contains("agg")))
                 .map(line -> patterns.stream().map(pattern -> pattern.matcher(line))
                         .filter(Matcher::matches)
                         .map(matcher -> matcher.group("id"))
@@ -69,8 +78,25 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
                         .findFirst()
                         .map(InterfaceKey::new)
                         .orElse(null))
+                .filter(Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toList());
+        List<Pattern> patterns2 = Arrays.asList(INTERFACE_RANGE_ID_LINE, NEXT_RANGE_ID_LINE, LAST_RANGE_ID_LINE);
+        allIds.addAll(ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .filter(l -> !l.startsWith("port tdm"))
+                .filter(l -> (l.contains("port") || l.contains("agg")))
+                .flatMap(line -> patterns2.stream().map(pattern -> pattern.matcher(line))
+                        .filter(Matcher::matches)
+                        .map((matcher -> IntStream.rangeClosed(Integer.parseInt(matcher.group("id1")),
+                                Integer.parseInt(matcher.group("id2"))).mapToObj(String::valueOf)
+                                .map(InterfaceKey::new)
+                                .distinct()
+                                .collect(Collectors.toList())))
+                        .flatMap(List::stream))
+                .distinct()
+                .collect(Collectors.toList()));
+        return allIds.stream().distinct().collect(Collectors.toList());
     }
 
     @Override

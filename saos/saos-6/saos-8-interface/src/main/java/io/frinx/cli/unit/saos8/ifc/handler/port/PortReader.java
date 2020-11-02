@@ -28,7 +28,6 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -43,10 +42,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class PortReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder>,
         CompositeListReader.Child<Interface, InterfaceKey, InterfaceBuilder> {
 
-    public static final String SH_PORTS = "configuration search string \" port \"";
-    public static final String LAG_PORTS = "configuration search string \"aggregation create\"";
-    private static final Pattern INTERFACE_ID_LINE = Pattern.compile(".*port (?<id>\\S+).*");
-    private static final Pattern LAG_INTERFACE_ID_LINE = Pattern.compile(".*agg (?<id>\\S+)");
+    public static final String SH_PORTS = "port show";
+    private static final Pattern PORT_LINE = Pattern.compile("^\\|\\s(?<id>\\S+).*");
 
     public static Check ethernetCheck = BasicCheck.checkData(
             ChecksMap.DataCheck.InterfaceConfig.IID_TRANSFORMATION,
@@ -73,25 +70,18 @@ public class PortReader implements CliConfigListReader<Interface, InterfaceKey, 
     public static List<InterfaceKey> getAllIds(Cli cli, CliReader reader,
                                                @Nonnull InstanceIdentifier id,
                                                @Nonnull ReadContext context) throws ReadFailedException {
-
+        Pattern pattern = PORT_LINE;
         String portOutput = reader.blockingRead(SH_PORTS, cli, id, context);
-        String lagOutput = reader.blockingRead(LAG_PORTS, cli, id, context);
-
-        List<Pattern> patterns = Arrays.asList(INTERFACE_ID_LINE, LAG_INTERFACE_ID_LINE);
-
-        return ParsingUtils.NEWLINE.splitAsStream(portOutput.concat(lagOutput))
+        List<InterfaceKey> allIds = ParsingUtils.NEWLINE.splitAsStream(portOutput)
                 .map(String::trim)
-                .filter(l -> !l.startsWith("lldp"))
-                .filter(l -> !l.startsWith("port tdm"))
-                .map(line -> patterns.stream().map(pattern -> pattern.matcher(line))
-                        .filter(Matcher::matches)
-                        .map(matcher -> matcher.group("id"))
-                        .filter(Objects::nonNull)
-                        .findFirst()
-                        .map(InterfaceKey::new)
-                        .orElse(null))
+                .map(pattern::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("id"))
+                .filter(Objects::nonNull)
+                .map(InterfaceKey::new)
                 .distinct()
                 .collect(Collectors.toList());
+        return allIds.stream().distinct().collect(Collectors.toList());
     }
 
     @Override
@@ -105,4 +95,3 @@ public class PortReader implements CliConfigListReader<Interface, InterfaceKey, 
         return BasicCheck.emptyCheck();
     }
 }
-
