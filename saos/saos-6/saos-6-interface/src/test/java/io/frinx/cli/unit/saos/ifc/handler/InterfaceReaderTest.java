@@ -148,10 +148,4 @@ public class InterfaceReaderTest {
         Assert.assertEquals(IDS_OF_TRIPLE_RANGE_EXPECTED,
                 new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT_2));
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testParseInterfaceRangeIdsWithError() {
-        Assert.assertEquals(IDS_OF_RANGE_EXPECTED,
-                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(SH_INTERFACE_PARSE_ERROR));
-    }
 }
