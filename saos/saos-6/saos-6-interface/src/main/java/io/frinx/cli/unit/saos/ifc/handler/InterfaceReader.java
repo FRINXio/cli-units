@@ -24,13 +24,12 @@ import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
@@ -89,33 +88,15 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
                 .filter(l -> (l.contains("port") || l.contains("agg")))
                 .flatMap(line -> patterns2.stream().map(pattern -> pattern.matcher(line))
                         .filter(Matcher::matches)
-                        .map(InterfaceReader::getRangeOffIds)
+                        .map((matcher -> IntStream.rangeClosed(Integer.parseInt(matcher.group("id1")),
+                                Integer.parseInt(matcher.group("id2"))).mapToObj(String::valueOf)
+                                .map(InterfaceKey::new)
+                                .distinct()
+                                .collect(Collectors.toList())))
                         .flatMap(List::stream))
                 .distinct()
                 .collect(Collectors.toList()));
         return allIds.stream().distinct().collect(Collectors.toList());
-    }
-
-    @VisibleForTesting
-    public static List<InterfaceKey> getRangeOffIds(Matcher matcher) {
-        Set<Integer> rangeIds = new HashSet<>();
-        if (matcher.groupCount() == 2) {
-            int id1 = Integer.parseInt(matcher.group("id1"));
-            int id2 = Integer.parseInt(matcher.group("id2"));
-            if (id2 > id1) {
-                for (int i = id1; i <= id2; i++) {
-                    rangeIds.add(i);
-                }
-            } else {
-                throw new IllegalArgumentException("Invalid range for ports set: " + id1 + "-" + id2);
-            }
-        }
-        return rangeIds.stream()
-                .sorted()
-                .map((Integer ids) -> Integer.toString(ids))
-                .map(InterfaceKey::new)
-                .distinct()
-                .collect(Collectors.toList());
     }
 
     @Override

@@ -30,7 +30,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ag
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AggregateConfigReader  implements CliConfigReader<Config1, Config1Builder> {
+public class AggregateConfigReader implements CliConfigReader<Config1, Config1Builder> {
 
     private final Cli cli;
 
@@ -38,19 +38,21 @@ public class AggregateConfigReader  implements CliConfigReader<Config1, Config1B
         this.cli = cli;
     }
 
+    public static final String SH_PORTS = "configuration search string \" port \"";
+
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config1> instanceIdentifier,
                                       @Nonnull Config1Builder config1Builder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         if (isPort(instanceIdentifier, readContext)) {
             String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
-            String output = blockingRead(PortReader.SH_PORTS, cli, instanceIdentifier, readContext);
+            String output = blockingRead(SH_PORTS, cli, instanceIdentifier, readContext);
             parseConfig(output, config1Builder, ifcName);
         }
     }
 
     @VisibleForTesting
-    void parseConfig(String output, Config1Builder builder, String ifcName)  {
+    void parseConfig(String output, Config1Builder builder, String ifcName) {
         Pattern pattern = Pattern.compile("aggregation add agg (?<name>\\S+) port " + ifcName);
 
         ParsingUtils.parseFields(output, 0,
