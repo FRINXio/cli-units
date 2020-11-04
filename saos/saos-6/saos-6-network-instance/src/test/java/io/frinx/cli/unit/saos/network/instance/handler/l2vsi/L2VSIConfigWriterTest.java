@@ -66,6 +66,7 @@ public class L2VSIConfigWriterTest {
     public void testWrite() throws Exception {
         createCommandAndTest(createConfig("Testing", (short) 3, EncapCosPolicy.Fixed, true),
             "virtual-switch ethernet create vs VLAN111444 vc vc4\n"
+                    + "configuration save\n"
                     + "virtual-switch ethernet set vs VLAN111444 description Testing\n"
                     + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy fixed\n"
                     + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 3\n"
@@ -77,6 +78,7 @@ public class L2VSIConfigWriterTest {
     public void testWriteNoDesc() throws Exception {
         createCommandAndTest(createConfig(null, (short) 3, EncapCosPolicy.Fixed, true),
                 "virtual-switch ethernet create vs VLAN111444 vc vc4\n"
+                        + "configuration save\n"
                         + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy fixed\n"
                         + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 3\n"
                         + "l2-cft tagged-pvst-l2pt enable vs VLAN111444\n"
@@ -87,6 +89,7 @@ public class L2VSIConfigWriterTest {
     public void testWriteDisableL2pt() throws Exception {
         createCommandAndTest(createConfig(null, (short) 3, EncapCosPolicy.Fixed, false),
                 "virtual-switch ethernet create vs VLAN111444 vc vc4\n"
+                        + "configuration save\n"
                         + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy fixed\n"
                         + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 3\n"
                         + "l2-cft tagged-pvst-l2pt disable vs VLAN111444\n"
@@ -97,6 +100,7 @@ public class L2VSIConfigWriterTest {
     public void testWriteNoL2pt() throws Exception {
         createCommandAndTest(createConfig(null, (short) 3, EncapCosPolicy.Fixed, null),
                 "virtual-switch ethernet create vs VLAN111444 vc vc4\n"
+                        + "configuration save\n"
                         + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy fixed\n"
                         + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 3\n"
                         + "configuration save\n");
