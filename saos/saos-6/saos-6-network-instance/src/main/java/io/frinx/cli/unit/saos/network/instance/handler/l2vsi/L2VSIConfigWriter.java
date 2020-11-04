@@ -40,6 +40,7 @@ public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWrit
 
     private static final String WRITE_TEMPLATE = "{% if ($vc) %}virtual-switch ethernet create vs {$vsi_ni_name}"
             + " vc {$vsi_cp_name}\n{% endif %}"
+            + "configuration save\n"
             + "{% if ($description) %}virtual-switch ethernet set vs {$vsi_ni_name}"
             + " description {$vsi_ni_description}\n{% endif %}"
             + "virtual-switch ethernet set vs {$vsi_ni_name} encap-cos-policy {$vsi_ni_encap_cos_policy}\n"

@@ -65,7 +65,9 @@ public class L2VSIConfigWriterTest {
 
         Mockito.verify(cli).executeAndRead(commands.capture());
         Assert.assertEquals("virtual-switch create vs FRINX001_2500\n"
-                + "virtual-switch set vs FRINX001_2500 description \"Ethernet Link-frinx.001\"\n",
+                + "configuration save\n"
+                + "virtual-switch set vs FRINX001_2500 description \"Ethernet Link-frinx.001\"\n"
+                + "configuration save\n",
                 commands.getValue().getContent());
     }
 
@@ -91,7 +93,8 @@ public class L2VSIConfigWriterTest {
         writer.updateCurrentAttributesWResult(iid, dataBefore, dataAfter, context);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("virtual-switch set vs FRINX001_2500 description \"Ethernet Link-frinx.002\"\n",
+        Assert.assertEquals("virtual-switch set vs FRINX001_2500 description \"Ethernet Link-frinx.002\"\n"
+                + "configuration save\n",
                 commands.getValue().getContent());
     }
 
@@ -118,7 +121,8 @@ public class L2VSIConfigWriterTest {
         writer.deleteCurrentAttributesWResult(iid, data, context);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("virtual-switch delete vs FRINX001_2500\n", commands.getValue().getContent());
+        Assert.assertEquals("virtual-switch delete vs FRINX001_2500\n"
+                + "configuration save\n", commands.getValue().getContent());
     }
 
     @Test

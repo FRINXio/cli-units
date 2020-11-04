@@ -31,12 +31,15 @@ public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWrit
 
     private static final String WRITE_TEMPLATE =
             "virtual-switch create vs {$data.name}\n"
+            + "configuration save\n"
             + "{% if ($data.description) %}virtual-switch set vs {$data.name} "
-            + "description {$data.description}\n{% endif %}";
+            + "description {$data.description}\n{% endif %}"
+            + "configuration save\n";
 
     private static final String UPDATE_TEMPLATE =
             "{$data|update(description,virtual-switch set vs `$data.name` "
-            + "description `$data.description`\n,)}";
+            + "description `$data.description`\n,)}"
+            + "configuration save\n";
 
     private Cli cli;
 
@@ -85,7 +88,7 @@ public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWrit
             return false;
         }
 
-        blockingDeleteAndRead(f("virtual-switch delete vs %s\n",
+        blockingDeleteAndRead(f("virtual-switch delete vs %s\nconfiguration save\n",
                 dataBefore.getName()), cli, iid);
 
         return true;
