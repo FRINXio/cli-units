@@ -29,11 +29,11 @@
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-unit-ios-xr</artifactId>
     <packaging>feature</packaging>
-    <version>4.2.5.rc26-frinx</version>
+    <version>4.2.5.rc27-frinx-SNAPSHOT</version>
     <name>Frinx :: Cli :: Unit :: IOS :: XR</name>
 
     <properties>
-        <translate.unit.commons.version>4.2.5.rc26-frinx</translate.unit.commons.version>
+        <translate.unit.commons.version>4.2.5.rc27-frinx-SNAPSHOT</translate.unit.commons.version>
     </properties>
 
     <dependencyManagement>
@@ -49,7 +49,7 @@
                 <groupId>io.frinx.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.5.rc26-frinx</version>
+                <version>4.2.5.rc27-frinx-SNAPSHOT</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
