@@ -23,12 +23,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.5.rc29-frinx-SNAPSHOT</version>
+        <version>4.2.5.frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>brocade-network-instance-unit</artifactId>
-    <version>4.2.5.rc29-frinx-SNAPSHOT</version>
+    <version>4.2.5.frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
