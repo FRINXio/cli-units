@@ -19,14 +19,14 @@ package io.frinx.cli.unit.ios.qos.handler.scheduler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.CosValue;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DeiValue;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DscpValueBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Cos;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Dei;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DscpBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosExceedActionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroupBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._2r3c.top.two.rate.three.color.exceed.action.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.exceed.action.ConfigBuilder;
 
-public class TwoRateThreeColorExceedActionConfigReaderTest {
+public class OneRateTwoColorExceedActionConfigReaderTest {
 
     private static final String OUTPUT = "  Policy Map TEST\n"
             + "    Class DROP\n"
@@ -63,44 +63,44 @@ public class TwoRateThreeColorExceedActionConfigReaderTest {
 
     @Test
     public void testDrop() {
-        TwoRateThreeColorExceedActionConfigReader.parseConfig("DROP", OUTPUT, configBuilder);
+        OneRateTwoColorExceedActionConfigReader.parseConfig("DROP", OUTPUT, configBuilder);
         Assert.assertNull(configBuilder.getAugmentation(QosExceedActionAug.class));
         Assert.assertEquals(true, configBuilder.isDrop());
     }
 
     @Test
     public void testTransmit() {
-        TwoRateThreeColorExceedActionConfigReader.parseConfig("TRANSMIT", OUTPUT, configBuilder);
+        OneRateTwoColorExceedActionConfigReader.parseConfig("TRANSMIT", OUTPUT, configBuilder);
         final QosExceedActionAug aug = configBuilder.getAugmentation(QosExceedActionAug.class);
         Assert.assertEquals(true, aug.isTransmit());
     }
 
     @Test
     public void testCos() {
-        TwoRateThreeColorExceedActionConfigReader.parseConfig("COS", OUTPUT, configBuilder);
+        OneRateTwoColorExceedActionConfigReader.parseConfig("COS", OUTPUT, configBuilder);
         final QosExceedActionAug aug = configBuilder.getAugmentation(QosExceedActionAug.class);
-        Assert.assertEquals(CosValue.getDefaultInstance("2"), aug.getCos());
+        Assert.assertEquals(Cos.getDefaultInstance("2"), aug.getCosTransmit());
     }
 
     @Test
     public void testDei() {
-        TwoRateThreeColorExceedActionConfigReader.parseConfig("DEI", OUTPUT, configBuilder);
+        OneRateTwoColorExceedActionConfigReader.parseConfig("DEI", OUTPUT, configBuilder);
         final QosExceedActionAug aug = configBuilder.getAugmentation(QosExceedActionAug.class);
-        Assert.assertEquals(DeiValue.getDefaultInstance("1"), aug.getDei());
+        Assert.assertEquals(Dei.getDefaultInstance("1"), aug.getDeiTransmit());
     }
 
     @Test
     public void testDscp() {
-        TwoRateThreeColorExceedActionConfigReader.parseConfig("DSCP", OUTPUT, configBuilder);
+        OneRateTwoColorExceedActionConfigReader.parseConfig("DSCP", OUTPUT, configBuilder);
         final QosExceedActionAug aug = configBuilder.getAugmentation(QosExceedActionAug.class);
-        Assert.assertEquals(DscpValueBuilder.getDefaultInstance("cs7"), aug.getDscp());
+        Assert.assertEquals(DscpBuilder.getDefaultInstance("cs7"), aug.getDscpTransmit());
     }
 
     @Test
     public void testQosGroup() {
-        TwoRateThreeColorExceedActionConfigReader.parseConfig("QOS", OUTPUT, configBuilder);
+        OneRateTwoColorExceedActionConfigReader.parseConfig("QOS", OUTPUT, configBuilder);
         final QosExceedActionAug aug = configBuilder.getAugmentation(QosExceedActionAug.class);
-        Assert.assertEquals(QosGroupBuilder.getDefaultInstance("54"), aug.getQos());
+        Assert.assertEquals(QosGroupBuilder.getDefaultInstance("54"), aug.getQosTransmit());
     }
 
 }

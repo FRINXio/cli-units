@@ -26,14 +26,14 @@ import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.CosValue;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DeiValue;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DscpValueBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Cos;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Dei;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DscpBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConformActionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConformActionAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroupBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._2r3c.top.two.rate.three.color.conform.action.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._2r3c.top.two.rate.three.color.conform.action.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.conform.action.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.conform.action.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.Inputs;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicy;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.Schedulers;
@@ -41,13 +41,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.SchedulerKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TwoRateThreeColorConformActionConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public class OneRateTwoColorConformActionConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final Pattern CONFORM_ACTION = Pattern.compile("conform-action (?<action>.+)");
 
     private Cli cli;
 
-    public TwoRateThreeColorConformActionConfigReader(Cli cli) {
+    public OneRateTwoColorConformActionConfigReader(Cli cli) {
         this.cli = cli;
     }
 
@@ -55,7 +55,7 @@ public class TwoRateThreeColorConformActionConfigReader implements CliConfigRead
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String policyName = getPolicyName(instanceIdentifier);
+        final String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
         final String className = getClassName(instanceIdentifier, readContext);
         final String policyOutput = blockingRead(f(InputConfigReader.SH_POLICY_MAP, policyName),
                 cli, instanceIdentifier, readContext);
@@ -84,18 +84,14 @@ public class TwoRateThreeColorConformActionConfigReader implements CliConfigRead
 
         final String value = action.split("\\s")[1];
         if (action.contains("cos")) {
-            augBuilder.setCos(CosValue.getDefaultInstance(value));
+            augBuilder.setCosTransmit(Cos.getDefaultInstance(value));
         } else if (action.contains("dei")) {
-            augBuilder.setDei(DeiValue.getDefaultInstance(value));
+            augBuilder.setDeiTransmit(Dei.getDefaultInstance(value));
         } else if (action.contains("dscp")) {
-            augBuilder.setDscp(DscpValueBuilder.getDefaultInstance(value));
+            augBuilder.setDscpTransmit(DscpBuilder.getDefaultInstance(value));
         } else if (action.contains("qos")) {
-            augBuilder.setQos(QosGroupBuilder.getDefaultInstance(value));
+            augBuilder.setQosTransmit(QosGroupBuilder.getDefaultInstance(value));
         }
-    }
-
-    private String getPolicyName(InstanceIdentifier<Config> instanceIdentifier) {
-        return instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
     }
 
     private String getClassName(InstanceIdentifier<Config> instanceIdentifier, ReadContext readContext) {

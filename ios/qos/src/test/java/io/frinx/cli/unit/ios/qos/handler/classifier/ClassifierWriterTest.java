@@ -21,7 +21,6 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
@@ -31,16 +30,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.CosValue;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DscpValue;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DscpValueBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.Ipv4Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Cos;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DscpEnumeration;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroup;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.cos.config.CosBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.cos.config.cos.CosListBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.dscp.config.DscpBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.dscp.config.dscp.DscpListBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.Terms;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.TermsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.Term;
@@ -50,6 +49,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.ClassifierBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.ClassifierKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Dscp;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
@@ -58,11 +58,8 @@ public class ClassifierWriterTest {
     private static final String WRITE_ALL = "configure terminal\n"
             + "class-map match-all map1\n"
             + "match qos-group 10\n"
-            + "match qos-group 35\n"
-            + "match ip dscp default cs7\n"
-            + "match ip dscp 13 af43 ef 61\n"
-            + "match cos inner 1 2 5\n"
-            + "match cos 3 6\n"
+            + "match cos 3\n"
+            + "match ip dscp default\n"
             + "end\n";
 
     private static final String WRITE_ANY_QOS = "configure terminal\n"
@@ -72,12 +69,12 @@ public class ClassifierWriterTest {
 
     private static final String WRITE_ANY_DSCP = "configure terminal\n"
             + "class-map match-any map1\n"
-            + "match ip dscp 13 af43 ef 61\n"
+            + "match ip dscp 13\n"
             + "end\n";
 
     private static final String WRITE_ANY_COS = "configure terminal\n"
             + "class-map match-any map1\n"
-            + "match cos inner 1 2 5\n"
+            + "match cos inner 1\n"
             + "end\n";
 
     private static final String DELETE_INPUT = "configure terminal\n"
@@ -134,26 +131,17 @@ public class ClassifierWriterTest {
                 .setId("all")
                 .setConditions(new ConditionsBuilder()
                         .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
-                                .setQosGroup(Lists.newArrayList(new QosGroup(10L), new QosGroup(35L)))
-                                .setDscp(new DscpBuilder()
-                                        .setDscpList(Lists.newArrayList(
-                                                new DscpListBuilder()
-                                                        .setDscpValueList(getDscpValues("default", "cs7"))
-                                                        .build(),
-                                                new DscpListBuilder()
-                                                        .setDscpValueList(getDscpValues("13", "af43", "ef", "61"))
-                                                        .build()))
-                                        .build())
+                                .setQosGroup(Lists.newArrayList(new QosGroup(10L)))
                                 .setCos(new CosBuilder()
-                                        .setCosList(Lists.newArrayList(
-                                                new CosListBuilder()
-                                                        .setInner(true)
-                                                        .setCosValueList(getCosValues("1", "2", "5"))
-                                                        .build(),
-                                                new CosListBuilder()
-                                                        .setInner(false)
-                                                        .setCosValueList(getCosValues("3", "6"))
-                                                        .build()))
+                                        .setInner(false)
+                                        .setCos(Cos.getDefaultInstance("3"))
+                                        .build())
+                                .build())
+                        .setIpv4(new Ipv4Builder()
+                                .setConfig(new ConfigBuilder()
+                                        .addAugmentation(QosIpv4ConditionAug.class, new QosIpv4ConditionAugBuilder()
+                                                .setDscpEnum(DscpEnumeration.Default)
+                                                .build())
                                         .build())
                                 .build())
                         .build())
@@ -175,12 +163,9 @@ public class ClassifierWriterTest {
         Term term2 = new TermBuilder()
                 .setId("2")
                 .setConditions(new ConditionsBuilder()
-                        .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
-                                .setDscp(new DscpBuilder()
-                                        .setDscpList(Lists.newArrayList(
-                                                new DscpListBuilder()
-                                                        .setDscpValueList(getDscpValues("13", "af43", "ef", "61"))
-                                                        .build()))
+                        .setIpv4(new Ipv4Builder()
+                                .setConfig(new ConfigBuilder()
+                                        .setDscp(Dscp.getDefaultInstance("13"))
                                         .build())
                                 .build())
                         .build())
@@ -191,11 +176,8 @@ public class ClassifierWriterTest {
                 .setConditions(new ConditionsBuilder()
                         .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
                                 .setCos(new CosBuilder()
-                                        .setCosList(Lists.newArrayList(
-                                                new CosListBuilder()
-                                                        .setInner(true)
-                                                        .setCosValueList(getCosValues("1", "2", "5"))
-                                                        .build()))
+                                        .setInner(true)
+                                        .setCos(Cos.getDefaultInstance("1"))
                                         .build())
                                 .build())
                         .build())
@@ -211,22 +193,6 @@ public class ClassifierWriterTest {
                         .setTerm(terms)
                         .build())
                 .build();
-    }
-
-    private List<DscpValue> getDscpValues(String... values) {
-        List<DscpValue> dscpValues = new ArrayList<>();
-        for (String value : values) {
-            dscpValues.add(DscpValueBuilder.getDefaultInstance(value));
-        }
-        return dscpValues;
-    }
-
-    private List<CosValue> getCosValues(String... values) {
-        List<CosValue> cosValues = new ArrayList<>();
-        for (String value : values) {
-            cosValues.add(new CosValue(Short.valueOf(value)));
-        }
-        return cosValues;
     }
 
 }

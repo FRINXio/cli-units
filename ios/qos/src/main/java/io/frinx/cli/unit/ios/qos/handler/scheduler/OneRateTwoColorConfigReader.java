@@ -24,9 +24,12 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.qos.Util;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.math.BigInteger;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.Percentage;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosMaxQueueDepthBpsAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosMaxQueueDepthBpsAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.Inputs;
@@ -40,6 +43,8 @@ public class OneRateTwoColorConfigReader implements CliConfigReader<Config, Conf
 
     private static final Pattern BW_REM_LINE = Pattern.compile("bandwidth remaining percent (?<rem>.+)");
     private static final Pattern BW_LINE = Pattern.compile("bandwidth percent (?<bw>.+)");
+    private static final Pattern CIR_BC_LINE = Pattern.compile("police cir (?<bitrate>\\S+) bc (?<burst>\\S+)");
+    private static final Pattern SHAPE_LINE = Pattern.compile("shape average (?<bitrate>.+)");
 
     private Cli cli;
 
@@ -51,7 +56,7 @@ public class OneRateTwoColorConfigReader implements CliConfigReader<Config, Conf
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String policyName = getPolicyName(instanceIdentifier);
+        final String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
         final String className = getClassName(instanceIdentifier, readContext);
         final String policyOutput = blockingRead(f(InputConfigReader.SH_POLICY_MAP, policyName),
                 cli, instanceIdentifier, readContext);
@@ -60,17 +65,28 @@ public class OneRateTwoColorConfigReader implements CliConfigReader<Config, Conf
 
     @VisibleForTesting
     public static void parseConfig(String className, String policyOutput, ConfigBuilder builder) {
-        final String classOutput = Util.extractClass(className, policyOutput);
+        final String classOutput = Util.deleteBrackets(Util.extractClass(className, policyOutput));
         ParsingUtils.parseField(classOutput, BW_REM_LINE::matcher,
             matcher -> matcher.group("rem"),
             g -> builder.setCirPctRemaining(new Percentage(Short.valueOf(g))));
         ParsingUtils.parseField(classOutput, BW_LINE::matcher,
             matcher -> matcher.group("bw"),
             g -> builder.setCirPct(new Percentage(Short.valueOf(g))));
+        ParsingUtils.parseField(classOutput, CIR_BC_LINE::matcher,
+            matcher -> matcher.group("bitrate"),
+            g -> builder.setCir(new BigInteger(g)));
+        ParsingUtils.parseField(classOutput, CIR_BC_LINE::matcher,
+            matcher -> matcher.group("burst"),
+            g -> builder.setBc(new Long(g)));
+        ParsingUtils.parseField(classOutput, SHAPE_LINE::matcher,
+            matcher -> matcher.group("bitrate"),
+            g -> fillInAug(g, builder));
     }
 
-    private String getPolicyName(InstanceIdentifier<Config> instanceIdentifier) {
-        return instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+    private static void fillInAug(String output, ConfigBuilder builder) {
+        QosMaxQueueDepthBpsAugBuilder augBuilder = new QosMaxQueueDepthBpsAugBuilder();
+        augBuilder.setMaxQueueDepthBps(Long.valueOf(output));
+        builder.addAugmentation(QosMaxQueueDepthBpsAug.class, augBuilder.build());
     }
 
     private String getClassName(InstanceIdentifier<Config> instanceIdentifier, ReadContext readContext) {

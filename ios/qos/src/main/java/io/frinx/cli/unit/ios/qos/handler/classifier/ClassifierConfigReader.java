@@ -28,7 +28,8 @@ public class ClassifierConfigReader implements CliConfigReader<Config, ConfigBui
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                      @Nonnull ConfigBuilder configBuilder, @Nonnull ReadContext readContext) {
+                                      @Nonnull ConfigBuilder configBuilder,
+                                      @Nonnull ReadContext readContext) {
         final String name = instanceIdentifier.firstKeyOf(Classifier.class).getName();
         configBuilder.setName(name);
     }

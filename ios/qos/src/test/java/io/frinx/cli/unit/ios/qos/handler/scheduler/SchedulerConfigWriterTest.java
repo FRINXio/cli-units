@@ -30,9 +30,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.Percentage;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosServicePolicyAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosServicePolicyAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.QosSchedulerConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.Inputs;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.InputsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.inputs.InputBuilder;
@@ -42,30 +42,25 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.Schedulers;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.Scheduler;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.SchedulerKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.scheduler.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.scheduler.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
-public class OneRateTwoColorConfigWriterTest {
+public class SchedulerConfigWriterTest {
 
     private static final String WRITE_INPUT = "configure terminal\n"
             + "policy-map plmap\n"
             + "class map1\n"
-            + "bandwidth percent 30\n"
-            + "bandwidth remaining percent 50\n"
-            + "end\n";
-
-    private static final String UPDATE_INPUT = "configure terminal\n"
-            + "policy-map plmap\n"
-            + "class map1\n"
-            + "bandwidth percent 35\n"
-            + "bandwidth remaining percent 55\n"
+            + "priority\n"
+            + "service-policy TEST\n"
             + "end\n";
 
     private static final String DELETE_INPUT = "configure terminal\n"
             + "policy-map plmap\n"
             + "class map1\n"
-            + "no bandwidth\n"
-            + "no bandwidth remaining\n"
+            + "no priority\n"
+            + "no service-policy TEST\n"
             + "end\n";
 
     @Mock
@@ -74,7 +69,7 @@ public class OneRateTwoColorConfigWriterTest {
     @Mock
     private WriteContext context;
 
-    private OneRateTwoColorConfigWriter writer;
+    private SchedulerConfigWriter writer;
 
     private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
@@ -84,53 +79,37 @@ public class OneRateTwoColorConfigWriterTest {
             .child(Scheduler.class, new SchedulerKey(0L))
             .child(Inputs.class);
 
-    private Inputs inputs;
     private Config data;
+    private Inputs inputs;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
-        writer = new OneRateTwoColorConfigWriter(cli);
+        writer = new SchedulerConfigWriter(cli);
         inputs = new InputsBuilder().setInput(Lists.newArrayList(new InputBuilder()
                 .setId("map1")
                 .build()))
                 .build();
         Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(inputs));
         Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(inputs));
+        initializeData();
+    }
+
+    private void initializeData() {
+        data = new ConfigBuilder()
+                .setPriority(QosSchedulerConfig.Priority.STRICT)
+                .addAugmentation(QosServicePolicyAug.class, new QosServicePolicyAugBuilder()
+                        .setServicePolicy("TEST")
+                        .build())
+                .build();
     }
 
     @Test
     public void write() throws WriteFailedException {
-        data = new ConfigBuilder()
-                .setCirPct(new Percentage((short) 30))
-                .setCirPctRemaining(new Percentage((short) 50))
-                .build();
-
         writer.writeCurrentAttributes(piid, data, context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
-    }
-
-    @Test
-    public void update() throws WriteFailedException {
-        data = new ConfigBuilder()
-                .setCirPct(new Percentage((short) 35))
-                .setCirPctRemaining(new Percentage((short) 55))
-                .build();
-
-        writer.updateCurrentAttributes(piid, data, data, context);
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
-    }
-
-    @Test
-    public void updateClean() throws WriteFailedException {
-        data = new ConfigBuilder().build();
-
-        writer.updateCurrentAttributes(piid, data, data, context);
-        Mockito.verify(cli).executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 
     @Test

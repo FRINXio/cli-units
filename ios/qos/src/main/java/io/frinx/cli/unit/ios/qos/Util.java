@@ -33,7 +33,7 @@ public final class Util {
         String string = String.format("(?<=Class %s\\r?\\n)(.*?)(?=\\s*Class|\\s*$)", className);
         Pattern pattern = Pattern.compile(string, Pattern.DOTALL);
         Matcher matcher = pattern.matcher(output);
-        return matcher.find() ? matcher.group() : null;
+        return matcher.find() ? matcher.group() : "";
     }
 
 }
