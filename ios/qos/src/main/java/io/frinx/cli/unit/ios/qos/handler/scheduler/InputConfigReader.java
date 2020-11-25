@@ -25,7 +25,7 @@ import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.CosValue;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Cos;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosCosAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosCosAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.inputs.Input;
@@ -60,10 +60,14 @@ public class InputConfigReader implements CliConfigReader<Config, ConfigBuilder>
     @VisibleForTesting
     public static void parseConfig(String className, String policyOutput, ConfigBuilder configBuilder) {
         final String classOutput = Util.extractClass(className, policyOutput);
-        QosCosAugBuilder augBuilder = new QosCosAugBuilder();
         ParsingUtils.parseField(classOutput, COS_LINE::matcher,
             matcher -> matcher.group("cos"),
-            s -> augBuilder.setCos(CosValue.getDefaultInstance(s)));
+            s -> fillInAug(s, configBuilder));
+    }
+
+    private static void fillInAug(String line, ConfigBuilder configBuilder) {
+        QosCosAugBuilder augBuilder = new QosCosAugBuilder();
+        augBuilder.setCos(Cos.getDefaultInstance(line));
         configBuilder.addAugmentation(QosCosAug.class, augBuilder.build());
     }
 

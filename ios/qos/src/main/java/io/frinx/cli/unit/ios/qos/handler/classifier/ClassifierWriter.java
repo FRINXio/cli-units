@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.CosValue;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.cos.config.cos.CosList;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.Term;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.Conditions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
@@ -42,34 +42,19 @@ public class ClassifierWriter implements CliWriter<Classifier> {
             + "{% endloop %}"
             + "{% endif %}";
 
-    private static final String MATCH_DSCP = "{% if ($aug.dscp) %}"
-            + "{% if ($aug.dscp.dscp_list) %}"
-            + "{% loop in $aug.dscp.dscp_list as $dscp_leaf %}"
-            + "match ip dscp"
-            + "{% if ($dscp_leaf.dscp_value_list) %}"
-            + "{% loop in $dscp_leaf.dscp_value_list as $dscp_value_leaf %}"
-            + "{% if ($dscp_value_leaf.dscp_enumeration) %}"
-            + " {$dscp_value_leaf.dscp_enumeration.name}"
-            + "{% endif %}"
-            + "{% if ($dscp_value_leaf.dscp_number) %}"
-            + " {$dscp_value_leaf.dscp_number.value}"
-            + "{% endif %}"
-            + "{% endloop %}"
-            + "{% endif %}"
-            + "\n"
-            + "{% endloop %}"
-            + "{% endif %}"
-            + "{% endif %}";
+    private static final String MATCH_COS = "{% if ($cos) %}{$cos}\n{% endif %}";
 
-    private static final String WRITE_ALL_ATTR = "{% if ($conditions) %}"
+    private static final String MATCH_DSCP = "{% if ($dscp) %}{$dscp}\n{% endif %}";
+
+    private static final String WRITE_ALL_TEMPLATE = "{% if ($conditions) %}"
             + "configure terminal\n"
-            + "class-map match-{$classType} {$className}\n"
+            + "class-map match-{$class_type} {$class_name}\n"
             + MATCH_QOS
+            + MATCH_COS
             + MATCH_DSCP
-            + "{% if ($cos) %}{$cos}{% endif %}"
             + "end{% endif %}";
 
-    private static final String DELETE_MAP = "configure terminal\n"
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
             + "no class-map %s\n"
             + "end";
 
@@ -105,13 +90,14 @@ public class ClassifierWriter implements CliWriter<Classifier> {
                             Conditions conditions,
                             ClassMapType type) throws WriteFailedException.CreateFailedException {
         blockingWriteAndRead(cli, instanceIdentifier, classifier,
-                fT(WRITE_ALL_ATTR,
-                "className", className,
-                "classType", type.getStringValue(),
+                fT(WRITE_ALL_TEMPLATE,
+                "class_name", className,
+                "class_type", type.getStringValue(),
                 "conditions", conditions,
                 "aug", conditions.getAugmentation(QosConditionAug.class),
                 // cos has separate method, because I was unable to get "inner's" bool value in Chunk
-                "cos", getCosCommands(conditions)));
+                "cos", getCosCommand(conditions),
+                "dscp", getDscpCommand(conditions)));
     }
 
     private void writeMatchAny(InstanceIdentifier<Classifier> instanceIdentifier,
@@ -157,24 +143,34 @@ public class ClassifierWriter implements CliWriter<Classifier> {
                                         @Nonnull Classifier classifier,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         String className = instanceIdentifier.firstKeyOf(Classifier.class).getName();
-        blockingWriteAndRead(cli, instanceIdentifier, classifier, f(DELETE_MAP, className));
+        blockingWriteAndRead(cli, instanceIdentifier, classifier, f(DELETE_TEMPLATE, className));
     }
 
-    private String getCosCommands(Conditions conditions) {
+    private String getCosCommand(Conditions conditions) {
         QosConditionAug aug = conditions.getAugmentation(QosConditionAug.class);
-        if (aug != null && aug.getCos() != null && aug.getCos().getCosList() != null) {
+        if (aug != null && aug.getCos() != null && aug.getCos().getCos() != null) {
             StringBuilder stringBuilder = new StringBuilder();
-            for (CosList cosList : aug.getCos().getCosList()) {
-                stringBuilder.append("match cos");
-                if (cosList.isInner()) {
-                    stringBuilder.append(" inner");
-                }
-                for (CosValue cosValue : cosList.getCosValueList()) {
-                    stringBuilder.append(" ").append(cosValue.getValue());
-                }
-                stringBuilder.append("\n");
+            stringBuilder.append("match cos");
+            if (aug.getCos().isInner()) {
+                stringBuilder.append(" inner");
             }
+            stringBuilder.append(" ").append(aug.getCos().getCos().getValue().toString());
             return stringBuilder.toString();
+        }
+        return null;
+    }
+
+    private String getDscpCommand(Conditions conditions) {
+        if (conditions.getIpv4() != null && conditions.getIpv4().getConfig() != null) {
+            final Config config = conditions.getIpv4().getConfig();
+            if (config.getDscp() != null) {
+                return "match ip dscp " + config.getDscp().getValue().toString();
+            } else {
+                QosIpv4ConditionAug v4Aug = config.getAugmentation(QosIpv4ConditionAug.class);
+                if (v4Aug.getDscpEnum() != null) {
+                    return "match ip dscp " + v4Aug.getDscpEnum().getName();
+                }
+            }
         }
         return null;
     }

@@ -19,7 +19,7 @@ package io.frinx.cli.unit.ios.qos.handler.scheduler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.CosValue;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Cos;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosCosAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.inputs.input.ConfigBuilder;
 
@@ -42,14 +42,13 @@ public class InputConfigReaderTest {
     public void testCos() {
         InputConfigReader.parseConfig("class-default", OUTPUT, configBuilder);
         final QosCosAug qosCosAug = configBuilder.getAugmentation(QosCosAug.class);
-        Assert.assertEquals(CosValue.getDefaultInstance("5"), qosCosAug.getCos());
+        Assert.assertEquals(Cos.getDefaultInstance("5"), qosCosAug.getCos());
     }
 
     @Test
     public void testNullCos() {
         InputConfigReader.parseConfig("map", OUTPUT, configBuilder);
-        final QosCosAug qosCosAug = configBuilder.getAugmentation(QosCosAug.class);
-        Assert.assertNull(qosCosAug.getCos());
+        Assert.assertNull(configBuilder.getAugmentation(QosCosAug.class));
     }
 
 }

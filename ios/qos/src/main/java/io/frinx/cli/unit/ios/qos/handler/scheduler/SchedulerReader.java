@@ -31,7 +31,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.Scheduler;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.SchedulerBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.SchedulerKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.scheduler.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SchedulerReader implements CliConfigListReader<Scheduler, SchedulerKey, SchedulerBuilder> {
@@ -58,7 +57,6 @@ public class SchedulerReader implements CliConfigListReader<Scheduler, Scheduler
     public static List<SchedulerKey> getSequenceIds(String output) {
         final List<SchedulerKey> keys = new ArrayList<>();
         long seq = 1;
-
         for (String line : output.split(ParsingUtils.NEWLINE.pattern())) {
             line = line.trim();
             Matcher matcher = CLASS_NAME_LINE.matcher(line);
@@ -67,16 +65,15 @@ public class SchedulerReader implements CliConfigListReader<Scheduler, Scheduler
                 seq++;
             }
         }
-
         return keys;
     }
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Scheduler> instanceIdentifier,
-                                      @Nonnull SchedulerBuilder builder, @Nonnull ReadContext readContext) {
+                                      @Nonnull SchedulerBuilder builder,
+                                      @Nonnull ReadContext readContext) {
         final Long sequence = instanceIdentifier.firstKeyOf(Scheduler.class).getSequence();
         builder.setSequence(sequence);
-        builder.setConfig(new ConfigBuilder().setSequence(sequence).build());
     }
 
 }

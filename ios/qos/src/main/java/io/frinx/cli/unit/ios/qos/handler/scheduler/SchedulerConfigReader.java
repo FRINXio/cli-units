@@ -24,26 +24,28 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.qos.Util;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.math.BigInteger;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._2r3c.top.two.rate.three.color.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._2r3c.top.two.rate.three.color.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosServicePolicyAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosServicePolicyAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.QosSchedulerConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.Inputs;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicy;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.Schedulers;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.Scheduler;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.SchedulerKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.scheduler.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.schedulers.scheduler.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class TwoRateThreeColorConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public class SchedulerConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final Pattern CIR_BIT_RATE = Pattern.compile("police cir (?<bitrate>\\S+).+");
-    private static final Pattern CONFORM_BURST = Pattern.compile(".+bc (?<burst>\\S+)");
+    private static final String CLASS_PRIORITY = "priority";
+    private static final Pattern SERVICE_POLICY = Pattern.compile("service-policy (?<name>.+)");
 
     private Cli cli;
 
-    public TwoRateThreeColorConfigReader(Cli cli) {
+    public SchedulerConfigReader(Cli cli) {
         this.cli = cli;
     }
 
@@ -51,26 +53,31 @@ public class TwoRateThreeColorConfigReader implements CliConfigReader<Config, Co
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        final String policyName = getPolicyName(instanceIdentifier);
-        final String className = getClassName(instanceIdentifier, readContext);
+        final Long sequence = instanceIdentifier.firstKeyOf(Scheduler.class).getSequence();
+        final String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
         final String policyOutput = blockingRead(f(InputConfigReader.SH_POLICY_MAP, policyName),
                 cli, instanceIdentifier, readContext);
-        fillInConfig(policyOutput, className,configBuilder);
+        final String className = getClassName(instanceIdentifier, readContext);
+
+        configBuilder.setSequence(sequence);
+        fillInConfig(className, policyOutput, configBuilder);
     }
 
     @VisibleForTesting
-    public static void fillInConfig(String policyOutput, String className, ConfigBuilder builder) {
+    public static void fillInConfig(String className, String policyOutput, ConfigBuilder configBuilder) {
         final String classOutput = Util.extractClass(className, policyOutput);
-        ParsingUtils.parseField(classOutput, CIR_BIT_RATE::matcher,
-            matcher -> matcher.group("bitrate"),
-            g -> builder.setCir(new BigInteger(g)));
-        ParsingUtils.parseField(classOutput, CONFORM_BURST::matcher,
-            matcher -> matcher.group("burst"),
-            g -> builder.setBc(new Long(g)));
+        if (classOutput.contains(CLASS_PRIORITY)) {
+            configBuilder.setPriority(QosSchedulerConfig.Priority.STRICT);
+        }
+        ParsingUtils.parseField(classOutput, 0, SERVICE_POLICY::matcher,
+            m -> m.group("name"),
+            s -> fillInAug(s, configBuilder));
     }
 
-    private String getPolicyName(InstanceIdentifier<Config> instanceIdentifier) {
-        return instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+    private static void fillInAug(String name, ConfigBuilder configBuilder) {
+        QosServicePolicyAugBuilder augBuilder = new QosServicePolicyAugBuilder();
+        augBuilder.setServicePolicy(name);
+        configBuilder.addAugmentation(QosServicePolicyAug.class, augBuilder.build());
     }
 
     private String getClassName(InstanceIdentifier<Config> instanceIdentifier, ReadContext readContext) {

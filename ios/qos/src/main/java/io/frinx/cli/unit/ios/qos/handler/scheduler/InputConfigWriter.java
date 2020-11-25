@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InputConfigWriter implements CliWriter<Config> {
 
-    private static final String WRITE_UPDATE_INPUT = "configure terminal\n"
+    private static final String WRITE_UPDATE_TEMPLATE = "configure terminal\n"
             + "policy-map {$policy_name}\n"
             + "class {$class_name}\n"
             + "{% if ($cos) %}set cos {$cos}\n"
@@ -36,7 +36,7 @@ public class InputConfigWriter implements CliWriter<Config> {
             + "{% endif %}"
             + "end";
 
-    private static final String DELETE_INPUT = "configure terminal\n"
+    private static final String DELETE_TEMPLATE = "configure terminal\n"
             + "policy-map {$policy_name}\n"
             + "no class {$class_name}\n"
             + "end";
@@ -51,12 +51,12 @@ public class InputConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+        final String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                fT(WRITE_UPDATE_INPUT,
-                "policy_name", policyName,
-                "class_name", config.getId(),
-                "cos", config.getAugmentation(QosCosAug.class).getCos().getValue()));
+                fT(WRITE_UPDATE_TEMPLATE,
+                        "policy_name", policyName,
+                        "class_name", config.getId(),
+                        "cos", getCos(config)));
     }
 
     @Override
@@ -64,32 +64,30 @@ public class InputConfigWriter implements CliWriter<Config> {
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = id.firstKeyOf(SchedulerPolicy.class).getName();
+        final String policyName = id.firstKeyOf(SchedulerPolicy.class).getName();
         blockingWriteAndRead(cli, id, dataAfter,
-                fT(WRITE_UPDATE_INPUT,
-                "policy_name", policyName,
-                "class_name", dataAfter.getId(),
-                "cos", getCos(dataAfter),
-                "cos_before", getCos(dataBefore)));
+                fT(WRITE_UPDATE_TEMPLATE,
+                        "policy_name", policyName,
+                        "class_name", dataAfter.getId(),
+                        "cos", getCos(dataAfter),
+                        "cos_before", getCos(dataBefore)));
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+        final String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                fT(DELETE_INPUT,
-                "policy_name", policyName,
-                "class_name", config.getId()));
+                fT(DELETE_TEMPLATE,
+                        "policy_name", policyName,
+                        "class_name", config.getId()));
     }
 
     private Short getCos(Config config) {
-        QosCosAug aug = config.getAugmentation(QosCosAug.class);
-        if (aug != null) {
-            if (aug.getCos() != null) {
-                return aug.getCos().getValue();
-            }
+        final QosCosAug aug = config.getAugmentation(QosCosAug.class);
+        if (aug != null && aug.getCos() != null) {
+            return aug.getCos().getValue();
         }
         return null;
     }

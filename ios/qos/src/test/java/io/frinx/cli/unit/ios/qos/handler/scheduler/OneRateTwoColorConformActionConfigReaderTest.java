@@ -19,14 +19,14 @@ package io.frinx.cli.unit.ios.qos.handler.scheduler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.CosValue;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DeiValue;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DscpValueBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Cos;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Dei;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.DscpBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConformActionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroupBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._2r3c.top.two.rate.three.color.conform.action.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.conform.action.ConfigBuilder;
 
-public class TwoRateThreeColorConformActionConfigReaderTest {
+public class OneRateTwoColorConformActionConfigReaderTest {
 
     private static final String OUTPUT = "  Policy Map TEST\n"
             + "    Class TRANSMIT\n"
@@ -59,37 +59,37 @@ public class TwoRateThreeColorConformActionConfigReaderTest {
 
     @Test
     public void testTransmit() {
-        TwoRateThreeColorConformActionConfigReader.parseConfig("TRANSMIT", OUTPUT, configBuilder);
+        OneRateTwoColorConformActionConfigReader.parseConfig("TRANSMIT", OUTPUT, configBuilder);
         final QosConformActionAug aug = configBuilder.getAugmentation(QosConformActionAug.class);
         Assert.assertEquals(true, aug.isTransmit());
     }
 
     @Test
     public void testCos() {
-        TwoRateThreeColorConformActionConfigReader.parseConfig("COS", OUTPUT, configBuilder);
+        OneRateTwoColorConformActionConfigReader.parseConfig("COS", OUTPUT, configBuilder);
         final QosConformActionAug aug = configBuilder.getAugmentation(QosConformActionAug.class);
-        Assert.assertEquals(CosValue.getDefaultInstance("7"), aug.getCos());
+        Assert.assertEquals(Cos.getDefaultInstance("7"), aug.getCosTransmit());
     }
 
     @Test
     public void testDei() {
-        TwoRateThreeColorConformActionConfigReader.parseConfig("DEI", OUTPUT, configBuilder);
+        OneRateTwoColorConformActionConfigReader.parseConfig("DEI", OUTPUT, configBuilder);
         final QosConformActionAug aug = configBuilder.getAugmentation(QosConformActionAug.class);
-        Assert.assertEquals(DeiValue.getDefaultInstance("1"), aug.getDei());
+        Assert.assertEquals(Dei.getDefaultInstance("1"), aug.getDeiTransmit());
     }
 
     @Test
     public void testDscp() {
-        TwoRateThreeColorConformActionConfigReader.parseConfig("DSCP", OUTPUT, configBuilder);
+        OneRateTwoColorConformActionConfigReader.parseConfig("DSCP", OUTPUT, configBuilder);
         final QosConformActionAug aug = configBuilder.getAugmentation(QosConformActionAug.class);
-        Assert.assertEquals(DscpValueBuilder.getDefaultInstance("af32"), aug.getDscp());
+        Assert.assertEquals(DscpBuilder.getDefaultInstance("af32"), aug.getDscpTransmit());
     }
 
     @Test
     public void testQos() {
-        TwoRateThreeColorConformActionConfigReader.parseConfig("QOS", OUTPUT, configBuilder);
+        OneRateTwoColorConformActionConfigReader.parseConfig("QOS", OUTPUT, configBuilder);
         final QosConformActionAug aug = configBuilder.getAugmentation(QosConformActionAug.class);
-        Assert.assertEquals(QosGroupBuilder.getDefaultInstance("13"), aug.getQos());
+        Assert.assertEquals(QosGroupBuilder.getDefaultInstance("13"), aug.getQosTransmit());
     }
 
 }

@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SchedulerPolicyWriter implements CliWriter<Config> {
 
-    private static final String POLICY_T = "configure terminal\n"
+    private static final String POLICY_TEMPLATE = "configure terminal\n"
             + "{% if ($delete) %}no {% endif %}policy-map {$name}\n"
             + "end";
 
@@ -42,10 +42,8 @@ public class SchedulerPolicyWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
-        blockingWriteAndRead(cli, instanceIdentifier, config,
-                fT(POLICY_T,
-                "name", policyName));
+        final String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+        blockingWriteAndRead(cli, instanceIdentifier, config, fT(POLICY_TEMPLATE, "name", policyName));
     }
 
     @Override
@@ -60,11 +58,11 @@ public class SchedulerPolicyWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
+        final String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                fT(POLICY_T,
-                "name", policyName,
-                "delete", Chunk.TRUE));
+                fT(POLICY_TEMPLATE,
+                        "name", policyName,
+                        "delete", Chunk.TRUE));
     }
 
 }

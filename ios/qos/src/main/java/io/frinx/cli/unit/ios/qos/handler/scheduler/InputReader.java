@@ -65,7 +65,8 @@ public class InputReader implements CliConfigListReader<Input, InputKey, InputBu
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Input> instanceIdentifier,
-                                      @Nonnull InputBuilder inputBuilder, @Nonnull ReadContext readContext) {
+                                      @Nonnull InputBuilder inputBuilder,
+                                      @Nonnull ReadContext readContext) {
         final String className = instanceIdentifier.firstKeyOf(Input.class).getId();
         inputBuilder.setId(className);
     }

@@ -31,13 +31,14 @@ import io.frinx.cli.unit.ios.qos.handler.scheduler.InputConfigReader;
 import io.frinx.cli.unit.ios.qos.handler.scheduler.InputConfigWriter;
 import io.frinx.cli.unit.ios.qos.handler.scheduler.InputReader;
 import io.frinx.cli.unit.ios.qos.handler.scheduler.OneRateTwoColorConfigReader;
-import io.frinx.cli.unit.ios.qos.handler.scheduler.OneRateTwoColorConfigWriter;
+import io.frinx.cli.unit.ios.qos.handler.scheduler.OneRateTwoColorConformActionConfigReader;
+import io.frinx.cli.unit.ios.qos.handler.scheduler.OneRateTwoColorExceedActionConfigReader;
+import io.frinx.cli.unit.ios.qos.handler.scheduler.OneRateTwoColorWriter;
+import io.frinx.cli.unit.ios.qos.handler.scheduler.SchedulerConfigReader;
+import io.frinx.cli.unit.ios.qos.handler.scheduler.SchedulerConfigWriter;
 import io.frinx.cli.unit.ios.qos.handler.scheduler.SchedulerPolicyReader;
 import io.frinx.cli.unit.ios.qos.handler.scheduler.SchedulerPolicyWriter;
 import io.frinx.cli.unit.ios.qos.handler.scheduler.SchedulerReader;
-import io.frinx.cli.unit.ios.qos.handler.scheduler.TwoRateThreeColorConfigReader;
-import io.frinx.cli.unit.ios.qos.handler.scheduler.TwoRateThreeColorConformActionConfigReader;
-import io.frinx.cli.unit.ios.qos.handler.scheduler.TwoRateThreeColorExceedActionConfigReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.qos.IIDs;
 import java.util.Set;
@@ -81,20 +82,27 @@ public class QoSUnit extends AbstractUnit {
                         IIDs.QO_CL_CL_TE_TE_CONFIG,
                         IIDs.QO_CL_CL_TE_TE_CONDITIONS,
                         IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG,
-                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_DSCP,
-                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_DS_DSCPLIST,
                         IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_COS,
-                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_CO_COSLIST));
+                        IIDs.QO_CL_CL_TE_TE_CO_IPV4,
+                        IIDs.QO_CL_CL_TE_TE_CO_IP_CONFIG,
+                        IIDs.QO_CL_CL_TE_TE_CO_IP_CO_AUG_QOSIPV4CONDITIONAUG));
         writeRegistry.addNoop(IIDs.QO_SCHEDULERPOLICIES);
         writeRegistry.addNoop(IIDs.QO_SC_SCHEDULERPOLICY);
         writeRegistry.addNoop(IIDs.QO_SC_SC_SC_SCHEDULER);
         writeRegistry.add(IIDs.QO_SC_SC_CONFIG, new SchedulerPolicyWriter(cli));
-        writeRegistry.addNoop(IIDs.QO_SC_SC_SC_SC_CONFIG);
         writeRegistry.addNoop(IIDs.QO_SC_SC_SC_SC_INPUTS);
         writeRegistry.addNoop(IIDs.QO_SC_SC_SC_SC_IN_INPUT);
+        writeRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_CONFIG, new SchedulerConfigWriter(cli),
+                Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_CO_AUG_QOSSERVICEPOLICYAUG));
         writeRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_IN_IN_CONFIG, new InputConfigWriter(cli),
                 Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_IN_IN_CO_AUG_QOSCOSAUG));
-        writeRegistry.add(IIDs.QO_SC_SC_SC_SC_ON_CONFIG, new OneRateTwoColorConfigWriter(cli));
+        writeRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_ONERATETWOCOLOR, new OneRateTwoColorWriter(cli),
+                Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_ON_CONFIG,
+                        IIDs.QO_SC_SC_SC_SC_ON_CO_AUG_QOSMAXQUEUEDEPTHBPSAUG,
+                        IIDs.QO_SC_SC_SC_SC_ON_CO_CONFIG,
+                        IIDs.QO_SC_SC_SC_SC_ON_CO_CO_AUG_QOSCONFORMACTIONAUG,
+                        IIDs.QO_SC_SC_SC_SC_ON_EX_CONFIG,
+                        IIDs.QO_SC_SC_SC_SC_ON_EX_CO_AUG_QOSEXCEEDACTIONAUG));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -103,19 +111,23 @@ public class QoSUnit extends AbstractUnit {
         readRegistry.subtreeAdd(IIDs.QO_CL_CL_TE_TERM, new TermReader(cli),
                 Sets.newHashSet(IIDs.QO_CL_CL_TE_TE_CONFIG));
         readRegistry.subtreeAdd(IIDs.QO_CL_CL_TE_TE_CONDITIONS, new ConditionsReader(cli),
-                Sets.newHashSet(IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG));
+                Sets.newHashSet(IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG,
+                        IIDs.QO_CL_CL_TE_TE_CO_IP_CO_AUG_QOSIPV4CONDITIONAUG));
         readRegistry.subtreeAdd(IIDs.QO_SC_SCHEDULERPOLICY, new SchedulerPolicyReader(cli),
                 Sets.newHashSet(IIDs.QO_SC_SC_CONFIG));
         readRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SCHEDULER, new SchedulerReader(cli),
                 Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_CONFIG));
         readRegistry.add(IIDs.QO_SC_SC_SC_SC_IN_INPUT, new InputReader(cli));
-        readRegistry.add(IIDs.QO_SC_SC_SC_SC_IN_IN_CONFIG, new InputConfigReader(cli));
-        readRegistry.add(IIDs.QO_SC_SC_SC_SC_ON_CONFIG, new OneRateTwoColorConfigReader(cli));
-        readRegistry.add(IIDs.QO_SC_SC_SC_SC_TW_CONFIG, new TwoRateThreeColorConfigReader(cli));
-        readRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_TW_CO_CONFIG, new TwoRateThreeColorConformActionConfigReader(cli),
-                Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_TW_CO_CO_AUG_QOSCONFORMACTIONAUG));
-        readRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_TW_EX_CONFIG, new TwoRateThreeColorExceedActionConfigReader(cli),
-                Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_TW_EX_CO_AUG_QOSEXCEEDACTIONAUG));
+        readRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_CONFIG, new SchedulerConfigReader(cli),
+                Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_CO_AUG_QOSSERVICEPOLICYAUG));
+        readRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_IN_IN_CONFIG, new InputConfigReader(cli),
+                Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_IN_IN_CO_AUG_QOSCOSAUG));
+        readRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_ON_CONFIG, new OneRateTwoColorConfigReader(cli),
+                Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_ON_CO_AUG_QOSMAXQUEUEDEPTHBPSAUG));
+        readRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_ON_CO_CONFIG, new OneRateTwoColorConformActionConfigReader(cli),
+                Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_ON_CO_CO_AUG_QOSCONFORMACTIONAUG));
+        readRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_ON_EX_CONFIG, new OneRateTwoColorExceedActionConfigReader(cli),
+                Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_ON_EX_CO_AUG_QOSEXCEEDACTIONAUG));
     }
 
     @Override

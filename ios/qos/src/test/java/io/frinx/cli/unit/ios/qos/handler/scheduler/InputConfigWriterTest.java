@@ -28,7 +28,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.CosValue;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.Cos;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosCosAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosCosAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.inputs.top.inputs.input.Config;
@@ -119,7 +119,7 @@ public class InputConfigWriterTest {
         ConfigBuilder configBuilder = new ConfigBuilder().setId(id);
         if (cos != null) {
             configBuilder.addAugmentation(QosCosAug.class,
-                    new QosCosAugBuilder().setCos(new CosValue(Short.valueOf(cos))).build());
+                    new QosCosAugBuilder().setCos(Cos.getDefaultInstance(cos)).build());
         }
         return configBuilder.build();
     }
