@@ -27,7 +27,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-native-units</artifactId>
-    <version>4.2.6.rc1-frinx</version>
+    <version>4.2.6.rc2-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
