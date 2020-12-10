@@ -20,10 +20,12 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigReader;
 import io.frinx.cli.unit.ios.ifc.Util;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -33,6 +35,9 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.policy.ServicePolicyBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 
@@ -57,6 +62,8 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     public static final Pattern NO_IP_REDIRECTS_LINE = Pattern.compile("\\s*no ip redirects");
     public static final Pattern NO_IP_UNREACHABLES_LINE = Pattern.compile("\\s*no ip unreachables");
     public static final Pattern NO_IP_PROXY_ARP_LINE = Pattern.compile("\\s*no ip proxy-arp");
+    private static final Pattern STORM_CONTROL_LINE =
+            Pattern.compile("\\s*storm-control (?<address>\\S+) level (?<level>.+)");
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);
@@ -76,6 +83,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setIpRedirects(output, ifCiscoExtAugBuilder);
         setIpUnreachables(output, ifCiscoExtAugBuilder);
         setIpProxyArp(output, ifCiscoExtAugBuilder);
+        setStormControl(output, ifCiscoExtAugBuilder);
         builder.addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder.build());
     }
 
@@ -238,6 +246,34 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
             }
             ifCiscoExtAugBuilder.setPortType(portType);
         }
+    }
+
+    private void setStormControl(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        List<StormControl> stormControls = new ArrayList<>();
+        ParsingUtils.parseFields(output, 0, STORM_CONTROL_LINE::matcher,
+            Matcher::group,
+            m -> stormControls.add(parseStormControlLine(m)));
+
+        if (!stormControls.isEmpty()) {
+            ifCiscoExtAugBuilder.setStormControl(stormControls);
+        }
+    }
+
+    private StormControl parseStormControlLine(String line) {
+        Optional<String> address = ParsingUtils.parseField(line, 0, STORM_CONTROL_LINE::matcher,
+            matcher -> matcher.group("address"));
+        Optional<String> level = ParsingUtils.parseField(line, 0, STORM_CONTROL_LINE::matcher,
+            matcher -> matcher.group("level"));
+
+        if (address.isPresent() && level.isPresent()) {
+            StormControlBuilder builder = new StormControlBuilder();
+            builder.setAddress(Util.getStormControlAddress(address.get()));
+            builder.setKey(new StormControlKey(builder.getAddress()));
+            builder.setLevel(new BigDecimal(level.get()));
+            return builder.build();
+        }
+
+        return null;
     }
 
     @Override

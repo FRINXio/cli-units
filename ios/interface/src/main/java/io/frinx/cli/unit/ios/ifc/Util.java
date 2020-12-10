@@ -20,7 +20,7 @@ import com.google.common.collect.HashBiMap;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceReader;
 import java.util.Collections;
 import java.util.Set;
-
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.ext.rev190724.SPEEDAUTO;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ETHERNETSPEED;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED100GB;
@@ -96,6 +96,19 @@ public final class Util {
         biMap.put("100000", SPEED100GB.class);
         biMap.put("auto", SPEEDAUTO.class);
         return biMap;
+    }
+
+    public static StormControl.Address getStormControlAddress(String name) {
+        switch (name) {
+            case "broadcast":
+                return StormControl.Address.Broadcast;
+            case "multicast":
+                return StormControl.Address.Multicast;
+            case "unicast":
+                return StormControl.Address.Unicast;
+            default:
+                return null;
+        }
     }
 
 }

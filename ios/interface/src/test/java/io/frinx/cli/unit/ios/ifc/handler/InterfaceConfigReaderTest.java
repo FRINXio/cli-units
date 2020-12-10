@@ -17,11 +17,16 @@
 package io.frinx.cli.unit.ios.ifc.handler;
 
 import io.frinx.cli.io.Cli;
+import java.math.BigDecimal;
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
@@ -33,7 +38,17 @@ public class InterfaceConfigReaderTest {
             .setType(EthernetCsmacd.class)
             .setDescription("asd fdsas'; dsa;d;fa'")
             .setMtu(1530)
-            .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder().build())
+            .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
+                    .setStormControl(Arrays.asList(new StormControlBuilder()
+                            .setKey(new StormControlKey(StormControl.Address.Broadcast))
+                            .setAddress(StormControl.Address.Broadcast)
+                            .setLevel(new BigDecimal("50.00"))
+                            .build(), new StormControlBuilder()
+                            .setKey(new StormControlKey(StormControl.Address.Multicast))
+                            .setAddress(StormControl.Address.Multicast)
+                            .setLevel(new BigDecimal("12.34"))
+                            .build()))
+                    .build())
             .build();
     private static final String SH_INTERFACE_RUN = "interface GigabitEthernet1/0\n"
             + " mtu 1530\n"
@@ -41,6 +56,8 @@ public class InterfaceConfigReaderTest {
             + " shutdown\n"
             + " negotiation auto\n"
             + " description asd fdsas'; dsa;d;fa'\n"
+            + " storm-control broadcast level 50.00\n"
+            + " storm-control multicast level 12.34\n"
             + "end\n";
 
 
