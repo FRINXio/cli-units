@@ -16,13 +16,13 @@
     <parent>
         <groupId>io.frinx.translate.unit.commons</groupId>
         <artifactId>checkstyle-parent</artifactId>
-        <version>4.2.6.rc3-frinx</version>
+        <version>4.2.6.rc4-frinx-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>yang-docs-plugin</artifactId>
-    <version>4.2.6.rc3-frinx</version>
+    <version>4.2.6.rc4-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencyManagement>
