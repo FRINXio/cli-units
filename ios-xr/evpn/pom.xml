@@ -24,12 +24,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.14.rc35-frinx-SNAPSHOT</version>
+        <version>3.1.14.rc35-frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>ios-xr-evpn-unit</artifactId>
-    <version>3.1.14.rc35-frinx-SNAPSHOT</version>
+    <version>3.1.14.rc35-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
