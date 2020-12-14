@@ -32,7 +32,7 @@ public class NetworkInstanceConfigReader extends CompositeReader<Config, ConfigB
     public NetworkInstanceConfigReader(Cli cli) {
         super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {
             {
-                add(new L2vsicpConfigReader());
+                add(new L2vsicpConfigReader(cli));
                 add(new L2VSIConfigReader(cli));
                 add(new DefaultConfigReader());
             }

@@ -22,24 +22,19 @@ import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.saos.network.instance.handler.l2vsicp.L2vsicpConfigWriter;
 import io.frinx.cli.unit.saos.network.instance.handler.l2vsicp.L2vsicpReader;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
-import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.Config2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.SaosVlanExtensionConfigStat;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class L2vsicpVlanConfigWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
 
     private static final String WRITE_VLAN_COMMAND =
             "{$data|update(value,virtual-circuit ethernet set vc `$name` vlan `$data.value`, )}";
-    private static final String WRITE_STAT_COMMAND = "{% if $set_statistics == TRUE %}"
-            + "virtual-circuit ethernet set vc {$name} statistics {$statistics}"
-            + "{% endif %}";
 
     private final Cli cli;
 
@@ -53,39 +48,22 @@ public final class L2vsicpVlanConfigWriter implements CompositeWriter.Child<Conf
         if (!L2vsicpReader.L2VSICP_CHECK.canProcess(iid, writeContext, false)) {
             return false;
         }
-
-        String name = iid.firstKeyOf(NetworkInstance.class).getName();
-        String command = createCommand(null, data, name, false);
-        Optional<NetworkInstance> niOpt = writeContext.readBefore(iid.firstIdentifierOf(NetworkInstance.class));
-        if (!niOpt.isPresent()) {
-            command = createCommand(null, data, name, true);
+        Optional<NetworkInstance> niOpt = writeContext.readAfter(iid.firstIdentifierOf(NetworkInstance.class));
+        if (niOpt.isPresent()) {
+            Config dataBefore = L2vsicpConfigWriter.getVlanId(niOpt.get());
+            String command = createCommand(dataBefore, data, data.getName());
+            blockingWriteAndRead(command, cli, iid, data);
+            return true;
         }
-        blockingWriteAndRead(command, cli, iid, data);
-        return true;
+        return false;
     }
 
     @VisibleForTesting
-    String createCommand(Config dataBefore, @Nonnull Config data, String name, boolean onlyStat) {
-        String command = fT(WRITE_VLAN_COMMAND, "name", name, "before",
-                dataBefore == null ? null : dataBefore.getVlanId(), "data", data.getVlanId());
-        boolean onOffBefore = getOnOff(dataBefore);
-        boolean onOff = getOnOff(data);
-        String setStatistics = dataBefore == null ? "TRUE" : onOff == onOffBefore ? "NULL" : "TRUE";
-        String statistics = onOff ? "on" : "off";
-        String statCommand = fT(WRITE_STAT_COMMAND, "name", name,
-                "set_statistics", setStatistics, "statistics", statistics);
-        return onlyStat ? statCommand :
-                command.isEmpty() ? statCommand :
-                        statCommand.isEmpty() ? command : command + "\n" + statCommand;
+    String createCommand(Config dataBefore, @Nonnull Config data, String name) {
+        return fT(WRITE_VLAN_COMMAND, "name", name, "before",
+            dataBefore == null ? null : dataBefore.getVlanId(), "data", data.getVlanId());
     }
 
-    private boolean getOnOff(Config data) {
-        return data == null ? false : java.util.Optional.of(data)
-                .map(d -> d.getAugmentation(Config2.class))
-                .filter(Objects::nonNull)
-                .map(SaosVlanExtensionConfigStat::isStatistics)
-                .orElse(false);
-    }
 
     @Override
     public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> iid, @Nonnull Config dataBefore,
@@ -96,7 +74,7 @@ public final class L2vsicpVlanConfigWriter implements CompositeWriter.Child<Conf
         }
 
         String name = iid.firstKeyOf(NetworkInstance.class).getName();
-        blockingWriteAndRead(createCommand(dataBefore, dataAfter, name, true), cli, iid, dataAfter);
+        blockingWriteAndRead(createCommand(dataBefore, dataAfter, name), cli, iid, dataAfter);
         return true;
     }
 

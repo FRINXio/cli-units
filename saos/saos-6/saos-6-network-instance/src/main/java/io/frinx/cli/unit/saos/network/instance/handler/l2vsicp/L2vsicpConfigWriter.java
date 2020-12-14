@@ -19,6 +19,7 @@ package io.frinx.cli.unit.saos.network.instance.handler.l2vsicp;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.x5.template.Chunk;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -29,6 +30,8 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.virtual.circuit.saos.extension.rev201204.NiVcSaosAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.virtual.circuit.saos.extension.rev201204.SaosExtensionConfigStat;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.Vlans;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.Vlan;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -36,7 +39,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class L2vsicpConfigWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
 
     private static final String L2VSICP_DELETE = "virtual-circuit ethernet delete vc %s";
-    private static final String L2VSICP_CREATE = "virtual-circuit ethernet create vc {$name} vlan {$vlan.value}";
+    private static final String L2VSICP_CREATE = "virtual-circuit ethernet create vc {$name} vlan {$vlan.value}\n"
+        + "configuration save\n"
+        + "{% if $set_statistics == TRUE %}"
+        + "virtual-circuit ethernet set vc {$name} statistics {$statistics}\n"
+        + "configuration save"
+        + "{% endif %}";
 
 
     private final Cli cli;
@@ -54,7 +62,7 @@ public class L2vsicpConfigWriter implements CompositeWriter.Child<Config>, CliWr
 
         Optional<NetworkInstance> niOpt = writeContext.readAfter(iid.firstIdentifierOf(NetworkInstance.class));
         if (niOpt.isPresent()) {
-            String command = createCommand(niOpt.get(), data.getName());
+            String command = createCommand(niOpt.get(), data);
             blockingWriteAndRead(command, cli, iid, data);
             return true;
         }
@@ -62,14 +70,18 @@ public class L2vsicpConfigWriter implements CompositeWriter.Child<Config>, CliWr
     }
 
     @VisibleForTesting
-    String createCommand(@Nonnull NetworkInstance networkInstance, String name) {
+    String createCommand(@Nonnull NetworkInstance networkInstance, Config data) {
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config
                 config = getVlanId(networkInstance);
         Preconditions.checkNotNull(config, "Missing vlan config to create virtual circuit");
-        return fT(L2VSICP_CREATE, "name", name, "vlan", config.getVlanId());
+        boolean onOff = getOnOff(data);
+        String setStatistics = data == null ? "NULL" : Chunk.TRUE;
+        String statistics = onOff ? "on" : "off";
+        return fT(L2VSICP_CREATE, "name", data.getName(), "vlan", config.getVlanId(),
+                "set_statistics", setStatistics, "statistics", statistics);
     }
 
-    private org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config
+    public static org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config
         getVlanId(NetworkInstance networkInstance) {
         return java.util.Optional.of(networkInstance)
                 .map(NetworkInstance::getVlans)
@@ -80,6 +92,13 @@ public class L2vsicpConfigWriter implements CompositeWriter.Child<Config>, CliWr
                 .map(Vlan::getConfig)
                 .findFirst()
                 .orElse(null);
+    }
+
+    private boolean getOnOff(Config data) {
+        return data == null ? false : java.util.Optional.of(data)
+                .map(d -> d.getAugmentation(NiVcSaosAug.class))
+                .map(SaosExtensionConfigStat::isStatistics)
+                .orElse(false);
     }
 
     @Override

@@ -122,7 +122,7 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
         // VLAN
         writeRegistry.addNoop(IIDs.NE_NE_VL_VLAN);
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
-                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1, IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2),
+                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1),
                 IIDs.NE_NE_CONFIG);
         // PF
         writeRegistry.addNoop(IIDs.NE_NE_PO_IN_INTERFACE);
@@ -175,7 +175,7 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
         // VLAN
         readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
         readRegistry.subtreeAdd(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli),
-                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1, IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2));
+                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1));
     }
 
     @Override
