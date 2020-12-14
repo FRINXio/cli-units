@@ -126,13 +126,6 @@ public class InterfaceConfigWriterTest {
                                 createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
                                         VlanEthertypePolicy.VlanTpid,  false))));
 
-        // physical type
-        Assert.assertEquals("port set port test_name mode sfp\nconfiguration save",
-                writer.updateTemplate(dataBefore,
-                        createConfig(true, EthernetCsmacd.class, 35, "test",
-                                createAugBuilder(PhysicalType.Sfp, IngressToEgressQmap.DefaultRCOS, 200, true,
-                                        VlanEthertypePolicy.VlanTpid,  false))));
-
         // ingress to egress qmap
         Assert.assertEquals("port set port test_name ingress-to-egress-qmap NNI-NNI\nconfiguration save",
                 writer.updateTemplate(dataBefore,
@@ -173,7 +166,6 @@ public class InterfaceConfigWriterTest {
         Assert.assertEquals("port disable port test_name\n"
                 + "port set port test_name description \"new description\"\n"
                 + "port set port test_name max-frame-size 1500\n"
-                + "port set port test_name mode sfp\n"
                 + "port set port test_name vs-ingress-filter off\n"
                 + "virtual-circuit ethernet set port test_name vlan-ethertype-policy all\n"
                 + "port set port test_name ingress-to-egress-qmap NNI-NNI\n"

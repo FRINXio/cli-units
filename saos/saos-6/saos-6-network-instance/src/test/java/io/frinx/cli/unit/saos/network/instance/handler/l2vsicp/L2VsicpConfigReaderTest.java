@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.saos.network.instance.handler.l2vsicp.vlan;
+package io.frinx.cli.unit.saos.network.instance.handler.l2vsicp;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.virtual.circuit.saos.extension.rev201204.NiVcSaosAug;
 
-public class L2VsicpVlanConfigReaderTest {
+public class L2VsicpConfigReaderTest {
 
     private static final String OUTPUT = "virtual-circuit transform create l2-transform l212 vid 1\n"
             + "virtual-circuit ethernet create vc vc2 vlan 3 statistics on\n"
@@ -37,20 +36,19 @@ public class L2VsicpVlanConfigReaderTest {
 
     @Test
     public void fillBuilderTest() {
-        buildAndTest("", 1, null);
-        buildAndTest(OUTPUT, 3, "vc2");
-        buildAndTest(OUTPUT, 11, "vc3");
-        buildAndTest(OUTPUT, 7, "Name");
-        buildAndTest(OUTPUT, 8, "VC22");
-        buildAndTest(OUTPUT, 1234, "vlan1234");
-        buildAndTest(OUTPUT, 2, "lksajd7");
+        buildAndTest("", null, false);
+        buildAndTest(OUTPUT, "vc2", true);
+        buildAndTest(OUTPUT, "vc3", true);
+        buildAndTest(OUTPUT, "Name", true);
+        buildAndTest(OUTPUT, "VC22", false);
+        buildAndTest(OUTPUT, "vlan1234", true);
+        buildAndTest(OUTPUT, "lksajd7", false);
     }
 
-    private void buildAndTest(String output, int vlanId, String name) {
+    private void buildAndTest(String output, String name, boolean isStatistics) {
         ConfigBuilder builder = new ConfigBuilder();
-        builder.setVlanId(new VlanId(vlanId));
         builder.setName(name);
-        Config config = builder.build();
-        Assert.assertEquals(config.getVlanId().getValue().intValue(), vlanId);
+        L2vsicpConfigReader.fillBuilder(builder, output, name);
+        Assert.assertEquals(builder.build().getAugmentation(NiVcSaosAug.class).isStatistics(), isStatistics);
     }
 }

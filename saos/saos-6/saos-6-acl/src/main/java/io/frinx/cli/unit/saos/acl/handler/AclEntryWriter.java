@@ -69,7 +69,7 @@ public class AclEntryWriter implements CliWriter<AclEntry> {
                                         @Nonnull AclEntry dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         String aclSetName = id.firstKeyOf(AclSet.class).getName();
-        blockingWriteAndRead(updateTemplate(dataBefore, dataAfter, aclSetName), cli, id, dataAfter);
+        blockingWriteAndRead(writeTemplate(dataAfter, aclSetName), cli, id, dataAfter);
     }
 
     @VisibleForTesting

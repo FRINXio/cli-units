@@ -73,6 +73,7 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
                 IIDs.FRINX_OPENCONFIG_INTERFACES,
                 IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE_TYPES,
                 IIDs.FRINX_SAOS_VS_EXTENSION,
+                IIDs.FRINX_SAOS_VC_EXTENSION,
                 IIDs.FRINX_SAOS_NETWORK_INSTANCE_TYPE_EXTENSION,
                 IIDs.FRINX_SAOS_VLAN_EXTENSION,
                 IIDs.FRINX_SAOS_VIRTUAL_RING_EXTENSION,
@@ -92,22 +93,19 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         // No handling required on the network instance level
         writeRegistry.addNoop(IIDs.NE_NETWORKINSTANCE);
-        writeRegistry.subtreeAddBefore(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli),
-                Collections.singleton(IIDs.NE_NE_CO_AUG_VSSAOSAUG),
-                IIDs.NE_NE_VL_VL_CONFIG,
-                io.frinx.openconfig.openconfig.qos.IIDs.QO_SC_SCHEDULERPOLICY);
+        writeRegistry.subtreeAdd(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_CO_AUG_VSSAOSAUG, IIDs.NE_NE_CO_AUG_NIVCSAOSAUG));
 
         // vlan
         writeRegistry.addNoop(IIDs.NE_NE_VL_VLAN);
-        writeRegistry.subtreeAddAfter(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
-                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1,
-                        IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2), IIDs.NE_NE_CONFIG);
+        writeRegistry.subtreeAdd(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
+                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1));
 
         writeRegistry.addNoop(IIDs.NE_NE_VL_VL_AUG_SAOS6VRAUG_VI_VIRTUALRING);
         writeRegistry.add(IIDs.NE_NE_VL_VL_AUG_SAOS6VRAUG_VI_VI_CONFIG,
                 new VirtualRingConfigWriter(cli));
 
-        // virtual-switch
+        // virtual-circuit
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_CONNECTIONPOINTS,
                 new ConnectionPointsWriter(),
                 Sets.newHashSet(
@@ -123,11 +121,11 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
-        readRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli));
+        readRegistry.subtreeAdd(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli),
+                Collections.singleton(IIDs.NE_NE_CO_AUG_NIVCSAOSAUG));
         readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
         readRegistry.subtreeAdd(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli),
-                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1,
-                        IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG2));
+                Collections.singleton(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1));
 
         readRegistry.add(IIDs.NE_NE_VL_VL_AUG_SAOS6VRAUG_VI_VIRTUALRING,
                 new VirtualRingReader(cli));

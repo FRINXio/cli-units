@@ -31,7 +31,7 @@ public class VlanConfigReader extends CompositeReader<Config, ConfigBuilder>
     public VlanConfigReader(Cli cli) {
         super(Lists.newArrayList(
                 new DefaultVlanConfigReader(cli),
-                new L2vsicpVlanConfigReader(cli)
+                new L2vsicpVlanConfigReader()
         ));
     }
 }

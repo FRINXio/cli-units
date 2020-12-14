@@ -43,8 +43,6 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
             + "{$data|update(mtu,port set port `$data.name` max-frame-size `$data.mtu`\n,)}"
             // acceptable-frame-type
             + "{% if ($aft) %}port set port {$data.name} acceptable-frame-type {$aft}\n{% endif %}"
-            // mode
-            + "{% if ($pt) %}port set port {$data.name} mode {$pt}\n{% endif %}"
             // vs-ingress-filter
             + "{% if ($vif) %}port set port {$data.name} vs-ingress-filter {$vif}\n{% endif %}"
             // vlan-ethertype-policy

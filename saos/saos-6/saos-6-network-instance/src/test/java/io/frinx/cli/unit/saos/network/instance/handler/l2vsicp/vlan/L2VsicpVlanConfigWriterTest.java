@@ -22,8 +22,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.Config2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.Config2Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 
 public class L2VsicpVlanConfigWriterTest {
@@ -31,26 +29,12 @@ public class L2VsicpVlanConfigWriterTest {
     @Test
     public void updateVlanTest() {
         L2vsicpVlanConfigWriter writer = new L2vsicpVlanConfigWriter(Mockito.mock(Cli.class));
-        createCommandAndTest(writer, null, createConfig(1, false, false), "test",
-                "virtual-circuit ethernet set vc test vlan 1\nvirtual-circuit ethernet set vc test statistics off");
-        createCommandAndTest(writer, null, createConfig(1, true, false), "test",
-                "virtual-circuit ethernet set vc test vlan 1\nvirtual-circuit ethernet set vc test statistics off");
-        createCommandAndTest(writer, null, createConfig(1, true, true), "test",
-                "virtual-circuit ethernet set vc test vlan 1\nvirtual-circuit ethernet set vc test statistics on");
-        createCommandAndTest(writer, createConfig(1, false, false), createConfig(1, false, false), "test", "");
-        createCommandAndTest(writer, createConfig(1, false, false), createConfig(2, false, false), "test",
+        createCommandAndTest(writer, null, createConfig(1), "test",
+                "virtual-circuit ethernet set vc test vlan 1");
+        createCommandAndTest(writer, createConfig(1), createConfig(2), "test",
                 "virtual-circuit ethernet set vc test vlan 2");
-        createCommandAndTest(writer, createConfig(2, true, false), createConfig(2, false, false), "test2", "");
-        createCommandAndTest(writer, createConfig(2, true, false), createConfig(2, true, false), "test", "");
-        createCommandAndTest(writer, createConfig(2, true, true), createConfig(2, true, false), "test2",
-                "virtual-circuit ethernet set vc test2 statistics off");
-        createCommandAndTest(writer, createConfig(2, true, false), createConfig(2, true, true), "test",
-                "virtual-circuit ethernet set vc test statistics on");
-        createCommandAndTest(writer, createConfig(2, true, true), createConfig(2, true, true), "test", "");
-        createCommandAndTest(writer, createConfig(1, true, false), createConfig(2, true, true), "test",
-                "virtual-circuit ethernet set vc test vlan 2\nvirtual-circuit ethernet set vc test statistics on");
-        createCommandAndTest(writer, createConfig(1, true, true), createConfig(2, true, false), "test",
-                "virtual-circuit ethernet set vc test vlan 2\nvirtual-circuit ethernet set vc test statistics off");
+        createCommandAndTest(writer, createConfig(1), createConfig(1), "test",
+                "");
     }
 
     private void createCommandAndTest(L2vsicpVlanConfigWriter writer,
@@ -58,15 +42,12 @@ public class L2VsicpVlanConfigWriterTest {
                                       Config after,
                                       String niName,
                                       String expected) {
-        String command = writer.createCommand(before, after, niName, false);
+        String command = writer.createCommand(before, after, niName);
         Assert.assertEquals(expected, command);
     }
 
-    private Config createConfig(int vlanId, boolean addAugmentation, boolean statistics) {
+    private Config createConfig(int vlanId) {
         ConfigBuilder configBuilder = new ConfigBuilder().setVlanId(new VlanId(vlanId));
-        if (addAugmentation) {
-            configBuilder.addAugmentation(Config2.class, new Config2Builder().setStatistics(statistics).build());
-        }
         return configBuilder.build();
     }
 }

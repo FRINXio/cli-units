@@ -87,7 +87,9 @@ public class SaosInterfaceUnit extends AbstractUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.INTERFACES);
         writeRegistry.addNoop(IIDs.IN_INTERFACE);
-        writeRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli));
+        writeRegistry.addAfter(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli),
+                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
+
 
         // sub-port of the lag interface
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
