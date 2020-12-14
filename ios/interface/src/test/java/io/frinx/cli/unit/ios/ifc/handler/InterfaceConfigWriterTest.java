@@ -21,6 +21,9 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,12 +32,60 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriterTest {
+
+    private static final String PHYSICAL_INTERFACE_WRITE_INPUT = "configure terminal\n"
+            + "interface GigabitEthernet0/1\n"
+            + "no shutdown\n"
+            + "no port-type\n"
+            + "no switchport mode\n"
+            + "snmp trap link-status\n"
+            + "no switchport access vlan\n"
+            + "no switchport trunk allowed vlan\n"
+            + "storm-control broadcast level 10.00\n"
+            + "no storm-control multicast level\n"
+            + "no storm-control unicast level\n"
+            + "end\n"
+            + "\n";
+
+    private static final String PHYSICAL_INTERFACE_UPDATE_INPUT = "configure terminal\n"
+            + "interface GigabitEthernet0/1\n"
+            + "no shutdown\n"
+            + "no port-type\n"
+            + "no switchport mode\n"
+            + "snmp trap link-status\n"
+            + "no switchport access vlan\n"
+            + "no switchport trunk allowed vlan\n"
+            + "storm-control broadcast level 10.00\n"
+            + "storm-control multicast level 23.45\n"
+            + "storm-control unicast level 67.89\n"
+            + "end\n"
+            + "\n";
+
+    private static final String PHYSICAL_INTERFACE_CLEAN_UPDATE_INPUT = "configure terminal\n"
+            + "interface GigabitEthernet0/1\n"
+            + "shutdown\n"
+            + "no port-type\n"
+            + "no switchport mode\n"
+            + "snmp trap link-status\n"
+            + "no switchport access vlan\n"
+            + "no switchport trunk allowed vlan\n"
+            + "no storm-control broadcast level\n"
+            + "no storm-control multicast level\n"
+            + "no storm-control unicast level\n"
+            + "end\n"
+            + "\n";
 
     private static final String WRITE_INPUT = "configure terminal\n"
             + "interface Bundle-Ether45\n"
@@ -192,4 +243,101 @@ public class InterfaceConfigWriterTest {
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
+
+    @Test
+    public void writePhysicalInterface() throws WriteFailedException {
+        // because physical interface can't be created, so it needs to be UPDATE
+        Config dataBefore = new ConfigBuilder()
+                .setEnabled(false)
+                .setName("GigabitEthernet0/1")
+                .setType(EthernetCsmacd.class)
+                .build();
+
+        data = new ConfigBuilder()
+                .setEnabled(true)
+                .setName("GigabitEthernet0/1")
+                .setType(EthernetCsmacd.class)
+                .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
+                        .setStormControl(getStormControls("10.00", null, null))
+                        .build())
+                .build();
+
+        this.writer.updateCurrentAttributes(iid, dataBefore, data, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(PHYSICAL_INTERFACE_WRITE_INPUT, response.getValue().getContent());
+    }
+
+    @Test
+    public void updatePhysicalInterface() throws WriteFailedException {
+        Config dataBefore = new ConfigBuilder()
+                .setEnabled(true)
+                .setName("GigabitEthernet0/1")
+                .setType(EthernetCsmacd.class)
+                .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
+                        .setStormControl(getStormControls("10.00", null, null))
+                        .build())
+                .build();
+
+        data = new ConfigBuilder()
+                .setEnabled(true)
+                .setName("GigabitEthernet0/1")
+                .setType(EthernetCsmacd.class)
+                .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
+                        .setStormControl(getStormControls("10.00", "23.45", "67.89"))
+                        .build())
+                .build();
+
+        this.writer.updateCurrentAttributes(iid, dataBefore, data, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(PHYSICAL_INTERFACE_UPDATE_INPUT, response.getValue().getContent());
+    }
+
+    @Test
+    public void cleanUpdatePhysicalInterface() throws WriteFailedException {
+        Config dataBefore = new ConfigBuilder()
+                .setEnabled(true)
+                .setName("GigabitEthernet0/1")
+                .setType(EthernetCsmacd.class)
+                .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
+                        .setStormControl(getStormControls("10.00", "23.45", "67.89"))
+                        .build())
+                .build();
+
+        data = new ConfigBuilder()
+                .setEnabled(false)
+                .setName("GigabitEthernet0/1")
+                .setType(EthernetCsmacd.class)
+                .build();
+
+        this.writer.updateCurrentAttributes(iid, dataBefore, data, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(PHYSICAL_INTERFACE_CLEAN_UPDATE_INPUT, response.getValue().getContent());
+    }
+
+    private List<StormControl> getStormControls(String broadcastValue, String multicastValue, String unicastValue) {
+        List<StormControl> stormControls = new ArrayList<>();
+        if (broadcastValue != null) {
+            stormControls.add(new StormControlBuilder()
+                    .setKey(new StormControlKey(StormControl.Address.Broadcast))
+                    .setAddress(StormControl.Address.Broadcast)
+                    .setLevel(new BigDecimal(broadcastValue))
+                    .build());
+        }
+        if (multicastValue != null) {
+            stormControls.add(new StormControlBuilder()
+                    .setKey(new StormControlKey(StormControl.Address.Multicast))
+                    .setAddress(StormControl.Address.Multicast)
+                    .setLevel(new BigDecimal(multicastValue))
+                    .build());
+        }
+        if (unicastValue != null) {
+            stormControls.add(new StormControlBuilder()
+                    .setKey(new StormControlKey(StormControl.Address.Unicast))
+                    .setAddress(StormControl.Address.Unicast)
+                    .setLevel(new BigDecimal(unicastValue))
+                    .build());
+        }
+        return stormControls;
+    }
+
 }

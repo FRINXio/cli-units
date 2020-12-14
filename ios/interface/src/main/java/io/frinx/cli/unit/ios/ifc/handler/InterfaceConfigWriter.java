@@ -21,6 +21,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigWriter;
 import io.frinx.cli.unit.ios.ifc.Util;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 
 public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
@@ -45,6 +46,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($servicePolicyOutput) %}service-policy output {$servicePolicyOutput}\n"
             + "{% else %}{% if ($oldServicePolicyOutput) %}no service-policy output {$oldServicePolicyOutput}"
             + "\n{% endif %}{% endif %}"
+            + "{% if ($stormControl) %}{$stormControl}{% endif %}"
             + "end\n";
 
     private static final String WRITE_TEMPLATE_VLAN = "configure terminal\n"
@@ -92,7 +94,8 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                 "oldServicePolicyInput", getServicePolicyInput(before),
                 "servicePolicyOutput", (ciscoExtAug != null && ciscoExtAug.getServicePolicy() != null)
                             ? ciscoExtAug.getServicePolicy().getOutput() : null,
-                "oldServicePolicyOutput", getServicePolicyOutput(before));
+                "oldServicePolicyOutput", getServicePolicyOutput(before),
+                "stormControl", getStormControlCommands(after));
         }
         return fT(WRITE_TEMPLATE_VLAN,
             "before", before,
@@ -128,6 +131,27 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             return before.getAugmentation(IfCiscoExtAug.class).getServicePolicy().getInput();
         }
         return null;
+    }
+
+    private String getStormControlCommands(Config after) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (after != null && after.getAugmentation(IfCiscoExtAug.class) != null) {
+            IfCiscoExtAug aug = after.getAugmentation(IfCiscoExtAug.class);
+            if (aug.getStormControl() != null) {
+                // create commands for required storm controls
+                for (StormControl stormControl : aug.getStormControl()) {
+                    stringBuilder.append("storm-control ").append(stormControl.getAddress().getName());
+                    stringBuilder.append(" level ").append(stormControl.getLevel().toString()).append("\n");
+                }
+            }
+        }
+        // create no-commands for remaining storm controls
+        for (StormControl.Address address : StormControl.Address.values()) {
+            if (!stringBuilder.toString().contains(address.getName())) {
+                stringBuilder.append("no storm-control ").append(address.getName()).append(" level\n");
+            }
+        }
+        return stringBuilder.toString();
     }
 
     private Object convertVlansToString(IfCiscoExtAug ciscoExtAug) {
