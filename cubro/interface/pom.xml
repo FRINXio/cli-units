@@ -22,12 +22,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.6.rc4-frinx</version>
+        <version>4.2.6.rc5-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent/pom.xml</relativePath>
     </parent>
 
     <artifactId>cubro-interface-unit</artifactId>
-    <version>4.2.6.rc4-frinx</version>
+    <version>4.2.6.rc5-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
