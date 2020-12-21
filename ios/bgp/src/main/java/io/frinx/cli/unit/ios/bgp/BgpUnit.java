@@ -171,7 +171,8 @@ public class BgpUnit extends AbstractUnit {
     private void provideNeighborReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NEIGHBOR, new NeighborReader(cli));
 
-        readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader(cli));
+        readRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_BG_NE_NE_CONFIG, new NeighborConfigReader(cli),
+                Sets.newHashSet(IIDs.NE_NE_PR_PR_BG_NE_NE_CO_AUG_BGPNEIGHBORCONFIGAUG));
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_STATE, new NeighborStateReader(cli));
         readRegistry.add(IIDs.NE_NE_PR_PR_BG_NE_NE_TI_CONFIG, new NeighborTimersConfigReader(cli));
         readRegistry.subtreeAdd(IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AFISAFI, new NeighborAfiSafiReader(cli),
