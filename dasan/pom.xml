@@ -37,7 +37,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>dasan</artifactId>
-    <version>4.2.6.rc5-frinx-SNAPSHOT</version>
+    <version>4.2.6.rc5-frinx</version>
     <packaging>pom</packaging>
 
     <build>
