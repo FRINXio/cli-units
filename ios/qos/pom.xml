@@ -22,13 +22,13 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.6.rc6-frinx-SNAPSHOT</version>
+        <version>4.2.6.rc6-frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-qos-unit</artifactId>
-    <version>4.2.6.rc6-frinx-SNAPSHOT</version>
+    <version>4.2.6.rc6-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
