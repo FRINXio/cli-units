@@ -17,19 +17,16 @@
 package io.frinx.cli.unit.ios.unit.acl.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.unit.acl.handler.util.AclUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
@@ -40,10 +37,6 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class AclEntryReader {
     private static final String SH_ACCESS_LISTS_IPV4 = "show ip access-lists %s";
     private static final String SH_ACCESS_LISTS_IPV6 = "show ipv6 access-list %s";
-    private static final Map<Class<? extends ACLTYPE>, String> TYPES_TO_COMMANDS = ImmutableMap.of(
-            ACLIPV4.class, SH_ACCESS_LISTS_IPV4,
-            ACLIPV6.class, SH_ACCESS_LISTS_IPV6
-    );
 
     // find lines starting with number and not continuing with word remark
     private static final Pattern IP_SEQUENCE_PATTERN = Pattern.compile("^\\s*(?<sequenceId>\\d+) (?!remark).*", Pattern
@@ -70,13 +63,13 @@ public class AclEntryReader {
 
     static String getAclCommand(InstanceIdentifier<?> id) {
         AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
-        final String typedCommand = TYPES_TO_COMMANDS.get(aclSetKey.getType());
-        return String.format(typedCommand, aclSetKey.getName());
+        final String command = AclUtil.isIpv4Acl(aclSetKey.getType()) ? SH_ACCESS_LISTS_IPV4 : SH_ACCESS_LISTS_IPV6;
+        return String.format(command, aclSetKey.getName());
     }
 
     @VisibleForTesting
     static List<AclEntryKey> parseAclEntryKey(String output, Class<? extends ACLTYPE> type) {
-        Matcher matcher = (ACLIPV4.class.equals(type) ? IP_SEQUENCE_PATTERN : IPV6_SEQUENCE_PATTERN).matcher(output);
+        Matcher matcher = (AclUtil.isIpv4Acl(type) ? IP_SEQUENCE_PATTERN : IPV6_SEQUENCE_PATTERN).matcher(output);
         List<AclEntryKey> result = new ArrayList<>();
         while (matcher.find()) {
             long parseLong = Long.parseLong(matcher.group(1));

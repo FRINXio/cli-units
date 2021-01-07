@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.net.InetAddresses;
+import io.frinx.cli.unit.ios.unit.acl.handler.util.AclUtil;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Map.Entry;
@@ -30,6 +31,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4EXTENDED;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4STANDARD;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
@@ -52,7 +55,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcardedBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.DROP;
@@ -101,7 +103,7 @@ final class AclEntryLineParser {
                                                        Class<? extends ACLTYPE> aclType) {
         // search for line containing current sequence number
         long sequenceId = aclEntryKey.getSequenceId();
-        return ACLIPV4.class.equals(aclType) ? findIpv4LineWithSequenceId(sequenceId, lines)
+        return AclUtil.isIpv4Acl(aclType) ? findIpv4LineWithSequenceId(sequenceId, lines)
                 : findIpv6LineWithSequenceId(sequenceId, lines);
     }
 
@@ -125,25 +127,28 @@ final class AclEntryLineParser {
 
     static void parseLine(final AclEntryBuilder builder, String line, Class<? extends ACLTYPE> aclType) {
 
-        Preconditions.checkArgument(ACLIPV4.class.equals(aclType) || ACLIPV6.class.equals(aclType),
+        Preconditions.checkArgument(AclUtil.isIpv4Acl(aclType) || ACLIPV6.class.equals(aclType),
                 "Unsupported ACL type: " + aclType);
+        line = AclUtil.editAclEntry(line, aclType);
         Queue<String> words = Lists.newLinkedList(Arrays.asList(line.trim().split("\\s")));
         // ipv4 access lists have sequence number in the beginning of the line, ipv6 access lists have it at the end
-        if (ACLIPV4.class.equals(aclType)) {
+        if (AclUtil.isIpv4Acl(aclType)) {
             parseSequenceId(builder, words.poll());
         }
         // fwd action
         Class<? extends FORWARDINGACTION> fwdAction = parseAction(words.poll());
         builder.setActions(createActions(fwdAction));
         // protocol
-        IpProtocolType ipProtocolType = parseProtocol(words.poll());
-        if (ACLIPV4.class.equals(aclType)) {
+        IpProtocolType ipProtocolType = ACLIPV4STANDARD.class.equals(aclType) ? null : parseProtocol(words.poll());
+        if (AclUtil.isIpv4Acl(aclType)) {
             Ipv4Builder ipv4Builder = new Ipv4Builder();
-            ParseIpv4LineResult parseIpv4LineResult = parseIpv4Line(ipProtocolType, words);
+            ParseIpv4LineResult parseIpv4LineResult = parseIpv4Line(ipProtocolType, words, aclType);
             ipv4Builder.setConfig(parseIpv4LineResult.ipv4ProtocolFieldsConfig);
             builder.setIpv4(ipv4Builder.build());
-            builder.setTransport(parseIpv4LineResult.transport);
-            builder.addAugmentation(AclEntry1.class, parseIpv4LineResult.icmpMsgTypeAugment);
+            if (ACLIPV4EXTENDED.class.equals(aclType)) {
+                builder.setTransport(parseIpv4LineResult.transport);
+                builder.addAugmentation(AclEntry1.class, parseIpv4LineResult.icmpMsgTypeAugment);
+            }
         } else if (ACLIPV6.class.equals(aclType)) {
             Ipv6Builder ipv6Builder = new Ipv6Builder();
             ParseIpv6LineResult parseIpv6LineResult = parseIpv6Line(ipProtocolType, words);
@@ -208,7 +213,9 @@ final class AclEntryLineParser {
         }
     }
 
-    private static ParseIpv4LineResult parseIpv4Line(IpProtocolType ipProtocolType, Queue<String> words) {
+    private static ParseIpv4LineResult parseIpv4Line(IpProtocolType ipProtocolType,
+                                                     Queue<String> words,
+                                                     Class<? extends ACLTYPE> aclType) {
         org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top
                 .ipv4.ConfigBuilder ipv4ProtocolFieldsConfigBuilder = new org.opendaylight.yang.gen.v1.http.frinx
                 .openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
@@ -226,6 +233,15 @@ final class AclEntryLineParser {
             SourceAddressWildcarded srcIpv4Wildcarded = new SourceAddressWildcardedBuilder(parseIpv4Wildcarded(words)
             ).build();
             ipv4WildcardedAugBuilder.setSourceAddressWildcarded(srcIpv4Wildcarded);
+        }
+
+        // for STANDARD ACL entry we have enough information, return
+        if (ACLIPV4STANDARD.class.equals(aclType)) {
+            if (ipv4WildcardedAugBuilder.getSourceAddressWildcarded() != null) {
+                ipv4ProtocolFieldsConfigBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class,
+                        ipv4WildcardedAugBuilder.build());
+            }
+            return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), null, null);
         }
 
         // src port

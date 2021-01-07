@@ -45,8 +45,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AclSetReader implements CliConfigListReader<AclSet, AclSetKey, AclSetBuilder> {
 
-    private static final String SH_ACCESS_LISTS = "show running-config | include access-list";
-    private static final Pattern ACL_LINE = Pattern.compile("(?<type>.+) access-list (extended )?(?<name>.+)");
+    private static final String SH_ACCESS_LISTS = "show access-lists | include access list";
+    private static final Pattern ACL_LINE =
+            Pattern.compile("((?<ipv4Type>Standard|Extended) )?(?<type>IP(v6)?) access list (?<name>.+)");
 
     private final Cli cli;
     private final AclEntryReader aclEntryReader;

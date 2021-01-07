@@ -16,12 +16,16 @@
 
 package io.frinx.cli.unit.ios.unit.acl.handler;
 
+import com.google.common.collect.ImmutableMap;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliListWriter;
+import java.util.Map;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4EXTENDED;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4STANDARD;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetKey;
@@ -35,39 +39,54 @@ public class AclSetConfigWriter implements CliListWriter<AclSet, AclSetKey> {
         this.cli = cli;
     }
 
-    private static final String ACL_IPV4 = "configure terminal\n"
+    private static final String ACL_IPV4_STANDARD_WRITE = "configure terminal\n"
+            + "ip access-list standard {$aclName}\n"
+            + "end\n";
+    private static final String ACL_IPV4_EXTENDED_WRITE = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
             + "end\n";
-    private static final String ACL_IPV6 = "configure terminal\n"
+    private static final String ACL_IPV6_WRITE = "configure terminal\n"
             + "ipv6 access-list {$aclName}\n"
             + "end\n";
-    private static final String ACL_IPV4_DELETE = "configure terminal\n"
+    private static final Map<Class<? extends ACLTYPE>, String> WRITE_COMMANDS = ImmutableMap.of(
+            ACLIPV4STANDARD.class, ACL_IPV4_STANDARD_WRITE,
+            ACLIPV4EXTENDED.class, ACL_IPV4_EXTENDED_WRITE,
+            ACLIPV6.class, ACL_IPV6_WRITE
+    );
+
+    private static final String ACL_IPV4_STANDARD_DELETE = "configure terminal\n"
+            + "no ip access-list standard {$aclName}\n"
+            + "end\n";
+    private static final String ACL_IPV4_EXTENDED_DELETE = "configure terminal\n"
             + "no ip access-list extended {$aclName}\n"
             + "end\n";
     private static final String ACL_IPV6_DELETE = "configure terminal\n"
             + "no ipv6 access-list {$aclName}\n"
             + "end\n";
-
+    private static final Map<Class<? extends ACLTYPE>, String> DELETE_COMMANDS = ImmutableMap.of(
+            ACLIPV4STANDARD.class, ACL_IPV4_STANDARD_DELETE,
+            ACLIPV4EXTENDED.class, ACL_IPV4_EXTENDED_DELETE,
+            ACLIPV6.class, ACL_IPV6_DELETE
+    );
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<AclSet> id,
                                        @Nonnull AclSet aclSet,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
-        String aclName = aclSetKey.getName();
-        Class<? extends ACLTYPE> type = aclSetKey.getType();
-        blockingWriteAndRead(fT(type.equals(ACLIPV4.class) ? ACL_IPV4 : ACL_IPV6,
-                "aclName", aclName), cli, id, aclSet);
+        final AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
+        final String aclName = aclSetKey.getName();
+        final Class<? extends ACLTYPE> type = aclSetKey.getType();
+        blockingWriteAndRead(fT(WRITE_COMMANDS.get(type), "aclName", aclName), cli, id, aclSet);
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<AclSet> id,
                                         @Nonnull AclSet aclSet,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
-        String aclName = aclSetKey.getName();
-        Class<? extends ACLTYPE> type = aclSetKey.getType();
-        blockingWriteAndRead(fT(type.equals(ACLIPV4.class) ? ACL_IPV4_DELETE : ACL_IPV6_DELETE,
-                    "aclName", aclName), cli, id, aclSet);
+        final AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
+        final String aclName = aclSetKey.getName();
+        final Class<? extends ACLTYPE> type = aclSetKey.getType();
+        blockingWriteAndRead(fT(DELETE_COMMANDS.get(type), "aclName", aclName), cli, id, aclSet);
     }
+
 }

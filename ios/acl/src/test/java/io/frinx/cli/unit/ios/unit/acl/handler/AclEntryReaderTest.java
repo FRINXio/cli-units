@@ -21,8 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4EXTENDED;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntryKey;
@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class AclEntryReaderTest {
 
     private static final String OUTPUT = "Fri Feb 23 15:25:27.410 UTC\n"
-            + "ip access-list ipv4foo\n"
+            + "Extended IP access list ipv4foo\n"
             + " 1 permit ip any any\n"
             + " 10 remark remark1\n"
             + "!";
@@ -46,7 +46,7 @@ public class AclEntryReaderTest {
 
     @Test
     public void testParseAclEntryKey() {
-        List<AclEntryKey> result = AclEntryReader.parseAclEntryKey(OUTPUT, ACLIPV4.class);
+        List<AclEntryKey> result = AclEntryReader.parseAclEntryKey(OUTPUT, ACLIPV4EXTENDED.class);
         Assert.assertEquals(Collections.singletonList(ACL_ENTRY_KEY), result);
     }
 
@@ -55,7 +55,7 @@ public class AclEntryReaderTest {
         AclEntryBuilder aclEntryBuilder = new AclEntryBuilder();
         aclEntryBuilder.setKey(ACL_ENTRY_KEY);
         InstanceIdentifier<AclSet> aclEntryInstanceIdentifier =  IidUtils.createIid(IIDs.AC_AC_ACLSET,
-                new AclSetKey("ipv4foo", ACLIPV4.class));
+                new AclSetKey("ipv4foo", ACLIPV4EXTENDED.class));
         AclEntryReader.parseACL(aclEntryInstanceIdentifier, aclEntryBuilder, OUTPUT);
 
         AclEntry expected = new AclEntryBuilder()

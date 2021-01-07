@@ -30,7 +30,7 @@ public class NameTypeEntry extends SimpleEntry<String, Class<? extends ACLTYPE>>
     public static NameTypeEntry fromMatcher(final Matcher matcher) {
         return new NameTypeEntry(
             matcher.group("name"),
-            AclUtil.getType(matcher.group("type"))
+            AclUtil.getType(matcher.group("type"), matcher.group("ipv4Type"))
         );
     }
 

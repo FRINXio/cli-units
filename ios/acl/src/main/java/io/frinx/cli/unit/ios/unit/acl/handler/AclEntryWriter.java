@@ -18,12 +18,14 @@ package io.frinx.cli.unit.ios.unit.acl.handler;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.unit.acl.handler.util.AclUtil;
 import io.frinx.cli.unit.utils.CliListWriter;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -32,6 +34,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.SubnetUtils;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4EXTENDED;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4STANDARD;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
@@ -41,7 +45,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv4AddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Ipv6AddressWildcarded;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.DROP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.FORWARDINGACTION;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.access.list.entries.top.acl.entries.AclEntry;
@@ -85,6 +90,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     public static final String DESTINATION_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR = "destination-address-wildcarded "
             + "must contain address and wildcard-mask";
 
+    private static final String ACL_STANDARD_ENTRY = "configure terminal\n"
+            + "ip access-list standard {$aclName}\n"
+            + "{$aclSeqId} {$aclFwdAction} {$aclSrcAddr}\n"
+            + "end\n";
     private static final String ACL_IP_ENTRY = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
             + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclTtl}\n"
@@ -112,7 +121,11 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             + "ipv6 access-list {$aclName}\n"
             + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType}\n"
             + "end\n";
-    private static final String ACL_DELETE = "configure terminal\n"
+    private static final String ACL_STANDARD_DELETE = "configure terminal\n"
+            + "ip access-list standard {$aclName}\n"
+            + "no {$aclSeqId}\n"
+            + "end\n";
+    private static final String ACL_EXTENDED_DELETE = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
             + "no {$aclSeqId}\n"
             + "end\n";
@@ -124,6 +137,12 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     private static final Pattern PORT_RANGE_NAMED_PATTERN = Pattern.compile("(?<from>\\S*)\\.\\.(?<to>\\S*)");
     private static final Pattern IPV4_IN_IPV6_PATTERN =
             Pattern.compile("^(?<ipv6Part>.+:(ffff|FFFF):)(?<ipv4Part>[0-9a-fA-F]{1,4}:[0-9a-fA-F]{1,4})$");
+
+    private static final Map<Class<? extends ACLTYPE>, String> DELETE_COMMANDS = ImmutableMap.of(
+            ACLIPV4STANDARD.class, ACL_STANDARD_DELETE,
+            ACLIPV4EXTENDED.class, ACL_EXTENDED_DELETE,
+            ACLIPV6.class, ACL_IP6_DELETE
+    );
 
     private final Cli cli;
 
@@ -143,16 +162,16 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                                         @Nonnull AclEntry dataBefore,
                                         @Nonnull AclEntry dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        //overwrite the entry since sequence-id is the same
-        processChange(id, dataAfter);
+        deleteCurrentAttributes(id, dataBefore, writeContext);
+        writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<AclEntry> id,
                                         @Nonnull AclEntry dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
-        final String command = aclSetKey.getType().equals(ACLIPV4.class) ? ACL_DELETE : ACL_IP6_DELETE;
+        final AclSetKey aclSetKey = id.firstKeyOf(AclSet.class);
+        final String command = DELETE_COMMANDS.get(aclSetKey.getType());
         final String aclName = aclSetKey.getName();
         final String aclSequenceId = dataBefore.getSequenceId().toString();
 
@@ -167,7 +186,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         commandVars.aclSeqId = entry.getSequenceId().toString();
         // ipv4|ipv6
         if (entry.getIpv4() != null) {
-            processIpv4(entry, commandVars);
+            processIpv4(entry, commandVars, aclSetKey.getType());
         } else if (entry.getIpv6() != null) {
             processIpv6(entry, commandVars);
             commandVars.aclSeqId = " sequence " + entry.getSequenceId().toString();
@@ -229,11 +248,21 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                         "aclTtl", commandVars.aclTtl),
                         cli, id, entry);
                 break;
+            case "":
+                if (ACLIPV4STANDARD.class.equals(aclSetKey.getType())) {
+                    blockingWriteAndRead(fT(ACL_STANDARD_ENTRY,
+                            "aclName", commandVars.aclName,
+                            "aclSeqId", commandVars.aclSeqId,
+                            "aclFwdAction", commandVars.aclFwdAction,
+                            "aclSrcAddr", commandVars.aclSrcAddr),
+                            cli, id, entry);
+                }
+                break;
             default: break;
         }
     }
 
-    private void processIpv4(AclEntry entry, MaxMetricCommandDTO commandVars) {
+    private void processIpv4(AclEntry entry, MaxMetricCommandDTO commandVars, Class<? extends ACLTYPE> aclType) {
         if (entry.getIpv4().getConfig().getAugmentation(Config3.class) != null
                 && entry.getIpv4().getConfig().getAugmentation(Config3.class).getHopRange() != null) {
             commandVars.aclTtl =
@@ -261,6 +290,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                     SOURCE_ADDRESS_WILDCARDED_MISSING_FIELDS_ERROR);
             commandVars.aclSrcAddr = ipv4WildcardedOpt.get().getAddress().getValue() + " " + ipv4WildcardedOpt.get()
                     .getWildcardMask().getValue();
+        }
+        // standard ACL does not have destination address nor protocols
+        if (ACLIPV4STANDARD.class.equals(aclType)) {
+            return;
         }
         // dst address
         ipv4PrefixOpt = getIpv4Prefix(entry, Ipv4ProtocolFieldsConfig::getDestinationAddress);

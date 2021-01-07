@@ -82,7 +82,7 @@ public class EgressAclSetConfigReaderTest {
         NameTypeEntry entry = EgressAclSetReader.parseAcl(readOutput, setName);
 
         Assert.assertEquals(entry.getName(), setName);
-        Assert.assertEquals(entry.getType(), AclUtil.getType(type));
+        Assert.assertEquals(entry.getType(), AclUtil.getType(type, null));
     }
 
 
