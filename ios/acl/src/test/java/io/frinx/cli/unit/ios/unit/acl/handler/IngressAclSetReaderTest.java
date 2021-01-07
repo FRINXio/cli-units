@@ -79,7 +79,7 @@ public class IngressAclSetReaderTest {
         NameTypeEntry entry = IngressAclSetReader.parseAcl(readOutput, setName);
 
         Assert.assertEquals(entry.getName(), setName);
-        Assert.assertEquals(entry.getType(), AclUtil.getType(type));
+        Assert.assertEquals(entry.getType(), AclUtil.getType(type, null));
     }
 
     @Test

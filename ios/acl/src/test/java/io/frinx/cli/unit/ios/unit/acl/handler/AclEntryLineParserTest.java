@@ -21,6 +21,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4EXTENDED;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4STANDARD;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
@@ -39,7 +41,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev18
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.DestinationAddressWildcardedBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.src.dst.ipv4.address.wildcarded.SourceAddressWildcardedBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV6;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.DROP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.FORWARDINGACTION;
@@ -147,9 +148,62 @@ public class AclEntryLineParserTest {
     }
 
     @Test
-    public void testIpv4() {
+    public void testIpv4Standard() {
+        String lines = "Standard IP access list 70\n"
+                + "    10 permit 172.31.132.0, wildcard bits 0.0.3.255\n"
+                + "    20 permit 192.12.2.1\n"
+                + "    30 deny   any\n"
+                + "\n";
+        LinkedHashMap<Long, AclEntry> expectedResults = new LinkedHashMap<>();
+
+        {
+            // 10 permit 172.31.132.0, wildcard bits 0.0.3.255
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields
+                    .top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
+                    .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
+            configBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class,
+                    new AclSetAclEntryIpv4WildcardedAugBuilder()
+                            .setSourceAddressWildcarded(new SourceAddressWildcardedBuilder()
+                                    .setAddress(new Ipv4Address("172.31.132.0"))
+                                    .setWildcardMask(new Ipv4Address("0.0.3.255"))
+                                    .build())
+                            .build());
+            long sequenceId = 10;
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null));
+        }
+        {
+            // 20 permit 192.12.2.1
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields
+                    .top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
+                    .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
+            configBuilder.setSourceAddress(new Ipv4Prefix("192.12.2.1/32"));
+            long sequenceId = 20;
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, ACCEPT.class, configBuilder.build(), null));
+        }
+        {
+            // 30 deny   any
+            org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields
+                    .top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
+                    .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
+            configBuilder.setSourceAddress(new Ipv4Prefix("0.0.0.0/0"));
+            long sequenceId = 30;
+            expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(), null));
+        }
+
+        // verify expected results
+        for (Entry<Long, AclEntry> entry : expectedResults.entrySet()) {
+            long sequenceId = entry.getKey();
+            String line = AclEntryLineParser.findIpv4LineWithSequenceId(sequenceId, lines).get();
+            AclEntryBuilder resultBuilder = new AclEntryBuilder();
+            AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4STANDARD.class);
+            Assert.assertEquals(entry.getValue(), resultBuilder.build());
+        }
+    }
+
+    @Test
+    public void testIpv4Extended() {
         String lines = "Mon May 14 14:36:55.408 UTC\n"
-                + "ip access-list extended foo\n"
+                + "Extended IP access list foo\n"
                 + " 2 deny ip host 0.0.0.0 host 0.0.0.0\n"
                 + " 3 permit udp 192.168.1.1 0.0.0.255 10.10.10.10 0.0.0.255\n"
                 + " 4 permit tcp host 1.2.3.4 eq www any\n"
@@ -382,7 +436,7 @@ public class AclEntryLineParserTest {
             long sequenceId = entry.getKey();
             String line = AclEntryLineParser.findIpv4LineWithSequenceId(sequenceId, lines).get();
             AclEntryBuilder resultBuilder = new AclEntryBuilder();
-            AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4.class);
+            AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4EXTENDED.class);
             Assert.assertEquals(entry.getValue(), resultBuilder.build());
         }
     }
@@ -391,14 +445,14 @@ public class AclEntryLineParserTest {
     public void parseAclLineWithUnsupportedProtocolTest() {
         final String line = "10 deny esp host 1.2.3.4 host 5.6.7.8";
         final AclEntryBuilder resultBuilder = new AclEntryBuilder();
-        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4.class);
+        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4EXTENDED.class);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testIpv4WithUnsupportedOption() {
         final String line = "permit tcp host 1.1.1.1 host 2.2.2.2 eq 69 established";
         final AclEntryBuilder resultBuilder = new AclEntryBuilder();
-        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4.class);
+        AclEntryLineParser.parseLine(resultBuilder, line, ACLIPV4EXTENDED.class);
     }
 
     @Test
@@ -414,7 +468,7 @@ public class AclEntryLineParserTest {
 
     @Test
     public void testIpv6() {
-        String lines = "IPv6 access-list foo\n"
+        String lines = "IPv6 access list foo\n"
                 + " permit ipv6 any any sequence 1\n"
                 + " permit icmpv6 any any router-solicitation sequence 3\n"
                 + " deny ipv6 2001:db8:a0b:12f0::1/55 any sequence 4\n"
