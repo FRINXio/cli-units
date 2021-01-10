@@ -38,6 +38,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
@@ -53,10 +54,10 @@ public final class Util {
     }
 
     public static Class<? extends InterfaceType> parseType(String name) {
-        if (name.startsWith("FastEther")) {
+        if (name.startsWith("FastEther") || name.startsWith("GigabitEthernet")) {
             return EthernetCsmacd.class;
-        } else if (name.startsWith("GigabitEthernet")) {
-            return EthernetCsmacd.class;
+        } else if (name.startsWith("Port-channel")) {
+            return Ieee8023adLag.class;
         } else if (name.startsWith("Loopback")) {
             return SoftwareLoopback.class;
         } else {
