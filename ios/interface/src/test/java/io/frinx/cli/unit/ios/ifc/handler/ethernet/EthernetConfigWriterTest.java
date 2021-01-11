@@ -63,9 +63,9 @@ public class EthernetConfigWriterTest {
 
     private EthernetConfigWriter writer;
 
-    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
+    private final ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
 
-    private InstanceIdentifier iid = KeyedInstanceIdentifier.create(Interfaces.class)
+    private final InstanceIdentifier iid = KeyedInstanceIdentifier.create(Interfaces.class)
             .child(Interface.class, new InterfaceKey("FastEthernet0/1"));
 
     private Config data;
@@ -73,15 +73,9 @@ public class EthernetConfigWriterTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-
         Mockito.when(cli.executeAndRead(Mockito.any()))
                 .then(invocation -> CompletableFuture.completedFuture(""));
-
         writer = new EthernetConfigWriter(cli);
-        initializeData();
-    }
-
-    private void initializeData() {
         data = new ConfigBuilder()
                 .setPortSpeed(SPEED100MB.class)
                 .build();
@@ -90,35 +84,25 @@ public class EthernetConfigWriterTest {
     @Test
     public void write() throws WriteFailedException {
         writer.writeCurrentAttributes(iid, data, context);
-
-        Mockito.verify(cli)
-                .executeAndRead(response.capture());
-        Assert.assertEquals(WRITE_INPUT, response.getValue()
-                .getContent());
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
     @Test
     public void update() throws WriteFailedException {
-        Config newData = new ConfigBuilder()
+        final Config newData = new ConfigBuilder()
                 .setPortSpeed(SPEED10MB.class)
                 .build();
-
         writer.updateCurrentAttributes(iid, data, newData, context);
-
-        Mockito.verify(cli)
-                .executeAndRead(response.capture());
-        Assert.assertEquals(UPDATE_INPUT, response.getValue()
-                .getContent());
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
     }
 
     @Test
     public void delete() throws WriteFailedException {
         writer.deleteCurrentAttributes(iid, data, context);
-
-        Mockito.verify(cli)
-                .executeAndRead(response.capture());
-        Assert.assertEquals(DELETE_INPUT, response.getValue()
-                .getContent());
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 
 }

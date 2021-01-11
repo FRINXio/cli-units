@@ -17,14 +17,12 @@
 package io.frinx.cli.unit.ios.ifc.handler.ethernet;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.ext.rev190724.SPEEDAUTO;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED100MB;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.ConfigBuilder;
 
-@Ignore
 public class EthernetConfigReaderTest {
 
     private static final String SH_INT_CONFIG_AUTO_SPEED = "interface FastEthernet0/10\n"
@@ -33,7 +31,7 @@ public class EthernetConfigReaderTest {
             + "end\n"
             + "\n";
 
-    private static Config EXPECTED_CONFIG_AUTO_SPEED = new ConfigBuilder()
+    private static final Config EXPECTED_CONFIG_AUTO_SPEED = new ConfigBuilder()
             .setPortSpeed(SPEEDAUTO.class)
             .build();
 
@@ -42,19 +40,35 @@ public class EthernetConfigReaderTest {
             + "end\n"
             + "\n";
 
-    private static Config EXPECTED_CONFIG_100_SPEED = new ConfigBuilder()
+    private static final Config EXPECTED_CONFIG_100_SPEED = new ConfigBuilder()
             .setPortSpeed(SPEED100MB.class)
             .build();
 
-    @Test
-    public void testParseEthernetConfig() {
-        ConfigBuilder actualConfigBuilder = new ConfigBuilder();
-        EthernetConfigReader.parseEthernetConfig(SH_INT_CONFIG_AUTO_SPEED, actualConfigBuilder);
-        Assert.assertEquals(EXPECTED_CONFIG_AUTO_SPEED, actualConfigBuilder.build());
+    private static final String SH_INT_VLAN_CONFIG = "interface Vlan10\n"
+            + " description Internet\n"
+            + " no ip redirects\n"
+            + " no ip proxy-arp\n"
+            + "!\n";
 
-        actualConfigBuilder = new ConfigBuilder();
-        EthernetConfigReader.parseEthernetConfig(SH_INT_CONFIG_100_SPEED, actualConfigBuilder);
-        Assert.assertEquals(EXPECTED_CONFIG_100_SPEED, actualConfigBuilder.build());
+    private static final Config EXPECTED_VLAN_CONFIG = new ConfigBuilder()
+            .build();
+
+    @Test
+    public void testParseFastEthernet() {
+        ConfigBuilder configBuilder = new ConfigBuilder();
+        EthernetConfigReader.parseEthernetConfig("FastEthernet0/10", SH_INT_CONFIG_AUTO_SPEED, configBuilder);
+        Assert.assertEquals(EXPECTED_CONFIG_AUTO_SPEED, configBuilder.build());
+
+        configBuilder = new ConfigBuilder();
+        EthernetConfigReader.parseEthernetConfig("FastEthernet0/20", SH_INT_CONFIG_100_SPEED, configBuilder);
+        Assert.assertEquals(EXPECTED_CONFIG_100_SPEED, configBuilder.build());
+    }
+
+    @Test
+    public void testParseVlan() {
+        ConfigBuilder configBuilder = new ConfigBuilder();
+        EthernetConfigReader.parseEthernetConfig("Vlan10", SH_INT_VLAN_CONFIG, configBuilder);
+        Assert.assertEquals(EXPECTED_VLAN_CONFIG, configBuilder.build());
     }
 
 }

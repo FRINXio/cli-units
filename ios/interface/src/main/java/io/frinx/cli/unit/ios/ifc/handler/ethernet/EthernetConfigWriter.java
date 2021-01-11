@@ -51,10 +51,10 @@ public class EthernetConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataAfter,
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                       @Nonnull Config dataAfter,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class)
-                .getName();
+        final String ifcName = id.firstKeyOf(Interface.class).getName();
         blockingWriteAndRead(cli, id, dataAfter,
                 fT(IFC_ETHERNET_CONFIG_TEMPLATE,
                         "ifc_name", ifcName,
@@ -70,10 +70,10 @@ public class EthernetConfigWriter implements CliWriter<Config> {
     }
 
     @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                        @Nonnull Config dataBefore,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        String ifcName = id.firstKeyOf(Interface.class)
-                .getName();
+        final String ifcName = id.firstKeyOf(Interface.class).getName();
         blockingDeleteAndRead(cli, id,
                 fT(IFC_ETHERNET_CONFIG_DELETE_TEMPLATE,
                         "ifc_name", ifcName));

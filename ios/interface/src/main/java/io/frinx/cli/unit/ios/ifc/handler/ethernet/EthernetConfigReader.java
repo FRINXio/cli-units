@@ -44,24 +44,26 @@ public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuild
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id, @Nonnull ConfigBuilder builder,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                      @Nonnull ConfigBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
-        String ifcName = id.firstKeyOf(Interface.class)
-                .getName();
-        parseEthernetConfig(blockingRead(String.format(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, ifcName),
-                cli, id, ctx), builder);
+        final String ifcName = id.firstKeyOf(Interface.class).getName();
+        final String ifcOutput = blockingRead(f(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx);
+        parseEthernetConfig(ifcName, ifcOutput, builder);
     }
 
     @VisibleForTesting
-    static void parseEthernetConfig(String output, ConfigBuilder builder) {
-        Optional<String> speedValue = ParsingUtils.parseField(output, 0,
-            PORT_SPEED_LINE::matcher,
-            matcher -> matcher.group("portSpeed"));
+    static void parseEthernetConfig(String ifcName, String ifcOutput, ConfigBuilder builder) {
+        if (Util.canSetInterfaceSpeed(ifcName)) {
+            Optional<String> speedValue = ParsingUtils.parseField(ifcOutput, 0,
+                PORT_SPEED_LINE::matcher,
+                matcher -> matcher.group("portSpeed"));
 
-        if (speedValue.isPresent()) {
-            builder.setPortSpeed(Util.parseSpeed(speedValue.get()));
-        } else {
-            builder.setPortSpeed(SPEEDAUTO.class);
+            if (speedValue.isPresent()) {
+                builder.setPortSpeed(Util.parseSpeed(speedValue.get()));
+            } else {
+                builder.setPortSpeed(SPEEDAUTO.class);
+            }
         }
     }
 
