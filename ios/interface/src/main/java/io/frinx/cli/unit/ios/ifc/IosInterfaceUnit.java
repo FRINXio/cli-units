@@ -113,9 +113,7 @@ public final class IosInterfaceUnit extends AbstractUnit {
 
         // if-ethernet
         writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET);
-        writeRegistry.subtreeAddAfter(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli),
-                Sets.newHashSet(IIDs.IN_IN_ET_CO_AUG_CONFIG1),
-                IIDs.IN_IN_CONFIG);
+        writeRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {

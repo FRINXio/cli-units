@@ -75,6 +75,11 @@ public final class Util {
         return PHYS_IFC_TYPES.contains(data.getType());
     }
 
+    public static boolean canSetInterfaceSpeed(String interfaceName) {
+        final Class<? extends InterfaceType> type = parseType(interfaceName);
+        return type.equals(EthernetCsmacd.class) || type.equals(Ieee8023adLag.class);
+    }
+
     public static Class<? extends ETHERNETSPEED> parseSpeed(String name) {
         Class<? extends ETHERNETSPEED> ethernetSpeed = getBiMap().get(name);
         return ethernetSpeed == null ? SPEEDUNKNOWN.class : ethernetSpeed;
