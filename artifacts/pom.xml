@@ -216,6 +216,11 @@
                 <artifactId>ios-qos-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-snmp-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- IOS common -->
             <dependency>
