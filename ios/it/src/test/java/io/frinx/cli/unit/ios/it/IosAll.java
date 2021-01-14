@@ -50,6 +50,7 @@ import io.frinx.cli.unit.ios.mpls.MplsUnit;
 import io.frinx.cli.unit.ios.network.instance.IosNetworkInstanceUnit;
 import io.frinx.cli.unit.ios.qos.QoSUnit;
 import io.frinx.cli.unit.ios.rib.RibUnit;
+import io.frinx.cli.unit.ios.snmp.SnmpUnit;
 import io.frinx.cli.unit.ospf.OspfUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import io.frinx.translate.unit.commons.utils.NoopDataBroker;
@@ -278,6 +279,7 @@ public class IosAll {
         new LldpUnit(reg).init();
         new IosCliInitializerUnit(reg).init();
         new QoSUnit(reg).init();
+        new SnmpUnit(reg).init();
 
         return reg;
     }

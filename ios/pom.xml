@@ -47,6 +47,7 @@
         <module>acl</module>
         <module>init</module>
         <module>qos</module>
+        <module>snmp</module>
     </modules>
   <build>
     <plugins>
