@@ -131,7 +131,8 @@ public class SaosCliInitializerUnit extends AbstractUnit {
                 LOG.debug("{}: Disable pager to prevent \"[more x%]\" situation", session);
                 write(session, newline, SET_TERMINAL_PAGER_OFF_COMMAND);
                 session.readUntilTimeout(READ_TIMEOUT_SECONDS);
-
+                write(session, newline, COMMIT);
+                session.readUntilTimeout(READ_TIMEOUT_SECONDS);
                 LOG.info("{}: SAOS cli session initialized successfully", session);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
