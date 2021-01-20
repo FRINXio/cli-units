@@ -98,8 +98,8 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
 
         // vlan
         writeRegistry.addNoop(IIDs.NE_NE_VL_VLAN);
-        writeRegistry.subtreeAdd(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
-                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1));
+        writeRegistry.subtreeAddBefore(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
+                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1), IIDs.NE_NE_CONFIG);
 
         writeRegistry.addNoop(IIDs.NE_NE_VL_VL_AUG_SAOS6VRAUG_VI_VIRTUALRING);
         writeRegistry.add(IIDs.NE_NE_VL_VL_AUG_SAOS6VRAUG_VI_VI_CONFIG,
