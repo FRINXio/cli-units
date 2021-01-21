@@ -80,7 +80,8 @@ public class SaosQosUnit extends AbstractUnit {
                 Sets.newHashSet(IIDs.QO_CO_AUG_SAOSQOSAUG));
         writeRegistry.addNoop(IIDs.QO_IN_INTERFACE);
         writeRegistry.subtreeAddAfter(IIDs.QO_IN_IN_CONFIG, new InterfaceConfigWriter(cli),
-                Sets.newHashSet(IIDs.QO_IN_IN_CO_AUG_SAOSQOSIFAUG), IIDs.QO_SC_SCHEDULERPOLICY);
+                Sets.newHashSet(IIDs.QO_IN_IN_CO_AUG_SAOSQOSIFAUG),
+                        io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_IN_INTERFACE);
         writeRegistry.subtreeAddAfter(IIDs.QO_SC_SCHEDULERPOLICY, new SchedulerPolicyWriter(cli),
                 Sets.newHashSet(IIDs.QO_SC_SC_CONFIG,
                         IIDs.QO_SC_SC_CO_AUG_SAOSQOSSCPOLICYIFCID,
@@ -90,8 +91,7 @@ public class SaosQosUnit extends AbstractUnit {
                         IIDs.QO_SC_SC_SC_SC_CO_AUG_SAOSQOSSCHEDULERAUG,
                         IIDs.QO_SC_SC_SC_SC_TWORATETHREECOLOR,
                         IIDs.QO_SC_SC_SC_SC_TW_CONFIG,
-                        IIDs.QO_SC_SC_SC_SC_TW_CO_AUG_SAOSQOS2R3CAUG),
-                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_IN_INTERFACE);
+                        IIDs.QO_SC_SC_SC_SC_TW_CO_AUG_SAOSQOS2R3CAUG), IIDs.QO_IN_IN_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {

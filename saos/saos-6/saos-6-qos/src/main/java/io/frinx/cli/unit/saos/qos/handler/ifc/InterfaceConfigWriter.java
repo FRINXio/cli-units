@@ -31,12 +31,14 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE =
             "{% if ($data.mode.name) %}traffic-profiling set port {$name} mode {$data.mode.name}\n{% endif %}"
-            + "{% if ($isEnabled) %}traffic-profiling enable port {$name}\n{% endif %}";
+            + "{% if ($isEnabled) %}traffic-profiling enable port {$name}\n{% endif %}"
+            + "configuration save";
 
     private static final String UPDATE_TEMPLATE =
             "{% if ($mode) %}traffic-profiling set port {$name} mode {$mode}\n{% endif %}"
             + "{% if ($enabled == TRUE) %}traffic-profiling enable port {$name}\n"
-            + "{% elseIf ($enabled == FALSE) %}traffic-profiling disable port {$name}\n{% endif %}";
+            + "{% elseIf ($enabled == FALSE) %}traffic-profiling disable port {$name}\n{% endif %}"
+            + "configuration save";
 
     private Cli cli;
 
@@ -122,6 +124,7 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
         if (data.isEnabled() != null) {
             template += f("traffic-profiling disable port %s\n", config.getInterfaceId());
         }
+        template += "configuration save";
         return template;
     }
 }

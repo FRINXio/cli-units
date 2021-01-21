@@ -29,24 +29,25 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.exte
 
 public class InterfaceConfigWriterTest {
 
-    private static final String ENABLE_COMMAND = "traffic-profiling enable port %s\n";
-    private static final String DISABLE_COMMAND = "traffic-profiling disable port %s\n";
-    private static final String MODE_COMMAND = "traffic-profiling set port %s mode %s\n";
-
     private InterfaceConfigWriter writer = new InterfaceConfigWriter(Mockito.mock(Cli.class));
 
     @Test
     public void writeTemplateTest() {
         createWriteCmdAndTest(createConfig("1", true, true, Util.getModeName(1)),
-                createExpectedCmd("1", true, true,  Util.getModeName(1), 1));
+                "traffic-profiling set port 1 mode advanced\n"
+                        + "traffic-profiling enable port 1\n"
+                        + "configuration save");
         createWriteCmdAndTest(createConfig("2", true, true, Util.getModeName(4)),
-                createExpectedCmd("2", true, true,  Util.getModeName(4), 1));
+                "traffic-profiling set port 2 mode standard-dscp\n"
+                        + "traffic-profiling enable port 2\n"
+                        + "configuration save");
         createWriteCmdAndTest(createConfig("3", true, null, Util.getModeName(7)),
-                createExpectedCmd("3", true, null, Util.getModeName(7), 1));
+                "traffic-profiling set port 3 mode standard-vlan-ip-prec\n"
+                        + "configuration save");
         createWriteCmdAndTest(createConfig("4", true, true, null),
-                createExpectedCmd("4", true, true, null, 1));
-        createWriteCmdAndTest(createConfig("5", false, null, null),
-                createExpectedCmd("5", false, null, null, 1));
+                "traffic-profiling enable port 4\n"
+                        + "configuration save");
+        createWriteCmdAndTest(createConfig("5", false, null, null), null);
     }
 
     private void createWriteCmdAndTest(Config data, String expected) {
@@ -59,19 +60,23 @@ public class InterfaceConfigWriterTest {
         // nothing update
         createUpdateCmdAndTest(createConfig("1", true, true, Util.getModeName(1)),
                 createConfig("1", true, true, Util.getModeName(1)),
-                createExpectedCmd("1", true, null, null, 2));
+                "configuration save");
         // enabled update
         createUpdateCmdAndTest(createConfig("2", true, false, null),
                 createConfig("2", true, true, null),
-                createExpectedCmd("2", true, true, null, 2));
+                "traffic-profiling enable port 2\n"
+                        + "configuration save");
         // mode update
         createUpdateCmdAndTest(createConfig("3", true, false, Util.getModeName(1)),
                 createConfig("3", true, false, Util.getModeName(2)),
-                createExpectedCmd("3", true, null, Util.getModeName(2), 2));
+                "traffic-profiling set port 3 mode standard-dot1dpri\n"
+                        + "configuration save");
         // enabled and mode update
         createUpdateCmdAndTest(createConfig("4", true, false, Util.getModeName(2)),
                 createConfig("4", true, true, Util.getModeName(3)),
-                createExpectedCmd("4", true, true, Util.getModeName(3), 2));
+                "traffic-profiling set port 4 mode standard-ip-prec\n"
+                        + "traffic-profiling enable port 4\n"
+                        + "configuration save");
     }
 
     private void createUpdateCmdAndTest(Config before, Config after, String expected) {
@@ -83,13 +88,15 @@ public class InterfaceConfigWriterTest {
     public void deleteTemplateTest() {
         // delete enabled
         createDeleteCmdAndTest(createConfig("1", true, true, null),
-                createExpectedCmd("1", true, true, null, 3));
+                "traffic-profiling disable port 1\nconfiguration save");
         // delete mode
         createDeleteCmdAndTest(createConfig("1", true, null, Util.getModeName(2)),
-                createExpectedCmd("1", true, null, Util.getModeName(2), 3));
+                "traffic-profiling set port 1 mode standard-dot1dpri\nconfiguration save");
         // delete enabled and mode
         createDeleteCmdAndTest(createConfig("1", true, false, Util.getModeName(3)),
-                createExpectedCmd("1", true, false, Util.getModeName(2), 3));
+                "traffic-profiling set port 1 mode standard-dot1dpri\n"
+                        + "traffic-profiling disable port 1\n"
+                        + "configuration save");
     }
 
     private void createDeleteCmdAndTest(Config config, String expected) {
@@ -111,25 +118,5 @@ public class InterfaceConfigWriterTest {
             return configBuilder.addAugmentation(SaosQosIfAug.class, saosQosIfAugBuilder.build()).build();
         }
         return configBuilder.build();
-    }
-
-    private String createExpectedCmd(String ifcId, boolean addAugmentation, Boolean enabled, String mode, int cmdType) {
-        if (addAugmentation) {
-            if (cmdType == 1) {
-                String enableCmd = (enabled != null) ? String.format(ENABLE_COMMAND, ifcId) : "";
-                String modeCmd = (mode != null) ? String.format(MODE_COMMAND, ifcId, mode) : "";
-                return modeCmd.concat(enableCmd);
-            } else if (cmdType == 2) {
-                String enableCmd = (enabled != null)
-                        ? (enabled ? String.format(ENABLE_COMMAND, ifcId) : String.format(DISABLE_COMMAND, ifcId)) : "";
-                String modeCmd = (mode != null) ? String.format(MODE_COMMAND, ifcId, mode) : "";
-                return modeCmd.concat(enableCmd);
-            } else if (cmdType == 3) {
-                String enableCmd = (enabled != null) ? String.format(DISABLE_COMMAND, ifcId) : "";
-                String modeCmd = (mode != null) ? String.format(MODE_COMMAND, ifcId, mode) : "";
-                return modeCmd.concat(enableCmd);
-            }
-        }
-        return null;
     }
 }
