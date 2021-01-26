@@ -27,15 +27,23 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.ext.rev190724.SPEEDAUTO;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member.rev171109.LacpEthConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member.rev171109.LacpEthConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.LacpActivityType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
+    private static final Pattern MEDIA_TYPE_LINE = Pattern.compile("\\s*media-type (?<mediaType>.+)");
     public static final Pattern PORT_SPEED_LINE = Pattern.compile("\\s*speed (?<portSpeed>.+)");
+    private static final Pattern CHANNEL_GROUP_ID_LINE = Pattern.compile("\\s*channel-group (?<id>\\d+).*");
+    private static final Pattern LACP_MODE_LINE = Pattern.compile("\\s*channel-group (?<id>\\d+) mode (?<mode>.+)");
 
     private final Cli cli;
 
@@ -54,16 +62,53 @@ public class EthernetConfigReader implements CliConfigReader<Config, ConfigBuild
 
     @VisibleForTesting
     static void parseEthernetConfig(String ifcName, String ifcOutput, ConfigBuilder builder) {
-        if (Util.canSetInterfaceSpeed(ifcName)) {
-            Optional<String> speedValue = ParsingUtils.parseField(ifcOutput, 0,
-                PORT_SPEED_LINE::matcher,
-                matcher -> matcher.group("portSpeed"));
+        if (canSetSpeed(ifcName, ifcOutput)) {
+            setPortSpeed(ifcOutput, builder);
+        }
 
-            if (speedValue.isPresent()) {
-                builder.setPortSpeed(Util.parseSpeed(speedValue.get()));
-            } else {
-                builder.setPortSpeed(SPEEDAUTO.class);
+        if (Util.isPhysicalInterface(Util.parseType(ifcName))) {
+            Config1Builder ethIfAggregationConfigBuilder = new Config1Builder();
+            setAggregationId(ifcOutput, ethIfAggregationConfigBuilder);
+
+            if (ethIfAggregationConfigBuilder.getAggregateId() != null) {
+                builder.addAugmentation(Config1.class, ethIfAggregationConfigBuilder.build());
+                LacpEthConfigAugBuilder ethConfigAugBuilder = new LacpEthConfigAugBuilder();
+                setLacpMode(ifcOutput, ethConfigAugBuilder);
+                if (ethConfigAugBuilder.getLacpMode() != null) {
+                    builder.addAugmentation(LacpEthConfigAug.class, ethConfigAugBuilder.build());
+                }
             }
+        }
+    }
+
+    private static boolean canSetSpeed(String ifcName, String ifcOutput) {
+        // speed can only be set when media-type is set
+        return Util.canSetInterfaceSpeed(ifcName) && MEDIA_TYPE_LINE.matcher(ifcOutput).find();
+    }
+
+    private static void setLacpMode(String ifcOutput, LacpEthConfigAugBuilder ethConfigAugBuilder) {
+        ParsingUtils.parseField(ifcOutput,
+            LACP_MODE_LINE::matcher,
+            matcher -> matcher.group("mode"),
+            mode -> ethConfigAugBuilder.setLacpMode(LacpActivityType.valueOf(mode.toUpperCase())));
+    }
+
+    private static void setAggregationId(String ifcOutput, Config1Builder ethIfAggregationConfigBuilder) {
+        ParsingUtils.parseField(ifcOutput,
+            CHANNEL_GROUP_ID_LINE::matcher,
+            matcher -> matcher.group("id"),
+            ethIfAggregationConfigBuilder::setAggregateId);
+    }
+
+    private static void setPortSpeed(String ifcOutput, ConfigBuilder builder) {
+        Optional<String> speedValue = ParsingUtils.parseField(ifcOutput, 0,
+            PORT_SPEED_LINE::matcher,
+            matcher -> matcher.group("portSpeed"));
+
+        if (speedValue.isPresent()) {
+            builder.setPortSpeed(Util.parseSpeed(speedValue.get()));
+        } else {
+            builder.setPortSpeed(SPEEDAUTO.class);
         }
     }
 

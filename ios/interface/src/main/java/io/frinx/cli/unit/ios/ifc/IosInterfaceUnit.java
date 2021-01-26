@@ -75,6 +75,7 @@ public final class IosInterfaceUnit extends AbstractUnit {
                 io.frinx.openconfig.openconfig.vlan.IIDs.FRINX_OPENCONFIG_VLAN,
                 IIDs.FRINX_CISCO_IF_EXTENSION,
                 IIDs.FRINX_IF_ETHERNET_EXTENSION,
+                io.frinx.openconfig.openconfig.lacp.IIDs.FRINX_LACP_LAG_MEMBER,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -119,7 +120,10 @@ public final class IosInterfaceUnit extends AbstractUnit {
 
         // if-ethernet
         writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET);
-        writeRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli));
+        writeRegistry.subtreeAddAfter(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigWriter(cli),
+                Sets.newHashSet(IIDs.IN_IN_ET_CO_AUG_CONFIG1,
+                        io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG),
+                IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -151,6 +155,8 @@ public final class IosInterfaceUnit extends AbstractUnit {
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG, new InterfaceStatisticsConfigReader(cli));
 
         // if-ethernet
-        readRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli));
+        readRegistry.subtreeAdd(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli),
+                Sets.newHashSet(IIDs.IN_IN_ET_CO_AUG_CONFIG1,
+                        io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG));
     }
 }

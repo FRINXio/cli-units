@@ -72,7 +72,11 @@ public final class Util {
     }
 
     public static boolean isPhysicalInterface(Config data) {
-        return PHYS_IFC_TYPES.contains(data.getType());
+        return isPhysicalInterface(data.getType());
+    }
+
+    public static boolean isPhysicalInterface(Class<? extends InterfaceType> type) {
+        return PHYS_IFC_TYPES.contains(type);
     }
 
     public static boolean canSetInterfaceSpeed(String interfaceName) {

@@ -43,16 +43,19 @@ public class EthernetConfigWriterTest {
     private static final String WRITE_INPUT = "configure terminal\n"
             + "interface FastEthernet0/1\n"
             + "speed 100\n"
+            + "no channel-group\n"
             + "end\n";
 
     private static final String UPDATE_INPUT = "configure terminal\n"
             + "interface FastEthernet0/1\n"
             + "speed 10\n"
+            + "no channel-group\n"
             + "end\n";
 
     private static final String DELETE_INPUT = "configure terminal\n"
             + "interface FastEthernet0/1\n"
             + "no speed\n"
+            + "no channel-group\n"
             + "end\n";
 
     @Mock

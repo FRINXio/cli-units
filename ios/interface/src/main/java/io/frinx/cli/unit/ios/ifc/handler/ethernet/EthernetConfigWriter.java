@@ -16,32 +16,36 @@
 
 package io.frinx.cli.unit.ios.ifc.handler.ethernet;
 
+import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.ifc.Util;
 import io.frinx.cli.unit.utils.CliWriter;
+import java.util.Objects;
 import javax.annotation.Nonnull;
-
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ETHERNETSPEED;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member.rev171109.LacpEthConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.LacpActivityType;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class EthernetConfigWriter implements CliWriter<Config> {
 
-    private static final String SPEED_TEMPLATE = "speed"
-            + "{% if ($port_speed) %} {$port_speed}"
-            + "{% else %} auto"
-            + "{% endif %}\n";
-
     private static final String IFC_ETHERNET_CONFIG_TEMPLATE = "configure terminal\n"
             + "interface {$ifc_name}\n"
-            + SPEED_TEMPLATE
+            + "{% if ($port_speed) %}{$port_speed}\n{% endif %}"
+            + "{% if ($channel_id) %}channel-group {$channel_id} mode {$channel-group_id}\n"
+            + "{% else %}no channel-group\n"
+            + "{% endif %}"
             + "end";
 
     private static final String IFC_ETHERNET_CONFIG_DELETE_TEMPLATE = "configure terminal\n"
             + "interface {$ifc_name}\n"
             + "no speed\n"
+            + "no channel-group\n"
             + "end";
 
     private final Cli cli;
@@ -55,10 +59,49 @@ public class EthernetConfigWriter implements CliWriter<Config> {
                                        @Nonnull Config dataAfter,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String ifcName = id.firstKeyOf(Interface.class).getName();
+        Long channelId = getChannelId(dataAfter);
+        String channelGroup = getChannelGroup(dataAfter, ifcName, channelId);
+
         blockingWriteAndRead(cli, id, dataAfter,
                 fT(IFC_ETHERNET_CONFIG_TEMPLATE,
                         "ifc_name", ifcName,
-                        "port_speed", Util.getSpeedName(dataAfter.getPortSpeed())));
+                        "port_speed", getSpeed(null, dataAfter),
+                        "channel_id", channelId,
+                        "channel-group_id", channelGroup));
+    }
+
+    private String getSpeed(Config dataBefore, Config dataAfter) {
+        Class<? extends ETHERNETSPEED> speedBefore = dataBefore == null ? null : dataBefore.getPortSpeed();
+        Class<? extends ETHERNETSPEED> speedAfter = dataAfter == null ? null : dataAfter.getPortSpeed();
+        if (!Objects.equals(speedBefore, speedAfter)) {
+            String speed = Util.getSpeedName(dataAfter.getPortSpeed());
+            if (speed.isEmpty()) {
+                return "speed auto";
+            }
+            return "speed " + speed;
+        }
+        return null;
+    }
+
+    private String getChannelGroup(Config dataAfter, String ifcName, Long channelId) {
+        LacpEthConfigAug lacpAug = dataAfter.getAugmentation(LacpEthConfigAug.class);
+
+        if (lacpAug != null && lacpAug.getLacpMode() != null) {
+            Preconditions.checkArgument(channelId != null,
+                    "Missing aggregate-id, cannot configure LACP mode on non LAG enabled interface %s", ifcName);
+        }
+
+        LacpActivityType lacpMode = lacpAug != null ? lacpAug.getLacpMode() : null;
+        return lacpMode != null ? lacpMode.getName().toLowerCase() : "";
+    }
+
+    private static Long getChannelId(Config dataAfter) {
+        Config1 aggregationAug = dataAfter.getAugmentation(Config1.class);
+        if (aggregationAug == null || aggregationAug.getAggregateId() == null) {
+            return null;
+        }
+        String aggregateIfcName = aggregationAug.getAggregateId();
+        return Long.valueOf(aggregateIfcName);
     }
 
     @Override
@@ -66,7 +109,16 @@ public class EthernetConfigWriter implements CliWriter<Config> {
                                         @Nonnull final Config dataBefore,
                                         @Nonnull final Config dataAfter,
                                         @Nonnull final WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributes(id, dataAfter, writeContext);
+        final String ifcName = id.firstKeyOf(Interface.class).getName();
+        Long channelId = getChannelId(dataAfter);
+        String channelGroup = getChannelGroup(dataAfter, ifcName, channelId);
+
+        blockingWriteAndRead(cli, id, dataAfter,
+                fT(IFC_ETHERNET_CONFIG_TEMPLATE,
+                        "ifc_name", ifcName,
+                        "port_speed", getSpeed(dataBefore, dataAfter),
+                        "channel_id", channelId,
+                        "channel-group_id", channelGroup));
     }
 
     @Override
