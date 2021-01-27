@@ -22,14 +22,10 @@ import io.frinx.cli.unit.ios.ifc.Util;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig.SwitchportMode;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
@@ -51,12 +47,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     public static final Pattern PORT_TYPE_LINE = Pattern.compile("\\s*port-type (?<portType>.+)");
     public static final Pattern NO_SNMP_TRAP_LINE = Pattern.compile("\\s*no snmp trap link-status");
     public static final Pattern SWITCHPORT_MODE_LINE = Pattern.compile("\\s*switchport mode (?<mode>.+)");
-    public static final Pattern SWITCHPORT_ACCESS_VLAN_LINE =
-            Pattern.compile("\\s*switchport access vlan (?<switchportVlan>\\d+)");
-    public static final Pattern SWITCHPORT_TRUNK_ALLOWED_VLAN_LINE =
-            Pattern.compile("\\s*switchport trunk allowed vlan (?<allowedVlan>.+)");
-    public static final Pattern SWITCHPORT_TRUNK_ALLOWED_VLAN_ADD_LINE =
-            Pattern.compile("\\s*switchport trunk allowed vlan add (?<allowedVlan>.+)");
     public static final Pattern SERVICE_POLICY_INPUT_LINE = Pattern.compile("\\s*service-policy input (?<input>.+)");
     public static final Pattern SERVICE_POLICY_OUTPUT_LINE = Pattern.compile("\\s*service-policy output (?<output>.+)");
     public static final Pattern NO_IP_REDIRECTS_LINE = Pattern.compile("\\s*no ip redirects");
@@ -77,8 +67,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setPortType(output, ifCiscoExtAugBuilder);
         setSnmpTrap(output, ifCiscoExtAugBuilder);
         setSwitchportMode(output, ifCiscoExtAugBuilder);
-        setSwitchportAccessVlan(output, ifCiscoExtAugBuilder);
-        setSwitchportTrunkAllowedVlanAdd(output, ifCiscoExtAugBuilder);
         setServicePolicy(output, ifCiscoExtAugBuilder);
         setIpRedirects(output, ifCiscoExtAugBuilder);
         setIpUnreachables(output, ifCiscoExtAugBuilder);
@@ -161,61 +149,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
 
     private boolean hasServicePolicyBuilderData(ServicePolicyBuilder servicePolicyBuilder) {
         return servicePolicyBuilder.getInput() != null || servicePolicyBuilder.getOutput() != null;
-    }
-
-    private void setSwitchportTrunkAllowedVlanAdd(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
-        Optional<String> allowedValues = ParsingUtils.parseField(output, 0,
-            SWITCHPORT_TRUNK_ALLOWED_VLAN_LINE::matcher,
-            matcher -> matcher.group("allowedVlan"));
-
-        if (allowedValues.isPresent()) {
-            List<Long> list = getSwitchportTrunkAllowedVlanList(allowedValues);
-            ifCiscoExtAugBuilder.setSwitchportTrunkAllowedVlanAdd(list);
-        }
-
-        allowedValues = ParsingUtils.parseField(output, 0,
-            SWITCHPORT_TRUNK_ALLOWED_VLAN_ADD_LINE::matcher,
-            matcher -> matcher.group("allowedVlan"));
-
-        if (allowedValues.isPresent()) {
-            List<Long> list = getSwitchportTrunkAllowedVlanList(allowedValues);
-            ifCiscoExtAugBuilder.setSwitchportTrunkAllowedVlanAdd(
-                    Stream.concat(ifCiscoExtAugBuilder.getSwitchportTrunkAllowedVlanAdd().stream(), list.stream())
-                    .collect(Collectors.toList()));
-        }
-    }
-
-    private List<Long> getSwitchportTrunkAllowedVlanList(Optional<String> allowedValues) {
-        ArrayList<String> vlanStrings = new ArrayList<>(Arrays.asList(allowedValues.get().split(",")));
-        splitMultipleVlans(vlanStrings);
-        return vlanStrings
-                .stream()
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-    }
-
-    private void splitMultipleVlans(ArrayList<String> vlanStrings) {
-        for (int index = 0; index < vlanStrings.size(); index++) {
-            if (vlanStrings.get(index).contains("-")) {
-                List<Integer> list = Arrays.stream(vlanStrings.get(index).split("-"))
-                        .map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                IntStream stream = IntStream.range(list.get(0), list.get(1) + 1);
-                stream.forEach(i -> vlanStrings.add(String.valueOf(i)));
-                vlanStrings.remove(vlanStrings.get(index));
-            }
-        }
-    }
-
-    private void setSwitchportAccessVlan(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
-        Optional<String> accessVlanValue = ParsingUtils.parseField(output, 0,
-            SWITCHPORT_ACCESS_VLAN_LINE::matcher,
-            matcher -> matcher.group("switchportVlan"));
-
-        if (accessVlanValue.isPresent()) {
-            long value = Long.parseLong(accessVlanValue.get());
-            ifCiscoExtAugBuilder.setSwitchportAccessVlan(value);
-        }
     }
 
     private void setSnmpTrap(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
