@@ -79,8 +79,9 @@ public class AclUnit extends AbstractUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.AC_ACLSETS);
         writeRegistry.addNoop(IIDs.AC_AC_ACLSET);
-        writeRegistry.subtreeAdd(IIDs.AC_AC_AC_CONFIG, new AclSetConfigWriter(cli),
-                Collections.singleton(IIDs.AC_AC_AC_CO_AUG_SAOS6ACLSETAUG));
+        writeRegistry.subtreeAddBefore(IIDs.AC_AC_AC_CONFIG, new AclSetConfigWriter(cli),
+                Collections.singleton(IIDs.AC_AC_AC_CO_AUG_SAOS6ACLSETAUG),
+                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
         writeRegistry.addNoop(IIDs.AC_AC_AC_ACLENTRIES);
         writeRegistry.subtreeAdd(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryWriter(cli),
                 Sets.newHashSet(IIDs.AC_AC_AC_AC_AC_CONFIG,

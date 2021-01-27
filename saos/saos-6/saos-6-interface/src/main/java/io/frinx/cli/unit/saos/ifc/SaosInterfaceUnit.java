@@ -93,12 +93,13 @@ public class SaosInterfaceUnit extends AbstractUnit {
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.IN_INTERFACE);
-        writeRegistry.subtreeAdd(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli),
-                Collections.singleton(IIDs.IN_IN_CO_AUG_IFSAOSAUG));
+        writeRegistry.subtreeAddAfter(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli),
+                Collections.singleton(IIDs.IN_IN_CO_AUG_IFSAOSAUG),
+                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
 
         writeRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
-                new InterfaceVlanWriter(cli), IIDs.IN_IN_CONFIG,
-                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_VL_VL_CONFIG);
+                new InterfaceVlanWriter(cli), io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_VL_VL_CONFIG,
+                io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
 
         writeRegistry.addNoop(IIDs.IN_IN_AUG_SAOS6IFCFTAUG_CFTPROFILE);
         writeRegistry.add(IIDs.IN_IN_AUG_SAOS6IFCFTAUG_CF_CONFIG, new InterfaceCftProfileConfigWriter(cli));

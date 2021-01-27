@@ -116,7 +116,7 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.NE_NE_INTERFACES);
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_IN_INTERFACE, new InterfaceWriter(cli),
                 Sets.newHashSet(IIDs.NE_NE_IN_IN_CONFIG),
-                IIDs.NE_NE_CONFIG);
+                io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
