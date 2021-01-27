@@ -87,8 +87,6 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                 "mode", (ciscoExtAug != null) ? ciscoExtAug.getSwitchportMode() : null,
                 "snmpTrap", (ciscoExtAug != null && ciscoExtAug.isSnmpTrapLinkStatus() != null
                             && !ciscoExtAug.isSnmpTrapLinkStatus()) ? Chunk.TRUE : null,
-                "switchportAccessVlan", (ciscoExtAug != null) ? ciscoExtAug.getSwitchportAccessVlan() : null,
-                "switchportTrunkAllowed", convertVlansToString(ciscoExtAug),
                 "servicePolicyInput", (ciscoExtAug != null && ciscoExtAug.getServicePolicy() != null)
                             ? ciscoExtAug.getServicePolicy().getInput() : null,
                 "oldServicePolicyInput", getServicePolicyInput(before),
@@ -152,16 +150,6 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             }
         }
         return stringBuilder.toString();
-    }
-
-    private Object convertVlansToString(IfCiscoExtAug ciscoExtAug) {
-        StringBuilder string = new StringBuilder();
-        if (ciscoExtAug != null && ciscoExtAug.getSwitchportTrunkAllowedVlanAdd() != null) {
-            ciscoExtAug.getSwitchportTrunkAllowedVlanAdd().forEach(aLong -> string.append(aLong).append(","));
-            string.deleteCharAt(string.length() - 1);
-            return string.toString();
-        }
-        return null;
     }
 
     @Override
