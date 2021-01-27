@@ -27,7 +27,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>junos-17-native</artifactId>
-    <version>4.2.6.rc10-frinx-SNAPSHOT</version>
+    <version>4.2.6.rc10-frinx</version>
     <packaging>pom</packaging>
 
     <modules>
