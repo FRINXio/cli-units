@@ -41,6 +41,8 @@ import io.frinx.cli.unit.ios.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6AddressReader;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.ip6.Ipv6ConfigWriter;
+import io.frinx.cli.unit.ios.ifc.handler.vlan.InterfaceVlanReader;
+import io.frinx.cli.unit.ios.ifc.handler.vlan.InterfaceVlanWriter;
 import io.frinx.cli.unit.ios.init.IosDevices;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
@@ -107,6 +109,10 @@ public final class IosInterfaceUnit extends AbstractUnit {
                 new Ipv6ConfigWriter(cli),
                 IIDs.IN_IN_CONFIG, io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_IN_INTERFACE);
 
+        writeRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
+                new InterfaceVlanWriter(cli),
+                IIDs.IN_IN_CONFIG, io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_VL_VL_CONFIG);
+
         // cisco-if extensions
         writeRegistry.addAfter(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG,
                 new InterfaceStatisticsConfigWriter(cli), IIDs.IN_IN_CONFIG);
@@ -137,6 +143,9 @@ public final class IosInterfaceUnit extends AbstractUnit {
 
         readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
                 new SubinterfaceVlanConfigReader(cli));
+
+        readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
+                new InterfaceVlanReader(cli));
 
         // cisco if-extensions
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG, new InterfaceStatisticsConfigReader(cli));
