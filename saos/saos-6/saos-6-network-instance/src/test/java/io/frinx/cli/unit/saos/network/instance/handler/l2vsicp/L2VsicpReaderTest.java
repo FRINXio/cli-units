@@ -16,8 +16,14 @@
 
 package io.frinx.cli.unit.saos.network.instance.handler.l2vsicp;
 
+import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.utils.CliReader;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2VsicpReaderTest {
 
@@ -33,7 +39,10 @@ public class L2VsicpReaderTest {
             + "virtual-circuit ethernet set port 10 vlan-ethertype 88A8";
 
     @Test
-    public void allIdsTest() {
-        Assert.assertEquals(L2vsicpReader.getAllIds(OUTPUT).size(), 7);
+    public void allIdsTest() throws ReadFailedException {
+        CliReader cliReader = Mockito.mock(CliReader.class);
+        Mockito.when(cliReader.blockingRead(Mockito.anyString(), Mockito.any(Cli.class),
+                Mockito.any(InstanceIdentifier.class), Mockito.any(ReadContext.class))).thenReturn(OUTPUT);
+        Assert.assertEquals(L2vsicpReader.getAllIds(null, cliReader, null, null).size(), 7);
     }
 }
