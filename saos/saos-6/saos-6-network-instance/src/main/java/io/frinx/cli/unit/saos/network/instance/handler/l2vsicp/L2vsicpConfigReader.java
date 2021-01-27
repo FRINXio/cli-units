@@ -50,14 +50,16 @@ public final class L2vsicpConfigReader implements CliConfigReader<Config, Config
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String vsicpName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        configBuilder.setName(vsicpName);
-        configBuilder.setType(L2VSICP.class);
-        configBuilder.setEnabled(true);
+        if (isVsicp(instanceIdentifier, readContext)) {
+            String vsicpName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
+            configBuilder.setName(vsicpName);
+            configBuilder.setType(L2VSICP.class);
+            configBuilder.setEnabled(true);
 
-        String output = blockingRead(L2vsicpReader.SHOW_VC, cli, instanceIdentifier, readContext);
+            String output = blockingRead(L2vsicpReader.SHOW_VC, cli, instanceIdentifier, readContext);
 
-        fillBuilder(configBuilder, output, vsicpName);
+            fillBuilder(configBuilder, output, vsicpName);
+        }
     }
 
     @VisibleForTesting
@@ -73,6 +75,11 @@ public final class L2vsicpConfigReader implements CliConfigReader<Config, Config
             statBuilder::setStatistics);
 
         builder.addAugmentation(NiVcSaosAug.class, statBuilder.build());
+    }
+
+    private boolean isVsicp(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {
+        return L2vsicpReader.getAllIds(cli, this, id, readContext)
+                .contains(id.firstKeyOf(NetworkInstance.class));
     }
 
     @Override

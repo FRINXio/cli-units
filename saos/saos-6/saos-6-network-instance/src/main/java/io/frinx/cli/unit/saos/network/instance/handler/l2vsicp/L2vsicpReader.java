@@ -23,6 +23,7 @@ import io.fd.honeycomb.translate.spi.builder.BasicCheck;
 import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
+import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
@@ -55,11 +56,14 @@ public final class L2vsicpReader implements
     @Override
     public List<NetworkInstanceKey> getAllIds(@Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier,
                                               @Nonnull ReadContext readContext) throws ReadFailedException {
-        return getAllIds(blockingRead(SHOW_VC, cli, instanceIdentifier, readContext));
+        return getAllIds(cli, this, instanceIdentifier, readContext);
     }
 
     @VisibleForTesting
-    static List<NetworkInstanceKey> getAllIds(String output) {
+    static List<NetworkInstanceKey> getAllIds(Cli cli, CliReader cliReader,
+                                              @Nonnull InstanceIdentifier<?> id,
+                                              @Nonnull ReadContext readContext) throws ReadFailedException {
+        String output = cliReader.blockingRead(SHOW_VC, cli, id, readContext);
         return ParsingUtils.parseFields(output, 0,
             L2VSICP_IDS::matcher,
             m -> m.group("name"),
