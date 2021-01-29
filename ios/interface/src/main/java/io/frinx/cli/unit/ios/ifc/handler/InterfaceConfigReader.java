@@ -34,6 +34,9 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 
 public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
@@ -51,6 +54,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     public static final Pattern NO_IP_PROXY_ARP_LINE = Pattern.compile("\\s*no ip proxy-arp");
     private static final Pattern STORM_CONTROL_LINE =
             Pattern.compile("\\s*storm-control (?<address>\\S+) level (?<level>.+)");
+    private static final Pattern MEDIA_TYPE_LINE = Pattern.compile("\\s*media-type (?<mediaType>.+)");
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);
@@ -68,7 +72,47 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setIpUnreachables(output, ifCiscoExtAugBuilder);
         setIpProxyArp(output, ifCiscoExtAugBuilder);
         setStormControl(output, ifCiscoExtAugBuilder);
-        builder.addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder.build());
+        if (isCiscoExtAugNotEmpty(ifCiscoExtAugBuilder)) {
+            builder.addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder.build());
+        }
+
+        IfSaosAugBuilder ifSaosAugBuilder = new IfSaosAugBuilder();
+        setMode(output, ifSaosAugBuilder);
+        if (isSaosAugNotEmpty(ifSaosAugBuilder)) {
+            builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
+        }
+    }
+
+    private boolean isCiscoExtAugNotEmpty(IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        return !ifCiscoExtAugBuilder.build().equals((new IfCiscoExtAugBuilder()).build());
+    }
+
+    private Boolean isSaosAugNotEmpty(IfSaosAugBuilder ifSaosAugBuilder) {
+        return !ifSaosAugBuilder.build().equals((new IfSaosAugBuilder()).build());
+    }
+
+    private void setMode(String output, IfSaosAugBuilder ifSaosAugBuilder) {
+        Optional<String> mode = ParsingUtils.parseField(output, 0,
+            MEDIA_TYPE_LINE::matcher,
+            matcher -> matcher.group("mediaType"));
+
+        if (mode.isPresent()) {
+            PhysicalType physicalType;
+            switch (mode.get()) {
+                case "auto-select":
+                    physicalType = PhysicalType.Default;
+                    break;
+                case "rj45":
+                    physicalType = PhysicalType.Rj45;
+                    break;
+                case "sfp":
+                    physicalType = PhysicalType.Sfp;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Cannot parse Mode value: " + mode.get());
+            }
+            ifSaosAugBuilder.setPhysicalType(physicalType);
+        }
     }
 
     private void setSwitchportMode(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {

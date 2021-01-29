@@ -74,6 +74,7 @@ public final class IosInterfaceUnit extends AbstractUnit {
                 IIDs.FRINX_OPENCONFIG_IF_ETHERNET,
                 io.frinx.openconfig.openconfig.vlan.IIDs.FRINX_OPENCONFIG_VLAN,
                 IIDs.FRINX_CISCO_IF_EXTENSION,
+                IIDs.FRINX_SAOS_IF_EXTENSION,
                 IIDs.FRINX_IF_ETHERNET_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
@@ -92,7 +93,8 @@ public final class IosInterfaceUnit extends AbstractUnit {
         writeRegistry.subtreeAdd(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli),
             Sets.newHashSet(IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG,
                 IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_SERVICEPOLICY,
-                IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_STORMCONTROL));
+                IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_STORMCONTROL,
+                IIDs.IN_IN_CO_AUG_IFSAOSAUG));
 
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
         writeRegistry.addAfter(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli), IIDs.IN_IN_CONFIG);
