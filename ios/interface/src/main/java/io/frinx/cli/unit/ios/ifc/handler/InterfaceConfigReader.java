@@ -28,6 +28,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig.SwitchportMode;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig.SwitchportPortSecurityAgingType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig.SwitchportPortSecurityViolation;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
@@ -55,6 +57,17 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private static final Pattern STORM_CONTROL_LINE =
             Pattern.compile("\\s*storm-control (?<address>\\S+) level (?<level>.+)");
     private static final Pattern MEDIA_TYPE_LINE = Pattern.compile("\\s*media-type (?<mediaType>.+)");
+    private static final Pattern SWITCHPORT_PORT_SECURITY = Pattern.compile("\\s*switchport port-security");
+    private static final Pattern SWITCHPORT_PORT_SECURITY_MAXIMUM =
+            Pattern.compile("\\s*switchport port-security maximum (?<value>.+)");
+    private static final Pattern SWITCHPORT_PORT_SECURITY_VIOLATION =
+            Pattern.compile("\\s*switchport port-security violation (?<mode>.+)");
+    private static final Pattern SWITCHPORT_PORT_SECURITY_AGING_TIME =
+            Pattern.compile("\\s*switchport port-security aging time (?<value>.+)");
+    private static final Pattern SWITCHPORT_PORT_SECURITY_AGING_TYPE =
+            Pattern.compile("\\s*switchport port-security aging type (?<type>.+)");
+    private static final Pattern SWITCHPORT_PORT_SECURITY_AGING_STATIC =
+            Pattern.compile("\\s*switchport port-security aging static");
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);
@@ -68,6 +81,12 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setPortType(output, ifCiscoExtAugBuilder);
         setSnmpTrap(output, ifCiscoExtAugBuilder);
         setSwitchportMode(output, ifCiscoExtAugBuilder);
+        setSwitchportPortSecurity(output, ifCiscoExtAugBuilder);
+        setSwitchportPortSecurityMaximum(output, ifCiscoExtAugBuilder);
+        setSwitchportPortSecurityViolation(output, ifCiscoExtAugBuilder);
+        setSwitchportPortSecurityAgingTime(output, ifCiscoExtAugBuilder);
+        setSwitchportPortSecurityAgingType(output, ifCiscoExtAugBuilder);
+        setSwitchportPortSecurityAgingStatic(output, ifCiscoExtAugBuilder);
         setIpRedirects(output, ifCiscoExtAugBuilder);
         setIpUnreachables(output, ifCiscoExtAugBuilder);
         setIpProxyArp(output, ifCiscoExtAugBuilder);
@@ -80,6 +99,79 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setMode(output, ifSaosAugBuilder);
         if (isSaosAugNotEmpty(ifSaosAugBuilder)) {
             builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
+        }
+    }
+
+    private void setSwitchportPortSecurityAgingStatic(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        if (SWITCHPORT_PORT_SECURITY_AGING_STATIC.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setSwitchportPortSecurityAgingStatic(true);
+        }
+    }
+
+    private void setSwitchportPortSecurityAgingType(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        Optional<String> mode = ParsingUtils.parseField(output, 0,
+            SWITCHPORT_PORT_SECURITY_AGING_TYPE::matcher,
+            matcher -> matcher.group("type"));
+
+        if (mode.isPresent()) {
+            SwitchportPortSecurityAgingType type;
+            switch (mode.get()) {
+                case "absolute":
+                    type = SwitchportPortSecurityAgingType.Absolute;
+                    break;
+                case "inactivity":
+                    type = SwitchportPortSecurityAgingType.Inactivity;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Cannot parse switchport port-security aging type value: "
+                            + mode.get());
+            }
+            ifCiscoExtAugBuilder.setSwitchportPortSecurityAgingType(type);
+        }
+    }
+
+    private void setSwitchportPortSecurityAgingTime(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        ParsingUtils.parseField(output,
+            SWITCHPORT_PORT_SECURITY_AGING_TIME::matcher,
+            matcher -> Long.valueOf(matcher.group("value")),
+            ifCiscoExtAugBuilder::setSwitchportPortSecurityAgingTime);
+    }
+
+    private void setSwitchportPortSecurityViolation(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        Optional<String> mode = ParsingUtils.parseField(output, 0,
+            SWITCHPORT_PORT_SECURITY_VIOLATION::matcher,
+            matcher -> matcher.group("mode"));
+
+        if (mode.isPresent()) {
+            SwitchportPortSecurityViolation violation;
+            switch (mode.get()) {
+                case "protect":
+                    violation = SwitchportPortSecurityViolation.Protect;
+                    break;
+                case "restrict":
+                    violation = SwitchportPortSecurityViolation.Restrict;
+                    break;
+                case "shutdown":
+                    violation = SwitchportPortSecurityViolation.Shutdown;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Cannot parse switchport port-security violation mode value: "
+                            + mode.get());
+            }
+            ifCiscoExtAugBuilder.setSwitchportPortSecurityViolation(violation);
+        }
+    }
+
+    private void setSwitchportPortSecurityMaximum(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        ParsingUtils.parseField(output,
+            SWITCHPORT_PORT_SECURITY_MAXIMUM::matcher,
+            matcher -> Long.valueOf(matcher.group("value")),
+            ifCiscoExtAugBuilder::setSwitchportPortSecurityMaximum);
+    }
+
+    private void setSwitchportPortSecurity(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        if (SWITCHPORT_PORT_SECURITY.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setSwitchportPortSecurityEnable(true);
         }
     }
 

@@ -45,6 +45,12 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($switchportTrunkAllowed) %}switchport trunk allowed vlan {$switchportTrunkAllowed}\n"
             + "{% else %}no switchport trunk allowed vlan\n{% endif %}"
             + "{% if ($stormControl) %}{$stormControl}{% endif %}"
+            + "{% if ($portSecurity) %}{$portSecurity}\n{% endif %}"
+            + "{% if ($portSecurityMaximum) %}{$portSecurityMaximum}\n{% endif %}"
+            + "{% if ($portSecurityViolation) %}{$portSecurityViolation}\n{% endif %}"
+            + "{% if ($portSecurityAgingType) %}{$portSecurityAgingType}\n{% endif %}"
+            + "{% if ($portSecurityAgingTime) %}{$portSecurityAgingTime}\n{% endif %}"
+            + "{% if ($portSecurityAgingStatic) %}{$portSecurityAgingStatic}\n{% endif %}"
             + "end\n";
 
     private static final String WRITE_TEMPLATE_VLAN = "configure terminal\n"
@@ -81,7 +87,13 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                 "mode", (ciscoExtAug != null) ? ciscoExtAug.getSwitchportMode() : null,
                 "snmpTrap", (ciscoExtAug != null && ciscoExtAug.isSnmpTrapLinkStatus() != null
                             && !ciscoExtAug.isSnmpTrapLinkStatus()) ? Chunk.TRUE : null,
-                "stormControl", getStormControlCommands(after));
+                "stormControl", getStormControlCommands(after),
+                "portSecurity", getPortSecurityEnableCommand(before, after),
+                "portSecurityMaximum", getPortSecurityMaximumCommand(before, after),
+                "portSecurityViolation", getSwitchportPortSecurityViolation(before, after),
+                "portSecurityAgingType", getSwitchportPortSecurityAgingType(before, after),
+                "portSecurityAgingTime", getSwitchportPortSecurityAgingTime(before, after),
+                "portSecurityAgingStatic", getSwitchportPortSecurityAgingStatic(before, after));
         }
         return fT(WRITE_TEMPLATE_VLAN,
             "before", before,
@@ -97,6 +109,149 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             "ipProxyArp", (ciscoExtAug != null && ciscoExtAug.isIpProxyArp() != null && !ciscoExtAug.isIpProxyArp())
                         ? Chunk.TRUE : null);
     }
+
+    private String getSwitchportPortSecurityAgingStatic(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isSwitchportPortSecurityAgingStatic() != null) {
+                return ciscoExtAugAfter.isSwitchportPortSecurityAgingStatic()
+                        ? "switchport port-security aging static" : "no switchport port-security aging static";
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.isSwitchportPortSecurityAgingStatic() != null) {
+            return ciscoExtAugAfter.isSwitchportPortSecurityAgingStatic()
+                    ? "switchport port-security aging static" : "no switchport port-security aging static";
+        } else if (ciscoExtAugBefore.isSwitchportPortSecurityAgingStatic() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isSwitchportPortSecurityAgingStatic() != null) {
+                return ciscoExtAugAfter.isSwitchportPortSecurityAgingStatic()
+                        ? "switchport port-security aging static" : "no switchport port-security aging static";
+            } else {
+                return "no switchport port-security aging static";
+            }
+        }
+        return null;
+    }
+
+    private String getSwitchportPortSecurityAgingType(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityAgingType() != null) {
+                return "switchport port-security aging type "
+                        + ciscoExtAugAfter.getSwitchportPortSecurityAgingType().getName();
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityAgingType() != null) {
+            return "switchport port-security aging type "
+                    + ciscoExtAugAfter.getSwitchportPortSecurityAgingType().getName();
+        } else if (ciscoExtAugBefore.getSwitchportPortSecurityAgingType() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityAgingType() != null) {
+                return "switchport port-security aging type "
+                        + ciscoExtAugAfter.getSwitchportPortSecurityAgingType().getName();
+            } else {
+                return "no switchport port-security aging type";
+            }
+        }
+        return null;
+    }
+
+    private Object getSwitchportPortSecurityAgingTime(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityAgingTime() != null) {
+                return "switchport port-security aging time " + ciscoExtAugAfter.getSwitchportPortSecurityAgingTime();
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityAgingTime() != null) {
+            return "switchport port-security aging time " + ciscoExtAugAfter.getSwitchportPortSecurityAgingTime();
+        } else if (ciscoExtAugBefore.getSwitchportPortSecurityAgingTime() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityAgingTime() != null) {
+                return "switchport port-security aging time " + ciscoExtAugAfter.getSwitchportPortSecurityAgingTime();
+            } else {
+                return "no switchport port-security aging time";
+            }
+        }
+        return null;
+    }
+
+    private Object getSwitchportPortSecurityViolation(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityViolation() != null) {
+                return "switchport port-security violation "
+                        + ciscoExtAugAfter.getSwitchportPortSecurityViolation().getName();
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityViolation() != null) {
+            return "switchport port-security violation "
+                    + ciscoExtAugAfter.getSwitchportPortSecurityViolation().getName();
+        } else if (ciscoExtAugBefore.getSwitchportPortSecurityViolation() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityViolation() != null) {
+                return "switchport port-security violation "
+                        + ciscoExtAugAfter.getSwitchportPortSecurityViolation().getName();
+            } else {
+                return "no switchport port-security violation";
+            }
+        }
+        return null;
+    }
+
+    private Object getPortSecurityMaximumCommand(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityMaximum() != null) {
+                return "switchport port-security maximum " + ciscoExtAugAfter.getSwitchportPortSecurityMaximum();
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityMaximum() != null) {
+            return "switchport port-security maximum " + ciscoExtAugAfter.getSwitchportPortSecurityMaximum();
+        } else if (ciscoExtAugBefore.getSwitchportPortSecurityMaximum() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getSwitchportPortSecurityMaximum() != null) {
+                return "switchport port-security maximum " + ciscoExtAugAfter.getSwitchportPortSecurityMaximum();
+            } else {
+                return "no switchport port-security maximum";
+            }
+        }
+        return null;
+    }
+
+    private String getPortSecurityEnableCommand(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isSwitchportPortSecurityEnable() != null) {
+                return ciscoExtAugAfter.isSwitchportPortSecurityEnable()
+                        ? "switchport port-security" : "no switchport port-security";
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.isSwitchportPortSecurityEnable() != null) {
+            return ciscoExtAugAfter.isSwitchportPortSecurityEnable()
+                    ? "switchport port-security" : "no switchport port-security";
+        } else if (ciscoExtAugBefore.isSwitchportPortSecurityEnable() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isSwitchportPortSecurityEnable() != null) {
+                return ciscoExtAugAfter.isSwitchportPortSecurityEnable()
+                        ? "switchport port-security" : "no switchport port-security";
+            } else {
+                return "no switchport port-security";
+            }
+        }
+        return null;
+    }
+
+    private IfCiscoExtAug getIfCiscoExtAug(Config config) {
+        if (config != null) {
+            IfCiscoExtAug ciscoExtAug = config.getAugmentation(IfCiscoExtAug.class);
+            if (ciscoExtAug != null) {
+                return ciscoExtAug;
+            }
+        }
+        return null;
+    }
+
 
     private String getPhysicalType(Config dataBefore, Config dataAfter) {
         String typeBefore = getPhysicalType(dataBefore);
