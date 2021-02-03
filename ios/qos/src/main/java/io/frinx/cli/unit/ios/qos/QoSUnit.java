@@ -27,6 +27,12 @@ import io.frinx.cli.unit.ios.qos.handler.classifier.ClassifierReader;
 import io.frinx.cli.unit.ios.qos.handler.classifier.ClassifierWriter;
 import io.frinx.cli.unit.ios.qos.handler.classifier.ConditionsReader;
 import io.frinx.cli.unit.ios.qos.handler.classifier.TermReader;
+import io.frinx.cli.unit.ios.qos.handler.ifc.EgressInterfaceConfigReader;
+import io.frinx.cli.unit.ios.qos.handler.ifc.EgressInterfaceConfigWriter;
+import io.frinx.cli.unit.ios.qos.handler.ifc.IngressInterfaceConfigReader;
+import io.frinx.cli.unit.ios.qos.handler.ifc.IngressInterfaceConfigWriter;
+import io.frinx.cli.unit.ios.qos.handler.ifc.InterfaceConfigReader;
+import io.frinx.cli.unit.ios.qos.handler.ifc.InterfaceReader;
 import io.frinx.cli.unit.ios.qos.handler.scheduler.InputConfigReader;
 import io.frinx.cli.unit.ios.qos.handler.scheduler.InputConfigWriter;
 import io.frinx.cli.unit.ios.qos.handler.scheduler.InputReader;
@@ -103,6 +109,12 @@ public class QoSUnit extends AbstractUnit {
                         IIDs.QO_SC_SC_SC_SC_ON_CO_CO_AUG_QOSCONFORMACTIONAUG,
                         IIDs.QO_SC_SC_SC_SC_ON_EX_CONFIG,
                         IIDs.QO_SC_SC_SC_SC_ON_EX_CO_AUG_QOSEXCEEDACTIONAUG));
+        writeRegistry.addNoop(IIDs.QO_IN_INTERFACE);
+        writeRegistry.addNoop(IIDs.QO_IN_IN_CONFIG);
+        writeRegistry.subtreeAdd(IIDs.QO_IN_IN_IN_CONFIG, new IngressInterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.QO_IN_IN_IN_CO_AUG_QOSINGRESSINTERFACEAUG));
+        writeRegistry.subtreeAdd(IIDs.QO_IN_IN_OU_CONFIG, new EgressInterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.QO_IN_IN_OU_CO_AUG_QOSEGRESSINTERFACEAUG));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -128,6 +140,12 @@ public class QoSUnit extends AbstractUnit {
                 Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_ON_CO_CO_AUG_QOSCONFORMACTIONAUG));
         readRegistry.subtreeAdd(IIDs.QO_SC_SC_SC_SC_ON_EX_CONFIG, new OneRateTwoColorExceedActionConfigReader(cli),
                 Sets.newHashSet(IIDs.QO_SC_SC_SC_SC_ON_EX_CO_AUG_QOSEXCEEDACTIONAUG));
+        readRegistry.add(IIDs.QO_IN_INTERFACE, new InterfaceReader(cli));
+        readRegistry.add(IIDs.QO_IN_IN_CONFIG, new InterfaceConfigReader());
+        readRegistry.subtreeAdd(IIDs.QO_IN_IN_IN_CONFIG, new IngressInterfaceConfigReader(cli),
+                Sets.newHashSet(IIDs.QO_IN_IN_IN_CO_AUG_QOSINGRESSINTERFACEAUG));
+        readRegistry.subtreeAdd(IIDs.QO_IN_IN_OU_CONFIG, new EgressInterfaceConfigReader(cli),
+                Sets.newHashSet(IIDs.QO_IN_IN_OU_CO_AUG_QOSEGRESSINTERFACEAUG));
     }
 
     @Override
