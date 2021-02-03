@@ -30,7 +30,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig.SwitchportMode;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.policy.ServicePolicyBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlKey;
@@ -47,8 +46,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     public static final Pattern PORT_TYPE_LINE = Pattern.compile("\\s*port-type (?<portType>.+)");
     public static final Pattern NO_SNMP_TRAP_LINE = Pattern.compile("\\s*no snmp trap link-status");
     public static final Pattern SWITCHPORT_MODE_LINE = Pattern.compile("\\s*switchport mode (?<mode>.+)");
-    public static final Pattern SERVICE_POLICY_INPUT_LINE = Pattern.compile("\\s*service-policy input (?<input>.+)");
-    public static final Pattern SERVICE_POLICY_OUTPUT_LINE = Pattern.compile("\\s*service-policy output (?<output>.+)");
     public static final Pattern NO_IP_REDIRECTS_LINE = Pattern.compile("\\s*no ip redirects");
     public static final Pattern NO_IP_UNREACHABLES_LINE = Pattern.compile("\\s*no ip unreachables");
     public static final Pattern NO_IP_PROXY_ARP_LINE = Pattern.compile("\\s*no ip proxy-arp");
@@ -67,7 +64,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setPortType(output, ifCiscoExtAugBuilder);
         setSnmpTrap(output, ifCiscoExtAugBuilder);
         setSwitchportMode(output, ifCiscoExtAugBuilder);
-        setServicePolicy(output, ifCiscoExtAugBuilder);
         setIpRedirects(output, ifCiscoExtAugBuilder);
         setIpUnreachables(output, ifCiscoExtAugBuilder);
         setIpProxyArp(output, ifCiscoExtAugBuilder);
@@ -115,40 +111,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         if (NO_IP_UNREACHABLES_LINE.matcher(output).find()) {
             ifCiscoExtAugBuilder.setIpUnreachables(false);
         }
-    }
-
-    private void setServicePolicy(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
-        ServicePolicyBuilder servicePolicyBuilder = new ServicePolicyBuilder();
-        setServicePolicyInput(output, servicePolicyBuilder);
-        setServicePolicyOutput(output, servicePolicyBuilder);
-
-        if (hasServicePolicyBuilderData(servicePolicyBuilder)) {
-            ifCiscoExtAugBuilder.setServicePolicy(servicePolicyBuilder.build());
-        }
-    }
-
-    private void setServicePolicyOutput(String output, ServicePolicyBuilder servicePolicyBuilder) {
-        Optional<String> outputValue = ParsingUtils.parseField(output, 0,
-            SERVICE_POLICY_OUTPUT_LINE::matcher,
-            matcher -> matcher.group("output"));
-
-        if (outputValue.isPresent()) {
-            servicePolicyBuilder.setOutput(outputValue.get());
-        }
-    }
-
-    private void setServicePolicyInput(String output, ServicePolicyBuilder servicePolicyBuilder) {
-        Optional<String> inputValue = ParsingUtils.parseField(output, 0,
-            SERVICE_POLICY_INPUT_LINE::matcher,
-            matcher -> matcher.group("input"));
-
-        if (inputValue.isPresent()) {
-            servicePolicyBuilder.setInput(inputValue.get());
-        }
-    }
-
-    private boolean hasServicePolicyBuilderData(ServicePolicyBuilder servicePolicyBuilder) {
-        return servicePolicyBuilder.getInput() != null || servicePolicyBuilder.getOutput() != null;
     }
 
     private void setSnmpTrap(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {

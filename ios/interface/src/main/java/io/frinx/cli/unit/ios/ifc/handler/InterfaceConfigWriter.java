@@ -40,12 +40,6 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% else %}no switchport access vlan\n{% endif %}"
             + "{% if ($switchportTrunkAllowed) %}switchport trunk allowed vlan {$switchportTrunkAllowed}\n"
             + "{% else %}no switchport trunk allowed vlan\n{% endif %}"
-            + "{% if ($servicePolicyInput) %}service-policy input {$servicePolicyInput}\n"
-            + "{% else %}{% if ($oldServicePolicyInput) %}no service-policy input {$oldServicePolicyInput}"
-            + "\n{% endif %}{% endif %}"
-            + "{% if ($servicePolicyOutput) %}service-policy output {$servicePolicyOutput}\n"
-            + "{% else %}{% if ($oldServicePolicyOutput) %}no service-policy output {$oldServicePolicyOutput}"
-            + "\n{% endif %}{% endif %}"
             + "{% if ($stormControl) %}{$stormControl}{% endif %}"
             + "end\n";
 
@@ -56,12 +50,6 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             //  + "{$data|update(is_enabled,shutdown\n,no shutdown\n}"
             + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
             + "{% if ($snmpTrap) %}no snmp trap link-status\n{% else %}snmp trap link-status\n{% endif %}"
-            + "{% if ($servicePolicyInput) %}service-policy input {$servicePolicyInput}\n"
-            + "{% else %}{% if ($oldServicePolicyInput) %}no service-policy input {$oldServicePolicyInput}\n{% endif %}"
-            + "{% endif %}"
-            + "{% if ($servicePolicyOutput) %}service-policy output {$servicePolicyOutput}\n"
-            + "{% else %}{% if ($oldServicePolicyOutput) %}no service-policy output {$oldServicePolicyOutput}"
-            + "\n{% endif %}{% endif %}"
             + "{% if ($ipRedirects) %}no ip redirects\n{% else %}ip redirects\n{% endif %}"
             + "{% if ($ipUnreachables) %}no ip unreachables\n{% else %}ip unreachables\n{% endif %}"
             + "{% if ($ipProxyArp) %}no ip proxy-arp\n{% else %}ip proxy-arp\n{% endif %}"
@@ -87,12 +75,6 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                 "mode", (ciscoExtAug != null) ? ciscoExtAug.getSwitchportMode() : null,
                 "snmpTrap", (ciscoExtAug != null && ciscoExtAug.isSnmpTrapLinkStatus() != null
                             && !ciscoExtAug.isSnmpTrapLinkStatus()) ? Chunk.TRUE : null,
-                "servicePolicyInput", (ciscoExtAug != null && ciscoExtAug.getServicePolicy() != null)
-                            ? ciscoExtAug.getServicePolicy().getInput() : null,
-                "oldServicePolicyInput", getServicePolicyInput(before),
-                "servicePolicyOutput", (ciscoExtAug != null && ciscoExtAug.getServicePolicy() != null)
-                            ? ciscoExtAug.getServicePolicy().getOutput() : null,
-                "oldServicePolicyOutput", getServicePolicyOutput(before),
                 "stormControl", getStormControlCommands(after));
         }
         return fT(WRITE_TEMPLATE_VLAN,
@@ -101,34 +83,12 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
             "snmpTrap", (ciscoExtAug != null && ciscoExtAug.isSnmpTrapLinkStatus() != null
                         && !ciscoExtAug.isSnmpTrapLinkStatus()) ? Chunk.TRUE : null,
-            "servicePolicyInput", (ciscoExtAug != null && ciscoExtAug.getServicePolicy() != null)
-                        ? ciscoExtAug.getServicePolicy().getInput() : null,
-            "oldServicePolicyInput", getServicePolicyInput(before),
-            "servicePolicyOutput", (ciscoExtAug != null && ciscoExtAug.getServicePolicy() != null)
-                        ? ciscoExtAug.getServicePolicy().getOutput() : null,
-            "oldServicePolicyOutput", getServicePolicyOutput(before),
             "ipRedirects", (ciscoExtAug != null && ciscoExtAug.isIpRedirects() != null
                         && !ciscoExtAug.isIpRedirects()) ? Chunk.TRUE : null,
             "ipUnreachables", (ciscoExtAug != null && ciscoExtAug.isIpUnreachables() != null
                         && !ciscoExtAug.isIpUnreachables()) ? Chunk.TRUE : null,
             "ipProxyArp", (ciscoExtAug != null && ciscoExtAug.isIpProxyArp() != null && !ciscoExtAug.isIpProxyArp())
                         ? Chunk.TRUE : null);
-    }
-
-    private String getServicePolicyOutput(Config before) {
-        if (before != null && before.getAugmentation(IfCiscoExtAug.class) != null
-                && before.getAugmentation(IfCiscoExtAug.class).getServicePolicy() != null) {
-            return before.getAugmentation(IfCiscoExtAug.class).getServicePolicy().getOutput();
-        }
-        return null;
-    }
-
-    private String getServicePolicyInput(Config before) {
-        if (before != null && before.getAugmentation(IfCiscoExtAug.class) != null
-                && before.getAugmentation(IfCiscoExtAug.class).getServicePolicy() != null) {
-            return before.getAugmentation(IfCiscoExtAug.class).getServicePolicy().getInput();
-        }
-        return null;
     }
 
     private String getStormControlCommands(Config after) {
