@@ -25,13 +25,17 @@ import io.frinx.cli.unit.saos.acl.handler.AclEntryActionsConfigReader;
 import io.frinx.cli.unit.saos.acl.handler.AclEntryConfigReader;
 import io.frinx.cli.unit.saos.acl.handler.AclEntryReader;
 import io.frinx.cli.unit.saos.acl.handler.AclEntryWriter;
+import io.frinx.cli.unit.saos.acl.handler.AclInterfaceConfigReader;
+import io.frinx.cli.unit.saos.acl.handler.AclInterfaceReader;
 import io.frinx.cli.unit.saos.acl.handler.AclSetConfigReader;
 import io.frinx.cli.unit.saos.acl.handler.AclSetConfigWriter;
 import io.frinx.cli.unit.saos.acl.handler.AclSetReader;
+import io.frinx.cli.unit.saos.acl.handler.IngressAclSetConfigReader;
+import io.frinx.cli.unit.saos.acl.handler.IngressAclSetConfigWriter;
+import io.frinx.cli.unit.saos.acl.handler.IngressAclSetReader;
 import io.frinx.cli.unit.saos.init.SaosDevices;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.acl.IIDs;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -77,22 +81,43 @@ public class AclUnit extends AbstractUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
+        writeRegistry.addNoop(IIDs.ACL);
+        writeRegistry.addNoop(IIDs.AC_IN_INTERFACE);
+        writeRegistry.addNoop(IIDs.AC_IN_IN_CONFIG);
+
+        // sets
         writeRegistry.addNoop(IIDs.AC_ACLSETS);
         writeRegistry.addNoop(IIDs.AC_AC_ACLSET);
         writeRegistry.subtreeAddBefore(IIDs.AC_AC_AC_CONFIG, new AclSetConfigWriter(cli),
                 Collections.singleton(IIDs.AC_AC_AC_CO_AUG_SAOS6ACLSETAUG),
                 io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
+
+        // entries
         writeRegistry.addNoop(IIDs.AC_AC_AC_ACLENTRIES);
         writeRegistry.subtreeAdd(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryWriter(cli),
                 Sets.newHashSet(IIDs.AC_AC_AC_AC_AC_CONFIG,
                         IIDs.AC_AC_AC_AC_AC_CO_AUG_CONFIG2,
                         IIDs.AC_AC_AC_AC_AC_ACTIONS,
                         IIDs.AC_AC_AC_AC_AC_AC_CONFIG));
+
+        // ingress
+        writeRegistry.addNoop(IIDs.AC_IN_IN_IN_INGRESSACLSET);
+        writeRegistry.add(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigWriter(cli));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.add(IIDs.AC_IN_INTERFACE, new AclInterfaceReader(cli));
+        readRegistry.add(IIDs.AC_IN_IN_CONFIG, new AclInterfaceConfigReader());
+
+        // ingress
+        readRegistry.add(IIDs.AC_IN_IN_IN_INGRESSACLSET, new IngressAclSetReader(cli));
+        readRegistry.add(IIDs.AC_IN_IN_IN_IN_CONFIG, new IngressAclSetConfigReader());
+
+        // sets
         readRegistry.add(IIDs.AC_AC_ACLSET, new AclSetReader(cli));
         readRegistry.add(IIDs.AC_AC_AC_CONFIG, new AclSetConfigReader(cli));
+
+        // entries
         readRegistry.add(IIDs.AC_AC_AC_AC_ACLENTRY, new AclEntryReader(cli));
         readRegistry.add(IIDs.AC_AC_AC_AC_AC_CONFIG, new AclEntryConfigReader(cli));
         readRegistry.add(IIDs.AC_AC_AC_AC_AC_AC_CONFIG, new AclEntryActionsConfigReader(cli));
