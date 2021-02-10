@@ -20,9 +20,12 @@ import com.x5.template.Chunk;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigWriter;
 import io.frinx.cli.unit.ios.ifc.Util;
+import java.util.Objects;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
 
 public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
 
@@ -33,6 +36,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{$data|update(description,description `$data.description`\n,no description\n)}"
             //  + "{$data|update(is_enabled,shutdown\n,no shutdown\n}"
             + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
+            + "{% if ($pt) %}{$pt}\n{% endif %}"
             + "{% if ($portType) %}port-type {$portType}\n{% else %}no port-type\n{% endif %}"
             + "{% if ($mode) %}switchport mode {$mode}\n{% else %}no switchport mode\n{% endif %}"
             + "{% if ($snmpTrap) %}no snmp trap link-status\n{% else %}snmp trap link-status\n{% endif %}"
@@ -49,6 +53,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{$data|update(description,description `$data.description`\n,no description\n)}"
             //  + "{$data|update(is_enabled,shutdown\n,no shutdown\n}"
             + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
+            + "{% if ($pt) %}{$pt}\n{% endif %}"
             + "{% if ($snmpTrap) %}no snmp trap link-status\n{% else %}snmp trap link-status\n{% endif %}"
             + "{% if ($ipRedirects) %}no ip redirects\n{% else %}ip redirects\n{% endif %}"
             + "{% if ($ipUnreachables) %}no ip unreachables\n{% else %}ip unreachables\n{% endif %}"
@@ -71,6 +76,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                 "before", before,
                 "data", after,
                 "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
+                "pt", getPhysicalType(before, after),
                 "portType", (ciscoExtAug != null) ? ciscoExtAug.getPortType() : null,
                 "mode", (ciscoExtAug != null) ? ciscoExtAug.getSwitchportMode() : null,
                 "snmpTrap", (ciscoExtAug != null && ciscoExtAug.isSnmpTrapLinkStatus() != null
@@ -81,6 +87,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             "before", before,
             "data", after,
             "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
+            "pt", getPhysicalType(before, after),
             "snmpTrap", (ciscoExtAug != null && ciscoExtAug.isSnmpTrapLinkStatus() != null
                         && !ciscoExtAug.isSnmpTrapLinkStatus()) ? Chunk.TRUE : null,
             "ipRedirects", (ciscoExtAug != null && ciscoExtAug.isIpRedirects() != null
@@ -89,6 +96,29 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                         && !ciscoExtAug.isIpUnreachables()) ? Chunk.TRUE : null,
             "ipProxyArp", (ciscoExtAug != null && ciscoExtAug.isIpProxyArp() != null && !ciscoExtAug.isIpProxyArp())
                         ? Chunk.TRUE : null);
+    }
+
+    private String getPhysicalType(Config dataBefore, Config dataAfter) {
+        String typeBefore = getPhysicalType(dataBefore);
+        String typeAfter = getPhysicalType(dataAfter);
+        if (!Objects.equals(typeAfter, typeBefore)) {
+            if (typeAfter != null) {
+                return "media-type " + typeAfter;
+            }
+            return "no media-type";
+        }
+        return null;
+    }
+
+    private String getPhysicalType(Config config) {
+        if (config != null) {
+            IfSaosAug saosAug = config.getAugmentation(IfSaosAug.class);
+            if (saosAug != null) {
+                PhysicalType physicalType = saosAug.getPhysicalType();
+                return physicalType != null ? physicalType.getName() : null;
+            }
+        }
+        return null;
     }
 
     private String getStormControlCommands(Config after) {

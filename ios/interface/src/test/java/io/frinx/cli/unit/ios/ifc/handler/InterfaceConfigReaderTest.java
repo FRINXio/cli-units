@@ -64,7 +64,6 @@ public class InterfaceConfigReaderTest {
     private static final Config EXPECTED_INTERFACE2 = new ConfigBuilder().setEnabled(true)
             .setName("FastEthernet0/0")
             .setType(EthernetCsmacd.class)
-            .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder().build())
             .build();
     private static final String SH_INTERFACE_RUN2 = "interface FastEthernet0/0\n"
             + " ip address 192.168.56.121 255.255.255.0\n"
