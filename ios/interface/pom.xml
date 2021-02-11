@@ -69,6 +69,11 @@
             <artifactId>openconfig-lacp</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>openconfig-oam</artifactId>
+            <version>${openconfig.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
