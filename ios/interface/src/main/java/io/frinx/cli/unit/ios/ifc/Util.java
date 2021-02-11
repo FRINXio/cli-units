@@ -54,7 +54,7 @@ public final class Util {
     }
 
     public static Class<? extends InterfaceType> parseType(String name) {
-        if (name.startsWith("FastEther") || name.startsWith("GigabitEthernet")) {
+        if (name.startsWith("FastEther") || name.contains("GigabitEthernet")) {
             return EthernetCsmacd.class;
         } else if (name.startsWith("Port-channel")) {
             return Ieee8023adLag.class;
