@@ -18,16 +18,22 @@ package io.frinx.cli.unit.ios.ifc.handler.ethernet;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.ext.rev190724.SPEEDAUTO;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED100MB;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member.rev171109.LacpEthConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.lag.member.rev171109.LacpEthConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.lacp.rev170505.LacpActivityType;
 
 public class EthernetConfigReaderTest {
 
-    private static final String SH_INT_CONFIG_AUTO_SPEED = "interface FastEthernet0/10\n"
+    private static final String SH_INT_CONFIG_AUTO_SPEED = "interface TenGigabitEthernet0/10\n"
             + " no switchport\n"
             + " ip address 192.168.0.1 255.255.255.0\n"
+            + " channel-group 20 mode active\n"
             + "end\n"
             + "\n";
 
@@ -56,8 +62,12 @@ public class EthernetConfigReaderTest {
     @Test
     public void testParseFastEthernet() {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        EthernetConfigReader.parseEthernetConfig("FastEthernet0/10", SH_INT_CONFIG_AUTO_SPEED, configBuilder);
-        Assert.assertEquals(new ConfigBuilder().build(), configBuilder.build());
+        EthernetConfigReader.parseEthernetConfig("TenGigabitEthernet0/10", SH_INT_CONFIG_AUTO_SPEED, configBuilder);
+        Assert.assertEquals(new ConfigBuilder()
+                .addAugmentation(Config1.class, new Config1Builder().setAggregateId("20").build())
+                .addAugmentation(LacpEthConfigAug.class,
+                        new LacpEthConfigAugBuilder().setLacpMode(LacpActivityType.ACTIVE).build())
+                .build(), configBuilder.build());
 
         configBuilder = new ConfigBuilder();
         EthernetConfigReader.parseEthernetConfig("FastEthernet0/20", SH_INT_CONFIG_100_SPEED, configBuilder);
