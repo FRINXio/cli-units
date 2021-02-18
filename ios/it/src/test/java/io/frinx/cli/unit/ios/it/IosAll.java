@@ -48,6 +48,7 @@ import io.frinx.cli.unit.ios.lldp.LldpUnit;
 import io.frinx.cli.unit.ios.local.routing.LocalRoutingUnit;
 import io.frinx.cli.unit.ios.mpls.MplsUnit;
 import io.frinx.cli.unit.ios.network.instance.IosNetworkInstanceUnit;
+import io.frinx.cli.unit.ios.privilege.PrivilegeUnit;
 import io.frinx.cli.unit.ios.qos.QoSUnit;
 import io.frinx.cli.unit.ios.rib.RibUnit;
 import io.frinx.cli.unit.ios.snmp.SnmpUnit;
@@ -279,6 +280,7 @@ public class IosAll {
         new IosCliInitializerUnit(reg).init();
         new QoSUnit(reg).init();
         new SnmpUnit(reg).init();
+        new PrivilegeUnit(reg).init();
 
         return reg;
     }

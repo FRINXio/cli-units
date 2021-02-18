@@ -112,6 +112,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>ios-snmp-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-privilege-unit</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.frinx.cli</groupId>

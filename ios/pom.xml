@@ -50,6 +50,7 @@
         <module>init</module>
         <module>qos</module>
         <module>snmp</module>
+        <module>privilege</module>
     </modules>
 
     <build>
