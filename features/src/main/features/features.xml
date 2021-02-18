@@ -65,6 +65,7 @@
         <bundle>mvn:io.frinx.cli/ios-lldp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-platform-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-configuration-metadata-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-privilege-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-common-cli-initializer' version='${project.version}'>
