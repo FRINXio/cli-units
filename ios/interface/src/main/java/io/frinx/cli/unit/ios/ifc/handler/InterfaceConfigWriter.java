@@ -20,7 +20,9 @@ import com.x5.template.Chunk;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.AbstractInterfaceConfigWriter;
 import io.frinx.cli.unit.ios.ifc.Util;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
@@ -51,6 +53,10 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($portSecurityAgingType) %}{$portSecurityAgingType}\n{% endif %}"
             + "{% if ($portSecurityAgingTime) %}{$portSecurityAgingTime}\n{% endif %}"
             + "{% if ($portSecurityAgingStatic) %}{$portSecurityAgingStatic}\n{% endif %}"
+            + "{% if ($l2protocols) %}{$l2protocols}{% endif %}"
+            + "{% if ($lldpTransmit) %}{$lldpTransmit}\n{% endif %}"
+            + "{% if ($lldpReceive) %}{$lldpReceive}\n{% endif %}"
+            + "{% if ($cdpEnable) %}{$cdpEnable}\n{% endif %}"
             + "end\n";
 
     private static final String WRITE_TEMPLATE_VLAN = "configure terminal\n"
@@ -93,7 +99,11 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                 "portSecurityViolation", getSwitchportPortSecurityViolation(before, after),
                 "portSecurityAgingType", getSwitchportPortSecurityAgingType(before, after),
                 "portSecurityAgingTime", getSwitchportPortSecurityAgingTime(before, after),
-                "portSecurityAgingStatic", getSwitchportPortSecurityAgingStatic(before, after));
+                "portSecurityAgingStatic", getSwitchportPortSecurityAgingStatic(before, after),
+                "l2protocols", getl2Protocols(before, after),
+                "lldpTransmit", getLldpTransmit(ciscoExtAug),
+                "lldpReceive", getLldpReceive(ciscoExtAug),
+                "cdpEnable", getCdpEnable(ciscoExtAug));
         }
         return fT(WRITE_TEMPLATE_VLAN,
             "before", before,
@@ -108,6 +118,69 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                         && !ciscoExtAug.isIpUnreachables()) ? Chunk.TRUE : null,
             "ipProxyArp", (ciscoExtAug != null && ciscoExtAug.isIpProxyArp() != null && !ciscoExtAug.isIpProxyArp())
                         ? Chunk.TRUE : null);
+    }
+
+    private Object getCdpEnable(IfCiscoExtAug after) {
+        String command = "cdp enable";
+        return after != null ? getCommandHelper(after.isCdpEnable(), command) : command;
+    }
+
+    private String getLldpReceive(IfCiscoExtAug after) {
+        String command = "lldp receive";
+        return after != null ? getCommandHelper(after.isLldpReceive(), command) : command;
+    }
+
+    private String getLldpTransmit(IfCiscoExtAug after) {
+        String command = "lldp transmit";
+        return after != null ? getCommandHelper(after.isLldpTransmit(), command) : command;
+    }
+
+    private String getCommandHelper(Boolean value, String command) {
+        if (value != null) {
+            if (!value) {
+                return "no ".concat(command);
+            }
+        }
+        return command;
+    }
+
+    private String getl2Protocols(Config before, Config after) {
+        IfCiscoExtAug beforeAug = before.getAugmentation(IfCiscoExtAug.class);
+        IfCiscoExtAug afterAug = after.getAugmentation(IfCiscoExtAug.class);
+
+        StringBuilder str = new StringBuilder();
+        // remove protocols
+        str.append(getL2ProtocolsDiff(beforeAug, afterAug, true));
+        // create protocols
+        str.append(getL2ProtocolsDiff(afterAug, beforeAug, false));
+        return str.toString().equals("") ? null : str.toString();
+    }
+
+    private String getL2ProtocolsDiff(IfCiscoExtAug first, IfCiscoExtAug second, boolean delete) {
+        if (first != null && first.getL2Protocols() != null) {
+            if (second != null && second.getL2Protocols() != null) {
+                List<String> entries = first.getL2Protocols().stream()
+                        .filter(entry -> !second.getL2Protocols().contains(entry))
+                        .collect(Collectors.toList());
+                if (entries.isEmpty()) {
+                    return "";
+                }
+                return getL2ProtocolsStringString(entries, delete);
+            }
+            return getL2ProtocolsStringString(first.getL2Protocols(), delete);
+        }
+        return "";
+    }
+
+    private String getL2ProtocolsStringString(List<String> entries, boolean delete) {
+        StringBuilder str = new StringBuilder();
+        for (String entry : entries) {
+            if (delete) {
+                str.append("no ");
+            }
+            str.append("l2protocol-tunnel ").append(entry).append("\n");
+        }
+        return str.toString();
     }
 
     private String getSwitchportPortSecurityAgingStatic(Config before, Config after) {

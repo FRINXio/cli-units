@@ -22,6 +22,7 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig.PortType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
@@ -70,6 +71,30 @@ public class InterfaceConfigReaderTest {
             + " duplex full\n"
             + "end\n\n";
 
+    private static final Config EXPECTED_INTERFACE3 = new ConfigBuilder().setEnabled(true)
+            .setName("GigabitEthernet0/15")
+            .setType(EthernetCsmacd.class)
+            .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
+                    .setPortType(PortType.Nni)
+                    .setSwitchportPortSecurityAgingTime(5L)
+                    .setL2Protocols(Arrays.asList("shutdown-threshold cdp 1000",
+                            "cdp",
+                            "lldp"))
+                    .setLldpReceive(false)
+                    .setLldpTransmit(false)
+                    .setCdpEnable(false)
+                    .build())
+            .build();
+    private static final String SH_INTERFACE_RUN3 = "interface GigabitEthernet0/15\n"
+            + " port-type nni\n"
+            + " switchport port-security aging time 5\n"
+            + " l2protocol-tunnel shutdown-threshold cdp 1000\n"
+            + " l2protocol-tunnel cdp\n"
+            + " l2protocol-tunnel lldp\n"
+            + " no lldp transmit\n"
+            + " no lldp receive\n"
+            + " no cdp enable";
+
     @Test
     public void testParseInterface() {
         ConfigBuilder parsed = new ConfigBuilder();
@@ -81,5 +106,13 @@ public class InterfaceConfigReaderTest {
         new InterfaceConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(SH_INTERFACE_RUN2, parsed, "FastEthernet0/0");
         Assert.assertEquals(EXPECTED_INTERFACE2, parsed.build());
+    }
+
+    @Test
+    public void testParseInterfaceWithL2Protocols() {
+        ConfigBuilder parsed = new ConfigBuilder();
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseInterface(SH_INTERFACE_RUN3, parsed, "GigabitEthernet0/15");
+        Assert.assertEquals(EXPECTED_INTERFACE3, parsed.build());
     }
 }
