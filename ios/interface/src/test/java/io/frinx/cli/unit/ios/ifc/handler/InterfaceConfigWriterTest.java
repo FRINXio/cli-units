@@ -23,6 +23,7 @@ import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
@@ -56,6 +57,9 @@ public class InterfaceConfigWriterTest {
             + "storm-control broadcast level 10.00\n"
             + "no storm-control multicast level\n"
             + "no storm-control unicast level\n"
+            + "lldp transmit\n"
+            + "lldp receive\n"
+            + "cdp enable\n"
             + "end\n"
             + "\n";
 
@@ -70,6 +74,9 @@ public class InterfaceConfigWriterTest {
             + "storm-control broadcast level 10.00\n"
             + "storm-control multicast level 23.45\n"
             + "storm-control unicast level 67.89\n"
+            + "lldp transmit\n"
+            + "lldp receive\n"
+            + "cdp enable\n"
             + "end\n"
             + "\n";
 
@@ -84,6 +91,9 @@ public class InterfaceConfigWriterTest {
             + "no storm-control broadcast level\n"
             + "no storm-control multicast level\n"
             + "no storm-control unicast level\n"
+            + "lldp transmit\n"
+            + "lldp receive\n"
+            + "cdp enable\n"
             + "end\n"
             + "\n";
 
@@ -148,6 +158,45 @@ public class InterfaceConfigWriterTest {
             + "no interface Bundle-Ether45\n"
             + "end\n";
 
+    private static final String L2_PROTOCOL_BASE = "configure terminal\n"
+            + "interface GigabitEthernet0/1\n"
+            + "no shutdown\n"
+            + "no port-type\n"
+            + "no switchport mode\n"
+            + "snmp trap link-status\n"
+            + "no switchport access vlan\n"
+            + "no switchport trunk allowed vlan\n"
+            + "no storm-control broadcast level\n"
+            + "no storm-control multicast level\n"
+            + "no storm-control unicast level\n";
+
+    private static final String L2_PROTOCOL_WRITE_INPUT = L2_PROTOCOL_BASE
+            + "l2protocol-tunnel shutdown-threshold cdp 1000\n"
+            + "l2protocol-tunnel cdp\n"
+            + "no lldp transmit\n"
+            + "no lldp receive\n"
+            + "no cdp enable\n"
+            + "end\n"
+            + "\n";
+
+    private static final String L2_PROTOCOL_UPDATE_INPUT = L2_PROTOCOL_BASE
+            + "no l2protocol-tunnel shutdown-threshold cdp 1000\n"
+            + "l2protocol-tunnel stp\n"
+            + "lldp transmit\n"
+            + "lldp receive\n"
+            + "cdp enable\n"
+            + "end\n"
+            + "\n";
+
+    private static final String L2_PROTOCOL_DELETE_INPUT = L2_PROTOCOL_BASE
+            + "no l2protocol-tunnel shutdown-threshold cdp 1000\n"
+            + "no l2protocol-tunnel cdp\n"
+            + "lldp transmit\n"
+            + "lldp receive\n"
+            + "cdp enable\n"
+            + "end\n"
+            + "\n";
+
     @Mock
     private Cli cli;
 
@@ -162,6 +211,9 @@ public class InterfaceConfigWriterTest {
 
     // test data
     private Config data;
+    private Config l2ProtocolData0;
+    private Config l2ProtocolData1;
+    private Config l2ProtocolData2;
 
     @Before
     public void setUp() {
@@ -176,6 +228,40 @@ public class InterfaceConfigWriterTest {
     private void initializeData() {
         data = new ConfigBuilder().setEnabled(true).setName("Bundle-Ether45").setType(Ieee8023adLag.class)
                 .setMtu(35).setDescription("test desc")
+                .build();
+
+        l2ProtocolData0 = new ConfigBuilder()
+                .setEnabled(true)
+                .setName("GigabitEthernet0/1")
+                .setType(EthernetCsmacd.class)
+                .build();
+
+        IfCiscoExtAugBuilder ifCiscoExtAugBuilder1 = new IfCiscoExtAugBuilder()
+                .setL2Protocols(Arrays.asList("shutdown-threshold cdp 1000",
+                        "cdp"))
+                .setLldpReceive(false)
+                .setLldpTransmit(false)
+                .setCdpEnable(false);
+
+        l2ProtocolData1 = new ConfigBuilder()
+                .setEnabled(true)
+                .setName("GigabitEthernet0/1")
+                .setType(EthernetCsmacd.class)
+                .addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder1.build())
+                .build();
+
+        IfCiscoExtAugBuilder ifCiscoExtAugBuilder2 = new IfCiscoExtAugBuilder()
+                .setL2Protocols(Arrays.asList("stp",
+                        "cdp"))
+                .setLldpReceive(true)
+                .setLldpTransmit(true)
+                .setCdpEnable(true);
+
+        l2ProtocolData2 = new ConfigBuilder()
+                .setEnabled(true)
+                .setName("GigabitEthernet0/1")
+                .setType(EthernetCsmacd.class)
+                .addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder2.build())
                 .build();
     }
 
@@ -340,4 +426,24 @@ public class InterfaceConfigWriterTest {
         return stormControls;
     }
 
+    @Test
+    public void l2ProtocolWrite() throws WriteFailedException {
+        this.writer.updateCurrentAttributes(iid, l2ProtocolData0, l2ProtocolData1, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(L2_PROTOCOL_WRITE_INPUT, response.getValue().getContent());
+    }
+
+    @Test
+    public void l2ProtocolUpdate() throws WriteFailedException {
+        this.writer.updateCurrentAttributes(iid, l2ProtocolData1, l2ProtocolData2, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(L2_PROTOCOL_UPDATE_INPUT, response.getValue().getContent());
+    }
+
+    @Test
+    public void l2ProtocolDelete() throws WriteFailedException {
+        this.writer.updateCurrentAttributes(iid, l2ProtocolData1, l2ProtocolData0, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(L2_PROTOCOL_DELETE_INPUT, response.getValue().getContent());
+    }
 }

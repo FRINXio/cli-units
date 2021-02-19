@@ -57,7 +57,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private static final Pattern STORM_CONTROL_LINE =
             Pattern.compile("\\s*storm-control (?<address>\\S+) level (?<level>.+)");
     private static final Pattern MEDIA_TYPE_LINE = Pattern.compile("\\s*media-type (?<mediaType>.+)");
-    private static final Pattern SWITCHPORT_PORT_SECURITY = Pattern.compile("\\s*switchport port-security");
+    private static final Pattern SWITCHPORT_PORT_SECURITY = Pattern.compile("(?m)\\s*switchport port-security$");
     private static final Pattern SWITCHPORT_PORT_SECURITY_MAXIMUM =
             Pattern.compile("\\s*switchport port-security maximum (?<value>.+)");
     private static final Pattern SWITCHPORT_PORT_SECURITY_VIOLATION =
@@ -68,6 +68,10 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
             Pattern.compile("\\s*switchport port-security aging type (?<type>.+)");
     private static final Pattern SWITCHPORT_PORT_SECURITY_AGING_STATIC =
             Pattern.compile("\\s*switchport port-security aging static");
+    private static final Pattern L2_PROTOCOL_TUNNEL_LINE = Pattern.compile("\\s*l2protocol-tunnel (?<entry>.+)");
+    private static final Pattern LLDP_TRANSMIT_LINE = Pattern.compile("(?m)\\s*no lldp transmit$");
+    private static final Pattern LLDP_RECEIVE_LINE = Pattern.compile("(?m)\\s*no lldp receive$");
+    private static final Pattern CDP_ENABLE_LINE = Pattern.compile("(?m)\\s*no cdp enable$");
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);
@@ -91,6 +95,10 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setIpUnreachables(output, ifCiscoExtAugBuilder);
         setIpProxyArp(output, ifCiscoExtAugBuilder);
         setStormControl(output, ifCiscoExtAugBuilder);
+        setL2ProtocolTunnel(output, ifCiscoExtAugBuilder);
+        setLldpTransmit(output, ifCiscoExtAugBuilder);
+        setLldpReceive(output, ifCiscoExtAugBuilder);
+        setCdpEnable(output, ifCiscoExtAugBuilder);
         if (isCiscoExtAugNotEmpty(ifCiscoExtAugBuilder)) {
             builder.addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder.build());
         }
@@ -99,6 +107,35 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setMode(output, ifSaosAugBuilder);
         if (isSaosAugNotEmpty(ifSaosAugBuilder)) {
             builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
+        }
+    }
+
+    private void setCdpEnable(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        if (CDP_ENABLE_LINE.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setCdpEnable(false);
+        }
+    }
+
+    private void setLldpReceive(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        if (LLDP_RECEIVE_LINE.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setLldpReceive(false);
+        }
+    }
+
+    private void setLldpTransmit(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        if (LLDP_TRANSMIT_LINE.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setLldpTransmit(false);
+        }
+    }
+
+    private void setL2ProtocolTunnel(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        List<String> entries = ParsingUtils.parseFields(output, 0,
+            L2_PROTOCOL_TUNNEL_LINE::matcher,
+            matcher -> matcher.group("entry"),
+            String::new);
+
+        if (!entries.isEmpty()) {
+            ifCiscoExtAugBuilder.setL2Protocols(entries);
         }
     }
 
