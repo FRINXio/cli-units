@@ -22,12 +22,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.14.rc45-frinx-SNAPSHOT</version>
+        <version>3.1.14.rc45-frinx</version>
         <relativePath>../../../unit-parent</relativePath>
     </parent>
 
     <artifactId>ubnt-es-cli-init-unit</artifactId>
-    <version>3.1.14.rc45-frinx-SNAPSHOT</version>
+    <version>3.1.14.rc45-frinx</version>
     <packaging>bundle</packaging>
 
     <dependencies>
