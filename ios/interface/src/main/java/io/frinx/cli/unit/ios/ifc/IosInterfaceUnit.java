@@ -27,6 +27,8 @@ import io.frinx.cli.unit.ios.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceStatisticsConfigReader;
 import io.frinx.cli.unit.ios.ifc.handler.InterfaceStatisticsConfigWriter;
+import io.frinx.cli.unit.ios.ifc.handler.cfm.CfmMipReader;
+import io.frinx.cli.unit.ios.ifc.handler.cfm.CfmMipWriter;
 import io.frinx.cli.unit.ios.ifc.handler.ethernet.EthernetConfigReader;
 import io.frinx.cli.unit.ios.ifc.handler.ethernet.EthernetConfigWriter;
 import io.frinx.cli.unit.ios.ifc.handler.subifc.SubinterfaceConfigReader;
@@ -77,6 +79,7 @@ public final class IosInterfaceUnit extends AbstractUnit {
                 IIDs.FRINX_SAOS_IF_EXTENSION,
                 IIDs.FRINX_IF_ETHERNET_EXTENSION,
                 io.frinx.openconfig.openconfig.lacp.IIDs.FRINX_LACP_LAG_MEMBER,
+                io.frinx.openconfig.openconfig.oam.IIDs.FRINX_OAM,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -126,6 +129,10 @@ public final class IosInterfaceUnit extends AbstractUnit {
                 Sets.newHashSet(IIDs.IN_IN_ET_CO_AUG_CONFIG1,
                         io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG),
                 IIDs.IN_IN_CONFIG);
+
+        // cfm
+        writeRegistry.addAfter(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_AUG_IFCFMAUG_CF_MI_LEVEL,
+                new CfmMipWriter(cli), IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -160,5 +167,9 @@ public final class IosInterfaceUnit extends AbstractUnit {
         readRegistry.subtreeAdd(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli),
                 Sets.newHashSet(IIDs.IN_IN_ET_CO_AUG_CONFIG1,
                         io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG));
+
+        // cfm
+        readRegistry.add(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_AUG_IFCFMAUG_CF_MI_LEVEL,
+                new CfmMipReader(cli));
     }
 }
