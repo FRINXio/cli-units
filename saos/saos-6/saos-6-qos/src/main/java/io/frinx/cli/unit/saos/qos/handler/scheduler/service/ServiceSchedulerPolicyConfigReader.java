@@ -27,6 +27,8 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.SchedulerPolicy;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler.top.scheduler.policies.scheduler.policy.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQosScPolicyIfcId;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.saos.extension.rev200219.SaosQosScPolicyIfcIdBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ServiceSchedulerPolicyConfigReader implements CompositeReader.Child<Config, ConfigBuilder>,
@@ -45,6 +47,9 @@ public class ServiceSchedulerPolicyConfigReader implements CompositeReader.Child
         if (isService(instanceIdentifier, readContext)) {
             String policyName = instanceIdentifier.firstKeyOf(SchedulerPolicy.class).getName();
             configBuilder.setName(policyName);
+            SaosQosScPolicyIfcIdBuilder augBuilder = new SaosQosScPolicyIfcIdBuilder();
+            augBuilder.setInterfaceId(policyName);
+            configBuilder.addAugmentation(SaosQosScPolicyIfcId.class, augBuilder.build());
         }
     }
 
