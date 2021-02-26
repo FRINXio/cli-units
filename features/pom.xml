@@ -43,6 +43,8 @@
         <module>frinx-cli-unit-ios</module>
         <module>frinx-cli-unit-ios-initializer</module>
         <module>frinx-cli-unit-ios-common-handlers</module>
+        <module>frinx-cli-unit-ios-xe</module>
+        <module>frinx-cli-unit-ios-xe-initializer</module>
         <module>frinx-cli-unit-ios-xr</module>
         <module>frinx-cli-unit-ios-xr-initializer</module>
         <module>frinx-cli-unit-ios-xr-lldp</module>

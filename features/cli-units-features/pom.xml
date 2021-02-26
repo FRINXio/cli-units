@@ -57,6 +57,20 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>frinx-cli-unit-ios-xe-initializer</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>frinx-cli-unit-ios-xe</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>frinx-cli-unit-ios-xr-initializer</artifactId>
             <version>${project.version}</version>
             <type>xml</type>

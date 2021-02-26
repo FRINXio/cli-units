@@ -229,6 +229,18 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- IOS XE -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xe-cli-init-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xe-configuration-metadata-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- IOS XR -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -555,6 +567,20 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>frinx-cli-unit-ios</artifactId>
+                <type>xml</type>
+                <classifier>features</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>frinx-cli-unit-ios-xe-initializer</artifactId>
+                <type>xml</type>
+                <classifier>features</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>frinx-cli-unit-ios-xe</artifactId>
                 <type>xml</type>
                 <classifier>features</classifier>
                 <version>${project.version}</version>
