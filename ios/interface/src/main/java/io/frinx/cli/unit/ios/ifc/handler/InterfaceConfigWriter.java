@@ -66,10 +66,10 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             //  + "{$data|update(is_enabled,shutdown\n,no shutdown\n}"
             + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
             + "{% if ($pt) %}{$pt}\n{% endif %}"
-            + "{% if ($snmpTrap) %}no snmp trap link-status\n{% else %}snmp trap link-status\n{% endif %}"
-            + "{% if ($ipRedirects) %}no ip redirects\n{% else %}ip redirects\n{% endif %}"
-            + "{% if ($ipUnreachables) %}no ip unreachables\n{% else %}ip unreachables\n{% endif %}"
-            + "{% if ($ipProxyArp) %}no ip proxy-arp\n{% else %}ip proxy-arp\n{% endif %}"
+            + "{% if ($snmpTrap) %}{$snmpTrap}\n{% endif %}"
+            + "{% if ($ipRedirects) %}{$ipRedirects}\n{% endif %}"
+            + "{% if ($ipUnreachables) %}{$ipUnreachables}\n{% endif %}"
+            + "{% if ($ipProxyArp) %}{$ipProxyArp}\n{% endif %}"
             + "end\n";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
@@ -110,14 +110,90 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             "data", after,
             "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
             "pt", getPhysicalType(before, after),
-            "snmpTrap", (ciscoExtAug != null && ciscoExtAug.isSnmpTrapLinkStatus() != null
-                        && !ciscoExtAug.isSnmpTrapLinkStatus()) ? Chunk.TRUE : null,
-            "ipRedirects", (ciscoExtAug != null && ciscoExtAug.isIpRedirects() != null
-                        && !ciscoExtAug.isIpRedirects()) ? Chunk.TRUE : null,
-            "ipUnreachables", (ciscoExtAug != null && ciscoExtAug.isIpUnreachables() != null
-                        && !ciscoExtAug.isIpUnreachables()) ? Chunk.TRUE : null,
-            "ipProxyArp", (ciscoExtAug != null && ciscoExtAug.isIpProxyArp() != null && !ciscoExtAug.isIpProxyArp())
-                        ? Chunk.TRUE : null);
+            "snmpTrap", getSnmpTrap(before, after),
+            "ipRedirects", getIpRedirect(before, after),
+            "ipUnreachables", getIpUnreachables(before, after),
+            "ipProxyArp", getIpProxyArp(before, after));
+    }
+
+    private String getSnmpTrap(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isSnmpTrapLinkStatus() != null) {
+                return ciscoExtAugAfter.isSnmpTrapLinkStatus() ? "snmp trap link-status" : "no snmp trap link-status";
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.isSnmpTrapLinkStatus() != null) {
+            return ciscoExtAugAfter.isSnmpTrapLinkStatus() ? "snmp trap link-status" : "no snmp trap link-status";
+        } else if (ciscoExtAugBefore.isSnmpTrapLinkStatus() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isSnmpTrapLinkStatus() != null) {
+                return ciscoExtAugAfter.isSnmpTrapLinkStatus() ? "snmp trap link-status" : "no snmp trap link-status";
+            } else {
+                return "no snmp trap link-status";
+            }
+        }
+        return null;
+    }
+
+    private String getIpRedirect(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpRedirects() != null) {
+                return ciscoExtAugAfter.isIpRedirects() ? "ip redirects" : "no ip redirects";
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpRedirects() != null) {
+            return ciscoExtAugAfter.isIpRedirects() ? "ip redirects" : "no ip redirects";
+        } else if (ciscoExtAugBefore.isIpRedirects() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpRedirects() != null) {
+                return ciscoExtAugAfter.isIpRedirects() ? "ip redirects" : "no ip redirects";
+            } else {
+                return "no ip redirects";
+            }
+        }
+        return null;
+    }
+
+    private Object getIpUnreachables(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpUnreachables() != null) {
+                return ciscoExtAugAfter.isIpUnreachables() ? "ip unreachables" : "no ip unreachables";
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpUnreachables() != null) {
+            return ciscoExtAugAfter.isIpUnreachables() ? "ip unreachables" : "no ip unreachables";
+        } else if (ciscoExtAugBefore.isIpUnreachables() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpUnreachables() != null) {
+                return ciscoExtAugAfter.isIpUnreachables() ? "ip unreachables" : "no ip unreachables";
+            } else {
+                return "no ip unreachables";
+            }
+        }
+        return null;
+    }
+
+    private String getIpProxyArp(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpProxyArp() != null) {
+                return ciscoExtAugAfter.isIpProxyArp() ? "ip proxy-arp" : "no ip proxy-arp";
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpProxyArp() != null) {
+            return ciscoExtAugAfter.isIpProxyArp() ? "ip proxy-arp" : "no ip proxy-arp";
+        } else if (ciscoExtAugBefore.isIpProxyArp() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpProxyArp() != null) {
+                return ciscoExtAugAfter.isIpProxyArp() ? "ip proxy-arp" : "no ip proxy-arp";
+            } else {
+                return "no ip proxy-arp";
+            }
+        }
+        return null;
     }
 
     private Object getCdpEnable(IfCiscoExtAug after) {

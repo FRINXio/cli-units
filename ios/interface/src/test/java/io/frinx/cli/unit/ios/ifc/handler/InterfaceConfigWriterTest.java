@@ -102,20 +102,12 @@ public class InterfaceConfigWriterTest {
             + "mtu 35\n"
             + "description test desc\n"
             + "no shutdown\n"
-            + "snmp trap link-status\n"
-            + "ip redirects\n"
-            + "ip unreachables\n"
-            + "ip proxy-arp\n"
             + "end\n"
             + "\n";
 
     private static final String WRITE_EMPTY_INPUT = "configure terminal\n"
             + "interface Bundle-Ether45\n"
             + "shutdown\n"
-            + "snmp trap link-status\n"
-            + "ip redirects\n"
-            + "ip unreachables\n"
-            + "ip proxy-arp\n"
             + "end\n"
             + "\n";
 
@@ -124,10 +116,10 @@ public class InterfaceConfigWriterTest {
             + "mtu 50\n"
             + "description updated desc\n"
             + "shutdown\n"
-            + "snmp trap link-status\n"
-            + "ip redirects\n"
-            + "ip unreachables\n"
-            + "ip proxy-arp\n"
+            + "no snmp trap link-status\n"
+            + "no ip redirects\n"
+            + "no ip unreachables\n"
+            + "no ip proxy-arp\n"
             + "end\n"
             + "\n";
 
@@ -136,10 +128,6 @@ public class InterfaceConfigWriterTest {
             + "no mtu\n"
             + "no description\n"
             + "shutdown\n"
-            + "snmp trap link-status\n"
-            + "ip redirects\n"
-            + "ip unreachables\n"
-            + "ip proxy-arp\n"
             + "end\n"
             + "\n";
 
@@ -147,10 +135,6 @@ public class InterfaceConfigWriterTest {
             + "interface Bundle-Ether45\n"
             + "mtu 30\n"
             + "shutdown\n"
-            + "snmp trap link-status\n"
-            + "ip redirects\n"
-            + "ip unreachables\n"
-            + "ip proxy-arp\n"
             + "end\n"
             + "\n";
 
@@ -286,9 +270,16 @@ public class InterfaceConfigWriterTest {
 
     @Test
     public void update() throws WriteFailedException {
+        IfCiscoExtAugBuilder ifCiscoExtAugBuilder = new IfCiscoExtAugBuilder();
+        ifCiscoExtAugBuilder.setIpProxyArp(false);
+        ifCiscoExtAugBuilder.setIpRedirects(false);
+        ifCiscoExtAugBuilder.setIpUnreachables(false);
+        ifCiscoExtAugBuilder.setSnmpTrapLinkStatus(false);
+
         // update values
         Config newData = new ConfigBuilder().setEnabled(false).setName("Bundle-Ether45").setType(Ieee8023adLag.class)
                 .setMtu(50).setDescription("updated desc")
+                .addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder.build())
                 .build();
 
         this.writer.updateCurrentAttributes(iid, data, newData, context);
