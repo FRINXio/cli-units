@@ -28,7 +28,7 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-ubnt-es</artifactId>
-  <version>4.2.7.rc4-frinx</version>
+  <version>4.2.7.rc5-frinx-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
