@@ -100,6 +100,7 @@ public final class IosInterfaceUnit extends AbstractUnit {
                 IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_STORMCONTROL,
                 IIDs.IN_IN_CO_AUG_IFSAOSAUG));
 
+
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
         writeRegistry.addAfter(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli), IIDs.IN_IN_CONFIG);
         writeRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
