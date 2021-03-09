@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright © 2018 Frinx and others.
+  ~ Copyright © 2021 Frinx and others.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@
     </parent>
 
     <groupId>io.frinx.cli</groupId>
-    <artifactId>frinx-cli-all-units</artifactId>
+    <artifactId>frinx-cli-unit-sonic</artifactId>
     <packaging>feature</packaging>
     <version>4.2.7.rc10-frinx-SNAPSHOT</version>
-    <name>Frinx :: Cli :: Unit :: All</name>
+    <name>Frinx :: Cli :: Unit :: SONIC</name>
 
     <dependencyManagement>
         <dependencies>
@@ -41,85 +41,61 @@
                 <version>${project.version}</version>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>cli-artifacts</artifactId>
+                <type>pom</type>
+                <version>${project.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.frinx.openconfig</groupId>
+                <artifactId>openconfig-artifacts</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-native-all-units</artifactId>
+            <artifactId>sonic-cli-init-unit</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sonic-configuration-metadata-unit</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sonic-interface-unit</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>frinx-cli-topology</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-ios</artifactId>
+            <artifactId>frinx-cli-southbound-unit-generic</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-ios-xe</artifactId>
+            <artifactId>frinx-cli-unit-ios-common-handlers</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-ios-xr</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-brocade</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-cubro</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-sonic</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-junos</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-huawei</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-nexus</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-saos</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-ubnt-es</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>frinx-cli-unit-mikrotik</artifactId>
+            <groupId>io.frinx.openconfig</groupId>
+            <artifactId>frinx-openconfig-models</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

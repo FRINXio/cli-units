@@ -108,6 +108,23 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- SONiC -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sonic-cli-init-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sonic-configuration-metadata-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sonic-interface-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Huawei -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -626,6 +643,13 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>frinx-cli-unit-cubro</artifactId>
+                <type>xml</type>
+                <classifier>features</classifier>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>frinx-cli-unit-sonic</artifactId>
                 <type>xml</type>
                 <classifier>features</classifier>
                 <version>${project.version}</version>
