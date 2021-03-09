@@ -245,6 +245,11 @@
                 <artifactId>ios-xe-configuration-metadata-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xe-interface-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- IOS XR -->
             <dependency>
