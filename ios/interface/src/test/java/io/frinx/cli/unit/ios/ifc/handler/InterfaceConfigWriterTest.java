@@ -33,6 +33,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfExtensionConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
@@ -49,8 +50,8 @@ public class InterfaceConfigWriterTest {
     private static final String PHYSICAL_INTERFACE_WRITE_INPUT = "configure terminal\n"
             + "interface GigabitEthernet0/1\n"
             + "no shutdown\n"
-            + "no port-type\n"
-            + "no switchport mode\n"
+            + "port-type uni\n"
+            + "switchport mode dot1q-tunnel\n"
             + "snmp trap link-status\n"
             + "no switchport access vlan\n"
             + "no switchport trunk allowed vlan\n"
@@ -335,6 +336,8 @@ public class InterfaceConfigWriterTest {
                 .setName("GigabitEthernet0/1")
                 .setType(EthernetCsmacd.class)
                 .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
+                        .setPortType(CiscoIfExtensionConfig.PortType.Uni)
+                        .setSwitchportMode(CiscoIfExtensionConfig.SwitchportMode.Dot1qTunnel)
                         .setStormControl(getStormControls("10.00", null, null))
                         .build())
                 .build();
