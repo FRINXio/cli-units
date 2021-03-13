@@ -53,8 +53,6 @@ public class InterfaceConfigWriterTest {
             + "port-type uni\n"
             + "switchport mode dot1q-tunnel\n"
             + "snmp trap link-status\n"
-            + "no switchport access vlan\n"
-            + "no switchport trunk allowed vlan\n"
             + "storm-control broadcast level 10.00\n"
             + "lldp transmit\n"
             + "lldp receive\n"
@@ -68,8 +66,6 @@ public class InterfaceConfigWriterTest {
             + "no port-type\n"
             + "no switchport mode\n"
             + "snmp trap link-status\n"
-            + "no switchport access vlan\n"
-            + "no switchport trunk allowed vlan\n"
             + "storm-control broadcast level 11.00\n"
             + "storm-control unicast level 67.89\n"
             + "lldp transmit\n"
@@ -84,8 +80,6 @@ public class InterfaceConfigWriterTest {
             + "no port-type\n"
             + "no switchport mode\n"
             + "snmp trap link-status\n"
-            + "no switchport access vlan\n"
-            + "no switchport trunk allowed vlan\n"
             + "no storm-control broadcast level\n"
             + "no storm-control unicast level\n"
             + "lldp transmit\n"
@@ -144,9 +138,7 @@ public class InterfaceConfigWriterTest {
             + "no shutdown\n"
             + "no port-type\n"
             + "no switchport mode\n"
-            + "snmp trap link-status\n"
-            + "no switchport access vlan\n"
-            + "no switchport trunk allowed vlan\n";
+            + "snmp trap link-status\n";
 
     private static final String L2_PROTOCOL_WRITE_INPUT = L2_PROTOCOL_BASE
             + "l2protocol-tunnel shutdown-threshold cdp 1000\n"
