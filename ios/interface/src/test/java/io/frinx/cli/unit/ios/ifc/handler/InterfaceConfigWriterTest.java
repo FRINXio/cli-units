@@ -56,8 +56,6 @@ public class InterfaceConfigWriterTest {
             + "no switchport access vlan\n"
             + "no switchport trunk allowed vlan\n"
             + "storm-control broadcast level 10.00\n"
-            + "no storm-control multicast level\n"
-            + "no storm-control unicast level\n"
             + "lldp transmit\n"
             + "lldp receive\n"
             + "cdp enable\n"
@@ -72,8 +70,7 @@ public class InterfaceConfigWriterTest {
             + "snmp trap link-status\n"
             + "no switchport access vlan\n"
             + "no switchport trunk allowed vlan\n"
-            + "storm-control broadcast level 10.00\n"
-            + "storm-control multicast level 23.45\n"
+            + "storm-control broadcast level 11.00\n"
             + "storm-control unicast level 67.89\n"
             + "lldp transmit\n"
             + "lldp receive\n"
@@ -90,7 +87,6 @@ public class InterfaceConfigWriterTest {
             + "no switchport access vlan\n"
             + "no switchport trunk allowed vlan\n"
             + "no storm-control broadcast level\n"
-            + "no storm-control multicast level\n"
             + "no storm-control unicast level\n"
             + "lldp transmit\n"
             + "lldp receive\n"
@@ -150,10 +146,7 @@ public class InterfaceConfigWriterTest {
             + "no switchport mode\n"
             + "snmp trap link-status\n"
             + "no switchport access vlan\n"
-            + "no switchport trunk allowed vlan\n"
-            + "no storm-control broadcast level\n"
-            + "no storm-control multicast level\n"
-            + "no storm-control unicast level\n";
+            + "no switchport trunk allowed vlan\n";
 
     private static final String L2_PROTOCOL_WRITE_INPUT = L2_PROTOCOL_BASE
             + "l2protocol-tunnel shutdown-threshold cdp 1000\n"
@@ -363,7 +356,7 @@ public class InterfaceConfigWriterTest {
                 .setName("GigabitEthernet0/1")
                 .setType(EthernetCsmacd.class)
                 .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
-                        .setStormControl(getStormControls("10.00", "23.45", "67.89"))
+                        .setStormControl(getStormControls("11.00", null, "67.89"))
                         .build())
                 .build();
 
@@ -379,7 +372,7 @@ public class InterfaceConfigWriterTest {
                 .setName("GigabitEthernet0/1")
                 .setType(EthernetCsmacd.class)
                 .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
-                        .setStormControl(getStormControls("10.00", "23.45", "67.89"))
+                        .setStormControl(getStormControls("11.00", null, "67.89"))
                         .build())
                 .build();
 
