@@ -83,6 +83,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
     @Override
     protected String updateTemplate(Config before, Config after) {
         IfCiscoExtAug ciscoExtAug = after.getAugmentation(IfCiscoExtAug.class);
+        IfCiscoExtAug ciscoExtAugBefore = before != null ? before.getAugmentation(IfCiscoExtAug.class) : null;
         if (isPhysicalInterface(after)) {
             return fT(WRITE_TEMPLATE,
                 "before", before,
@@ -101,9 +102,9 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                 "portSecurityAgingTime", getSwitchportPortSecurityAgingTime(before, after),
                 "portSecurityAgingStatic", getSwitchportPortSecurityAgingStatic(before, after),
                 "l2protocols", getl2Protocols(before, after),
-                "lldpTransmit", getLldpTransmit(ciscoExtAug),
-                "lldpReceive", getLldpReceive(ciscoExtAug),
-                "cdpEnable", getCdpEnable(ciscoExtAug));
+                "lldpTransmit", getLldpTransmit(ciscoExtAugBefore, ciscoExtAug),
+                "lldpReceive", getLldpReceive(ciscoExtAugBefore, ciscoExtAug),
+                "cdpEnable", getCdpEnable(ciscoExtAugBefore, ciscoExtAug));
         }
         return fT(WRITE_TEMPLATE_VLAN,
             "before", before,
@@ -196,28 +197,50 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
         return null;
     }
 
-    private Object getCdpEnable(IfCiscoExtAug after) {
-        String command = "cdp enable";
-        return after != null ? getCommandHelper(after.isCdpEnable(), command) : command;
-    }
-
-    private String getLldpReceive(IfCiscoExtAug after) {
-        String command = "lldp receive";
-        return after != null ? getCommandHelper(after.isLldpReceive(), command) : command;
-    }
-
-    private String getLldpTransmit(IfCiscoExtAug after) {
-        String command = "lldp transmit";
-        return after != null ? getCommandHelper(after.isLldpTransmit(), command) : command;
-    }
-
-    private String getCommandHelper(Boolean value, String command) {
-        if (value != null) {
-            if (!value) {
-                return "no ".concat(command);
-            }
+    private Object getCdpEnable(IfCiscoExtAug before, IfCiscoExtAug after) {
+        Boolean beforeCdp = null;
+        Boolean afterCdp = null;
+        if (before != null) {
+            beforeCdp = before.isCdpEnable();
         }
-        return command;
+        if (after != null) {
+            afterCdp = after.isCdpEnable();
+        }
+        return getCommandHelper(beforeCdp, afterCdp, "cdp enable");
+    }
+
+    private String getLldpReceive(IfCiscoExtAug before, IfCiscoExtAug after) {
+        Boolean beforeLldpReceive = null;
+        Boolean afterLldpReceive = null;
+        if (before != null) {
+            beforeLldpReceive = before.isLldpReceive();
+        }
+        if (after != null) {
+            afterLldpReceive = after.isLldpReceive();
+        }
+        return getCommandHelper(beforeLldpReceive, afterLldpReceive, "lldp receive");
+    }
+
+    private String getLldpTransmit(IfCiscoExtAug before, IfCiscoExtAug after) {
+        Boolean beforeLldpTransmit = null;
+        Boolean afterLldpTransmit = null;
+        if (before != null) {
+            beforeLldpTransmit = before.isLldpTransmit();
+        }
+        if (after != null) {
+            afterLldpTransmit = after.isLldpTransmit();
+        }
+        return getCommandHelper(beforeLldpTransmit, afterLldpTransmit, "lldp transmit");
+    }
+
+    private String getCommandHelper(Boolean before, Boolean after, String command) {
+        if (before != null && before && (after == null || !after)) {
+            return "no ".concat(command);
+        }
+        if (after != null && after && (before == null || !before)) {
+            return command;
+        }
+        return null;
     }
 
     private String getl2Protocols(Config before, Config after) {
