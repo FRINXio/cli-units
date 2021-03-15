@@ -93,7 +93,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                 "mode", (ciscoExtAug != null) ? ciscoExtAug.getSwitchportMode() : null,
                 "snmpTrap", (ciscoExtAug != null && ciscoExtAug.isSnmpTrapLinkStatus() != null
                             && !ciscoExtAug.isSnmpTrapLinkStatus()) ? Chunk.TRUE : null,
-                "stormControl", getStormControlCommands(after),
+                "stormControl", getStormControlCommands(before, after),
                 "portSecurity", getPortSecurityEnableCommand(before, after),
                 "portSecurityMaximum", getPortSecurityMaximumCommand(before, after),
                 "portSecurityViolation", getSwitchportPortSecurityViolation(before, after),
@@ -425,25 +425,33 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
         return null;
     }
 
-    private String getStormControlCommands(Config after) {
-        StringBuilder stringBuilder = new StringBuilder();
+    private String getStormControlCommands(Config before, Config after) {
+        StringBuilder currentControls = new StringBuilder();
         if (after != null && after.getAugmentation(IfCiscoExtAug.class) != null) {
             IfCiscoExtAug aug = after.getAugmentation(IfCiscoExtAug.class);
             if (aug.getStormControl() != null) {
                 // create commands for required storm controls
                 for (StormControl stormControl : aug.getStormControl()) {
-                    stringBuilder.append("storm-control ").append(stormControl.getAddress().getName());
-                    stringBuilder.append(" level ").append(stormControl.getLevel().toString()).append("\n");
+                    currentControls.append("storm-control ").append(stormControl.getAddress().getName());
+                    currentControls.append(" level ").append(stormControl.getLevel().toString()).append("\n");
                 }
             }
         }
-        // create no-commands for remaining storm controls
-        for (StormControl.Address address : StormControl.Address.values()) {
-            if (!stringBuilder.toString().contains(address.getName())) {
-                stringBuilder.append("no storm-control ").append(address.getName()).append(" level\n");
+        if (before != null && before.getAugmentation(IfCiscoExtAug.class) != null) {
+            IfCiscoExtAug aug = before.getAugmentation(IfCiscoExtAug.class);
+            // create no-commands for remaining storm controls only if they were there before
+            if (aug.getStormControl() != null) {
+                for (StormControl.Address address : StormControl.Address.values()) {
+                    for (StormControl stormControl : aug.getStormControl()) {
+                        if (!currentControls.toString().contains(address.getName())
+                                && stormControl.getAddress().getName().equals(address.getName())) {
+                            currentControls.append("no storm-control ").append(address.getName()).append(" level\n");
+                        }
+                    }
+                }
             }
         }
-        return stringBuilder.toString();
+        return currentControls.toString();
     }
 
     @Override
