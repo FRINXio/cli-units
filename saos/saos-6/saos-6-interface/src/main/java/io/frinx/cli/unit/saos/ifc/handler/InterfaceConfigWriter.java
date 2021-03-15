@@ -38,7 +38,8 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
             // enable/disable port
             "{% if ($enabled) %}port {$enabled} port {$data.name}\n{% endif %}"
             // description
-            + "{$data|update(description,port set port `$data.name` description \"`$data.description`\"\n,)}"
+            + "{$data|update(description,port set port `$data.name` description \"`$data.description`\"\n,"
+            + "port unset port `$data.name` description\n)}"
             // max-frame-size
             + "{$data|update(mtu,port set port `$data.name` max-frame-size `$data.mtu`\n,)}"
             // acceptable-frame-type

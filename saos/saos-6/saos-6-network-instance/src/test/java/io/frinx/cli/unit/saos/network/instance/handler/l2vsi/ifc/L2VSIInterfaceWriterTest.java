@@ -38,6 +38,11 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2VSIInterfaceWriterTest {
 
+    private static final String L2_VSI_INTERFACE_DELETE_INPUT = "virtual-switch ethernet remove vs VLAN111444 port 4\n"
+            + "port unset port 4 untagged-ctrl-vs\n"
+            + "port unset port 4 untagged-data-vs\n"
+            + "configuration save\n";
+
     @Mock
     private Cli cli;
 
@@ -75,10 +80,7 @@ public class L2VSIInterfaceWriterTest {
     @Test
     public void testDelete() throws Exception {
         writer.deleteCurrentAttributesTesting(IID, ifcData);
-
         Mockito.verify(cli).executeAndRead(commands.capture());
-
-        Assert.assertEquals("virtual-switch ethernet remove vs VLAN111444 port 4\n"
-                + "configuration save\n", commands.getValue().getContent());
+        Assert.assertEquals(L2_VSI_INTERFACE_DELETE_INPUT, commands.getValue().getContent());
     }
 }
