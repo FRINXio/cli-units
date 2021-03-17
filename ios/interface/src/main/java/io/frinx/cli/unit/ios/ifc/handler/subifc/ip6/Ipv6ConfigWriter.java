@@ -24,8 +24,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip
 public final class Ipv6ConfigWriter extends AbstractIpv6ConfigWriter {
 
     private static final String WRITE_TEMPLATE = "configure terminal\n"
-            + "interface ${name}\n"
-            + "{% if($delete) %}no {% endif %}ipv6 address ${address}\n"
+            + "interface {$name}\n"
+            + "{% if($delete) %}no {% endif %}ipv6 address {$address}\n"
             + "end";
 
     private static final Pattern LINK_LOCAL = Pattern.compile("[Ff][Ee][89AaBb].*");
