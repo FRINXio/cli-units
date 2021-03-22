@@ -21,8 +21,10 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.virtual.rings.VirtualRing;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.ring.saos.rev200317.saos.virtual.ring.extension.virtual.rings.VirtualRingBuilder;
@@ -51,12 +53,33 @@ public class VirtualRingReader implements CliConfigListReader<VirtualRing, Virtu
 
     @VisibleForTesting
     static List<VirtualRingKey> getAllIds(String output, String vlanId) {
+        String vlan = getVlan(output, vlanId);
         Pattern vrPattern = Pattern.compile("ring-protection virtual-ring add ring (?<name>\\S+)"
-                + " vid " + vlanId);
+                + " vid " + vlan);
         return ParsingUtils.parseFields(output, 0,
             vrPattern::matcher,
             matcher -> matcher.group("name"),
             VirtualRingKey::new);
+    }
+
+    static String getVlan(String output, String vlanId) {
+        String[] vlans = output.split("\n");
+        for (String vlan: vlans) {
+            String vlanNumber = vlan.substring(vlan.lastIndexOf(" ") + 1);
+            if (vlanNumber.contains("-")) {
+                List<Integer> range = getRange(vlanNumber);
+                for (int index = range.get(0); index <= range.get(1); index++) {
+                    if (vlanId.equals(String.valueOf(index))) {
+                        return vlanNumber;
+                    }
+                }
+            }
+        }
+        return vlanId;
+    }
+
+    private static List<Integer> getRange(String vlanNumber) {
+        return Arrays.stream(vlanNumber.split("-")).map(Integer::parseInt).collect(Collectors.toList());
     }
 
     @Override
