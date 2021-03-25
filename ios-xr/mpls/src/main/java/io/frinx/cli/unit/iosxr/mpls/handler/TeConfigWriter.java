@@ -64,7 +64,7 @@ public class TeConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                                @Nonnull Config config, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
-        final TeInterfaceAttributes ifaces = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Mpls.class))
+        final TeInterfaceAttributes ifaces = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Mpls.class))
                 .get().getTeInterfaceAttributes();
         // sometimes the interface list remains empty in the data, this shouldn't happen
         Preconditions.checkArgument(ifaces == null || ifaces.getInterface() == null || ifaces.getInterface().isEmpty(),

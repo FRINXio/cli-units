@@ -59,7 +59,7 @@ public class NiMplsLdpGlobalAugWriter implements CliWriter<NiMplsLdpGlobalAug> {
     @Override
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<NiMplsLdpGlobalAug> id, @Nonnull
             NiMplsLdpGlobalAug data, @Nonnull WriteContext writeContext) throws WriteFailedException {
-        final InterfaceAttributes ifaces = writeContext.readAfter(RWUtils.cutId(id,Ldp.class))
+        final InterfaceAttributes ifaces = writeContext.readBefore(RWUtils.cutId(id,Ldp.class))
                 .get().getInterfaceAttributes();
         Preconditions.checkArgument(ifaces == null
                 || ifaces.getInterfaces() == null
