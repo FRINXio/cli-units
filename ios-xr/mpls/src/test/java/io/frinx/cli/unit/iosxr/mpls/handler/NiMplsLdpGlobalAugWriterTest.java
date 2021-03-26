@@ -92,7 +92,7 @@ public class NiMplsLdpGlobalAugWriterTest {
     public void delete() throws WriteFailedException {
         Ldp ldp = new LdpBuilder().setInterfaceAttributes(new InterfaceAttributesBuilder().build()).build();
 
-        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(ldp));
+        Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(ldp));
 
         this.writer.deleteCurrentAttributes(iid, data, context);
 
