@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.iosxr.mpls.handler;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -30,7 +31,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class TeConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_RUN_MPLS = "show running-config mpls traffic-eng";
+    @VisibleForTesting
+    static final String SHOW_RUN_MPLS = "show running-config mpls traffic-eng";
     private static final Pattern MPLS_LINE = Pattern.compile("(.*)mpls traffic-eng(.*)");
 
     private Cli cli;

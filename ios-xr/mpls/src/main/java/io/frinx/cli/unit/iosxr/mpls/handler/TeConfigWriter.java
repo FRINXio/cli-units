@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.iosxr.mpls.handler;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.fd.honeycomb.translate.util.RWUtils;
 import io.fd.honeycomb.translate.write.WriteContext;
@@ -64,11 +65,17 @@ public class TeConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                                @Nonnull Config config, @Nonnull WriteContext writeContext)
             throws WriteFailedException {
-        final TeInterfaceAttributes ifaces = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Mpls.class))
-                .get().getTeInterfaceAttributes();
-        // sometimes the interface list remains empty in the data, this shouldn't happen
-        Preconditions.checkArgument(ifaces == null || ifaces.getInterface() == null || ifaces.getInterface().isEmpty(),
-                "Invalid request, interfaces cannot be present when mpls is disabled.");
+        // this needs to be read after, because we have to ensure, that there are no more interfaces in config DS
+        // and those interfaces could have been removed by the same transaction
+        final Optional<Mpls> maybeMpls = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Mpls.class));
+        if (maybeMpls.isPresent()) {
+            TeInterfaceAttributes ifaces = maybeMpls.get().getTeInterfaceAttributes();
+            // sometimes the interface list remains empty in the data, this shouldn't happen
+            Preconditions.checkArgument(ifaces == null || ifaces.getInterface() == null
+                            || ifaces.getInterface().isEmpty(),
+                    "Invalid request, interfaces cannot be present when mpls is disabled.");
+            return;
+        }
         blockingDeleteAndRead(cli, instanceIdentifier, NO_MPLS_COMMAND);
     }
 }
