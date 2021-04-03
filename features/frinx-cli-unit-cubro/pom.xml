@@ -29,7 +29,7 @@
     <groupId>io.frinx.cli</groupId>
     <artifactId>frinx-cli-unit-cubro</artifactId>
     <packaging>feature</packaging>
-    <version>4.2.7.rc9-frinx-SNAPSHOT</version>
+    <version>4.2.7.rc9-frinx</version>
     <name>Frinx :: Cli :: Unit :: CUBRO</name>
 
     <dependencyManagement>
