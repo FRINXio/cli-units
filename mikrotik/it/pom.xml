@@ -28,17 +28,17 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.cli</groupId>
     <artifactId>mikrotik-it</artifactId>
-    <version>3.1.14.rc51-frinx-SNAPSHOT</version>
+    <version>3.1.14.rc51-frinx</version>
 
     <properties>
-        <cli.version>3.1.14.rc51-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.14.rc51-frinx-SNAPSHOT</openconfig.version>
+        <cli.version>3.1.14.rc51-frinx</cli.version>
+        <openconfig.version>3.1.14.rc51-frinx</openconfig.version>
         <hc.version>1.17.10-Carbon-SR1.3_1_14_rc51-frinxodl</hc.version>
         <controller.version>1.5.1-Carbon-SR1.3_1_14_rc51-frinxodl</controller.version>
         <yangtools.version>1.1.1-Carbon-SR1.3_1_14_rc51-frinxodl</yangtools.version>
         <mdsal.version>2.2.1-Carbon-SR1.3_1_14_rc51-frinxodl</mdsal.version>
         <mdsal.model.version>0.10.1-Carbon-SR1.3_1_14_rc51-frinxodl</mdsal.model.version>
-        <translate.unit.commons.version>3.1.14.rc51-frinx-SNAPSHOT</translate.unit.commons.version>
+        <translate.unit.commons.version>3.1.14.rc51-frinx</translate.unit.commons.version>
     </properties>
 
     <dependencyManagement>

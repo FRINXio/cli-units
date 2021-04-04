@@ -23,18 +23,18 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>3.1.14.rc51-frinx-SNAPSHOT</version>
+        <version>3.1.14.rc51-frinx</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-configuration-metadata-unit</artifactId>
-    <version>3.1.14.rc51-frinx-SNAPSHOT</version>
+    <version>3.1.14.rc51-frinx</version>
     <packaging>bundle</packaging>
 
     <properties>
-        <cli.version>3.1.14.rc51-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>3.1.14.rc51-frinx-SNAPSHOT</openconfig.version>
+        <cli.version>3.1.14.rc51-frinx</cli.version>
+        <openconfig.version>3.1.14.rc51-frinx</openconfig.version>
     </properties>
 
     <dependencies>
