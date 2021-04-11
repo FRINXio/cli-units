@@ -140,6 +140,11 @@ public class CubroAll {
         }
 
         @Override
+        public void onFailedConnection(final String errorMessage) {
+            throw new RuntimeException("Connection failed: " + errorMessage);
+        }
+
+        @Override
         public void onStatusMsgUpdate(String newStatus) {
             // NOOP
         }
