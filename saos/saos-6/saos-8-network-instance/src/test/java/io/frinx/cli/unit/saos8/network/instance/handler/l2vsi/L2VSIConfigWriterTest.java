@@ -59,7 +59,7 @@ public class L2VSIConfigWriterTest {
 
     @Test
     public void writeCurrentAttributesWResultTest() throws WriteFailedException {
-        Config data = createConfig("FRINX001_2500", "\"Ethernet Link-frinx.001\"", L2VSI.class);
+        Config data = createConfig("FRINX001_2500", "Ethernet Link-frinx.001", L2VSI.class);
 
         writer.writeCurrentAttributesWResult(iid, data, this.context);
 
@@ -87,8 +87,8 @@ public class L2VSIConfigWriterTest {
 
     @Test
     public void updateCurrentAttributesWResultTest() throws WriteFailedException {
-        Config dataBefore = createConfig("FRINX001_2500", "\"Ethernet Link-frinx.001\"", L2VSI.class);
-        Config dataAfter = createConfig("FRINX001_2500", "\"Ethernet Link-frinx.002\"", L2VSI.class);
+        Config dataBefore = createConfig("FRINX001_2500", "Ethernet Link-frinx.001", L2VSI.class);
+        Config dataAfter = createConfig("FRINX001_2500", "Ethernet Link-frinx.002", L2VSI.class);
 
         writer.updateCurrentAttributesWResult(iid, dataBefore, dataAfter, context);
 
