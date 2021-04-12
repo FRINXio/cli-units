@@ -25,6 +25,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
@@ -60,10 +61,24 @@ public final class L2VSIConfigReader implements CliConfigReader<Config, ConfigBu
         Pattern desc = Pattern.compile("virtual-switch set vs " + vsName + " description (?<desc>(\\S+\\s*)+).*");
         builder.setName(vsName);
         builder.setType(L2VSI.class);
-        ParsingUtils.parseField(output, 0,
-            desc::matcher,
-            m -> m.group("desc"),
-            builder::setDescription);
+        getDescForVS(output, builder, vsName);
+    }
+
+    static void getDescForVS(String output, ConfigBuilder configBuilder, String vsId) {
+        Pattern portDescLine = Pattern.compile("virtual-switch set vs " + vsId + " description (?<desc>\\S+.*)");
+        Optional<String> line = ParsingUtils.parseField(output, 0,
+            portDescLine::matcher,
+            matcher -> matcher.group("desc"));
+        if (line.isPresent()) {
+            Pattern portDesc = Pattern.compile("(?<desc>\\S+).*");
+            if (line.get().startsWith("\"")) {
+                portDesc = Pattern.compile("\"(?<desc>\\S+.*)\".*");
+            }
+            ParsingUtils.parseField(line.get(), 0,
+                portDesc::matcher,
+                m -> m.group("desc"),
+                configBuilder::setDescription);
+        }
     }
 
     private boolean isVSI(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {

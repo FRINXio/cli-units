@@ -33,12 +33,12 @@ public class L2VSIConfigWriter implements CompositeWriter.Child<Config>, CliWrit
             "virtual-switch create vs {$data.name}\n"
             + "configuration save\n"
             + "{% if ($data.description) %}virtual-switch set vs {$data.name} "
-            + "description {$data.description}\n{% endif %}"
+            + "description \"{$data.description}\"\n{% endif %}"
             + "configuration save\n";
 
     private static final String UPDATE_TEMPLATE =
             "{$data|update(description,virtual-switch set vs `$data.name` "
-            + "description `$data.description`\n,)}"
+            + "description \"`$data.description`\"\n,)}"
             + "configuration save\n";
 
     private Cli cli;

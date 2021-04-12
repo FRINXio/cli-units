@@ -73,11 +73,14 @@ public final class L2VSIConfigReader implements CliConfigReader<Config, ConfigBu
     }
 
     private void getDescForVS(String output, ConfigBuilder configBuilder, String vsId) {
-        Pattern pattern = Pattern.compile("virtual-switch ethernet create vs "
-                + vsId + " (encap-fixed-dot1dpri (\\d+) )?vc (\\S+) description (?<desc>\\S+).*");
-
+        String descriptionCommnadTemplate = "virtual-switch ethernet create vs " + vsId
+                + " (encap-fixed-dot1dpri (\\d+) )?vc (\\S+) description ";
+        Pattern portDesc = Pattern.compile(descriptionCommnadTemplate + "(?<desc>\\S+).*");
+        if (output.contains("\"")) {
+            portDesc = Pattern.compile(descriptionCommnadTemplate + "\"(?<desc>\\S+.*)\".*");
+        }
         ParsingUtils.parseField(output, 0,
-            pattern::matcher,
+            portDesc::matcher,
             m -> m.group("desc"),
             configBuilder::setDescription);
     }

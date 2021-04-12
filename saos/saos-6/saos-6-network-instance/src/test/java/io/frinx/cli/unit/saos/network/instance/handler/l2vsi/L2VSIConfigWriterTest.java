@@ -67,7 +67,7 @@ public class L2VSIConfigWriterTest {
         createCommandAndTest(createConfig("Testing", (short) 3, EncapCosPolicy.Fixed, true),
             "virtual-switch ethernet create vs VLAN111444 vc vc4\n"
                     + "configuration save\n"
-                    + "virtual-switch ethernet set vs VLAN111444 description Testing\n"
+                    + "virtual-switch ethernet set vs VLAN111444 description \"Testing\"\n"
                     + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy fixed\n"
                     + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 3\n"
                     + "l2-cft tagged-pvst-l2pt enable vs VLAN111444\n"
@@ -124,7 +124,7 @@ public class L2VSIConfigWriterTest {
                 createConfig("desc1", (short) 3, EncapCosPolicy.Fixed, false), "VLAN111444"));
 
         // description
-        Assert.assertEquals("virtual-switch ethernet set vs VLAN111444 description desc2\nconfiguration save",
+        Assert.assertEquals("virtual-switch ethernet set vs VLAN111444 description \"desc2\"\nconfiguration save",
                 writer.updateTemplate(
                 createConfig("desc1", (short) 3, EncapCosPolicy.Fixed, true),
                 createConfig("desc2", (short) 3, EncapCosPolicy.Fixed, true), "VLAN111444"));
@@ -144,7 +144,7 @@ public class L2VSIConfigWriterTest {
                 createConfig("desc1", (short) 3, EncapCosPolicy.PortInherit, true), "VLAN111444"));
 
         // all config parameters
-        Assert.assertEquals("virtual-switch ethernet set vs VLAN111444 description desc2\n"
+        Assert.assertEquals("virtual-switch ethernet set vs VLAN111444 description \"desc2\"\n"
                 + "l2-cft tagged-pvst-l2pt disable vs VLAN111444\n"
                 + "virtual-switch ethernet set vs VLAN111444 encap-cos-policy phbg-inherit\n"
                 + "virtual-switch ethernet set vs VLAN111444 encap-fixed-dot1dpri 4\n"
