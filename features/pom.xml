@@ -376,6 +376,16 @@
     </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
+      <artifactId>ios-qos-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
+      <artifactId>ios-snmp-unit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.frinx.cli</groupId>
       <artifactId>ios-privilege-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
