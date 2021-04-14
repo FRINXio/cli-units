@@ -22,22 +22,12 @@ import io.frinx.cli.unit.iosxe.ifc.Util;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.config.Encapsulation;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.config.EncapsulationBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstances;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstancesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlKey;
@@ -59,10 +49,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private static final Pattern MEDIA_TYPE_LINE = Pattern.compile("media-type (?<mediaType>.+)");
     private static final Pattern LLDP_TRANSMIT_LINE = Pattern.compile("no lldp transmit");
     private static final Pattern LLDP_RECEIVE_LINE = Pattern.compile("no lldp receive");
-    private static final Pattern SERVICE_INSTANCE_LINE =
-            Pattern.compile("service instance(?<trunk> trunk)? (?<id>\\d+) ethernet( (?<evc>\\S+))?.*");
-    private static final Pattern SERVICE_INSTANCE_ENCAPSULATION_LINE =
-            Pattern.compile("encapsulation (untagged)?( , )?(dot1q (?<ids>.+))?");
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);
@@ -77,7 +63,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setLldpTransmit(output, ifCiscoExtAugBuilder);
         if (Util.isPhysicalInterface(builder.getType())) {
             setLldpReceive(output, ifCiscoExtAugBuilder);
-            setServiceInstance(output, ifCiscoExtAugBuilder);
         }
         if (isCiscoExtAugNotEmpty(ifCiscoExtAugBuilder)) {
             builder.addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder.build());
@@ -159,80 +144,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         }
 
         return null;
-    }
-
-    private void setServiceInstance(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
-        final List<ServiceInstance> serviceInstanceList = ParsingUtils.parseFields(output, 0,
-            SERVICE_INSTANCE_LINE::matcher,
-            matcher -> matcher.group("id"),
-            id -> parseServiceInstance(id, output));
-        if (serviceInstanceList.size() > 0) {
-            final ServiceInstances serviceInstances = new ServiceInstancesBuilder()
-                    .setServiceInstance(serviceInstanceList)
-                    .build();
-            ifCiscoExtAugBuilder.setServiceInstances(serviceInstances);
-        }
-    }
-
-    private ServiceInstance parseServiceInstance(final String id, final String output) {
-        final String extracted = Util.extractServiceInstance(id, output);
-
-        final Optional<String> trunk = ParsingUtils.parseField(extracted, 0,
-            SERVICE_INSTANCE_LINE::matcher,
-            matcher -> matcher.group("trunk"));
-        final Optional<String> evc = ParsingUtils.parseField(extracted, 0,
-            SERVICE_INSTANCE_LINE::matcher,
-            matcher -> matcher.group("evc"));
-
-        final ServiceInstanceBuilder serviceInstanceBuilder = new ServiceInstanceBuilder();
-        serviceInstanceBuilder.setId(Long.valueOf(id));
-        serviceInstanceBuilder.setKey(new ServiceInstanceKey(serviceInstanceBuilder.getId()));
-        serviceInstanceBuilder.setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
-                .cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder()
-                .setId(serviceInstanceBuilder.getId())
-                .setTrunk(trunk.isPresent())
-                .setEvc(evc.orElse(null))
-                .setEncapsulation(parseServiceInstanceEncapsulation(extracted))
-                .build());
-        return serviceInstanceBuilder.build();
-    }
-
-    private Encapsulation parseServiceInstanceEncapsulation(final String output) {
-        final Optional<String> encapsulationLine = ParsingUtils.parseField(output, 0,
-            SERVICE_INSTANCE_ENCAPSULATION_LINE::matcher,
-            Matcher::group);
-
-        if (encapsulationLine.isPresent()) {
-            final EncapsulationBuilder encapsulationBuilder = new EncapsulationBuilder();
-            encapsulationBuilder.setUntagged(encapsulationLine.get().contains("untagged"));
-
-            final Optional<String> dot1qLine = ParsingUtils.parseField(output, 0,
-                SERVICE_INSTANCE_ENCAPSULATION_LINE::matcher,
-                matcher -> matcher.group("ids"));
-            dot1qLine.ifPresent(s -> encapsulationBuilder.setDot1q(splitMultipleVlans(Arrays.asList(s.split(",")))));
-
-            return encapsulationBuilder.build();
-        }
-
-        return null;
-    }
-
-    private List<Integer> splitMultipleVlans(final List<String> vlanStrings) {
-        final List<Integer> splitVlans = new ArrayList<>();
-
-        for (final String vlanString : vlanStrings) {
-            if (vlanString.contains("-")) {
-                final List<Integer> list = Arrays.stream(vlanString.split("-"))
-                        .map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                final IntStream stream = IntStream.range(list.get(0), list.get(1) + 1);
-                stream.forEach(splitVlans::add);
-            } else {
-                splitVlans.add(Integer.parseInt(vlanString));
-            }
-        }
-
-        return splitVlans;
     }
 
     @Override
