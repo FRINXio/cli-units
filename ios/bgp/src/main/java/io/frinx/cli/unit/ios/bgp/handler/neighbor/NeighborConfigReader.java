@@ -63,6 +63,8 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
             Pattern.compile("neighbor (?<neighborIp>\\S*) description (?<description>.+)");
     private static final Pattern SEND_COMMUNITY_PATTERN =
             Pattern.compile("neighbor (?<neighborIp>\\S*) send-community (?<community>.+)");
+    private static final Pattern AS_OVERRIDE_PATTERN =
+            Pattern.compile("neighbor (?<neighborIp>\\S*) (?<enabled>as-override).*");
     private static final Pattern VERSION_PATTERN =
             Pattern.compile("neighbor (?<neighborIp>\\S*) version (?<version>.+)");
     private static final Pattern PASSWORD_REGEX_FORM = Pattern.compile("^([\\d] )\\S+$");
@@ -113,7 +115,17 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
         setPeerGroup(configBuilder, output);
         setDescription(configBuilder, output);
         setCommunity(configBuilder, output);
-        setNeighborVersion(configBuilder, output);
+        setBgpNeighborConfigAugmentation(configBuilder, output);
+    }
+
+    private static void setBgpNeighborConfigAugmentation(ConfigBuilder configBuilder, String output) {
+        BgpNeighborConfigAugBuilder configAugBuilder = new BgpNeighborConfigAugBuilder();
+        setNeighborVersion(configAugBuilder, output);
+        setAsOverride(configAugBuilder, output);
+
+        if (!configAugBuilder.build().equals(new BgpNeighborConfigAugBuilder().build())) {
+            configBuilder.addAugmentation(BgpNeighborConfigAug.class, configAugBuilder.build());
+        }
     }
 
     private static void parseVrf(ConfigBuilder configBuilder, String vrfName, String[] output) {
@@ -157,13 +169,16 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
                         .toUpperCase())));
     }
 
-    private static void setNeighborVersion(ConfigBuilder configBuilder, String defaultInstance) {
+    private static void setAsOverride(BgpNeighborConfigAugBuilder configAugBuilder, String output) {
+        ParsingUtils.parseFields(preprocessOutput(output), 0, AS_OVERRIDE_PATTERN::matcher,
+            m -> findGroup(m, "enabled"),
+            groupsHashMap -> configAugBuilder.setAsOverride("as-override".equals(groupsHashMap.get("enabled"))));
+    }
+
+    private static void setNeighborVersion(BgpNeighborConfigAugBuilder configAugBuilder, String defaultInstance) {
         ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, VERSION_PATTERN::matcher,
-            m -> findGroup(m, "version"),
-            groupsHashMap -> configBuilder.addAugmentation(BgpNeighborConfigAug.class,
-                    new BgpNeighborConfigAugBuilder()
-                            .setNeighborVersion(parseBgpVersion(groupsHashMap.get("version")))
-                            .build()));
+            m -> findGroup(m, "version"), groupsHashMap ->
+                    configAugBuilder.setNeighborVersion(parseBgpVersion(groupsHashMap.get("version"))));
     }
 
     private static String preprocessOutput(String defaultInstance) {
