@@ -30,17 +30,36 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 
 public class NeighborConfigReaderTest {
 
-    public static final String OUTPUT = "router bgp 65000\n"
+    public static final String OUTPUT_WITHOUT_AUG_COMMANDS = "router bgp 65000\n"
             + " neighbor 1.2.3.4 remote-as 45\n"
             + " neighbor 1.2.3.4 password 7 AB7657E89DG\n"
             + " neighbor 1.2.3.4 peer-group group12\n"
             + " neighbor 1.2.3.4 description description\n"
             + " neighbor 1.2.3.4 send-community both\n"
-            + " neighbor 1.2.3.4 activate\n"
+            + " neighbor 1.2.3.4 activate\n";
+
+    public static final String OUTPUT = OUTPUT_WITHOUT_AUG_COMMANDS
+            + " neighbor 1.2.3.4 as-override\n"
             + " neighbor 1.2.3.4 version 4\n";
 
     @Test
-    public void testParse() throws Exception {
+    public void testOutputWithoutAugCommandsParse() {
+        ConfigBuilder configBuilder = new ConfigBuilder();
+        NeighborConfigReader.parseConfigAttributes(OUTPUT_WITHOUT_AUG_COMMANDS, configBuilder,
+            NetworInstance.DEFAULT_NETWORK_NAME);
+        Assert.assertEquals(new ConfigBuilder()
+                        .setDescription("description")
+                        .setAuthPassword(new EncryptedPassword(new EncryptedString("Encrypted[7 AB7657E89DG]")))
+                        .setPeerAs(new AsNumber(45L))
+                        .setPeerGroup("group12")
+                        .setEnabled(true)
+                        .setSendCommunity(CommunityType.BOTH)
+                        .build(),
+                configBuilder.build());
+    }
+
+    @Test
+    public void testParse() {
         ConfigBuilder configBuilder = new ConfigBuilder();
         NeighborConfigReader.parseConfigAttributes(OUTPUT, configBuilder, NetworInstance.DEFAULT_NETWORK_NAME);
         Assert.assertEquals(new ConfigBuilder()
@@ -52,6 +71,7 @@ public class NeighborConfigReaderTest {
                         .setSendCommunity(CommunityType.BOTH)
                         .addAugmentation(BgpNeighborConfigAug.class, new BgpNeighborConfigAugBuilder()
                                 .setNeighborVersion(VERSION4.class)
+                                .setAsOverride(true)
                                 .build())
                         .build(),
                 configBuilder.build());

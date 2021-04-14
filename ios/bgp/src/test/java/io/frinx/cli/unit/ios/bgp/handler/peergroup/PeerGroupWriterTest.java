@@ -141,7 +141,7 @@ public class PeerGroupWriterTest implements CliFormatter {
         NeighborWriter.renderNeighbor(writer, cli, id,
                 source, null, null, null, id.firstKeyOf(NetworkInstance.class), as, afiSafisForGroupSource,
                 Collections.emptyMap(),
-                PeerGroupWriter.getPeerGroupId(id), null, null, null, null, PeerGroupWriter.PEER_GROUP_GLOBAL,
+                PeerGroupWriter.getPeerGroupId(id), null, null, null, null, null, PeerGroupWriter.PEER_GROUP_GLOBAL,
                 PeerGroupWriter.PEER_GROUP_VRF);
 
         String writeRender = NeighborWriterTest.getCommands(writer, false, 1);
@@ -152,7 +152,7 @@ public class PeerGroupWriterTest implements CliFormatter {
                     after, source, null, null, id.firstKeyOf(NetworkInstance.class), as,
                     NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
                             PeerGroupWriter.getAfiSafisForPeerGroup(after.getAfiSafis())),
-                    afiSafisForGroupSource, PeerGroupWriter.getPeerGroupId(id), null, null, null, null,
+                    afiSafisForGroupSource, PeerGroupWriter.getPeerGroupId(id), null, null, null, null, null,
                     PeerGroupWriter.PEER_GROUP_GLOBAL, PeerGroupWriter.PEER_GROUP_VRF);
 
             String updateRender = NeighborWriterTest.getCommands(writer, false, 2);
@@ -162,8 +162,8 @@ public class PeerGroupWriterTest implements CliFormatter {
         NeighborWriter.deleteNeighbor(writer, cli, id,
                 source, id.firstKeyOf(NetworkInstance.class), as, NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
                         PeerGroupWriter.getAfiSafisForPeerGroup(source.getAfiSafis())),
-                PeerGroupWriter.getPeerGroupId(id), null, PeerGroupWriter.PEER_GROUP_GLOBAL_DELETE, PeerGroupWriter
-                        .PEER_GROUP_VRF_DELETE);
+                PeerGroupWriter.getPeerGroupId(id), null, null, PeerGroupWriter.PEER_GROUP_GLOBAL_DELETE,
+                PeerGroupWriter.PEER_GROUP_VRF_DELETE);
 
         String deleteRender = NeighborWriterTest.getCommands(writer, true, 1);
         Assert.assertEquals(delete, deleteRender);

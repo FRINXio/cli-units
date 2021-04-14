@@ -37,7 +37,8 @@ public class GlobalReadersTest {
             + "  bgp router-id 10.10.10.30\n";
 
     private String shRunOutputBgpLog = "router bgp 65333\n"
-            + " bgp log-neighbor-changes\n";
+            + " bgp log-neighbor-changes\n"
+            + " default-information originate\n";
 
     private String shRunOutputNoBgpLog = "router bgp 65333\n"
             + " no bgp log-neighbor-changes\n";
@@ -68,9 +69,12 @@ public class GlobalReadersTest {
 
         Assert.assertEquals(true, configBuilder.getAugmentation(BgpGlobalConfigAug.class)
                 .isLogNeighborChanges());
+        Assert.assertEquals(true, configBuilder.getAugmentation(BgpGlobalConfigAug.class)
+                .isDefaultInformationOriginate());
 
         GlobalConfigReader.parseConfigAttributes(shRunOutputNoBgpLog, configBuilder, NetworInstance.DEFAULT_NETWORK);
         Assert.assertEquals(false, configBuilder.getAugmentation(BgpGlobalConfigAug.class)
                 .isLogNeighborChanges());
+        Assert.assertNull(configBuilder.getAugmentation(BgpGlobalConfigAug.class).isDefaultInformationOriginate());
     }
 }
