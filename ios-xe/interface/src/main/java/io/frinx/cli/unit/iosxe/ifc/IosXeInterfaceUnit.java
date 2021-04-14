@@ -27,6 +27,9 @@ import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStatisticsConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStatisticsConfigWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceConfigReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceWriter;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.SubinterfaceConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.SubinterfaceConfigWriter;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.SubinterfaceReader;
@@ -90,11 +93,13 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 Sets.newHashSet(IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG,
                         IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_SERVICEPOLICY,
                         IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_STORMCONTROL,
-                        IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_SERVICEINSTANCES,
-                        IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_SE_SERVICEINSTANCE,
-                        IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_SE_SE_CONFIG,
-                        IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_SE_SE_CO_ENCAPSULATION,
                         IIDs.IN_IN_CO_AUG_IFSAOSAUG));
+
+        writeRegistry.subtreeAdd(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG, new ServiceInstanceWriter(cli),
+                Sets.newHashSet(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SERVICEINSTANCES,
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SERVICEINSTANCE,
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_CONFIG,
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_CO_ENCAPSULATION));
 
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
         writeRegistry.addAfter(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli), IIDs.IN_IN_CONFIG);
@@ -117,6 +122,11 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
         readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
         readRegistry.add(IIDs.IN_IN_STATE, new InterfaceStateReader(cli));
         readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli));
+
+        readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SERVICEINSTANCE,
+                new ServiceInstanceReader(cli));
+        readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_CONFIG,
+                new ServiceInstanceConfigReader(cli));
 
         readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli));
         readRegistry.add(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli));
