@@ -18,6 +18,7 @@ package io.frinx.cli.unit.iosxe.ifc.handler.service.instance;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.BridgeDomain;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
 
@@ -26,32 +27,34 @@ public class ServiceInstanceConfigReaderTest {
     private static final Config TRUNK_CONFIG = new ConfigBuilder()
             .setId(100L)
             .setTrunk(true)
+            .setBridgeDomain(new BridgeDomain(true))
             .build();
 
-    private static final String TRUNK_OUTPUT = " service instance trunk 100 ethernet\n";
+    private static final String TRUNK_OUTPUT = " service instance trunk 100 ethernet\n"
+            + "  bridge-domain from-encapsulation\n";
 
     private static final Config EVC_CONFIG = new ConfigBuilder()
             .setId(200L)
             .setTrunk(false)
             .setEvc("EVC")
+            .setBridgeDomain(new BridgeDomain(200))
             .build();
 
     private static final String EVC_OUTPUT = " service instance 200 ethernet EVC\n"
-            + "  encapsulation untagged , dot1q 1-3,5-10\n";
+            + "  encapsulation untagged , dot1q 1-3,5-10\n"
+            + "  bridge-domain 200\n";
 
     private final ConfigBuilder configBuilder = new ConfigBuilder();
 
     @Test
     public void testClean() {
-        ServiceInstanceConfigReader
-                .parseConfig(TRUNK_OUTPUT, 100L, configBuilder);
+        ServiceInstanceConfigReader.parseConfig(TRUNK_OUTPUT, 100L, configBuilder);
         Assert.assertEquals(TRUNK_CONFIG, configBuilder.build());
     }
 
     @Test
     public void testEncapsulation() {
-        ServiceInstanceConfigReader
-                .parseConfig(EVC_OUTPUT, 200L, configBuilder);
+        ServiceInstanceConfigReader.parseConfig(EVC_OUTPUT, 200L, configBuilder);
         Assert.assertEquals(EVC_CONFIG, configBuilder.build());
     }
 
