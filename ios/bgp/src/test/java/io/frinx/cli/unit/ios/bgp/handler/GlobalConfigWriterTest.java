@@ -61,7 +61,7 @@ public class GlobalConfigWriterTest {
     private static final String WRITE_INPUT_2 = "configure terminal\n"
         + "router bgp 65505\n"
         + "no bgp router id\n"
-        + "bgp log-neighbor-changes\n"
+        + "no bgp log-neighbor-changes\n"
         + "no default-information originate\n"
         + "end\n";
 
@@ -115,9 +115,6 @@ public class GlobalConfigWriterTest {
         dataWithoutDefaultInformationOriginateAug = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
                 .bgp.rev170202.bgp.global.base.ConfigBuilder()
                 .setAs(new AsNumber(65505L))
-                .addAugmentation(BgpGlobalConfigAug.class, new BgpGlobalConfigAugBuilder()
-                        .setLogNeighborChanges(true)
-                        .build())
                 .build();
 
         data = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
@@ -141,9 +138,6 @@ public class GlobalConfigWriterTest {
         deleteData = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
                 .ConfigBuilder()
             .setAs(new AsNumber(65505L))
-            .addAugmentation(BgpGlobalConfigAug.class, new BgpGlobalConfigAugBuilder()
-                .setLogNeighborChanges(true)
-                .build())
             .build();
     }
 
