@@ -34,12 +34,15 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.Protocol;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.ProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstances;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.EncapsulationBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocolBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
@@ -62,6 +65,10 @@ public class ServiceInstanceWriterTest {
                                     .setUntagged(true)
                                     .setDot1q(Arrays.asList(1, 2, 3, 5, 6, 7, 8, 9, 10))
                                     .build())
+                            .setL2protocol(new L2protocolBuilder()
+                                    .setProtocol((Arrays.asList(Protocol.Lldp, Protocol.Stp)))
+                                    .setProtocolType(ProtocolType.Peer)
+                                    .build())
                             .build(),
                     new ServiceInstanceBuilder()
                             .setId(200L)
@@ -78,6 +85,7 @@ public class ServiceInstanceWriterTest {
             + "interface GigabitEthernet0/0/0\n"
             + "service instance 100 ethernet EVC\n"
             + "encapsulation untagged , dot1q 1 , 2 , 3 , 5 , 6 , 7 , 8 , 9 , 10\n"
+            + "l2protocol peer lldp stp\n"
             + "exit\n"
             + "service instance trunk 200 ethernet\n"
             + "exit\n"
@@ -96,6 +104,10 @@ public class ServiceInstanceWriterTest {
                                     .setUntagged(false)
                                     .setDot1q(Arrays.asList(1, 9))
                                     .build())
+                            .setL2protocol(new L2protocolBuilder()
+                                    .setProtocol(Arrays.asList(Protocol.Lldp))
+                                    .setProtocolType(ProtocolType.Peer)
+                                    .build())
                             .build()
             ))
             .build();
@@ -106,6 +118,7 @@ public class ServiceInstanceWriterTest {
             + "no service instance trunk 200\n"
             + "service instance trunk 100 ethernet\n"
             + "encapsulation dot1q 1 , 9\n"
+            + "l2protocol peer lldp\n"
             + "exit\n"
             + "end\n";
 
