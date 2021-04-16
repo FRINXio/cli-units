@@ -33,12 +33,16 @@ public class L2VSIConfigReaderTest {
             + "virtual-switch set vs FRINX002_2501 description \"Ethernet Link-frinx.002\"\n"
             + "virtual-switch set vs FRINX003_2502 description \"Ethernet Link-frinx.003\"\n"
             + "virtual-switch set vs FRINX004_2503 description \"Ethernet Link-frinx.004\"\n"
-            + "virtual-switch set vs FRINX005_2504 description \"Ethernet Link-frinx.005\"";
+            + "virtual-switch set vs FRINX005_2504 description \"Ethernet Link-frinx.005\"\n"
+            + "virtual-switch set vs FRINX005_2505 description Link-frinx.005 and something else\n"
+            + "virtual-switch set vs FRINX005_2506 description \"Ethernet Link-frinx.006\" and something else";
 
     @Test
     public void parseL2VSIConfigTest() {
         buildAndTest("IPVPN_1202", "IPVPN_1202");
-        buildAndTest("FRINX001_2500", "\"Ethernet Link-frinx.001\"");
+        buildAndTest("FRINX001_2500", "Ethernet Link-frinx.001");
+        buildAndTest("FRINX005_2505", "Link-frinx.005");
+        buildAndTest("FRINX005_2506", "Ethernet Link-frinx.006");
     }
 
     private void buildAndTest(String vsName, String expectedDesc) {

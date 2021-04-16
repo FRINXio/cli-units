@@ -32,6 +32,18 @@ public class L2VSIConfigReaderTest {
             + "virtual-switch ethernet add vs vsVLAN399918 port 1\n"
             + "l2-cft tagged-pvst-l2pt enable vs vsVLAN399918\n";
 
+    private static final String OUTPUT_WITH_DESCTIPTION_AND_CONFIG =
+            "virtual-switch ethernet create vs vsVLAN399918 encap-fixed-dot1dpri 1 vc vc2 "
+                    + "description EthernetCFMtest and something else\n";
+
+    private static final String OUTPUT_WITH_MULTIWORD_DESCRIPTION =
+            "virtual-switch ethernet create vs vsVLAN399918 encap-fixed-dot1dpri 1 vc vc2 "
+            + "description \"Port EthernetCFMtest\"\n";
+
+    private static final String OUTPUT_WITH_MULTIWORD_DESCRIPTION_AND_CONFIG =
+            "virtual-switch ethernet create vs vsVLAN399918 encap-fixed-dot1dpri 1 vc vc2 "
+                    + "description \"Port EthernetCFMtest\" and something else\n";
+
     @Test
     public void parseConfigTest() {
         ConfigBuilder builder = new ConfigBuilder();
@@ -46,5 +58,20 @@ public class L2VSIConfigReaderTest {
         Assert.assertEquals(new Short("1"), builder.getAugmentation(VsSaosAug.class).getEncapFixedDot1dpri());
         Assert.assertEquals(true, builder.getAugmentation(VsSaosAug.class).isTaggedPvstL2pt());
         Assert.assertEquals(EncapCosPolicy.Fixed, builder.getAugmentation(VsSaosAug.class).getEncapCosPolicy());
+    }
+
+    @Test
+    public void parseConfigWithMultiwordDescriptionTest() {
+        ConfigBuilder builder = new ConfigBuilder();
+        L2VSIConfigReader reader = new L2VSIConfigReader(Mockito.mock(Cli.class));
+
+        reader.parseConfig(OUTPUT_WITH_DESCTIPTION_AND_CONFIG, builder, "vsVLAN399918");
+        Assert.assertEquals("EthernetCFMtest", builder.getDescription());
+
+        reader.parseConfig(OUTPUT_WITH_MULTIWORD_DESCRIPTION, builder, "vsVLAN399918");
+        Assert.assertEquals("Port EthernetCFMtest", builder.getDescription());
+
+        reader.parseConfig(OUTPUT_WITH_MULTIWORD_DESCRIPTION_AND_CONFIG, builder, "vsVLAN399918");
+        Assert.assertEquals("Port EthernetCFMtest", builder.getDescription());
     }
 }
