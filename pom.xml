@@ -34,6 +34,7 @@
   <modules>
     <module>ios-common</module>
     <module>ios</module>
+    <module>ios-xe</module>
     <module>ios-xr</module>
     <module>brocade</module>
     <module>cubro</module>
