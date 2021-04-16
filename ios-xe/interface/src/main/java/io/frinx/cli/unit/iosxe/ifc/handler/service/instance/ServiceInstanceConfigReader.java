@@ -19,21 +19,11 @@ package io.frinx.cli.unit.iosxe.ifc.handler.service.instance;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.iosxe.ifc.Util;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.config.Encapsulation;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.config.EncapsulationBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
@@ -42,8 +32,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class ServiceInstanceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final Pattern SERVICE_INSTANCE_ENCAPSULATION_LINE =
-        Pattern.compile("encapsulation (untagged)?( , )?(dot1q (?<ids>.+))?");
+    public static final String SH_SERVICE_INSTANCE =
+            InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG + " | section service instance.* %s ethernet";
 
     private final Cli cli;
 
@@ -56,10 +46,9 @@ public final class ServiceInstanceConfigReader implements CliConfigReader<Config
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         final String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        final String ifcOutput = blockingRead(f(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, ifcName),
-                cli, instanceIdentifier, readContext);
         final Long serviceInstanceId = instanceIdentifier.firstKeyOf(ServiceInstance.class).getId();
-        final String serviceInstanceOutput = Util.extractServiceInstance(serviceInstanceId, ifcOutput);
+        final String showCommand = f(SH_SERVICE_INSTANCE, ifcName, serviceInstanceId);
+        final String serviceInstanceOutput = blockingRead(showCommand, cli, instanceIdentifier, readContext);
         parseConfig(serviceInstanceOutput, serviceInstanceId, configBuilder);
     }
 
@@ -77,46 +66,6 @@ public final class ServiceInstanceConfigReader implements CliConfigReader<Config
             ServiceInstanceReader.SERVICE_INSTANCE_LINE::matcher,
             matcher -> matcher.group("evc"));
         configBuilder.setEvc(evc.orElse(null));
-
-        configBuilder.setEncapsulation(parseServiceInstanceEncapsulation(output));
-    }
-
-    private static Encapsulation parseServiceInstanceEncapsulation(final String output) {
-        final Optional<String> encapsulationLine = ParsingUtils.parseField(output, 0,
-            SERVICE_INSTANCE_ENCAPSULATION_LINE::matcher,
-            Matcher::group);
-
-        if (encapsulationLine.isPresent()) {
-            final EncapsulationBuilder encapsulationBuilder = new EncapsulationBuilder();
-            encapsulationBuilder.setUntagged(encapsulationLine.get().contains("untagged"));
-
-            final Optional<String> dot1qLine = ParsingUtils.parseField(output, 0,
-                SERVICE_INSTANCE_ENCAPSULATION_LINE::matcher,
-                matcher -> matcher.group("ids"));
-            dot1qLine.ifPresent(s -> encapsulationBuilder.setDot1q(splitMultipleVlans(Arrays.asList(s.split(",")))));
-
-            return encapsulationBuilder.build();
-        }
-
-        return null;
-    }
-
-    private static List<Integer> splitMultipleVlans(final List<String> vlanStrings) {
-        final List<Integer> splitVlans = new ArrayList<>();
-
-        for (final String vlanString : vlanStrings) {
-            if (vlanString.contains("-")) {
-                final List<Integer> list = Arrays.stream(vlanString.split("-"))
-                        .map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                final IntStream stream = IntStream.range(list.get(0), list.get(1) + 1);
-                stream.forEach(splitVlans::add);
-            } else {
-                splitVlans.add(Integer.parseInt(vlanString));
-            }
-        }
-
-        return splitVlans;
     }
 
 }
