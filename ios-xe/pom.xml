@@ -36,6 +36,7 @@
         <module>init</module>
         <module>configuration-metadata</module>
         <module>it</module>
+        <module>interface</module>
     </modules>
 
     <build>
