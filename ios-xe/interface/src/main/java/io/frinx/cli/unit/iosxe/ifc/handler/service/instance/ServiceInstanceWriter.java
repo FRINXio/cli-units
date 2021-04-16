@@ -25,11 +25,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.BridgeDomain;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.ProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstances;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Encapsulation;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -95,15 +97,14 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                 final Set<Integer> vlanIds = new HashSet<>();
 
                 for (final ServiceInstance serviceInstance : serviceInstanceList) {
-                    final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024
-                            .service.instance.top.service.instances.service.instance.Config config =
-                            serviceInstance.getConfig();
+                    final Config config = serviceInstance.getConfig();
 
                     if (config != null) {
                         if (config.isTrunk() != null && config.isTrunk()) {
                             trunkCount++;
                         }
                         checkTrunkValidity(trunkCount, serviceInstance, ifcName);
+                        checkBridgeDomainValidity(serviceInstance, ifcName, serviceInstanceList);
 
                         final Encapsulation encapsulation = serviceInstance.getEncapsulation();
                         if (encapsulation != null) {
@@ -121,8 +122,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
     private void checkTrunkValidity(int trunkCount,
                                     final ServiceInstance serviceInstance,
                                     final String ifcName) {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance
-                .top.service.instances.service.instance.Config config = serviceInstance.getConfig();
+        final Config config = serviceInstance.getConfig();
 
         if (trunkCount > 1) {
             throw new IllegalStateException(
@@ -138,12 +138,58 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         }
     }
 
+    private void checkBridgeDomainValidity(final ServiceInstance serviceInstance,
+                                           final String ifcName,
+                                           final List<ServiceInstance> serviceInstanceList) {
+        final Config config = serviceInstance.getConfig();
+
+        if (config.getBridgeDomain() != null) {
+            final BridgeDomain bridgeDomain = config.getBridgeDomain();
+            final boolean isTrunk = config.isTrunk() != null && config.isTrunk();
+            final boolean hasNumber = bridgeDomain.getUint16() != null;
+            final boolean isFromEncapsulation = bridgeDomain.isBoolean() != null && bridgeDomain.isBoolean();
+
+            final Encapsulation encapsulation = serviceInstance.getEncapsulation();
+            final boolean hasEncapsulation = encapsulation != null
+                    && ((encapsulation.getDot1q() != null && encapsulation.getDot1q().size() > 0)
+                    || (encapsulation.isUntagged() != null && encapsulation.isUntagged()));
+
+            if (!hasEncapsulation) {
+                throw new IllegalStateException(
+                        f("%s: Configuring bridge domain in service instance (id: %s) without configured "
+                                + "encapsulation is not supported", ifcName, serviceInstance.getId()));
+            } else if (isTrunk && hasNumber) {
+                throw new IllegalStateException(
+                        f("%s: Specifying bridge domain number in trunk service instance (id: %s) is not "
+                                + "supported", ifcName, serviceInstance.getId()));
+            } else if (!isTrunk && isFromEncapsulation) {
+                throw new IllegalStateException(
+                        f("%s: Derivation of bridge domains from encapsulation vlan list in non-trunk "
+                                + "service instance (id: %s) is not supported", ifcName, serviceInstance.getId()));
+            }
+
+            if (hasNumber) {
+                for (final ServiceInstance tempServiceInstance : serviceInstanceList) {
+                    if (tempServiceInstance.getConfig() != null) {
+                        final Config tempConfig = tempServiceInstance.getConfig();
+                        final boolean isTempTrunk = tempConfig.isTrunk() != null && tempConfig.isTrunk();
+                        if (isTempTrunk && tempServiceInstance.getId().equals(new Long(bridgeDomain.getUint16()))) {
+                            throw new IllegalStateException(
+                                    f("%s: Configuring bridge domain %s in service instance (id: %s) is not "
+                                                    + "supported because it is in use by trunk service instance",
+                                            ifcName, bridgeDomain.getUint16(), serviceInstance.getId()));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void checkEncapsulationValidity(final int untaggedVlanCount,
                                             final Set<Integer> vlanIds,
                                             final ServiceInstance serviceInstance,
                                             final String ifcName) {
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance
-                .top.service.instances.service.instance.Config config = serviceInstance.getConfig();
+        final Config config = serviceInstance.getConfig();
 
         final Encapsulation encapsulation = serviceInstance.getEncapsulation();
         final boolean isTrunk = config.isTrunk() != null && config.isTrunk();
@@ -195,6 +241,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                         currentInstances.append(getCreationCommands(serviceInstance, false));
                         currentInstances.append(getEncapsulationCommands(serviceInstance.getEncapsulation()));
                         currentInstances.append(getL2ProtocolCommands(serviceInstance.getL2protocol()));
+                        currentInstances.append(getConfigCommands(serviceInstance.getConfig()));
                         currentInstances.append("exit\n");
                     }
                 }
@@ -206,8 +253,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
 
     private String getCreationCommands(final ServiceInstance serviceInstance, boolean delete) {
         final StringBuilder creationCommands = new StringBuilder();
-        final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance
-                .top.service.instances.service.instance.Config config = serviceInstance.getConfig();
+        final Config config = serviceInstance.getConfig();
 
         final boolean isTrunk = config != null && config.isTrunk() != null && config.isTrunk();
         final boolean hasEvc = config != null && config.getEvc() != null && config.getEvc().length() > 0;
@@ -231,8 +277,24 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         return creationCommands.toString();
     }
 
-    private String getEncapsulationCommands(final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
-            .cisco.rev171024.service.instance.top.service.instances.service.instance.Encapsulation encapsulation) {
+    private String getConfigCommands(final Config config) {
+        final StringBuilder configCommands = new StringBuilder();
+
+        if (config != null) {
+            if (config.getBridgeDomain() != null) {
+                final BridgeDomain bridgeDomain = config.getBridgeDomain();
+                if (bridgeDomain.getUint16() != null) {
+                    configCommands.append("bridge-domain ").append(bridgeDomain.getUint16()).append("\n");
+                } else if (bridgeDomain.isBoolean() != null && bridgeDomain.isBoolean()) {
+                    configCommands.append("bridge-domain ").append("from-encapsulation").append("\n");
+                }
+            }
+        }
+
+        return configCommands.toString();
+    }
+
+    private String getEncapsulationCommands(final Encapsulation encapsulation) {
         final StringBuilder configCommands = new StringBuilder();
 
         if (encapsulation != null) {

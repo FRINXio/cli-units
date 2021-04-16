@@ -23,7 +23,9 @@ import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.BridgeDomainBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
@@ -34,6 +36,8 @@ public final class ServiceInstanceConfigReader implements CliConfigReader<Config
 
     public static final String SH_SERVICE_INSTANCE =
             InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG + " | section service instance.* %s ethernet";
+
+    private static final Pattern BRIDGE_DOMAIN_LINE = Pattern.compile("bridge-domain (?<value>(\\d|\\S)+)");
 
     private final Cli cli;
 
@@ -66,6 +70,11 @@ public final class ServiceInstanceConfigReader implements CliConfigReader<Config
             ServiceInstanceReader.SERVICE_INSTANCE_LINE::matcher,
             matcher -> matcher.group("evc"));
         configBuilder.setEvc(evc.orElse(null));
+
+        final Optional<String> bridgeDomain = ParsingUtils.parseField(output, 0,
+            BRIDGE_DOMAIN_LINE::matcher,
+            matcher -> matcher.group("value"));
+        bridgeDomain.ifPresent(s -> configBuilder.setBridgeDomain(BridgeDomainBuilder.getDefaultInstance(s)));
     }
 
 }
