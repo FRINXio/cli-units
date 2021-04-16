@@ -65,6 +65,8 @@
         <bundle>mvn:io.frinx.cli/ios-lldp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-platform-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-configuration-metadata-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-qos-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-snmp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-privilege-unit/{{VERSION}}</bundle>
     </feature>
 
