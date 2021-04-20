@@ -38,6 +38,7 @@
         <module>it</module>
         <module>interface</module>
         <module>bfd</module>
+        <module>evc</module>
     </modules>
 
     <build>

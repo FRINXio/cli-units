@@ -85,6 +85,7 @@
         <bundle>mvn:io.frinx.cli/network-instance-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/interface-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xe-configuration-metadata-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xe-evc-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xe-interface-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xe-bfd-unit/{{VERSION}}</bundle>
     </feature>
