@@ -31,6 +31,11 @@ import io.frinx.cli.unit.ios.routing.policy.handlers.action.BgpActionsConfigRead
 import io.frinx.cli.unit.ios.routing.policy.handlers.aspath.AsPathPrependConfigReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.community.ExtCommunitySetConfigWriter;
 import io.frinx.cli.unit.ios.routing.policy.handlers.community.ExtCommunitySetReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixConfigWriter;
+import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixSetConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixSetReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.policy.IIDs;
 import java.util.HashSet;
@@ -79,6 +84,15 @@ public class RoutingPolicyUnit extends AbstractUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writerRegistryBuilder, Cli cli) {
+        // Prefix sets
+        writerRegistryBuilder.addNoop(IIDs.RO_DE_PREFIXSETS);
+        writerRegistryBuilder.addNoop(IIDs.RO_DE_PR_PREFIXSET);
+        writerRegistryBuilder.addNoop(IIDs.RO_DE_PR_PR_PREFIXES);
+        writerRegistryBuilder.addNoop(IIDs.RO_DE_PR_PR_PR_PREFIX);
+        writerRegistryBuilder.addNoop(IIDs.RO_DE_PR_PR_CONFIG);
+        writerRegistryBuilder.subtreeAdd(IIDs.RO_DE_PR_PR_PR_PR_CONFIG, new PrefixConfigWriter(cli),
+                Sets.newHashSet(IIDs.RO_DE_PR_PR_PR_PR_CO_AUG_PREFIXCONFIGAUG));
+
         writerRegistryBuilder.addNoop(IIDs.ROUTINGPOLICY);
         writerRegistryBuilder.addNoop(IIDs.RO_DEFINEDSETS);
         writerRegistryBuilder.addNoop(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2);
@@ -107,6 +121,15 @@ public class RoutingPolicyUnit extends AbstractUnit {
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readerRegistryBuilder, Cli cli) {
+        readerRegistryBuilder
+                .add(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PREFIXSET, new PrefixSetReader(cli));
+        readerRegistryBuilder.add(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_CONFIG,
+                new PrefixSetConfigReader());
+        readerRegistryBuilder
+                .add(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_PR_PREFIX, new PrefixReader(cli));
+        readerRegistryBuilder.add(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_PR_PR_CONFIG,
+                new PrefixConfigReader(cli));
+
         readerRegistryBuilder.add(IIDs.RO_PO_POLICYDEFINITION, new PolicyReader(cli));
         readerRegistryBuilder.add(IIDs.RO_PO_PO_CONFIG, new PolicyConfigReader());
         readerRegistryBuilder.add(IIDs.RO_PO_PO_ST_STATEMENT, new StatementReader(cli));
