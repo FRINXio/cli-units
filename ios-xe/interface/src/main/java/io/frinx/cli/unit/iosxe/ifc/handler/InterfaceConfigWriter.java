@@ -38,6 +38,8 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($stormControl) %}{$stormControl}{% endif %}"
             + "{% if ($lldpTransmit) %}{$lldpTransmit}{% endif %}"
             + "{% if ($lldpReceive) %}{$lldpReceive}{% endif %}"
+            + "{% if ($fhrpMinimum) %}{$fhrpMinimum}{% endif %}"
+            + "{% if ($fhrpReload) %}{$fhrpReload}{% endif %}"
             + "end";
 
     private static final String WRITE_TEMPLATE_VLAN = "configure terminal\n"
@@ -67,7 +69,9 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                     "pt", getPhysicalType(before, after),
                     "stormControl", getStormControlCommands(ciscoExtAugBefore, ciscoExtAug),
                     "lldpTransmit", getLldpTransmit(ciscoExtAugBefore, ciscoExtAug),
-                    "lldpReceive", getLldpReceive(ciscoExtAugBefore, ciscoExtAug));
+                    "lldpReceive", getLldpReceive(ciscoExtAugBefore, ciscoExtAug),
+                    "fhrpMinimum", getFhrpMinimumDelay(ciscoExtAugBefore, ciscoExtAug),
+                    "fhrpReload", getFhrpReloadDelay(ciscoExtAugBefore, ciscoExtAug));
         }
         return fT(WRITE_TEMPLATE_VLAN,
                 "before", before,
@@ -166,6 +170,45 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
         }
 
         return currentControls.toString();
+    }
+
+    private String getFhrpMinimumDelay(final IfCiscoExtAug before, final IfCiscoExtAug after) {
+        Integer beforeMinimumDelay = null;
+        if (before != null) {
+            beforeMinimumDelay = before.getFhrpMinimumDelay();
+        }
+
+        Integer afterMinimumDelay = null;
+        if (after != null) {
+            afterMinimumDelay = after.getFhrpMinimumDelay();
+        }
+
+        return getFhrp(beforeMinimumDelay, afterMinimumDelay, "fhrp delay minimum");
+    }
+
+    private String getFhrpReloadDelay(final IfCiscoExtAug before, final IfCiscoExtAug after) {
+        Integer beforeReloadDelay = null;
+        if (before != null) {
+            beforeReloadDelay = before.getFhrpReloadDelay();
+        }
+
+        Integer afterReloadDelay = null;
+        if (after != null) {
+            afterReloadDelay = after.getFhrpReloadDelay();
+        }
+
+        return getFhrp(beforeReloadDelay, afterReloadDelay, "fhrp delay reload");
+    }
+
+    private String getFhrp(final Integer beforeValue, final Integer afterValue, final String command) {
+        if (!Objects.equals(beforeValue, afterValue)) {
+            if (afterValue != null) {
+                return command + " " + afterValue + "\n";
+            } else {
+                return "no " + command + "\n";
+            }
+        }
+        return null;
     }
 
     @Override
