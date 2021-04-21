@@ -53,7 +53,6 @@ public class InterfaceConfigWriterTest {
             + "no media-type\n"
             + "no storm-control broadcast level\n"
             + "no storm-control unicast level\n"
-            + "lldp transmit\n"
             + "lldp receive\n"
             + "end\n";
 
@@ -75,7 +74,6 @@ public class InterfaceConfigWriterTest {
             + "media-type rj45\n"
             + "storm-control broadcast level 10.00\n"
             + "storm-control unicast level 10.00\n"
-            + "no lldp transmit\n"
             + "no lldp receive\n"
             + "end\n";
 
