@@ -52,7 +52,6 @@ public class InterfaceConfigReaderTest {
 
     public static final IfCiscoExtAug IF_CISCO_EXT_AUG = new IfCiscoExtAugBuilder()
             .setStormControl(STORM_CONTROL_LIST)
-            .setLldpTransmit(false)
             .setLldpReceive(false)
             .build();
 
@@ -76,7 +75,6 @@ public class InterfaceConfigReaderTest {
             + " shutdown\n"
             + " negotiation auto\n"
             + " description test - description\n"
-            + " no lldp transmit\n"
             + " no lldp receive\n"
             + " media-type rj45\n"
             + " storm-control broadcast level 10.00 \n"

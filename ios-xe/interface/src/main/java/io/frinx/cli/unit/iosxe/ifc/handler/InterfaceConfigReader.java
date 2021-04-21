@@ -76,11 +76,15 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     }
 
     private void setLldpReceive(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
-        ifCiscoExtAugBuilder.setLldpReceive(!LLDP_RECEIVE_LINE.matcher(output).find());
+        if (LLDP_RECEIVE_LINE.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setLldpReceive(false);
+        }
     }
 
     private void setLldpTransmit(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
-        ifCiscoExtAugBuilder.setLldpTransmit(!LLDP_TRANSMIT_LINE.matcher(output).find());
+        if (LLDP_TRANSMIT_LINE.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setLldpTransmit(false);
+        }
     }
 
     private boolean isCiscoExtAugNotEmpty(final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
