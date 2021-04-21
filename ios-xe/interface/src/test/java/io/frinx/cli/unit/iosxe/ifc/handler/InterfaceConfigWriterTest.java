@@ -54,6 +54,8 @@ public class InterfaceConfigWriterTest {
             + "no storm-control broadcast level\n"
             + "no storm-control unicast level\n"
             + "lldp receive\n"
+            + "no fhrp delay minimum\n"
+            + "no fhrp delay reload\n"
             + "end\n";
 
     private static final Config PHYSICAL_INT_CONFIG = new ConfigBuilder()
@@ -75,6 +77,8 @@ public class InterfaceConfigWriterTest {
             + "storm-control broadcast level 10.00\n"
             + "storm-control unicast level 10.00\n"
             + "no lldp receive\n"
+            + "fhrp delay minimum 1\n"
+            + "fhrp delay reload 3600\n"
             + "end\n";
 
     private static final Config LOGICAL_INT_CONFIG = new ConfigBuilder()
