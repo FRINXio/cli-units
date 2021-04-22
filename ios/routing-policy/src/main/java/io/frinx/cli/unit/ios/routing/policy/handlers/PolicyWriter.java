@@ -31,6 +31,9 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.SetAsPathPrepend;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.BgpActions;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.DENY;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PERMIT;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PrefixListAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.definitions.top.policy.definitions.PolicyDefinition;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.statements.top.statements.Statement;
@@ -40,23 +43,31 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
 
     static final String WRITE_ROUTE_MAP =
             "configure terminal\n"
-            + "route-map {$data.name} permit {$statement}\n"
+            + "route-map {$data.name} {$action} {$sequence}\n"
             + "{% if ($localPref) %}set local-preference {$localPref}\n{% endif %}"
             + "{% if ($asnValue) %}set as-path prepend {$asnValue}\n{% endif %}"
+            + "{% if ($aug.ip_prefix_list) %}match ip address prefix-list"
+            + "{% loop in $aug.ip_prefix_list as $ip_prefix %} {$ip_prefix}{% endloop %}\n{% endif %}"
+            + "{% if ($aug.ipv6_prefix_list) %}match ipv6 address prefix-list {$aug.ipv6_prefix_list}\n{% endif %}"
             + "end";
 
     static final String UPDATE_STATEMENT =
             "configure terminal\n"
-            + "route-map {$data.name} permit {$statement}\n"
+            + "route-map {$data.name} {$action} {$sequence}\n"
             + "{% if ($localPrefEnable == TRUE) %}set local-preference {$localPref}\n"
             + "{% elseif ($localPrefEnable == FALSE) %}no set local-preference\n{% endif %}"
             + "{% if ($asnEnable == TRUE) %}set as-path prepend {$asnValue}\n"
             + "{% elseif ($asnEnable == FALSE) %}no set as-path prepend {$asnValue}\n{% endif %}"
+            + "{% if ($ipEnable == TRUE) %}no match ip address\nmatch ip address prefix-list"
+            + "{% loop in $ip as $ip_prefix %} {$ip_prefix}{% endloop %}\n"
+            + "{% elseif ($ipEnable == FALSE) %}no match ip address\n{% endif %}"
+            + "{% if ($ipv6Enable == TRUE) %}no match ipv6 address\nmatch ipv6 address prefix-list {$ipv6}\n"
+            + "{% elseif ($ipv6Enable == FALSE) %}no match ipv6 address\n{% endif %}"
             + "end";
 
     private static final String DELETE_STATEMENT =
             "configure terminal\n"
-            + "no route-map {$data.name} permit {$statement}\n"
+            + "no route-map {$data.name} {$action} {$sequence}\n"
             + "end";
 
     private static final String DELETE_ROUTE_MAP =
@@ -103,7 +114,11 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
             }
             Actions actions = statement.getActions();
             commands.append(fT(WRITE_ROUTE_MAP, "data", policyDefinition,
-                    "statement", statement.getName(),
+                    "sequence", statement.getName(),
+                    "aug", statement.getConfig() != null
+                            ? statement.getConfig().getAugmentation(PrefixListAug.class) : null,
+                    "action", statement.getConfig() != null
+                            ? getAction(statement.getConfig().getAugmentation(PrefixListAug.class)) : null,
                     "localPref", actions != null
                             ? getLocalPref(actions.getAugmentation(Actions2.class).getBgpActions()) : null,
                     "asnValue", actions != null
@@ -129,7 +144,7 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
         StringBuffer commands = new StringBuffer();
 
         for (String statementId : statementsMapAfter.keySet()) {
-            if (!statementsMapBefore.keySet().contains(statementId)) {
+            if (!statementsMapBefore.containsKey(statementId)) {
                 if (commands.length() > 0) {
                     commands.append("\n");
                 }
@@ -137,8 +152,14 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                 BgpActions bgpActionsAugAfter = statementsMapAfter.get(statementId).getActions()
                         .getAugmentation(Actions2.class).getBgpActions();
 
+
+
                 commands.append(fT(WRITE_ROUTE_MAP, "data", dataAfter,
-                        "statement", statementId,
+                        "sequence", statementId,
+                        "action", getAction(statementsMapAfter.get(statementId).getConfig()
+                                .getAugmentation(PrefixListAug.class)),
+                        "aug", statementsMapAfter.get(statementId).getConfig()
+                                .getAugmentation(PrefixListAug.class),
                         "localPref", getLocalPref(bgpActionsAugAfter),
                         "asnValue", getAsnValue(bgpActionsAugAfter)));
             } else {
@@ -146,27 +167,56 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                 Actions actionsBefore = statementsMapBefore.get(statementId).getActions();
                 Actions actionsAfter = statementsMapAfter.get(statementId).getActions();
 
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing
+                        .policy.rev170714.policy.statements.top.statements.statement
+                        .Config statementConfigBefore = statementsMapBefore.get(statementId).getConfig();
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing
+                        .policy.rev170714.policy.statements.top.statements.statement
+                        .Config statementConfigAfter = statementsMapAfter.get(statementId).getConfig();
+
                 BgpActions bgpActionsAugBefore = actionsBefore != null
                         ? actionsBefore.getAugmentation(Actions2.class).getBgpActions() : null;
                 BgpActions bgpActionsAugAfter = actionsAfter != null
                         ? actionsAfter.getAugmentation(Actions2.class).getBgpActions() : null;
 
+                PrefixListAug prefixListAugBefore = statementConfigBefore != null
+                        ? statementConfigBefore.getAugmentation(PrefixListAug.class) : null;
+
+                PrefixListAug prefixListAugAfter = statementConfigAfter != null
+                        ? statementConfigAfter.getAugmentation(PrefixListAug.class) : null;
+
                 // Compare setLocalPreferences
                 String afterPref = compareSetLocalPref(bgpActionsAugBefore, bgpActionsAugAfter);
                 // Compare asn
                 String afterAsn = compareAsn(bgpActionsAugBefore, bgpActionsAugAfter);
+                // Compare prefix-list ip
+                String afterIp = comparePrefixListIp(prefixListAugBefore, prefixListAugAfter);
+                // Compare prefix-list ipv6
+                String afterIpv6 = comparePrefixListIpv6(prefixListAugBefore, prefixListAugAfter);
+                // Compare action
+                String afterSetOperation = compareSetOperation(prefixListAugBefore, prefixListAugAfter);
 
-                if (afterPref != null || afterAsn != null) {
+                if (afterPref != null || afterAsn != null || afterIp != null || afterSetOperation != null
+                        || afterIpv6 != null) {
                     if (commands.length() > 0) {
                         commands.append("\n");
                     }
                     commands.append(fT(UPDATE_STATEMENT, "data", dataAfter,
-                            "statement", statementId,
+                            "sequence", statementId,
+                            "action", statementsMapAfter.get(statementId).getConfig() != null
+                                    ? getAction(statementsMapAfter.get(statementId).getConfig()
+                                    .getAugmentation(PrefixListAug.class)) : null,
                             "localPrefEnable", afterPref,
                             "localPref", getLocalPref(bgpActionsAugAfter),
                             "asnEnable", afterAsn,
-                            "asnValue", afterAsn == "FALSE" ? bgpActionsAugBefore.getSetAsPathPrepend().getConfig()
-                                    .getAsn().getValue().toString() : getAsnValue(bgpActionsAugAfter)));
+                            "asnValue", "FALSE".equals(afterAsn) ? bgpActionsAugBefore.getSetAsPathPrepend().getConfig()
+                                    .getAsn().getValue().toString() : getAsnValue(bgpActionsAugAfter),
+                            "ipEnable", afterIp,
+                            "ip", prefixListAugAfter.getIpPrefixList(),
+                            "ipv6Enable", afterIpv6,
+                            "ipv6", getIpv6Prefix(prefixListAugBefore, prefixListAugAfter, afterIpv6),
+                            "action", getSetOperation(prefixListAugBefore, prefixListAugAfter, afterSetOperation)
+                            ));
                 }
             }
         }
@@ -177,7 +227,9 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                     commands.append("\n");
                 }
                 commands.append(fT(DELETE_STATEMENT, "data", dataAfter,
-                        "statement", statementId));
+                        "sequence", statementId,
+                        "action", getAction(statementsMapBefore.get(statementId).getConfig()
+                                .getAugmentation(PrefixListAug.class))));
             }
         }
         return commands.toString();
@@ -193,6 +245,15 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                 .Config config = bgpActionsAug != null ? bgpActionsAug.getConfig() : null;
 
         return config != null ? config.getSetLocalPref().toString() : null;
+    }
+
+    private String getAction(PrefixListAug aug) {
+        if (aug != null) {
+            if (DENY.class.equals(aug.getSetOperation())) {
+                return "deny";
+            }
+        }
+        return "permit";
     }
 
     private String getAsnValue(BgpActions bgpActionsAug) {
@@ -241,4 +302,67 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
         }
         return null;
     }
+
+    private String comparePrefixListIp(PrefixListAug prefixListAugAugBefore, PrefixListAug prefixListAugAfter) {
+        if (prefixListAugAugBefore != null && prefixListAugAfter != null) {
+            if (!Objects.equals(prefixListAugAugBefore.getIpPrefixList(), prefixListAugAfter.getIpPrefixList())) {
+                if (prefixListAugAfter.getIpPrefixList() != null) {
+                    return Chunk.TRUE;
+                } else {
+                    return "FALSE";
+                }
+            }
+        }
+        return null;
+    }
+
+    private String comparePrefixListIpv6(PrefixListAug prefixListAugAugBefore, PrefixListAug prefixListAugAfter) {
+        if (prefixListAugAugBefore != null && prefixListAugAfter != null) {
+            if (!Objects.equals(prefixListAugAugBefore.getIpv6PrefixList(),
+                    prefixListAugAfter.getIpv6PrefixList())) {
+                if (prefixListAugAfter.getIpv6PrefixList() != null) {
+                    return Chunk.TRUE;
+                } else {
+                    return "FALSE";
+                }
+            }
+        } else if (prefixListAugAfter == null && prefixListAugAugBefore != null) {
+            return "FALSE";
+        }
+        return null;
+    }
+
+    private String compareSetOperation(PrefixListAug prefixListAugAugBefore, PrefixListAug prefixListAugAfter) {
+        if (prefixListAugAugBefore != null && prefixListAugAfter != null) {
+            if (!Objects.equals(prefixListAugAugBefore.getSetOperation(), prefixListAugAfter.getSetOperation())) {
+                if (prefixListAugAfter.getSetOperation() != null) {
+                    return Chunk.TRUE;
+                } else {
+                    return "FALSE";
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getIpv6Prefix(PrefixListAug prefixListAugBefore, PrefixListAug prefixListAugAfter, String ipv6) {
+        if (prefixListAugBefore != null && prefixListAugAfter != null) {
+            return "FALSE".equals(ipv6) ? prefixListAugBefore.getIpv6PrefixList() :
+                    prefixListAugAfter.getIpv6PrefixList();
+        }
+        else {
+            return null;
+        }
+    }
+
+    private String getSetOperation(PrefixListAug prefixListAugBefore, PrefixListAug prefixListAugAfter, String action) {
+        if (prefixListAugBefore != null && prefixListAugAfter != null) {
+            return "FALSE".equals(action) ? prefixListAugBefore.getSetOperation() == PERMIT.class ? "permit" : "deny" :
+                    prefixListAugAfter.getSetOperation() == PERMIT.class ? "permit" : "deny";
+        }
+        else {
+            return null;
+        }
+    }
+
 }

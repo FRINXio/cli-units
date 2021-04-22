@@ -29,6 +29,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.SetAsPathPrependBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.BgpActionsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.DENY;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PERMIT;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PrefixListAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PrefixListAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.ActionsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.definitions.top.policy.definitions.PolicyDefinition;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.definitions.top.policy.definitions.PolicyDefinitionBuilder;
@@ -54,32 +58,60 @@ public class PolicyWriterTests {
                         + "route-map test permit 9\n"
                         + "set local-preference 90\n"
                         + "set as-path prepend 65222 65222 65222 65222\n"
+                        + "match ip address prefix-list PL-CUST-NETWORKS\n"
+                        + "match ipv6 address prefix-list PXL_V6_B2B_VZ_PA_PFX_VLAN011220\n"
                         + "end",
                 writer.writeTemplate(createPolicyDefinition("test", Collections.singletonList(
-                        createStatement("9", "90", "65222", new Short("4"))))));
+                        createStatement("9", "90", "65222", new Short("4"), "permit",
+                                Arrays.asList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220")))));
 
         Assert.assertEquals(
                 "configure terminal\n"
                         + "route-map test permit 9\n"
                         + "set local-preference 90\n"
+                        + "match ip address prefix-list PL-CUST-NETWORKS\n"
+                        + "match ipv6 address prefix-list PXL_V6_B2B_VZ_PA_PFX_VLAN011220\n"
                         + "end",
                 writer.writeTemplate(createPolicyDefinition("test", Collections.singletonList(
-                        createStatement("9", "90", null, null)))));
+                        createStatement("9", "90", null, null, "permit",
+                                Arrays.asList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220")))));
 
         Assert.assertEquals(
                 "configure terminal\n"
                         + "route-map test permit 9\n"
                         + "set as-path prepend 65222 65222 65222\n"
+                        + "match ip address prefix-list PL-CUST-NETWORKS\n"
+                        + "match ipv6 address prefix-list PXL_V6_B2B_VZ_PA_PFX_VLAN011220\n"
                         + "end",
                 writer.writeTemplate(createPolicyDefinition("test", Collections.singletonList(
-                        createStatement("9", null, "65222", new Short("3"))))));
+                        createStatement("9", null, "65222", new Short("3"), "permit",
+                                Arrays.asList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220")))));
 
         Assert.assertEquals(
                 "configure terminal\n"
                         + "route-map test permit 9\n"
                         + "end",
                 writer.writeTemplate(createPolicyDefinition("test", Collections.singletonList(
-                        createStatement("9", null, null, null)))));
+                        createStatement("9", null, null, null, "permit",
+                                null, null)))));
+
+        Assert.assertEquals(
+                "configure terminal\n"
+                        + "route-map test permit 9\n"
+                        + "match ip address prefix-list PL-CUST-NETWORKS\n"
+                        + "end",
+                writer.writeTemplate(createPolicyDefinition("test", Collections.singletonList(
+                        createStatement("9", null, null, null, "permit",
+                                Arrays.asList("PL-CUST-NETWORKS"), null)))));
+
+        Assert.assertEquals(
+                "configure terminal\n"
+                        + "route-map test permit 9\n"
+                        + "match ipv6 address prefix-list PXL_V6_B2B_VZ_PA_PFX_VLAN011220\n"
+                        + "end",
+                writer.writeTemplate(createPolicyDefinition("test", Collections.singletonList(
+                        createStatement("9", null, null, null, "permit",
+                                null, "PXL_V6_B2B_VZ_PA_PFX_VLAN011220")))));
     }
 
     @Test
@@ -87,20 +119,26 @@ public class PolicyWriterTests {
         Assert.assertEquals("",
                 writer.updateTemplate(
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "90", "65222", new Short("4")))),
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        Arrays.asList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220"))),
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "90", "65222", new Short("4"))))));
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        Arrays.asList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220")))));
 
         Assert.assertEquals(
                 "configure terminal\n"
                         + "route-map test permit 9\n"
                         + "set local-preference 95\n"
+                        + "no match ip address\n"
+                        + "no match ipv6 address\n"
                         + "end",
                 writer.updateTemplate(
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "90", "65222", new Short("4")))),
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        Arrays.asList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220"))),
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "95", "65222", new Short("4"))))));
+                                createStatement("9", "95", "65222", new Short("4"), "permit",
+                                        null, null)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -109,9 +147,11 @@ public class PolicyWriterTests {
                         + "end",
                 writer.updateTemplate(
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "90", "65222", new Short("4")))),
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        null, null))),
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "90", "65222", new Short("3"))))));
+                                createStatement("9", "90", "65222", new Short("3"), "permit",
+                                        null, null)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -120,9 +160,11 @@ public class PolicyWriterTests {
                         + "end",
                 writer.updateTemplate(
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "90", "65222", new Short("4")))),
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        null, null))),
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", null, "65222", new Short("4"))))));
+                                createStatement("9", null, "65222", new Short("4"), "permit",
+                                        null, null)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -132,9 +174,11 @@ public class PolicyWriterTests {
                         + "end",
                 writer.updateTemplate(
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "90", "65222", new Short("4")))),
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        null, null))),
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "91", null, null)))));
+                                createStatement("9", "91", null, null, "permit",
+                                        null, null)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -146,10 +190,13 @@ public class PolicyWriterTests {
                         + "end",
                 writer.updateTemplate(
                         createPolicyDefinition("test", Arrays.asList(
-                                createStatement("9", "90", "65222", new Short("4")),
-                                createStatement("10", "91", "65222", new Short("3")))),
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        null, null),
+                                createStatement("10", "91", "65222", new Short("3"), "permit",
+                                        null, null))),
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "80", "65222", new Short("4"))))));
+                                createStatement("9", "80", "65222", new Short("4"), "permit",
+                                        null, null)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -164,10 +211,44 @@ public class PolicyWriterTests {
                         + "end",
                 writer.updateTemplate(
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "90", "65222", new Short("4")))),
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        null, null))),
                         createPolicyDefinition("test", Arrays.asList(
-                                createStatement("9", "80", "65222", new Short("3")),
-                                createStatement("10", "91", "65222", new Short("3"))))));
+                                createStatement("9", "80", "65222", new Short("3"), "permit",
+                                        null, null),
+                                createStatement("10", "91", "65222", new Short("3"), "permit",
+                                        null, null)))));
+
+        Assert.assertEquals(
+                "configure terminal\n"
+                        + "route-map test permit 9\n"
+                        + "set local-preference 95\n"
+                        + "no match ipv6 address\n"
+                        + "match ipv6 address prefix-list PXL_V6_B2B_VZ_PA_PFX_VLAN011221\n"
+                        + "end",
+                writer.updateTemplate(
+                        createPolicyDefinition("test", Collections.singletonList(
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        Arrays.asList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220"))),
+                        createPolicyDefinition("test", Collections.singletonList(
+                                createStatement("9", "95", "65222", new Short("4"), "permit",
+                                        Arrays.asList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011221")))));
+
+        Assert.assertEquals(
+                "configure terminal\n"
+                        + "route-map test permit 9\n"
+                        + "set local-preference 95\n"
+                        + "no match ip address\n"
+                        + "match ip address prefix-list PL-CUST-NETWORKS\n"
+                        + "end",
+                writer.updateTemplate(
+                        createPolicyDefinition("test", Collections.singletonList(
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        Arrays.asList("PL-CUST-NETWORKS", "testValue"),
+                                        "PXL_V6_B2B_VZ_PA_PFX_VLAN011220"))),
+                        createPolicyDefinition("test", Collections.singletonList(
+                                createStatement("9", "95", "65222", new Short("4"), "permit",
+                                        Arrays.asList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220")))));
     }
 
     @Test
@@ -178,7 +259,8 @@ public class PolicyWriterTests {
                         + "end",
                 writer.deleteTemplate(
                         createPolicyDefinition("test", Collections.singletonList(
-                                createStatement("9", "90", "65222", new Short("4"))))));
+                                createStatement("9", "90", "65222", new Short("4"), "permit",
+                                        Arrays.asList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220")))));
     }
 
     private PolicyDefinition createPolicyDefinition(String name, List<Statement> statements) {
@@ -190,7 +272,8 @@ public class PolicyWriterTests {
                 .build();
     }
 
-    private Statement createStatement(String id, String localPref, String asn, Short repeatN) {
+    private Statement createStatement(String id, String localPref, String asn, Short repeatN, String action,
+                                      List<String> ip, String ipv6) {
         BgpActionsBuilder bgpActionsBuilder = new BgpActionsBuilder();
 
         if (localPref != null) {
@@ -205,8 +288,29 @@ public class PolicyWriterTests {
                     .ConfigBuilder().setAsn(new AsNumber(Long.valueOf(asn))).setRepeatN(repeatN).build()).build());
         }
 
-        if (localPref != null || asn != null) {
-            return new StatementBuilder().setName(id).setConfig(new ConfigBuilder().setName(id).build())
+        final PrefixListAugBuilder prefixListAugBuilder = new PrefixListAugBuilder();
+
+        if (ip != null) {
+            prefixListAugBuilder.setIpPrefixList(ip);
+        }
+
+        if (ipv6 != null) {
+            prefixListAugBuilder.setIpv6PrefixList(ipv6);
+        }
+
+        if (action != null) {
+            if (action.equalsIgnoreCase("permit")) {
+                prefixListAugBuilder.setSetOperation(PERMIT.class);
+            } else if (action.equalsIgnoreCase("deny")) {
+                prefixListAugBuilder.setSetOperation(DENY.class);
+            }
+        }
+
+        if (localPref != null || asn != null || ipv6 != null || ip != null || action != null) {
+            return new StatementBuilder().setName(id).setConfig(new ConfigBuilder()
+                        .setName(id)
+                        .addAugmentation(PrefixListAug.class, prefixListAugBuilder.build())
+                        .build())
                     .setActions(new ActionsBuilder()
                             .addAugmentation(Actions2.class, new Actions2Builder().setBgpActions(
                                         bgpActionsBuilder.build())

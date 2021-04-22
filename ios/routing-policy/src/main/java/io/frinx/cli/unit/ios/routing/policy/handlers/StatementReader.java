@@ -33,8 +33,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class StatementReader implements CliConfigListReader<Statement, StatementKey, StatementBuilder> {
 
-    private static final String SH_ROUTE_MAP = "show running-config | include %s permit";
-    private static final Pattern STATEMENT = Pattern.compile(".*permit (?<id>\\S+).*");
+    private static final String SH_ROUTE_MAP = "show running-config | include %s";
+    private static final Pattern STATEMENT_PERMIT = Pattern.compile(".*permit (?<id>\\S+).*");
+    private static final Pattern STATEMENT_DENY = Pattern.compile(".*deny (?<id>\\S+).*");
 
     private final Cli cli;
 
@@ -51,10 +52,15 @@ public class StatementReader implements CliConfigListReader<Statement, Statement
 
     @VisibleForTesting
     static List<StatementKey> getAllIds(String output) {
-        return ParsingUtils.parseFields(output, 0,
-            STATEMENT::matcher,
+        List<StatementKey> statementKeys = ParsingUtils.parseFields(output, 0,
+            STATEMENT_PERMIT::matcher,
             matcher -> matcher.group("id"),
             StatementKey::new);
+        statementKeys.addAll(ParsingUtils.parseFields(output, 0,
+            STATEMENT_DENY::matcher,
+            matcher -> matcher.group("id"),
+            StatementKey::new));
+        return statementKeys;
     }
 
     @Override

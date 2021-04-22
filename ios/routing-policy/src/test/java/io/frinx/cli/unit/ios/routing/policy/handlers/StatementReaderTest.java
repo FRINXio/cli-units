@@ -28,7 +28,7 @@ public class StatementReaderTest {
     private static final String OUTPUT =
             "neighbor 217.105.224.26 route-map RM-IPVPN-SECONDARY-PE in\n"
             + "route-map RM-IPVPN-SECONDARY-PE permit 9 \n"
-            + "route-map RM-IPVPN-SECONDARY-PE permit 10 \n";
+            + "route-map RM-IPVPN-SECONDARY-PE deny 10 \n";
 
     @Test
     public void getAllIdsTest() {

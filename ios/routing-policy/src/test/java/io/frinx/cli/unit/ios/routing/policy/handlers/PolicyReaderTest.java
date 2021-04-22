@@ -31,7 +31,7 @@ public class PolicyReaderTest {
             + "route-map RM-IPVPN-SECONDARY-PE permit 10\n"
             + "route-map RM-IPVPN-PRIMARY-CPE-SECONDARY-PE permit 10\n"
             + "route-map RM-IPVPN-SECONDARY-CPE-PRIMARY-PE permit 10\n"
-            + "route-map RM-IPVPN-PRIMARY-PE permit 10\n";
+            + "route-map RM-IPVPN-PRIMARY-PE deny 10\n";
 
     @Test
     public void getAllIdsTest() {

@@ -95,12 +95,13 @@ public class BgpActionsConfigReader implements CliConfigReader<Config, ConfigBui
 
     public static void removeTopLines(List<String> lines, String routeMapName, String statementId) {
         Pattern pattern = Pattern.compile("route-map " + routeMapName + " permit " + statementId);
+        Pattern patternDeny = Pattern.compile("route-map " + routeMapName + " deny " + statementId);
         boolean run = false;
 
         while (!run) {
             String line = lines.get(0);
             Matcher matcher = pattern.matcher(line);
-            if (!matcher.find()) {
+            if (!matcher.find() && !patternDeny.matcher(line).find()) {
                 lines.remove(0);
             } else {
                 run = true;
