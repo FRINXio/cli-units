@@ -72,8 +72,8 @@ public final class SubinterfaceReader extends AbstractSubinterfaceReader {
         // Now exclude interfaces
         return interfaceReader.parseAllInterfaceIds(output)
                 .stream()
+                .filter(key -> isSubinterface(key.getName()))
                 .map(InterfaceKey::getName)
-                .filter(this::isSubinterface)
                 .filter(subifcName -> subifcName.startsWith(ifcName))
                 .map(name -> name.substring(name.lastIndexOf(SEPARATOR) + 1))
                 .map(subifcIndex -> new SubinterfaceKey(Long.valueOf(subifcIndex)))
@@ -85,7 +85,7 @@ public final class SubinterfaceReader extends AbstractSubinterfaceReader {
         return InterfaceReader.SH_INTERFACES;
     }
 
-    private boolean isSubinterface(final String ifcName) {
+    public static boolean isSubinterface(final String ifcName) {
         return InterfaceReader.SUBINTERFACE_NAME.matcher(ifcName).matches();
     }
 

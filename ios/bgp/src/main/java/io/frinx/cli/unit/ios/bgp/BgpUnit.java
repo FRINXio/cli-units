@@ -69,7 +69,7 @@ public class BgpUnit extends AbstractUnit {
 
     @Override
     protected Set<Device> getSupportedVersions() {
-        return IosDevices.IOS_ALL;
+        return IosDevices.IOS_ONLY;
     }
 
     @Override
