@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanSwitchedConfig;
@@ -45,6 +46,8 @@ public class InterfaceVlanReader implements CliConfigReader<Config, ConfigBuilde
             Pattern.compile("\\s*switchport trunk native vlan (?<nativeVlan>.+)");
     public static final Pattern SWITCHPORT_TRUNK_ALLOWED_VLAN_LINE =
             Pattern.compile("\\s*switchport trunk allowed vlan (?<allowedVlan>.+)");
+    public static final Pattern SWITCHPORT_TRUNK_ALLOWED_VLAN_ADD_LINE =
+            Pattern.compile("\\s*switchport trunk allowed vlan add (?<allowedVlan>.+)");
 
     private final Cli cli;
 
@@ -81,6 +84,14 @@ public class InterfaceVlanReader implements CliConfigReader<Config, ConfigBuilde
         Optional<String> allowedValues = ParsingUtils.parseField(output, 0,
             SWITCHPORT_TRUNK_ALLOWED_VLAN_LINE::matcher,
             matcher -> matcher.group("allowedVlan"));
+
+        Optional<String> allowedValuesAdd = ParsingUtils.parseField(output, 0,
+            SWITCHPORT_TRUNK_ALLOWED_VLAN_ADD_LINE::matcher,
+            matcher -> matcher.group("allowedVlan"));
+        allowedValues = Stream.of(allowedValues, allowedValuesAdd)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .reduce((main, add) -> main + "," + add);
         allowedValues.ifPresent(s -> configBuilder.setTrunkVlans(getSwitchportTrunkAllowedVlanList(s)));
     }
 
