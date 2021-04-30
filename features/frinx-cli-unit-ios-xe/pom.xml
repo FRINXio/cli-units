@@ -62,6 +62,10 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-bfd-template-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>ios-xe-evc-unit</artifactId>
         </dependency>
 
