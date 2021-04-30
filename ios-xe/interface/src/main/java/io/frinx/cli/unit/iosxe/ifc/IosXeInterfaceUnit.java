@@ -40,6 +40,9 @@ import io.frinx.cli.unit.iosxe.ifc.handler.subifc.SubinterfaceStateReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip4.Ipv4AddressReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip4.Ipv4VrrpGroupConfigReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip4.Ipv4VrrpGroupConfigWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip4.Ipv4VrrpGroupReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip6.Ipv6AddressReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip6.Ipv6ConfigWriter;
@@ -76,6 +79,9 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 IIDs.FRINX_CISCO_IF_EXTENSION,
                 IIDs.FRINX_SAOS_IF_EXTENSION,
                 IIDs.FRINX_IF_ETHERNET_EXTENSION,
+                io.frinx.openconfig.openconfig._if.ip.IIDs.FRINX_OPENCONFIG_IF_IP,
+                io.frinx.openconfig.openconfig._if.ip.IIDs.FRINX_CISCO_VRRP_EXTENSION,
+                io.frinx.openconfig.openconfig._if.ip.IIDs.FRINX_OPENCONFIG_IF_IP_EXT,
                 io.frinx.openconfig.openconfig.lacp.IIDs.FRINX_LACP_LAG_MEMBER,
                 io.frinx.openconfig.openconfig.oam.IIDs.FRINX_OAM,
                 $YangModuleInfoImpl.getInstance());
@@ -114,6 +120,21 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 new Ipv4ConfigWriter(cli),
                 IIDs.IN_IN_CONFIG, io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_IN_INTERFACE);
 
+        writeRegistry.addNoop(io.frinx.openconfig.openconfig._if.ip
+                .IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV4VRRPAUG_VR_VRRPGROUP);
+        writeRegistry.subtreeAdd(io.frinx.openconfig.openconfig._if.ip
+                .IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV4VRRPAUG_VR_VR_CONFIG,
+                new Ipv4VrrpGroupConfigWriter(cli),
+                Sets.newHashSet(
+                    io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV4VRRPAUG_VR_VR_CONFIG
+                        .augmentation(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.cisco
+                                .vrrp.ext.rev210521.Config1.class),
+                    io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV4VRRPAUG_VR_VR_CONFIG
+                        .augmentation(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.cisco
+                                .vrrp.ext.rev210521.Config1.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.cisco.vrrp.ext
+                                .rev210521.ipv4.vrrp.group.config.TrackedObjects.class)));
+
         writeRegistry.addNoop(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_ADDRESS);
         writeRegistry.addAfter(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_AD_CONFIG,
                 new Ipv6ConfigWriter(cli),
@@ -146,6 +167,13 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 new Ipv4AddressReader(cli));
         readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
                 new Ipv4ConfigReader(cli));
+
+        readRegistry.addAfter(io.frinx.openconfig.openconfig._if.ip
+                .IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV4VRRPAUG_VR_VRRPGROUP,
+                new Ipv4VrrpGroupReader(cli),
+                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS);
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV4VRRPAUG_VR_VR_CONFIG,
+                new Ipv4VrrpGroupConfigReader(cli));
 
         readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_ADDRESS,
                 new Ipv6AddressReader(cli));
