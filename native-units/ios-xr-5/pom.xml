@@ -27,7 +27,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>ios-xr-5-native</artifactId>
-    <version>4.2.7.rc12-frinx</version>
+    <version>4.2.7.rc13-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
