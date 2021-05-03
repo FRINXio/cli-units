@@ -22,48 +22,24 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 
 public class BgpActionsConfigReaderTest {
 
-    public static final String OUTPUT =
-            "route-map RM-IPVPN-PRIMARY-CPE-PRIMARY-PE permit 10\n"
-            + "route-map test permit 10 \n"
-            + " set local-preference 9888\n"
-            + "route-map RM-IPVPN-PRIMARY-CPE-PRIMARY-PE permit 10 \n"
-            + "route-map RM-IPVPN-SECONDARY-CPE-SECONDARY-PE permit 10 \n"
-            + " set as-path prepend 65222 65222 65222 65222\n"
-            + "route-map RM-IPVPN-SECONDARY-PE permit 9 \n"
-            + "route-map RM-IPVPN-SECONDARY-PE permit 10 \n"
+    private static final String EMPTY_ROUTE_MAP = "route-map RM-IPVPN-SECONDARY-CPE-SECONDARY-PE permit 10 \n";
+
+    private static final String ROUTE_MAP = "route-map RM-IPVPN-SECONDARY-PE permit 10 \n"
             + " set as-path prepend 65222\n"
-            + " set local-preference 90\n"
-            + "route-map test-deny deny 10 \n"
-            + " set local-preference 1223\n"
-            + "route-map RM-IPVPN-PRIMARY-CPE-SECONDARY-PE permit 10 \n"
-            + " set as-path prepend 65222\n"
-            + "route-map RM-IPVPN-SECONDARY-CPE-PRIMARY-PE permit 10 \n"
-            + " set as-path prepend 65222 65222 65222\n"
-            + "route-map RM-IPVPN-PRIMARY-PE permit 10 \n"
-            + " set local-preference 95";
+            + " set local-preference 90\n";
 
     @Test
-    public void parseConfigTest() {
-        buildAndTest("test", "10", "9888");
-        buildAndTest("RM-IPVPN-SECONDARY-PE", "10", "90");
-        buildAndTest("RM-IPVPN-PRIMARY-PE", "10", "95");
-        buildAndTest_null("RM-IPVPN-SECONDARY-CPE-PRIMARY-PE", "10");
-        buildAndTest_null("RM-IPVPN-SECONDARY-PE", "9");
-    }
-
-    private void buildAndTest(String routeMapName, String statementId, String expectedPreference) {
+    public void testEmpty() {
         ConfigBuilder builder = new ConfigBuilder();
-
-        BgpActionsConfigReader.parseConfig(OUTPUT, routeMapName, statementId, builder);
-
-        Assert.assertEquals(expectedPreference, builder.getSetLocalPref().toString());
-    }
-
-    private void buildAndTest_null(String routeMapName, String statementId) {
-        ConfigBuilder builder = new ConfigBuilder();
-
-        BgpActionsConfigReader.parseConfig(OUTPUT, routeMapName, statementId, builder);
-
+        BgpActionsConfigReader.parseConfig(EMPTY_ROUTE_MAP, builder);
         Assert.assertNull(builder.getSetLocalPref());
     }
+
+    @Test
+    public void testWithValue() {
+        ConfigBuilder builder = new ConfigBuilder();
+        BgpActionsConfigReader.parseConfig(ROUTE_MAP, builder);
+        Assert.assertEquals("90", builder.getSetLocalPref().toString());
+    }
+
 }
