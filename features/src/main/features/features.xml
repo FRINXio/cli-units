@@ -86,6 +86,7 @@
         <bundle>mvn:io.frinx.cli/interface-base/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xe-configuration-metadata-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xe-interface-unit/{{VERSION}}</bundle>
+        <bundle>mvn:io.frinx.cli/ios-xe-bfd-unit/{{VERSION}}</bundle>
     </feature>
 
     <feature name='cli-southbound-unit-ios-xr-common-cli-initializer' version='${project.version}'>
@@ -128,7 +129,6 @@
         <bundle>mvn:io.frinx.cli/ios-xr-configuration-metadata-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-hsrp-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-lacp-unit/{{VERSION}}</bundle>
-        <bundle>mvn:io.frinx.cli/ios-xr-bfd-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-evpn-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-isis-unit/{{VERSION}}</bundle>
         <bundle>mvn:io.frinx.cli/ios-xr-oam-unit/{{VERSION}}</bundle>

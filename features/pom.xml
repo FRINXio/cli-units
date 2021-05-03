@@ -340,7 +340,7 @@
     </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xr-bfd-unit</artifactId>
+      <artifactId>ios-xe-bfd-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
