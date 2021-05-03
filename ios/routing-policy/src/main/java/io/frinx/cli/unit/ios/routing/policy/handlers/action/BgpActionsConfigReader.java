@@ -22,10 +22,8 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.List;
-import java.util.regex.Matcher;
+import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions.ConfigBuilder;
@@ -35,7 +33,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpActionsConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    public static final String SH_ROUTE_MAP = "show running-config | include ^route-map |^ set";
+    public static final String SH_ROUTE_MAP = "show running-config | section route-map %s .+ %s";
+    private static final Pattern LOCAL_PREFERENCE_LINE = Pattern.compile("set local-preference (?<value>\\S+)");
 
     private final Cli cli;
 
@@ -50,62 +49,16 @@ public class BgpActionsConfigReader implements CliConfigReader<Config, ConfigBui
         String routeMapName = instanceIdentifier.firstKeyOf(PolicyDefinition.class).getName();
         String statementId = instanceIdentifier.firstKeyOf(Statement.class).getName();
 
-        String output = blockingRead(SH_ROUTE_MAP, cli, instanceIdentifier, readContext);
-        parseConfig(output, routeMapName, statementId, configBuilder);
+        String output = blockingRead(f(SH_ROUTE_MAP, routeMapName, statementId), cli, instanceIdentifier, readContext);
+        parseConfig(output, configBuilder);
     }
 
     @VisibleForTesting
-    static void parseConfig(String output, String routeMapName, String statementId, ConfigBuilder builder) {
-        parsePreference(output, routeMapName, statementId, builder);
+    static void parseConfig(String output, ConfigBuilder builder) {
+        Optional<String> localPreference = ParsingUtils.parseField(output, 0,
+            LOCAL_PREFERENCE_LINE::matcher,
+            matcher -> matcher.group("value"));
+        localPreference.ifPresent(s -> builder.setSetLocalPref(Long.parseLong(s)));
     }
 
-    private static void parsePreference(String output, String routeMapName, String statementId, ConfigBuilder builder) {
-        List<String> lines = ParsingUtils.NEWLINE.splitAsStream(output)
-                .map(String::trim)
-                .collect(Collectors.toList());
-
-        Pattern preferencePattern = Pattern.compile("set local-preference (?<value>\\S+)");
-        Pattern routeMapPattern = Pattern.compile("route-map");
-        boolean run = false;
-
-        removeTopLines(lines, routeMapName, statementId);
-
-        if (lines.size() == 1) {
-            return;
-        }
-
-        lines.remove(0);
-
-        for (String line : lines) {
-            if (!run) {
-                Matcher preferenceMatcher = preferencePattern.matcher(line);
-                Matcher routeMapMatcher = routeMapPattern.matcher(line);
-                if (preferenceMatcher.matches()) {
-                    String value = preferenceMatcher.group("value");
-                    builder.setSetLocalPref(Long.parseLong(value));
-                    run = true;
-                } else if (routeMapMatcher.find()) {
-                    run = true;
-                }
-            } else {
-                break;
-            }
-        }
-    }
-
-    public static void removeTopLines(List<String> lines, String routeMapName, String statementId) {
-        Pattern pattern = Pattern.compile("route-map " + routeMapName + " permit " + statementId);
-        Pattern patternDeny = Pattern.compile("route-map " + routeMapName + " deny " + statementId);
-        boolean run = false;
-
-        while (!run) {
-            String line = lines.get(0);
-            Matcher matcher = pattern.matcher(line);
-            if (!matcher.find() && !patternDeny.matcher(line).find()) {
-                lines.remove(0);
-            } else {
-                run = true;
-            }
-        }
-    }
 }

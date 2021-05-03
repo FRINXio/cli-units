@@ -23,10 +23,8 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.routing.policy.handlers.action.BgpActionsConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.List;
-import java.util.regex.Matcher;
+import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.ConfigBuilder;
@@ -36,6 +34,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AsPathPrependConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+
+    private static final Pattern AS_PATH_PREPEND_LINE = Pattern.compile("set as-path prepend (?<value>.*)");
 
     private final Cli cli;
 
@@ -50,58 +50,21 @@ public class AsPathPrependConfigReader implements CliConfigReader<Config, Config
         String routeMapName = instanceIdentifier.firstKeyOf(PolicyDefinition.class).getName();
         String statementId = instanceIdentifier.firstKeyOf(Statement.class).getName();
 
-        String output = blockingRead(BgpActionsConfigReader.SH_ROUTE_MAP, cli, instanceIdentifier, readContext);
-        parseConfig(output, routeMapName, statementId, configBuilder);
+        String output = blockingRead(f(BgpActionsConfigReader.SH_ROUTE_MAP, routeMapName, statementId),
+                cli, instanceIdentifier, readContext);
+        parseConfig(output, configBuilder);
     }
 
     @VisibleForTesting
-    static void parseConfig(String output, String routeMapName, String statementId, ConfigBuilder builder) {
-        parsePrepand(output, routeMapName, statementId, builder);
-    }
-
-    private static void parsePrepand(String output, String routeMapName, String statementId, ConfigBuilder builder) {
-        List<String> lines = ParsingUtils.NEWLINE.splitAsStream(output)
-                .map(String::trim)
-                .collect(Collectors.toList());
-
-        Pattern prependPattern = Pattern.compile("set as-path prepend (?<value>.*)");
-        Pattern routeMapPattern = Pattern.compile("route-map");
-        boolean run = false;
-
-        BgpActionsConfigReader.removeTopLines(lines, routeMapName, statementId);
-
-        if (lines.size() == 1) {
-            return;
-        }
-
-        lines.remove(0);
-
-        for (String line : lines) {
-            if (!run) {
-                Matcher prepandMatcher = prependPattern.matcher(line);
-                Matcher routeMapMatcher = routeMapPattern.matcher(line);
-                if (prepandMatcher.matches()) {
-                    String value = prepandMatcher.group("value");
-                    String[] asnAndRepeat = parsePrependValue(value);
-                    builder.setAsn(new AsNumber(new Long(asnAndRepeat[0])));
-                    builder.setRepeatN(new Short(asnAndRepeat[1]));
-                    run = true;
-                } else if (routeMapMatcher.find()) {
-                    run = true;
-                }
-            } else {
-                break;
-            }
+    static void parseConfig(String output, ConfigBuilder builder) {
+        Optional<String> asPathPrepend = ParsingUtils.parseField(output, 0,
+            AS_PATH_PREPEND_LINE::matcher,
+            matcher -> matcher.group("value"));
+        if (asPathPrepend.isPresent()) {
+            final String[] values = asPathPrepend.get().split(" ");
+            builder.setAsn(new AsNumber(Long.parseLong(values[0])));
+            builder.setRepeatN((short) values.length);
         }
     }
 
-    private static String[] parsePrependValue(String value) {
-        String[] asnAndRepeat = new String[2];
-        String[] values = value.split(" ");
-
-        asnAndRepeat[0] = values[0];
-        asnAndRepeat[1] = String.valueOf(values.length);
-
-        return asnAndRepeat;
-    }
 }
