@@ -62,7 +62,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>ios-xe-bfd-template-unit</artifactId>
+            <artifactId>ios-xe-bfd-unit</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

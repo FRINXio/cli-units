@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.iosxe.bfdt;
+package io.frinx.cli.unit.iosxe.bfd;
 
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
-import io.frinx.cli.unit.iosxe.bfdt.handler.BfdTemplateConfigReader;
-import io.frinx.cli.unit.iosxe.bfdt.handler.BfdTemplateConfigWriter;
-import io.frinx.cli.unit.iosxe.bfdt.handler.BfdTemplateReader;
-import io.frinx.cli.unit.iosxe.bfdt.handler.IntervalReader;
+import io.frinx.cli.unit.iosxe.bfd.handler.BfdTemplateConfigReader;
+import io.frinx.cli.unit.iosxe.bfd.handler.BfdTemplateConfigWriter;
+import io.frinx.cli.unit.iosxe.bfd.handler.BfdTemplateReader;
+import io.frinx.cli.unit.iosxe.bfd.handler.IntervalReader;
 import io.frinx.cli.unit.iosxe.init.IosXeDevices;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.bfd.IIDs;
@@ -33,9 +33,9 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
-public class IosXEBfdTemplateUnit extends AbstractUnit {
+public class IosXEBfdUnit extends AbstractUnit {
 
-    public IosXEBfdTemplateUnit(@Nonnull final TranslationUnitCollector translationRegistry) {
+    public IosXEBfdUnit(@Nonnull final TranslationUnitCollector translationRegistry) {
         super(translationRegistry);
     }
 

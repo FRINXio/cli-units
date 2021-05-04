@@ -27,7 +27,7 @@
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
-    <artifactId>ios-xe-bfd-template-unit</artifactId>
+    <artifactId>ios-xe-bfd-unit</artifactId>
     <version>4.2.7.rc13-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
