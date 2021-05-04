@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Frinx and others.
+ * Copyright © 2021 Frinx and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.tran
 public final class IosXeDevices {
 
     private IosXeDevices() {
-
     }
 
     public static final Device IOS_XE_GENERIC = new DeviceIdBuilder()
@@ -32,15 +31,26 @@ public final class IosXeDevices {
             .setDeviceVersion("*")
             .build();
 
-    public static final Device IOS_16 = new DeviceIdBuilder()
+    public static final Device IOS_XE_15 = new DeviceIdBuilder()
+            .setDeviceType("ios xe")
+            .setDeviceVersion("15.*")
+            .build();
+
+    public static final Device IOS_XE_16 = new DeviceIdBuilder()
             .setDeviceType("ios xe")
             .setDeviceVersion("16.*")
             .build();
 
+    public static final Device IOS_XE_17 = new DeviceIdBuilder()
+            .setDeviceType("ios xe")
+            .setDeviceVersion("17.*")
+            .build();
+
     public static final Set<Device> IOS_XE_ALL = new HashSet<Device>() {
         {
-            add(IOS_16);
+            add(IOS_XE_15);
+            add(IOS_XE_16);
+            add(IOS_XE_17);
         }
     };
-
 }
