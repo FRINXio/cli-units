@@ -18,7 +18,6 @@ package io.frinx.cli.unit.iosxe.ifc.handler.service.instance;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.BridgeDomain;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
 
@@ -27,7 +26,7 @@ public class ServiceInstanceConfigReaderTest {
     private static final Config TRUNK_CONFIG = new ConfigBuilder()
             .setId(100L)
             .setTrunk(true)
-            .setBridgeDomain(new BridgeDomain(true))
+            .setBridgeDomain("from-encapsulation")
             .build();
 
     private static final String TRUNK_OUTPUT = " service instance trunk 100 ethernet\n"
@@ -35,9 +34,8 @@ public class ServiceInstanceConfigReaderTest {
 
     private static final Config EVC_CONFIG = new ConfigBuilder()
             .setId(200L)
-            .setTrunk(false)
             .setEvc("EVC")
-            .setBridgeDomain(new BridgeDomain(200))
+            .setBridgeDomain("200")
             .build();
 
     private static final String EVC_OUTPUT = " service instance 200 ethernet EVC\n"
