@@ -20,12 +20,9 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.BridgeDomain;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.ProtocolType;
@@ -57,7 +54,6 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                                        @Nonnull IfCiscoServiceInstanceAug ifCiscoServiceInstanceAug,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        checkValidity(ifCiscoServiceInstanceAug, ifcName);
         blockingWriteAndRead(cli, instanceIdentifier, ifCiscoServiceInstanceAug,
                 fT(TEMPLATE,
                         "ifcName", ifcName,
@@ -70,7 +66,6 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                                         @Nonnull IfCiscoServiceInstanceAug dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String ifcName = id.firstKeyOf(Interface.class).getName();
-        checkValidity(dataAfter, ifcName);
         blockingWriteAndRead(cli, id, dataAfter,
                 fT(TEMPLATE,
                         "ifcName", ifcName,
@@ -86,134 +81,6 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                 fT(TEMPLATE,
                         "ifcName", ifcName,
                         "serviceInstance", getCommands(ifCiscoServiceInstanceAug, null)));
-    }
-
-    private void checkValidity(final IfCiscoServiceInstanceAug aug, final String ifcName) {
-        if (aug != null && aug.getServiceInstances() != null) {
-            final List<ServiceInstance> serviceInstanceList = aug.getServiceInstances().getServiceInstance();
-            if (serviceInstanceList != null) {
-                int trunkCount = 0;
-                int untaggedVlanCount = 0;
-                final Set<Integer> vlanIds = new HashSet<>();
-
-                for (final ServiceInstance serviceInstance : serviceInstanceList) {
-                    final Config config = serviceInstance.getConfig();
-
-                    if (config != null) {
-                        if (config.isTrunk() != null && config.isTrunk()) {
-                            trunkCount++;
-                        }
-                        checkTrunkValidity(trunkCount, serviceInstance, ifcName);
-                        checkBridgeDomainValidity(serviceInstance, ifcName, serviceInstanceList);
-
-                        final Encapsulation encapsulation = serviceInstance.getEncapsulation();
-                        if (encapsulation != null) {
-                            if (encapsulation.isUntagged() != null && encapsulation.isUntagged()) {
-                                untaggedVlanCount++;
-                            }
-                            checkEncapsulationValidity(untaggedVlanCount, vlanIds, serviceInstance, ifcName);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void checkTrunkValidity(int trunkCount,
-                                    final ServiceInstance serviceInstance,
-                                    final String ifcName) {
-        final Config config = serviceInstance.getConfig();
-
-        if (trunkCount > 1) {
-            throw new IllegalStateException(
-                    f("%s: Only one trunk service instance is allowed per interface", ifcName));
-        }
-
-        final boolean isTrunk = config.isTrunk() != null && config.isTrunk();
-        final boolean hasEvc = config.getEvc() != null && config.getEvc().length() > 0;
-        if (isTrunk && hasEvc) {
-            throw new IllegalStateException(
-                    f("%s: Attaching EVC to trunk service instance (id: %s) is not supported",
-                            ifcName, serviceInstance.getId()));
-        }
-    }
-
-    private void checkBridgeDomainValidity(final ServiceInstance serviceInstance,
-                                           final String ifcName,
-                                           final List<ServiceInstance> serviceInstanceList) {
-        final Config config = serviceInstance.getConfig();
-
-        if (config.getBridgeDomain() != null) {
-            final BridgeDomain bridgeDomain = config.getBridgeDomain();
-            final boolean isTrunk = config.isTrunk() != null && config.isTrunk();
-            final boolean hasNumber = bridgeDomain.getUint16() != null;
-            final boolean isFromEncapsulation = bridgeDomain.isBoolean() != null && bridgeDomain.isBoolean();
-
-            final Encapsulation encapsulation = serviceInstance.getEncapsulation();
-            final boolean hasEncapsulation = encapsulation != null
-                    && ((encapsulation.getDot1q() != null && encapsulation.getDot1q().size() > 0)
-                    || (encapsulation.isUntagged() != null && encapsulation.isUntagged()));
-
-            if (!hasEncapsulation) {
-                throw new IllegalStateException(
-                        f("%s: Configuring bridge domain in service instance (id: %s) without configured "
-                                + "encapsulation is not supported", ifcName, serviceInstance.getId()));
-            } else if (isTrunk && hasNumber) {
-                throw new IllegalStateException(
-                        f("%s: Specifying bridge domain number in trunk service instance (id: %s) is not "
-                                + "supported", ifcName, serviceInstance.getId()));
-            } else if (!isTrunk && isFromEncapsulation) {
-                throw new IllegalStateException(
-                        f("%s: Derivation of bridge domains from encapsulation vlan list in non-trunk "
-                                + "service instance (id: %s) is not supported", ifcName, serviceInstance.getId()));
-            }
-
-            if (hasNumber) {
-                for (final ServiceInstance tempServiceInstance : serviceInstanceList) {
-                    if (tempServiceInstance.getConfig() != null) {
-                        final Config tempConfig = tempServiceInstance.getConfig();
-                        final boolean isTempTrunk = tempConfig.isTrunk() != null && tempConfig.isTrunk();
-                        if (isTempTrunk && tempServiceInstance.getId().equals(new Long(bridgeDomain.getUint16()))) {
-                            throw new IllegalStateException(
-                                    f("%s: Configuring bridge domain %s in service instance (id: %s) is not "
-                                                    + "supported because it is in use by trunk service instance",
-                                            ifcName, bridgeDomain.getUint16(), serviceInstance.getId()));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void checkEncapsulationValidity(final int untaggedVlanCount,
-                                            final Set<Integer> vlanIds,
-                                            final ServiceInstance serviceInstance,
-                                            final String ifcName) {
-        final Config config = serviceInstance.getConfig();
-
-        final Encapsulation encapsulation = serviceInstance.getEncapsulation();
-        final boolean isTrunk = config.isTrunk() != null && config.isTrunk();
-        final boolean isUntagged = encapsulation.isUntagged() != null && encapsulation.isUntagged();
-
-        if (isTrunk && isUntagged) {
-            throw new IllegalStateException(
-                    f("%s: Untagged encapsulation in trunk service instance (id: %s) "
-                            + "is not supported", ifcName, serviceInstance.getId()));
-        }
-        if (untaggedVlanCount > 1) {
-            throw new IllegalStateException(
-                    f("%s: Untagged encapsulation is already configured under other service "
-                            + "instance", ifcName));
-        }
-        if (encapsulation.getDot1q() != null) {
-            if (vlanIds.stream().anyMatch(encapsulation.getDot1q()::contains)) {
-                throw new IllegalStateException(
-                        f("%s: Some vlan ids are already configured under other service "
-                                + "instance ", ifcName));
-            } else {
-                vlanIds.addAll(encapsulation.getDot1q());
-            }
-        }
     }
 
     private String getCommands(final IfCiscoServiceInstanceAug before,
@@ -282,12 +149,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
 
         if (config != null) {
             if (config.getBridgeDomain() != null) {
-                final BridgeDomain bridgeDomain = config.getBridgeDomain();
-                if (bridgeDomain.getUint16() != null) {
-                    configCommands.append("bridge-domain ").append(bridgeDomain.getUint16()).append("\n");
-                } else if (bridgeDomain.isBoolean() != null && bridgeDomain.isBoolean()) {
-                    configCommands.append("bridge-domain ").append("from-encapsulation").append("\n");
-                }
+                configCommands.append("bridge-domain ").append(config.getBridgeDomain()).append("\n");
             }
         }
 

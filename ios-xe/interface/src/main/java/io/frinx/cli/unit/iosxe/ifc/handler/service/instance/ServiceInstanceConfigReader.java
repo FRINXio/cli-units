@@ -22,10 +22,8 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.BridgeDomainBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
@@ -61,20 +59,20 @@ public final class ServiceInstanceConfigReader implements CliConfigReader<Config
                                    final ConfigBuilder configBuilder) {
         configBuilder.setId(serviceInstanceId);
 
-        final Optional<String> trunk = ParsingUtils.parseField(output, 0,
+        ParsingUtils.parseField(output, 0,
             ServiceInstanceReader.SERVICE_INSTANCE_LINE::matcher,
-            matcher -> matcher.group("trunk"));
-        configBuilder.setTrunk(trunk.isPresent());
+            matcher -> matcher.group("trunk"),
+            value -> configBuilder.setTrunk(true));
 
-        final Optional<String> evc = ParsingUtils.parseField(output, 0,
+        ParsingUtils.parseField(output, 0,
             ServiceInstanceReader.SERVICE_INSTANCE_LINE::matcher,
-            matcher -> matcher.group("evc"));
-        configBuilder.setEvc(evc.orElse(null));
+            matcher -> matcher.group("evc"),
+            configBuilder::setEvc);
 
-        final Optional<String> bridgeDomain = ParsingUtils.parseField(output, 0,
+        ParsingUtils.parseField(output, 0,
             BRIDGE_DOMAIN_LINE::matcher,
-            matcher -> matcher.group("value"));
-        bridgeDomain.ifPresent(s -> configBuilder.setBridgeDomain(BridgeDomainBuilder.getDefaultInstance(s)));
+            matcher -> matcher.group("value"),
+            configBuilder::setBridgeDomain);
     }
 
 }

@@ -26,14 +26,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.BridgeDomain;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.Protocol;
@@ -62,7 +59,7 @@ public class ServiceInstanceWriterTest {
                                     .setId(100L)
                                     .setTrunk(false)
                                     .setEvc("EVC")
-                                    .setBridgeDomain(new BridgeDomain(100))
+                                    .setBridgeDomain("100")
                                     .build())
                             .setEncapsulation(new EncapsulationBuilder()
                                     .setUntagged(true)
@@ -79,7 +76,7 @@ public class ServiceInstanceWriterTest {
                             .setConfig(new ConfigBuilder()
                                     .setId(200L)
                                     .setTrunk(true)
-                                    .setBridgeDomain(new BridgeDomain(true))
+                                    .setBridgeDomain("from-encapsulation")
                                     .build())
                             .setEncapsulation(new EncapsulationBuilder()
                                     .setDot1q(Collections.singletonList(200))
@@ -114,7 +111,7 @@ public class ServiceInstanceWriterTest {
                                     .setDot1q(Arrays.asList(1, 9))
                                     .build())
                             .setL2protocol(new L2protocolBuilder()
-                                    .setProtocol(Arrays.asList(Protocol.Lldp))
+                                    .setProtocol(Collections.singletonList(Protocol.Lldp))
                                     .setProtocolType(ProtocolType.Peer)
                                     .build())
                             .build()
@@ -173,265 +170,6 @@ public class ServiceInstanceWriterTest {
         writer.deleteCurrentAttributes(iid, getAug(UPDATE_SERVICE_INSTANCES), context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
-    }
-
-    // testing service instance illegal states
-
-    private static final IfCiscoServiceInstanceAug CLEAN_AUG = new IfCiscoServiceInstanceAugBuilder().build();
-
-    private static final List<ServiceInstance> MORE_TRUNK_SERVICE_INSTANCES =
-            Arrays.asList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(true)
-                                    .build())
-                            .build(),
-                    new ServiceInstanceBuilder()
-                            .setId(200L)
-                            .setKey(new ServiceInstanceKey(200L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(200L)
-                                    .setTrunk(true)
-                                    .build())
-                            .build()
-            );
-
-    private static final List<ServiceInstance> TRUNK_AND_EVC_SERVICE_INSTANCE =
-            Collections.singletonList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(true)
-                                    .setEvc("EVC")
-                                    .build())
-                            .build()
-            );
-
-    private static final List<ServiceInstance> UNTAGGED_ENCAPSULATION_TRUNK_SERVICE_INSTANCE =
-            Collections.singletonList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(true)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
-                                    .build())
-                            .build()
-            );
-
-    private static final List<ServiceInstance> MORE_UNTAGGED_ENCAPSULATIONS_SERVICE_INSTANCE =
-            Arrays.asList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
-                                    .build())
-                            .build(),
-                    new ServiceInstanceBuilder()
-                            .setId(200L)
-                            .setKey(new ServiceInstanceKey(200L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(200L)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
-                                    .build())
-                            .build()
-            );
-
-    private static final List<ServiceInstance> SAME_DOT1Q_ENCAPSULATIONS_SERVICE_INSTANCE =
-            Arrays.asList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(true)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setDot1q(Arrays.asList(1, 2, 3))
-                                    .build())
-                            .build(),
-                    new ServiceInstanceBuilder()
-                            .setId(200L)
-                            .setKey(new ServiceInstanceKey(200L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(200L)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
-                                    .setDot1q(Collections.singletonList(2))
-                                    .build())
-                            .build()
-            );
-
-    private static final List<ServiceInstance> NO_ENCAPSULATION_BRIDGE_DOMAIN_SERVICE_INSTANCE =
-            Collections.singletonList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(true)
-                                    .setBridgeDomain(new BridgeDomain(100))
-                                    .build())
-                            .build()
-                );
-
-    private static final List<ServiceInstance> TRUNK_AND_NUMBER_BRIDGE_DOMAIN_SERVICE_INSTANCE =
-            Collections.singletonList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(true)
-                                    .setBridgeDomain(new BridgeDomain(100))
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
-                                    .build())
-                            .build()
-            );
-
-    private static final List<ServiceInstance> NONTRUNK_AND_DERIVATION_BRIDGE_DOMAIN_SERVICE_INSTANCE =
-            Collections.singletonList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(false)
-                                    .setBridgeDomain(new BridgeDomain(true))
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
-                                    .build())
-                            .build()
-            );
-
-    private static final List<ServiceInstance> BRIDGE_DOMAIN_IN_USE_SERVICE_INSTANCE =
-            Arrays.asList(
-                    new ServiceInstanceBuilder()
-                            .setId(200L)
-                            .setKey(new ServiceInstanceKey(200L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(200L)
-                                    .setTrunk(false)
-                                    .setBridgeDomain(new BridgeDomain(100))
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
-                                    .build())
-                            .build(),
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(true)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setDot1q(Collections.singletonList(100))
-                                    .build())
-                            .build()
-            );
-
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Test
-    public void testServiceInstanceWithMoreTrunks() throws WriteFailedException {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Only one trunk service instance");
-
-        writer.updateCurrentAttributes(iid, CLEAN_AUG,
-                getAug(MORE_TRUNK_SERVICE_INSTANCES), context);
-    }
-
-    @Test
-    public void testServiceInstanceWithEvcAndTrunk() throws WriteFailedException {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Attaching EVC to trunk service instance");
-
-        writer.updateCurrentAttributes(iid, CLEAN_AUG,
-                getAug(TRUNK_AND_EVC_SERVICE_INSTANCE), context);
-    }
-
-    @Test
-    public void testTrunkServiceInstanceWithUntaggedEncapsulation() throws WriteFailedException {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Untagged encapsulation in trunk service instance");
-
-        writer.updateCurrentAttributes(iid, CLEAN_AUG,
-                getAug(UNTAGGED_ENCAPSULATION_TRUNK_SERVICE_INSTANCE), context);
-    }
-
-    @Test
-    public void testMoreServiceInstanceWithUntaggedEncapsulations() throws WriteFailedException {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Untagged encapsulation is already configured");
-
-        writer.updateCurrentAttributes(iid, CLEAN_AUG,
-                getAug(MORE_UNTAGGED_ENCAPSULATIONS_SERVICE_INSTANCE), context);
-    }
-
-    @Test
-    public void testServiceInstanceWithSameDot1qEncapsulations() throws WriteFailedException {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Some vlan ids are already configured");
-
-        writer.updateCurrentAttributes(iid, CLEAN_AUG,
-                getAug(SAME_DOT1Q_ENCAPSULATIONS_SERVICE_INSTANCE), context);
-    }
-
-    @Test
-    public void testServiceInstanceBridgeDomainWithoutEncapsulation() throws WriteFailedException {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("without configured encapsulation is not supported");
-
-        writer.updateCurrentAttributes(iid, CLEAN_AUG,
-                getAug(NO_ENCAPSULATION_BRIDGE_DOMAIN_SERVICE_INSTANCE), context);
-    }
-
-    @Test
-    public void testTrunkServiceInstanceWithNumberBridgeDomain() throws WriteFailedException {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Specifying bridge domain number in trunk");
-
-        writer.updateCurrentAttributes(iid, CLEAN_AUG,
-                getAug(TRUNK_AND_NUMBER_BRIDGE_DOMAIN_SERVICE_INSTANCE), context);
-    }
-
-    @Test
-    public void testServiceInstanceWithDerivedBridgeDomain() throws WriteFailedException {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("Derivation of bridge domains from encapsulation");
-
-        writer.updateCurrentAttributes(iid, CLEAN_AUG,
-                getAug(NONTRUNK_AND_DERIVATION_BRIDGE_DOMAIN_SERVICE_INSTANCE), context);
-    }
-
-    @Test
-    public void testServiceInstanceWithBridgeDomainInUse() throws WriteFailedException {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("is in use by trunk service instance");
-
-        writer.updateCurrentAttributes(iid, CLEAN_AUG,
-                getAug(BRIDGE_DOMAIN_IN_USE_SERVICE_INSTANCE), context);
     }
 
     private IfCiscoServiceInstanceAug getAug(final List<ServiceInstance> serviceInstances) {
