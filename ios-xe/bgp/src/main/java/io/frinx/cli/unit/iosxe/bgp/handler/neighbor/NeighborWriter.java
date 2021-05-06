@@ -88,6 +88,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
     public static final String NEIGHBOR_ENABLE_CONFIG = "{%if ($enabled) %}neighbor {$neighbor_id} activate\n"
             + "{% elseIf ($before_enabled) %}no neighbor {$neighbor_id} activate\n{% endif %}";
 
+    public static final String NEIGHBOR_VRF_FALL_OVER_MODE = "{%if ($fall_over_mode) %}{$fall_over_mode}\n{% endif %}";
+
     public static final String NEIGHBOR_TIMERS =
             "{%if ($isTimers == TRUE) %}neighbor {$neighbor_id} timers {$timers}\n"
             + "{% elseIf ($isTimers == FALSE) %}no neighbor {$neighbor_id} timers\n"
@@ -110,6 +112,10 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             + ".value}\n{% endif %}"
             + "{%if ($neighbor_version) %}no neighbor {$neighbor_id} version\n{% endif %}"
             + "{%if ($neighbor_as_override) %}{$neighbor_as_override}\n{% endif %}";
+
+
+    private static final String NEIGHBOR_FALL_OVER_MODE_DELETE =
+            "{%if ($fall_over_mode) %}{$fall_over_mode}\n{% endif %}";
 
     public static final String NEIGHBOR_TRANSPORT =
             //Set update source
@@ -212,6 +218,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             + NEIGHBOR_AFI_POLICIES
             + NEIGHBOR_ENABLE_CONFIG
             + NEIGHBOR_TIMERS
+            + NEIGHBOR_VRF_FALL_OVER_MODE
             + "exit\n"
             + "{% onEmpty %}"
             + "{% endloop %}"
@@ -242,6 +249,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
             "{% loop in $afis as $af_name:af %}\n"
             + "address-family {$af_name} vrf {$vrf}\n"
+            + NEIGHBOR_FALL_OVER_MODE_DELETE
             + NEIGHBOR_DELETE
             + "exit\n"
             + "{% onEmpty %}"
@@ -258,7 +266,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
     @Override
     public void writeCurrentAttributes(InstanceIdentifier<Neighbor> instanceIdentifier, Neighbor neighbor,
-                                              WriteContext writeContext) throws WriteFailedException {
+                                       WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
         final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
 
@@ -272,13 +280,14 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         Map<String, Object> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, afiSafisForNeighbor);
         String neighborIp = getNeighborIp(instanceIdentifier);
         Boolean enabled = neighbor.getConfig().isEnabled();
+        String fallOverMode = getNeighborVrfAsFallOverMode(neighbor, neighborIp);
         String version = getNeighborVersion(neighbor);
         String asOverride = getNeighborAsOverride(neighbor, neighborIp);
 
         renderNeighbor(this, cli, instanceIdentifier,
-                neighbor, null, enabled, null, vrfKey, bgpAs, neighAfiSafi, Collections.emptyMap(), neighborIp,
-                getTimers(neighbor) == null ? null : Chunk.TRUE, getTimers(neighbor), version, null, asOverride,
-                NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
+                neighbor, null, enabled, null, vrfKey, bgpAs, neighAfiSafi, Collections.emptyMap(),
+                neighborIp, getTimers(neighbor) == null ? null : Chunk.TRUE, getTimers(neighbor), version, null,
+                asOverride, fallOverMode, NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
     }
 
     private static <T extends DataObject> void renderNeighbor(CliWriter<T> writer, Cli cli,
@@ -293,25 +302,22 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
     public static <T extends BgpCommonStructureNeighborGroupRouteReflector> void renderNeighbor(
             CliWriter<T> writer,
             Cli cli,
-            InstanceIdentifier<T>
-            instanceIdentifier,
+            InstanceIdentifier<T> instanceIdentifier,
             T neighbor,
             T before,
             Boolean enabled,
             Boolean beforeEnabled,
-            NetworkInstanceKey
-            vrfKey,
+            NetworkInstanceKey vrfKey,
             Long bgpAs,
-            Map<String, Object>
-            neighAfiSafi,
-            Map<String, Object>
-            beforeAfiSafi,
+            Map<String, Object> neighAfiSafi,
+            Map<String, Object> beforeAfiSafi,
             String neighborId,
             String isTimers,
             String timers,
             String neighborVersion,
             String beforeNeighborVersion,
             String neighborAsOverride,
+            String neighborVrfFallOverMode,
             String globalTemplate,
             String vrfTemplate)
             throws WriteFailedException.CreateFailedException {
@@ -350,8 +356,20 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     "timers", timers,
                     "neighbor_version", neighborVersion,
                     "before_neighbor_version", beforeNeighborVersion,
-                    "neighbor_as_override", neighborAsOverride);
+                    "neighbor_as_override", neighborAsOverride,
+                    "fall_over_mode", neighborVrfFallOverMode);
         }
+    }
+
+    public static String getNeighborVrfAsFallOverMode(Neighbor neighbor, String neighborId) {
+        String command = "neighbor " + neighborId + " fall-over bfd";
+        BgpNeighborConfigAug neighborConfigAug = neighbor.getConfig().getAugmentation(BgpNeighborConfigAug.class);
+        if (neighborConfigAug != null) {
+            if (neighborConfigAug.isFallOverMode() != null) {
+                return neighborConfigAug.isFallOverMode() ? command : "no " + command;
+            }
+        }
+        return "no " + command;
     }
 
     public static String getNeighborAsOverride(Neighbor neighbor, String neighborId) {
@@ -371,14 +389,10 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             T neighbor,
             NetworkInstanceKey vrfKey,
             Long bgpAs,
-            Map<String,
-                    Object> neighAfiSafi,
-            String
-                    neighborId,
-            String
-                    globalTemplate,
-            String
-                    vrfTemplate) throws WriteFailedException.CreateFailedException {
+            Map<String, Object> neighAfiSafi,
+            String neighborId,
+            String globalTemplate,
+            String vrfTemplate) throws WriteFailedException.CreateFailedException {
 
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             renderNeighbor(writer, cli, globalTemplate, instanceIdentifier, neighbor,
@@ -407,17 +421,15 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
     public static <T extends BgpCommonStructureNeighborGroupRouteReflector> void deleteNeighbor(
             CliWriter<T> writer,
             Cli cli,
-            InstanceIdentifier<T>
-                    instanceIdentifier,
+            InstanceIdentifier<T> instanceIdentifier,
             T neighbor,
-            NetworkInstanceKey
-                    vrfKey,
+            NetworkInstanceKey vrfKey,
             Long bgpAs,
-            Map<String, Object>
-                    neighAfiSafi,
+            Map<String, Object> neighAfiSafi,
             String neighborId,
             String neighborVersion,
             String asOverride,
+            String neighborVrfFallOverMode,
             String globalTemplate, String vrfTemplate) throws WriteFailedException.DeleteFailedException {
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             deleteNeighbor(writer, cli, globalTemplate, instanceIdentifier,
@@ -438,7 +450,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     "afis", neighAfiSafi,
                     "route_reflect_client", isRouteReflectClient(neighbor),
                     "neighbor_version", neighborVersion,
-                    "neighbor_as_override", asOverride);
+                    "neighbor_as_override", asOverride,
+                    "fall_over_mode", neighborVrfFallOverMode);
         }
     }
 
@@ -481,8 +494,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
     @Override
     public void updateCurrentAttributes(InstanceIdentifier<Neighbor> instanceIdentifier,
-                                               Neighbor before, Neighbor neighbor,
-                                               WriteContext writeContext) throws WriteFailedException {
+                                        Neighbor before, Neighbor neighbor,
+                                        WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
         final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
         if (afiSafisHaveChanged(before, neighbor)) {
@@ -508,6 +521,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         String version = getNeighborVersion(neighbor);
         String beforeVersion = getNeighborVersion(before);
         String asOverride = getNeighborAsOverride(neighbor, neighborIp);
+        String fallOverMode = getNeighborVrfAsFallOverMode(neighbor, neighborIp);
 
         // This is a subtree writer which handles entire neighbor config. This means that if during update an AFI was
         // removed, it has to be detected and deleted here
@@ -518,9 +532,10 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
         // Then update existing attributes
         renderNeighbor(this, cli, instanceIdentifier,
-                neighbor, before, enabled, beforeEnabled, vrfKey, bgpAs, neighAfiSafi, neighAfiSafiBefore, neighborIp,
+                neighbor, before, enabled, beforeEnabled, vrfKey, bgpAs, neighAfiSafi,
+                neighAfiSafiBefore, neighborIp,
                 updateTimers(getTimers(before), getTimers(neighbor)), getTimers(neighbor), version, beforeVersion,
-                asOverride, NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
+                asOverride, fallOverMode, NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
     }
 
     private static String getTimers(Neighbor neighbor) {
@@ -559,7 +574,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
     @Override
     public void deleteCurrentAttributes(InstanceIdentifier<Neighbor> instanceIdentifier, Neighbor neighbor,
-                                               WriteContext writeContext) throws WriteFailedException {
+                                        WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
         final Bgp bgp = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
 
@@ -574,9 +589,9 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         String neighborIp = getNeighborIp(instanceIdentifier);
         String neighborVersion = getNeighborVersion(neighbor);
         String asOverride = getNeighborAsOverride(neighbor, neighborIp);
-
+        String fallOverMode = getNeighborVrfAsFallOverMode(neighbor, neighborIp);
         deleteNeighbor(this, cli, instanceIdentifier, neighbor, vrfKey, bgpAs, neighAfiSafi, neighborIp,
-                neighborVersion, asOverride, NEIGHBOR_GLOBAL_DELETE, NEIGHBOR_VRF_DELETE);
+                neighborVersion, asOverride, fallOverMode, NEIGHBOR_GLOBAL_DELETE, NEIGHBOR_VRF_DELETE);
     }
 
     public static String getNeighborIp(InstanceIdentifier<?> neigh) {

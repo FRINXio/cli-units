@@ -167,6 +167,7 @@ public class NeighborWriterTest implements CliFormatter {
                 afiSafisForNeighborSource, Collections.emptyMap(),
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), Chunk.TRUE, "10 20 30",
                 NeighborWriter.getNeighborVersion(source), null, null,
+               null,
                 NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
         String writeRender = getCommands(writer, false, 1);
@@ -192,6 +193,8 @@ public class NeighborWriterTest implements CliFormatter {
                     NeighborWriter.getNeighborVersion(after), NeighborWriter.getNeighborVersion(source),
                     NeighborWriter.getNeighborAsOverride(after,
                             NeighborWriter.getNeighborIp(after.getNeighborAddress())),
+                    NeighborWriter.getNeighborVrfAsFallOverMode(after,
+                            NeighborWriter.getNeighborIp(after.getNeighborAddress())),
                     NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
             String updateRender = updateAfiSafiRender + "\n" + getCommands(writer, false, 3);
@@ -203,6 +206,8 @@ public class NeighborWriterTest implements CliFormatter {
                         NeighborWriter.getAfiSafisForNeighbor(source.getAfiSafis())),
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), NeighborWriter.getNeighborVersion(source),
                 NeighborWriter.getNeighborAsOverride(source,
+                        NeighborWriter.getNeighborIp(source.getNeighborAddress())),
+                NeighborWriter.getNeighborVrfAsFallOverMode(source,
                         NeighborWriter.getNeighborIp(source.getNeighborAddress())),
                 NeighborWriter.NEIGHBOR_GLOBAL_DELETE, NeighborWriter.NEIGHBOR_VRF_DELETE);
 
@@ -237,6 +242,9 @@ public class NeighborWriterTest implements CliFormatter {
             .setConfig(new ConfigBuilder()
                     .setNeighborAddress(new IpAddress(new Ipv4Address("1.2.3.4")))
                     .setPeerAs(new AsNumber(45L))
+                    .addAugmentation(BgpNeighborConfigAug.class, new BgpNeighborConfigAugBuilder()
+                            .setFallOverMode(true)
+                            .build())
                     .build())
             .build();
 
@@ -247,6 +255,9 @@ public class NeighborWriterTest implements CliFormatter {
                     .setAuthPassword(new EncryptedPassword(new EncryptedString("Encrypted[7 154032E24A465C]")))
                     .setPeerAs(new AsNumber(45L))
                     .setDescription("descr 1")
+                    .addAugmentation(BgpNeighborConfigAug.class, new BgpNeighborConfigAugBuilder()
+                            .setFallOverMode(false)
+                            .build())
                     .build())
             .build();
 
@@ -255,6 +266,9 @@ public class NeighborWriterTest implements CliFormatter {
             .setConfig(new ConfigBuilder()
                     .setNeighborAddress(new IpAddress(new Ipv4Address("1.2.3.4")))
                     .setPeerAs(new AsNumber(45L))
+                    .addAugmentation(BgpNeighborConfigAug.class, new BgpNeighborConfigAugBuilder()
+                            .setFallOverMode(false)
+                            .build())
                     .build())
             .setAfiSafis(new AfiSafisBuilder()
                     .setAfiSafi(Lists.newArrayList(new AfiSafiBuilder().setAfiSafiName(IPV4UNICAST.class).build()))
@@ -271,6 +285,8 @@ public class NeighborWriterTest implements CliFormatter {
                     .setDescription("descr 1")
                     .setSendCommunity(CommunityType.BOTH)
                     .setEnabled(true)
+                    .addAugmentation(BgpNeighborConfigAug.class, new BgpNeighborConfigAugBuilder()
+                            .build())
                     .build())
             .setAfiSafis(getAfiSafi())
             .setTransport(new TransportBuilder()
@@ -313,7 +329,9 @@ public class NeighborWriterTest implements CliFormatter {
             .setConfig(new ConfigBuilder()
                     .setNeighborAddress(new IpAddress(new Ipv4Address("1.2.3.4")))
                     .addAugmentation(BgpNeighborConfigAug.class,
-                            new BgpNeighborConfigAugBuilder().setNeighborVersion(VERSION4.class).build())
+                            new BgpNeighborConfigAugBuilder().setNeighborVersion(VERSION4.class)
+                                    .setFallOverMode(true)
+                                    .build())
                     .build())
             .build();
 
@@ -564,16 +582,19 @@ public class NeighborWriterTest implements CliFormatter {
     public static final String NALL_VRF_DELETE = "configure terminal\n"
             + "router bgp 484\n"
             + "address-family ipv4 vrf vrf1\n"
+            + "no neighbor 1.2.3.4 fall-over bfd\n"
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
             + "exit\n"
             + "address-family ipv6 vrf vrf1\n"
+            + "no neighbor 1.2.3.4 fall-over bfd\n"
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
             + "exit\n"
             + "address-family vpnv4 vrf vrf1\n"
+            + "no neighbor 1.2.3.4 fall-over bfd\n"
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
@@ -610,10 +631,12 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor 1.2.3.4 route-map a in\n"
             + "no neighbor 1.2.3.4 activate\n"
             + "neighbor 1.2.3.4 timers 30 10 10\n"
+            + "no neighbor 1.2.3.4 fall-over bfd\n"
             + "exit\n"
             + "end";
 
-    private static final Neighbor N_ALL_NOAFI = new NeighborBuilder(N_ALL).setAfiSafis(null).build();
+    private static final Neighbor N_ALL_NOAFI = new NeighborBuilder(N_ALL).setAfiSafis(null)
+            .build();
 
     public static final String NALL_AFI_FROM_BGP_WRITE = "configure terminal\n"
             + "router bgp 484\n"
@@ -664,6 +687,7 @@ public class NeighborWriterTest implements CliFormatter {
     public static final String NALL_AFI_FROM_BGP_VRF_DELETE = "configure terminal\n"
             + "router bgp 484\n"
             + "address-family ipv4 vrf vrf-a\n"
+            + "no neighbor 1.2.3.4 fall-over bfd\n"
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
@@ -766,7 +790,8 @@ public class NeighborWriterTest implements CliFormatter {
 
     private static final Neighbor N6_MINIMAL = new NeighborBuilder().setNeighborAddress(new IpAddress(new Ipv6Address(
             "dead:beee::1"))).setConfig(new ConfigBuilder(N_MINIMAL.getConfig()).setNeighborAddress(new IpAddress(
-                    new Ipv6Address("dead:beee::1"))).build()).build();
+            new Ipv6Address("dead:beee::1"))).addAugmentation(BgpNeighborConfigAug.class,
+            new BgpNeighborConfigAugBuilder().setFallOverMode(true).build()).build()).build();
 
     private static final String N6MIN_WRITE = "configure terminal\n"
             + "router bgp 484\n"
