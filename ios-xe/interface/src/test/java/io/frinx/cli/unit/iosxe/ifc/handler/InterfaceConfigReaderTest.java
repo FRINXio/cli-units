@@ -81,8 +81,9 @@ public class InterfaceConfigReaderTest {
             + " fhrp delay reload 3600\n"
             + " no lldp receive\n"
             + " media-type rj45\n"
-            + " storm-control broadcast level 10.00 \n"
-            + " storm-control unicast level 10.00 \n"
+            + " storm-control broadcast level 10.00\n"
+            + " storm-control multicast level bps 0\n"
+            + " storm-control unicast level 10.00\n"
             + " !\n"
             + "end\n";
 
