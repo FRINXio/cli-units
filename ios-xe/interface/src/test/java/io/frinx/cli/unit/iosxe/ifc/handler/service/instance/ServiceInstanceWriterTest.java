@@ -39,6 +39,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.BridgeDomainBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.EncapsulationBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocolBuilder;
@@ -59,7 +60,6 @@ public class ServiceInstanceWriterTest {
                                     .setId(100L)
                                     .setTrunk(false)
                                     .setEvc("EVC")
-                                    .setBridgeDomain("100")
                                     .build())
                             .setEncapsulation(new EncapsulationBuilder()
                                     .setUntagged(true)
@@ -69,6 +69,10 @@ public class ServiceInstanceWriterTest {
                                     .setProtocol((Arrays.asList(Protocol.Lldp, Protocol.Stp)))
                                     .setProtocolType(ProtocolType.Peer)
                                     .build())
+                            .setBridgeDomain(new BridgeDomainBuilder()
+                                    .setValue("100")
+                                    .setGroupNumber((short) 2)
+                                    .build())
                             .build(),
                     new ServiceInstanceBuilder()
                             .setId(200L)
@@ -76,10 +80,12 @@ public class ServiceInstanceWriterTest {
                             .setConfig(new ConfigBuilder()
                                     .setId(200L)
                                     .setTrunk(true)
-                                    .setBridgeDomain("from-encapsulation")
                                     .build())
                             .setEncapsulation(new EncapsulationBuilder()
                                     .setDot1q(Collections.singletonList(200))
+                                    .build())
+                            .setBridgeDomain(new BridgeDomainBuilder()
+                                    .setValue("from-encapsulation")
                                     .build())
                             .build()
             );
@@ -89,7 +95,7 @@ public class ServiceInstanceWriterTest {
             + "service instance 100 ethernet EVC\n"
             + "encapsulation untagged , dot1q 1 , 2 , 3 , 5 , 6 , 7 , 8 , 9 , 10\n"
             + "l2protocol peer lldp stp\n"
-            + "bridge-domain 100\n"
+            + "bridge-domain 100 split-horizon group 2\n"
             + "exit\n"
             + "service instance trunk 200 ethernet\n"
             + "encapsulation dot1q 200\n"

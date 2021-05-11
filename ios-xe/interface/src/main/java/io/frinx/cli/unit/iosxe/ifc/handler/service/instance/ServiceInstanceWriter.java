@@ -28,6 +28,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.ProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstances;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.BridgeDomain;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Encapsulation;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocol;
@@ -108,7 +109,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                         currentInstances.append(getCreationCommands(serviceInstance, false));
                         currentInstances.append(getEncapsulationCommands(serviceInstance.getEncapsulation()));
                         currentInstances.append(getL2ProtocolCommands(serviceInstance.getL2protocol()));
-                        currentInstances.append(getConfigCommands(serviceInstance.getConfig()));
+                        currentInstances.append(getBridgeDomainCommands(serviceInstance.getBridgeDomain()));
                         currentInstances.append("exit\n");
                     }
                 }
@@ -144,16 +145,20 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         return creationCommands.toString();
     }
 
-    private String getConfigCommands(final Config config) {
-        final StringBuilder configCommands = new StringBuilder();
+    private String getBridgeDomainCommands(final BridgeDomain bridgeDomain) {
+        final StringBuilder bridgeDomainCommand = new StringBuilder();
 
-        if (config != null) {
-            if (config.getBridgeDomain() != null) {
-                configCommands.append("bridge-domain ").append(config.getBridgeDomain()).append("\n");
+        if (bridgeDomain != null) {
+            if (bridgeDomain.getValue() != null) {
+                bridgeDomainCommand.append("bridge-domain ").append(bridgeDomain.getValue());
+                if (bridgeDomain.getGroupNumber() != null) {
+                    bridgeDomainCommand.append(" split-horizon group ").append(bridgeDomain.getGroupNumber());
+                }
+                bridgeDomainCommand.append("\n");
             }
         }
 
-        return configCommands.toString();
+        return bridgeDomainCommand.toString();
     }
 
     private String getEncapsulationCommands(final Encapsulation encapsulation) {

@@ -19,52 +19,48 @@ package io.frinx.cli.unit.iosxe.ifc.handler.service.instance;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.BridgeDomain;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.BridgeDomainBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class ServiceInstanceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public final class ServiceInstanceBridgeDomainReader implements CliConfigReader<BridgeDomain, BridgeDomainBuilder> {
 
-    public static final String SH_SERVICE_INSTANCE =
-            InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG + " | section service instance.* %s ethernet";
+    private static final Pattern BRIDGE_DOMAIN_LINE =
+            Pattern.compile("bridge-domain (?<value>\\S+)( split-horizon group (?<group>\\d+))?.*");
 
     private final Cli cli;
 
-    public ServiceInstanceConfigReader(Cli cli) {
+    public ServiceInstanceBridgeDomainReader(Cli cli) {
         this.cli = cli;
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                      @Nonnull ConfigBuilder configBuilder,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<BridgeDomain> instanceIdentifier,
+                                      @Nonnull BridgeDomainBuilder bridgeDomainBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         final String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
         final Long serviceInstanceId = instanceIdentifier.firstKeyOf(ServiceInstance.class).getId();
-        final String showCommand = f(SH_SERVICE_INSTANCE, ifcName, serviceInstanceId);
+        final String showCommand = f(ServiceInstanceConfigReader.SH_SERVICE_INSTANCE, ifcName, serviceInstanceId);
         final String serviceInstanceOutput = blockingRead(showCommand, cli, instanceIdentifier, readContext);
-        parseConfig(serviceInstanceOutput, serviceInstanceId, configBuilder);
+        parseBridgeDomain(serviceInstanceOutput, bridgeDomainBuilder);
     }
 
-    public static void parseConfig(final String output,
-                                   final Long serviceInstanceId,
-                                   final ConfigBuilder configBuilder) {
-        configBuilder.setId(serviceInstanceId);
+    public static void parseBridgeDomain(final String output, final BridgeDomainBuilder bridgeDomainBuilder) {
+        ParsingUtils.parseField(output, 0,
+            BRIDGE_DOMAIN_LINE::matcher,
+            matcher -> matcher.group("value"),
+            bridgeDomainBuilder::setValue);
 
         ParsingUtils.parseField(output, 0,
-            ServiceInstanceReader.SERVICE_INSTANCE_LINE::matcher,
-            matcher -> matcher.group("trunk"),
-            value -> configBuilder.setTrunk(true));
-
-        ParsingUtils.parseField(output, 0,
-            ServiceInstanceReader.SERVICE_INSTANCE_LINE::matcher,
-            matcher -> matcher.group("evc"),
-            configBuilder::setEvc);
+            BRIDGE_DOMAIN_LINE::matcher,
+            matcher -> matcher.group("group"),
+            number -> bridgeDomainBuilder.setGroupNumber(Short.parseShort(number)));
     }
 
 }

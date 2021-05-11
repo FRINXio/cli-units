@@ -28,6 +28,7 @@ import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStatisticsConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStatisticsConfigWriter;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.L2protocolReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceBridgeDomainReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceEncapsulationReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceReader;
@@ -101,7 +102,8 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 Sets.newHashSet(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SERVICEINSTANCES,
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SERVICEINSTANCE,
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_CONFIG,
-                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_ENCAPSULATION));
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_ENCAPSULATION,
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_BRIDGEDOMAIN));
 
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
         writeRegistry.addAfter(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli), IIDs.IN_IN_CONFIG);
@@ -131,8 +133,9 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 new ServiceInstanceConfigReader(cli));
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_ENCAPSULATION,
                 new ServiceInstanceEncapsulationReader(cli));
+        readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_BRIDGEDOMAIN,
+                new ServiceInstanceBridgeDomainReader(cli));
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2PROTOCOL, new L2protocolReader(cli));
-
 
         readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli));
         readRegistry.add(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli));

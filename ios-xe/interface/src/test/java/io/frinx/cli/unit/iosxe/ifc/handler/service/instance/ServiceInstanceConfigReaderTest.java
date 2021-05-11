@@ -26,19 +26,17 @@ public class ServiceInstanceConfigReaderTest {
     private static final Config TRUNK_CONFIG = new ConfigBuilder()
             .setId(100L)
             .setTrunk(true)
-            .setBridgeDomain("from-encapsulation")
             .build();
 
-    private static final String TRUNK_OUTPUT = " service instance trunk 100 ethernet\n"
+    public static final String TRUNK_OUTPUT = " service instance trunk 100 ethernet\n"
             + "  bridge-domain from-encapsulation\n";
 
     private static final Config EVC_CONFIG = new ConfigBuilder()
             .setId(200L)
             .setEvc("EVC")
-            .setBridgeDomain("200")
             .build();
 
-    private static final String EVC_OUTPUT = " service instance 200 ethernet EVC\n"
+    public static final String EVC_OUTPUT = " service instance 200 ethernet EVC\n"
             + "  encapsulation untagged , dot1q 1-3,5-10\n"
             + "  bridge-domain 200 split-horizon group 3\n";
 
