@@ -20,10 +20,10 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.routing.policy.Util;
 import io.frinx.cli.unit.ios.routing.policy.handlers.action.BgpActionsConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.Config;
@@ -47,24 +47,25 @@ public class AsPathPrependConfigReader implements CliConfigReader<Config, Config
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String routeMapName = instanceIdentifier.firstKeyOf(PolicyDefinition.class).getName();
-        String statementId = instanceIdentifier.firstKeyOf(Statement.class).getName();
-
-        String output = blockingRead(f(BgpActionsConfigReader.SH_ROUTE_MAP, routeMapName, statementId),
-                cli, instanceIdentifier, readContext);
-        parseConfig(output, configBuilder);
+        final String routeMapName = instanceIdentifier.firstKeyOf(PolicyDefinition.class).getName();
+        final String statementId = instanceIdentifier.firstKeyOf(Statement.class).getName();
+        final String output = blockingRead(BgpActionsConfigReader.SH_ROUTE_MAPS, cli, instanceIdentifier, readContext);
+        parseConfig(routeMapName, statementId, output, configBuilder);
     }
 
     @VisibleForTesting
-    static void parseConfig(String output, ConfigBuilder builder) {
-        Optional<String> asPathPrepend = ParsingUtils.parseField(output, 0,
+    static void parseConfig(String routeMapName, String statementId, String output, ConfigBuilder builder) {
+        final String routeMapOutput = Util.extractRouteMap(routeMapName, statementId, output);
+        ParsingUtils.parseField(routeMapOutput, 0,
             AS_PATH_PREPEND_LINE::matcher,
-            matcher -> matcher.group("value"));
-        if (asPathPrepend.isPresent()) {
-            final String[] values = asPathPrepend.get().split(" ");
-            builder.setAsn(new AsNumber(Long.parseLong(values[0])));
-            builder.setRepeatN((short) values.length);
-        }
+            matcher -> matcher.group("value"),
+            s -> parseAsPathPrepend(s, builder));
+    }
+
+    private static void parseAsPathPrepend(final String value, final ConfigBuilder builder) {
+        final String[] values = value.split(" ");
+        builder.setAsn(new AsNumber(Long.parseLong(values[0])));
+        builder.setRepeatN((short) values.length);
     }
 
 }

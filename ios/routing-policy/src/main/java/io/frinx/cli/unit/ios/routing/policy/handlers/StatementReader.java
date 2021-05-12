@@ -33,9 +33,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class StatementReader implements CliConfigListReader<Statement, StatementKey, StatementBuilder> {
 
-    private static final String SH_ROUTE_MAP = "show running-config | include %s";
-    private static final Pattern STATEMENT_PERMIT = Pattern.compile(".*permit (?<id>\\S+).*");
-    private static final Pattern STATEMENT_DENY = Pattern.compile(".*deny (?<id>\\S+).*");
+    private static final String SH_ROUTE_MAPS = "show running-config | include ^route-map";
 
     private final Cli cli;
 
@@ -46,21 +44,17 @@ public class StatementReader implements CliConfigListReader<Statement, Statement
     @Override
     public List<StatementKey> getAllIds(@Nonnull InstanceIdentifier<Statement> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
-        String routeMapName = instanceIdentifier.firstKeyOf(PolicyDefinition.class).getName();
-        return getAllIds(blockingRead(f(SH_ROUTE_MAP, routeMapName), cli, instanceIdentifier, readContext));
+        final String routeMapName = instanceIdentifier.firstKeyOf(PolicyDefinition.class).getName();
+        return getAllIds(blockingRead(SH_ROUTE_MAPS, cli, instanceIdentifier, readContext), routeMapName);
     }
 
     @VisibleForTesting
-    static List<StatementKey> getAllIds(String output) {
-        List<StatementKey> statementKeys = ParsingUtils.parseFields(output, 0,
-            STATEMENT_PERMIT::matcher,
+    static List<StatementKey> getAllIds(String output, String routeMapName) {
+        final String regex = String.format("route-map %s (permit|deny) (?<id>\\d+).*", routeMapName);
+        return ParsingUtils.parseFields(output, 0,
+            Pattern.compile(regex)::matcher,
             matcher -> matcher.group("id"),
             StatementKey::new);
-        statementKeys.addAll(ParsingUtils.parseFields(output, 0,
-            STATEMENT_DENY::matcher,
-            matcher -> matcher.group("id"),
-            StatementKey::new));
-        return statementKeys;
     }
 
     @Override
@@ -69,4 +63,5 @@ public class StatementReader implements CliConfigListReader<Statement, Statement
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         statementBuilder.setName(instanceIdentifier.firstKeyOf(Statement.class).getName());
     }
+
 }

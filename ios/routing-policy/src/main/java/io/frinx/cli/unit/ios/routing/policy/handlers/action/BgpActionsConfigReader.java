@@ -16,13 +16,12 @@
 
 package io.frinx.cli.unit.ios.routing.policy.handlers.action;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.routing.policy.Util;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions.Config;
@@ -33,7 +32,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BgpActionsConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    public static final String SH_ROUTE_MAP = "show running-config | section route-map %s .+ %s";
+    public static final String SH_ROUTE_MAPS = "show running-config | include ^route-map |^ set";
     private static final Pattern LOCAL_PREFERENCE_LINE = Pattern.compile("set local-preference (?<value>\\S+)");
 
     private final Cli cli;
@@ -46,19 +45,21 @@ public class BgpActionsConfigReader implements CliConfigReader<Config, ConfigBui
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        String routeMapName = instanceIdentifier.firstKeyOf(PolicyDefinition.class).getName();
-        String statementId = instanceIdentifier.firstKeyOf(Statement.class).getName();
-
-        String output = blockingRead(f(SH_ROUTE_MAP, routeMapName, statementId), cli, instanceIdentifier, readContext);
-        parseConfig(output, configBuilder);
+        final String routeMapName = instanceIdentifier.firstKeyOf(PolicyDefinition.class).getName();
+        final String statementId = instanceIdentifier.firstKeyOf(Statement.class).getName();
+        final String output = blockingRead(SH_ROUTE_MAPS, cli, instanceIdentifier, readContext);
+        parseConfig(routeMapName, statementId, output, configBuilder);
     }
 
-    @VisibleForTesting
-    static void parseConfig(String output, ConfigBuilder builder) {
-        Optional<String> localPreference = ParsingUtils.parseField(output, 0,
+    public static void parseConfig(final String routeMapName,
+                                   final String statementId,
+                                   final String output,
+                                   final ConfigBuilder configBuilder) {
+        final String routeMapOutput = Util.extractRouteMap(routeMapName, statementId, output);
+        ParsingUtils.parseField(routeMapOutput, 0,
             LOCAL_PREFERENCE_LINE::matcher,
-            matcher -> matcher.group("value"));
-        localPreference.ifPresent(s -> builder.setSetLocalPref(Long.parseLong(s)));
+            matcher -> matcher.group("value"),
+            s -> configBuilder.setSetLocalPref(Long.parseLong(s)));
     }
 
 }

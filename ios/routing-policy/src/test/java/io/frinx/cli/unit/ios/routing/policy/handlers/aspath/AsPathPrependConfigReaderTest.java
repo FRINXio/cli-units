@@ -22,37 +22,40 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 
 public class AsPathPrependConfigReaderTest {
 
-    private static final String ZERO_REPEATS = "route-map RM-IPVPN-SECONDARY-CPE-SECONDARY-PE permit 10 \n"
-            + " set local-preference 9888\n";
-
-    private static final String ONE_REPEAT = "route-map RM-IPVPN-SECONDARY-CPE-SECONDARY-PE permit 10 \n"
-            + " set as-path prepend 65222\n";
-
-    private static final String FOUR_REPEATS = "route-map RM-IPVPN-SECONDARY-CPE-SECONDARY-PE permit 10 \n"
-            + " set as-path prepend 65222 65222 65222 65222\n";
+    private static final String OUTPUT =
+            "route-map RM_CI_REDIST_STATIC_VLAN123456_V4 permit 300 \n"
+            + " set origin igp\n"
+            + " set community 65222:999\n"
+            + "route-map RM_CI_REDIST_STATIC_VLAN123456_V4 deny 1000 \n"
+            + "route-map FRINX permit 10 \n"
+            + " set local-preference 90\n"
+            + " set as-path prepend 65222 65222 65222 65222\n"
+            + "route-map RM_CI_VLAN112233_SEC_CPE_PRI_PE_V4 permit 100 \n"
+            + " set as-path prepend 65222 65222\n"
+            + " set community no-export additive\n";
 
     @Test
     public void testZeroRepeats() {
-        ConfigBuilder builder = new ConfigBuilder();
-        AsPathPrependConfigReader.parseConfig(ZERO_REPEATS, builder);
-        Assert.assertNull(builder.getAsn());
-        Assert.assertNull(builder.getRepeatN());
+        final ConfigBuilder configBuilder = new ConfigBuilder();
+        AsPathPrependConfigReader.parseConfig("RM_CI_REDIST_STATIC_VLAN123456_V4", "300", OUTPUT, configBuilder);
+        Assert.assertNull(configBuilder.getAsn());
+        Assert.assertNull(configBuilder.getRepeatN());
     }
 
     @Test
-    public void parseOneRepeat() {
-        ConfigBuilder builder = new ConfigBuilder();
-        AsPathPrependConfigReader.parseConfig(ONE_REPEAT, builder);
-        Assert.assertEquals("65222", builder.getAsn().getValue().toString());
-        Assert.assertEquals("1", builder.getRepeatN().toString());
+    public void parseTwoRepeat() {
+        final ConfigBuilder configBuilder = new ConfigBuilder();
+        AsPathPrependConfigReader.parseConfig("RM_CI_VLAN112233_SEC_CPE_PRI_PE_V4", "100", OUTPUT, configBuilder);
+        Assert.assertEquals("65222", configBuilder.getAsn().getValue().toString());
+        Assert.assertEquals("2", configBuilder.getRepeatN().toString());
     }
 
     @Test
     public void parseFourRepeats() {
-        ConfigBuilder builder = new ConfigBuilder();
-        AsPathPrependConfigReader.parseConfig(FOUR_REPEATS, builder);
-        Assert.assertEquals("65222", builder.getAsn().getValue().toString());
-        Assert.assertEquals("4", builder.getRepeatN().toString());
+        final ConfigBuilder configBuilder = new ConfigBuilder();
+        AsPathPrependConfigReader.parseConfig("FRINX", "10", OUTPUT, configBuilder);
+        Assert.assertEquals("65222", configBuilder.getAsn().getValue().toString());
+        Assert.assertEquals("4", configBuilder.getRepeatN().toString());
     }
 
 }

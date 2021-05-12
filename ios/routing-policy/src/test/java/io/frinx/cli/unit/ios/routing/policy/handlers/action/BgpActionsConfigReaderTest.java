@@ -22,24 +22,47 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 
 public class BgpActionsConfigReaderTest {
 
-    private static final String EMPTY_ROUTE_MAP = "route-map RM-IPVPN-SECONDARY-CPE-SECONDARY-PE permit 10 \n";
-
-    private static final String ROUTE_MAP = "route-map RM-IPVPN-SECONDARY-PE permit 10 \n"
-            + " set as-path prepend 65222\n"
-            + " set local-preference 90\n";
+    public static final String OUTPUT =
+            "route-map RM-IPVPN-PRIMARY-CPE-PRIMARY-PE permit 10 \n"
+            + "route-map RM-IPVPN-SECONDARY-CPE-SECONDARY-PE permit 10 \n"
+            + " set as-path prepend 65222 65222 65222 65222\n"
+            + "route-map RM_CI_REDIST_DIRECT_VLAN123456_V6 permit 300 \n"
+            + " set origin igp\n"
+            + " set community 65222:999\n"
+            + "route-map RM_CI_REDIST_DIRECT_VLAN123456_V6 deny 1000 \n"
+            + "route-map RM_CI_ANTIDDOS_VLAN123456_PRI_CPE_PRI_PE_V4 permit 100 \n"
+            + "route-map RM_CI_ANTIDDOS_VLAN123456_PRI_CPE_PRI_PE_V4 deny 1000 \n"
+            + "route-map RM_CI_REDIST_DIRECT_VLAN123456_V4 permit 300 \n"
+            + " set origin igp\n"
+            + " set community 65222:999\n"
+            + "route-map RM_CI_REDIST_DIRECT_VLAN123456_V4 deny 1000 \n"
+            + "route-map RM_CI_ANTIDDOS_VLAN123456_PRI_CPE_PRI_PE_V6 permit 100 \n"
+            + "route-map RM_CI_ANTIDDOS_VLAN123456_PRI_CPE_PRI_PE_V6 deny 1000 \n"
+            + "route-map RM-IPVPN-SECONDARY-PE permit 10 \n"
+            + " set local-preference 90\n"
+            + "route-map test-deny deny 10 \n"
+            + " set local-preference 1223\n"
+            + "route-map RM_CI_REDIST_DIRECT_VLAN113399_V4 permit 300 \n"
+            + " set origin igp\n"
+            + " set community 65222:999\n"
+            + "route-map RM_CI_REDIST_DIRECT_VLAN113399_V4 deny 1000 \n"
+            + "route-map RM_CI_REDIST_DIRECT_VLAN113399_V6 permit 300 \n"
+            + " set origin igp\n"
+            + " set community 65222:999\n"
+            + "route-map RM_CI_REDIST_DIRECT_VLAN113399_V6 deny 1000 \n";
 
     @Test
     public void testEmpty() {
-        ConfigBuilder builder = new ConfigBuilder();
-        BgpActionsConfigReader.parseConfig(EMPTY_ROUTE_MAP, builder);
-        Assert.assertNull(builder.getSetLocalPref());
+        final ConfigBuilder configBuilder = new ConfigBuilder();
+        BgpActionsConfigReader.parseConfig("RM-IPVPN-PRIMARY-CPE-PRIMARY-PE", "10", OUTPUT, configBuilder);
+        Assert.assertNull(configBuilder.getSetLocalPref());
     }
 
     @Test
     public void testWithValue() {
-        ConfigBuilder builder = new ConfigBuilder();
-        BgpActionsConfigReader.parseConfig(ROUTE_MAP, builder);
-        Assert.assertEquals("90", builder.getSetLocalPref().toString());
+        final ConfigBuilder configBuilder = new ConfigBuilder();
+        BgpActionsConfigReader.parseConfig("RM-IPVPN-SECONDARY-PE", "10", OUTPUT, configBuilder);
+        Assert.assertEquals("90", configBuilder.getSetLocalPref().toString());
     }
 
 }

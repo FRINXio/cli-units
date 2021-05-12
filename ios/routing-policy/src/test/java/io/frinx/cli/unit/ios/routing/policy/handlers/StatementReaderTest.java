@@ -26,15 +26,30 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.polic
 public class StatementReaderTest {
 
     private static final String OUTPUT =
-            "neighbor 217.105.224.26 route-map RM-IPVPN-SECONDARY-PE in\n"
-            + "route-map RM-IPVPN-SECONDARY-PE permit 9 \n"
-            + "route-map RM-IPVPN-SECONDARY-PE deny 10 \n";
+            "route-map RM_CI_REDIST_STATIC_VLAN123456_V6 permit 100 \n"
+            + "route-map RM_CI_REDIST_STATIC_VLAN123456_V6 permit 300 \n"
+            + "route-map RM_CI_REDIST_STATIC_VLAN123456_V6 deny 1000 \n"
+            + "route-map RM_CI_ANTIDDOS_VLAN123456_DENY_ALL_V6 deny 0 \n"
+            + "route-map RM_CI_REDIST_STATIC_VLAN123456_V4 permit 100 \n"
+            + "route-map RM_CI_REDIST_STATIC_VLAN123456_V4 permit 300 \n"
+            + "route-map RM_CI_REDIST_STATIC_VLAN123456_V4 deny 1000 \n"
+            + "route-map FRINX permit 10 \n"
+            + "route-map RM_CI_VLAN112233_SEC_CPE_PRI_PE_V4 permit 100 \n"
+            + "route-map RM_CI_VLAN112233_SEC_CPE_PRI_PE_V4 permit 200 \n"
+            + "route-map RM_CI_VLAN112233_SEC_CPE_PRI_PE_V4 permit 300 \n"
+            + "route-map RM_CI_VLAN112233_SEC_CPE_PRI_PE_V4 permit 400 \n"
+            + "route-map RM_CI_VLAN112233_SEC_CPE_PRI_PE_V4 deny 1000 \n"
+            + "route-map RM_CI_VLAN113399_PRI_CPE_SEC_PE_V4 permit 100 \n"
+            + "route-map RM_CI_VLAN113399_PRI_CPE_SEC_PE_V4 permit 200 \n"
+            + "route-map RM_CI_VLAN113399_PRI_CPE_SEC_PE_V4 deny 1000 \n"
+            + "route-map RM_CI_VLAN112233_PRI_PE_V6 permit 100 \n";
 
     @Test
     public void getAllIdsTest() {
-        List<StatementKey> expected = Stream.of("9", "10")
-                .map(StatementKey::new).collect(Collectors.toList());
+        List<StatementKey> expected = Stream.of("100", "200", "300", "400", "1000")
+                .map(StatementKey::new)
+                .collect(Collectors.toList());
 
-        Assert.assertEquals(expected, StatementReader.getAllIds(OUTPUT));
+        Assert.assertEquals(expected, StatementReader.getAllIds(OUTPUT, "RM_CI_VLAN112233_SEC_CPE_PRI_PE_V4"));
     }
 }
