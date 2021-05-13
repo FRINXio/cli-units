@@ -41,6 +41,7 @@
         <module>evc</module>
         <module>bgp</module>
         <module>network-instance</module>
+        <module>fhrp</module>
     </modules>
 
     <build>

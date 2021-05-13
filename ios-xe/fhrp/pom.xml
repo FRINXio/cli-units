@@ -14,20 +14,18 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<!-- vi: set et smarttab sw=4 tabstop=4: -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
+        <groupId>io.frinx.cli</groupId>
         <version>4.2.7.rc15-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ios-xe-bfd-unit</artifactId>
+    <artifactId>ios-xe-fhrp-unit</artifactId>
     <version>4.2.7.rc15-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
@@ -53,11 +51,6 @@
         <!-- Openconfig models -->
         <dependency>
             <groupId>io.frinx.openconfig</groupId>
-            <artifactId>openconfig-bfd</artifactId>
-            <version>${openconfig.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.frinx.openconfig</groupId>
             <artifactId>openconfig-fhrp</artifactId>
             <version>${openconfig.version}</version>
         </dependency>
@@ -68,5 +61,10 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>utils-unit</artifactId>
+        </dependency>
     </dependencies>
+
 </project>

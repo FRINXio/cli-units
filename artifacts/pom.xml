@@ -287,6 +287,11 @@
                 <artifactId>ios-xe-network-instance-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xe-fhrp-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- IOS XR -->
             <dependency>
