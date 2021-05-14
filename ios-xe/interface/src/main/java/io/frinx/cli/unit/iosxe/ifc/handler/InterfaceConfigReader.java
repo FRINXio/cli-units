@@ -45,7 +45,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     public static final Pattern DESCRIPTION_LINE = Pattern.compile("description (?<desc>.+)");
     private static final Pattern MTU_LINE = Pattern.compile("mtu (?<mtu>.+)");
     private static final Pattern STORM_CONTROL_LINE =
-            Pattern.compile("storm-control (?<address>\\S+) level (?<level>.+)");
+            Pattern.compile("storm-control (?<address>\\S+) level (?<level>(\\d|\\.)+).*");
     private static final Pattern MEDIA_TYPE_LINE = Pattern.compile("media-type (?<mediaType>.+)");
     private static final Pattern LLDP_TRANSMIT_LINE = Pattern.compile("no lldp transmit");
     private static final Pattern LLDP_RECEIVE_LINE = Pattern.compile("no lldp receive");
