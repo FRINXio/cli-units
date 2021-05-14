@@ -103,7 +103,8 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SERVICEINSTANCE,
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_CONFIG,
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_ENCAPSULATION,
-                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_BRIDGEDOMAIN));
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_BRIDGEDOMAIN,
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2PROTOCOL));
 
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
         writeRegistry.addAfter(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli), IIDs.IN_IN_CONFIG);
