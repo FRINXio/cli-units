@@ -66,6 +66,8 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
             Pattern.compile("neighbor (?<neighborIp>\\S*) (?<enabled>as-override).*");
     private static final Pattern VERSION_PATTERN =
             Pattern.compile("neighbor (?<neighborIp>\\S*) version (?<version>.+)");
+    private static final Pattern FALL_OVER_PATTERN =
+            Pattern.compile("neighbor (?<neighborIp>\\S*) (?<enabled>fall-over bfd).*");
     private static final Pattern PASSWORD_REGEX_FORM = Pattern.compile("^([\\d] )\\S+$");
 
     private final Cli cli;
@@ -121,6 +123,7 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
         BgpNeighborConfigAugBuilder configAugBuilder = new BgpNeighborConfigAugBuilder();
         setNeighborVersion(configAugBuilder, output);
         setAsOverride(configAugBuilder, output);
+        setFallOver(configAugBuilder, output);
 
         if (!configAugBuilder.build().equals(new BgpNeighborConfigAugBuilder().build())) {
             configBuilder.addAugmentation(BgpNeighborConfigAug.class, configAugBuilder.build());
@@ -172,6 +175,12 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
         ParsingUtils.parseFields(preprocessOutput(output), 0, AS_OVERRIDE_PATTERN::matcher,
             m -> findGroup(m, "enabled"),
             groupsHashMap -> configAugBuilder.setAsOverride("as-override".equals(groupsHashMap.get("enabled"))));
+    }
+
+    private static void setFallOver(BgpNeighborConfigAugBuilder configAugBuilder, String output) {
+        ParsingUtils.parseFields(preprocessOutput(output), 0, FALL_OVER_PATTERN::matcher,
+            m -> findGroup(m, "enabled"),
+            groupsHashMap -> configAugBuilder.setFallOverMode("fall-over bfd".equals(groupsHashMap.get("enabled"))));
     }
 
     private static void setNeighborVersion(BgpNeighborConfigAugBuilder configAugBuilder, String defaultInstance) {

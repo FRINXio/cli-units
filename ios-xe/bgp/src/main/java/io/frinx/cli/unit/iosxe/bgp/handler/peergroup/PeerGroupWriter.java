@@ -122,8 +122,10 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
         String groupId = getPeerGroupId(instanceIdentifier);
 
         NeighborWriter.renderNeighbor(this, cli, instanceIdentifier,
-                neighbor, null, null, null, vrfKey, bgpAs, groupAfiSafi, Collections.emptyMap(), groupId,
-                null, null, null, null, null, PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
+                neighbor, null, null, null,
+                vrfKey, bgpAs, groupAfiSafi, Collections.emptyMap(), groupId,
+                null, null, null, null, null, null,
+                PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
     }
 
     static Map<String, Object> getAfiSafisForPeerGroup(AfiSafis afiSafis) {
@@ -158,8 +160,10 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
         String groupId = getPeerGroupId(instanceIdentifier);
 
         NeighborWriter.renderNeighbor(this, cli, instanceIdentifier,
-                neighbor, before, null, null, vrfKey, bgpAs, groupAfiSafi, groupAfiSafiBefore, groupId,
-                null, null, null, null, null, PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
+                neighbor, before, null, null,
+                vrfKey, bgpAs, groupAfiSafi, groupAfiSafiBefore, groupId,
+                null, null, null, null, null, null,
+                PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
     }
 
     private static boolean afiSafisHaveChanged(final PeerGroup before, final PeerGroup after) {
@@ -190,8 +194,10 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
         Map<String, Object> groupAfiSafi = NeighborWriter.getAfiSafisForNeighbor(bgpGlobal, afiSafisForPeerGroup);
         String groupId = getPeerGroupId(instanceIdentifier);
 
-        NeighborWriter.deleteNeighbor(this, cli, instanceIdentifier, neighbor, vrfKey, bgpAs, groupAfiSafi, groupId,
-                null, null, PEER_GROUP_GLOBAL_DELETE, PEER_GROUP_VRF_DELETE);
+        NeighborWriter.deleteNeighbor(this, cli, instanceIdentifier, neighbor,
+                vrfKey, bgpAs, groupAfiSafi, groupId,
+                null, null, null,
+                PEER_GROUP_GLOBAL_DELETE, PEER_GROUP_VRF_DELETE);
     }
 
     static String getPeerGroupId(InstanceIdentifier<?> group) {

@@ -40,7 +40,8 @@ public class NeighborConfigReaderTest {
 
     public static final String OUTPUT = OUTPUT_WITHOUT_AUG_COMMANDS
             + " neighbor 1.2.3.4 as-override\n"
-            + " neighbor 1.2.3.4 version 4\n";
+            + " neighbor 1.2.3.4 version 4\n"
+            + " neighbor 1.2.3.4 fall-over bfd\n";
 
     @Test
     public void testOutputWithoutAugCommandsParse() {
@@ -72,6 +73,7 @@ public class NeighborConfigReaderTest {
                         .addAugmentation(BgpNeighborConfigAug.class, new BgpNeighborConfigAugBuilder()
                                 .setNeighborVersion(VERSION4.class)
                                 .setAsOverride(true)
+                                .setFallOverMode(true)
                                 .build())
                         .build(),
                 configBuilder.build());

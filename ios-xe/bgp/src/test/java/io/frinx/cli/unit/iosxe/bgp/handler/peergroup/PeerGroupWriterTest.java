@@ -139,20 +139,22 @@ public class PeerGroupWriterTest implements CliFormatter {
                 PeerGroupWriter.getAfiSafisForPeerGroup(source.getAfiSafis()));
 
         NeighborWriter.renderNeighbor(writer, cli, id,
-                source, null, null, null, id.firstKeyOf(NetworkInstance.class), as, afiSafisForGroupSource,
-                Collections.emptyMap(),
-                PeerGroupWriter.getPeerGroupId(id), null, null, null, null, null, PeerGroupWriter.PEER_GROUP_GLOBAL,
-                PeerGroupWriter.PEER_GROUP_VRF);
+                source, null, null, null,
+                id.firstKeyOf(NetworkInstance.class), as, afiSafisForGroupSource, Collections.emptyMap(),
+                PeerGroupWriter.getPeerGroupId(id), null, null, null, null, null, null,
+                PeerGroupWriter.PEER_GROUP_GLOBAL, PeerGroupWriter.PEER_GROUP_VRF);
 
         String writeRender = NeighborWriterTest.getCommands(writer, false, 1);
         Assert.assertEquals(write, writeRender);
 
         if (after != null) {
             NeighborWriter.renderNeighbor(writer, cli, id,
-                    after, source, null, null, id.firstKeyOf(NetworkInstance.class), as,
+                    after, source, null, null,
+                    id.firstKeyOf(NetworkInstance.class), as,
                     NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
                             PeerGroupWriter.getAfiSafisForPeerGroup(after.getAfiSafis())),
-                    afiSafisForGroupSource, PeerGroupWriter.getPeerGroupId(id), null, null, null, null, null,
+                    afiSafisForGroupSource, PeerGroupWriter.getPeerGroupId(id),
+                    null, null, null, null, null, null,
                     PeerGroupWriter.PEER_GROUP_GLOBAL, PeerGroupWriter.PEER_GROUP_VRF);
 
             String updateRender = NeighborWriterTest.getCommands(writer, false, 2);
@@ -162,8 +164,8 @@ public class PeerGroupWriterTest implements CliFormatter {
         NeighborWriter.deleteNeighbor(writer, cli, id,
                 source, id.firstKeyOf(NetworkInstance.class), as, NeighborWriter.getAfiSafisForNeighbor(bgpConfig,
                         PeerGroupWriter.getAfiSafisForPeerGroup(source.getAfiSafis())),
-                PeerGroupWriter.getPeerGroupId(id), null, null, PeerGroupWriter.PEER_GROUP_GLOBAL_DELETE,
-                PeerGroupWriter.PEER_GROUP_VRF_DELETE);
+                PeerGroupWriter.getPeerGroupId(id), null, null, null,
+                PeerGroupWriter.PEER_GROUP_GLOBAL_DELETE, PeerGroupWriter.PEER_GROUP_VRF_DELETE);
 
         String deleteRender = NeighborWriterTest.getCommands(writer, true, 1);
         Assert.assertEquals(delete, deleteRender);
@@ -181,16 +183,14 @@ public class PeerGroupWriterTest implements CliFormatter {
 
     private static final PeerGroup N_EMPTY = new PeerGroupBuilder()
             .setPeerGroupName("group1")
-            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group
-                    .base.ConfigBuilder()
+            .setConfig(new ConfigBuilder()
                     .setPeerGroupName("group1")
                     .build())
             .build();
 
     private static final PeerGroup N_EMPTY_VRF = new PeerGroupBuilder()
             .setPeerGroupName("group1")
-            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.peer.group
-                    .base.ConfigBuilder()
+            .setConfig(new ConfigBuilder()
                     .setPeerGroupName("group1")
                     .build())
             .setAfiSafis(new AfiSafisBuilder()
