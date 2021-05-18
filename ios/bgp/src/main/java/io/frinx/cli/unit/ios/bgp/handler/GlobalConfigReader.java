@@ -39,8 +39,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_SUMM = "show running-config | include ^router bgp|^ "
-            + "(no bgp log-neighbor-changes|bgp log-neighbor-changes)|^ *address-family|^ *bgp router-id "
-            + "|^ default-information originate";
+            + "(no bgp log-neighbor-changes|bgp log-neighbor-changes)|^ *address-family|^ *bgp router-id";
 
     private static final Pattern AS_PATTERN = Pattern.compile("router bgp (?<as>\\S*).*");
     private static final Pattern ROUTER_ID_PATTERN_GLOBAL = Pattern.compile("\\s*router bgp (?<as>\\S*)\\s+bgp "
@@ -48,8 +47,6 @@ public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder
     private static final Pattern ROUTER_ID_PATTERN = Pattern.compile("\\s*address-family (?<family>\\S*) vrf "
             + "(?<vrf>\\S*)\\s+bgp router-id (?<routerId>\\S*).*");
     private static final Pattern LOG_NEIGHBOR_PATTERN = Pattern.compile("bgp log-neighbor-changes");
-    private static final Pattern DEFAULT_INFORMATION_ORIGINATE_PATTERN =
-            Pattern.compile("default-information originate.*");
 
     private Cli cli;
 
@@ -75,7 +72,7 @@ public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             setGlobalRouterId(builder, output);
             setBgpLogNeighborChanges(augBuilder, output);
-            setBgpDefaultInfomrationOriginate(augBuilder, output);
+
             builder.addAugmentation(BgpGlobalConfigAug.class, augBuilder.build());
         } else {
             setVrfRouterId(builder, output, vrfKey.getName());
@@ -117,14 +114,6 @@ public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder
                 AS_PATTERN::matcher,
             matcher -> matcher.group("as"),
             (String value) -> configBuilder.setAs(new AsNumber(Long.valueOf(value))));
-    }
-
-    @VisibleForTesting
-    static void setBgpDefaultInfomrationOriginate(BgpGlobalConfigAugBuilder builder, String output) {
-        ParsingUtils.parseField(output, 0,
-            DEFAULT_INFORMATION_ORIGINATE_PATTERN::matcher,
-            Matcher::find,
-            value -> builder.setDefaultInformationOriginate(true));
     }
 
     @VisibleForTesting

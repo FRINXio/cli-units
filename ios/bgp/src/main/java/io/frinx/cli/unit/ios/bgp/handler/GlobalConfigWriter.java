@@ -78,7 +78,6 @@ public class GlobalConfigWriter implements CliWriter<Config> {
                             .getValue()),
                     config.getAugmentation(BgpGlobalConfigAug.class)
                             .isLogNeighborChanges() ? "bgp log-neighbor-changes" : "no bgp log-neighbor-changes",
-                    getDefaultOriginate(config),
                     "end");
         } else {
             // Compare AS for global and current VRF. Must match for IOS
@@ -112,17 +111,6 @@ public class GlobalConfigWriter implements CliWriter<Config> {
                         cli, id, config);
             }
         }
-    }
-
-    private String getDefaultOriginate(Config config) {
-        String command = "default-information originate";
-        BgpGlobalConfigAug aug = config.getAugmentation(BgpGlobalConfigAug.class);
-        if (aug != null) {
-            if (aug.isDefaultInformationOriginate() != null) {
-                return aug.isDefaultInformationOriginate() ? command : "no " + command;
-            }
-        }
-        return "no " + command;
     }
 
     @Override
