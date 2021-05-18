@@ -187,11 +187,6 @@
     </dependency>
     <dependency>
       <groupId>io.frinx.cli</groupId>
-      <artifactId>ios-xe-evc-unit</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.frinx.cli</groupId>
       <artifactId>ios-xe-interface-unit</artifactId>
       <version>${project.version}</version>
     </dependency>
