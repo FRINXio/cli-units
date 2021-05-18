@@ -51,8 +51,6 @@ public class InterfaceConfigReaderTest {
     );
 
     public static final IfCiscoExtAug IF_CISCO_EXT_AUG = new IfCiscoExtAugBuilder()
-            .setFhrpMinimumDelay(1)
-            .setFhrpReloadDelay(3600)
             .setStormControl(STORM_CONTROL_LIST)
             .setLldpReceive(false)
             .build();
@@ -77,8 +75,6 @@ public class InterfaceConfigReaderTest {
             + " shutdown\n"
             + " negotiation auto\n"
             + " description test - description\n"
-            + " fhrp delay minimum 1\n"
-            + " fhrp delay reload 3600\n"
             + " no lldp receive\n"
             + " media-type rj45\n"
             + " storm-control broadcast level 10.00 \n"

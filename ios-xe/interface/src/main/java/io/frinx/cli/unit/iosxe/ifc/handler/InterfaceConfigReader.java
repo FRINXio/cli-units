@@ -49,8 +49,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private static final Pattern MEDIA_TYPE_LINE = Pattern.compile("media-type (?<mediaType>.+)");
     private static final Pattern LLDP_TRANSMIT_LINE = Pattern.compile("no lldp transmit");
     private static final Pattern LLDP_RECEIVE_LINE = Pattern.compile("no lldp receive");
-    private static final Pattern FHRP_MINIMUM_DELAY_LINE = Pattern.compile("fhrp delay minimum (?<seconds>.+)");
-    private static final Pattern FHRP_RELOAD_DELAY_LINE = Pattern.compile("fhrp delay reload (?<seconds>.+)");
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);
@@ -63,8 +61,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         final IfCiscoExtAugBuilder ifCiscoExtAugBuilder = new IfCiscoExtAugBuilder();
         setStormControl(output, ifCiscoExtAugBuilder);
         setLldpTransmit(output, ifCiscoExtAugBuilder);
-        setFhrpMinimumDelay(output, ifCiscoExtAugBuilder);
-        setFhrpReloadDelay(output, ifCiscoExtAugBuilder);
         if (Util.isPhysicalInterface(builder.getType())) {
             setLldpReceive(output, ifCiscoExtAugBuilder);
         }
@@ -152,20 +148,6 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         }
 
         return null;
-    }
-
-    private void setFhrpMinimumDelay(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
-        final Optional<String> delay = ParsingUtils.parseField(output, 0,
-            FHRP_MINIMUM_DELAY_LINE::matcher,
-            matcher -> matcher.group("seconds"));
-        delay.ifPresent(s -> ifCiscoExtAugBuilder.setFhrpMinimumDelay(Integer.parseInt(s)));
-    }
-
-    private void setFhrpReloadDelay(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
-        final Optional<String> delay = ParsingUtils.parseField(output, 0,
-            FHRP_RELOAD_DELAY_LINE::matcher,
-            matcher -> matcher.group("seconds"));
-        delay.ifPresent(s -> ifCiscoExtAugBuilder.setFhrpReloadDelay(Integer.parseInt(s)));
     }
 
     @Override
