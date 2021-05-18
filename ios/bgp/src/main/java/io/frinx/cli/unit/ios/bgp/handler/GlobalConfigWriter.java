@@ -76,8 +76,7 @@ public class GlobalConfigWriter implements CliWriter<Config> {
                     f("router bgp %s", config.getAs().getValue()),
                     config.getRouterId() == null ? "no bgp router id" : f("bgp router-id %s", config.getRouterId()
                             .getValue()),
-                    config.getAugmentation(BgpGlobalConfigAug.class)
-                            .isLogNeighborChanges() ? "bgp log-neighbor-changes" : "no bgp log-neighbor-changes",
+                    getLogNeighborChanges(config),
                     "end");
         } else {
             // Compare AS for global and current VRF. Must match for IOS
@@ -135,6 +134,17 @@ public class GlobalConfigWriter implements CliWriter<Config> {
                     f("no router bgp %s", config.getAs().getValue()),
                     "end");
         }
+    }
+
+    private String getLogNeighborChanges(Config config) {
+        String command = "bgp log-neighbor-changes";
+        BgpGlobalConfigAug aug = config.getAugmentation(BgpGlobalConfigAug.class);
+        if (aug != null) {
+            if (aug.isLogNeighborChanges() != null) {
+                return aug.isLogNeighborChanges() ? command : "no " + command;
+            }
+        }
+        return "no " + command;
     }
 
     /**
