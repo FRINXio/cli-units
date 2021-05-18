@@ -34,7 +34,7 @@ public class PolicyReader implements
         CliConfigListReader<PolicyDefinition, PolicyDefinitionKey, PolicyDefinitionBuilder> {
 
     private static final String SH_ROUTE_MAP = "show running-config | include ^route-map";
-    private static final Pattern ROUTE_MAP_NAME = Pattern.compile("route-map (?<name>\\S+) .*");
+    private static final Pattern ROUTE_MAP_NAME = Pattern.compile("route-map (?<name>\\S+) permit.*");
 
     private final Cli cli;
 

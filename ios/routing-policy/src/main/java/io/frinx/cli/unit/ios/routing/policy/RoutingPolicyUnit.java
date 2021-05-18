@@ -65,8 +65,7 @@ public class RoutingPolicyUnit extends AbstractUnit {
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(
                 $YangModuleInfoImpl.getInstance(),
-                io.frinx.openconfig.openconfig.bgp.IIDs.FRINX_OPENCONFIG_BGP_POLICY,
-                IIDs.FRINX_CISCO_ROUTING_POLICY_EXTENSION);
+                io.frinx.openconfig.openconfig.bgp.IIDs.FRINX_OPENCONFIG_BGP_POLICY);
     }
 
     @Override
@@ -97,7 +96,6 @@ public class RoutingPolicyUnit extends AbstractUnit {
                         IIDs.RO_PO_PO_STATEMENTS,
                         IIDs.RO_PO_PO_ST_STATEMENT,
                         IIDs.RO_PO_PO_ST_ST_CONFIG,
-                        IIDs.RO_PO_PO_ST_ST_CO_AUG_PREFIXLISTAUG,
                         IIDs.RO_PO_PO_ST_ST_ACTIONS,
                         io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2,
                         io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BGPACTIONS,
@@ -110,7 +108,7 @@ public class RoutingPolicyUnit extends AbstractUnit {
         readerRegistryBuilder.add(IIDs.RO_PO_POLICYDEFINITION, new PolicyReader(cli));
         readerRegistryBuilder.add(IIDs.RO_PO_PO_CONFIG, new PolicyConfigReader());
         readerRegistryBuilder.add(IIDs.RO_PO_PO_ST_STATEMENT, new StatementReader(cli));
-        readerRegistryBuilder.add(IIDs.RO_PO_PO_ST_ST_CONFIG, new StatementConfigReader(cli));
+        readerRegistryBuilder.add(IIDs.RO_PO_PO_ST_ST_CONFIG, new StatementConfigReader());
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
                 .RO_PO_PO_ST_ST_AC_AUG_ACTIONS1_BG_CONFIG, new BgpActionsConfigReader(cli));
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
