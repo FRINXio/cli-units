@@ -24,6 +24,7 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -59,15 +60,18 @@ public final class ServiceInstanceEncapsulationReader implements CliConfigReader
 
     public static void parseEncapsulation(final String output,
                                           final EncapsulationBuilder encapsulationBuilder) {
-        ParsingUtils.parseField(output, 0,
+        final Optional<String> encapsulationLine = ParsingUtils.parseField(output, 0,
             SERVICE_INSTANCE_ENCAPSULATION_LINE::matcher,
-            Matcher::group,
-            value -> encapsulationBuilder.setUntagged(value.contains("untagged")));
+            Matcher::group);
 
-        ParsingUtils.parseField(output, 0,
-            SERVICE_INSTANCE_ENCAPSULATION_LINE::matcher,
-            matcher -> matcher.group("ids"),
-            value -> encapsulationBuilder.setDot1q(splitMultipleVlans(Arrays.asList(value.split(",")))));
+        if (encapsulationLine.isPresent()) {
+            encapsulationBuilder.setUntagged(encapsulationLine.get().contains("untagged"));
+
+            final Optional<String> dot1qLine = ParsingUtils.parseField(output, 0,
+                SERVICE_INSTANCE_ENCAPSULATION_LINE::matcher,
+                matcher -> matcher.group("ids"));
+            dot1qLine.ifPresent(s -> encapsulationBuilder.setDot1q(splitMultipleVlans(Arrays.asList(s.split(",")))));
+        }
     }
 
     private static List<Integer> splitMultipleVlans(final List<String> vlanStrings) {
