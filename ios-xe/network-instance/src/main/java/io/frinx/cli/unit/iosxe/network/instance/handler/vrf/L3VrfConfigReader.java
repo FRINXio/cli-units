@@ -25,7 +25,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 
 public final class L3VrfConfigReader extends AbstractL3VrfConfigReader {
 
-    private static final String SH_IP_VRF_CFG = "show running-config | include ^ip vrf|^ rd";
+    private static final String SH_IP_VRF_CFG = "show running-config | include ^vrf definition |^ rd";
     private static final Pattern RD_LINE = Pattern.compile(".*rd (?<rd>(\\S+):(\\S+)).*");
 
     public L3VrfConfigReader(Cli cli) {
@@ -44,7 +44,7 @@ public final class L3VrfConfigReader extends AbstractL3VrfConfigReader {
 
         String config = ParsingUtils.NEWLINE.splitAsStream(realignedOutput)
                 // we can call builder.getName(), since this was previously set in the parent class
-                .filter(vrfConfigLine -> vrfConfigLine.contains(String.format("ip vrf %s ", builder.getName())))
+                .filter(vrfConfigLine -> vrfConfigLine.contains(String.format("vrf definition %s ", builder.getName())))
                 .findAny()
                 .orElse("");
         super.parseVrfConfig(config, builder);
@@ -62,6 +62,7 @@ public final class L3VrfConfigReader extends AbstractL3VrfConfigReader {
         // Note the space after each vrf name. That way we can distinguish VRFs
         // with names that are prefixes of name of some another VRFs in the
         // following processing of the config.
-        return withoutNewlines.replaceAll("$", " ").replaceAll("ip vrf ", " \nip vrf ");
+        return withoutNewlines.replaceAll("$", " ")
+                .replaceAll("vrf definition ", " \nvrf definition ");
     }
 }

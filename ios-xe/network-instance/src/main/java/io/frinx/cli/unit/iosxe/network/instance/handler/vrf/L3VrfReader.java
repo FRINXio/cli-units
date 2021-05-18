@@ -30,8 +30,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class L3VrfReader extends AbstractL3VrfReader {
 
-    private static final String SH_IP_VRF = "show running-config | include ^ip vrf";
-    private static final Pattern VRF_ID_LINE = Pattern.compile("ip vrf (?<vrfName>[\\S]+).*");
+    private static final String SH_IP_VRF = "show running-config | include ^vrf definition";
+    private static final Pattern VRF_ID_LINE = Pattern.compile("vrf definition (?<vrfName>[\\S]+).*");
+
 
     public L3VrfReader(Cli cli) {
         super(cli);

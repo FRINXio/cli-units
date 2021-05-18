@@ -37,13 +37,13 @@ public final class L3VrfConfigWriter extends AbstractL3VrfConfigWriter {
     }
 
     private static final String WRITE_TEMPLATE = "configure terminal\n"
-            + "ip vrf {$data.name}\n"
+            + "vrf definition {$data.name}\n"
             + "{$data|update(description,description `$data.description`\n,no description\n)}"
             + "{$data|update(route_distinguisher,rd `$data.route_distinguisher.string`\n,no rd\n)}"
             + "end";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
-            + "no ip vrf {$data.name}\n"
+            + "no vrf definition {$data.name}\n"
             + "end";
 
     @Override
