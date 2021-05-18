@@ -19,7 +19,6 @@ package io.frinx.cli.unit.iosxe.it;
 import io.frinx.cli.registry.impl.TranslateRegistryImpl;
 import io.frinx.cli.unit.generic.GenericTranslateUnit;
 import io.frinx.cli.unit.iosxe.conf.ConfigurationUnit;
-import io.frinx.cli.unit.iosxe.ifc.IosXeInterfaceUnit;
 import io.frinx.cli.unit.iosxe.init.IosXeCliInitializerUnit;
 import java.net.InetSocketAddress;
 import org.junit.Ignore;
@@ -90,7 +89,6 @@ public class IosAll extends io.frinx.cli.unit.ios.it.IosAll {
         TranslateRegistryImpl reg = new TranslateRegistryImpl(mockBroker);
 
         new GenericTranslateUnit(reg).init();
-        new IosXeInterfaceUnit(reg).init();
         new IosXeCliInitializerUnit(reg).init();
         new ConfigurationUnit(reg).init();
 
@@ -103,11 +101,13 @@ public class IosAll extends io.frinx.cli.unit.ios.it.IosAll {
         super.testConnectivity();
     }
 
-    @Ignore
-    @Test
-    public void getInterfacesBA() throws Exception {
-        super.getInterfacesBA();
-    }
+// TODO: uncomment this test after interface module is done
+
+//    @Ignore
+//    @Test
+//    public void getInterfacesBA() throws Exception {
+//        super.getInterfacesBA();
+//    }
 
     @Ignore
     @Test
