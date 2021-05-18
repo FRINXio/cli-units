@@ -76,7 +76,8 @@ public class GlobalConfigWriter implements CliWriter<Config> {
                     f("router bgp %s", config.getAs().getValue()),
                     config.getRouterId() == null ? "no bgp router id" : f("bgp router-id %s", config.getRouterId()
                             .getValue()),
-                    getLogNeighborChanges(config),
+                    config.getAugmentation(BgpGlobalConfigAug.class)
+                            .isLogNeighborChanges() ? "bgp log-neighbor-changes" : "no bgp log-neighbor-changes",
                     getDefaultOriginate(config),
                     "end");
         } else {
@@ -111,17 +112,6 @@ public class GlobalConfigWriter implements CliWriter<Config> {
                         cli, id, config);
             }
         }
-    }
-
-    private String getLogNeighborChanges(Config config) {
-        String command = "bgp log-neighbor-changes";
-        BgpGlobalConfigAug aug = config.getAugmentation(BgpGlobalConfigAug.class);
-        if (aug != null) {
-            if (aug.isLogNeighborChanges() != null) {
-                return aug.isLogNeighborChanges() ? command : "no " + command;
-            }
-        }
-        return "no " + command;
     }
 
     private String getDefaultOriginate(Config config) {
