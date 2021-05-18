@@ -42,7 +42,7 @@ public class ServiceInstanceConfigReaderTest {
 
     private static final String EVC_OUTPUT = " service instance 200 ethernet EVC\n"
             + "  encapsulation untagged , dot1q 1-3,5-10\n"
-            + "  bridge-domain 200 split-horizon group 3\n";
+            + "  bridge-domain 200\n";
 
     private final ConfigBuilder configBuilder = new ConfigBuilder();
 

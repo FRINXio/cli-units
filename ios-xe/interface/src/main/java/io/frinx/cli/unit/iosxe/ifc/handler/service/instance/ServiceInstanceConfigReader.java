@@ -37,7 +37,7 @@ public final class ServiceInstanceConfigReader implements CliConfigReader<Config
     public static final String SH_SERVICE_INSTANCE =
             InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG + " | section service instance.* %s ethernet";
 
-    private static final Pattern BRIDGE_DOMAIN_LINE = Pattern.compile("bridge-domain (?<value>\\S+).*");
+    private static final Pattern BRIDGE_DOMAIN_LINE = Pattern.compile("bridge-domain (?<value>(\\d|\\S)+)");
 
     private final Cli cli;
 
