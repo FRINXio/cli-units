@@ -47,20 +47,7 @@ public final class IosDevices {
             .setDeviceVersion("16.*")
             .build();
 
-    public static final Device IOS_XE_16 = new DeviceIdBuilder()
-            .setDeviceType("ios xe")
-            .setDeviceVersion("16.*")
-            .build();
-
     public static final Set<Device> IOS_ALL = new HashSet<Device>() {{
-            add(IOS_12);
-            add(IOS_15);
-            add(IOS_16);
-            add(IOS_XE_16);
-        }
-    };
-
-    public static final Set<Device> IOS_ONLY = new HashSet<Device>() {{
             add(IOS_12);
             add(IOS_15);
             add(IOS_16);
