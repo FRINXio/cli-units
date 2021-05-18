@@ -37,7 +37,6 @@
         <module>configuration-metadata</module>
         <module>it</module>
         <module>interface</module>
-        <module>bfd</module>
     </modules>
 
     <build>
