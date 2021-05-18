@@ -117,7 +117,7 @@ public final class Util {
         return null;
     }
 
-    public static String extractServiceInstance(final Long id, final String output) {
+    public static String extractServiceInstance(final String id, final String output) {
         final String string = String.format("(?=service instance( trunk)? %s)(.*?)(?= !)", id);
         final Pattern pattern = Pattern.compile(string, Pattern.DOTALL);
         final Matcher matcher = pattern.matcher(output);

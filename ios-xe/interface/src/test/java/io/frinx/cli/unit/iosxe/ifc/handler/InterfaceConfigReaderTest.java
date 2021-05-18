@@ -25,6 +25,11 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.config.EncapsulationBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstances;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstancesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlKey;
@@ -50,10 +55,41 @@ public class InterfaceConfigReaderTest {
                     .build()
     );
 
+    private static final ServiceInstances SERVICE_INSTANCES = new ServiceInstancesBuilder()
+            .setServiceInstance(Arrays.asList(
+                    new ServiceInstanceBuilder()
+                            .setId(100L)
+                            .setKey(new ServiceInstanceKey(100L))
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                    .interfaces.cisco.rev171024.service.instance.top.service.instances
+                                    .service.instance.ConfigBuilder()
+                                    .setId(100L)
+                                    .setTrunk(false)
+                                    .setEvc("EVC")
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(true)
+                                            .setDot1q(Arrays.asList(1, 2, 3, 5, 6, 7, 8, 9, 10))
+                                            .build())
+                                    .build())
+                            .build(),
+                    new ServiceInstanceBuilder()
+                            .setId(200L)
+                            .setKey(new ServiceInstanceKey(200L))
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                    .interfaces.cisco.rev171024.service.instance.top.service.instances
+                                    .service.instance.ConfigBuilder()
+                                    .setId(200L)
+                                    .setTrunk(true)
+                                    .build())
+                            .build()
+            ))
+            .build();
+
     public static final IfCiscoExtAug IF_CISCO_EXT_AUG = new IfCiscoExtAugBuilder()
             .setStormControl(STORM_CONTROL_LIST)
             .setLldpTransmit(false)
             .setLldpReceive(false)
+            .setServiceInstances(SERVICE_INSTANCES)
             .build();
 
     public static final IfSaosAug IF_SAOS_AUG = new IfSaosAugBuilder()
@@ -81,6 +117,11 @@ public class InterfaceConfigReaderTest {
             + " media-type rj45\n"
             + " storm-control broadcast level 10.00 \n"
             + " storm-control unicast level 10.00 \n"
+            + " !\n"
+            + " service instance 100 ethernet EVC\n"
+            + "  encapsulation untagged , dot1q 1-3,5-10\n"
+            + " !\n"
+            + " service instance trunk 200 ethernet\n"
             + " !\n"
             + "end\n";
 

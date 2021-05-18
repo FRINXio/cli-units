@@ -21,15 +21,25 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.config.EncapsulationBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstances;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstancesBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
@@ -55,6 +65,8 @@ public class InterfaceConfigWriterTest {
             + "no storm-control unicast level\n"
             + "lldp transmit\n"
             + "lldp receive\n"
+            + "no service instance 100\n"
+            + "no service instance trunk 200\n"
             + "end\n";
 
     private static final Config PHYSICAL_INT_CONFIG = new ConfigBuilder()
@@ -77,6 +89,11 @@ public class InterfaceConfigWriterTest {
             + "storm-control unicast level 10.00\n"
             + "no lldp transmit\n"
             + "no lldp receive\n"
+            + "service instance 100 ethernet EVC\n"
+            + "encapsulation untagged , dot1q 1 , 2 , 3 , 5 , 6 , 7 , 8 , 9 , 10\n"
+            + "exit\n"
+            + "service instance trunk 200 ethernet\n"
+            + "exit\n"
             + "end\n";
 
     private static final Config LOGICAL_INT_CONFIG = new ConfigBuilder()
@@ -140,6 +157,187 @@ public class InterfaceConfigWriterTest {
         writer.deleteCurrentAttributes(iid, LOGICAL_INT_CONFIG, context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(LOGICAL_INT_DELETE_INPUT, response.getValue().getContent());
+    }
+
+    // testing service instance illegal states
+
+    private static final ServiceInstances MORE_TRUNK_SERVICE_INSTANCES = new ServiceInstancesBuilder()
+            .setServiceInstance(Arrays.asList(
+                    new ServiceInstanceBuilder()
+                            .setId(100L)
+                            .setKey(new ServiceInstanceKey(100L))
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                    .interfaces.cisco.rev171024.service.instance.top.service.instances
+                                    .service.instance.ConfigBuilder()
+                                    .setId(100L)
+                                    .setTrunk(true)
+                                    .build())
+                            .build(),
+                    new ServiceInstanceBuilder()
+                            .setId(200L)
+                            .setKey(new ServiceInstanceKey(200L))
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                    .interfaces.cisco.rev171024.service.instance.top.service.instances
+                                    .service.instance.ConfigBuilder()
+                                    .setId(200L)
+                                    .setTrunk(true)
+                                    .build())
+                            .build()
+            ))
+            .build();
+
+    private static final ServiceInstances TRUNK_AND_EVC_SERVICE_INSTANCE = new ServiceInstancesBuilder()
+            .setServiceInstance(Collections.singletonList(
+                    new ServiceInstanceBuilder()
+                            .setId(100L)
+                            .setKey(new ServiceInstanceKey(100L))
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                    .interfaces.cisco.rev171024.service.instance.top.service.instances
+                                    .service.instance.ConfigBuilder()
+                                    .setId(100L)
+                                    .setTrunk(true)
+                                    .setEvc("EVC")
+                                    .build())
+                            .build()
+            ))
+            .build();
+
+    private static final ServiceInstances UNTAGGED_ENCAPSULATION_TRUNK_SERVICE_INSTANCE = new ServiceInstancesBuilder()
+            .setServiceInstance(Collections.singletonList(
+                    new ServiceInstanceBuilder()
+                            .setId(100L)
+                            .setKey(new ServiceInstanceKey(100L))
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                    .interfaces.cisco.rev171024.service.instance.top.service.instances
+                                    .service.instance.ConfigBuilder()
+                                    .setId(100L)
+                                    .setTrunk(true)
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(true)
+                                            .build())
+                                    .build())
+                            .build()
+            ))
+            .build();
+
+    private static final ServiceInstances MORE_UNTAGGED_ENCAPSULATIONS_SERVICE_INSTANCE = new ServiceInstancesBuilder()
+            .setServiceInstance(Arrays.asList(
+                    new ServiceInstanceBuilder()
+                            .setId(100L)
+                            .setKey(new ServiceInstanceKey(100L))
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                    .interfaces.cisco.rev171024.service.instance.top.service.instances
+                                    .service.instance.ConfigBuilder()
+                                    .setId(100L)
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(true)
+                                            .build())
+                                    .build())
+                            .build(),
+                    new ServiceInstanceBuilder()
+                            .setId(200L)
+                            .setKey(new ServiceInstanceKey(200L))
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                    .interfaces.cisco.rev171024.service.instance.top.service.instances
+                                    .service.instance.ConfigBuilder()
+                                    .setId(200L)
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(true)
+                                            .build())
+                                    .build())
+                            .build()
+            ))
+            .build();
+
+    private static final ServiceInstances SAME_DOT1Q_ENCAPSULATIONS_SERVICE_INSTANCE = new ServiceInstancesBuilder()
+            .setServiceInstance(Arrays.asList(
+                    new ServiceInstanceBuilder()
+                            .setId(100L)
+                            .setKey(new ServiceInstanceKey(100L))
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                    .interfaces.cisco.rev171024.service.instance.top.service.instances
+                                    .service.instance.ConfigBuilder()
+                                    .setId(100L)
+                                    .setTrunk(true)
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setDot1q(Arrays.asList(1, 2, 3))
+                                            .build())
+                                    .build())
+                            .build(),
+                    new ServiceInstanceBuilder()
+                            .setId(200L)
+                            .setKey(new ServiceInstanceKey(200L))
+                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+                                    .interfaces.cisco.rev171024.service.instance.top.service.instances
+                                    .service.instance.ConfigBuilder()
+                                    .setId(200L)
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(true)
+                                            .setDot1q(Collections.singletonList(2))
+                                            .build())
+                                    .build())
+                            .build()
+            ))
+            .build();
+
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void testServiceInstanceWithMoreTrunks() throws WriteFailedException {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Only one trunk service instance");
+
+        writer.updateCurrentAttributes(iid, PHYSICAL_INT_CLEAN_CONFIG,
+                getConfig(MORE_TRUNK_SERVICE_INSTANCES), context);
+    }
+
+    @Test
+    public void testServiceInstanceWithEvcAndTrunk() throws WriteFailedException {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Attaching EVC to trunk service instance");
+
+        writer.updateCurrentAttributes(iid, PHYSICAL_INT_CLEAN_CONFIG,
+                getConfig(TRUNK_AND_EVC_SERVICE_INSTANCE), context);
+    }
+
+    @Test
+    public void testTrunkServiceInstanceWithUntaggedEncapsulation() throws WriteFailedException {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Untagged encapsulation in trunk service instance");
+
+        writer.updateCurrentAttributes(iid, PHYSICAL_INT_CLEAN_CONFIG,
+                getConfig(UNTAGGED_ENCAPSULATION_TRUNK_SERVICE_INSTANCE), context);
+    }
+
+    @Test
+    public void testMoreServiceInstanceWithUntaggedEncapsulations() throws WriteFailedException {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Untagged encapsulation is already configured");
+
+        writer.updateCurrentAttributes(iid, PHYSICAL_INT_CLEAN_CONFIG,
+                getConfig(MORE_UNTAGGED_ENCAPSULATIONS_SERVICE_INSTANCE), context);
+    }
+
+    @Test
+    public void testServiceInstanceWithSameDot1qEncapsulations() throws WriteFailedException {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Some vlan ids are already configured");
+
+        writer.updateCurrentAttributes(iid, PHYSICAL_INT_CLEAN_CONFIG,
+                getConfig(SAME_DOT1Q_ENCAPSULATIONS_SERVICE_INSTANCE), context);
+    }
+
+    private Config getConfig(final ServiceInstances serviceInstances) {
+        return new ConfigBuilder()
+                .setName("GigabitEthernet0/0/0")
+                .setType(EthernetCsmacd.class)
+                .setEnabled(true)
+                .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
+                        .setServiceInstances(serviceInstances)
+                        .build())
+                .build();
     }
 
 }
