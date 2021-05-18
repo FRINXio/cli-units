@@ -57,7 +57,6 @@ public class RoutingPolicyUnit extends AbstractUnit {
             {
                 add(IosDevices.IOS_12);
                 add(IosDevices.IOS_15);
-                add(IosDevices.IOS_XE_16);
             }
         };
     }
