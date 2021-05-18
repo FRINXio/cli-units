@@ -20,6 +20,9 @@ import com.google.common.collect.HashBiMap;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.SubinterfaceReader;
 import java.util.Collections;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.ext.rev190724.SPEEDAUTO;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ETHERNETSPEED;
@@ -112,6 +115,13 @@ public final class Util {
             }
         }
         return null;
+    }
+
+    public static String extractServiceInstance(final Long id, final String output) {
+        final String string = String.format("(?=service instance( trunk)? %s)(.*?)(?= !)", id);
+        final Pattern pattern = Pattern.compile(string, Pattern.DOTALL);
+        final Matcher matcher = pattern.matcher(output);
+        return matcher.find() ? matcher.group() : "";
     }
 
 }

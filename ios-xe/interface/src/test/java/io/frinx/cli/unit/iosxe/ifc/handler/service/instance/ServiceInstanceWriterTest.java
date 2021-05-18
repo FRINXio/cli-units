@@ -34,12 +34,12 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.config.EncapsulationBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstances;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.EncapsulationBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
@@ -57,10 +57,10 @@ public class ServiceInstanceWriterTest {
                                     .setId(100L)
                                     .setTrunk(false)
                                     .setEvc("EVC")
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
-                                    .setDot1q(Arrays.asList(1, 2, 3, 5, 6, 7, 8, 9, 10))
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(true)
+                                            .setDot1q(Arrays.asList(1, 2, 3, 5, 6, 7, 8, 9, 10))
+                                            .build())
                                     .build())
                             .build(),
                     new ServiceInstanceBuilder()
@@ -91,10 +91,10 @@ public class ServiceInstanceWriterTest {
                             .setConfig(new ConfigBuilder()
                                     .setId(100L)
                                     .setTrunk(true)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(false)
-                                    .setDot1q(Arrays.asList(1, 9))
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(false)
+                                            .setDot1q(Arrays.asList(1, 9))
+                                            .build())
                                     .build())
                             .build()
             ))
@@ -209,9 +209,9 @@ public class ServiceInstanceWriterTest {
                                     .service.instance.ConfigBuilder()
                                     .setId(100L)
                                     .setTrunk(true)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(true)
+                                            .build())
                                     .build())
                             .build()
             ))
@@ -226,9 +226,9 @@ public class ServiceInstanceWriterTest {
                                     .interfaces.cisco.rev171024.service.instance.top.service.instances
                                     .service.instance.ConfigBuilder()
                                     .setId(100L)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(true)
+                                            .build())
                                     .build())
                             .build(),
                     new ServiceInstanceBuilder()
@@ -238,9 +238,9 @@ public class ServiceInstanceWriterTest {
                                     .interfaces.cisco.rev171024.service.instance.top.service.instances
                                     .service.instance.ConfigBuilder()
                                     .setId(200L)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(true)
+                                            .build())
                                     .build())
                             .build()
             ))
@@ -256,9 +256,9 @@ public class ServiceInstanceWriterTest {
                                     .service.instance.ConfigBuilder()
                                     .setId(100L)
                                     .setTrunk(true)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setDot1q(Arrays.asList(1, 2, 3))
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setDot1q(Arrays.asList(1, 2, 3))
+                                            .build())
                                     .build())
                             .build(),
                     new ServiceInstanceBuilder()
@@ -268,10 +268,10 @@ public class ServiceInstanceWriterTest {
                                     .interfaces.cisco.rev171024.service.instance.top.service.instances
                                     .service.instance.ConfigBuilder()
                                     .setId(200L)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
-                                    .setDot1q(Collections.singletonList(2))
+                                    .setEncapsulation(new EncapsulationBuilder()
+                                            .setUntagged(true)
+                                            .setDot1q(Collections.singletonList(2))
+                                            .build())
                                     .build())
                             .build()
             ))

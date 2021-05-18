@@ -26,13 +26,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.config.Encapsulation;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstances;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Encapsulation;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInstanceAug> {
+public class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInstanceAug> {
 
     private static final String TEMPLATE = "{% if ($serviceInstance) %}"
             + "configure terminal\n"
@@ -52,11 +52,11 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                                        @Nonnull IfCiscoServiceInstanceAug ifCiscoServiceInstanceAug,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        checkValidity(ifCiscoServiceInstanceAug, ifcName);
+        checkServiceInstances(ifCiscoServiceInstanceAug, ifcName);
         blockingWriteAndRead(cli, instanceIdentifier, ifCiscoServiceInstanceAug,
                 fT(TEMPLATE,
                         "ifcName", ifcName,
-                        "serviceInstance", getCommands(null, ifCiscoServiceInstanceAug)));
+                        "serviceInstance", getServiceInstanceCommands(null, ifCiscoServiceInstanceAug)));
     }
 
     @Override
@@ -65,11 +65,11 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                                         @Nonnull IfCiscoServiceInstanceAug dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String ifcName = id.firstKeyOf(Interface.class).getName();
-        checkValidity(dataAfter, ifcName);
+        checkServiceInstances(dataAfter, ifcName);
         blockingWriteAndRead(cli, id, dataAfter,
                 fT(TEMPLATE,
                         "ifcName", ifcName,
-                        "serviceInstance", getCommands(dataBefore, dataAfter)));
+                        "serviceInstance", getServiceInstanceCommands(dataBefore, dataAfter)));
     }
 
     @Override
@@ -80,10 +80,10 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         blockingWriteAndRead(cli, instanceIdentifier, ifCiscoServiceInstanceAug,
                 fT(TEMPLATE,
                         "ifcName", ifcName,
-                        "serviceInstance", getCommands(ifCiscoServiceInstanceAug, null)));
+                        "serviceInstance", getServiceInstanceCommands(ifCiscoServiceInstanceAug, null)));
     }
 
-    private void checkValidity(final IfCiscoServiceInstanceAug aug, final String ifcName) {
+    private void checkServiceInstances(final IfCiscoServiceInstanceAug aug, final String ifcName) {
         if (aug != null && aug.getServiceInstances() != null) {
             final List<ServiceInstance> serviceInstanceList = aug.getServiceInstances().getServiceInstance();
             if (serviceInstanceList != null) {
@@ -100,14 +100,14 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                         if (config.isTrunk() != null && config.isTrunk()) {
                             trunkCount++;
                         }
-                        checkTrunkValidity(trunkCount, serviceInstance, ifcName);
+                        checkServiceInstanceTrunk(trunkCount, serviceInstance, ifcName);
 
-                        final Encapsulation encapsulation = serviceInstance.getEncapsulation();
+                        final Encapsulation encapsulation = config.getEncapsulation();
                         if (encapsulation != null) {
                             if (encapsulation.isUntagged() != null && encapsulation.isUntagged()) {
                                 untaggedVlanCount++;
                             }
-                            checkEncapsulationValidity(untaggedVlanCount, vlanIds, serviceInstance, ifcName);
+                            checkServiceInstanceEncapsulation(untaggedVlanCount, vlanIds, serviceInstance, ifcName);
                         }
                     }
                 }
@@ -115,9 +115,9 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         }
     }
 
-    private void checkTrunkValidity(int trunkCount,
-                                    final ServiceInstance serviceInstance,
-                                    final String ifcName) {
+    private void checkServiceInstanceTrunk(int trunkCount,
+                                           final ServiceInstance serviceInstance,
+                                           final String ifcName) {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance
                 .top.service.instances.service.instance.Config config = serviceInstance.getConfig();
 
@@ -135,14 +135,14 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         }
     }
 
-    private void checkEncapsulationValidity(final int untaggedVlanCount,
-                                            final Set<Integer> vlanIds,
-                                            final ServiceInstance serviceInstance,
-                                            final String ifcName) {
+    private void checkServiceInstanceEncapsulation(final int untaggedVlanCount,
+                                                   final Set<Integer> vlanIds,
+                                                   final ServiceInstance serviceInstance,
+                                                   final String ifcName) {
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance
                 .top.service.instances.service.instance.Config config = serviceInstance.getConfig();
 
-        final Encapsulation encapsulation = serviceInstance.getEncapsulation();
+        final Encapsulation encapsulation = config.getEncapsulation();
         final boolean isTrunk = config.isTrunk() != null && config.isTrunk();
         final boolean isUntagged = encapsulation.isUntagged() != null && encapsulation.isUntagged();
 
@@ -167,8 +167,8 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         }
     }
 
-    private String getCommands(final IfCiscoServiceInstanceAug before,
-                               final IfCiscoServiceInstanceAug after) {
+    private String getServiceInstanceCommands(final IfCiscoServiceInstanceAug before,
+                                              final IfCiscoServiceInstanceAug after) {
         final StringBuilder currentInstances = new StringBuilder();
 
         if (before != null) {
@@ -177,7 +177,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                 final List<ServiceInstance> serviceInstanceList = serviceInstances.getServiceInstance();
                 if (serviceInstanceList != null) {
                     for (final ServiceInstance serviceInstance : serviceInstanceList) {
-                        currentInstances.append(getCreationCommands(serviceInstance, true));
+                        currentInstances.append(getServiceInstanceCreationCommands(serviceInstance, true));
                     }
                 }
             }
@@ -189,9 +189,8 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                 final List<ServiceInstance> serviceInstanceList = serviceInstances.getServiceInstance();
                 if (serviceInstanceList != null) {
                     for (final ServiceInstance serviceInstance : serviceInstanceList) {
-                        currentInstances.append(getCreationCommands(serviceInstance, false));
-                        currentInstances.append(getEncapsulationCommands(serviceInstance.getEncapsulation()));
-                        currentInstances.append("exit\n");
+                        currentInstances.append(getServiceInstanceCreationCommands(serviceInstance, false));
+                        currentInstances.append(getServiceInstanceConfigCommands(serviceInstance.getConfig()));
                     }
                 }
             }
@@ -200,7 +199,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         return currentInstances.toString();
     }
 
-    private String getCreationCommands(final ServiceInstance serviceInstance, boolean delete) {
+    private String getServiceInstanceCreationCommands(final ServiceInstance serviceInstance, boolean delete) {
         final StringBuilder creationCommands = new StringBuilder();
         final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance
                 .top.service.instances.service.instance.Config config = serviceInstance.getConfig();
@@ -227,36 +226,41 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         return creationCommands.toString();
     }
 
-    private String getEncapsulationCommands(final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
-            .cisco.rev171024.service.instance.top.service.instances.service.instance.Encapsulation encapsulation) {
+    private String getServiceInstanceConfigCommands(final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
+            .interfaces.cisco.rev171024.service.instance.top.service.instances
+            .service.instance.Config config) {
         final StringBuilder configCommands = new StringBuilder();
 
-        if (encapsulation != null) {
-            final boolean isUntagged = encapsulation.isUntagged() != null && encapsulation.isUntagged();
-            final boolean hasDot1q = encapsulation.getDot1q() != null && encapsulation.getDot1q().size() > 0;
+        if (config != null) {
+            final Encapsulation encapsulation = config.getEncapsulation();
+            if (encapsulation != null) {
+                final boolean isUntagged = encapsulation.isUntagged() != null && encapsulation.isUntagged();
+                final boolean hasDot1q = encapsulation.getDot1q() != null && encapsulation.getDot1q().size() > 0;
 
-            if (isUntagged || hasDot1q) {
-                configCommands.append("encapsulation ");
-            }
-            if (isUntagged) {
-                configCommands.append("untagged");
-            }
-            if (isUntagged && hasDot1q) {
-                configCommands.append(" , ");
-            }
-            if (hasDot1q) {
-                configCommands.append("dot1q ");
-                configCommands.append(encapsulation
-                        .getDot1q()
-                        .stream()
-                        .map(String::valueOf)
-                        .collect(Collectors.joining(" , ")));
-            }
-            if (isUntagged || hasDot1q) {
-                configCommands.append("\n");
+                if (isUntagged || hasDot1q) {
+                    configCommands.append("encapsulation ");
+                }
+                if (isUntagged) {
+                    configCommands.append("untagged");
+                }
+                if (isUntagged && hasDot1q) {
+                    configCommands.append(" , ");
+                }
+                if (hasDot1q) {
+                    configCommands.append("dot1q ");
+                    configCommands.append(encapsulation
+                            .getDot1q()
+                            .stream()
+                            .map(String::valueOf)
+                            .collect(Collectors.joining(" , ")));
+                }
+                if (isUntagged || hasDot1q) {
+                    configCommands.append("\n");
+                }
             }
         }
 
+        configCommands.append("exit\n");
         return configCommands.toString();
     }
 
