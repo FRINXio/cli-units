@@ -39,7 +39,7 @@ public class ConfigurationUnit extends AbstractUnit {
 
     @Override
     protected Set<Device> getSupportedVersions() {
-        return IosDevices.IOS_ONLY;
+        return IosDevices.IOS_ALL;
     }
 
     @Override
