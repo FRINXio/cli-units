@@ -24,18 +24,18 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.polic
 
 public class PrefixSetReaderTest {
 
-    private static final String OUTPUT = "ip prefix-list NAME1 seq 5 permit 0.0.0.0/0\n"
-        + "ip prefix-list NAME1 seq 25 permit 128.1.1.0/24\n"
-        + "ip prefix-list NAME2 seq 5 permit 0.0.0.0/24\n"
-        + "ip prefix-list NAME3 seq 5 permit 0.0.0.0/24\n"
-        + "ip prefix-list 1 seq 10 deny 0.0.0.0/24\n";
+    public static final String OUTPUT = "ip prefix-list NAME1 seq 5 permit 0.0.0.0/0\n"
+        + "ipv6 prefix-list NAME1 seq 25 deny AB::/64 ge 1 le 128\n"
+        + "ip prefix-list NAME2 seq 10 permit 0.0.0.0/24\n"
+        + "ipv6 prefix-list NAME3 seq 5 permit 0.0.0.0/24\n";
 
     @Test
     public void testIds() {
-        Assert.assertEquals(Lists.newArrayList("NAME1", "NAME2", "NAME3", "1")
+        Assert.assertEquals(Lists.newArrayList("NAME1", "NAME2", "NAME3")
                 .stream()
                 .map(PrefixSetKey::new)
                 .collect(Collectors.toList()),
             PrefixSetReader.parseAllIds(OUTPUT));
     }
+
 }

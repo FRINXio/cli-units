@@ -16,10 +16,14 @@
 
 package io.frinx.cli.unit.ios.routing.policy.handlers.prefix;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import javax.annotation.Nonnull;
+
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.PrefixSetConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.top.prefix.sets.PrefixSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.top.prefix.sets.PrefixSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.top.prefix.sets.prefix.set.Config;
@@ -28,11 +32,38 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
+    private static final String IPV4_LINE = "ip prefix-list %s ";
+    private static final String IPV6_LINE = "ipv6 prefix-list %s ";
+
+    private final Cli cli;
+
+    public PrefixSetConfigReader(Cli cli) {
+        this.cli = cli;
+    }
+
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                       @Nonnull ConfigBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         PrefixSetKey prefixSetKey = id.firstKeyOf(PrefixSet.class);
-        builder.setName(prefixSetKey.getName());
+        String output = blockingRead(PrefixSetReader.SH_ALL_PREFIX_SETS, cli, id, ctx);
+        parseConfig(prefixSetKey.getName(), output, builder);
     }
+
+    @VisibleForTesting
+    static void parseConfig(String prefixSetName, String output, ConfigBuilder builder) {
+        builder.setName(prefixSetName);
+
+        String ipv4PrefixList = String.format(IPV4_LINE, prefixSetName);
+        String ipv6PrefixList = String.format(IPV6_LINE, prefixSetName);
+
+        if (output.contains(ipv4PrefixList) && output.contains(ipv6PrefixList)) {
+            builder.setMode(PrefixSetConfig.Mode.MIXED);
+        } else if (output.contains(ipv4PrefixList)) {
+            builder.setMode(PrefixSetConfig.Mode.IPV4);
+        } else if (output.contains(ipv6PrefixList)) {
+            builder.setMode(PrefixSetConfig.Mode.IPV6);
+        }
+    }
+
 }

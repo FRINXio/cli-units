@@ -16,74 +16,93 @@
 
 package io.frinx.cli.unit.ios.routing.policy.handlers.prefix;
 
-import io.frinx.cli.unit.utils.CliFormatter;
+import io.fd.honeycomb.translate.write.WriteContext;
+import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
+import io.frinx.openconfig.openconfig.policy.IIDs;
+import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.DENY;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PERMIT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PrefixConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PrefixConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.top.prefix.sets.PrefixSet;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.set.top.prefix.sets.PrefixSetKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.prefix.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.prefix.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefixBuilder;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class PrefixConfigWriterTest implements CliFormatter {
+public class PrefixConfigWriterTest {
 
-    private static final String WRITE_INPUT_PERMIT = "configure terminal\n"
-            + "ip prefix-list NAME seq 5 permit 0.0.0.0/24\n"
-            + "end\n";
-
-    private static final String WRITE_INPUT_DENY = "configure terminal\n"
-            + "ip prefix-list NAME seq 5 deny 0.0.0.0/24\n"
+    private static final String WRITE_INPUT = "configure terminal\n"
+            + "ip prefix-list NAME seq 5 permit 0.0.0.0/24 ge 8 le 24\n"
             + "end\n";
 
     private static final String DELETE_INPUT = "configure terminal\n"
-            + "no ip prefix-list NAME seq 5 permit 0.0.0.0/24\n"
+            + "no ipv6 prefix-list NAME seq 10 deny AB::0/64 le 24\n"
             + "end\n";
 
-    @Test
-    public void writeTest() {
-        Assert.assertEquals(WRITE_INPUT_PERMIT, configWithPermit(PrefixConfigWriter.WRITE_TEMPLATE));
-        Assert.assertEquals(WRITE_INPUT_DENY, configWithDeny(PrefixConfigWriter.WRITE_TEMPLATE));
+    @Mock
+    private Cli cli;
+
+    @Mock
+    private WriteContext context;
+
+    private PrefixConfigWriter writer;
+    private ArgumentCaptor<Command> response = ArgumentCaptor.forClass(Command.class);
+    private final InstanceIdentifier iid = IIDs.RO_DE_PREFIXSETS.child(PrefixSet.class, new PrefixSetKey("NAME"));
+    private Config data;
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        writer = new PrefixConfigWriter(cli);
     }
 
     @Test
-    public void deleteTest() {
-        Assert.assertEquals(DELETE_INPUT, configWithPermit(PrefixConfigWriter.DELETE_TEMPLATE));
+    public void write() throws WriteFailedException {
+        data = new ConfigBuilder()
+                .setIpPrefix(IpPrefixBuilder.getDefaultInstance("0.0.0.0/24"))
+                .setMasklengthRange("exact")
+                .addAugmentation(PrefixConfigAug.class,
+                        new PrefixConfigAugBuilder()
+                                .setOperation(PERMIT.class)
+                                .setSequenceId(5L)
+                                .setMinimumPrefixLength((short) 8)
+                                .setMaximumPrefixLength((short) 24)
+                                .build())
+                .build();
+
+        writer.writeCurrentAttributes(iid, data, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
     }
 
-    private String configWithDeny(String template) {
-        Config config = new ConfigBuilder()
-            .setIpPrefix(new IpPrefix(new Ipv4Prefix("0.0.0.0/24")))
-            .setMasklengthRange("exact")
-            .addAugmentation(PrefixConfigAug.class,
-                new PrefixConfigAugBuilder()
-                        .setSequenceId(5L)
-                        .setOperation(DENY.class)
-                        .build())
-            .build();
-        return writeTemplate(config, template);
+    @Test
+    public void delete() throws WriteFailedException {
+        data = new ConfigBuilder()
+                .setIpPrefix(IpPrefixBuilder.getDefaultInstance("AB::0/64"))
+                .setMasklengthRange("exact")
+                .addAugmentation(PrefixConfigAug.class,
+                        new PrefixConfigAugBuilder()
+                                .setOperation(DENY.class)
+                                .setSequenceId(10L)
+                                .setMaximumPrefixLength((short) 24)
+                                .build())
+                .build();
+
+        writer.deleteCurrentAttributes(iid, data, context);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }
 
-    private String configWithPermit(String template) {
-        Config config = new ConfigBuilder()
-            .setIpPrefix(new IpPrefix(new Ipv4Prefix("0.0.0.0/24")))
-            .setMasklengthRange("exact")
-            .addAugmentation(PrefixConfigAug.class,
-                new PrefixConfigAugBuilder()
-                        .setSequenceId(5L)
-                        .setOperation(PERMIT.class)
-                        .build())
-            .build();
-        return writeTemplate(config, template);
-    }
-
-    private String writeTemplate(Config config, String template) {
-        return fT(template,
-            "name", "NAME",
-            "sequenceId", config.getAugmentation(PrefixConfigAug.class).getSequenceId(),
-            "operation", PrefixConfigWriter.getOperationName(config),
-            "network", config.getIpPrefix().getIpv4Prefix().getValue());
-    }
 }

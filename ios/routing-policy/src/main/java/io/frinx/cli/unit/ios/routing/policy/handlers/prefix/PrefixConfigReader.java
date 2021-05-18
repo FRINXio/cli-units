@@ -16,9 +16,11 @@
 
 package io.frinx.cli.unit.ios.routing.policy.handlers.prefix;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.routing.policy.Util;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
@@ -38,7 +40,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SH_PREFIX_SET = "show running-config | include ^ip prefix-list %s";
+    private static final String PREFIX_LINE = "ip(v6)? prefix-list %s seq (?<sequenceId>\\d+) (?<operation>\\S+) %s"
+            + "( ge (?<minimum>\\d+))?( le (?<maximum>\\d+))?.*";
 
     private final Cli cli;
 
@@ -52,19 +55,23 @@ public class PrefixConfigReader implements CliConfigReader<Config, ConfigBuilder
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         PrefixSetKey prefixSetKey = id.firstKeyOf(PrefixSet.class);
         PrefixKey prefixKey = id.firstKeyOf(Prefix.class);
+
         builder.setIpPrefix(prefixKey.getIpPrefix());
         builder.setMasklengthRange(prefixKey.getMasklengthRange());
-        String output = blockingRead(f(SH_PREFIX_SET, prefixSetKey.getName()), cli, id, ctx);
-        parseConfig(builder, output, builder.getIpPrefix().getIpv4Prefix().getValue(), prefixSetKey.getName());
+
+        String output = blockingRead(PrefixSetReader.SH_ALL_PREFIX_SETS, cli, id, ctx);
+        parseConfig(builder, output, Util.getIpPrefixAsString(builder.getIpPrefix()), prefixSetKey.getName());
     }
 
-    public void parseConfig(ConfigBuilder builder, String output, String prefix, String key) {
-        Pattern prefixPattern = Pattern.compile(
-                f("ip prefix-list %s seq (?<sequenceId>\\d+) (?<operation>\\S+) %s", key, prefix));
+    @VisibleForTesting
+    void parseConfig(ConfigBuilder builder, String output, String prefix, String key) {
+        Pattern prefixPattern = Pattern.compile(f(PREFIX_LINE, key, prefix));
 
         PrefixConfigAugBuilder augBuilder = new PrefixConfigAugBuilder();
         setSequenceId(output, augBuilder, prefixPattern);
         setOperation(output, augBuilder, prefixPattern);
+        setMinimumPrefixLength(output, augBuilder, prefixPattern);
+        setMaximumPrefixLength(output, augBuilder, prefixPattern);
         builder.addAugmentation(PrefixConfigAug.class, augBuilder.build());
     }
 
@@ -80,6 +87,18 @@ public class PrefixConfigReader implements CliConfigReader<Config, ConfigBuilder
             value -> augBuilder.setSequenceId(Long.parseLong(value)));
     }
 
+    private void setMinimumPrefixLength(String output, PrefixConfigAugBuilder augBuilder, Pattern prefixPattern) {
+        ParsingUtils.parseField(output, prefixPattern::matcher,
+            matcher -> matcher.group("minimum"),
+            value -> augBuilder.setMinimumPrefixLength(Short.parseShort(value)));
+    }
+
+    private void setMaximumPrefixLength(String output, PrefixConfigAugBuilder augBuilder, Pattern prefixPattern) {
+        ParsingUtils.parseField(output, prefixPattern::matcher,
+            matcher -> matcher.group("maximum"),
+            value -> augBuilder.setMaximumPrefixLength(Short.parseShort(value)));
+    }
+
     private Class<? extends SETOPERATION> getOperation(String value) {
         switch (value) {
             case "permit":
@@ -90,4 +109,5 @@ public class PrefixConfigReader implements CliConfigReader<Config, ConfigBuilder
                 throw new IllegalArgumentException("Did not match operation for value: " + value);
         }
     }
+
 }

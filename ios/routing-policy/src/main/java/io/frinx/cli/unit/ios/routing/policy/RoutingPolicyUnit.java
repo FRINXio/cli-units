@@ -127,7 +127,7 @@ public class RoutingPolicyUnit extends AbstractUnit {
         readerRegistryBuilder
                 .add(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PREFIXSET, new PrefixSetReader(cli));
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_CONFIG,
-                new PrefixSetConfigReader());
+                new PrefixSetConfigReader(cli));
         readerRegistryBuilder
                 .add(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_PR_PREFIX, new PrefixReader(cli));
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.policy.IIDs.RO_DE_PR_PR_PR_PR_CONFIG,

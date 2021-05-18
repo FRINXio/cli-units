@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.ios.routing.policy.handlers.prefix;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -32,13 +33,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.polic
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.PrefixBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.PrefixKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefixBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixReader implements CliConfigListReader<Prefix, PrefixKey, PrefixBuilder> {
 
-    private static final String SH_PREFIX_SET = "show running-config | include ^ip prefix-list %s";
-    private static final Pattern PREFIX_PATTERN =
-            Pattern.compile("ip prefix-list (?<name>\\S+) seq (?<sequenceId>\\d+) (?<operation>\\S+) (?<network>\\S+)");
+    private static final String PREFIX_LINE = "ip(v6)? prefix-list %s seq \\d+ \\S+ (?<network>\\S+).*";
 
     private final Cli cli;
 
@@ -51,13 +51,14 @@ public class PrefixReader implements CliConfigListReader<Prefix, PrefixKey, Pref
     public List<PrefixKey> getAllIds(@Nonnull InstanceIdentifier<Prefix> id,
                                      @Nonnull ReadContext context) throws ReadFailedException {
         PrefixSetKey prefixSetKey = id.firstKeyOf(PrefixSet.class);
-        String output = blockingRead(f(SH_PREFIX_SET, prefixSetKey.getName()), cli, id, context);
-        return parseIds(output);
+        String output = blockingRead(PrefixSetReader.SH_ALL_PREFIX_SETS, cli, id, context);
+        return parseIds(output, prefixSetKey.getName());
     }
 
-    static List<PrefixKey> parseIds(String output) {
+    @VisibleForTesting
+    static List<PrefixKey> parseIds(String output, String name) {
         return ParsingUtils.NEWLINE.splitAsStream(output)
-            .map(PREFIX_PATTERN::matcher)
+            .map(Pattern.compile(String.format(PREFIX_LINE, name))::matcher)
             .filter(Matcher::matches)
             .map(PrefixReader::toKey)
             .distinct()
@@ -65,8 +66,8 @@ public class PrefixReader implements CliConfigListReader<Prefix, PrefixKey, Pref
     }
 
     private static PrefixKey toKey(Matcher matcher) {
-        String network = matcher.group("network").trim();
-        IpPrefix ipPrefix = new IpPrefix(network.toCharArray());
+        String network = matcher.group("network");
+        IpPrefix ipPrefix = IpPrefixBuilder.getDefaultInstance(network);
         return new PrefixKey(ipPrefix, "exact");
     }
 
@@ -78,4 +79,5 @@ public class PrefixReader implements CliConfigListReader<Prefix, PrefixKey, Pref
         builder.setIpPrefix(prefixKey.getIpPrefix());
         builder.setMasklengthRange(prefixKey.getMasklengthRange());
     }
+
 }

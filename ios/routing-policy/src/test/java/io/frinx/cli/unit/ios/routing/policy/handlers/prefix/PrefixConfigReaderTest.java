@@ -18,49 +18,57 @@ package io.frinx.cli.unit.ios.routing.policy.handlers.prefix;
 
 import io.frinx.cli.io.Cli;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.DENY;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PERMIT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PrefixConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PrefixConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.prefix.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.prefix.ConfigBuilder;
 
 public class PrefixConfigReaderTest {
 
+    private static final Config CONFIG_PERMIT = new ConfigBuilder()
+            .addAugmentation(PrefixConfigAug.class,
+                new PrefixConfigAugBuilder()
+                        .setSequenceId(5L)
+                        .setOperation(PERMIT.class)
+                        .build())
+            .build();
+
+    private static final Config CONFIG_DENY = new ConfigBuilder()
+            .addAugmentation(PrefixConfigAug.class,
+                    new PrefixConfigAugBuilder()
+                            .setSequenceId(25L)
+                            .setOperation(DENY.class)
+                            .setMinimumPrefixLength((short) 1)
+                            .setMaximumPrefixLength((short) 128)
+                            .build())
+            .build();
+
     @Mock
     private Cli cli;
+    private PrefixConfigReader prefixConfigReader;
+    private ConfigBuilder configBuilderTest;
 
-    private static final String OUTPUT1 = "ip prefix-list NAME seq 5 permit 0.0.0.0/0\n";
-    private static final String OUTPUT2 = "ip prefix-list NAME seq 15 deny 0.0.0.0/0\n";
+    @Before
+    public void setup() {
+        prefixConfigReader = new PrefixConfigReader(cli);
+        configBuilderTest = new ConfigBuilder();
+    }
 
     @Test
-    public void testParsingPrefixConfigAug() {
-        PrefixConfigReader prefixConfigReader = new PrefixConfigReader(cli);
-        ConfigBuilder configBuilderTest = new ConfigBuilder();
-
-        ConfigBuilder configBuilderResult1 = getConfigWithPermit();
-        prefixConfigReader.parseConfig(configBuilderTest, OUTPUT1, "0.0.0.0/0", "NAME");
-        Assert.assertEquals(configBuilderResult1.build(), configBuilderTest.build());
-
-        ConfigBuilder configBuilderResult2 = getConfigWithDeny();
-        prefixConfigReader.parseConfig(configBuilderTest, OUTPUT2, "0.0.0.0/0", "NAME");
-        Assert.assertEquals(configBuilderResult2.build(), configBuilderTest.build());
+    public void testPermit() {
+        prefixConfigReader.parseConfig(configBuilderTest, PrefixSetReaderTest.OUTPUT, "0.0.0.0/0", "NAME1");
+        Assert.assertEquals(CONFIG_PERMIT, configBuilderTest.build());
     }
 
-    private ConfigBuilder getConfigWithDeny() {
-        return new ConfigBuilder().addAugmentation(PrefixConfigAug.class,
-            new PrefixConfigAugBuilder()
-                .setSequenceId(15L)
-                .setOperation(DENY.class)
-                .build());
+    @Test
+    public void testDeny() {
+        prefixConfigReader.parseConfig(configBuilderTest, PrefixSetReaderTest.OUTPUT, "AB::/64", "NAME1");
+        Assert.assertEquals(CONFIG_DENY, configBuilderTest.build());
     }
 
-    private ConfigBuilder getConfigWithPermit() {
-        return new ConfigBuilder().addAugmentation(PrefixConfigAug.class,
-            new PrefixConfigAugBuilder()
-                .setSequenceId(5L)
-                .setOperation(PERMIT.class)
-                .build());
-    }
 }

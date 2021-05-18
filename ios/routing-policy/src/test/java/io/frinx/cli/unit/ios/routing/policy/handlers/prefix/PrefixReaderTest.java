@@ -21,17 +21,17 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.prefix.top.prefixes.PrefixKey;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefixBuilder;
 
 public class PrefixReaderTest {
 
-    private static final List<PrefixKey> OUTPUT1_KEYS1 = Lists.newArrayList(new PrefixKey(new IpPrefix("0.0.0.0/0"
-            .toCharArray()), "exact"));
-
-    private static final String OUTPUT1 = "ip prefix-list NAME seq 5 permit 0.0.0.0/0\n";
+    private static final List<PrefixKey> OUTPUT_KEYS = Lists.newArrayList(
+            new PrefixKey(IpPrefixBuilder.getDefaultInstance("0.0.0.0/0"), "exact"),
+            new PrefixKey(IpPrefixBuilder.getDefaultInstance("AB::/64"), "exact"));
 
     @Test
-    public void testAllIds() throws Exception {
-        Assert.assertEquals(OUTPUT1_KEYS1, PrefixReader.parseIds(OUTPUT1));
+    public void testAllIds() {
+        Assert.assertEquals(OUTPUT_KEYS, PrefixReader.parseIds(PrefixSetReaderTest.OUTPUT, "NAME1"));
     }
+
 }

@@ -18,6 +18,7 @@ package io.frinx.cli.unit.ios.routing.policy;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpPrefix;
 
 public final class Util {
 
@@ -28,6 +29,12 @@ public final class Util {
                 routeMapName, statementId);
         final Matcher matcher = Pattern.compile(string, Pattern.DOTALL).matcher(output);
         return matcher.find() ? matcher.group() : "";
+    }
+
+    public static String getIpPrefixAsString(final IpPrefix ipPrefix) {
+        return ipPrefix.getIpv4Prefix() != null
+                ? ipPrefix.getIpv4Prefix().getValue()
+                : ipPrefix.getIpv6Prefix().getValue();
     }
 
 }

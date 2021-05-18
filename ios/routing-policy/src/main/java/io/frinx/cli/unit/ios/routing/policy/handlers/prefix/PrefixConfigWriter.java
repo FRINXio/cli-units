@@ -16,9 +16,11 @@
 
 package io.frinx.cli.unit.ios.routing.policy.handlers.prefix;
 
+import com.x5.template.Chunk;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.ios.routing.policy.Util;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.DENY;
@@ -33,12 +35,14 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class PrefixConfigWriter implements CliWriter<Config> {
 
     public static final String WRITE_TEMPLATE = "configure terminal\n"
-            + "ip prefix-list {$name} seq {$sequenceId} {$operation} {$network}\n"
-            + "end\n";
+            + "ip{% if ($isV6) %}v6{% endif %} prefix-list {$name} seq {$sequenceId} {$operation} {$network}"
+            + "{% if ($minimum) %} ge {$minimum}{% endif %}{% if ($maximum) %} le {$maximum}{% endif %}\n"
+            + "end";
 
     public static final String DELETE_TEMPLATE = "configure terminal\n"
-            + "no ip prefix-list {$name} seq {$sequenceId} {$operation} {$network}\n"
-            + "end\n";
+            + "no ip{% if ($isV6) %}v6{% endif %} prefix-list {$name} seq {$sequenceId} {$operation} {$network}"
+            + "{% if ($minimum) %} ge {$minimum}{% endif %}{% if ($maximum) %} le {$maximum}{% endif %}\n"
+            + "end";
 
     private final Cli cli;
 
@@ -50,15 +54,35 @@ public class PrefixConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        PrefixSetKey prefixSetKey = id.firstKeyOf(PrefixSet.class);
-        blockingWriteAndRead(cli, id, config, fT(WRITE_TEMPLATE,
-                "name", prefixSetKey.getName(),
-                "sequenceId", config.getAugmentation(PrefixConfigAug.class).getSequenceId(),
-                "operation", getOperationName(config),
-                "network", config.getIpPrefix().getIpv4Prefix().getValue()));
+        update(id, config, false);
     }
 
-    public static String getOperationName(@Nonnull Config config) {
+    @Override
+    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                        @Nonnull Config config,
+                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
+        update(id, config, true);
+    }
+
+    private void update(@Nonnull InstanceIdentifier<Config> id,
+                       @Nonnull Config config,
+                       boolean delete) throws WriteFailedException {
+        PrefixSetKey prefixSetKey = id.firstKeyOf(PrefixSet.class);
+        String template = delete ? DELETE_TEMPLATE : WRITE_TEMPLATE;
+        String network = Util.getIpPrefixAsString(config.getIpPrefix());
+        PrefixConfigAug aug = config.getAugmentation(PrefixConfigAug.class);
+
+        blockingWriteAndRead(cli, id, config, fT(template,
+                "isV6", network.contains(":") ? Chunk.TRUE : null,
+                "name", prefixSetKey.getName(),
+                "sequenceId", aug != null ? aug.getSequenceId() : null,
+                "operation", getOperationName(config),
+                "network", network,
+                "minimum", aug != null ? aug.getMinimumPrefixLength() : null,
+                "maximum", aug != null ? aug.getMaximumPrefixLength() : null));
+    }
+
+    private static String getOperationName(@Nonnull Config config) {
         Class<? extends SETOPERATION> action = config.getAugmentation(PrefixConfigAug.class).getOperation();
         if (action.equals(PERMIT.class)) {
             return  "permit";
@@ -68,15 +92,4 @@ public class PrefixConfigWriter implements CliWriter<Config> {
         throw new IllegalStateException("No action found for entry %s" + action);
     }
 
-    @Override
-    public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                        @Nonnull Config config,
-                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        PrefixSetKey prefixSetKey = id.firstKeyOf(PrefixSet.class);
-        blockingWriteAndRead(cli, id, config, fT(DELETE_TEMPLATE,
-                "name", prefixSetKey.getName(),
-                "sequenceId", config.getAugmentation(PrefixConfigAug.class).getSequenceId(),
-                "operation", getOperationName(config),
-                "network", config.getIpPrefix().getIpv4Prefix().getValue()));
-    }
 }
