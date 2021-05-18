@@ -26,12 +26,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.ProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstances;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Encapsulation;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -194,7 +191,6 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                     for (final ServiceInstance serviceInstance : serviceInstanceList) {
                         currentInstances.append(getCreationCommands(serviceInstance, false));
                         currentInstances.append(getEncapsulationCommands(serviceInstance.getEncapsulation()));
-                        currentInstances.append(getL2ProtocolCommands(serviceInstance.getL2protocol()));
                         currentInstances.append("exit\n");
                     }
                 }
@@ -262,29 +258,6 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         }
 
         return configCommands.toString();
-    }
-
-    private String getL2ProtocolCommands(final L2protocol l2protocol) {
-        final StringBuilder creationCommands = new StringBuilder();
-        if (l2protocol != null) {
-            final ProtocolType protocolType = l2protocol.getProtocolType();
-            final List<Protocol> protocol = l2protocol.getProtocol();
-
-            creationCommands.append("l2protocol ");
-
-            if (protocolType != null) {
-                creationCommands.append(protocolType.getName()).append(" ");
-            }
-            if (protocol != null) {
-                creationCommands.append(protocol.stream()
-                        .map(String::valueOf)
-                        .collect(Collectors.joining(" "))
-                        .toLowerCase());
-            }
-            creationCommands.append("\n");
-        }
-
-        return creationCommands.toString();
     }
 
 }
