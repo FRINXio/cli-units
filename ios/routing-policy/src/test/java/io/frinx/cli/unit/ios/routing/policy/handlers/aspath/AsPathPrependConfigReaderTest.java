@@ -16,43 +16,36 @@
 
 package io.frinx.cli.unit.ios.routing.policy.handlers.aspath;
 
+import io.frinx.cli.unit.ios.routing.policy.handlers.action.BgpActionsConfigReaderTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.ConfigBuilder;
 
 public class AsPathPrependConfigReaderTest {
 
-    private static final String ZERO_REPEATS = "route-map RM-IPVPN-SECONDARY-CPE-SECONDARY-PE permit 10 \n"
-            + " set local-preference 9888\n";
-
-    private static final String ONE_REPEAT = "route-map RM-IPVPN-SECONDARY-CPE-SECONDARY-PE permit 10 \n"
-            + " set as-path prepend 65222\n";
-
-    private static final String FOUR_REPEATS = "route-map RM-IPVPN-SECONDARY-CPE-SECONDARY-PE permit 10 \n"
-            + " set as-path prepend 65222 65222 65222 65222\n";
-
     @Test
-    public void testZeroRepeats() {
+    public void parseConfigTest() {
+        buildAndTest("RM-IPVPN-SECONDARY-PE", "10", "65222", "1");
+        buildAndTest("RM-IPVPN-SECONDARY-CPE-SECONDARY-PE", "10", "65222", "4");
+        buildAndTest_null("RM-IPVPN-SECONDARY-PE", "9");
+        buildAndTest_null("RM-IPVPN-PRIMARY-PE", "10");
+    }
+
+    private void buildAndTest(String routeMapName, String statementId, String expectedAsn, String expectedRepead) {
         ConfigBuilder builder = new ConfigBuilder();
-        AsPathPrependConfigReader.parseConfig(ZERO_REPEATS, builder);
+
+        AsPathPrependConfigReader.parseConfig(BgpActionsConfigReaderTest.OUTPUT, routeMapName, statementId, builder);
+
+        Assert.assertEquals(expectedAsn, builder.getAsn().getValue().toString());
+        Assert.assertEquals(expectedRepead, builder.getRepeatN().toString());
+    }
+
+    private void buildAndTest_null(String routeMapName, String statementId) {
+        ConfigBuilder builder = new ConfigBuilder();
+
+        AsPathPrependConfigReader.parseConfig(BgpActionsConfigReaderTest.OUTPUT, routeMapName, statementId, builder);
+
         Assert.assertNull(builder.getAsn());
         Assert.assertNull(builder.getRepeatN());
     }
-
-    @Test
-    public void parseOneRepeat() {
-        ConfigBuilder builder = new ConfigBuilder();
-        AsPathPrependConfigReader.parseConfig(ONE_REPEAT, builder);
-        Assert.assertEquals("65222", builder.getAsn().getValue().toString());
-        Assert.assertEquals("1", builder.getRepeatN().toString());
-    }
-
-    @Test
-    public void parseFourRepeats() {
-        ConfigBuilder builder = new ConfigBuilder();
-        AsPathPrependConfigReader.parseConfig(FOUR_REPEATS, builder);
-        Assert.assertEquals("65222", builder.getAsn().getValue().toString());
-        Assert.assertEquals("4", builder.getRepeatN().toString());
-    }
-
 }
