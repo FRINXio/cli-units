@@ -87,6 +87,8 @@ public class InterfaceConfigWriterTest {
             + "mtu 35\n"
             + "description test desc\n"
             + "no shutdown\n"
+            + "no ip redirects\n"
+            + "ipv6 nd ra suppress all\n"
             + "end\n"
             + "\n";
 
@@ -225,7 +227,16 @@ public class InterfaceConfigWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        this.writer.writeCurrentAttributes(iid, data, context);
+        IfCiscoExtAugBuilder ifCiscoExtAugBuilder = new IfCiscoExtAugBuilder();
+        ifCiscoExtAugBuilder.setIpRedirects(false);
+        ifCiscoExtAugBuilder.setIpv6NdRaSuppress("all");
+
+        // write values
+        Config newData = new ConfigBuilder().setEnabled(true).setName("Bundle-Ether45").setType(Ieee8023adLag.class)
+                .setMtu(35).setDescription("test desc")
+                .addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder.build())
+                .build();
+        this.writer.writeCurrentAttributes(iid, newData, context);
 
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());

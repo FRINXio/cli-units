@@ -30,10 +30,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -93,6 +95,8 @@ public class InterfaceConfigWriterTest {
             + "no mtu\n"
             + "description test - loopback\n"
             + "no shutdown\n"
+            + "ipv6 nd ra suppress all\n"
+            + "no ip redirects\n"
             + "end\n";
 
     private static final String LOGICAL_INT_DELETE_INPUT = "configure terminal\n"
@@ -132,7 +136,16 @@ public class InterfaceConfigWriterTest {
 
     @Test
     public void writeLogical() throws WriteFailedException {
-        writer.writeCurrentAttributes(iid, LOGICAL_INT_CONFIG, context);
+        IfCiscoExtAugBuilder ifCiscoExtAugBuilder = new IfCiscoExtAugBuilder();
+        ifCiscoExtAugBuilder.setIpRedirects(false);
+        ifCiscoExtAugBuilder.setIpv6NdRaSuppress("all");
+
+        // write values
+        Config newData = new ConfigBuilder().setEnabled(true).setName("Loopback0").setType(Ieee8023adLag.class)
+                .setDescription("test - loopback")
+                .addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder.build())
+                .build();
+        writer.writeCurrentAttributes(iid, newData, context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(LOGICAL_INT_INPUT, response.getValue().getContent());
     }

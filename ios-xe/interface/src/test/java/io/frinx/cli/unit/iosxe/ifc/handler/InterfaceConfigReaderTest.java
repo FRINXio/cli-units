@@ -87,6 +87,17 @@ public class InterfaceConfigReaderTest {
             + " !\n"
             + "end\n";
 
+    private static final String SH_INTERFACE_BDI_RUN = "interface BDI101\n"
+            + " description LAN VLAN123456\n"
+            + " vrf forwarding VLAN123456\n"
+            + " ip address 120.130.140.1 255.255.255.248\n"
+            + " no ip redirects\n"
+            + " no ip proxy-arp\n"
+            + " ip access-group ACL_CPE_PROT_VLAN123456_LAN_IN_V4 in\n"
+            + " ipv6 address 2001:ABC:ABC::1/64\n"
+            + " ipv6 nd ra suppress all\n"
+            + " ipv6 traffic-filter ACL_CPE_PROT_VLAN123456_LAN_IN_V6 in\n";
+
     @Test
     public void testParseInterface() {
         final ConfigBuilder configBuilder = new ConfigBuilder();

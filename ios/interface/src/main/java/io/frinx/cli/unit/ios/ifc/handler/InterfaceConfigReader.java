@@ -72,6 +72,8 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private static final Pattern LLDP_TRANSMIT_LINE = Pattern.compile("(?m)\\s*no lldp transmit$");
     private static final Pattern LLDP_RECEIVE_LINE = Pattern.compile("(?m)\\s*no lldp receive$");
     private static final Pattern CDP_ENABLE_LINE = Pattern.compile("(?m)\\s*no cdp enable$");
+    private static final Pattern IPV6_ND_RA_SURPESS_LINE = Pattern.compile("\\s*ipv6 nd ra suppress (?<number>.+)");
+
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);
@@ -94,6 +96,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setIpRedirects(output, ifCiscoExtAugBuilder);
         setIpUnreachables(output, ifCiscoExtAugBuilder);
         setIpProxyArp(output, ifCiscoExtAugBuilder);
+        setIpv6NdRa(output, ifCiscoExtAugBuilder);
         setStormControl(output, ifCiscoExtAugBuilder);
         setL2ProtocolTunnel(output, ifCiscoExtAugBuilder);
         setLldpTransmit(output, ifCiscoExtAugBuilder);
@@ -284,6 +287,13 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         if (NO_IP_UNREACHABLES_LINE.matcher(output).find()) {
             ifCiscoExtAugBuilder.setIpUnreachables(false);
         }
+    }
+
+    private void setIpv6NdRa(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        ParsingUtils.parseField(output, 0,
+            IPV6_ND_RA_SURPESS_LINE::matcher,
+            matcher -> matcher.group("number"),
+            ifCiscoExtAugBuilder::setIpv6NdRaSuppress);
     }
 
     private void setSnmpTrap(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {

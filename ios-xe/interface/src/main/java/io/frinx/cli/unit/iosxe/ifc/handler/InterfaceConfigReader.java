@@ -51,6 +51,9 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private static final Pattern LLDP_RECEIVE_LINE = Pattern.compile("no lldp receive");
     private static final Pattern FHRP_MINIMUM_DELAY_LINE = Pattern.compile("fhrp delay minimum (?<seconds>.+)");
     private static final Pattern FHRP_RELOAD_DELAY_LINE = Pattern.compile("fhrp delay reload (?<seconds>.+)");
+    private static final Pattern NO_IP_PROXY_ARP_LINE = Pattern.compile("\\s*no ip proxy-arp");
+    private static final Pattern NO_IP_REDIRECTS_LINE = Pattern.compile("\\s*no ip redirects");
+    private static final Pattern IPV6_ND_RA_LINE = Pattern.compile("\\s*ipv6 nd ra suppress (?<number>.+)");
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);
@@ -65,6 +68,9 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setLldpTransmit(output, ifCiscoExtAugBuilder);
         setFhrpMinimumDelay(output, ifCiscoExtAugBuilder);
         setFhrpReloadDelay(output, ifCiscoExtAugBuilder);
+        setIpRedirects(output, ifCiscoExtAugBuilder);
+        setIpProxyArp(output, ifCiscoExtAugBuilder);
+        setIpv6NdRa(output, ifCiscoExtAugBuilder);
         if (Util.isPhysicalInterface(builder.getType())) {
             setLldpReceive(output, ifCiscoExtAugBuilder);
         }
@@ -166,6 +172,25 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
             FHRP_RELOAD_DELAY_LINE::matcher,
             matcher -> matcher.group("seconds"));
         delay.ifPresent(s -> ifCiscoExtAugBuilder.setFhrpReloadDelay(Integer.parseInt(s)));
+    }
+
+    private void setIpRedirects(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        if (NO_IP_REDIRECTS_LINE.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setIpRedirects(false);
+        }
+    }
+
+    private void setIpProxyArp(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        if (NO_IP_PROXY_ARP_LINE.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setIpProxyArp(false);
+        }
+    }
+
+    private void setIpv6NdRa(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        ParsingUtils.parseField(output, 0,
+            IPV6_ND_RA_LINE::matcher,
+            matcher -> matcher.group("number"),
+            ifCiscoExtAugBuilder::setIpv6NdRaSuppress);
     }
 
     @Override

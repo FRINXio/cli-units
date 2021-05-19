@@ -47,6 +47,9 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($data.mtu) %}mtu {$data.mtu}\n{% else %}no mtu\n{% endif %}"
             + "{% if ($data.description) %}description {$data.description}\n{% else %}no description\n{% endif %}"
             + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
+            + "{% if ($ipProxyArp) %}{$ipProxyArp}\n{% endif %}"
+            + "{% if ($ipv6NdRaSuppress) %}{$ipv6NdRaSuppress}\n{% endif %}"
+            + "{% if ($ipRedirects) %}{$ipRedirects}\n{% endif %}"
             + "end";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
@@ -76,6 +79,9 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
         return fT(WRITE_TEMPLATE_VLAN,
                 "before", before,
                 "data", after,
+                "ipRedirects", getIpRedirect(before, after),
+                "ipProxyArp", getIpProxyArp(before, after),
+                "ipv6NdRaSuppress", getIpv6NdRaSuppress(before, after),
                 "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null);
     }
 
@@ -210,6 +216,67 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
         }
         return null;
     }
+
+    private String getIpRedirect(final Config before, final Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpRedirects() != null) {
+                return ciscoExtAugAfter.isIpRedirects() ? "ip redirects" : "no ip redirects";
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpRedirects() != null) {
+            return ciscoExtAugAfter.isIpRedirects() ? "ip redirects" : "no ip redirects";
+        } else if (ciscoExtAugBefore.isIpRedirects() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpRedirects() != null) {
+                return ciscoExtAugAfter.isIpRedirects() ? "ip redirects" : "no ip redirects";
+            } else {
+                return "no ip redirects";
+            }
+        }
+        return null;
+    }
+
+    private String getIpProxyArp(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpProxyArp() != null) {
+                return ciscoExtAugAfter.isIpProxyArp() ? "ip proxy-arp" : "no ip proxy-arp";
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpProxyArp() != null) {
+            return ciscoExtAugAfter.isIpProxyArp() ? "ip proxy-arp" : "no ip proxy-arp";
+        } else if (ciscoExtAugBefore.isIpProxyArp() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpProxyArp() != null) {
+                return ciscoExtAugAfter.isIpProxyArp() ? "ip proxy-arp" : "no ip proxy-arp";
+            } else {
+                return "no ip proxy-arp";
+            }
+        }
+        return null;
+    }
+
+    private String getIpv6NdRaSuppress(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getIpv6NdRaSuppress() != null) {
+                return "ipv6 nd ra suppress " + ciscoExtAugAfter.getIpv6NdRaSuppress();
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.getIpv6NdRaSuppress() != null) {
+            return "ipv6 nd ra suppress " + ciscoExtAugAfter.getIpv6NdRaSuppress();
+        } else if (ciscoExtAugBefore.getIpv6NdRaSuppress() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getIpv6NdRaSuppress() != null) {
+                return "ipv6 nd ra suppress " + ciscoExtAugAfter.getIpv6NdRaSuppress();
+            } else {
+                return "no ipv6 nd ra suppress all";
+            }
+        }
+        return null;
+    }
+
 
     @Override
     protected boolean isPhysicalInterface(Config data) {

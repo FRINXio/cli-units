@@ -59,6 +59,7 @@ public class InterfaceConfigReaderTest {
             + " description asd fdsas'; dsa;d;fa'\n"
             + " storm-control broadcast level 50.00\n"
             + " storm-control multicast level 12.34\n"
+            + " ipv6 nd ra suppress\n"
             + "end\n";
 
 
