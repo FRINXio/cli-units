@@ -201,7 +201,7 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
         Boolean autoSummaryAfter = dataAfter != null ? dataAfter.isAutoSummary() : null;
 
         if (!Objects.equals(autoSummaryAfter, autoSummaryBefore)) {
-            return autoSummaryAfter ? Chunk.TRUE : "FALSE";
+            return autoSummaryAfter == null || !autoSummaryAfter ? "FALSE" : Chunk.TRUE;
         }
         return null;
     }
