@@ -23,6 +23,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.inline.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.inline.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityTypeString;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.NOADVERTISE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.NOEXPORT;
 
@@ -30,8 +31,10 @@ public class SetCommunityInlineConfigReaderTest {
 
     private static final Config CONFIG = new ConfigBuilder()
             .setCommunities(Arrays.asList(
-                    new SetCommunityInlineConfig.Communities(new BgpStdCommunityType("6830:666")),
-                    new SetCommunityInlineConfig.Communities(new BgpStdCommunityType("65222:999")),
+                    new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(
+                            BgpStdCommunityTypeString.getDefaultInstance("6830:666"))),
+                    new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(
+                            BgpStdCommunityTypeString.getDefaultInstance("65222:999"))),
                     new SetCommunityInlineConfig.Communities(NOEXPORT.class),
                     new SetCommunityInlineConfig.Communities(NOADVERTISE.class)
             ))

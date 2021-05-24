@@ -25,6 +25,9 @@ import io.frinx.cli.unit.ios.init.IosDevices;
 import io.frinx.cli.unit.ios.routing.policy.handlers.PolicyConfigReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.PolicyReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.PolicyWriter;
+import io.frinx.cli.unit.ios.routing.policy.handlers.community.CommunityListConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.community.CommunityListConfigWriter;
+import io.frinx.cli.unit.ios.routing.policy.handlers.community.CommunityListReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.community.ExtCommunitySetConfigWriter;
 import io.frinx.cli.unit.ios.routing.policy.handlers.community.ExtCommunitySetReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixConfigReader;
@@ -77,6 +80,7 @@ public class RoutingPolicyUnit extends AbstractUnit {
         return Sets.newHashSet(
                 $YangModuleInfoImpl.getInstance(),
                 io.frinx.openconfig.openconfig.bgp.IIDs.FRINX_OPENCONFIG_BGP_POLICY,
+                io.frinx.openconfig.openconfig.bgp.IIDs.FRINX_OPENCONFIG_BGP_POLICY_EXTENSION,
                 IIDs.FRINX_CISCO_ROUTING_POLICY_EXTENSION);
     }
 
@@ -110,7 +114,6 @@ public class RoutingPolicyUnit extends AbstractUnit {
         writerRegistryBuilder.addAfter(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_EX_EX_CONFIG,
                 new ExtCommunitySetConfigWriter(cli),
                 io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
-
         writerRegistryBuilder.addNoop(IIDs.RO_POLICYDEFINITIONS);
         writerRegistryBuilder.subtreeAdd(IIDs.RO_PO_POLICYDEFINITION, new PolicyWriter(cli),
                 Sets.newHashSet(IIDs.RO_PO_PO_CONFIG,
@@ -129,6 +132,12 @@ public class RoutingPolicyUnit extends AbstractUnit {
                         io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_IN_CONFIG,
                         io.frinx.openconfig.openconfig.bgp.IIDs
                                 .ROU_POL_POL_STA_STA_CON_AUG_CONDITIONS2_BGP_MAT_CONFIG));
+        writerRegistryBuilder.addNoop(
+                io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_CO_COMMUNITYSET);
+        writerRegistryBuilder.subtreeAdd(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_CO_CO_CONFIG,
+                new CommunityListConfigWriter(cli),
+                Sets.newHashSet(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_BG_CO_CO_CO_AUG_COMMMEMBERSAUG,
+                        io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_BG_CO_CO_CO_AUG_CONFIG1));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readerRegistryBuilder, Cli cli) {
@@ -158,5 +167,11 @@ public class RoutingPolicyUnit extends AbstractUnit {
 
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_EX_EXTCOMMUNITYSET,
                 new ExtCommunitySetReader(cli));
+        readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_CO_COMMUNITYSET,
+                new CommunityListReader(cli));
+        readerRegistryBuilder.subtreeAdd(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_CO_CO_CONFIG,
+                new CommunityListConfigReader(cli),
+                        Sets.newHashSet(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_BG_CO_CO_CO_AUG_CONFIG1,
+                                    io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_BG_CO_CO_CO_AUG_COMMMEMBERSAUG));
     }
 }
