@@ -17,23 +17,30 @@
 package io.frinx.cli.unit.ios.routing.policy.handlers;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.x5.template.Chunk;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.SetAsPathPrepend;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.BgpSetCommunityOptionType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Conditions2;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.SetCommunityInlineConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.BgpActions;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.conditions.top.BgpConditions;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.NOADVERTISE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.NOEXPORT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.DENY;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PERMIT;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PrefixListAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.SETOPERATION;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.actions.top.Actions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.definitions.top.policy.definitions.PolicyDefinition;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.statements.top.statements.Statement;
@@ -49,6 +56,10 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
             + "{% if ($aug.ip_prefix_list) %}match ip address prefix-list"
             + "{% loop in $aug.ip_prefix_list as $ip_prefix %} {$ip_prefix}{% endloop %}\n{% endif %}"
             + "{% if ($aug.ipv6_prefix_list) %}match ipv6 address prefix-list {$aug.ipv6_prefix_list}\n{% endif %}"
+            + "{% if ($origin) %}set origin {$origin}\n{% endif %}"
+            + "{% if ($communitySet) %}match community {$communitySet}\n{% endif %}"
+            + "{% if ($setCommunities) %}set community{% loop in $setCommunities as $community %} {$community}"
+            + "{% endloop %}\n{% endif %}"
             + "end";
 
     static final String UPDATE_STATEMENT =
@@ -63,6 +74,13 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
             + "{% elseif ($ipEnable == FALSE) %}no match ip address\n{% endif %}"
             + "{% if ($ipv6Enable == TRUE) %}no match ipv6 address\nmatch ipv6 address prefix-list {$ipv6}\n"
             + "{% elseif ($ipv6Enable == FALSE) %}no match ipv6 address\n{% endif %}"
+            + "{% if ($originEnable == TRUE) %}set origin {$origin}\n"
+            + "{% elseif ($originEnable == FALSE) %}no set origin\n{% endif %}"
+            + "{% if ($communitySetEnable == TRUE) %}no match community\nmatch community {$communitySet}\n"
+            + "{% elseif ($communitySetEnable == FALSE) %}no match community\n{% endif %}"
+            + "{% if ($setCommunitiesEnable == TRUE) %}no set community\nset community"
+            + "{% loop in $setCommunities as $community %} {$community}{% endloop %}\n"
+            + "{% elseif ($setCommunitiesEnable == FALSE) %}no set community\n{% endif %}"
             + "end";
 
     private static final String DELETE_STATEMENT =
@@ -106,11 +124,11 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
     @VisibleForTesting
     String writeTemplate(PolicyDefinition policyDefinition) {
         List<Statement> statementsList = policyDefinition.getStatements().getStatement();
-        StringBuffer commands = new StringBuffer();
+        StringBuilder commands = new StringBuilder();
 
         for (Statement statement : statementsList) {
             if (commands.length() > 0) {
-                commands.append("/n");
+                commands.append("\n");
             }
             Actions actions = statement.getActions();
             commands.append(fT(WRITE_ROUTE_MAP, "data", policyDefinition,
@@ -122,7 +140,11 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                     "localPref", actions != null
                             ? getLocalPref(actions.getAugmentation(Actions2.class).getBgpActions()) : null,
                     "asnValue", actions != null
-                            ? getAsnValue(actions.getAugmentation(Actions2.class).getBgpActions()) : null));
+                            ? getAsnValue(actions.getAugmentation(Actions2.class).getBgpActions()) : null,
+                    "origin", actions != null
+                            ? getOrigin(actions.getAugmentation(Actions2.class).getBgpActions()) : null,
+                    "communitySet", getCommunitySet(statement),
+                    "setCommunities", getSetCommunities(statement)));
         }
         return commands.toString();
     }
@@ -141,7 +163,7 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
             statementsMapAfter.put(s.getName(), s);
         });
 
-        StringBuffer commands = new StringBuffer();
+        StringBuilder commands = new StringBuilder();
 
         for (String statementId : statementsMapAfter.keySet()) {
             if (!statementsMapBefore.containsKey(statementId)) {
@@ -149,10 +171,8 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                     commands.append("\n");
                 }
                 // Statement from dataAfter does not exists in dataBefore. Create statement
-                BgpActions bgpActionsAugAfter = statementsMapAfter.get(statementId).getActions()
-                        .getAugmentation(Actions2.class).getBgpActions();
-
-
+                Statement statement = statementsMapAfter.get(statementId);
+                BgpActions bgpActionsAugAfter = statement.getActions().getAugmentation(Actions2.class).getBgpActions();
 
                 commands.append(fT(WRITE_ROUTE_MAP, "data", dataAfter,
                         "sequence", statementId,
@@ -161,18 +181,23 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                         "aug", statementsMapAfter.get(statementId).getConfig()
                                 .getAugmentation(PrefixListAug.class),
                         "localPref", getLocalPref(bgpActionsAugAfter),
-                        "asnValue", getAsnValue(bgpActionsAugAfter)));
+                        "asnValue", getAsnValue(bgpActionsAugAfter),
+                        "origin", getOrigin(bgpActionsAugAfter),
+                        "communitySet", getCommunitySet(statement)));
             } else {
                 // Statement from dataAfter exists in dataBefore. Compare with statement from dataBefore.
-                Actions actionsBefore = statementsMapBefore.get(statementId).getActions();
-                Actions actionsAfter = statementsMapAfter.get(statementId).getActions();
+                Statement statementBefore = statementsMapBefore.get(statementId);
+                Statement statementAfter = statementsMapAfter.get(statementId);
+
+                Actions actionsBefore = statementBefore.getActions();
+                Actions actionsAfter = statementAfter.getActions();
 
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing
                         .policy.rev170714.policy.statements.top.statements.statement
-                        .Config statementConfigBefore = statementsMapBefore.get(statementId).getConfig();
+                        .Config statementConfigBefore = statementBefore.getConfig();
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing
                         .policy.rev170714.policy.statements.top.statements.statement
-                        .Config statementConfigAfter = statementsMapAfter.get(statementId).getConfig();
+                        .Config statementConfigAfter = statementAfter.getConfig();
 
                 BgpActions bgpActionsAugBefore = actionsBefore != null
                         ? actionsBefore.getAugmentation(Actions2.class).getBgpActions() : null;
@@ -195,16 +220,23 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                 String afterIpv6 = comparePrefixListIpv6(prefixListAugBefore, prefixListAugAfter);
                 // Compare action
                 String afterSetOperation = compareSetOperation(prefixListAugBefore, prefixListAugAfter);
+                // Compare origin
+                String afterOrigin = compareOrigin(bgpActionsAugBefore, bgpActionsAugAfter);
+                // Compare community set
+                String afterCommunitySet = compareCommunitySet(statementBefore, statementAfter);
+                // Compare set communities
+                String afterSetCommunities = compareSetCommunities(statementBefore, statementAfter);
 
                 if (afterPref != null || afterAsn != null || afterIp != null || afterSetOperation != null
-                        || afterIpv6 != null) {
+                    || afterIpv6 != null || afterOrigin != null || afterCommunitySet != null
+                    || afterSetCommunities != null) {
                     if (commands.length() > 0) {
                         commands.append("\n");
                     }
                     commands.append(fT(UPDATE_STATEMENT, "data", dataAfter,
                             "sequence", statementId,
-                            "action", statementsMapAfter.get(statementId).getConfig() != null
-                                    ? getAction(statementsMapAfter.get(statementId).getConfig()
+                            "action", statementAfter.getConfig() != null
+                                    ? getAction(statementAfter.getConfig()
                                     .getAugmentation(PrefixListAug.class)) : null,
                             "localPrefEnable", afterPref,
                             "localPref", getLocalPref(bgpActionsAugAfter),
@@ -215,14 +247,20 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                             "ip", prefixListAugAfter.getIpPrefixList(),
                             "ipv6Enable", afterIpv6,
                             "ipv6", getIpv6Prefix(prefixListAugBefore, prefixListAugAfter, afterIpv6),
-                            "action", getSetOperation(prefixListAugBefore, prefixListAugAfter, afterSetOperation)
+                            "action", getSetOperation(prefixListAugBefore, prefixListAugAfter, afterSetOperation),
+                            "originEnable", afterOrigin,
+                            "origin", getOrigin(bgpActionsAugAfter),
+                            "communitySetEnable", afterCommunitySet,
+                            "communitySet", getCommunitySet(statementAfter),
+                            "setCommunitiesEnable", afterSetCommunities,
+                            "setCommunities", getSetCommunities(statementAfter)
                             ));
                 }
             }
         }
 
         for (String statementId : statementsMapBefore.keySet()) {
-            if (!statementsMapAfter.keySet().contains(statementId)) {
+            if (!statementsMapAfter.containsKey(statementId)) {
                 if (commands.length() > 0) {
                     commands.append("\n");
                 }
@@ -241,36 +279,97 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
     }
 
     private String getLocalPref(BgpActions bgpActionsAug) {
-        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions
-                .Config config = bgpActionsAug != null ? bgpActionsAug.getConfig() : null;
-
-        return config != null ? config.getSetLocalPref().toString() : null;
+        if (bgpActionsAug != null
+            && bgpActionsAug.getConfig() != null
+            && bgpActionsAug.getConfig().getSetLocalPref() != null) {
+            return bgpActionsAug.getConfig().getSetLocalPref().toString();
+        }
+        return null;
     }
 
     private String getAction(PrefixListAug aug) {
-        if (aug != null) {
-            if (DENY.class.equals(aug.getSetOperation())) {
-                return "deny";
-            }
-        }
-        return "permit";
+        return aug != null && DENY.class.equals(aug.getSetOperation()) ? "deny" : "permit";
     }
 
     private String getAsnValue(BgpActions bgpActionsAug) {
-        SetAsPathPrepend setAsPathPrepend = bgpActionsAug != null ? bgpActionsAug.getSetAsPathPrepend() : null;
-        Config config =  setAsPathPrepend != null ? setAsPathPrepend.getConfig() : null;
+        if (bgpActionsAug != null
+            && bgpActionsAug.getSetAsPathPrepend() != null
+            && bgpActionsAug.getSetAsPathPrepend().getConfig() != null
+            && bgpActionsAug.getSetAsPathPrepend().getConfig().getAsn() != null
+            && bgpActionsAug.getSetAsPathPrepend().getConfig().getRepeatN() != null) {
+            String asnValue = bgpActionsAug.getSetAsPathPrepend().getConfig().getAsn().getValue().toString();
+            Short repeatN = bgpActionsAug.getSetAsPathPrepend().getConfig().getRepeatN();
+            String repeatedValue = Strings.repeat(asnValue + " ", repeatN);
+            return repeatedValue.trim();
+        }
+        return null;
+    }
 
-        if (config != null) {
-            String asnValue = config.getAsn().getValue().toString();
-            Short repeatN = config.getRepeatN();
+    private String getOrigin(BgpActions bgpActionsAug) {
+        if (bgpActionsAug != null
+            && bgpActionsAug.getConfig() != null
+            && bgpActionsAug.getConfig().getSetRouteOrigin() != null
+            && bgpActionsAug.getConfig().getSetRouteOrigin().getName() != null) {
+            return bgpActionsAug.getConfig().getSetRouteOrigin().getName().toLowerCase();
+        }
+        return null;
+    }
 
-            String resultAsnValue = asnValue;
+    private String getCommunitySet(Statement statement) {
+        BgpConditions bgpConditions = getBgpConditions(statement);
+        if (bgpConditions != null
+            && bgpConditions.getMatchCommunitySet() != null
+            && bgpConditions.getMatchCommunitySet().getConfig() != null) {
+            return bgpConditions.getMatchCommunitySet().getConfig().getCommunitySet();
+        }
+        return null;
+    }
 
-            while (repeatN != 1) {
-                resultAsnValue = resultAsnValue + " " + asnValue;
-                repeatN--;
+    public List<String> getSetCommunities(Statement statement) {
+        BgpActions bgpActions = getBgpActions(statement);
+        if (bgpActions != null
+            && bgpActions.getSetCommunity() != null
+            && bgpActions.getSetCommunity().getConfig() != null
+            && bgpActions.getSetCommunity().getInline() != null
+            && bgpActions.getSetCommunity().getInline().getConfig() != null
+            && bgpActions.getSetCommunity().getInline().getConfig().getCommunities() != null) {
+            List<String> setCommunities = new ArrayList<>();
+
+            for (SetCommunityInlineConfig.Communities community : bgpActions.getSetCommunity().getInline().getConfig()
+                    .getCommunities()) {
+                if (community.getIdentityref() != null) {
+                    if (community.getIdentityref().equals(NOEXPORT.class)) {
+                        setCommunities.add("no-export");
+                    }
+                    if (community.getIdentityref().equals(NOADVERTISE.class)) {
+                        setCommunities.add("no-advertise");
+                    }
+                } else {
+                    setCommunities.add(String.valueOf(community.getValue()));
+                }
             }
-            return resultAsnValue;
+
+            if (bgpActions.getSetCommunity().getConfig().getOptions() == BgpSetCommunityOptionType.ADD) {
+                setCommunities.add("additive");
+            }
+
+            return setCommunities;
+        }
+        return null;
+    }
+
+    private BgpConditions getBgpConditions(Statement statement) {
+        if (statement.getConditions() != null
+            && statement.getConditions().getAugmentation(Conditions2.class) != null) {
+            return statement.getConditions().getAugmentation(Conditions2.class).getBgpConditions();
+        }
+        return null;
+    }
+
+    private BgpActions getBgpActions(Statement statement) {
+        if (statement.getActions() != null
+            && statement.getActions().getAugmentation(Actions2.class) != null) {
+            return statement.getActions().getAugmentation(Actions2.class).getBgpActions();
         }
         return null;
     }
@@ -278,91 +377,83 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
     private String compareSetLocalPref(BgpActions bgpActionsAugBefore, BgpActions bgpActionsAugAfter) {
         String localPrefBefore = getLocalPref(bgpActionsAugBefore);
         String localPrefAfter = getLocalPref(bgpActionsAugAfter);
-
-        if (!Objects.equals(localPrefBefore, localPrefAfter)) {
-            if (localPrefAfter != null) {
-                return Chunk.TRUE;
-            } else {
-                return "FALSE";
-            }
-        }
-        return null;
+        return compareObjects(localPrefBefore, localPrefAfter);
     }
 
     private String compareAsn(BgpActions bgpActionsAugBefore, BgpActions bgpActionsAugAfter) {
         String asnBefore = getAsnValue(bgpActionsAugBefore);
         String asnAfter = getAsnValue(bgpActionsAugAfter);
-
-        if (!Objects.equals(asnBefore, asnAfter)) {
-            if (asnAfter != null) {
-                return Chunk.TRUE;
-            } else {
-                return "FALSE";
-            }
-        }
-        return null;
+        return compareObjects(asnBefore, asnAfter);
     }
 
     private String comparePrefixListIp(PrefixListAug prefixListAugAugBefore, PrefixListAug prefixListAugAfter) {
         if (prefixListAugAugBefore != null && prefixListAugAfter != null) {
-            if (!Objects.equals(prefixListAugAugBefore.getIpPrefixList(), prefixListAugAfter.getIpPrefixList())) {
-                if (prefixListAugAfter.getIpPrefixList() != null) {
-                    return Chunk.TRUE;
-                } else {
-                    return "FALSE";
-                }
-            }
+            List<String> ipPrefixListBefore = prefixListAugAugBefore.getIpPrefixList();
+            List<String> ipPrefixListAfter = prefixListAugAfter.getIpPrefixList();
+            return compareObjects(ipPrefixListBefore, ipPrefixListAfter);
         }
         return null;
     }
 
     private String comparePrefixListIpv6(PrefixListAug prefixListAugAugBefore, PrefixListAug prefixListAugAfter) {
         if (prefixListAugAugBefore != null && prefixListAugAfter != null) {
-            if (!Objects.equals(prefixListAugAugBefore.getIpv6PrefixList(),
-                    prefixListAugAfter.getIpv6PrefixList())) {
-                if (prefixListAugAfter.getIpv6PrefixList() != null) {
-                    return Chunk.TRUE;
-                } else {
-                    return "FALSE";
-                }
-            }
-        } else if (prefixListAugAfter == null && prefixListAugAugBefore != null) {
-            return "FALSE";
+            String ipv6PrefixListBefore = prefixListAugAugBefore.getIpv6PrefixList();
+            String ipv6PrefixListAfter = prefixListAugAfter.getIpv6PrefixList();
+            return compareObjects(ipv6PrefixListBefore, ipv6PrefixListAfter);
         }
         return null;
     }
 
-    private String compareSetOperation(PrefixListAug prefixListAugAugBefore, PrefixListAug prefixListAugAfter) {
-        if (prefixListAugAugBefore != null && prefixListAugAfter != null) {
-            if (!Objects.equals(prefixListAugAugBefore.getSetOperation(), prefixListAugAfter.getSetOperation())) {
-                if (prefixListAugAfter.getSetOperation() != null) {
-                    return Chunk.TRUE;
-                } else {
-                    return "FALSE";
-                }
-            }
+    private String compareSetOperation(PrefixListAug prefixListAugBefore, PrefixListAug prefixListAugAfter) {
+        if (prefixListAugBefore != null && prefixListAugAfter != null) {
+            Class<? extends SETOPERATION> setOperationBefore = prefixListAugBefore.getSetOperation();
+            Class<? extends SETOPERATION> setOperationAfter = prefixListAugAfter.getSetOperation();
+            return compareObjects(setOperationBefore, setOperationAfter);
         }
         return null;
     }
 
     private String getIpv6Prefix(PrefixListAug prefixListAugBefore, PrefixListAug prefixListAugAfter, String ipv6) {
         if (prefixListAugBefore != null && prefixListAugAfter != null) {
-            return "FALSE".equals(ipv6) ? prefixListAugBefore.getIpv6PrefixList() :
-                    prefixListAugAfter.getIpv6PrefixList();
+            return "FALSE".equals(ipv6)
+                    ? prefixListAugBefore.getIpv6PrefixList()
+                    : prefixListAugAfter.getIpv6PrefixList();
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
     private String getSetOperation(PrefixListAug prefixListAugBefore, PrefixListAug prefixListAugAfter, String action) {
         if (prefixListAugBefore != null && prefixListAugAfter != null) {
-            return "FALSE".equals(action) ? prefixListAugBefore.getSetOperation() == PERMIT.class ? "permit" : "deny" :
-                    prefixListAugAfter.getSetOperation() == PERMIT.class ? "permit" : "deny";
+            return "FALSE".equals(action)
+                    ? prefixListAugBefore.getSetOperation() == PERMIT.class ? "permit" : "deny"
+                    : prefixListAugAfter.getSetOperation() == PERMIT.class ? "permit" : "deny";
         }
-        else {
-            return null;
+        return null;
+    }
+
+    private String compareOrigin(BgpActions bgpActionsAugBefore, BgpActions bgpActionsAugAfter) {
+        String originBefore = getOrigin(bgpActionsAugBefore);
+        String originAfter = getOrigin(bgpActionsAugAfter);
+        return compareObjects(originBefore, originAfter);
+    }
+
+    private String compareCommunitySet(Statement statementBefore, Statement statementAfter) {
+        String communitySetBefore = getCommunitySet(statementBefore);
+        String communitySetAfter = getCommunitySet(statementAfter);
+        return compareObjects(communitySetBefore, communitySetAfter);
+    }
+
+    private String compareSetCommunities(Statement statementBefore, Statement statementAfter) {
+        List<String> setCommunitiesBefore = getSetCommunities(statementBefore);
+        List<String> setCommunitiesAfter = getSetCommunities(statementAfter);
+        return compareObjects(setCommunitiesBefore, setCommunitiesAfter);
+    }
+
+    private String compareObjects(Object objectBefore, Object objectAfter) {
+        if (!Objects.equals(objectBefore, objectAfter)) {
+            return objectAfter != null ? Chunk.TRUE : "FALSE";
         }
+        return null;
     }
 
 }

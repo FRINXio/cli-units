@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.ios.routing.policy.handlers.aspath;
+package io.frinx.cli.unit.ios.routing.policy.handlers.statement.actions;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.routing.policy.Util;
-import io.frinx.cli.unit.ios.routing.policy.handlers.action.BgpActionsConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.as.path.prepend.top.set.as.path.prepend.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.bgp.actions.top.bgp.actions.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpOriginAttrType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.definitions.top.policy.definitions.PolicyDefinition;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.statements.top.statements.Statement;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class AsPathPrependConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public class BgpActionsConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final Pattern AS_PATH_PREPEND_LINE = Pattern.compile("set as-path prepend (?<value>.*)");
+    public static final String SH_ROUTE_MAPS = "show running-config | include ^route-map |^ set";
+    private static final Pattern LOCAL_PREFERENCE_LINE = Pattern.compile("set local-preference (?<value>\\S+)");
+    private static final Pattern ORIGIN_LINE = Pattern.compile("set origin (?<value>\\S+).*");
 
     private final Cli cli;
 
-    public AsPathPrependConfigReader(Cli cli) {
+    public BgpActionsConfigReader(Cli cli) {
         this.cli = cli;
     }
 
@@ -49,23 +49,38 @@ public class AsPathPrependConfigReader implements CliConfigReader<Config, Config
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         final String routeMapName = instanceIdentifier.firstKeyOf(PolicyDefinition.class).getName();
         final String statementId = instanceIdentifier.firstKeyOf(Statement.class).getName();
-        final String output = blockingRead(BgpActionsConfigReader.SH_ROUTE_MAPS, cli, instanceIdentifier, readContext);
+        final String output = blockingRead(SH_ROUTE_MAPS, cli, instanceIdentifier, readContext);
         parseConfig(routeMapName, statementId, output, configBuilder);
     }
 
-    @VisibleForTesting
-    static void parseConfig(String routeMapName, String statementId, String output, ConfigBuilder builder) {
+    public static void parseConfig(final String routeMapName,
+                                   final String statementId,
+                                   final String output,
+                                   final ConfigBuilder configBuilder) {
         final String routeMapOutput = Util.extractRouteMap(routeMapName, statementId, output);
+
         ParsingUtils.parseField(routeMapOutput, 0,
-            AS_PATH_PREPEND_LINE::matcher,
+            LOCAL_PREFERENCE_LINE::matcher,
             matcher -> matcher.group("value"),
-            s -> parseAsPathPrepend(s, builder));
+            s -> configBuilder.setSetLocalPref(Long.parseLong(s)));
+
+        ParsingUtils.parseField(routeMapOutput, 0,
+            ORIGIN_LINE::matcher,
+            matcher -> matcher.group("value"),
+            s -> configBuilder.setSetRouteOrigin(parseOrigin(s)));
     }
 
-    private static void parseAsPathPrepend(final String value, final ConfigBuilder builder) {
-        final String[] values = value.split(" ");
-        builder.setAsn(new AsNumber(Long.parseLong(values[0])));
-        builder.setRepeatN((short) values.length);
+    private static BgpOriginAttrType parseOrigin(final String value) {
+        switch (value) {
+            case "egp":
+                return BgpOriginAttrType.EGP;
+            case "igp":
+                return BgpOriginAttrType.IGP;
+            case "incomplete":
+                return BgpOriginAttrType.INCOMPLETE;
+            default:
+                throw new IllegalArgumentException("Did not match origin for value: " + value);
+        }
     }
 
 }

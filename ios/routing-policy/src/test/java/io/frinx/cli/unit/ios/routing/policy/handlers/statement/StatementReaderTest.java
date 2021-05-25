@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.ios.routing.policy.handlers;
+package io.frinx.cli.unit.ios.routing.policy.handlers.statement;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -25,10 +25,6 @@ import io.frinx.cli.unit.ios.init.IosDevices;
 import io.frinx.cli.unit.ios.routing.policy.handlers.PolicyConfigReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.PolicyReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.PolicyWriter;
-import io.frinx.cli.unit.ios.routing.policy.handlers.StatementConfigReader;
-import io.frinx.cli.unit.ios.routing.policy.handlers.StatementReader;
-import io.frinx.cli.unit.ios.routing.policy.handlers.action.BgpActionsConfigReader;
-import io.frinx.cli.unit.ios.routing.policy.handlers.aspath.AsPathPrependConfigReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.community.ExtCommunitySetConfigWriter;
 import io.frinx.cli.unit.ios.routing.policy.handlers.community.ExtCommunitySetReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixConfigReader;
@@ -36,6 +32,13 @@ import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixConfigWriter;
 import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixSetConfigReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.prefix.PrefixSetReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.statement.StatementConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.statement.StatementReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.statement.actions.BgpActionsConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.statement.actions.SetAsPathPrependConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.statement.actions.SetCommunityConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.statement.actions.SetCommunityInlineConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.statement.conditions.MatchCommunitySetConfigReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.policy.IIDs;
 import java.util.HashSet;
@@ -120,7 +123,12 @@ public class RoutingPolicyUnit extends AbstractUnit {
                         io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BGPACTIONS,
                         io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_CONFIG,
                         io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SETASPATHPREPEND,
-                        io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_CONFIG));
+                        io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_CONFIG,
+                        io.frinx.openconfig.openconfig.bgp.IIDs.ROU_POL_POL_STA_STA_ACT_AUG_ACTIONS2_BGP_SET_CONFIG,
+                        io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_INLINE,
+                        io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_AC_AUG_ACTIONS2_BG_SE_IN_CONFIG,
+                        io.frinx.openconfig.openconfig.bgp.IIDs
+                                .ROU_POL_POL_STA_STA_CON_AUG_CONDITIONS2_BGP_MAT_CONFIG));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readerRegistryBuilder, Cli cli) {
@@ -140,7 +148,13 @@ public class RoutingPolicyUnit extends AbstractUnit {
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
                 .RO_PO_PO_ST_ST_AC_AUG_ACTIONS1_BG_CONFIG, new BgpActionsConfigReader(cli));
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
-                .RO_PO_PO_ST_ST_AC_AUG_ACTIONS1_BG_SE_CONFIG, new AsPathPrependConfigReader(cli));
+                .RO_PO_PO_ST_ST_AC_AUG_ACTIONS1_BG_SE_CONFIG, new SetAsPathPrependConfigReader(cli));
+        readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
+                .ROU_POL_POL_STA_STA_ACT_AUG_ACTIONS1_BGP_SET_CONFIG, new SetCommunityConfigReader(cli));
+        readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
+                .RO_PO_PO_ST_ST_AC_AUG_ACTIONS1_BG_SE_IN_CONFIG, new SetCommunityInlineConfigReader(cli));
+        readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
+                .ROU_POL_POL_STA_STA_CON_AUG_CONDITIONS1_BGP_MAT_CONFIG, new MatchCommunitySetConfigReader(cli));
 
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_EX_EXTCOMMUNITYSET,
                 new ExtCommunitySetReader(cli));
