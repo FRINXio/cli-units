@@ -46,6 +46,9 @@ import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip4.Ipv4VrrpGroupReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip6.Ipv6AddressReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip6.Ipv6ConfigWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip6.Ipv6VrrpGroupConfigReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip6.Ipv6VrrpGroupConfigWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip6.Ipv6VrrpGroupReader;
 import io.frinx.cli.unit.iosxe.init.IosXeDevices;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
@@ -140,6 +143,21 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 new Ipv6ConfigWriter(cli),
                 IIDs.IN_IN_CONFIG, io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_IN_INTERFACE);
 
+        writeRegistry.addNoop(io.frinx.openconfig.openconfig._if.ip
+                .IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV6VRRPAUG_VR_VRRPGROUP);
+        writeRegistry.subtreeAdd(io.frinx.openconfig.openconfig._if.ip
+                        .IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV6VRRPAUG_VR_VR_CONFIG,
+                new Ipv6VrrpGroupConfigWriter(cli),
+                Sets.newHashSet(
+                    io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV6VRRPAUG_VR_VR_CONFIG
+                        .augmentation(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.cisco
+                            .vrrp.ext.rev210521.Config2.class),
+                    io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV6VRRPAUG_VR_VR_CONFIG
+                        .augmentation(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.cisco
+                            .vrrp.ext.rev210521.Config2.class)
+                        .child(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.cisco.vrrp.ext
+                            .rev210521.ipv6.vrrp.group.config.TrackedObjects.class)));
+
         writeRegistry.addAfter(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG,
                 new InterfaceStatisticsConfigWriter(cli), IIDs.IN_IN_CONFIG);
     }
@@ -179,6 +197,12 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 new Ipv6AddressReader(cli));
         readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_AD_CONFIG,
                 new Ipv6ConfigReader(cli));
+
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip
+                        .IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV6VRRPAUG_VR_VRRPGROUP,
+                new Ipv6VrrpGroupReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_IP_AD_AD_AUG_IFIPV6VRRPAUG_VR_VR_CONFIG,
+                new Ipv6VrrpGroupConfigReader(cli));
 
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG, new InterfaceStatisticsConfigReader(cli));
     }

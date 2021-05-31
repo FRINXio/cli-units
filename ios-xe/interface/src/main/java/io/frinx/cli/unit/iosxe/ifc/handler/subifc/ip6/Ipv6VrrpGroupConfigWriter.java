@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip4;
+package io.frinx.cli.unit.iosxe.ifc.handler.subifc.ip6;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -26,40 +26,36 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.cisco.vrrp.ext.rev210521.Config1;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.cisco.vrrp.ext.rev210521.ipv4.vrrp.group.config.TrackedObjects;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.cisco.vrrp.ext.rev210521.Config2;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.cisco.vrrp.ext.rev210521.ipv6.vrrp.group.config.TrackedObjects;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ip.vrrp.top.vrrp.VrrpGroup;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ip.vrrp.top.vrrp.vrrp.group.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6Prefix;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class Ipv4VrrpGroupConfigWriter implements CliWriter<Config> {
+public class Ipv6VrrpGroupConfigWriter implements CliWriter<Config> {
 
-    private static final String SECONDARY_ADDRESS_COMMAND = "address %s secondary\n";
     private static final String PRIMARY_ADDRESS_COMMAND = "address %s primary\n";
-    private static final String TRACK_COMMAND = "track %s decrement %s\n";
+    private static final String ADDRESS_COMMAND = "address %s\n";
     private static final String TRACK_SHUTDOWN_COMMAND = "track %s shutdown\n";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
-        + "interface {$interface}\n"
-        + "no vrrp {$vrrp} address-family ipv4\n"
-        + "end\n";
+            + "interface {$interface}\n"
+            + "no vrrp {$vrrp} address-family ipv6\n"
+            + "end\n";
     private static final String WRITE_TEMPLATE = "configure terminal\n"
-        + "interface {$interface}\n"
-        + "vrrp {$vrrp} address-family ipv4\n"
-        + "{% if ($priority) %}priority {$priority}\n"
-        + "{% else %}no priority\n{% endif %}"
-        + "{% if ($preempt) %}preempt delay minimum {$preempt}\n"
-        + "{% else %}no preempt delay\n{% endif %}"
-        + "{% if ($track) %}{$track}{% endif %}"
-        + "{% if ($addressPrimary) %}{$addressPrimary}{% endif %}"
-        + "{% if ($addressSecondary) %}{$addressSecondary}{% endif %}"
-        + "end\n";
+            + "interface {$interface}\n"
+            + "vrrp {$vrrp} address-family ipv6\n"
+            + "{% if ($track) %}{$track}{% endif %}"
+            + "{% if ($addressPrimary) %}{$addressPrimary}{% endif %}"
+            + "{% if ($address) %}{$address}{% endif %}"
+            + "end\n";
 
     private final Cli cli;
 
-    public Ipv4VrrpGroupConfigWriter(Cli cli) {
+    public Ipv6VrrpGroupConfigWriter(Cli cli) {
         this.cli = cli;
     }
 
@@ -94,71 +90,69 @@ public class Ipv4VrrpGroupConfigWriter implements CliWriter<Config> {
     @VisibleForTesting
     String getDeleteTemplate(String interfaceName, Short vrrpGroupName) {
         return fT(DELETE_TEMPLATE,
-            "interface", interfaceName,
-            "vrrp", vrrpGroupName);
+                "interface", interfaceName,
+                "vrrp", vrrpGroupName);
     }
 
     @VisibleForTesting
     String getWriteTemplate(Config dataBefore, Config dataAfter, String interfaceName, Short vrrpGroupName) {
         return fT(WRITE_TEMPLATE,
-            "interface", interfaceName,
-            "vrrp", vrrpGroupName,
-            "priority", dataAfter.getPriority(),
-            "preempt", dataAfter.getPreemptDelay(),
-            "track", getTrack(dataBefore, dataAfter),
-            "addressPrimary", getAddressPrimary(dataBefore, dataAfter),
-            "addressSecondary", getAddressSecondary(dataBefore, dataAfter));
+                "interface", interfaceName,
+                "vrrp", vrrpGroupName,
+                "track", getTrack(dataBefore, dataAfter),
+                "addressPrimary", getAddressPrimary(dataBefore, dataAfter),
+                "address", getAddress(dataBefore, dataAfter));
     }
 
-    private String getAddressSecondary(Config dataBefore, Config dataAfter) {
-        List<IpAddress> virtualAddressesOld = getVirtualSecondaryAddresses(dataBefore);
-        List<IpAddress> virtualAddresses = getVirtualSecondaryAddresses(dataAfter);
+    private String getAddress(Config dataBefore, Config dataAfter) {
+        List<Ipv6Prefix> addressesOld = getAddresses(dataBefore);
+        List<Ipv6Prefix> addresses = getAddresses(dataAfter);
         StringBuilder command = new StringBuilder();
-        command.append(getOldAddressSecondary(virtualAddressesOld, virtualAddresses));
-        command.append(getAddress(virtualAddresses, SECONDARY_ADDRESS_COMMAND));
+        command.append(getOldAddress(addressesOld, addresses));
+        command.append(getNewAddress(addresses, ADDRESS_COMMAND));
         return command.toString();
     }
 
-    private List<IpAddress> getVirtualSecondaryAddresses(Config dataBefore) {
-        if (dataBefore != null && dataBefore.getAugmentation(Config1.class) != null
-                && dataBefore.getAugmentation(Config1.class).getVirtualSecondaryAddresses() != null) {
-            return dataBefore.getAugmentation(Config1.class).getVirtualSecondaryAddresses();
+    private List<Ipv6Prefix> getAddresses(Config dataBefore) {
+        if (dataBefore != null && dataBefore.getAugmentation(Config2.class) != null
+                && dataBefore.getAugmentation(Config2.class).getAddresses() != null) {
+            return dataBefore.getAugmentation(Config2.class).getAddresses();
         }
-        return Collections.<IpAddress>emptyList();
+        return Collections.<Ipv6Prefix>emptyList();
     }
 
-    private String getOldAddressSecondary(List<IpAddress> virtualAddressesOld, List<IpAddress> virtualAddresses) {
-        List<IpAddress> diff = new LinkedList<>(virtualAddressesOld);
-        if (virtualAddresses != null) {
-            diff.removeAll(virtualAddresses);
+    private String getOldAddress(List<Ipv6Prefix> addressesOld, List<Ipv6Prefix> addresses) {
+        List<Ipv6Prefix> diff = new LinkedList<>(addressesOld);
+        if (addresses != null) {
+            diff.removeAll(addresses);
         }
-        return getAddress(diff, "no " + SECONDARY_ADDRESS_COMMAND);
+        return getNewAddress(diff, "no " + ADDRESS_COMMAND);
+    }
+
+    private String getNewAddress(List<Ipv6Prefix> addresses, String template) {
+        if (addresses == null) {
+            return "";
+        }
+
+        StringBuilder command = new StringBuilder();
+        for (Ipv6Prefix address : addresses) {
+            command.append(f(template, address.getValue()));
+        }
+        return command.toString();
     }
 
     private Object getAddressPrimary(Config dataBefore, Config dataAfter) {
         List<IpAddress> virtualAddress = dataAfter.getVirtualAddress();
         if (virtualAddress == null) {
             if (dataBefore != null && dataBefore.getVirtualAddress() != null) {
-                return f("no " + PRIMARY_ADDRESS_COMMAND, dataBefore.getVirtualAddress().get(0).getIpv4Address()
+                return f("no " + PRIMARY_ADDRESS_COMMAND, dataBefore.getVirtualAddress().get(0).getIpv6Address()
                         .getValue());
             }
             return "";
         }
 
         Preconditions.checkState(virtualAddress.size() < 2, "Only one primary virtual address is allowed!");
-        return f(PRIMARY_ADDRESS_COMMAND, virtualAddress.get(0).getIpv4Address().getValue());
-    }
-
-    private String getAddress(List<IpAddress> virtualAddresses, String template) {
-        if (virtualAddresses == null) {
-            return "";
-        }
-
-        StringBuilder command = new StringBuilder();
-        for (IpAddress virtualAddress : virtualAddresses) {
-            command.append(f(template, virtualAddress.getIpv4Address().getValue()));
-        }
-        return command.toString();
+        return f(PRIMARY_ADDRESS_COMMAND, virtualAddress.get(0).getIpv6Address().getValue());
     }
 
     private Object getTrack(Config dataBefore, Config dataAfter) {
@@ -180,10 +174,7 @@ public class Ipv4VrrpGroupConfigWriter implements CliWriter<Config> {
     private Object getTrackedCommand(List<TrackedObjects> trackedObjects, String prefix) {
         StringBuilder command = new StringBuilder();
         for (TrackedObjects trackedObject : trackedObjects) {
-            if (trackedObject.getPriorityDecrement() != null) {
-                command.append(f(prefix + TRACK_COMMAND, trackedObject.getTrackedObjectId(),
-                        trackedObject.getPriorityDecrement()));
-            } else if (trackedObject.isShutdown() != null) {
+            if (trackedObject.isShutdown() != null) {
                 if (prefix.isEmpty()) {
                     if (trackedObject.isShutdown()) {
                         command.append(f(TRACK_SHUTDOWN_COMMAND, trackedObject.getTrackedObjectId()));
@@ -199,8 +190,8 @@ public class Ipv4VrrpGroupConfigWriter implements CliWriter<Config> {
     }
 
     private List<TrackedObjects> getTrackedObjects(Config dataBefore) {
-        if (dataBefore != null && dataBefore.getAugmentation(Config1.class) != null) {
-            return dataBefore.getAugmentation(Config1.class).getTrackedObjects();
+        if (dataBefore != null && dataBefore.getAugmentation(Config2.class) != null) {
+            return dataBefore.getAugmentation(Config2.class).getTrackedObjects();
         }
         return Collections.<TrackedObjects>emptyList();
     }

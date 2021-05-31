@@ -36,6 +36,7 @@ public class Ipv4VrrpGroupConfigReaderTest {
             + "  track 901 decrement 11\n"
             + "  track 902 decrement 11\n"
             + "  track 903 decrement 11\n"
+            + "  track 904 shutdown\n"
             + "  address 192.168.100.0 primary\n"
             + "  address 192.168.101.0 secondary\n"
             + "  address 192.168.102.0 secondary\n"
@@ -54,10 +55,10 @@ public class Ipv4VrrpGroupConfigReaderTest {
                     new IpAddress(new Ipv4Address("192.168.102.0"))
                 ))
                 .setTrackedObjects(Arrays.asList(
-                   new TrackedObjectsBuilder()
-                       .setTrackedObjectId(900)
-                       .setPriorityDecrement((short) 11)
-                       .build(),
+                    new TrackedObjectsBuilder()
+                        .setTrackedObjectId(900)
+                        .setPriorityDecrement((short) 11)
+                        .build(),
                     new TrackedObjectsBuilder()
                         .setTrackedObjectId(901)
                         .setPriorityDecrement((short) 11)
@@ -67,9 +68,13 @@ public class Ipv4VrrpGroupConfigReaderTest {
                         .setPriorityDecrement((short) 11)
                         .build(),
                     new TrackedObjectsBuilder()
-                            .setTrackedObjectId(903)
-                            .setPriorityDecrement((short) 11)
-                            .build()
+                        .setTrackedObjectId(903)
+                        .setPriorityDecrement((short) 11)
+                        .build(),
+                   new TrackedObjectsBuilder()
+                        .setTrackedObjectId(904)
+                        .setShutdown(true)
+                        .build()
                 ))
             .build());
 

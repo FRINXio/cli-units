@@ -49,6 +49,7 @@ public class Ipv4VrrpGroupConfigReader implements CliConfigReader<Config, Config
     private static final Pattern PREEMPT_DELAY_LINE = Pattern.compile("preempt delay minimum (?<delay>.+)");
     private static final Pattern PRIORITY_LINE = Pattern.compile("priority (?<priority>.+)");
     private static final Pattern TRACK_LINE = Pattern.compile("track (?<object>.+) decrement (?<value>.+)");
+    private static final Pattern TRACK_SHUTDOWN_LINE = Pattern.compile("track (?<object>.+) shutdown");
     private static final Pattern PRIMARY_ADDRESS_LINE = Pattern.compile("address (?<ip>.+) primary");
     private static final Pattern SECONDARY_ADDRESS_LINE = Pattern.compile("address (?<ip>.+) secondary");
 
@@ -99,11 +100,17 @@ public class Ipv4VrrpGroupConfigReader implements CliConfigReader<Config, Config
     }
 
     private static void setTrackedObjects(String output, Config1Builder configAug) {
+        List<TrackedObjects> trackedObjects = new ArrayList<>();
+        setDecrement(output, trackedObjects);
+        setShutdown(output, trackedObjects);
+        configAug.setTrackedObjects(trackedObjects);
+    }
+
+    private static void setDecrement(String output, List<TrackedObjects> trackedObjects) {
         List<Integer> objects = ParsingUtils.parseFields(output, 0,
             TRACK_LINE::matcher,
             m -> m.group("object"),
             Integer::parseInt);
-        List<TrackedObjects> trackedObjects = new ArrayList<>();
         for (Integer object: objects) {
             Pattern pattern = Pattern.compile(String.format("track %s decrement (?<value>.+)", object));
             Optional<Boolean> maybeVrrp = ParsingUtils.parseField(output, 0,
@@ -117,7 +124,20 @@ public class Ipv4VrrpGroupConfigReader implements CliConfigReader<Config, Config
                 trackedObjects.add(trackedObject.build());
             }
         }
-        configAug.setTrackedObjects(trackedObjects);
+    }
+
+    private static void setShutdown(String output, List<TrackedObjects> trackedObjects) {
+        List<Integer> objects = ParsingUtils.parseFields(output, 0,
+            TRACK_SHUTDOWN_LINE::matcher,
+            m -> m.group("object"),
+            Integer::parseInt);
+        for (Integer object: objects) {
+            TrackedObjectsBuilder trackedObject = new TrackedObjectsBuilder()
+                    .setTrackedObjectId(object)
+                    .setShutdown(true);
+
+            trackedObjects.add(trackedObject.build());
+        }
     }
 
     private static void setPriority(String output, ConfigBuilder builder) {

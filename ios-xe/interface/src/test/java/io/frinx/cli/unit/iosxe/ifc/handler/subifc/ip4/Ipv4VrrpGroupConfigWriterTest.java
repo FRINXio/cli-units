@@ -45,6 +45,8 @@ public class Ipv4VrrpGroupConfigWriterTest {
         + "track 901 decrement 11\n"
         + "track 902 decrement 11\n"
         + "track 903 decrement 11\n"
+        + "track 100 shutdown\n"
+        + "no track 101 shutdown\n"
         + "address 192.168.100.0 primary\n"
         + "address 192.168.101.0 secondary\n"
         + "address 192.168.102.0 secondary\n"
@@ -78,6 +80,8 @@ public class Ipv4VrrpGroupConfigWriterTest {
         + "no preempt delay\n"
         + "no track 902 decrement 11\n"
         + "no track 903 decrement 11\n"
+        + "no track 100 shutdown\n"
+        + "no track 101 shutdown\n"
         + "track 900 decrement 11\n"
         + "track 901 decrement 11\n"
         + "track 904 decrement 11\n"
@@ -128,6 +132,14 @@ public class Ipv4VrrpGroupConfigWriterTest {
                     new TrackedObjectsBuilder()
                         .setTrackedObjectId(903)
                         .setPriorityDecrement((short) 11)
+                        .build(),
+                    new TrackedObjectsBuilder()
+                        .setTrackedObjectId(100)
+                        .setShutdown(true)
+                        .build(),
+                    new TrackedObjectsBuilder()
+                        .setTrackedObjectId(101)
+                        .setShutdown(false)
                         .build()
                 ))
                 .build()).build();
