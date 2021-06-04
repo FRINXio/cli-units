@@ -41,10 +41,12 @@ public class GlobalAfiSafiConfigReaderTest {
             + "  redistribute connected\n"
             + "  redistribute static\n"
             + "  default-information originate\n"
+            + "  table-map FOO filter\n"
             + " exit-address-family\n"
             + " address-family ipv4 vrf CIA-SINGLE1\n"
             + "  synchronization\n"
             + "  redistribute static\n"
+            + "  table-map BAR filter\n"
             + " exit-address-family\n"
             + " address-family ipv4 vrf CIA-SINGLE\n"
             + " exit-address-family\n";
@@ -59,16 +61,16 @@ public class GlobalAfiSafiConfigReaderTest {
     @Test
     public void parseConfigTest() {
         // default network instance
-        buildAndTest("default", IPV4UNICAST.class, false, null, null, null, null);
+        buildAndTest("default", IPV4UNICAST.class, false, null, null, null, null, null);
 
         // VLAN372638 network instance
-        buildAndTest("VLAN372638", IPV4UNICAST.class, null, true, true, true, true);
+        buildAndTest("VLAN372638", IPV4UNICAST.class, null, true, true, true, true, "FOO");
 
         // CIA-SINGLE network instance
-        buildAndTest("CIA-SINGLE", IPV4UNICAST.class, null, false, false, false, false);
+        buildAndTest("CIA-SINGLE", IPV4UNICAST.class, null, false, false, false, false, null);
 
         // CIA-SINGLE1 network instance
-        buildAndTest("CIA-SINGLE1", IPV4UNICAST.class, null, false, true, false, true);
+        buildAndTest("CIA-SINGLE1", IPV4UNICAST.class, null, false, true, false, true, "BAR");
     }
 
     private void buildAndTest(String vrfKey,
@@ -77,7 +79,8 @@ public class GlobalAfiSafiConfigReaderTest {
                               Boolean expectedRedistributeConnected,
                               Boolean expectedRedistributeStatic,
                               Boolean expectedDefaultInformation,
-                              Boolean expectedSynchronization) {
+                              Boolean expectedSynchronization,
+                              String expectedTableMap) {
         ConfigBuilder builder = new ConfigBuilder();
         GlobalAfiSafiConfigReader.parseConfig(OUTPUT, new NetworkInstanceKey(vrfKey), afiSafiName, builder);
         GlobalAfiSafiConfigAug configAug = builder.getAugmentation(GlobalAfiSafiConfigAug.class);
@@ -87,5 +90,6 @@ public class GlobalAfiSafiConfigReaderTest {
         Assert.assertEquals(expectedRedistributeStatic, configAug.isRedistributeStatic());
         Assert.assertEquals(expectedDefaultInformation, configAug.isDefaultInformationOriginate());
         Assert.assertEquals(expectedSynchronization, configAug.isSynchronization());
+        Assert.assertEquals(expectedTableMap, configAug.getTableMap());
     }
 }

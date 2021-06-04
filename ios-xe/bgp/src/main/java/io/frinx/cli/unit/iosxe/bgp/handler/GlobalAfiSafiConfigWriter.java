@@ -54,6 +54,7 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
             + "{% if ($redistStat) %}redistribute static\n{% endif %}"
             + "{% if ($defaultInf) %}default-information originate\n{% endif %}"
             + "{% if ($sync) %}synchronization\n{% endif %}"
+            + "{% if ($map) %}table-map {$map} filter\n{% endif %}"
             + "end";
 
     private static final String UPDATE_TEMPLATE = "configure terminal\n"
@@ -80,6 +81,10 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
             // synchronization
             + "{% if ($sync == TRUE) %}synchronization\n"
             + "{% elseIf ($sync == FALSE) %}no synchronization\n"
+            + "{% endif %}"
+            // table-map
+            + "{% if ($mapEnabled == TRUE) %}table-map {$map} filter\n"
+            + "{% elseIf ($mapEnabled == FALSE) %}no table-map\n"
             + "{% endif %}"
             + "end";
 
@@ -150,7 +155,8 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
                 "defaultInf", (vrfName != null && aug != null && aug.isDefaultInformationOriginate() != null
                         && aug.isDefaultInformationOriginate() && isIpv4) ? true : null,
                 "sync", (vrfName != null && aug != null && aug.isSynchronization() != null
-                        && aug.isSynchronization() && isIpv4) ? true : null
+                        && aug.isSynchronization() && isIpv4) ? true : null,
+                "map", (vrfName != null && aug != null && isIpv4) ? aug.getTableMap() : null
         );
     }
 
@@ -197,6 +203,7 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
 
     @VisibleForTesting
     String updateTemplate(Long as, @Nullable String vrfName, Config dataBefore, Config dataAfter) {
+        boolean isIpv4 = dataAfter.getAfiSafiName().equals(IPV4UNICAST.class);
         GlobalAfiSafiConfigAug augBefore = dataBefore.getAugmentation(GlobalAfiSafiConfigAug.class);
         GlobalAfiSafiConfigAug augAfter = dataAfter.getAugmentation(GlobalAfiSafiConfigAug.class);
 
@@ -208,7 +215,9 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
                 "redistCon", vrfName != null ? updateRedistributeConnected(augBefore, augAfter) : null,
                 "redistStat", vrfName != null ? updateRedistributeStatic(augBefore, augAfter) : null,
                 "defaultInf", vrfName != null ? updateDefaultInformation(augBefore, augAfter) : null,
-                "sync", vrfName != null ? updateSynchronization(augBefore, augAfter) : null
+                "sync", vrfName != null ? updateSynchronization(augBefore, augAfter) : null,
+                "mapEnabled", vrfName != null ? updateTableMap(augBefore, augAfter) : null,
+                "map", (vrfName != null && augAfter != null && isIpv4) ? augAfter.getTableMap() : null
         );
     }
 
@@ -258,6 +267,16 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
 
         if (!Objects.equals(synchronizationBefore, synchronizationAfter)) {
             return synchronizationAfter == null || !synchronizationAfter ? "FALSE" : Chunk.TRUE;
+        }
+        return null;
+    }
+
+    private String updateTableMap(GlobalAfiSafiConfigAug dataBefore, GlobalAfiSafiConfigAug dataAfter) {
+        String tableMapBefore = dataBefore != null ? dataBefore.getTableMap() : null;
+        String tableMapAfter = dataAfter != null ? dataAfter.getTableMap() : null;
+
+        if (!Objects.equals(tableMapBefore, tableMapAfter)) {
+            return tableMapAfter == null ? "FALSE" : Chunk.TRUE;
         }
         return null;
     }

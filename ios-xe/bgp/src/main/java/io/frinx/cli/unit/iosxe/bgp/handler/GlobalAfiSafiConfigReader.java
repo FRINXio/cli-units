@@ -48,6 +48,7 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
             + "|^  redistribute (connected|static)"
             + "|^  default-information originate"
             + "|^  synchronization"
+            + "|^  table-map"
             + "|^ exit-address-family";
 
     private static final Pattern AUTO_SUMMARY_PATTERN = Pattern.compile("auto-summary");
@@ -55,6 +56,7 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
     private static final Pattern REDISTRIBUTE_STAT_PATTERN = Pattern.compile("redistribute static");
     private static final Pattern DEFAULT_INFORMATION_PATTERN = Pattern.compile("default-information originate");
     private static final Pattern SYNCHRONIZATION_PATTERN = Pattern.compile("synchronization");
+    private static final Pattern TABLE_MAP_PATTERN = Pattern.compile("table-map (?<map>\\S+) filter");
 
     private Cli cli;
 
@@ -100,7 +102,7 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
 
     static void setRedistribute(GlobalAfiSafiConfigAugBuilder builder, String output, String vrfKey) {
         Pattern pattern = Pattern.compile("address-family.*|redistribute connected|redistribute static|"
-                + "default-information originate|synchronization|exit-address-family");
+                + "default-information originate|synchronization|table-map.*|exit-address-family");
         Pattern startPattern = Pattern.compile("address-family ipv4 vrf " + vrfKey);
         Pattern endPattern = Pattern.compile("exit-address-family");
 
@@ -131,6 +133,10 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
                 }
                 if (SYNCHRONIZATION_PATTERN.matcher(line).matches()) {
                     builder.setSynchronization(true);
+                }
+                Matcher tableMapMatcher = TABLE_MAP_PATTERN.matcher(line);
+                if (tableMapMatcher.matches()) {
+                    builder.setTableMap(tableMapMatcher.group("map"));
                 }
             }
             if (startPattern.matcher(line).matches()) {
