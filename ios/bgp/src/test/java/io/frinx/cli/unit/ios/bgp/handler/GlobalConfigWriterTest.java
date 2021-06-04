@@ -32,6 +32,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpGlobalConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpGlobalConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
@@ -55,21 +57,18 @@ public class GlobalConfigWriterTest {
         + "router bgp 65505\n"
         + "no bgp router id\n"
         + "bgp log-neighbor-changes\n"
-        + "default-information originate\n"
         + "end\n";
 
     private static final String WRITE_INPUT_2 = "configure terminal\n"
         + "router bgp 65505\n"
         + "no bgp router id\n"
         + "no bgp log-neighbor-changes\n"
-        + "no default-information originate\n"
         + "end\n";
 
     private static final String UPDATE_INPUT = "configure terminal\n"
         + "router bgp 65505\n"
         + "no bgp router id\n"
         + "bgp log-neighbor-changes\n"
-        + "no default-information originate\n"
         + "end\n";
 
     private static final String DELETE_INPUT = "configure terminal\n"
@@ -95,11 +94,10 @@ public class GlobalConfigWriterTest {
             .child(Neighbor.class, new NeighborKey(new IpAddress(new Ipv4Address("192.168.1.1"))));
 
     // test data
-    private org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config data;
-    private org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config updateData;
-    private org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config deleteData;
-    private org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config
-            dataWithoutDefaultInformationOriginateAug;
+    private Config data;
+    private Config updateData;
+    private Config deleteData;
+    private Config dataWithoutDefaultInformationOriginateAug;
 
     @Before
     public void setUp() {
@@ -112,31 +110,25 @@ public class GlobalConfigWriterTest {
     }
 
     private void initializeData() {
-        dataWithoutDefaultInformationOriginateAug = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang
-                .bgp.rev170202.bgp.global.base.ConfigBuilder()
+        dataWithoutDefaultInformationOriginateAug = new ConfigBuilder()
                 .setAs(new AsNumber(65505L))
                 .build();
 
-        data = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
-                .ConfigBuilder()
+        data = new ConfigBuilder()
             .setAs(new AsNumber(65505L))
             .addAugmentation(BgpGlobalConfigAug.class, new BgpGlobalConfigAugBuilder()
-                .setDefaultInformationOriginate(true)
                 .setLogNeighborChanges(true)
                 .build())
             .build();
 
-        updateData = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
-                .ConfigBuilder()
+        updateData = new ConfigBuilder()
             .setAs(new AsNumber(65505L))
             .addAugmentation(BgpGlobalConfigAug.class, new BgpGlobalConfigAugBuilder()
-                .setDefaultInformationOriginate(false)
                 .setLogNeighborChanges(true)
                 .build())
             .build();
 
-        deleteData = new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base
-                .ConfigBuilder()
+        deleteData = new ConfigBuilder()
             .setAs(new AsNumber(65505L))
             .build();
     }

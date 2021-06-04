@@ -30,10 +30,10 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.yang.re
 
 public class GlobalAfiSafiConfigWriterTest {
 
-    GlobalAfiSafiConfigWriter writer;
+    private GlobalAfiSafiConfigWriter writer;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         writer = new GlobalAfiSafiConfigWriter(Mockito.mock(Cli.class));
     }
 
@@ -44,25 +44,29 @@ public class GlobalAfiSafiConfigWriterTest {
                         + "address-family ipv4\n"
                         + "auto-summary\n"
                         + "end",
-                writer.writeTemplate(65333L, null, null, createConfig(true, null, null)));
+                writer.writeTemplate(65333L, null, null,
+                        createConfig(true, null, null, null, null)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
                         + "address-family ipv4\n"
                         + "end",
-                writer.writeTemplate(65333L, null, null, createConfig(false, null, null)));
+                writer.writeTemplate(65333L, null, null,
+                        createConfig(false, null, null, null, null)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
                         + "address-family ipv4\n"
                         + "end",
-                writer.writeTemplate(65333L, null, null, createConfig(null, null, null)));
+                writer.writeTemplate(65333L, null, null,
+                        createConfig(null, null, null, null, null)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
                         + "address-family ipv4\n"
                         + "end",
-                writer.writeTemplate(65333L, null, null, createConfig(null, true, true)));
+                writer.writeTemplate(65333L, null, null,
+                        createConfig(null, true, true, true, true)));
     }
 
     @Test
@@ -72,7 +76,7 @@ public class GlobalAfiSafiConfigWriterTest {
                         + "address-family ipv4 vrf vlan12\n"
                         + "end",
                 writer.writeTemplate(65333L, "vlan12", null,
-                        createConfig(null, null, null)));
+                        createConfig(null, null, null, null, null)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
@@ -80,24 +84,26 @@ public class GlobalAfiSafiConfigWriterTest {
                         + "bgp router-id 0.0.0.0\n"
                         + "end",
                 writer.writeTemplate(65333L, "vlan12", new DottedQuad("0.0.0.0"),
-                        createConfig(null, null, null)));
+                        createConfig(null, null, null, null, null)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
                         + "address-family ipv4 vrf vlan12\n"
                         + "bgp router-id 0.0.0.0\n"
                         + "redistribute connected\n"
+                        + "default-information originate\n"
                         + "end",
                 writer.writeTemplate(65333L, "vlan12", new DottedQuad("0.0.0.0"),
-                        createConfig(true, true, null)));
+                        createConfig(true, true, null, true, null)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
                         + "address-family ipv4 vrf vlan12\n"
                         + "redistribute static\n"
+                        + "synchronization\n"
                         + "end",
                 writer.writeTemplate(65333L, "vlan12", null,
-                        createConfig(null, null, true)));
+                        createConfig(null, null, true, null, true)));
     }
 
     @Test
@@ -108,8 +114,8 @@ public class GlobalAfiSafiConfigWriterTest {
                         + "no auto-summary\n"
                         + "end",
                 writer.updateTemplate(65333L, null,
-                        createConfig(true, null, null),
-                        createConfig(false, null, null)));
+                        createConfig(true, null, null, null, null),
+                        createConfig(false, null, null, null, null)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
@@ -117,8 +123,8 @@ public class GlobalAfiSafiConfigWriterTest {
                         + "auto-summary\n"
                         + "end",
                 writer.updateTemplate(65333L, null,
-                        createConfig(false, null, null),
-                        createConfig(true, null, null)));
+                        createConfig(false, null, null, null, null),
+                        createConfig(true, null, null, null, null)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
@@ -126,8 +132,8 @@ public class GlobalAfiSafiConfigWriterTest {
                         + "no auto-summary\n"
                         + "end",
                 writer.updateTemplate(65333L, null,
-                        createConfig(true, null, null),
-                        createConfig(false, true, true)));
+                        createConfig(true, null, null, null, null),
+                        createConfig(false, true, true, true, true)));
     }
 
     @Test
@@ -137,59 +143,60 @@ public class GlobalAfiSafiConfigWriterTest {
                         + "address-family ipv4 vrf VLAN1234\n"
                         + "end",
                 writer.updateTemplate(65333L, "VLAN1234",
-                        createConfig(true, null, null),
-                        createConfig(false, null, null)));
+                        createConfig(true, null, null, null, null),
+                        createConfig(false, null, null, null, null)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
                         + "address-family ipv4 vrf VLAN1234\n"
                         + "redistribute connected\n"
                         + "redistribute static\n"
+                        + "default-information originate\n"
+                        + "synchronization\n"
                         + "end",
                 writer.updateTemplate(65333L, "VLAN1234",
-                        createConfig(null, null, null),
-                        createConfig(null, true, true)));
+                        createConfig(null, null, null, null, null),
+                        createConfig(null, true, true, true, true)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
                         + "address-family ipv4 vrf VLAN1234\n"
                         + "end",
                 writer.updateTemplate(65333L, "VLAN1234",
-                        createConfig(null, true, true),
-                        createConfig(null, true, true)));
+                        createConfig(null, true, true, true, true),
+                        createConfig(null, true, true, true, true)));
 
         Assert.assertEquals("configure terminal\n"
                         + "router bgp 65333\n"
                         + "address-family ipv4 vrf VLAN1234\n"
                         + "no redistribute connected\n"
                         + "no redistribute static\n"
+                        + "no default-information originate\n"
+                        + "no synchronization\n"
                         + "end",
                 writer.updateTemplate(65333L, "VLAN1234",
-                        createConfig(null, true, true),
-                        createConfig(null, false, false)));
+                        createConfig(null, true, true, true, true),
+                        createConfig(null, false, false, false, false)));
 
     }
 
-    private Config createConfig(Boolean autoSummary, Boolean redistCon, Boolean redistStat) {
+    private Config createConfig(Boolean autoSummary,
+                                Boolean redistCon,
+                                Boolean redistStat,
+                                Boolean defaultInf,
+                                Boolean sync) {
         ConfigBuilder builder = new ConfigBuilder().setAfiSafiName(IPV4UNICAST.class);
 
-        if (autoSummary != null || redistCon != null || redistStat != null) {
+        if (autoSummary != null || redistCon != null || redistStat != null || defaultInf != null || sync != null) {
             GlobalAfiSafiConfigAugBuilder augBuilder = new GlobalAfiSafiConfigAugBuilder();
-
-            if (autoSummary != null) {
-                augBuilder.setAutoSummary(autoSummary);
-            }
-            if (redistCon != null) {
-                augBuilder.setRedistributeConnected(redistCon);
-            }
-            if (redistStat != null) {
-                augBuilder.setRedistributeStatic(redistStat);
-            }
-
-            return builder.addAugmentation(GlobalAfiSafiConfigAug.class, augBuilder.build()).build();
+            augBuilder.setAutoSummary(autoSummary);
+            augBuilder.setRedistributeConnected(redistCon);
+            augBuilder.setRedistributeStatic(redistStat);
+            augBuilder.setDefaultInformationOriginate(defaultInf);
+            augBuilder.setSynchronization(sync);
+            builder.addAugmentation(GlobalAfiSafiConfigAug.class, augBuilder.build());
         }
 
         return builder.build();
     }
 }
-

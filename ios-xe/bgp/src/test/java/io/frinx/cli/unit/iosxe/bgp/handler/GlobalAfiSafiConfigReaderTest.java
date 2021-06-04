@@ -37,10 +37,13 @@ public class GlobalAfiSafiConfigReaderTest {
             + " address-family ipv4 vrf iaksip\n"
             + " exit-address-family\n"
             + " address-family ipv4 vrf VLAN372638\n"
+            + "  synchronization\n"
             + "  redistribute connected\n"
             + "  redistribute static\n"
+            + "  default-information originate\n"
             + " exit-address-family\n"
             + " address-family ipv4 vrf CIA-SINGLE1\n"
+            + "  synchronization\n"
             + "  redistribute static\n"
             + " exit-address-family\n"
             + " address-family ipv4 vrf CIA-SINGLE\n"
@@ -49,41 +52,40 @@ public class GlobalAfiSafiConfigReaderTest {
     @Test
     public void setAutoSummaryTest() {
         ConfigBuilder builder = new ConfigBuilder();
-
-        GlobalAfiSafiConfigReader.parseConfig(
-                OUTPUT, new NetworkInstanceKey("default"), IPV4UNICAST.class, builder);
-
-
+        GlobalAfiSafiConfigReader.parseConfig(OUTPUT, new NetworkInstanceKey("default"), IPV4UNICAST.class, builder);
         Assert.assertEquals(false, builder.getAugmentation(GlobalAfiSafiConfigAug.class).isAutoSummary());
     }
 
     @Test
     public void parseConfigTest() {
         // default network instance
-        buildAndTest("default", IPV4UNICAST.class, false, null, null);
+        buildAndTest("default", IPV4UNICAST.class, false, null, null, null, null);
 
         // VLAN372638 network instance
-        buildAndTest("VLAN372638", IPV4UNICAST.class, null, true, true);
+        buildAndTest("VLAN372638", IPV4UNICAST.class, null, true, true, true, true);
 
         // CIA-SINGLE network instance
-        buildAndTest("CIA-SINGLE", IPV4UNICAST.class, null, false, false);
+        buildAndTest("CIA-SINGLE", IPV4UNICAST.class, null, false, false, false, false);
 
         // CIA-SINGLE1 network instance
-        buildAndTest("CIA-SINGLE1", IPV4UNICAST.class, null, false, true);
+        buildAndTest("CIA-SINGLE1", IPV4UNICAST.class, null, false, true, false, true);
     }
 
-    private void buildAndTest(String vrfKey, Class<? extends AFISAFITYPE> afiSafiName,
-                              Boolean expectedAutoSummary, Boolean expectedRedistributeConnected,
-                              Boolean expectedRedistributeStatic) {
+    private void buildAndTest(String vrfKey,
+                              Class<? extends AFISAFITYPE> afiSafiName,
+                              Boolean expectedAutoSummary,
+                              Boolean expectedRedistributeConnected,
+                              Boolean expectedRedistributeStatic,
+                              Boolean expectedDefaultInformation,
+                              Boolean expectedSynchronization) {
         ConfigBuilder builder = new ConfigBuilder();
-
-        GlobalAfiSafiConfigReader.parseConfig(OUTPUT, new NetworkInstanceKey(vrfKey),
-                afiSafiName, builder);
-
+        GlobalAfiSafiConfigReader.parseConfig(OUTPUT, new NetworkInstanceKey(vrfKey), afiSafiName, builder);
         GlobalAfiSafiConfigAug configAug = builder.getAugmentation(GlobalAfiSafiConfigAug.class);
+
         Assert.assertEquals(expectedAutoSummary, configAug.isAutoSummary());
         Assert.assertEquals(expectedRedistributeConnected, configAug.isRedistributeConnected());
         Assert.assertEquals(expectedRedistributeStatic, configAug.isRedistributeStatic());
+        Assert.assertEquals(expectedDefaultInformation, configAug.isDefaultInformationOriginate());
+        Assert.assertEquals(expectedSynchronization, configAug.isSynchronization());
     }
 }
-

@@ -46,11 +46,15 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
             + "|^  (auto-summary|no auto-summary)"
             + "|^ *address-family"
             + "|^  redistribute (connected|static)"
+            + "|^  default-information originate"
+            + "|^  synchronization"
             + "|^ exit-address-family";
 
     private static final Pattern AUTO_SUMMARY_PATTERN = Pattern.compile("auto-summary");
     private static final Pattern REDISTRIBUTE_CON_PATTERN = Pattern.compile("redistribute connected");
     private static final Pattern REDISTRIBUTE_STAT_PATTERN = Pattern.compile("redistribute static");
+    private static final Pattern DEFAULT_INFORMATION_PATTERN = Pattern.compile("default-information originate");
+    private static final Pattern SYNCHRONIZATION_PATTERN = Pattern.compile("synchronization");
 
     private Cli cli;
 
@@ -95,14 +99,16 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
     }
 
     static void setRedistribute(GlobalAfiSafiConfigAugBuilder builder, String output, String vrfKey) {
-        Pattern pattern = Pattern.compile("address-family.*|redistribute connected|redistribute static"
-                + "|exit-address-family");
+        Pattern pattern = Pattern.compile("address-family.*|redistribute connected|redistribute static|"
+                + "default-information originate|synchronization|exit-address-family");
         Pattern startPattern = Pattern.compile("address-family ipv4 vrf " + vrfKey);
         Pattern endPattern = Pattern.compile("exit-address-family");
 
         // default values
         builder.setRedistributeConnected(false);
         builder.setRedistributeStatic(false);
+        builder.setDefaultInformationOriginate(false);
+        builder.setSynchronization(false);
 
         List<String> lines = ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
@@ -119,6 +125,12 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
                 }
                 if (REDISTRIBUTE_STAT_PATTERN.matcher(line).matches()) {
                     builder.setRedistributeStatic(true);
+                }
+                if (DEFAULT_INFORMATION_PATTERN.matcher(line).matches()) {
+                    builder.setDefaultInformationOriginate(true);
+                }
+                if (SYNCHRONIZATION_PATTERN.matcher(line).matches()) {
+                    builder.setSynchronization(true);
                 }
             }
             if (startPattern.matcher(line).matches()) {

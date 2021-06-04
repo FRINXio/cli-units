@@ -62,7 +62,7 @@ public class GlobalConfigWriter implements CliWriter<Config> {
 
     @Override
     public void writeCurrentAttributes(InstanceIdentifier<Config> id, Config config,
-                                              WriteContext writeContext) throws WriteFailedException {
+                                       WriteContext writeContext) throws WriteFailedException {
 
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         ProtocolKey protoKey = id.firstKeyOf(Protocol.class);
@@ -77,7 +77,6 @@ public class GlobalConfigWriter implements CliWriter<Config> {
                     config.getRouterId() == null ? "no bgp router id" : f("bgp router-id %s", config.getRouterId()
                             .getValue()),
                     getLogNeighborChanges(config),
-                    getDefaultOriginate(config),
                     "end");
         } else {
             // Compare AS for global and current VRF. Must match for IOS
@@ -119,17 +118,6 @@ public class GlobalConfigWriter implements CliWriter<Config> {
         if (aug != null) {
             if (aug.isLogNeighborChanges() != null) {
                 return aug.isLogNeighborChanges() ? command : "no " + command;
-            }
-        }
-        return "no " + command;
-    }
-
-    private String getDefaultOriginate(Config config) {
-        String command = "default-information originate";
-        BgpGlobalConfigAug aug = config.getAugmentation(BgpGlobalConfigAug.class);
-        if (aug != null) {
-            if (aug.isDefaultInformationOriginate() != null) {
-                return aug.isDefaultInformationOriginate() ? command : "no " + command;
             }
         }
         return "no " + command;

@@ -52,6 +52,8 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
             + "{% if ($autoSummary) %}auto-summary\n{% endif %}"
             + "{% if ($redistCon) %}redistribute connected\n{% endif %}"
             + "{% if ($redistStat) %}redistribute static\n{% endif %}"
+            + "{% if ($defaultInf) %}default-information originate\n{% endif %}"
+            + "{% if ($sync) %}synchronization\n{% endif %}"
             + "end";
 
     private static final String UPDATE_TEMPLATE = "configure terminal\n"
@@ -70,6 +72,14 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
             // redistribute-static
             + "{% if ($redistStat == TRUE) %}redistribute static\n"
             + "{% elseIf ($redistStat == FALSE) %}no redistribute static\n"
+            + "{% endif %}"
+            // default-information originate
+            + "{% if ($defaultInf == TRUE) %}default-information originate\n"
+            + "{% elseIf ($defaultInf == FALSE) %}no default-information originate\n"
+            + "{% endif %}"
+            // synchronization
+            + "{% if ($sync == TRUE) %}synchronization\n"
+            + "{% elseIf ($sync == FALSE) %}no synchronization\n"
             + "{% endif %}"
             + "end";
 
@@ -136,7 +146,11 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
                 "redistCon", (vrfName != null && aug != null && aug.isRedistributeConnected() != null
                         && aug.isRedistributeConnected() && isIpv4) ? true : null,
                 "redistStat", (vrfName != null && aug != null && aug.isRedistributeStatic() != null
-                        && aug.isRedistributeStatic() && isIpv4) ? true : null
+                        && aug.isRedistributeStatic() && isIpv4) ? true : null,
+                "defaultInf", (vrfName != null && aug != null && aug.isDefaultInformationOriginate() != null
+                        && aug.isDefaultInformationOriginate() && isIpv4) ? true : null,
+                "sync", (vrfName != null && aug != null && aug.isSynchronization() != null
+                        && aug.isSynchronization() && isIpv4) ? true : null
         );
     }
 
@@ -192,7 +206,9 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
                 "afiSafiName", toDeviceAddressFamily(dataAfter.getAfiSafiName()),
                 "autoSummary", vrfName == null ? updateAutoSummary(augBefore, augAfter) : null,
                 "redistCon", vrfName != null ? updateRedistributeConnected(augBefore, augAfter) : null,
-                "redistStat", vrfName != null ? updateRedistributeStatic(augBefore, augAfter) : null
+                "redistStat", vrfName != null ? updateRedistributeStatic(augBefore, augAfter) : null,
+                "defaultInf", vrfName != null ? updateDefaultInformation(augBefore, augAfter) : null,
+                "sync", vrfName != null ? updateSynchronization(augBefore, augAfter) : null
         );
     }
 
@@ -211,7 +227,7 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
         Boolean redistributeConAfter = dataAfter != null ? dataAfter.isRedistributeConnected() : null;
 
         if (!Objects.equals(redistributeConBefore, redistributeConAfter)) {
-            return redistributeConAfter ? Chunk.TRUE : "FALSE";
+            return redistributeConAfter == null || !redistributeConAfter ? "FALSE" : Chunk.TRUE;
         }
         return null;
     }
@@ -221,7 +237,27 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
         Boolean redistributeStatAfter = dataAfter != null ? dataAfter.isRedistributeStatic() : null;
 
         if (!Objects.equals(redistributeStatAfter, redistributeStatBefore)) {
-            return redistributeStatAfter ? Chunk.TRUE : "FALSE";
+            return redistributeStatAfter == null || !redistributeStatAfter ? "FALSE" : Chunk.TRUE;
+        }
+        return null;
+    }
+
+    private String updateDefaultInformation(GlobalAfiSafiConfigAug dataBefore, GlobalAfiSafiConfigAug dataAfter) {
+        Boolean defaultInformationBefore = dataBefore != null ? dataBefore.isDefaultInformationOriginate() : null;
+        Boolean defaultInformationAfter = dataAfter != null ? dataAfter.isDefaultInformationOriginate() : null;
+
+        if (!Objects.equals(defaultInformationBefore, defaultInformationAfter)) {
+            return defaultInformationAfter == null || !defaultInformationAfter ? "FALSE" : Chunk.TRUE;
+        }
+        return null;
+    }
+
+    private String updateSynchronization(GlobalAfiSafiConfigAug dataBefore, GlobalAfiSafiConfigAug dataAfter) {
+        Boolean synchronizationBefore = dataBefore != null ? dataBefore.isSynchronization() : null;
+        Boolean synchronizationAfter = dataAfter != null ? dataAfter.isSynchronization() : null;
+
+        if (!Objects.equals(synchronizationBefore, synchronizationAfter)) {
+            return synchronizationAfter == null || !synchronizationAfter ? "FALSE" : Chunk.TRUE;
         }
         return null;
     }
