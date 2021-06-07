@@ -50,14 +50,21 @@ public final class BgpAfiSafiChecks {
      */
     public static void checkAddressFamilies(final NetworkInstanceKey vrfKey, final Bgp bgpConfigurationAfter) {
         final Long autonomousSystemNumber = bgpConfigurationAfter.getGlobal().getConfig().getAs().getValue();
-        final Set<? extends Class<? extends AFISAFITYPE>> globalAfiSafis = getGlobalAfiSafis(bgpConfigurationAfter);
-        final Set<Class<? extends AFISAFITYPE>> specificAfiSafis = getSpecificAfiSafis(bgpConfigurationAfter);
+        final Set<? extends Class<? extends AFISAFITYPE>> globalAfiSafis =
+                bgpConfigurationAfter.getGlobal().getAfiSafis() != null ? getGlobalAfiSafis(bgpConfigurationAfter) :
+                null;
+        final Set<Class<? extends AFISAFITYPE>> specificAfiSafis =
+                bgpConfigurationAfter.getGlobal().getAfiSafis() != null ? getSpecificAfiSafis(bgpConfigurationAfter) :
+                null;
 
-        // 1. check - all neighbor and peer-group afi-safis must be placed in global afi-safis
-        checkGlobalAfiSafisContainSpecificAfiSafis(autonomousSystemNumber, globalAfiSafis, specificAfiSafis);
+        if (globalAfiSafis != null && specificAfiSafis != null) {
+            // 1. check - all neighbor and peer-group afi-safis must be placed in global afi-safis
+            checkGlobalAfiSafisContainSpecificAfiSafis(autonomousSystemNumber, globalAfiSafis, specificAfiSafis);
 
-        // 2. check - some of global afi-safis must be placed somewhere under neighbors or peer-groups
-        checkSpecificAfiSafisContainGlobalAfiSafis(autonomousSystemNumber, vrfKey, globalAfiSafis, specificAfiSafis);
+            // 2. check - some of global afi-safis must be placed somewhere under neighbors or peer-groups
+            checkSpecificAfiSafisContainGlobalAfiSafis(autonomousSystemNumber, vrfKey,
+                    globalAfiSafis, specificAfiSafis);
+        }
     }
 
     private static Set<? extends Class<? extends AFISAFITYPE>> getGlobalAfiSafis(final Bgp bgpConfigurationAfter) {

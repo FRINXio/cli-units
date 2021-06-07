@@ -167,8 +167,8 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
     }
 
     private static boolean afiSafisHaveChanged(final PeerGroup before, final PeerGroup after) {
-        final List<AfiSafi> afiSafisBefore = before.getAfiSafis().getAfiSafi();
-        final List<AfiSafi> afiSafisAfter = after.getAfiSafis().getAfiSafi();
+        final List<AfiSafi> afiSafisBefore = before.getAfiSafis() != null ? before.getAfiSafis().getAfiSafi() : null;
+        final List<AfiSafi> afiSafisAfter = after.getAfiSafis() != null ? after.getAfiSafis().getAfiSafi() : null;
         if (afiSafisBefore == null && afiSafisAfter != null || afiSafisBefore != null && afiSafisAfter == null) {
             return true;
         } else if (afiSafisAfter == null) {
