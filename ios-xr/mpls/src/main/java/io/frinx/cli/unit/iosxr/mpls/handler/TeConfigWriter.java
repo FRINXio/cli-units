@@ -74,7 +74,6 @@ public class TeConfigWriter implements CliWriter<Config> {
             Preconditions.checkArgument(ifaces == null || ifaces.getInterface() == null
                             || ifaces.getInterface().isEmpty(),
                     "Invalid request, interfaces cannot be present when mpls is disabled.");
-            return;
         }
         blockingDeleteAndRead(cli, instanceIdentifier, NO_MPLS_COMMAND);
     }
