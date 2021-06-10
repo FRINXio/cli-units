@@ -38,8 +38,8 @@ public class GlobalAfiSafiConfigReaderTest {
             + " exit-address-family\n"
             + " address-family ipv4 vrf VLAN372638\n"
             + "  synchronization\n"
-            + "  redistribute connected\n"
-            + "  redistribute static\n"
+            + "  redistribute connected route-map FOO\n"
+            + "  redistribute static route-map BAR\n"
             + "  default-information originate\n"
             + " exit-address-family\n"
             + " address-family ipv4 vrf CIA-SINGLE1\n"
@@ -59,23 +59,25 @@ public class GlobalAfiSafiConfigReaderTest {
     @Test
     public void parseConfigTest() {
         // default network instance
-        buildAndTest("default", IPV4UNICAST.class, false, null, null, null, null);
+        buildAndTest("default", IPV4UNICAST.class, false, null, null, null, null, null, null);
 
         // VLAN372638 network instance
-        buildAndTest("VLAN372638", IPV4UNICAST.class, null, true, true, true, true);
+        buildAndTest("VLAN372638", IPV4UNICAST.class, null, true, "FOO", true, "BAR", true, true);
 
         // CIA-SINGLE network instance
-        buildAndTest("CIA-SINGLE", IPV4UNICAST.class, null, false, false, false, false);
+        buildAndTest("CIA-SINGLE", IPV4UNICAST.class, null, false, null, false, null, false, false);
 
         // CIA-SINGLE1 network instance
-        buildAndTest("CIA-SINGLE1", IPV4UNICAST.class, null, false, true, false, true);
+        buildAndTest("CIA-SINGLE1", IPV4UNICAST.class, null, false, null, true, null, false, true);
     }
 
     private void buildAndTest(String vrfKey,
                               Class<? extends AFISAFITYPE> afiSafiName,
                               Boolean expectedAutoSummary,
-                              Boolean expectedRedistributeConnected,
-                              Boolean expectedRedistributeStatic,
+                              Boolean expectedRedistributeConnectedEnabled,
+                              String expectedRedistributeConnectedRouteMap,
+                              Boolean expectedRedistributeStaticEnabled,
+                              String expectedRedistributeStaticRouteMap,
                               Boolean expectedDefaultInformation,
                               Boolean expectedSynchronization) {
         ConfigBuilder builder = new ConfigBuilder();
@@ -83,8 +85,22 @@ public class GlobalAfiSafiConfigReaderTest {
         GlobalAfiSafiConfigAug configAug = builder.getAugmentation(GlobalAfiSafiConfigAug.class);
 
         Assert.assertEquals(expectedAutoSummary, configAug.isAutoSummary());
-        Assert.assertEquals(expectedRedistributeConnected, configAug.isRedistributeConnected());
-        Assert.assertEquals(expectedRedistributeStatic, configAug.isRedistributeStatic());
+
+        if (expectedRedistributeConnectedEnabled == null) {
+            Assert.assertNull(configAug.getRedistributeConnected());
+        } else {
+            Assert.assertEquals(expectedRedistributeConnectedEnabled, configAug.getRedistributeConnected().isEnabled());
+            Assert.assertEquals(expectedRedistributeConnectedRouteMap,
+                    configAug.getRedistributeConnected().getRouteMap());
+        }
+
+        if (expectedRedistributeStaticEnabled == null) {
+            Assert.assertNull(configAug.getRedistributeStatic());
+        } else {
+            Assert.assertEquals(expectedRedistributeStaticEnabled, configAug.getRedistributeStatic().isEnabled());
+            Assert.assertEquals(expectedRedistributeStaticRouteMap, configAug.getRedistributeStatic().getRouteMap());
+        }
+
         Assert.assertEquals(expectedDefaultInformation, configAug.isDefaultInformationOriginate());
         Assert.assertEquals(expectedSynchronization, configAug.isSynchronization());
     }

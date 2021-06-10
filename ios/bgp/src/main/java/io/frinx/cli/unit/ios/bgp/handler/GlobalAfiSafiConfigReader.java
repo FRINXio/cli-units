@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.GlobalAfiSafiConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.GlobalAfiSafiConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.global.afi.safi.config.extension.RedistributeConnectedBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.global.afi.safi.config.extension.RedistributeStaticBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.afi.safi.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.afi.safi.ConfigBuilder;
@@ -51,8 +53,10 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
             + "|^ exit-address-family";
 
     private static final Pattern AUTO_SUMMARY_PATTERN = Pattern.compile("auto-summary");
-    private static final Pattern REDISTRIBUTE_CON_PATTERN = Pattern.compile("redistribute connected");
-    private static final Pattern REDISTRIBUTE_STAT_PATTERN = Pattern.compile("redistribute static");
+    private static final Pattern REDISTRIBUTE_CON_PATTERN =
+            Pattern.compile("redistribute connected( route-map (?<map>\\S+))?.*");
+    private static final Pattern REDISTRIBUTE_STAT_PATTERN =
+            Pattern.compile("redistribute static( route-map (?<map>\\S+))?.*");
     private static final Pattern DEFAULT_INFORMATION_PATTERN = Pattern.compile("default-information originate");
     private static final Pattern SYNCHRONIZATION_PATTERN = Pattern.compile("synchronization");
 
@@ -99,14 +103,14 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
     }
 
     static void setRedistribute(GlobalAfiSafiConfigAugBuilder builder, String output, String vrfKey) {
-        Pattern pattern = Pattern.compile("address-family.*|redistribute connected|redistribute static|"
+        Pattern pattern = Pattern.compile("address-family.*|redistribute connected.*|redistribute static.*|"
                 + "default-information originate|synchronization|exit-address-family");
         Pattern startPattern = Pattern.compile("address-family ipv4 vrf " + vrfKey);
         Pattern endPattern = Pattern.compile("exit-address-family");
 
         // default values
-        builder.setRedistributeConnected(false);
-        builder.setRedistributeStatic(false);
+        builder.setRedistributeConnected(new RedistributeConnectedBuilder().setEnabled(false).build());
+        builder.setRedistributeStatic(new RedistributeStaticBuilder().setEnabled(false).build());
         builder.setDefaultInformationOriginate(false);
         builder.setSynchronization(false);
 
@@ -120,15 +124,26 @@ public class GlobalAfiSafiConfigReader implements CliConfigReader<Config, Config
         boolean run = false;
         for (String line : lines) {
             if (run) {
-                if (REDISTRIBUTE_CON_PATTERN.matcher(line).matches()) {
-                    builder.setRedistributeConnected(true);
+                final Matcher redistributeConnectedMatcher = REDISTRIBUTE_CON_PATTERN.matcher(line);
+                if (redistributeConnectedMatcher.matches()) {
+                    builder.setRedistributeConnected(new RedistributeConnectedBuilder()
+                            .setEnabled(true)
+                            .setRouteMap(redistributeConnectedMatcher.group("map"))
+                            .build());
                 }
-                if (REDISTRIBUTE_STAT_PATTERN.matcher(line).matches()) {
-                    builder.setRedistributeStatic(true);
+
+                final Matcher redistributeStaticMatcher = REDISTRIBUTE_STAT_PATTERN.matcher(line);
+                if (redistributeStaticMatcher.matches()) {
+                    builder.setRedistributeStatic(new RedistributeStaticBuilder()
+                            .setEnabled(true)
+                            .setRouteMap(redistributeStaticMatcher.group("map"))
+                            .build());
                 }
+
                 if (DEFAULT_INFORMATION_PATTERN.matcher(line).matches()) {
                     builder.setDefaultInformationOriginate(true);
                 }
+
                 if (SYNCHRONIZATION_PATTERN.matcher(line).matches()) {
                     builder.setSynchronization(true);
                 }

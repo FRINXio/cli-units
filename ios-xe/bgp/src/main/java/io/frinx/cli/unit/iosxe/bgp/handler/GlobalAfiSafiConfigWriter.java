@@ -28,6 +28,8 @@ import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.GlobalAfiSafiConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.global.afi.safi.config.extension.RedistributeConnected;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.global.afi.safi.config.extension.RedistributeStatic;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.afi.safi.list.afi.safi.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
@@ -50,8 +52,10 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
             + "{% endif %}"
             + "{% if ($routerId) %}bgp router-id {$routerId}\n{% endif %}"
             + "{% if ($autoSummary) %}auto-summary\n{% endif %}"
-            + "{% if ($redistCon) %}redistribute connected\n{% endif %}"
-            + "{% if ($redistStat) %}redistribute static\n{% endif %}"
+            + "{% if ($redistCon) %}redistribute connected"
+            + "{% if ($redistConRouteMap) %} route-map {$redistConRouteMap}{% endif %}\n{% endif %}"
+            + "{% if ($redistStat) %}redistribute static"
+            + "{% if ($redistStatRouteMap) %} route-map {$redistStatRouteMap}{% endif %}\n{% endif %}"
             + "{% if ($defaultInf) %}default-information originate\n{% endif %}"
             + "{% if ($sync) %}synchronization\n{% endif %}"
             + "{% if ($map) %}table-map {$map} filter\n{% endif %}"
@@ -67,13 +71,9 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
             + "{% elseIf ($autoSummary == FALSE) %}no auto-summary\n"
             + "{% endif %}"
             // redistribute-connected
-            + "{% if ($redistCon == TRUE) %}redistribute connected\n"
-            + "{% elseIf ($redistCon == FALSE) %}no redistribute connected\n"
-            + "{% endif %}"
+            + "{% if ($redistCon) %}{$redistCon}{% endif %}"
             // redistribute-static
-            + "{% if ($redistStat == TRUE) %}redistribute static\n"
-            + "{% elseIf ($redistStat == FALSE) %}no redistribute static\n"
-            + "{% endif %}"
+            + "{% if ($redistStat) %}{$redistStat}{% endif %}"
             // default-information originate
             + "{% if ($defaultInf == TRUE) %}default-information originate\n"
             + "{% elseIf ($defaultInf == FALSE) %}no default-information originate\n"
@@ -148,10 +148,16 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
                 "afiSafiName", toDeviceAddressFamily(config.getAfiSafiName()),
                 "autoSummary", (vrfName == null && aug != null && aug.isAutoSummary() != null
                         && aug.isAutoSummary() && isIpv4) ? true : null,
-                "redistCon", (vrfName != null && aug != null && aug.isRedistributeConnected() != null
-                        && aug.isRedistributeConnected() && isIpv4) ? true : null,
-                "redistStat", (vrfName != null && aug != null && aug.isRedistributeStatic() != null
-                        && aug.isRedistributeStatic() && isIpv4) ? true : null,
+                "redistCon", (vrfName != null && aug != null && aug.getRedistributeConnected() != null
+                        && aug.getRedistributeConnected().isEnabled() != null
+                        && aug.getRedistributeConnected().isEnabled() && isIpv4) ? true : null,
+                "redistConRouteMap", (vrfName != null && aug != null && aug.getRedistributeConnected() != null
+                        && isIpv4) ? aug.getRedistributeConnected().getRouteMap() : null,
+                "redistStat", (vrfName != null && aug != null && aug.getRedistributeStatic() != null
+                        && aug.getRedistributeStatic().isEnabled() != null
+                        && aug.getRedistributeStatic().isEnabled() && isIpv4) ? true : null,
+                "redistStatRouteMap", (vrfName != null && aug != null && aug.getRedistributeStatic() != null
+                        && isIpv4) ? aug.getRedistributeStatic().getRouteMap() : null,
                 "defaultInf", (vrfName != null && aug != null && aug.isDefaultInformationOriginate() != null
                         && aug.isDefaultInformationOriginate() && isIpv4) ? true : null,
                 "sync", (vrfName != null && aug != null && aug.isSynchronization() != null
@@ -232,22 +238,54 @@ public class GlobalAfiSafiConfigWriter implements CliWriter<Config> {
     }
 
     private String updateRedistributeConnected(GlobalAfiSafiConfigAug dataBefore, GlobalAfiSafiConfigAug dataAfter) {
-        Boolean redistributeConBefore = dataBefore != null ? dataBefore.isRedistributeConnected() : null;
-        Boolean redistributeConAfter = dataAfter != null ? dataAfter.isRedistributeConnected() : null;
+        RedistributeConnected redistributeConBefore = dataBefore != null ? dataBefore.getRedistributeConnected() : null;
+        RedistributeConnected redistributeConAfter = dataAfter != null ? dataAfter.getRedistributeConnected() : null;
 
         if (!Objects.equals(redistributeConBefore, redistributeConAfter)) {
-            return redistributeConAfter == null || !redistributeConAfter ? "FALSE" : Chunk.TRUE;
+            final StringBuilder stringBuilder = new StringBuilder();
+
+            if (redistributeConBefore != null) {
+                stringBuilder.append("no redistribute connected\n");
+            }
+            if (redistributeConAfter != null
+                    && redistributeConAfter.isEnabled() != null
+                    && redistributeConAfter.isEnabled()) {
+                stringBuilder.append("redistribute connected");
+                if (redistributeConAfter.getRouteMap() != null) {
+                    stringBuilder.append(" route-map ").append(redistributeConAfter.getRouteMap());
+                }
+                stringBuilder.append("\n");
+            }
+
+            return stringBuilder.toString();
         }
+
         return null;
     }
 
     private String updateRedistributeStatic(GlobalAfiSafiConfigAug dataBefore, GlobalAfiSafiConfigAug dataAfter) {
-        Boolean redistributeStatBefore = dataBefore != null ? dataBefore.isRedistributeStatic() : null;
-        Boolean redistributeStatAfter = dataAfter != null ? dataAfter.isRedistributeStatic() : null;
+        RedistributeStatic redistributeStatBefore = dataBefore != null ? dataBefore.getRedistributeStatic() : null;
+        RedistributeStatic redistributeStatAfter = dataAfter != null ? dataAfter.getRedistributeStatic() : null;
 
         if (!Objects.equals(redistributeStatAfter, redistributeStatBefore)) {
-            return redistributeStatAfter == null || !redistributeStatAfter ? "FALSE" : Chunk.TRUE;
+            final StringBuilder stringBuilder = new StringBuilder();
+
+            if (redistributeStatBefore != null) {
+                stringBuilder.append("no redistribute static\n");
+            }
+            if (redistributeStatAfter != null
+                    && redistributeStatAfter.isEnabled() != null
+                    && redistributeStatAfter.isEnabled()) {
+                stringBuilder.append("redistribute static");
+                if (redistributeStatAfter.getRouteMap() != null) {
+                    stringBuilder.append(" route-map ").append(redistributeStatAfter.getRouteMap());
+                }
+                stringBuilder.append("\n");
+            }
+
+            return stringBuilder.toString();
         }
+
         return null;
     }
 

@@ -53,7 +53,6 @@ import io.frinx.cli.unit.iosxe.init.IosXeDevices;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -109,7 +108,9 @@ public class BgpUnit extends AbstractUnit {
 
         writeRegistry.addNoop(IIDs.NE_NE_PR_PR_BG_GL_AF_AFISAFI);
         writeRegistry.subtreeAddAfter(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CONFIG, new GlobalAfiSafiConfigWriter(cli),
-                Collections.singleton(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CO_AUG_GLOBALAFISAFICONFIGAUG),
+                Sets.newHashSet(IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CO_AUG_GLOBALAFISAFICONFIGAUG,
+                        IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CO_AUG_GLOBALAFISAFICONFIGAUG_REDISTRIBUTECONNECTED,
+                        IIDs.NE_NE_PR_PR_BG_GL_AF_AF_CO_AUG_GLOBALAFISAFICONFIGAUG_REDISTRIBUTESTATIC),
                 IIDs.NE_NE_PR_PR_BG_GL_CONFIG);
 
         // Peer group writer, handle also subtrees
