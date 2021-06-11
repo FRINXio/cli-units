@@ -124,7 +124,7 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
         NeighborWriter.renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, null, null, null,
                 vrfKey, bgpAs, groupAfiSafi, Collections.emptyMap(), groupId,
-                null, null, null, null, null, null,
+                null, null, null, null, null, null, null,
                 PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
     }
 
@@ -162,7 +162,7 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
         NeighborWriter.renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, before, null, null,
                 vrfKey, bgpAs, groupAfiSafi, groupAfiSafiBefore, groupId,
-                null, null, null, null, null, null,
+                null, null, null, null, null, null, null,
                 PEER_GROUP_GLOBAL, PEER_GROUP_VRF);
     }
 
@@ -196,7 +196,7 @@ public class PeerGroupWriter implements CliListWriter<PeerGroup, PeerGroupKey> {
 
         NeighborWriter.deleteNeighbor(this, cli, instanceIdentifier, neighbor,
                 vrfKey, bgpAs, groupAfiSafi, groupId,
-                null, null, null,
+                null, null, null, null,
                 PEER_GROUP_GLOBAL_DELETE, PEER_GROUP_VRF_DELETE);
     }
 

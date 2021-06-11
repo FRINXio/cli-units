@@ -41,6 +41,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigExtension.Transport;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSION4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpCommonNeighborGroupTransportConfig;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.common.structure.neighbor.group.route.reflector.RouteReflectorBuilder;
@@ -167,7 +168,7 @@ public class NeighborWriterTest implements CliFormatter {
                 afiSafisForNeighborSource, Collections.emptyMap(),
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), Chunk.TRUE, "10 20 30",
                 NeighborWriter.getNeighborVersion(source), null, null,
-               null,
+               null, null,
                 NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
         String writeRender = getCommands(writer, false, 1);
@@ -195,6 +196,8 @@ public class NeighborWriterTest implements CliFormatter {
                             NeighborWriter.getNeighborIp(after.getNeighborAddress())),
                     NeighborWriter.getNeighborVrfAsFallOverMode(after,
                             NeighborWriter.getNeighborIp(after.getNeighborAddress())),
+                    NeighborWriter.getNeighborTransport(after,
+                            NeighborWriter.getNeighborIp(after.getNeighborAddress())),
                     NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
             String updateRender = updateAfiSafiRender + "\n" + getCommands(writer, false, 3);
@@ -208,6 +211,8 @@ public class NeighborWriterTest implements CliFormatter {
                 NeighborWriter.getNeighborAsOverride(source,
                         NeighborWriter.getNeighborIp(source.getNeighborAddress())),
                 NeighborWriter.getNeighborVrfAsFallOverMode(source,
+                        NeighborWriter.getNeighborIp(source.getNeighborAddress())),
+                NeighborWriter.getNeighborTransport(source,
                         NeighborWriter.getNeighborIp(source.getNeighborAddress())),
                 NeighborWriter.NEIGHBOR_GLOBAL_DELETE, NeighborWriter.NEIGHBOR_VRF_DELETE);
 
@@ -244,6 +249,7 @@ public class NeighborWriterTest implements CliFormatter {
                     .setPeerAs(new AsNumber(45L))
                     .addAugmentation(BgpNeighborConfigAug.class, new BgpNeighborConfigAugBuilder()
                             .setFallOverMode(true)
+                            .setTransport(Transport.PathMtuDiscovery)
                             .build())
                     .build())
             .build();
@@ -257,6 +263,7 @@ public class NeighborWriterTest implements CliFormatter {
                     .setDescription("descr 1")
                     .addAugmentation(BgpNeighborConfigAug.class, new BgpNeighborConfigAugBuilder()
                             .setFallOverMode(false)
+                            .setTransport(Transport.PathMtuDiscovery)
                             .build())
                     .build())
             .build();
@@ -268,6 +275,7 @@ public class NeighborWriterTest implements CliFormatter {
                     .setPeerAs(new AsNumber(45L))
                     .addAugmentation(BgpNeighborConfigAug.class, new BgpNeighborConfigAugBuilder()
                             .setFallOverMode(false)
+                            .setTransport(Transport.PathMtuDiscovery)
                             .build())
                     .build())
             .setAfiSafis(new AfiSafisBuilder()
@@ -331,6 +339,7 @@ public class NeighborWriterTest implements CliFormatter {
                     .addAugmentation(BgpNeighborConfigAug.class,
                             new BgpNeighborConfigAugBuilder().setNeighborVersion(VERSION4.class)
                                     .setFallOverMode(true)
+                                    .setTransport(Transport.PathMtuDiscovery)
                                     .build())
                     .build())
             .build();
@@ -620,6 +629,7 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor 1.2.3.4 description\n"
             + "no neighbor 1.2.3.4 password\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "neighbor 1.2.3.4 transport path-mtu-discovery\n"
             + "no neighbor 1.2.3.4 update-source Loopback0\n"
             + "no neighbor 1.2.3.4 transport connection-mode passive\n"
             + "no neighbor 1.2.3.4 send-community both\n"
@@ -732,6 +742,7 @@ public class NeighborWriterTest implements CliFormatter {
             + "router bgp 484\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 transport path-mtu-discovery\n"
             + "end";
 
     private static final String NMIN_WRITE = "configure terminal\n"
@@ -819,5 +830,6 @@ public class NeighborWriterTest implements CliFormatter {
             + "router bgp 484\n"
             + "no neighbor 1.2.3.4 version\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 transport path-mtu-discovery\n"
             + "end";
 }

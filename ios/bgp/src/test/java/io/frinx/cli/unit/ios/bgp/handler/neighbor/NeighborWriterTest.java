@@ -165,7 +165,7 @@ public class NeighborWriterTest implements CliFormatter {
                 source, null, source.getConfig().isEnabled(), null, id.firstKeyOf(NetworkInstance.class), as,
                 afiSafisForNeighborSource, Collections.emptyMap(),
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), Chunk.TRUE, "10 20 30",
-                NeighborWriter.getNeighborVersion(source), null, null,
+                NeighborWriter.getNeighborVersion(source), null, null, null,
                 NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
         String writeRender = getCommands(writer, false, 1);
@@ -190,6 +190,8 @@ public class NeighborWriterTest implements CliFormatter {
                     NeighborWriter.getNeighborVersion(after), NeighborWriter.getNeighborVersion(source),
                     NeighborWriter.getNeighborAsOverride(after,
                         NeighborWriter.getNeighborIp(after.getNeighborAddress())),
+                    NeighborWriter.getNeighborTransport(after,
+                            NeighborWriter.getNeighborIp(after.getNeighborAddress())),
                     NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
             String updateRender = updateAfiSafiRender + "\n" + getCommands(writer, false, 3);
@@ -201,6 +203,8 @@ public class NeighborWriterTest implements CliFormatter {
                         NeighborWriter.getAfiSafisForNeighbor(source.getAfiSafis())),
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), NeighborWriter.getNeighborVersion(source),
                 NeighborWriter.getNeighborAsOverride(source,
+                        NeighborWriter.getNeighborIp(source.getNeighborAddress())),
+                NeighborWriter.getNeighborTransport(source,
                         NeighborWriter.getNeighborIp(source.getNeighborAddress())),
                 NeighborWriter.NEIGHBOR_GLOBAL_DELETE, NeighborWriter.NEIGHBOR_VRF_DELETE);
 

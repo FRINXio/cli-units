@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigExtension.Transport;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSION4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.CommunityType;
@@ -38,10 +39,12 @@ public class NeighborConfigReaderTest {
             + " neighbor 1.2.3.4 send-community both\n"
             + " neighbor 1.2.3.4 activate\n";
 
+
     public static final String OUTPUT = OUTPUT_WITHOUT_AUG_COMMANDS
             + " neighbor 1.2.3.4 as-override\n"
             + " neighbor 1.2.3.4 version 4\n"
-            + " neighbor 1.2.3.4 fall-over bfd\n";
+            + " neighbor 1.2.3.4 fall-over bfd\n"
+            + " neighbor 1.2.3.4 transport path-mtu-discovery\n";
 
     @Test
     public void testOutputWithoutAugCommandsParse() {
@@ -74,6 +77,7 @@ public class NeighborConfigReaderTest {
                                 .setNeighborVersion(VERSION4.class)
                                 .setAsOverride(true)
                                 .setFallOverMode(true)
+                                .setTransport(Transport.PathMtuDiscovery)
                                 .build())
                         .build(),
                 configBuilder.build());

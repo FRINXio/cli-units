@@ -32,6 +32,7 @@ import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BGPVERSION;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigExtension.Transport;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSION4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSIONUNKNOWN;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Config;
@@ -69,6 +70,8 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
     private static final Pattern FALL_OVER_PATTERN =
             Pattern.compile("neighbor (?<neighborIp>\\S*) (?<enabled>fall-over bfd).*");
     private static final Pattern PASSWORD_REGEX_FORM = Pattern.compile("^([\\d] )\\S+$");
+    private static final Pattern TRANSPORT_PATTERN =
+            Pattern.compile("neighbor (?<neighborIp>\\S*) transport (?<transport>.+)");
 
     private final Cli cli;
 
@@ -124,6 +127,7 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
         setNeighborVersion(configAugBuilder, output);
         setAsOverride(configAugBuilder, output);
         setFallOver(configAugBuilder, output);
+        setTransport(configAugBuilder, output);
 
         if (!configAugBuilder.build().equals(new BgpNeighborConfigAugBuilder().build())) {
             configBuilder.addAugmentation(BgpNeighborConfigAug.class, configAugBuilder.build());
@@ -189,6 +193,12 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
                     configAugBuilder.setNeighborVersion(parseBgpVersion(groupsHashMap.get("version"))));
     }
 
+    private static void setTransport(BgpNeighborConfigAugBuilder configAugBuilder, String defaultInstance) {
+        ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, TRANSPORT_PATTERN::matcher,
+            m -> findGroup(m, "transport"),
+            groupsHashMap -> configAugBuilder.setTransport(getTransport(groupsHashMap.get("transport"))));
+    }
+
     private static String preprocessOutput(String defaultInstance) {
         return defaultInstance
                 .replaceAll(" neighbor", "\n neighbor")
@@ -220,4 +230,14 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
     private static Class<? extends BGPVERSION> parseBgpVersion(String name) {
         return (name.equals("4")) ? VERSION4.class : VERSIONUNKNOWN.class;
     }
+
+    private static Transport getTransport(String transport) {
+        for (final Transport type: Transport.values()) {
+            if (transport.equalsIgnoreCase(type.getName())) {
+                return type;
+            }
+        }
+        return null;
+    }
+
 }
