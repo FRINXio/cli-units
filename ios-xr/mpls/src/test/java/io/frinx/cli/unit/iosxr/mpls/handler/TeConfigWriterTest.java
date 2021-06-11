@@ -20,6 +20,7 @@ import com.google.common.base.Optional;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,6 +38,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev17082
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributes;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.mpls.top.mpls.TeInterfaceAttributesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.mpls.rev170824.te._interface.attributes.top.InterfaceKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -97,7 +99,7 @@ public class TeConfigWriterTest {
     }
 
     @Test
-    public void failedDelete() throws Exception {
+    public void deleteWithEmptyInterfaceContainer() throws Exception {
         Mockito.when(context.readAfter(Mockito.any()))
                 .thenReturn(Optional.of(new MplsBuilder().setTeInterfaceAttributes(
                         new TeInterfaceAttributesBuilder()
@@ -106,7 +108,27 @@ public class TeConfigWriterTest {
 
         Config data = new ConfigBuilder().build();
         this.writer.deleteCurrentAttributes(iid, data, context);
-        Mockito.verifyZeroInteractions(cli);
+        Mockito.verify(cli).executeAndRead(response.capture());
+        Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
+    }
 
+    @Test
+    public void failedDelete() throws Exception {
+        Mockito.when(context.readAfter(Mockito.any()))
+                .thenReturn(Optional.of(new MplsBuilder().setTeInterfaceAttributes(
+                        new TeInterfaceAttributesBuilder()
+                                .setInterface(Collections.singletonList(new InterfaceBuilder()
+                                        .setInterfaceId(new InterfaceId("Ethernet 0"))
+                                        .build()))
+                                .build()
+                ).build()));
+
+        Config data = new ConfigBuilder().build();
+        try {
+            this.writer.deleteCurrentAttributes(iid, data, context);
+            Assert.fail();
+        } catch (IllegalArgumentException illegalArgumentException) {
+            // When we have Interface configured IllegalArgumentException is expected
+        }
     }
 }
