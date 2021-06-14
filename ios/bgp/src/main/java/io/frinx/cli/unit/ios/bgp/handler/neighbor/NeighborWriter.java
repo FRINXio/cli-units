@@ -52,6 +52,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.Bgp;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.Global;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.PRIVATEASREMOVEALL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
@@ -81,7 +82,9 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             + "{% elseIf ($before_neighbor_version) %}no neighbor {$neighbor_id} version\n{% endif %}"
             + "{%if ($neighbor_as_override) %}{$neighbor_as_override}\n{% endif %}"
             + "{%if ($transport) %}{$transport}\n{% endif %}"
-            + "{%if ($transport) %}{$transport}\n{% endif %}";
+            + "{%if ($transport) %}{$transport}\n{% endif %}"
+            + "{%if ($neighbor_locale_as) %}{$neighbor_locale_as}\n{% endif %}"
+            + "{%if ($neighbor_remove_private_as) %}{$neighbor_remove_private_as}\n{% endif %}";
 
     public static final String NEIGHBOR_RR_CONFIG = "{%if ($route_reflect_client) %}neighbor {$neighbor_id} "
             + "route-reflector-client\n"
@@ -113,7 +116,9 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             + ".value}\n{% endif %}"
             + "{%if ($neighbor_version) %}no neighbor {$neighbor_id} version\n{% endif %}"
             + "{%if ($neighbor_as_override) %}{$neighbor_as_override}\n{% endif %}"
-            + "{%if ($transport) %}no {$transport}\n{% endif %}";
+            + "{%if ($transport) %}no {$transport}\n{% endif %}"
+            + "{%if ($neighbor_locale_as) %}{$neighbor_locale_as}\n{% endif %}"
+            + "{%if ($neighbor_remove_private_as) %}{$neighbor_remove_private_as}\n{% endif %}";
 
     public static final String NEIGHBOR_TRANSPORT =
             //Set update source
@@ -279,11 +284,13 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         String version = getNeighborVersion(neighbor);
         String asOverride = getNeighborAsOverride(neighbor, neighborIp);
         String transport = getNeighborTransport(neighbor, neighborIp);
+        String localeAs = getNeighborLocaleAs(neighbor, neighborIp);
+        String removePrivateAs = getNeighborRemovePrivateAs(neighbor, neighborIp);
 
         renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, null, enabled, null, vrfKey, bgpAs, neighAfiSafi, Collections.emptyMap(), neighborIp,
                 getTimers(neighbor) == null ? null : Chunk.TRUE, getTimers(neighbor), version, null, asOverride,
-                transport, NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
+                transport, localeAs, removePrivateAs, NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
     }
 
     private static <T extends DataObject> void renderNeighbor(CliWriter<T> writer, Cli cli,
@@ -318,6 +325,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             String beforeNeighborVersion,
             String neighborAsOverride,
             String transport,
+            String neighborLocalseAs,
+            String neighborRemovePrivateAs,
             String globalTemplate,
             String vrfTemplate)
             throws WriteFailedException.CreateFailedException {
@@ -357,7 +366,10 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     "neighbor_version", neighborVersion,
                     "before_neighbor_version", beforeNeighborVersion,
                     "neighbor_as_override", neighborAsOverride,
-                    "transport", transport);
+                    "transport", transport,
+                    "neighbor_locale_as", neighborLocalseAs,
+                    "neighbor_remove_private_as", neighborRemovePrivateAs);
+
         }
     }
 
@@ -381,6 +393,33 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             }
         }
         return null;
+    }
+
+    public static String getNeighborLocaleAs(Neighbor neighbor, String neighborIp) {
+        StringBuilder command = new StringBuilder("neighbor " + neighborIp + " locale-as");
+        BgpNeighborConfigAug neighborConfigAug = neighbor.getConfig().getAugmentation(BgpNeighborConfigAug.class);
+        if (neighborConfigAug != null && neighbor.getConfig().getLocalAs() != null) {
+            if (neighborConfigAug.getLocalAsGroup() != null) {
+                if (neighborConfigAug.getLocalAsGroup().isNoPrepend()) {
+                    command.append(" no-prepend");
+                }
+                if (neighborConfigAug.getLocalAsGroup().isReplaceAs()) {
+                    command.append(" replace-as");
+                }
+            }
+            return command.toString();
+        } else if (neighbor.getConfig().getLocalAs() != null) {
+            return command.toString();
+        }
+        return "no " + command;
+    }
+
+    public static String getNeighborRemovePrivateAs(Neighbor neighbor, String neighborIp) {
+        String command = "neighbor " + neighborIp + " remove-private-as";
+        if (neighbor.getConfig().getRemovePrivateAs() == PRIVATEASREMOVEALL.class) {
+            return command;
+        }
+        return "no " + command;
     }
 
     public static <T extends BgpCommonStructureNeighborGroupRouteReflector> void renderNeighborAfiRemoval(
@@ -437,6 +476,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
             String neighborVersion,
             String asOverride,
             String transport,
+            String localeAs,
+            String removePrivateAs,
             String globalTemplate, String vrfTemplate) throws WriteFailedException.DeleteFailedException {
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             deleteNeighbor(writer, cli, globalTemplate, instanceIdentifier,
@@ -447,7 +488,9 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     "route_reflect_client", isRouteReflectClient(neighbor),
                     "neighbor_version", neighborVersion,
                     "neighbor_as_override", asOverride,
-                    "transport", transport);
+                    "transport", transport,
+                    "neighbor_locale_as", localeAs,
+                    "neighbor_remove_private_as", removePrivateAs);
         } else {
             String vrfName = vrfKey.getName();
             deleteNeighbor(writer, cli, vrfTemplate, instanceIdentifier,
@@ -459,7 +502,9 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     "route_reflect_client", isRouteReflectClient(neighbor),
                     "neighbor_version", neighborVersion,
                     "neighbor_as_override", asOverride,
-                    "transport", transport);
+                    "transport", transport,
+                    "neighbor_locale_as", localeAs,
+                    "neighbor_remove_private_as", removePrivateAs);
         }
     }
 
@@ -530,6 +575,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         String beforeVersion = getNeighborVersion(before);
         String asOverride = getNeighborAsOverride(neighbor, neighborIp);
         String transport = getNeighborTransport(neighbor, neighborIp);
+        String localeAs = getNeighborLocaleAs(neighbor, neighborIp);
+        String removePrivateAs = getNeighborRemovePrivateAs(neighbor, neighborIp);
 
         // This is a subtree writer which handles entire neighbor config. This means that if during update an AFI was
         // removed, it has to be detected and deleted here
@@ -542,7 +589,7 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         renderNeighbor(this, cli, instanceIdentifier,
                 neighbor, before, enabled, beforeEnabled, vrfKey, bgpAs, neighAfiSafi, neighAfiSafiBefore, neighborIp,
                 updateTimers(getTimers(before), getTimers(neighbor)), getTimers(neighbor), version, beforeVersion,
-                asOverride, transport, NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
+                asOverride, transport, localeAs, removePrivateAs, NEIGHBOR_GLOBAL, NEIGHBOR_VRF);
     }
 
     private static String getTimers(Neighbor neighbor) {
@@ -597,9 +644,12 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         String neighborVersion = getNeighborVersion(neighbor);
         String asOverride = getNeighborAsOverride(neighbor, neighborIp);
         String transport = getNeighborTransport(neighbor, neighborIp);
+        String localeAs = getNeighborLocaleAs(neighbor, neighborIp);
+        String removePrivateAs = getNeighborRemovePrivateAs(neighbor, neighborIp);
 
         deleteNeighbor(this, cli, instanceIdentifier, neighbor, vrfKey, bgpAs, neighAfiSafi, neighborIp,
-                neighborVersion, asOverride, transport, NEIGHBOR_GLOBAL_DELETE, NEIGHBOR_VRF_DELETE);
+                neighborVersion, asOverride, transport, localeAs, removePrivateAs, NEIGHBOR_GLOBAL_DELETE,
+                NEIGHBOR_VRF_DELETE);
     }
 
     public static String getNeighborIp(InstanceIdentifier<?> neigh) {

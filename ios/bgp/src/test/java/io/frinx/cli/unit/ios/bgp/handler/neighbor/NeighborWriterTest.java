@@ -165,7 +165,7 @@ public class NeighborWriterTest implements CliFormatter {
                 source, null, source.getConfig().isEnabled(), null, id.firstKeyOf(NetworkInstance.class), as,
                 afiSafisForNeighborSource, Collections.emptyMap(),
                 NeighborWriter.getNeighborIp(source.getNeighborAddress()), Chunk.TRUE, "10 20 30",
-                NeighborWriter.getNeighborVersion(source), null, null, null,
+                NeighborWriter.getNeighborVersion(source), null, null, null, null, null,
                 NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
         String writeRender = getCommands(writer, false, 1);
@@ -192,6 +192,10 @@ public class NeighborWriterTest implements CliFormatter {
                         NeighborWriter.getNeighborIp(after.getNeighborAddress())),
                     NeighborWriter.getNeighborTransport(after,
                             NeighborWriter.getNeighborIp(after.getNeighborAddress())),
+                    NeighborWriter.getNeighborLocaleAs(after,
+                            NeighborWriter.getNeighborIp(after.getNeighborAddress())),
+                    NeighborWriter.getNeighborRemovePrivateAs(after,
+                            NeighborWriter.getNeighborIp(after.getNeighborAddress())),
                     NeighborWriter.NEIGHBOR_GLOBAL, NeighborWriter.NEIGHBOR_VRF);
 
             String updateRender = updateAfiSafiRender + "\n" + getCommands(writer, false, 3);
@@ -205,6 +209,10 @@ public class NeighborWriterTest implements CliFormatter {
                 NeighborWriter.getNeighborAsOverride(source,
                         NeighborWriter.getNeighborIp(source.getNeighborAddress())),
                 NeighborWriter.getNeighborTransport(source,
+                        NeighborWriter.getNeighborIp(source.getNeighborAddress())),
+                NeighborWriter.getNeighborLocaleAs(source,
+                        NeighborWriter.getNeighborIp(source.getNeighborAddress())),
+                NeighborWriter.getNeighborRemovePrivateAs(source,
                         NeighborWriter.getNeighborIp(source.getNeighborAddress())),
                 NeighborWriter.NEIGHBOR_GLOBAL_DELETE, NeighborWriter.NEIGHBOR_VRF_DELETE);
 
@@ -440,6 +448,8 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "end";
 
     public static final String NALL_UPDATE = "configure terminal\n"
@@ -569,16 +579,22 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "exit\n"
             + "address-family ipv6 vrf vrf1\n"
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "exit\n"
             + "address-family vpnv4 vrf vrf1\n"
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "exit\n"
             + "end";
 
@@ -586,11 +602,9 @@ public class NeighborWriterTest implements CliFormatter {
             + "router bgp 484\n"
             + "address-family ipv6 vrf vrf1\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
-//            + "no neighbor 1.2.3.4 as-override\n"
             + "exit\n"
             + "address-family vpnv4 vrf vrf1\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
-//            + "no neighbor 1.2.3.4 as-override\n"
             + "exit\n"
             + "end\n"
             + "configure terminal\n"
@@ -601,6 +615,8 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor 1.2.3.4 description\n"
             + "no neighbor 1.2.3.4 password\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "no neighbor 1.2.3.4 update-source Loopback0\n"
             + "no neighbor 1.2.3.4 transport connection-mode passive\n"
             + "no neighbor 1.2.3.4 send-community both\n"
@@ -641,6 +657,8 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "end";
 
     public static final String NALL_AFI_FROM_BGP_VRF_WRITE = "configure terminal\n"
@@ -669,6 +687,8 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "exit\n"
             + "end";
 
@@ -694,6 +714,8 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "end";
 
     private static final Neighbor N_MINIMAL = new NeighborBuilder(N_ALL).setAfiSafis(null).setTransport(null)
@@ -710,6 +732,8 @@ public class NeighborWriterTest implements CliFormatter {
             + "router bgp 484\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "end";
 
     private static final String NMIN_WRITE = "configure terminal\n"
@@ -727,6 +751,8 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor 1.2.3.4 peer-group group12\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "end";
 
     private static final Neighbor N_NO_GLOBAL_POLICIES = new NeighborBuilder(N_ALL).setConfig(new ConfigBuilder(N_ALL
@@ -764,6 +790,8 @@ public class NeighborWriterTest implements CliFormatter {
             + "router bgp 484\n"
             + "no neighbor 1.2.3.4 remote-as 45\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "end";
 
     private static final Neighbor N6_MINIMAL = new NeighborBuilder().setNeighborAddress(new IpAddress(new Ipv6Address(
@@ -785,6 +813,8 @@ public class NeighborWriterTest implements CliFormatter {
             + "no neighbor dead:beee::1 peer-group group12\n"
             + "no neighbor dead:beee::1 remote-as 45\n"
             + "no neighbor dead:beee::1 as-override\n"
+            + "no neighbor dead:beee::1 locale-as\n"
+            + "no neighbor dead:beee::1 remove-private-as\n"
             + "end";
 
     public static final String N_WRITE_BGP_VERSION = "configure terminal\n"
@@ -796,5 +826,7 @@ public class NeighborWriterTest implements CliFormatter {
             + "router bgp 484\n"
             + "no neighbor 1.2.3.4 version\n"
             + "no neighbor 1.2.3.4 as-override\n"
+            + "no neighbor 1.2.3.4 locale-as\n"
+            + "no neighbor 1.2.3.4 remove-private-as\n"
             + "end";
 }

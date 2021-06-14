@@ -36,10 +36,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigExtension.Transport;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSION4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.VERSIONUNKNOWN;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.bgp.neighbor.config.extension.LocalAsGroupBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.CommunityType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.PRIVATEASREMOVEALL;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedPassword;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedString;
@@ -71,7 +73,10 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
     private static final Pattern PASSWORD_REGEX_FORM = Pattern.compile("^([\\d] )\\S+$");
     private static final Pattern TRANSPORT_PATTERN =
             Pattern.compile("neighbor (?<neighborIp>\\S*) transport (?<transport>.+)");
-
+    private static final Pattern LOCAL_AS_PATTERN =
+            Pattern.compile(".*neighbor (?<neighborIp>\\S*) local-as (?<value>.*)");
+    private static final Pattern REMOVE_PRIVATE_AS_PATTERN =
+            Pattern.compile(".*neighbor (?<neighborIp>\\S*) remove-private-as.*");
     private final Cli cli;
 
     public NeighborConfigReader(Cli cli) {
@@ -114,6 +119,7 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
     private static void setAttributes(ConfigBuilder configBuilder, String output) {
         setAs(configBuilder, output);
         setEnabled(configBuilder, output);
+        setRemovePrivateAs(configBuilder, output);
         setPasswd(configBuilder, output);
         setPeerGroup(configBuilder, output);
         setDescription(configBuilder, output);
@@ -126,9 +132,34 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
         setNeighborVersion(configAugBuilder, output);
         setAsOverride(configAugBuilder, output);
         setTransport(configAugBuilder, output);
+        setLocaleAs(configBuilder, configAugBuilder, output);
 
         if (!configAugBuilder.build().equals(new BgpNeighborConfigAugBuilder().build())) {
             configBuilder.addAugmentation(BgpNeighborConfigAug.class, configAugBuilder.build());
+        }
+    }
+
+    private static void setLocaleAs(ConfigBuilder configBuilder, BgpNeighborConfigAugBuilder configAugBuilder,
+                                    String output) {
+        Optional<String> value = ParsingUtils.parseField(output, 0,
+                LOCAL_AS_PATTERN::matcher, m -> m.group("value"));
+
+        if (value.isPresent()) {
+            LocalAsGroupBuilder localAsGroup = new LocalAsGroupBuilder();
+            int indexValue = value.get().indexOf(" ");
+
+            if (indexValue != -1) {
+                configBuilder.setLocalAs(new AsNumber(Long.valueOf(value.get().substring(0, indexValue))));
+                if (value.get().contains("no-prepend")) {
+                    localAsGroup.setNoPrepend(true);
+                }
+                if (value.get().contains("replace-as")) {
+                    localAsGroup.setReplaceAs(true);
+                }
+                configAugBuilder.setLocalAsGroup(localAsGroup.build());
+            } else {
+                configBuilder.setLocalAs(new AsNumber(Long.valueOf(value.get())));
+            }
         }
     }
 
@@ -201,6 +232,12 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
         ParsingUtils.parseFields(preprocessOutput(defaultInstance), 0, NEIGHBOR_ACTIVATE_PATTERN::matcher,
             m -> findGroup(m, "enabled"),
             groupsHashMap -> configBuilder.setEnabled("activate".equals(groupsHashMap.get("enabled"))));
+    }
+
+    private static void setRemovePrivateAs(ConfigBuilder configBuilder, String output) {
+        if (REMOVE_PRIVATE_AS_PATTERN.matcher(output).matches()) {
+            configBuilder.setRemovePrivateAs(PRIVATEASREMOVEALL.class);
+        }
     }
 
     private static HashMap<String, String> findGroup(Matcher matcher, String group) {

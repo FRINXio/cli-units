@@ -89,6 +89,7 @@ public class InterfaceConfigWriterTest {
             + "no shutdown\n"
             + "no ip redirects\n"
             + "ipv6 nd ra suppress all\n"
+            + "vrf forwarding vlan300\n"
             + "end\n"
             + "\n";
 
@@ -230,6 +231,7 @@ public class InterfaceConfigWriterTest {
         IfCiscoExtAugBuilder ifCiscoExtAugBuilder = new IfCiscoExtAugBuilder();
         ifCiscoExtAugBuilder.setIpRedirects(false);
         ifCiscoExtAugBuilder.setIpv6NdRaSuppress("all");
+        ifCiscoExtAugBuilder.setVrfForwarding("vlan300");
 
         // write values
         Config newData = new ConfigBuilder().setEnabled(true).setName("Bundle-Ether45").setType(Ieee8023adLag.class)

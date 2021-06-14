@@ -67,6 +67,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($ipUnreachables) %}{$ipUnreachables}\n{% endif %}"
             + "{% if ($ipProxyArp) %}{$ipProxyArp}\n{% endif %}"
             + "{% if ($ipv6NdRaSuppress) %}{$ipv6NdRaSuppress}\n{% endif %}"
+            + "{% if ($vrfForwarding) %}{$vrfForwarding}\n{% endif %}"
             + "end\n";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
@@ -112,7 +113,28 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             "ipRedirects", getIpRedirect(before, after),
             "ipUnreachables", getIpUnreachables(before, after),
             "ipProxyArp", getIpProxyArp(before, after),
-            "ipv6NdRaSuppress", getIpv6NdRaSuppress(before, after));
+            "ipv6NdRaSuppress", getIpv6NdRaSuppress(before, after),
+            "vrfForwarding", getVrfForwarding(before, after));
+    }
+
+    private String getVrfForwarding(Config before, Config after) {
+        IfCiscoExtAug ciscoExtAugBefore = getIfCiscoExtAug(before);
+        IfCiscoExtAug ciscoExtAugAfter = getIfCiscoExtAug(after);
+
+        if (ciscoExtAugBefore == null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getVrfForwarding() != null) {
+                return f("vrf forwarding %s", ciscoExtAugAfter.getVrfForwarding());
+            }
+        } else if (ciscoExtAugAfter != null && ciscoExtAugAfter.getVrfForwarding() != null) {
+            return f("vrf forwarding %s", ciscoExtAugAfter.getVrfForwarding());
+        } else if (ciscoExtAugBefore.getVrfForwarding() != null) {
+            if (ciscoExtAugAfter != null && ciscoExtAugAfter.getVrfForwarding() != null) {
+                return f("vrf forwarding %s", ciscoExtAugAfter.getVrfForwarding());
+            } else {
+                return "no vrf forwarding";
+            }
+        }
+        return null;
     }
 
     private String getSnmpTrap(Config before, Config after) {

@@ -150,7 +150,8 @@ public class BgpUnit extends AbstractUnit {
                         IIDs.NE_NE_PR_PR_BG_NE_NE_AF_AF_AP_CONFIG,
                         IIDs.NE_NE_PR_PR_BG_NE_NE_TIMERS,
                         IIDs.NE_NE_PR_PR_BG_NE_NE_TI_CONFIG,
-                        IIDs.NE_NE_PR_PR_BG_NE_NE_CO_AUG_BGPNEIGHBORCONFIGAUG),
+                        IIDs.NE_NE_PR_PR_BG_NE_NE_CO_AUG_BGPNEIGHBORCONFIGAUG,
+                        IIDs.NE_NE_PR_PR_BG_NE_NE_CO_AUG_BGPNEIGHBORCONFIGAUG_LOCALASGROUP),
                 IIDs.NE_NE_PR_PR_BG_PE_PEERGROUP);
 
         writeRegistry.addAfter(IIDs.NE_NE_PR_PR_LO_AG_CONFIG, new BgpLocalAggregateConfigWriter(cli),

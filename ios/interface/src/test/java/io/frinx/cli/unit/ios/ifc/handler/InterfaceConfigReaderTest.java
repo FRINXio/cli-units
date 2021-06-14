@@ -31,6 +31,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
 
 public class InterfaceConfigReaderTest {
 
@@ -96,6 +97,26 @@ public class InterfaceConfigReaderTest {
             + " no lldp receive\n"
             + " no cdp enable";
 
+    private static final Config EXPECTED_INTERFACE4 = new ConfigBuilder().setEnabled(true)
+            .setName("Vlan100")
+            .setType(Other.class)
+            .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
+                    .setVrfForwarding("VLAN011220")
+                    .setIpProxyArp(false)
+                    .setIpRedirects(false)
+                    .setIpUnreachables(false)
+                    .setSnmpTrapLinkStatus(false)
+                    .build())
+            .build();
+    private static final String SH_INTERFACE_RUN4 = "interface Vlan100\n"
+            + " vrf forwarding VLAN011220\n"
+            + " no ip address\n"
+            + " ip access-group anti-spoof-VLAN998877 in\n"
+            + " no ip redirects\n"
+            + " no ip unreachables\n"
+            + " no ip proxy-arp\n"
+            + " no snmp trap link-status\n";
+
     @Test
     public void testParseInterface() {
         ConfigBuilder parsed = new ConfigBuilder();
@@ -115,5 +136,13 @@ public class InterfaceConfigReaderTest {
         new InterfaceConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(SH_INTERFACE_RUN3, parsed, "GigabitEthernet0/15");
         Assert.assertEquals(EXPECTED_INTERFACE3, parsed.build());
+    }
+
+    @Test
+    public void testParseVlan() {
+        ConfigBuilder parsed = new ConfigBuilder();
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseInterface(SH_INTERFACE_RUN4, parsed, "Vlan100");
+        Assert.assertEquals(EXPECTED_INTERFACE4, parsed.build());
     }
 }
