@@ -39,10 +39,15 @@ public class L3VrfReaderTest {
 
     private static final String SH_IP_VRF = "ip vrf DEP_1  \n"
             + "ip vrf DEP_2  dfs dsf dsf\n"
-            + "ip vrf a\n";
+            + "ip vrf a\n"
+            + "vrf definition VLAN123456\n"
+            + "vrf definition VLAN372638\n"
+            + "ip vrf FRINX_TEST\n"
+            + "ip vrf definition\n";
 
     private static final List<NetworkInstanceKey> IDS_EXPECTED =
-            Lists.newArrayList("DEP_1", "DEP_2", "a", "default")
+            Lists.newArrayList("DEP_1", "DEP_2", "a", "VLAN123456", "VLAN372638", "FRINX_TEST", "definition",
+                    "default")
                     .stream()
                     .map(NetworkInstanceKey::new)
                     .collect(Collectors.toList());
