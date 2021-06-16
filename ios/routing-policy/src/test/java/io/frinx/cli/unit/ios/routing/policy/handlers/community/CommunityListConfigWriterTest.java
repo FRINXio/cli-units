@@ -39,6 +39,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpCommunityRegexpType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityTypeString;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityTypeUnit32;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class CommunityListConfigWriterTest {
@@ -46,6 +47,8 @@ public class CommunityListConfigWriterTest {
     private static final String FIRST_STANDARD_CMD = "configure terminal\n"
             + "ip community-list standard COM_NO_EXPORT_TO_PE permit 65222:999\n"
             + "ip community-list standard COM_NO_EXPORT_TO_PE permit 65222:888\n"
+            + "ip community-list standard COM_NO_EXPORT_TO_PE permit 4274389991\n"
+            + "ip community-list standard COM_NO_EXPORT_TO_PE permit 4274389955\n"
             + "ip community-list standard COM_NO_EXPORT_TO_PE deny 65333:111\n"
             + "ip community-list standard COM_NO_EXPORT_TO_PE deny 65333:222\n"
             + "end\n";
@@ -76,7 +79,11 @@ public class CommunityListConfigWriterTest {
             value -> new CommunityMember(new BgpStdCommunityType(
                     BgpStdCommunityTypeString.getDefaultInstance(communityValue[value]))));
 
-        List<CommunityMemberDeny> communityMemberDeny = getCommunityMembersList(2, 4,
+        communityMembers.addAll(getCommunityMembersList(2, 4,
+            value -> new CommunityMember(new BgpStdCommunityType(
+                        BgpStdCommunityTypeUnit32.getDefaultInstance(communityValue[value])))));
+
+        List<CommunityMemberDeny> communityMemberDeny = getCommunityMembersList(4, 6,
             value -> new CommunityMemberDeny(new BgpStdCommunityType(
                     BgpStdCommunityTypeString.getDefaultInstance(communityValue[value]))));
 
@@ -116,7 +123,7 @@ public class CommunityListConfigWriterTest {
     @Test
     public void writeCurrentAttributesTest_Standard() throws WriteFailedException {
         writer.writeCurrentAttributes(iid, createStandardConfig("COM_NO_EXPORT_TO_PE",
-                "65222:999", "65222:888", "65333:111", "65333:222"), null);
+                "65222:999", "65222:888", "4274389991", "4274389955", "65333:111", "65333:222"), null);
         Mockito.verify(cli).executeAndRead(Command.writeCommand(FIRST_STANDARD_CMD));
     }
 
@@ -130,7 +137,7 @@ public class CommunityListConfigWriterTest {
     @Test
     public void deleteCurrentAttributesTestStandard() throws WriteFailedException {
         writer.deleteCurrentAttributes(iid, createStandardConfig("COM_NO_EXPORT_TO_PE",
-                "65222:888", "65222:999", "65333:111", "65333:222"), null);
+                "65222:888", "65222:999", "4274389991", "4274389955", "65333:111", "65333:222"), null);
         Mockito.verify(cli).executeAndRead(Command.writeCommand(DELETE_STANDARD_CMD));
     }
 

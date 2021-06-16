@@ -28,13 +28,18 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpCommunityRegexpType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityTypeString;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityTypeUnit32;
 
 public class CommunityListConfigReaderTest {
 
     private static final String CMD = "configure terminal\n"
             + "ip community-list standard COM_NO_EXPORT_TO_PE permit 65222:999\n"
             + "ip community-list standard COM_NO_EXPORT_TO_PE permit 65222:888\n"
+            + "ip community-list standard COM_NO_EXPORT_TO_PE permit 4274389991\n"
+            + "ip community-list standard COM_NO_EXPORT_TO_PE permit 4274389955\n"
             + "ip community-list standard COM_NO_EXPORT_TO_PE deny 65333:123\n"
+            + "ip community-list standard COM_NO_EXPORT_TO_PE deny 4274389874\n"
+            + "ip community-list standard COM_NO_EXPORT_TO_PE deny 4274389471\n"
             + "ip community-list standard COM_NO_EXPORT_TO_PE deny 65222:777\n"
             + "ip community-list standard COM_ART_AK permit 68888:111\n"
             + "ip community-list expanded COM_BLACKHOLE permit .*:666\n"
@@ -61,12 +66,20 @@ public class CommunityListConfigReaderTest {
                 new CommunityMember(new BgpStdCommunityType(
                         BgpStdCommunityTypeString.getDefaultInstance("65222:999"))),
                 new CommunityMember(new BgpStdCommunityType(
-                        BgpStdCommunityTypeString.getDefaultInstance("65222:888")))));
+                        BgpStdCommunityTypeString.getDefaultInstance("65222:888"))),
+                new CommunityMember(new BgpStdCommunityType(
+                        BgpStdCommunityTypeUnit32.getDefaultInstance("4274389991"))),
+                new CommunityMember(new BgpStdCommunityType(
+                        BgpStdCommunityTypeUnit32.getDefaultInstance("4274389955")))));
         commListBuilder.setCommunityMemberDeny(Arrays.asList(
                 new CommunityMemberDeny(new BgpStdCommunityType(
                         BgpStdCommunityTypeString.getDefaultInstance("65333:123"))),
                 new CommunityMemberDeny(new BgpStdCommunityType(
-                        BgpStdCommunityTypeString.getDefaultInstance("65222:777")))));
+                        BgpStdCommunityTypeString.getDefaultInstance("65222:777"))),
+                new CommunityMemberDeny(new BgpStdCommunityType(
+                        BgpStdCommunityTypeUnit32.getDefaultInstance("4274389874"))),
+                new CommunityMemberDeny(new BgpStdCommunityType(
+                        BgpStdCommunityTypeUnit32.getDefaultInstance("4274389471")))));
         expectedBuilder.addAugmentation(CommMembersAug.class, commListBuilder.build());
         CommunityListConfigReader.parseCommunityConfig(CMD, builder, "COM_NO_EXPORT_TO_PE");
         Assert.assertNull(builder.getCommunityMember().get(0).getBgpCommunityRegexpType());

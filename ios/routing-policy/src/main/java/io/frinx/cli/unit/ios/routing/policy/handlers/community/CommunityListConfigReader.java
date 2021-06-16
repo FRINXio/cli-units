@@ -38,13 +38,16 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpCommunityRegexpType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityTypeString;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityTypeUnit32;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class CommunityListConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final String SH_RUN_VRF_ID = "show running-config | include ^ip community-list";
-    private static final Pattern COMMUNITY_MEMBER_STANDARD =
-            Pattern.compile("ip community-list standard (?<rt>[\\S]+) (permit|deny) (?<number>[\\d+\\:\\d]+)");
+    private static final Pattern COMMUNITY_MEMBER_STANDARD_STRING =
+            Pattern.compile("ip community-list standard (?<rt>[\\S]+) (permit|deny) (?<number>\\d+:\\d+)$");
+    private static final Pattern COMMUNITY_MEMBER_STANDARD_INTEGER =
+            Pattern.compile("ip community-list standard (?<rt>[\\S]+) (permit|deny) (?<number>\\d+)$");
     private static final Pattern COMMUNITY_MEMBER_EXPANDED =
             Pattern.compile("ip community-list expanded (?<rt>[\\S]+) (permit|deny) (?<number>[\\S]+)");
 
@@ -70,11 +73,17 @@ public final class CommunityListConfigReader implements CliConfigReader<Config, 
         List<CommunityMemberDeny> communityMembersDeny;
         if (output.contains("standard " + communityName)) {
             communityMembers = parseMembers(output, communityName, "standard ", "permit",
-                    COMMUNITY_MEMBER_STANDARD, value -> new CommunityMember(
+                    COMMUNITY_MEMBER_STANDARD_STRING, value -> new CommunityMember(
                                    new BgpStdCommunityType(BgpStdCommunityTypeString.getDefaultInstance(value))));
+            communityMembers.addAll(parseMembers(output, communityName, "standard ", "permit",
+                    COMMUNITY_MEMBER_STANDARD_INTEGER, value -> new CommunityMember(
+                            new BgpStdCommunityType(BgpStdCommunityTypeUnit32.getDefaultInstance(value)))));
             communityMembersDeny = parseMembers(output, communityName, "standard ", "deny",
-                    COMMUNITY_MEMBER_STANDARD, value -> new CommunityMemberDeny(
+                    COMMUNITY_MEMBER_STANDARD_STRING, value -> new CommunityMemberDeny(
                             new BgpStdCommunityType(BgpStdCommunityTypeString.getDefaultInstance(value))));
+            communityMembersDeny.addAll(parseMembers(output, communityName, "standard ", "deny",
+                    COMMUNITY_MEMBER_STANDARD_INTEGER, value -> new CommunityMemberDeny(
+                            new BgpStdCommunityType(BgpStdCommunityTypeUnit32.getDefaultInstance(value)))));
         } else {
             communityMembers = parseMembers(output, communityName, "expanded ", "permit",
                     COMMUNITY_MEMBER_EXPANDED, value -> new CommunityMember(new BgpCommunityRegexpType(value)));
