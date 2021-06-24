@@ -44,7 +44,8 @@ public final class SaosDevices {
 
     public static final Set<Device> SAOS_ALL = new HashSet<Device>() {
         {
-            add(SAOS_GENERIC);
+            add(SAOS_6);
+            add(SAOS_8);
         }
     };
 }
