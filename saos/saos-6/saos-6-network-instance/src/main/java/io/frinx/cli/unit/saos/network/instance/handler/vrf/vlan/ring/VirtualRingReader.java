@@ -63,7 +63,7 @@ public class VirtualRingReader implements CliConfigListReader<VirtualRing, Virtu
     }
 
     static String getVlan(String output, String vlanId) {
-        String[] vlans = output.split("\n");
+        String[] vlans = output.split("\r\n");
         for (String vlan: vlans) {
             String vlanNumber = vlan.substring(vlan.lastIndexOf(" ") + 1);
             if (vlanNumber.contains("-")) {

@@ -34,10 +34,11 @@ public class VirtualRingReaderTest {
             + "ring-protection virtual-ring create virtual-ring-name v-ring3 logical-ring l-ring2 raps-vid 103\n"
             + "ring-protection virtual-ring add ring v-ring3 vid 3\n";
 
-    private static final String OUTPUT_VIRTUAL_RING = "ring-protection virtual-ring add ring VSR990102 vid 4\n"
-           + "ring-protection virtual-ring add ring VSR990102 vid 6\n"
-           + "ring-protection virtual-ring add ring VSR990102 vid 100-102\n"
-           + "ring-protection virtual-ring add ring VSR990102 vid 799-800\n";
+    private static final String OUTPUT_VIRTUAL_RING = "\r\nring-protection virtual-ring add ring VSR990102 vid 4"
+           + "\r\nring-protection virtual-ring add ring VSR990102 vid 6"
+           + "\r\nring-protection virtual-ring add ring VSR990102 vid 100-102"
+           + "\r\nring-protection virtual-ring add ring VMR970100 vid 3001-3003"
+           + "\r\nring-protection virtual-ring add ring VSR990102 vid 799-800";
 
 
     @Test
@@ -53,6 +54,7 @@ public class VirtualRingReaderTest {
     @Test
     public void getVlanId() {
         Assert.assertEquals("100-102", VirtualRingReader.getVlan(OUTPUT_VIRTUAL_RING, "101"));
+        Assert.assertEquals("3001-3003", VirtualRingReader.getVlan(OUTPUT_VIRTUAL_RING, "3001"));
         Assert.assertEquals("799-800", VirtualRingReader.getVlan(OUTPUT_VIRTUAL_RING, "799"));
         Assert.assertEquals("4", VirtualRingReader.getVlan(OUTPUT_VIRTUAL_RING, "4"));
     }
