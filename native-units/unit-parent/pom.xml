@@ -31,7 +31,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <hc.version>1.18.04-Oxygen-SR2.4_2_7_rc18-frinxodl</hc.version>
+        <hc.version>1.18.04-Oxygen-SR2.4_2_7_rc19-frinxodl-SNAPSHOT</hc.version>
     </properties>
 
     <dependencyManagement>
