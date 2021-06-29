@@ -34,12 +34,12 @@ public class VirtualRingReaderTest {
             + "ring-protection virtual-ring create virtual-ring-name v-ring3 logical-ring l-ring2 raps-vid 103\n"
             + "ring-protection virtual-ring add ring v-ring3 vid 3\n";
 
-    private static final String OUTPUT_VIRTUAL_RING = "\r\nring-protection virtual-ring add ring VSR990102 vid 4"
-           + "\r\nring-protection virtual-ring add ring VSR990102 vid 6"
-           + "\r\nring-protection virtual-ring add ring VSR990102 vid 100-102"
-           + "\r\nring-protection virtual-ring add ring VMR970100 vid 3001-3003"
-           + "\r\nring-protection virtual-ring add ring VSR990102 vid 799-800";
-
+    private static final String OUTPUT_VIRTUAL_RING =
+            "ring-protection virtual-ring add ring VSR990102 vid 4\r\n"
+            + "ring-protection virtual-ring add ring VSR990102 vid 6\r\n"
+            + "ring-protection virtual-ring add ring VSR990102 vid 100-102\n"
+            + "ring-protection virtual-ring add ring VMR970100 vid 3001-3003\r\n"
+            + "ring-protection virtual-ring add ring VSR990102 vid 799-800\n";
 
     @Test
     public void getAllIdsTest() {
