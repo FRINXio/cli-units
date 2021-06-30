@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.saos.ifc.handler.aggregate;
 
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos.ifc.handler.InterfaceReaderTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -25,13 +24,18 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ag
 
 public class AggregateConfigReaderTest {
 
+    private static final String OUTPUT = "aggregation add agg LP01 port 1\n"
+            + "aggregation add agg LM01W port 2\n"
+            + "aggregation add agg LM01E port 3\n"
+            + "aggregation add agg LS01E port 4\n";
+
     @Test
     public void parseConfigTest() {
         Config1Builder builder = new Config1Builder();
         AggregateConfigReader reader = new AggregateConfigReader(Mockito.mock(Cli.class));
 
-        reader.parseConfig(InterfaceReaderTest.OUTPUT, builder, "3");
+        reader.parseConfig(OUTPUT, builder, "3");
 
-        Assert.assertEquals("LS02E", builder.getAggregateId());
+        Assert.assertEquals("LM01E", builder.getAggregateId());
     }
 }

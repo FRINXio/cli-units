@@ -27,125 +27,59 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 
 public class InterfaceReaderTest {
 
-    public static final String SH_INTERFACE = "port tdm set mode ansi\n"
-            + "port set port 1-5 speed hundred auto-neg off mode rj45\n"
-            + "port set port 1 max-frame-size 9000 ingress-to-egress-qmap NNI-NNI resolved-cos-remark-l2 true\n"
-            + "port set port 15-20 mode rj45\n"
-            + "port set port 2 description cau\n"
-            + "port set port 3 speed hundred auto-neg off mode rj45\n"
-            + "port set port 3-10 max-frame-size 9216\n"
-            + "port disable port 4\n"
-            + "port set port 4 max-frame-size 9216 ingress-to-egress-qmap NNI-NNI\n"
-            + "port set port 5 max-frame-size 9130 description test\n"
-            + "port set port 6 max-frame-size 9216\n"
-            + "port set port 8 description TEST\n"
-            + "port set port 10 speed ten-gig auto-neg off\n"
-            + "port set port 10 max-frame-size 9200\n"
-            + "vlan add vlan 25,50 port 4\n"
-            + "vlan add vlan 127,1234 port 4\n"
-            + "vlan add vlan 5 port 5\n"
-            + "vlan add vlan 5 port 6\n"
-            + "vlan add vlan 199 port 9\n"
-            + "vlan remove vlan 127 port 9\n"
-            + "vlan add vlan 2,199 port 10\n"
-            + "vlan remove vlan 127 port 10\n"
-            + "aggregation add agg LP02 port 2\n"
-            + "aggregation add agg LS02E port 3\n"
-            + "port set port 4 acceptable-frame-type tagged-only vs-ingress-filter on\n"
-            + "port set port 7 acceptable-frame-type untagged-only\n"
-            + "virtual-switch ethernet add vs VLAN111222 port 1\n"
-            + "virtual-switch ethernet add vs VLAN111333 port 3\n"
-            + "port set port 1 untagged-data-vs VLAN111222 untagged-ctrl-vs VLAN111222\n"
-            + "virtual-circuit ethernet set port 4 vlan-ethertype-policy vlan-tpid\n"
-            + "virtual-circuit ethernet set port 8 vlan-ethertype-policy vlan-tpid\n"
-            + "virtual-circuit ethernet set port 10 vlan-ethertype 88A8\n"
-            + "traffic-services queuing egress-port-queue-group set port 1 shaper-rate 50048\n"
-            + "aggregation set port 4 activity passive\n"
-            + "l2-cft set port 1 profile VLAN111222\n"
-            + "l2-cft enable port 1\n"
-            + "traffic-profiling set port 1 mode advanced\n"
-            + "traffic-profiling set port 3 mode advanced\n"
-            + "traffic-profiling set port 4 mode advanced\n"
-            + "traffic-profiling set port 6 mode advanced\n"
-            + "traffic-profiling standard-profile create port 1 profile 1 name CIA_CoS0 cir 50048 eir 0 cbs 8 ebs 0\n"
-            + "traffic-profiling standard-profile set port 1 profile CIA_CoS0 remark-rcos-policy remark-both"
-            + " green-remark-rcos 0 yellow-remark-rcos 0\n"
-            + "traffic-profiling standard-profile create port 1 profile 2 name V4096 cir 10048 eir 0 cbs 256"
-            + " ebs 0 vs VLAN111222\n"
-            + "traffic-profiling enable port 1\n"
-            + "lldp  set port 1-10 notification on\n"
-            + "mstp disable port 3\n"
-            + "mstp disable port 10\n";
+    public static final String SH_INTERFACE = "\n"
+            + "+--------------- PORT GLOBAL CONFIGURATION ----------------+\n"
+            + "|            Parameter             |       Value           |\n"
+            + "+----------------------------------+-----------------------+\n"
+            + "| Rx Low Power Detect Admin State  | Disabled              |\n"
+            + "+----------------------------------+-----------------------+\n"
+            + "+-------------------------------------------------------------------------------+\n"
+            + "| Port Table        |           Operational Status            |  Admin Config   |\n"
+            + "|---------+---------+----+--------------+----+---+-------+----+----+-------+----|\n"
+            + "| Port    | Port    |    |  Link State  |    |   |       |Auto|    |       |Auto|\n"
+            + "| Name    | Type    |Link|   Duration   |XCVR|STP| Mode  |Neg |Link| Mode  |Neg |\n"
+            + "|---------+---------+----+--------------+----+---+-------+----+----+-------+----|\n"
+            + "| 1       |10/100/G |Down|   0d 0h 0m 0s|    |Dis|       |    | Dis| 100/FD| Off|\n"
+            + "| 2       |10/100/G |Down|   0d 0h 0m 0s|    |Dis|       |    |Ena |1000/FD| On |\n"
+            + "| 3       |Uncertif |Down|   0d 0h 0m 0s|UCTF|Dis|       |    |Ena | 100/FD| Off|\n"
+            + "| 4       |10/100/G | Up |  19d 0h31m36s|    |FWD| 100/HD| On |Ena |1000/FD| On |\n"
+            + "| 5       | 100/G   |Down|   0d 0h 0m 0s|    |Dis|       |    |Ena |1000/FD| On |\n"
+            + "| 6       | 100/G   |Down|   0d 0h 0m 0s|    |Dis|       |    |Ena |1000/FD| On |\n"
+            + "| 7       | 100/G   |Down|   0d 0h 0m 0s|    |Dis|       |    |Ena |1000/FD| On |\n"
+            + "| 8       | 100/G   |Down|   0d 0h 0m 0s|    |Dis|       |    |Ena |1000/FD| On |\n"
+            + "| 9       | Gig     |Down|   0d 0h 0m 0s|    |Dis|       |    |Ena |Auto/FD| On |\n"
+            + "| 10      |Uncertif | Up | 119d23h29m11s|UCTF|FWD| 10G/FD| Off|Ena | 10G/FD| Off|\n"
+            + "+---------+---------+----+--------------+----+---+-------+----+----+-------+----+\n"
+            + "\n";
 
-    public static final String SH_AGG_IFACE =
-            "aggregation create agg LP01\n"
-                    + "aggregation create agg LM01E\n"
-                    + "aggregation create agg LM01W\n"
-                    + "aggregation create agg LS01W\n"
-                    + "aggregation create agg LS02W\n"
-                    + "aggregation create agg LP02\n"
-                    + "aggregation create agg JMEP\n"
-                    + "aggregation create agg LSPIRENT01\n";
+    public static final String SH_AGG_IFACE = "aggregation create agg LP01\n"
+            + "aggregation create agg LM01E\n"
+            + "aggregation create agg LM01W\n"
+            + "aggregation create agg LS01W\n"
+            + "aggregation create agg LS02W\n"
+            + "aggregation create agg LP02\n"
+            + "aggregation create agg JMEP\n"
+            + "aggregation create agg LSPIRENT01\n";
 
     public static final String OUTPUT = SH_INTERFACE.concat(SH_AGG_IFACE);
 
-    public static final String SH_INTERFACE_PARSE_ERROR = "port tdm set mode ansi\n"
-            + "port set port 5-1 mode rj45\n";
-
-    public static final String OUTPUT_1 =
-            "port set port 1-5,100 speed hundred auto-neg off mode rj45\n"
-                    + "port set port 5-6,9-12 max-frame-size 9000 ingress-to-egress-qmap NNI-NNI\n"
-                    + "vlan create vlan 114 hundred\n"
-                    + "vlan create vlan 114,191-193 sd\n"
-                    + "vlan add vlan 127,190 port LS02W\n"
-                    + "port set port 15-20,101 mode rj45\n";
-
-    public static final String OUTPUT_2 =
-            "port set port 1-5 speed hundred auto-neg off mode rj45\n"
-                    + "port set port 4-7,9-12,54-59 max-frame-size 9000\n"
-                    + "vlan create vlan 114,191-193 hundred\n"
-                    + "port set port 5-6,10-12,25 max-frame-size";
-
-    private static final List<InterfaceKey> IDS_EXPECTED = Lists.newArrayList("1", "2", "3", "4", "5", "6",
-            "8", "10", "9", "7", "LP01", "LM01E", "LM01W", "LS01W", "LS02W", "LP02", "JMEP", "LSPIRENT01", "15",
-            "16", "17", "18", "19", "20")
+    private static final List<InterfaceKey> IDS_EXPECTED_PORT = Lists.newArrayList("1", "2", "3", "4", "5", "6",
+            "7", "8", "9", "10")
             .stream()
             .map(InterfaceKey::new)
             .collect(Collectors.toList());
 
-    private static final List<InterfaceKey> IDS_OF_RANGE_EXPECTED = Lists.newArrayList("1", "2", "3", "4",
-            "5", "6", "7", "8", "9", "10", "15", "16", "17", "18", "19", "20")
-            .stream()
-            .map(InterfaceKey::new)
-            .collect(Collectors.toList());
-
-    private static final List<InterfaceKey> IDS_OF_DOUBLE_RANGE_EXPECTED = Lists.newArrayList("100", "101",
-            "1", "2", "3", "4", "5", "6", "9", "10", "11", "12", "15", "16", "17", "18", "19", "20")
-            .stream()
-            .map(InterfaceKey::new)
-            .collect(Collectors.toList());
-
-    private static final List<InterfaceKey> IDS_OF_TRIPLE_RANGE_EXPECTED = Lists.newArrayList("25", "1", "2",
-            "3", "4", "5", "6", "7", "9", "10", "11", "12", "54", "55", "56", "57", "58", "59")
+    private static final List<InterfaceKey> IDS_EXPECTED_AGG = Lists.newArrayList("LP01", "LM01E", "LM01W",
+            "LS01W", "LS02W", "LP02", "JMEP", "LSPIRENT01")
             .stream()
             .map(InterfaceKey::new)
             .collect(Collectors.toList());
 
     @Test
     public void testParseInterfaceAggIds() {
-        Assert.assertEquals(IDS_EXPECTED,
-                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT));
-    }
-
-    @Test
-    public void testDoubleInterfaceRangeIds() {
-        Assert.assertEquals(IDS_OF_DOUBLE_RANGE_EXPECTED,
-                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT_1));
-    }
-
-    @Test
-    public void testTripleInterfaceIds() {
-        Assert.assertEquals(IDS_OF_TRIPLE_RANGE_EXPECTED,
-                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT_2));
+        Assert.assertEquals(IDS_EXPECTED_PORT,
+                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT, InterfaceReader.INTERFACE_ID_LINE));
+        Assert.assertEquals(IDS_EXPECTED_AGG,
+                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT, InterfaceReader.LAG_INTERFACE_ID_LINE));
     }
 }

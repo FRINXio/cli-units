@@ -20,7 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.regex.Pattern;
@@ -32,6 +31,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class AggregateConfigReader  implements CliConfigReader<Config1, Config1Builder> {
 
+    private static final String LAG_PORTS = "configuration search string \"aggregation add agg\"";
     private final Cli cli;
 
     public AggregateConfigReader(Cli cli) {
@@ -43,7 +43,7 @@ public class AggregateConfigReader  implements CliConfigReader<Config1, Config1B
                                       @Nonnull Config1Builder config1Builder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
-        String output = blockingRead(InterfaceReader.SH_PORTS, cli, instanceIdentifier, readContext);
+        String output = blockingRead(LAG_PORTS, cli, instanceIdentifier, readContext);
         parseConfig(output, config1Builder, ifcName);
     }
 
