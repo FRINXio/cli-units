@@ -28,6 +28,8 @@ import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigReade
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceReader;
 import io.frinx.cli.unit.ios.network.instance.handler.NetworkInstanceStateReader;
+import io.frinx.cli.unit.ios.network.instance.handler.ipv6.Ipv6GlobalConfigReader;
+import io.frinx.cli.unit.ios.network.instance.handler.ipv6.Ipv6GlobalConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceConfigReader;
 import io.frinx.cli.unit.ios.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceConfigWriter;
 import io.frinx.cli.unit.ios.network.instance.handler.policy.forwarding.PolicyForwardingInterfaceReader;
@@ -44,7 +46,9 @@ import io.frinx.cli.unit.ios.network.instance.handler.vrf.table.TableConnectionC
 import io.frinx.cli.unit.ios.network.instance.handler.vrf.table.TableConnectionReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import java.util.Collections;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -131,6 +135,11 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
                 /*handle after sub-ifc configuration*/
                 io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_SU_SU_CONFIG);
 
+        // IPV6 Global
+        writeRegistry.addNoop(IIDs.NE_NE_AUG_IPV6CISCOAUG);
+        writeRegistry.addNoop(IIDs.NE_NE_AUG_NETWORKINSTANCE1_CISCOIPV6CONFIG);
+        writeRegistry.addAfter(IIDs.NE_NE_AUG_IPV6CISCOAUG_CISCOIPV6CONFIG, new Ipv6GlobalConfigWriter(cli),
+                IIDs.NE_NE_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -176,11 +185,22 @@ public class IosNetworkInstanceUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
         readRegistry.subtreeAdd(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli),
                 Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1));
+
+        // IPV6 Global
+        readRegistry.add(IIDs.NE_NE_AUG_NETWORKINSTANCE1_CISCOIPV6CONFIG, new Ipv6GlobalConfigReader(cli));
     }
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_NETWORK_INSTANCE,
-                IIDs.FRINX_CISCO_PF_INTERFACES_EXTENSION);
+                IIDs.FRINX_CISCO_PF_INTERFACES_EXTENSION,
+                IIDs.FRINX_CISCO_IPVSIX_EXTENSION);
+    }
+
+    @Override
+    public Set<Pattern> getErrorPatterns() {
+        return Sets.newLinkedHashSet(Collections.singletonList(
+                Pattern.compile("%Cannot disable IPv6 CEF on this platform", Pattern.DOTALL)
+        ));
     }
 }
