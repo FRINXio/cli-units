@@ -24,9 +24,9 @@ public final class InterfaceReader extends AbstractInterfaceReader {
 
     private static final String SH_INTERFACE = "display ip interface brief";
 
-    private static final Pattern INTERFACE_ID_LINE =
-            Pattern.compile("(?<id>[^\\s^(]+)(\\(10G\\))*\\s+(?<ipAddr>[^\\s]+)\\s+(?<status>[^\\s]+)\\s+"
-                    + "(?<protocol>[^\\s]+)\\s+(?<vpn>[^\\s]+)\\s*");
+    private static final Pattern INTERFACE_ID_LINES = Pattern.compile(
+            "(?<id>[a-zA-Z]+[0-9/*.]+)\\s+(?<ipAddr>[^\\s]+)\\s+(?<status>[^\\s]+)\\s+(?<protocol>[^\\s]+)\\s*"
+    );
 
     private static final Pattern SUBINTERFACE_NAME = Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
 
@@ -41,7 +41,7 @@ public final class InterfaceReader extends AbstractInterfaceReader {
 
     @Override
     protected Pattern getInterfaceIdLine() {
-        return INTERFACE_ID_LINE;
+        return INTERFACE_ID_LINES;
     }
 
     @Override

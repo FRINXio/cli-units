@@ -27,40 +27,56 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 
 public class InterfaceReaderTest {
 
-    private static final String DISPLAY_IP_INT_BRIE = "*down: administratively down\n"
-            + "!down: FIB overload down\n"
+    private static final String DISPLAY_IP_INT_BRIEF = "*down: administratively down\n"
             + "^down: standby\n"
             + "(l): loopback\n"
             + "(s): spoofing\n"
-            + "(d): Dampening Suppressed\n"
             + "(E): E-Trunk down\n"
-            + "The number of interface that is UP in Physical is 7\n"
-            + "The number of interface that is DOWN in Physical is 26\n"
-            + "The number of interface that is UP in Protocol is 7\n"
-            + "The number of interface that is DOWN in Protocol is 26\n"
+            + "The number of interface that is UP in Physical is 15\n"
+            + "The number of interface that is DOWN in Physical is 12\n"
+            + "The number of interface that is UP in Protocol is 15\n"
+            + "The number of interface that is DOWN in Protocol is 12\n"
             + "\n"
-            + "Interface                         IP Address/Mask      Physical   Protocol VPN \n"
-            + "Eth-Trunk1                        99.1.1.1/24          down       down     --  \n"
-            + "GigabitEthernet0/0/0              192.168.2.241/24     down       down     --  \n"
-            + "GigabitEthernet1/0/4              10.0.3.1/24          down       down     --  \n"
-            + "GigabitEthernet1/0/5              unassigned           down       down     --  \n"
-            + "GigabitEthernet1/0/12             100.100.100.200/24   down       down     --  \n"
-            + "GigabitEthernet1/0/13             unassigned           down       down     --  \n"
-            + "GigabitEthernet1/0/14             219.141.189.237/27   up         up       --  \n"
-            + "GigabitEthernet1/2/0(10G)         10.0.111.1/24        down       down     --  \n"
-            + "GigabitEthernet1/2/2(10G)         10.0.12.1/24         up         up       --  \n"
-            + "GigabitEthernet1/2/4(10G)         172.16.124.1/24      up         up       l3vpn\n"
-            + "LoopBack0                         100.100.100.1/32     up         up(s)    --  \n"
-            + "NULL0                             unassigned           up         up(s)    --";
+            + "Interface                         IP Address/Mask      Physical   Protocol  \n"
+            + "Cellular0/0/0                     unassigned           *down      down      \n"
+            + "Cellular0/0/1                     unassigned           *down      down      \n"
+            + "Ethernet0/0/0                     unassigned           *down      down      \n"
+            + "GigabitEthernet0/0/0              213.34.16.238/29     *down      down      \n"
+            + "GigabitEthernet0/0/0.200          217.100.226.6/29     down       down      \n"
+            + "GigabitEthernet0/0/1              213.34.18.238/29     up         up        \n"
+            + "GigabitEthernet0/0/1.500          217.105.224.22/29    up         up        \n"
+            + "GigabitEthernet0/0/1.600          217.105.225.18/29    up         up        \n"
+            + "GigabitEthernet0/0/3              unassigned           *down      down      \n"
+            + "GigabitEthernet0/0/4              172.16.1.189/23      up         up        \n"
+            + "GigabitEthernet0/0/4.100          217.105.224.6/29     up         up        \n"
+            + "GigabitEthernet0/0/5              unassigned           *down      down      \n"
+            + "LoopBack0                         198.18.5.8/32        up         up(s)     \n"
+            + "LoopBack1                         213.124.248.1/32     up         up(s)     \n"
+            + "LoopBack100                       unassigned           up         up(s)     \n"
+            + "LoopBack101                       unassigned           up         up(s)     \n"
+            + "LoopBack112                       33.33.33.33/32       up         up(s)     \n"
+            + "LoopBack200                       10.128.12.217/30     up         up(s)     \n"
+            + "LoopBack308                       unassigned           up         up(s)     \n"
+            + "LoopBack394                       unassigned           up         up(s)     \n"
+            + "LoopBack500                       20.20.20.20/32       up         up(s)     \n"
+            + "NULL0                             unassigned           up         up(s)     \n"
+            + "Vlanif101                         213.34.166.238/29    down       down      \n"
+            + "Vlanif112                         213.34.201.238/29    down       down      \n"
+            + "Vlanif140                         213.34.20.238/29     down       down      \n"
+            + "Vlanif400                         217.105.226.70/29    down       down      \n"
+            + "Vlanif911                         2.2.2.2/24           down       down ";
 
-    private static List<InterfaceKey> EXPECTED_ALL_IDS = Lists.newArrayList("Eth-Trunk1", "GigabitEthernet0/0/0",
-            "GigabitEthernet1/0/4", "GigabitEthernet1/0/5", "GigabitEthernet1/0/12", "GigabitEthernet1/0/13",
-            "GigabitEthernet1/0/14", "GigabitEthernet1/2/0", "GigabitEthernet1/2/2", "GigabitEthernet1/2/4",
-            "LoopBack0", "NULL0").stream().map(InterfaceKey::new).collect(Collectors.toList());
+    private static List<InterfaceKey> EXPECTED_ALL_IDS = Lists.newArrayList("Cellular0/0/0", "Cellular0/0/1",
+            "Ethernet0/0/0", "GigabitEthernet0/0/0", "GigabitEthernet0/0/0.200", "GigabitEthernet0/0/1",
+            "GigabitEthernet0/0/1.500", "GigabitEthernet0/0/1.600", "GigabitEthernet0/0/3", "GigabitEthernet0/0/4",
+            "GigabitEthernet0/0/4.100", "GigabitEthernet0/0/5", "LoopBack0", "LoopBack1", "LoopBack100", "LoopBack101",
+            "LoopBack112", "LoopBack200", "LoopBack308", "LoopBack394", "LoopBack500", "NULL0", "Vlanif101",
+            "Vlanif112", "Vlanif140", "Vlanif400",
+            "Vlanif911").stream().map(InterfaceKey::new).collect(Collectors.toList());
 
     @Test
     public void testParseAllInterfaceIds() {
         Assert.assertEquals(EXPECTED_ALL_IDS,
-                new InterfaceReader(Mockito.mock(Cli.class)).parseAllInterfaceIds(DISPLAY_IP_INT_BRIE));
+                new InterfaceReader(Mockito.mock(Cli.class)).parseAllInterfaceIds(DISPLAY_IP_INT_BRIEF));
     }
 }
