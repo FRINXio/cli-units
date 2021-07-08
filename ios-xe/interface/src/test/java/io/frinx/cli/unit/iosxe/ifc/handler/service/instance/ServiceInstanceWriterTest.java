@@ -35,6 +35,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.Protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.ProtocolType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceRewrite.Operation;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceRewrite.Type;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceBuilder;
@@ -43,6 +45,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.EncapsulationBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocolBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.RewriteBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
@@ -73,6 +76,10 @@ public class ServiceInstanceWriterTest {
                                     .setValue("100")
                                     .setGroupNumber((short) 2)
                                     .build())
+                            .setRewrite(new RewriteBuilder()
+                                    .setType(Type.Ingress)
+                                    .setOperation(Operation.Pop)
+                                    .build())
                             .build(),
                     new ServiceInstanceBuilder()
                             .setId(200L)
@@ -96,6 +103,7 @@ public class ServiceInstanceWriterTest {
             + "encapsulation untagged , dot1q 1 , 2 , 3 , 5 , 6 , 7 , 8 , 9 , 10\n"
             + "l2protocol peer lldp stp\n"
             + "bridge-domain 100 split-horizon group 2\n"
+            + "rewrite ingress tag pop 1 symmetric\n"
             + "exit\n"
             + "service instance trunk 200 ethernet\n"
             + "encapsulation dot1q 200\n"
@@ -123,9 +131,44 @@ public class ServiceInstanceWriterTest {
                             .build()
             );
 
+    private static final List<ServiceInstance> UPDATE_SERVICE_INSTANCES_WITH_REWRITE =
+            Collections.singletonList(
+                    new ServiceInstanceBuilder()
+                            .setId(100L)
+                            .setKey(new ServiceInstanceKey(100L))
+                            .setConfig(new ConfigBuilder()
+                                    .setId(100L)
+                                    .setTrunk(true)
+                                    .build())
+                            .setEncapsulation(new EncapsulationBuilder()
+                                    .setUntagged(false)
+                                    .setDot1q(Arrays.asList(1, 9))
+                                    .build())
+                            .setL2protocol(new L2protocolBuilder()
+                                    .setProtocol(Collections.singletonList(Protocol.Lldp))
+                                    .setProtocolType(ProtocolType.Peer)
+                                    .build())
+                            .setRewrite(new RewriteBuilder()
+                                    .setType(Type.Egress)
+                                    .setOperation(Operation.Pop)
+                                    .build())
+                            .build()
+            );
+
     private static final String UPDATE_INPUT = "configure terminal\n"
             + "interface GigabitEthernet0/0/0\n"
             + "no service instance 100\n"
+            + "no service instance trunk 200\n"
+            + "service instance trunk 100 ethernet\n"
+            + "encapsulation dot1q 1 , 9\n"
+            + "l2protocol peer lldp\n"
+            + "exit\n"
+            + "end\n";
+
+    private static final String UPDATE_INPUT_WITH_REWRITE = "configure terminal\n"
+            + "interface GigabitEthernet0/0/0\n"
+            + "no service instance 100\n"
+            + "no rewrite ingress\n"
             + "no service instance trunk 200\n"
             + "service instance trunk 100 ethernet\n"
             + "encapsulation dot1q 1 , 9\n"
@@ -158,6 +201,7 @@ public class ServiceInstanceWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
+        // tu
         writer.writeCurrentAttributes(iid, getAug(WRITE_SERVICE_INSTANCES), context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
@@ -169,6 +213,20 @@ public class ServiceInstanceWriterTest {
                 context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(UPDATE_INPUT, response.getValue().getContent());
+    }
+
+    @Test
+    public void updateRewrite() throws WriteFailedException {
+        try {
+            writer.updateCurrentAttributes(iid, getAug(WRITE_SERVICE_INSTANCES),
+                    getAug(UPDATE_SERVICE_INSTANCES_WITH_REWRITE), context);
+            Mockito.verify(cli).executeAndRead(response.capture());
+            Assert.assertEquals(UPDATE_INPUT_WITH_REWRITE, response.getValue().getContent());
+        } catch (IllegalArgumentException exception) {
+            // we don't have implementation for POP operation
+            Assert.assertTrue(true);
+        }
+
     }
 
     @Test

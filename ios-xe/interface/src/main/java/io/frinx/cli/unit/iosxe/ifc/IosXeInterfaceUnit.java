@@ -32,6 +32,7 @@ import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceBridg
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceEncapsulationReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceRewriteReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceWriter;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.SubinterfaceConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.subifc.SubinterfaceConfigWriter;
@@ -113,7 +114,8 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_CONFIG,
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_ENCAPSULATION,
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_BRIDGEDOMAIN,
-                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2PROTOCOL));
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2PROTOCOL,
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_REWRITE));
 
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
         writeRegistry.addAfter(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli), IIDs.IN_IN_CONFIG);
@@ -176,6 +178,7 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_BRIDGEDOMAIN,
                 new ServiceInstanceBridgeDomainReader(cli));
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2PROTOCOL, new L2protocolReader(cli));
+        readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_REWRITE, new ServiceInstanceRewriteReader(cli));
 
         readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli));
         readRegistry.add(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli));

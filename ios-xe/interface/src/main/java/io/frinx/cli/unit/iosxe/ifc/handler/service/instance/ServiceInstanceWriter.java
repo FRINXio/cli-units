@@ -32,6 +32,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Encapsulation;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocol;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Rewrite;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -110,6 +111,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                         currentInstances.append(getEncapsulationCommands(serviceInstance.getEncapsulation()));
                         currentInstances.append(getL2ProtocolCommands(serviceInstance.getL2protocol()));
                         currentInstances.append(getBridgeDomainCommands(serviceInstance.getBridgeDomain()));
+                        currentInstances.append(getRewrite(serviceInstance));
                         currentInstances.append("exit\n");
                     }
                 }
@@ -117,6 +119,21 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         }
 
         return currentInstances.toString();
+    }
+
+    private String getRewrite(ServiceInstance serviceInstance) {
+        Rewrite rewrite = serviceInstance.getRewrite();
+        if (rewrite != null && rewrite.getType() != null && rewrite.getOperation() != null) {
+            if (rewrite.getType().getName().equals("ingress") && rewrite.getOperation().getName().equals("pop")) {
+                return "rewrite ingress tag pop 1 symmetric\n";
+            } else {
+                throw new IllegalArgumentException(
+                        String.format("Rewrite contains unsupported type(%s) or protocol(%s)!",
+                                rewrite.getType().getName(),
+                                rewrite.getOperation().getName()));
+            }
+        }
+        return "";
     }
 
     private String getCreationCommands(final ServiceInstance serviceInstance, boolean delete) {
