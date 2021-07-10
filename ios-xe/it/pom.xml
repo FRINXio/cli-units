@@ -28,17 +28,17 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.cli</groupId>
     <artifactId>ios-xe-it</artifactId>
-    <version>4.2.7.rc21-frinx-SNAPSHOT</version>
+    <version>4.2.7.rc21-frinx</version>
 
     <properties>
-        <cli.version>4.2.7.rc21-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>4.2.7.rc21-frinx-SNAPSHOT</openconfig.version>
+        <cli.version>4.2.7.rc21-frinx</cli.version>
+        <openconfig.version>4.2.7.rc21-frinx</openconfig.version>
         <hc.version>1.18.04-Oxygen-SR2.4_2_7_rc21-frinxodl</hc.version>
         <controller.version>1.7.2-Oxygen-SR2.4_2_7_rc21-frinxodl</controller.version>
         <yangtools.version>2.0.5-Oxygen-SR2.4_2_7_rc21-frinxodl</yangtools.version>
         <mdsal.model.version>0.12.2-Oxygen-SR2.4_2_7_rc21-frinxodl</mdsal.model.version>
         <mdsal.version>2.4.2-Oxygen-SR2.4_2_7_rc21-frinxodl</mdsal.version>
-        <translate.unit.commons.version>4.2.7.rc21-frinx-SNAPSHOT</translate.unit.commons.version>
+        <translate.unit.commons.version>4.2.7.rc21-frinx</translate.unit.commons.version>
     </properties>
 
     <dependencyManagement>
