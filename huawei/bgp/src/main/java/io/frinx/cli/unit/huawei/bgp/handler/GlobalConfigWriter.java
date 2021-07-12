@@ -23,6 +23,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.openconfig.openconfig.network.instance.IIDs;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,7 +32,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpGlobalConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpGlobalBase;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpNeighborAfiSafiList;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.BgpNeighborBase;
@@ -52,31 +55,35 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalConfigWriter implements CliWriter<Config> {
 
-    private Cli cli;
+    private final Cli cli;
 
     public GlobalConfigWriter(Cli cli) {
         this.cli = cli;
     }
 
-    @Override
-    public void writeCurrentAttributes(InstanceIdentifier<Config> id, Config config, WriteContext writeContext)
-            throws WriteFailedException {
+    private static final String WRITE_UPDATE_TEMPLATE = "system-view\n"
+            + "bgp {$bgp}\n"
+            + "{$routerId}\n"
+            + "{% loop in $importRoute as $im_r %}\n"
+            + "{$im_r}\n"
+            + "{% onEmpty %}"
+            + "undo import-route static\n"
+            + "undo import-route direct\n"
+            + "{% endloop %}"
+            + "commit\n"
+            + "return";
 
+    @Override
+    public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                       @Nonnull Config config,
+                                       @Nonnull WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
         ProtocolKey protoKey = id.firstKeyOf(Protocol.class);
         Preconditions.checkArgument(protoKey.getName().equals(BgpProtocolReader.DEFAULT_BGP_INSTANCE),
                 "BGP protocol instance has to be named: %s. Not: %s", BgpProtocolReader.DEFAULT_BGP_INSTANCE, protoKey);
-
-        if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
-            // Only set global router id for default network
-            blockingWriteAndRead(cli, id, config,
-                    "system-view",
-                    f("bgp %s", config.getAs().getValue()),
-                    config.getRouterId() == null ? "undo router-id"
-                            : f("router-id %s", config.getRouterId().getValue()),
-                    "commit",
-                    "return");
-        } else {
+        List<String> importRouteList = getImportRouteList(config.getAugmentation(BgpGlobalConfigAug.class));
+        String routerId = getRouterId(config);
+        if (!vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             // Compare AS for global and current VRF. Must match for IOS
             writeContext.readAfter(IIDs.NETWORKINSTANCES.child(NetworkInstance.class, NetworInstance.DEFAULT_NETWORK)
                     .child(Protocols.class))
@@ -87,25 +94,25 @@ public class GlobalConfigWriter implements CliWriter<Config> {
                     .map(bgp -> bgp.getBgp().getGlobal().getConfig().getAs())
                     .ifPresent(globalAs -> Preconditions.checkArgument(globalAs.equals(config.getAs()),
                             "BGP for VRF contains different AS: %s than global BGP: %s", config.getAs(), globalAs));
-
-            blockingWriteAndRead(cli, id, config,
-                    "system-view",
-                    f("bgp %s", config.getAs().getValue()),
-                    "commit",
-                    "return");
         }
+        blockingWriteAndRead(cli, id, config,
+                fT(WRITE_UPDATE_TEMPLATE, "bgp", config.getAs().getValue(), "routerId", routerId,
+                "importRoute", importRouteList));
     }
 
     @Override
-    public void updateCurrentAttributes(InstanceIdentifier<Config> id, Config dataBefore, Config dataAfter,
-                                               WriteContext writeContext) throws WriteFailedException {
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                        @Nonnull Config dataBefore,
+                                        @Nonnull Config dataAfter,
+                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         // Just perform write, delete not necessary (bgp router is global and encapsulates configuration for all vrfs)
         // cannot just delete and replace
         writeCurrentAttributes(id, dataAfter, writeContext);
     }
 
-    @Override public void deleteCurrentAttributes(InstanceIdentifier<Config> id, Config config,
-                                                         WriteContext writeContext) throws WriteFailedException {
+    @Override public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+                                                  @Nonnull Config config,
+                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
 
         NetworkInstanceKey vrfKey = id.firstKeyOf(NetworkInstance.class);
 
@@ -119,6 +126,37 @@ public class GlobalConfigWriter implements CliWriter<Config> {
                     "commit",
                     "return");
         }
+    }
+
+    private List<String> getImportRouteList(BgpGlobalConfigAug configAug) {
+        List<String> importRouteList = new ArrayList<>();
+        if (configAug != null && configAug.getImportRoute() != null) {
+            if (configAug.getImportRoute().size() != 2) {
+                if (configAug.getImportRoute().contains("direct")) {
+                    importRouteList.add("import-route direct");
+                    importRouteList.add("undo import-route static");
+                }
+                else {
+                    importRouteList.add("import-route static");
+                    importRouteList.add("undo import-route direct");
+                }
+            }
+            else {
+                importRouteList.add("import-route static");
+                importRouteList.add("import-route direct");
+            }
+        }
+        return importRouteList;
+    }
+
+    private String getRouterId(Config config) {
+        String routerId;
+        if (config.getRouterId() == null) {
+            routerId = "undo router-id";
+        } else {
+            routerId = "router-id " + config.getRouterId().getValue();
+        }
+        return routerId;
     }
 
     /**

@@ -69,5 +69,12 @@
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
         </dependency>
+
+        <!-- Testing Dependencies -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

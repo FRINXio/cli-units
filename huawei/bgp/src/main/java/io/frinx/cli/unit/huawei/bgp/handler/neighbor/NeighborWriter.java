@@ -27,6 +27,7 @@ import io.frinx.openconfig.network.instance.NetworInstance;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.afi.safi.list.AfiSafi;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborKey;
@@ -51,9 +52,21 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                     + "{% onEmpty %}"
                     + "{% endloop %}";
 
+    private static final String NEIGHBOR_COMMON_CONFIG =
+            "{% if ($description) %}peer {$neighbor_ip} description {$description}\n"
+                    + "{% else %}undo peer {$neighbor_ip} description\n{% endif %}"
+            + "{% if ($password) %}peer {$neighbor_ip} password cipher {$password}\n"
+                    + "{% else %}undo peer {$neighbor_ip} password cipher\n{% endif %}"
+            + "{% if ($timer_mode) %}peer {$neighbor_ip} timer {$timer_mode} {$time_before} hold {$time_after}\n"
+                    + "{% else %}undo peer {$neighbor_ip} timer\n{% endif %}"
+            + "{% if ($transport) %}peer {$neighbor_ip} path-mtu {$transport}\n"
+                    + "{% else %}undo peer {$neighbor_ip} path-mtu\n{% endif %}";
+
     static final String NEIGHBOR_GLOBAL = "system-view\n"
             + "bgp {$as}\n"
             + "peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n"
+            +
+            NEIGHBOR_COMMON_CONFIG
             +
 
             // //Active the neighbor. Either under address family, or globally if no family present
@@ -76,7 +89,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
     static final String NEIGHBOR_GLOBAL_DELETE = "system-view\n"
             + "bgp {$as}\n"
             +
-
+            NEIGHBOR_COMMON_CONFIG
+            +
             "{.if ($afi_safi) }ipv4-family {$afi_safi}\n{/if}"
             + "undo peer {$neighbor_ip} enable\n"
             + "{.if ($afi_safi) }quit\n{/if}"
@@ -99,7 +113,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
             "peer {$neighbor_ip} as-number {$neighbor.config.peer_as.value}\n"
             +
-
+            NEIGHBOR_COMMON_CONFIG
+            +
             //Set policies
             NEIGHBOR_POLICIES
             +
@@ -116,6 +131,9 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
 
             "ipv4-family vpn-instance {$vrf}\n"
             + "undo peer {$neighbor_ip} enable\n"
+            +
+            NEIGHBOR_COMMON_CONFIG
+
             + "undo peer {$neighbor_ip} \n"
             + "Y\n"
             + "commit\n"
@@ -131,26 +149,55 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
     public void writeCurrentAttributes(InstanceIdentifier<Neighbor> instanceIdentifier, Neighbor neighbor,
                                               WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
-
-        final Global bgpGlobal = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get().getGlobal();
+        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
+        final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = getAsValue(bgpGlobal);
 
         List<Class<? extends AFISAFITYPE>> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, neighbor);
         String neighborIp = getNeighborIp(instanceIdentifier);
+        String description = neighbor.getConfig().getDescription();
+        String password = getPasswordOrNull(neighbor);
 
+        BgpNeighborConfigAug configAug = neighbor.getConfig().getAugmentation(BgpNeighborConfigAug.class);
+        String timerMode = null;
+        String transport = null;
+        Short timeBefore = null;
+        Short timeAfter = null;
+        if (configAug != null) {
+            if (configAug.getTimerConfiguration() != null) {
+                timerMode = configAug.getTimerConfiguration().getTimerMode();
+                timeBefore = configAug.getTimerConfiguration().getTimeBefore();
+                timeAfter = configAug.getTimerConfiguration().getTimeAfter();
+            }
+            if (configAug.getTransport() != null) {
+                transport = configAug.getTransport().getName();
+            }
+        }
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             if (neighAfiSafi.isEmpty()) {
                 renderNeighbor(NEIGHBOR_GLOBAL, instanceIdentifier, neighbor,
                         "as", bgpAs,
                         "neighbor_ip", neighborIp,
-                        "neighbor", neighbor);
+                        "neighbor", neighbor,
+                        "description", description,
+                        "password", password,
+                        "timer_mode", timerMode,
+                        "time_before", timeBefore,
+                        "time_after", timeAfter,
+                        "transport", transport);
             } else {
                 for (Class<? extends AFISAFITYPE> afiClass : neighAfiSafi) {
                     renderNeighbor(NEIGHBOR_GLOBAL, instanceIdentifier, neighbor,
                             "as", bgpAs,
                             "afi_safi", GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afiClass),
                             "neighbor_ip", neighborIp,
-                            "neighbor", neighbor);
+                            "neighbor", neighbor,
+                            "description", description,
+                            "password", password,
+                            "timer_mode", timerMode,
+                            "time_before", timeBefore,
+                            "time_after", timeAfter,
+                            "transport", transport);
                 }
             }
         } else {
@@ -164,7 +211,13 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                         "vrf", vrfName,
                         "afi_safi", GlobalAfiSafiConfigWriter.toDeviceAddressFamily(afiClass),
                         "neighbor_ip", neighborIp,
-                        "neighbor", neighbor);
+                        "neighbor", neighbor,
+                        "description", description,
+                        "password", password,
+                        "timer_mode", timerMode,
+                        "time_before", timeBefore,
+                        "time_after", timeAfter,
+                        "transport", transport);
             }
         }
     }
@@ -221,8 +274,8 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
                                                WriteContext writeContext) throws WriteFailedException {
         NetworkInstanceKey vrfKey = instanceIdentifier.firstKeyOf(NetworkInstance.class);
 
-        final Global bgpGlobal = writeContext.readBefore(RWUtils.cutId(instanceIdentifier, Bgp.class)).get()
-                .getGlobal();
+        final Bgp bgp = writeContext.readAfter(RWUtils.cutId(instanceIdentifier, Bgp.class)).get();
+        final Global bgpGlobal = bgp.getGlobal();
         Long bgpAs = getAsValue(bgpGlobal);
 
         List<Class<? extends AFISAFITYPE>> neighAfiSafi = getAfiSafisForNeighbor(bgpGlobal, neighbor);
@@ -257,15 +310,15 @@ public class NeighborWriter implements CliListWriter<Neighbor, NeighborKey> {
         }
     }
 
-    static String getNeighborIp(InstanceIdentifier<?> neigh) {
-        IpAddress addr = neigh.firstKeyOf(Neighbor.class).getNeighborAddress();
-        return getNeighborIp(addr);
+    private String getPasswordOrNull(Neighbor neighbor) {
+        if (neighbor.getConfig().getAuthPassword() != null) {
+            return neighbor.getConfig().getAuthPassword().getPlainString().getValue();
+        }
+        return null;
     }
 
-    static String getNeighborIp(IpAddress addr) {
-        return addr.getIpv4Address() != null
-                ?
-                addr.getIpv4Address().getValue() :
-                addr.getIpv6Address().getValue();
+    static String getNeighborIp(InstanceIdentifier<?> neigh) {
+        IpAddress addr = neigh.firstKeyOf(Neighbor.class).getNeighborAddress();
+        return addr.getIpv4Address() != null ? addr.getIpv4Address().getValue() : addr.getIpv6Address().getValue();
     }
 }

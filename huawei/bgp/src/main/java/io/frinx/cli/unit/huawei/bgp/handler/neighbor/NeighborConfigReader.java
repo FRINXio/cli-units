@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.huawei.bgp.handler.neighbor;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -28,11 +29,17 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpNeighborConfigExtension.Transport;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.bgp.neighbor.config.extension.TimerConfigurationBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.EncryptedPassword;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.openconfig.types.rev170113.PlainString;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.AsNumber;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
@@ -40,16 +47,24 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    static final String DISPLAY_PEER_CONFIG =
-            "display current-configuration configuration bgp | include ^router bgp|^ *ipv4-family|^ *peer %s";
+    static final String DISPLAY_PEER_CONFIG = "display current-configuration configuration bgp "
+            + "| include ^router bgp|^ *ipv4-family|^ *peer %s";
     private static final String NEIGHBOR_IP = "neighborIp";
     private static final String ENABLED = "enabled";
-    private static final String REMOTE_AS = "remoteAs";
     private static final String ACTIVATE = "activate";
+
     private static final Pattern NEIGHBOR_ACTIVATE_PATTERN =
             Pattern.compile("peer (?<neighborIp>\\S*) enable.*");
     private static final Pattern REMOTE_AS_PATTERN =
             Pattern.compile("peer (?<neighborIp>\\S*) as-number (?<remoteAs>\\S*).*");
+    private static final Pattern DESCRIPTION_PATTERN =
+            Pattern.compile("peer (?<neighborIp>\\S*) description (?<description>.+)");
+    private static final Pattern TIMER_PATTERN = Pattern.compile("peer (?<neighborIp>\\S*) timer"
+            + " (?<timerMode>keepalive|connect-retry) (?<timer1>\\d+) hold (?<timer2>\\d+).*");
+    private static final Pattern PASSWORD_PATTERN =
+            Pattern.compile("peer (?<neighborIp>\\S*) password cipher (?<password>.+)");
+    private static final Pattern PATH_MTU_PATTERN =
+            Pattern.compile("peer (?<neighborIp>\\S*) path-mtu (?<transport>auto-discovery).*");
 
     private final Cli cli;
 
@@ -64,20 +79,19 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
 
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                             @Nonnull ConfigBuilder configBuilder,
-                                             @Nonnull ReadContext readContext) throws ReadFailedException {
+                                      @Nonnull ConfigBuilder configBuilder,
+                                      @Nonnull ReadContext readContext) throws ReadFailedException {
         String vrfName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         String ipAddress = NeighborAfiSafiReader.getNeighborIp(
                 instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
 
         configBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
         parseConfigAttributes(blockingRead(String.format(DISPLAY_PEER_CONFIG, ipAddress), cli, instanceIdentifier,
-                readContext),
-                configBuilder, vrfName);
+                readContext), configBuilder, vrfName);
     }
 
-    private void parseConfigAttributes(String output, ConfigBuilder configBuilder, String vrfName) {
-
+    @VisibleForTesting
+    public static void parseConfigAttributes(String output, ConfigBuilder configBuilder, String vrfName) {
         String[] vrfSplit = NeighborReader.getSplitedOutput(output);
 
         if (NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfName)) {
@@ -87,7 +101,7 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
         }
     }
 
-    private void parseDefault(ConfigBuilder configBuilder, String[] output) {
+    private static void parseDefault(ConfigBuilder configBuilder, String[] output) {
         Optional<String> defaultNetworkNeighbors = Arrays.stream(output)
             .filter(value -> !value.contains("vpn-instance"))
             .reduce((s1, s2) -> s1 + s2);
@@ -95,12 +109,15 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
         setAttributes(configBuilder, defaultNetworkNeighbors.orElse(""));
     }
 
-    private void setAttributes(ConfigBuilder configBuilder, String output) {
+    private static void setAttributes(ConfigBuilder configBuilder, String output) {
         setAs(configBuilder, output);
         setEnabled(configBuilder, output);
+        setDescription(configBuilder, output);
+        setPassword(configBuilder, output);
+        setBgpNeighborConfigAugmentation(configBuilder, output);
     }
 
-    private void parseVrf(ConfigBuilder configBuilder, String vrfName, String[] output) {
+    private static void parseVrf(ConfigBuilder configBuilder, String vrfName, String[] output) {
         Optional<String> optionalVrfOutput =
             Arrays.stream(output).filter(value -> value.contains(vrfName)).findFirst();
 
@@ -110,33 +127,75 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
         }
     }
 
-    private void setAs(ConfigBuilder configBuilder, String defaultInstance) {
-        ParsingUtils.parseFields(defaultInstance.replaceAll(" peer", "\n peer"), 0, REMOTE_AS_PATTERN::matcher,
-            NeighborConfigReader::resolveGroupsRemoteAs,
-            groupsHashMap -> configBuilder.setPeerAs(new AsNumber(Long.valueOf(groupsHashMap.get(REMOTE_AS)))));
+    private static void setBgpNeighborConfigAugmentation(ConfigBuilder configBuilder, String output) {
+        BgpNeighborConfigAugBuilder configAugBuilder = new BgpNeighborConfigAugBuilder();
+        setPathMtu(configAugBuilder, output);
+        setTimer(configAugBuilder, output);
+
+        if (!configAugBuilder.build().equals(new BgpNeighborConfigAugBuilder().build())) {
+            configBuilder.addAugmentation(BgpNeighborConfigAug.class, configAugBuilder.build());
+        }
     }
 
-    private void setEnabled(ConfigBuilder configBuilder, String defaultInstance) {
-        ParsingUtils.parseFields(defaultInstance.replaceAll(" peer", "\n peer"), 0, NEIGHBOR_ACTIVATE_PATTERN::matcher,
-            NeighborConfigReader::resolveGroupsActivate,
+    private static void setAs(ConfigBuilder configBuilder, String defaultInstance) {
+        ParsingUtils.parseFields(defaultInstance.replaceAll(" peer", "\n peer"),
+            0, REMOTE_AS_PATTERN::matcher, m -> findGroup(m, "remoteAs"),
+            groupsHashMap -> configBuilder.setPeerAs(new AsNumber(Long.valueOf(groupsHashMap.get("remoteAs")))));
+    }
+
+    private static void setEnabled(ConfigBuilder configBuilder, String defaultInstance) {
+        ParsingUtils.parseFields(defaultInstance.replaceAll(" peer", "\n peer"),
+                0, NEIGHBOR_ACTIVATE_PATTERN::matcher, NeighborConfigReader::resolveGroupsActivate,
             groupsHashMap -> configBuilder.setEnabled(ACTIVATE.equals(groupsHashMap.get(ENABLED))));
+    }
+
+    private static void setDescription(ConfigBuilder configBuilder, String defaultInstance) {
+        ParsingUtils.parseFields(defaultInstance.replaceAll(" peer", "\n peer"),
+            0, DESCRIPTION_PATTERN::matcher, m -> findGroup(m, "description"),
+            groupsHashMap -> configBuilder.setDescription(groupsHashMap.get("description")));
+    }
+
+    private static void setPassword(ConfigBuilder configBuilder, String defaultInstance) {
+        ParsingUtils.parseFields(defaultInstance.replaceAll(" peer", "\n peer"), 0, PASSWORD_PATTERN::matcher,
+            m -> findGroup(m, "password"), groupsHashMap -> configBuilder.setAuthPassword(
+                new EncryptedPassword(new PlainString(groupsHashMap.get("password")))));
+    }
+
+    private static void setPathMtu(BgpNeighborConfigAugBuilder configAugBuilder, String defaultInstance) {
+        ParsingUtils.parseFields(defaultInstance.replaceAll(" peer", "\n peer"),
+            0, PATH_MTU_PATTERN::matcher, m -> findGroup(m, "transport"),
+            groupsHashMap -> configAugBuilder.setTransport(getTransport(groupsHashMap.get("transport"))));
+    }
+
+    private static void setTimer(BgpNeighborConfigAugBuilder configAugBuilder, String defaultInstance) {
+        ParsingUtils.parseFields(defaultInstance.replaceAll(" peer", "\n peer"), 0, TIMER_PATTERN::matcher,
+            m -> findGroup(m, "timerMode", "timer1", "timer2"),
+            groupsHashMap -> configAugBuilder.setTimerConfiguration(new TimerConfigurationBuilder()
+                .setTimerMode(groupsHashMap.get("timerMode"))
+                .setTimeBefore(Short.parseShort(groupsHashMap.get("timer1")))
+                .setTimeAfter(Short.parseShort(groupsHashMap.get("timer2"))).build()));
     }
 
     private static HashMap<String, String> resolveGroupsActivate(Matcher matcher) {
         HashMap<String, String> hashMap = new HashMap<>();
-
         hashMap.put(NEIGHBOR_IP, matcher.group(NEIGHBOR_IP));
         hashMap.put(ENABLED, ACTIVATE);
-
         return hashMap;
     }
 
-    private static HashMap<String, String> resolveGroupsRemoteAs(Matcher matcher) {
+    private static HashMap<String, String> findGroup(Matcher matcher, String... groupNames) {
         HashMap<String, String> hashMap = new HashMap<>();
-
         hashMap.put(NEIGHBOR_IP, matcher.group(NEIGHBOR_IP));
-        hashMap.put(REMOTE_AS, matcher.group(REMOTE_AS));
-
+        Arrays.stream(groupNames).forEach(groupName -> hashMap.put(groupName, matcher.group(groupName)));
         return hashMap;
+    }
+
+    private static Transport getTransport(String transport) {
+        for (final Transport type: Transport.values()) {
+            if (transport.equalsIgnoreCase(type.getName())) {
+                return type;
+            }
+        }
+        return null;
     }
 }

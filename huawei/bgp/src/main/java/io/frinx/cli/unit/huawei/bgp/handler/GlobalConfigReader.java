@@ -23,9 +23,14 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpGlobalConfigAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.extension.rev180323.BgpGlobalConfigAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.global.base.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.top.bgp.GlobalBuilder;
@@ -39,12 +44,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String DISPLAY_BGP_CONFIG =
-            "display current-configuration configuration bgp | include ^bgp|^ *router-id|^ ipv4-family vpn-instance";
+    private static final String DISPLAY_BGP_CONFIG = "display current-configuration configuration bgp | "
+           + "include ^bgp|^ *router-id|^ *import-route| ipv4-family vpn-instance";
     private static final Pattern AS_PATTERN = Pattern.compile("bgp (?<as>\\S*).*");
-    private static final Pattern ROUTER_ID_PATTERN_GLOBAL = Pattern.compile("\\s*router-id (?<routerId>\\S*).*");
-    private static final Pattern ROUTER_ID_PATTERN =
-            Pattern.compile("\\s*ipv4-family vpn-instance (?<vrf>\\S*)\\s+router-id (?<routerId>\\S*).*");
+    private static final Pattern ROUTER_ID_PATTERN = Pattern.compile(".*router-id (?<routerId>\\S*).*");
+    private static final Pattern IMPORT_ROUTE_PATTERN =
+            Pattern.compile("\\s+import-route (?<mode>direct|static)(\\s+|$)");
 
     private Cli cli;
 
@@ -70,18 +75,25 @@ public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder
     @VisibleForTesting
     public static void parseConfigAttributes(String output, ConfigBuilder builder, NetworkInstanceKey vrfKey) {
         parseGlobalAs(output, builder);
+        BgpGlobalConfigAugBuilder configAugBuilder = new BgpGlobalConfigAugBuilder();
         if (vrfKey.equals(NetworInstance.DEFAULT_NETWORK)) {
             setGlobalRouterId(builder, output);
+            //output which is separated by "ipv4-family" and does not contain "family" is default network instance
+            setImportRoute(configAugBuilder, output, m -> !m.contains("family"));
         } else {
             setVrfRouterId(builder, output, vrfKey.getName());
+            if (output.contains(vrfKey.getName())) {
+                setImportRoute(configAugBuilder, output, m -> m.contains(vrfKey.getName()));
+            }
+        }
+        if (!configAugBuilder.build().equals(new BgpGlobalConfigAugBuilder().build())) {
+            builder.addAugmentation(BgpGlobalConfigAug.class, configAugBuilder.build());
         }
     }
 
     private static void setGlobalRouterId(ConfigBuilder configBuilder, String output) {
-        output = realignOutput(output);
-
         ParsingUtils.parseField(output, 0,
-            ROUTER_ID_PATTERN_GLOBAL::matcher,
+            ROUTER_ID_PATTERN::matcher,
             matcher -> matcher.group("routerId"),
             (String value) -> configBuilder.setRouterId(new DottedQuad(value)));
     }
@@ -97,13 +109,28 @@ public class GlobalConfigReader implements CliConfigReader<Config, ConfigBuilder
 
         ParsingUtils.NEWLINE.splitAsStream(output)
                 .map(String::trim)
+                .filter(m -> m.contains(vrf))
                 .map(ROUTER_ID_PATTERN::matcher)
                 .filter(Matcher::matches)
-                .filter(m -> m.group("vrf").equals(vrf))
                 .map(m -> m.group("routerId"))
                 .findFirst()
                 .map(DottedQuad::new)
                 .ifPresent(configBuilder::setRouterId);
+    }
+
+    private static void setImportRoute(BgpGlobalConfigAugBuilder configAugBuilder, String output,
+                                       Predicate<String> filter) {
+        // in this case we need to split the output 2 times to properly match or exclude vrf and multiple import-route
+        // first time we split output with "ipv4-" second time with \n
+        configAugBuilder.setImportRoute(Stream.of(output.split("ipv4-"))
+                .map(String::trim)
+                .filter(filter)
+                .flatMap(Pattern.compile("\n")::splitAsStream)
+                .map(IMPORT_ROUTE_PATTERN::matcher)
+                .filter(Matcher::matches)
+                .map(m -> m.group("mode"))
+                .distinct()
+                .collect(Collectors.toList()));
     }
 
     @VisibleForTesting
