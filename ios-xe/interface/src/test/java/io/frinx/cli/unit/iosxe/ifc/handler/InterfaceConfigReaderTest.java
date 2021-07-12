@@ -54,6 +54,7 @@ public class InterfaceConfigReaderTest {
             .setFhrpMinimumDelay(1)
             .setFhrpReloadDelay(3600)
             .setStormControl(STORM_CONTROL_LIST)
+            .setSnmpTrapLinkStatus(false)
             .setLldpReceive(false)
             .build();
 
@@ -81,6 +82,7 @@ public class InterfaceConfigReaderTest {
             + " fhrp delay reload 3600\n"
             + " no lldp receive\n"
             + " media-type rj45\n"
+            + " no snmp trap link-status\n"
             + " storm-control broadcast level 10.00\n"
             + " storm-control multicast level bps 0\n"
             + " storm-control unicast level 10.00\n"

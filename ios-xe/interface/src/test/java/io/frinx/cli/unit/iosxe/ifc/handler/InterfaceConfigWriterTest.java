@@ -53,6 +53,7 @@ public class InterfaceConfigWriterTest {
             + "no description\n"
             + "shutdown\n"
             + "no media-type\n"
+            + "snmp trap link-status\n"
             + "no storm-control broadcast level\n"
             + "no storm-control unicast level\n"
             + "lldp receive\n"
@@ -76,6 +77,7 @@ public class InterfaceConfigWriterTest {
             + "description test - ethernet\n"
             + "no shutdown\n"
             + "media-type rj45\n"
+            + "no snmp trap link-status\n"
             + "storm-control broadcast level 10.00\n"
             + "storm-control unicast level 10.00\n"
             + "no lldp receive\n"
@@ -95,6 +97,7 @@ public class InterfaceConfigWriterTest {
             + "no mtu\n"
             + "description test - loopback\n"
             + "no shutdown\n"
+            + "snmp trap link-status\n"
             + "ipv6 nd ra suppress all\n"
             + "no ip redirects\n"
             + "end\n";

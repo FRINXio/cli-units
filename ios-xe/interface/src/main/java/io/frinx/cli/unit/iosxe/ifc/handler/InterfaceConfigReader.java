@@ -46,6 +46,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private static final Pattern MTU_LINE = Pattern.compile("mtu (?<mtu>.+)");
     private static final Pattern STORM_CONTROL_LINE =
             Pattern.compile("storm-control (?<address>\\S+) level (?<level>(\\d|\\.)+).*");
+    public static final Pattern NO_SNMP_TRAP_LINE = Pattern.compile("\\s*no snmp trap link-status");
     private static final Pattern MEDIA_TYPE_LINE = Pattern.compile("media-type (?<mediaType>.+)");
     private static final Pattern LLDP_TRANSMIT_LINE = Pattern.compile("no lldp transmit");
     private static final Pattern LLDP_RECEIVE_LINE = Pattern.compile("no lldp receive");
@@ -65,6 +66,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
 
         final IfCiscoExtAugBuilder ifCiscoExtAugBuilder = new IfCiscoExtAugBuilder();
         setStormControl(output, ifCiscoExtAugBuilder);
+        setSnmpTrap(output, ifCiscoExtAugBuilder);
         setLldpTransmit(output, ifCiscoExtAugBuilder);
         setFhrpMinimumDelay(output, ifCiscoExtAugBuilder);
         setFhrpReloadDelay(output, ifCiscoExtAugBuilder);
@@ -82,6 +84,12 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setMode(output, ifSaosAugBuilder);
         if (isSaosAugNotEmpty(ifSaosAugBuilder)) {
             builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
+        }
+    }
+
+    private void setSnmpTrap(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        if (NO_SNMP_TRAP_LINE.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setSnmpTrapLinkStatus(false);
         }
     }
 

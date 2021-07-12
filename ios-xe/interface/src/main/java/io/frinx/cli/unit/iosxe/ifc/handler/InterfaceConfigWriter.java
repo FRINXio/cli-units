@@ -35,6 +35,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($data.description) %}description {$data.description}\n{% else %}no description\n{% endif %}"
             + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
             + "{% if ($pt) %}{$pt}{% endif %}"
+            + "{% if ($snmpTrap) %}no snmp trap link-status\n{% else %}snmp trap link-status\n{% endif %}"
             + "{% if ($stormControl) %}{$stormControl}{% endif %}"
             + "{% if ($lldpTransmit) %}{$lldpTransmit}{% endif %}"
             + "{% if ($lldpReceive) %}{$lldpReceive}{% endif %}"
@@ -47,6 +48,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($data.mtu) %}mtu {$data.mtu}\n{% else %}no mtu\n{% endif %}"
             + "{% if ($data.description) %}description {$data.description}\n{% else %}no description\n{% endif %}"
             + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
+            + "{% if ($snmpTrap) %}no snmp trap link-status\n{% else %}snmp trap link-status\n{% endif %}"
             + "{% if ($ipProxyArp) %}{$ipProxyArp}\n{% endif %}"
             + "{% if ($ipv6NdRaSuppress) %}{$ipv6NdRaSuppress}\n{% endif %}"
             + "{% if ($ipRedirects) %}{$ipRedirects}\n{% endif %}"
@@ -70,6 +72,8 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                     "data", after,
                     "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null,
                     "pt", getPhysicalType(before, after),
+                    "snmpTrap", (ciscoExtAug != null && ciscoExtAug.isSnmpTrapLinkStatus() != null
+                            && !ciscoExtAug.isSnmpTrapLinkStatus()) ? Chunk.TRUE : null,
                     "stormControl", getStormControlCommands(ciscoExtAugBefore, ciscoExtAug),
                     "lldpTransmit", getLldpTransmit(ciscoExtAugBefore, ciscoExtAug),
                     "lldpReceive", getLldpReceive(ciscoExtAugBefore, ciscoExtAug),
@@ -81,6 +85,8 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                 "data", after,
                 "ipRedirects", getIpRedirect(before, after),
                 "ipProxyArp", getIpProxyArp(before, after),
+                "snmpTrap", (ciscoExtAug != null && ciscoExtAug.isSnmpTrapLinkStatus() != null
+                        && !ciscoExtAug.isSnmpTrapLinkStatus()) ? Chunk.TRUE : null,
                 "ipv6NdRaSuppress", getIpv6NdRaSuppress(before, after),
                 "enabled", (after.isEnabled() != null && after.isEnabled()) ? Chunk.TRUE : null);
     }
