@@ -27,6 +27,8 @@ import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStatisticsConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStatisticsConfigWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.cfm.CfmMipReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.cfm.CfmMipWriter;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.L2protocolConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.L2protocolReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceBridgeDomainReader;
@@ -166,6 +168,10 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
 
         writeRegistry.addAfter(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG,
                 new InterfaceStatisticsConfigWriter(cli), IIDs.IN_IN_CONFIG);
+
+        // cfm
+        writeRegistry.addAfter(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_AUG_IFCFMAUG_CF_MI_LEVEL,
+                new CfmMipWriter(cli), IIDs.IN_IN_CONFIG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -214,6 +220,7 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 new Ipv6VrrpGroupConfigReader(cli));
 
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG, new InterfaceStatisticsConfigReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_AUG_IFCFMAUG_CF_MI_LEVEL, new CfmMipReader(cli));
     }
 
 }
