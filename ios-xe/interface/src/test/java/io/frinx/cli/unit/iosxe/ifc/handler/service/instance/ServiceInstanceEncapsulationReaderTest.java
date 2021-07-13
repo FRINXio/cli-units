@@ -38,15 +38,15 @@ public class ServiceInstanceEncapsulationReaderTest {
 
     private static final Encapsulation DOT1Q_ENCAPSULATION = new EncapsulationBuilder()
             .setUntagged(false)
-            .setDot1q(Arrays.asList(1, 2, 3, 5, 6, 7, 8, 9, 10))
+            .setDot1q(Arrays.asList("1-3", "5-10", "11"))
             .build();
 
     private static final String DOT1Q_OUTPUT = " service instance 1 ethernet\n"
-            + "  encapsulation dot1q 1-3,5-10\n";
+            + "  encapsulation dot1q 1-3, 5-10, 11\n";
 
     private static final Encapsulation BOTH_ENCAPSULATIONS = new EncapsulationBuilder()
             .setUntagged(true)
-            .setDot1q(Arrays.asList(1, 2, 3, 5, 6, 7, 8, 9, 10))
+            .setDot1q(Arrays.asList("1-3", "5-10"))
             .build();
 
     private static final String BOTH_OUTPUT = " service instance 1 ethernet\n"

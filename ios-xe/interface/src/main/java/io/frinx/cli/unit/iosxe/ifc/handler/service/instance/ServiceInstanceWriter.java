@@ -201,7 +201,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                         .getDot1q()
                         .stream()
                         .map(String::valueOf)
-                        .collect(Collectors.joining(" , ")));
+                        .collect(Collectors.joining(", ")));
             }
             if (isUntagged || hasDot1q) {
                 configCommands.append("\n");
