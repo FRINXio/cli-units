@@ -39,6 +39,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($stormControl) %}{$stormControl}{% endif %}"
             + "{% if ($lldpTransmit) %}{$lldpTransmit}{% endif %}"
             + "{% if ($lldpReceive) %}{$lldpReceive}{% endif %}"
+            + "{% if ($negotiationAuto) %}{$negotiationAuto}{% endif %}"
             + "{% if ($fhrpMinimum) %}{$fhrpMinimum}{% endif %}"
             + "{% if ($fhrpReload) %}{$fhrpReload}{% endif %}"
             + "end";
@@ -77,6 +78,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                     "stormControl", getStormControlCommands(ciscoExtAugBefore, ciscoExtAug),
                     "lldpTransmit", getLldpTransmit(ciscoExtAugBefore, ciscoExtAug),
                     "lldpReceive", getLldpReceive(ciscoExtAugBefore, ciscoExtAug),
+                    "negotiationAuto", getNegotiationAuto(ciscoExtAugBefore, ciscoExtAug),
                     "fhrpMinimum", getFhrpMinimumDelay(ciscoExtAugBefore, ciscoExtAug),
                     "fhrpReload", getFhrpReloadDelay(ciscoExtAugBefore, ciscoExtAug));
         }
@@ -129,6 +131,22 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             afterLldpReceive = after.isLldpReceive();
         }
         return getCommandHelper(beforeLldpReceive, afterLldpReceive, "lldp receive\n");
+    }
+
+    private String getNegotiationAuto(final IfCiscoExtAug before, final IfCiscoExtAug after) {
+        Boolean beforeNegotiationAuto = true;
+        Boolean afterNegotiationAuto = true;
+        if (before != null && before.isNegotiationAuto() != null) {
+            beforeNegotiationAuto = before.isNegotiationAuto();
+        } else {
+            beforeNegotiationAuto = false;
+        }
+        if (after != null && after.isNegotiationAuto() != null) {
+            afterNegotiationAuto = after.isNegotiationAuto();
+        } else {
+            afterNegotiationAuto = false;
+        }
+        return getCommandHelper(beforeNegotiationAuto, afterNegotiationAuto, "negotiation auto\n");
     }
 
     private String getPhysicalType(final Config dataBefore, final Config dataAfter) {

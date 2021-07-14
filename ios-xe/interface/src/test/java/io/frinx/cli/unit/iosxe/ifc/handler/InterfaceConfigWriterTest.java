@@ -57,6 +57,7 @@ public class InterfaceConfigWriterTest {
             + "no storm-control broadcast level\n"
             + "no storm-control unicast level\n"
             + "lldp receive\n"
+            + "no negotiation auto\n"
             + "no fhrp delay minimum\n"
             + "no fhrp delay reload\n"
             + "end\n";
@@ -81,6 +82,7 @@ public class InterfaceConfigWriterTest {
             + "storm-control broadcast level 10.00\n"
             + "storm-control unicast level 10.00\n"
             + "no lldp receive\n"
+            + "negotiation auto\n"
             + "fhrp delay minimum 1\n"
             + "fhrp delay reload 3600\n"
             + "end\n";

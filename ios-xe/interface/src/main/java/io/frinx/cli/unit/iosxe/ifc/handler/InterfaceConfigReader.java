@@ -50,6 +50,8 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private static final Pattern MEDIA_TYPE_LINE = Pattern.compile("media-type (?<mediaType>.+)");
     private static final Pattern LLDP_TRANSMIT_LINE = Pattern.compile("no lldp transmit");
     private static final Pattern LLDP_RECEIVE_LINE = Pattern.compile("no lldp receive");
+    private static final Pattern NO_NEGOTIATION_AUTO_LINE = Pattern.compile("no negotiation auto");
+    private static final Pattern NEGOTIATION_AUTO_LINE = Pattern.compile("negotiation auto");
     private static final Pattern FHRP_MINIMUM_DELAY_LINE = Pattern.compile("fhrp delay minimum (?<seconds>.+)");
     private static final Pattern FHRP_RELOAD_DELAY_LINE = Pattern.compile("fhrp delay reload (?<seconds>.+)");
     private static final Pattern NO_IP_PROXY_ARP_LINE = Pattern.compile("\\s*no ip proxy-arp");
@@ -76,6 +78,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         if (Util.isPhysicalInterface(builder.getType())) {
             setLldpReceive(output, ifCiscoExtAugBuilder);
         }
+        setNegotiationAuto(output, ifCiscoExtAugBuilder);
         if (isCiscoExtAugNotEmpty(ifCiscoExtAugBuilder)) {
             builder.addAugmentation(IfCiscoExtAug.class, ifCiscoExtAugBuilder.build());
         }
@@ -96,6 +99,14 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private void setLldpReceive(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
         if (LLDP_RECEIVE_LINE.matcher(output).find()) {
             ifCiscoExtAugBuilder.setLldpReceive(false);
+        }
+    }
+
+    private void setNegotiationAuto(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        if (NO_NEGOTIATION_AUTO_LINE.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setNegotiationAuto(false);
+        } else if (NEGOTIATION_AUTO_LINE.matcher(output).find()) {
+            ifCiscoExtAugBuilder.setNegotiationAuto(true);
         }
     }
 

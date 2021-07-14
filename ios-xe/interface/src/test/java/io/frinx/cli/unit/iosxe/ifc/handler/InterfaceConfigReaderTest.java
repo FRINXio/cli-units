@@ -56,6 +56,7 @@ public class InterfaceConfigReaderTest {
             .setStormControl(STORM_CONTROL_LIST)
             .setSnmpTrapLinkStatus(false)
             .setLldpReceive(false)
+            .setNegotiationAuto(true)
             .build();
 
     public static final IfSaosAug IF_SAOS_AUG = new IfSaosAugBuilder()
@@ -81,6 +82,7 @@ public class InterfaceConfigReaderTest {
             + " fhrp delay minimum 1\n"
             + " fhrp delay reload 3600\n"
             + " no lldp receive\n"
+            + " negotiation info\n"
             + " media-type rj45\n"
             + " no snmp trap link-status\n"
             + " storm-control broadcast level 10.00\n"
