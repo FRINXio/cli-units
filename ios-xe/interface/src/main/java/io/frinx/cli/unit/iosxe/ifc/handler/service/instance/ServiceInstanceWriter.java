@@ -24,14 +24,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.ProtocolType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.L2protocolConfig.Protocol;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.L2protocolConfig.ProtocolType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.l2protocols.service.instance.l2protocol.L2protocol;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstances;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.BridgeDomain;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Encapsulation;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocol;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocols;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Rewrite;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -109,7 +110,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                     for (final ServiceInstance serviceInstance : serviceInstanceList) {
                         currentInstances.append(getCreationCommands(serviceInstance, false));
                         currentInstances.append(getEncapsulationCommands(serviceInstance.getEncapsulation()));
-                        currentInstances.append(getL2ProtocolCommands(serviceInstance.getL2protocol()));
+                        currentInstances.append(getL2ProtocolCommands(serviceInstance.getL2protocols()));
                         currentInstances.append(getBridgeDomainCommands(serviceInstance.getBridgeDomain()));
                         currentInstances.append(getRewrite(serviceInstance));
                         currentInstances.append("exit\n");
@@ -210,27 +211,27 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         return configCommands.toString();
     }
 
-    private String getL2ProtocolCommands(final L2protocol l2protocol) {
+    private String getL2ProtocolCommands(final L2protocols l2protocols) {
         final StringBuilder creationCommands = new StringBuilder();
-        if (l2protocol != null) {
-            final ProtocolType protocolType = l2protocol.getProtocolType();
-            final List<Protocol> protocol = l2protocol.getProtocol();
+        if (l2protocols != null && l2protocols.getServiceInstanceL2protocol() != null) {
+            for (L2protocol l2protocol: l2protocols.getServiceInstanceL2protocol().getL2protocol()) {
+                final ProtocolType protocolType = l2protocol.getConfig().getProtocolType();
+                final List<Protocol> protocol = l2protocol.getConfig().getProtocol();
 
-            creationCommands.append("l2protocol ");
+                creationCommands.append("l2protocol ");
 
-            if (protocolType != null) {
-                creationCommands.append(protocolType.getName()).append(" ");
+                if (protocolType != null) {
+                    creationCommands.append(protocolType.getName()).append(" ");
+                }
+                if (protocol != null) {
+                    creationCommands.append(protocol.stream()
+                            .map(Protocol::getName)
+                            .collect(Collectors.joining(" ")));
+                }
+                creationCommands.append("\n");
             }
-            if (protocol != null) {
-                creationCommands.append(protocol.stream()
-                        .map(String::valueOf)
-                        .collect(Collectors.joining(" "))
-                        .toLowerCase());
-            }
-            creationCommands.append("\n");
         }
 
         return creationCommands.toString();
     }
-
 }

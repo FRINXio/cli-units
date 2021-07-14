@@ -16,29 +16,26 @@
 
 package io.frinx.cli.unit.iosxe.ifc.handler.service.instance;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.ProtocolType;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocolBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.l2protocols.service.instance.l2protocol.L2protocolKey;
 
 
 public class L2ProtocolReaderTest {
-    private static final L2protocol SERVICE_INSTANCE_L2PROTOCOL_BUILDER = new L2protocolBuilder()
-            .setProtocolType(ProtocolType.Peer)
-            .setProtocol(Arrays.asList(Protocol.Lldp, Protocol.Stp))
-            .build();
 
     private static final String SERVICE_INSTANCE_L2PROTOCOL_OUTPUT = " service instance 200 ethernet EVC\n"
+            + "  l2protocol tunnel lldp stp\n"
             + "  l2protocol peer lldp stp\n";
 
     @Test
     public void testParseL2protocol() {
-        L2protocolBuilder configBuilder = new L2protocolBuilder();
-        L2protocolReader.parseL2Protocol(SERVICE_INSTANCE_L2PROTOCOL_OUTPUT, configBuilder);
-        Assert.assertEquals(SERVICE_INSTANCE_L2PROTOCOL_BUILDER, configBuilder.build());
+        List<L2protocolKey> expected = Stream.of("tunnel", "peer")
+                .map(L2protocolKey::new)
+                .collect(Collectors.toList());
+        List<L2protocolKey> l2protocolKeys =  L2protocolReader.parseL2protocolNames(SERVICE_INSTANCE_L2PROTOCOL_OUTPUT);
+        Assert.assertEquals(expected, l2protocolKeys);
     }
-
 }

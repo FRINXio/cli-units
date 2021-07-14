@@ -33,10 +33,12 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.ProtocolType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.L2protocolConfig.Protocol;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.L2protocolConfig.ProtocolType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceRewrite.Operation;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceRewrite.Type;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.l2protocols.ServiceInstanceL2protocolBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.l2protocols.service.instance.l2protocol.L2protocolBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.ServiceInstancesBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstanceBuilder;
@@ -44,7 +46,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.BridgeDomainBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.EncapsulationBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocolBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocolsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.RewriteBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -68,10 +70,24 @@ public class ServiceInstanceWriterTest {
                                     .setUntagged(true)
                                     .setDot1q(Arrays.asList(1, 2, 3, 5, 6, 7, 8, 9, 10))
                                     .build())
-                            .setL2protocol(new L2protocolBuilder()
-                                    .setProtocol((Arrays.asList(Protocol.Lldp, Protocol.Stp)))
-                                    .setProtocolType(ProtocolType.Peer)
-                                    .build())
+                            .setL2protocols(new L2protocolsBuilder()
+                                    .setServiceInstanceL2protocol(
+                                            new ServiceInstanceL2protocolBuilder()
+                                            .setL2protocol(Arrays.asList(
+                                                    new L2protocolBuilder()
+                                                            .setConfig(
+                                                                    new org.opendaylight.yang.gen.v1.http.frinx
+                                                                            .openconfig.net.yang.interfaces.cisco
+                                                                            .rev171024.service.instance.l2protocols
+                                                                            .service.instance.l2protocol
+                                                                            .l2protocol.ConfigBuilder()
+                                                                            .setProtocolType(ProtocolType.Peer)
+                                                                            .setProtocol(Arrays.asList(
+                                                                                    Protocol.RB, Protocol.Lacp))
+                                                                            .build()
+                                                            )
+                                                            .build()
+                                    )).build()).build())
                             .setBridgeDomain(new BridgeDomainBuilder()
                                     .setValue("100")
                                     .setGroupNumber((short) 2)
@@ -101,7 +117,7 @@ public class ServiceInstanceWriterTest {
             + "interface GigabitEthernet0/0/0\n"
             + "service instance 100 ethernet EVC\n"
             + "encapsulation untagged , dot1q 1 , 2 , 3 , 5 , 6 , 7 , 8 , 9 , 10\n"
-            + "l2protocol peer lldp stp\n"
+            + "l2protocol peer RB lacp\n"
             + "bridge-domain 100 split-horizon group 2\n"
             + "rewrite ingress tag pop 1 symmetric\n"
             + "exit\n"
@@ -124,10 +140,25 @@ public class ServiceInstanceWriterTest {
                                     .setUntagged(false)
                                     .setDot1q(Arrays.asList(1, 9))
                                     .build())
-                            .setL2protocol(new L2protocolBuilder()
-                                    .setProtocol(Collections.singletonList(Protocol.Lldp))
-                                    .setProtocolType(ProtocolType.Peer)
-                                    .build())
+                            .setL2protocols(new L2protocolsBuilder()
+                                    .setServiceInstanceL2protocol(
+                                            new ServiceInstanceL2protocolBuilder()
+                                                    .setL2protocol(Arrays.asList(
+                                                            new L2protocolBuilder()
+                                                                    .setConfig(
+                                                                            new org.opendaylight.yang.gen.v1.http.frinx
+                                                                                    .openconfig.net.yang.interfaces
+                                                                                    .cisco.rev171024.service.instance
+                                                                                    .l2protocols.service.instance
+                                                                                    .l2protocol.l2protocol
+                                                                                    .ConfigBuilder()
+                                                                                    .setProtocolType(ProtocolType.Peer)
+                                                                                    .setProtocol(Arrays.asList(
+                                                                                            Protocol.RB, Protocol.Lacp))
+                                                                                    .build()
+                                                                    )
+                                                                    .build()
+                                                    )).build()).build())
                             .build()
             );
 
@@ -144,10 +175,25 @@ public class ServiceInstanceWriterTest {
                                     .setUntagged(false)
                                     .setDot1q(Arrays.asList(1, 9))
                                     .build())
-                            .setL2protocol(new L2protocolBuilder()
-                                    .setProtocol(Collections.singletonList(Protocol.Lldp))
-                                    .setProtocolType(ProtocolType.Peer)
-                                    .build())
+                            .setL2protocols(new L2protocolsBuilder()
+                                    .setServiceInstanceL2protocol(
+                                            new ServiceInstanceL2protocolBuilder()
+                                                    .setL2protocol(Arrays.asList(
+                                                            new L2protocolBuilder()
+                                                                    .setConfig(
+                                                                            new org.opendaylight.yang.gen.v1.http.frinx
+                                                                                    .openconfig.net.yang.interfaces
+                                                                                    .cisco.rev171024.service.instance
+                                                                                    .l2protocols.service.instance
+                                                                                    .l2protocol.l2protocol
+                                                                                    .ConfigBuilder()
+                                                                                    .setProtocolType(ProtocolType.Peer)
+                                                                                    .setProtocol(Arrays.asList(
+                                                                                            Protocol.RB, Protocol.Lacp))
+                                                                                    .build()
+                                                                    )
+                                                                    .build()
+                                                    )).build()).build())
                             .setRewrite(new RewriteBuilder()
                                     .setType(Type.Egress)
                                     .setOperation(Operation.Pop)
@@ -161,7 +207,7 @@ public class ServiceInstanceWriterTest {
             + "no service instance trunk 200\n"
             + "service instance trunk 100 ethernet\n"
             + "encapsulation dot1q 1 , 9\n"
-            + "l2protocol peer lldp\n"
+            + "l2protocol peer RB lacp\n"
             + "exit\n"
             + "end\n";
 
@@ -172,7 +218,7 @@ public class ServiceInstanceWriterTest {
             + "no service instance trunk 200\n"
             + "service instance trunk 100 ethernet\n"
             + "encapsulation dot1q 1 , 9\n"
-            + "l2protocol peer lldp\n"
+            + "l2protocol peer RB lacp\n"
             + "exit\n"
             + "end\n";
 

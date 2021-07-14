@@ -27,6 +27,7 @@ import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStatisticsConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStatisticsConfigWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.L2protocolConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.L2protocolReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceBridgeDomainReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceConfigReader;
@@ -114,7 +115,10 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_CONFIG,
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_ENCAPSULATION,
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_BRIDGEDOMAIN,
-                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2PROTOCOL,
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2PROTOCOLS,
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2_SERVICEINSTANCEL2PROTOCOL,
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2_SE_L2PROTOCOL,
+                        IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2_SE_L2_CONFIG,
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_REWRITE));
 
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
@@ -177,7 +181,9 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 new ServiceInstanceEncapsulationReader(cli));
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_BRIDGEDOMAIN,
                 new ServiceInstanceBridgeDomainReader(cli));
-        readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2PROTOCOL, new L2protocolReader(cli));
+        readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2_SE_L2PROTOCOL, new L2protocolReader(cli));
+        readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2_SE_L2_CONFIG,
+                new L2protocolConfigReader(cli));
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_REWRITE, new ServiceInstanceRewriteReader(cli));
 
         readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli));

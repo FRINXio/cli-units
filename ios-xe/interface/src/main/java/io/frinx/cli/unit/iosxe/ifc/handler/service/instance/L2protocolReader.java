@@ -20,76 +20,53 @@ import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.Protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.ServiceInstanceL2protocol.ProtocolType;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.l2protocols.service.instance.l2protocol.L2protocol;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.l2protocols.service.instance.l2protocol.L2protocolBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.l2protocols.service.instance.l2protocol.L2protocolKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocol;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.L2protocolBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class L2protocolReader implements CliConfigReader<L2protocol, L2protocolBuilder> {
+public class L2protocolReader implements CliConfigListReader<L2protocol, L2protocolKey, L2protocolBuilder> {
+
+    private final Cli cli;
 
     private static final Pattern SERVICE_INSTANCE_L2PROTOCOL_LINE =
             Pattern.compile("l2protocol (?<operation>\\S+) (?<protocol>.+)");
 
-    private Cli cli;
 
     public L2protocolReader(Cli cli) {
         this.cli = cli;
     }
 
+    @Nonnull
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<L2protocol> id, @Nonnull L2protocolBuilder builder,
-                                      @Nonnull ReadContext ctx) throws ReadFailedException {
-        String ifcName = id.firstKeyOf(Interface.class).getName();
-        Long serviceInstanceId = id.firstKeyOf(ServiceInstance.class).getId();
+    public List<L2protocolKey> getAllIds(@Nonnull InstanceIdentifier<L2protocol> instanceIdentifier,
+                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+        final String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        Long serviceInstanceId = instanceIdentifier.firstKeyOf(ServiceInstance.class).getId();
         final String showCommand = f(ServiceInstanceConfigReader.SH_SERVICE_INSTANCE, ifcName, serviceInstanceId);
-        final String serviceInstanceOutput = blockingRead(showCommand, cli, id, ctx);
-        parseL2Protocol(serviceInstanceOutput, builder);
+        final String serviceInstanceOutput = blockingRead(showCommand, cli, instanceIdentifier, readContext);
+        return parseL2protocolNames(serviceInstanceOutput);
     }
 
     @VisibleForTesting
-    static void parseL2Protocol(String output, L2protocolBuilder builder) {
-        final Optional<String> protocolType = ParsingUtils.parseField(output, 0,
+    static List<L2protocolKey> parseL2protocolNames(@Nonnull String aclNameConfiguration) {
+        return ParsingUtils.parseFields(aclNameConfiguration, 0,
             SERVICE_INSTANCE_L2PROTOCOL_LINE::matcher,
-            matcher -> matcher.group("operation"));
-        final Optional<String> protocols = ParsingUtils.parseField(output, 0,
-            SERVICE_INSTANCE_L2PROTOCOL_LINE::matcher,
-            matcher -> matcher.group("protocol"));
-
-        if (protocols.isPresent() && protocolType.isPresent()) {
-            builder.setProtocolType(getL2protocolProtocolType(protocolType.get()));
-            builder.setProtocol(getL2protocolProtocol(Arrays.asList(protocols.get().split(" "))));
-        }
+            matcher -> matcher.group("operation"),
+            L2protocolKey::new);
     }
 
-    private static ProtocolType getL2protocolProtocolType(final String name) {
-        for (final ProtocolType type : ProtocolType.values()) {
-            if (name.equalsIgnoreCase(type.getName())) {
-                return type;
-            }
-        }
-        return null;
+    @Override
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<L2protocol> instanceIdentifier,
+                                      @Nonnull L2protocolBuilder l2protocolBuilder, @Nonnull ReadContext readContext)
+            throws ReadFailedException {
+        l2protocolBuilder.setName(instanceIdentifier.firstKeyOf(L2protocol.class).getName());
     }
-
-    private static List<Protocol> getL2protocolProtocol(final List<String> names) {
-        List<Protocol> protocols = new ArrayList<>();
-        for (final Protocol protocol : Protocol.values()) {
-            if (names.contains(protocol.getName().toLowerCase())) {
-                protocols.add(protocol);
-            }
-        }
-        return protocols.isEmpty() ? null : protocols;
-    }
-
 }
