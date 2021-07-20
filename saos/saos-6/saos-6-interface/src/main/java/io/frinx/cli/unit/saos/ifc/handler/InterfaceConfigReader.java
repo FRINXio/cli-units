@@ -23,6 +23,8 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -35,6 +37,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.sa
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.IngressToEgressQmap;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.VlanEthertypePolicy;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -44,7 +48,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
     public static final String SH_SINGLE_INTERFACE_CFG = "configuration search string \"port %s\"";
     private static final String SH_TYPE = "configuration search string \"aggregation create agg %s\"";
 
-    private Cli cli;
+    private final Cli cli;
 
     public InterfaceConfigReader(Cli cli) {
         this.cli = cli;
@@ -55,29 +59,44 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
                                       @Nonnull final ConfigBuilder builder,
                                       @Nonnull final ReadContext ctx) throws ReadFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
-        parseInterface(blockingRead(f(SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx), builder, ifcName);
         parseType(blockingRead(f(SH_TYPE, ifcName), cli, id, ctx), builder, ifcName);
+        IfSaosAugBuilder ifSaosAugBuilder = new IfSaosAugBuilder();
+        parseInterface(blockingRead(f(SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx),
+                builder, ifSaosAugBuilder, ifcName);
+        parseLogicalInterface(blockingRead(f(InterfaceReader.LOGICAL_INTERFACE, ifcName), cli, id, ctx),
+                builder, ifSaosAugBuilder, ifcName);
+        builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
     }
 
     @VisibleForTesting
-    void parseInterface(final String output, final ConfigBuilder builder, String name)  {
+    void parseLogicalInterface(final String output, ConfigBuilder builder,
+                               IfSaosAugBuilder ifSaosAugBuilder, String name) {
+        builder.setName(name);
+        builder.setType(EthernetCsmacd.class);
+        if (name.equals("remote")) {
+            setRemoteDescription(output, builder);
+        }
+        setIpvAddressAndMask(output, name, ipv4 -> !ipv4.contains(":"),
+            ipv4 -> ifSaosAugBuilder.setIpv4Prefix(new Ipv4Prefix(ipv4)));
+        setIpvAddressAndMask(output, name, ipv6 -> ipv6.contains(":"),
+            ipv6 -> ifSaosAugBuilder.setIpv6Prefix(new Ipv6Prefix(ipv6)));
+    }
+
+    @VisibleForTesting
+    void parseInterface(final String output, final ConfigBuilder builder,
+                        IfSaosAugBuilder ifSaosAugBuilder, String name)  {
         parseEnabled(output, builder, name);
         builder.setName(name);
 
         setMtu(output, builder, name);
         setDescription(output, builder, name);
-
-        IfSaosAugBuilder ifSaosAugBuilder = new IfSaosAugBuilder();
         setMode(output, ifSaosAugBuilder, name);
         setAcceptableFrameType(output, ifSaosAugBuilder, name);
         setIngressVSFilter(output, ifSaosAugBuilder, name);
         setVlanEthertypePolicy(output, ifSaosAugBuilder, name);
         setIngressToEgressQmap(output, ifSaosAugBuilder, name);
         setAccessControlAttributes(output, ifSaosAugBuilder, name);
-
-        builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
     }
-
 
     @VisibleForTesting
     void parseType(final String output, ConfigBuilder builder, String name) {
@@ -102,7 +121,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
             builder::setMtu);
     }
 
-    private void setDescription(String output, ConfigBuilder builder, String name) {
+    private void setDescription(final String output, ConfigBuilder builder, String name) {
         if (output.contains("\"")) {
             Pattern portDescLong = Pattern.compile("port set port " + name + " .*description \"(?<desc>\\S+.*)\".*");
             ParsingUtils.parseField(output,
@@ -118,7 +137,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         }
     }
 
-    private void setMode(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+    private void setMode(final String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
         Pattern portMode = Pattern.compile("port set port " + name + " .*mode (?<mode>\\S+).*");
         Optional<String> mode = ParsingUtils.parseField(output, 0,
             portMode::matcher,
@@ -143,7 +162,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         }
     }
 
-    private void setAcceptableFrameType(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+    private void setAcceptableFrameType(final String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
         Pattern portAft = Pattern.compile("port set port " + name + " .*acceptable-frame-type (?<aft>\\S+).*");
         Optional<String> aft = ParsingUtils.parseField(output, 0,
             portAft::matcher,
@@ -168,7 +187,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         }
     }
 
-    private void setIngressVSFilter(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+    private void setIngressVSFilter(final String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
         Pattern portVif = Pattern.compile("port set port " + name + " .*vs-ingress-filter (?<vif>\\S+).*");
         Optional<String> ingressFilter = ParsingUtils.parseField(output, 0,
             portVif::matcher,
@@ -190,7 +209,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         }
     }
 
-    private void setVlanEthertypePolicy(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+    private void setVlanEthertypePolicy(final String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
         Pattern vcVep = Pattern.compile("virtual-circuit ethernet set port "
                 + name + " vlan-ethertype-policy (?<vep>\\S+).*");
         Optional<String> vep = ParsingUtils.parseField(output, 0,
@@ -213,7 +232,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         }
     }
 
-    private void setIngressToEgressQmap(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+    private void setIngressToEgressQmap(final String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
         Pattern portIteq = Pattern.compile("port set port " + name + " .*ingress-to-egress-qmap NNI-NNI.*");
         ParsingUtils.parseField(output,
             portIteq::matcher,
@@ -221,7 +240,7 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
             iteq -> ifSaosAugBuilder.setIngressToEgressQmap(IngressToEgressQmap.NNINNI));
     }
 
-    private void setAccessControlAttributes(String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+    private void setAccessControlAttributes(final String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
         Pattern maxMacs = Pattern.compile("flow access-control set port " + name + " max-dynamic-macs (?<macs>\\d+).*");
         Pattern unlearned = Pattern.compile("flow access-control set port " + name + " .*forward-unlearned.*");
 
@@ -243,5 +262,28 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
             portEnabled::matcher,
             matcher -> true,
             mode -> builder.setEnabled(false));
+    }
+
+    private void setRemoteDescription(final String output, ConfigBuilder builder) {
+        Pattern description = Pattern.compile("\\| remote\\s+\\| (?<description>.*)\\s+\\|.*\\|");
+        ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(description::matcher)
+                .filter(Matcher::matches)
+                .map(m -> m.group("description"))
+                .findFirst()
+                .map(desc -> desc.replaceAll("\\s+", ""))
+                .ifPresent(builder::setDescription);
+    }
+
+    private void setIpvAddressAndMask(final String output, String name, Predicate<String> predicate,
+                                      Consumer<String> consumer) {
+        Pattern ipv4Prefix = Pattern.compile("\\|\\s(?<id>" + name + ")\\s+\\|.*\\|\\s(?<ipvType>\\S+).*");
+        ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(ipv4Prefix::matcher)
+                .filter(Matcher::matches)
+                .map(m -> m.group("ipvType"))
+                .filter(predicate)
+                .findFirst()
+                .ifPresent(consumer);
     }
 }

@@ -34,9 +34,11 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class InterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
     private static final String SH_PORTS = "port show";
+    protected static final String LOGICAL_INTERFACE = "interface show";
     private static final String LAG_PORTS = "configuration search string \"aggregation create\"";
     protected static final Pattern INTERFACE_ID_LINE = Pattern.compile("\\|\\s(?<id>\\d+)\\s+\\|.*");
     protected static final Pattern LAG_INTERFACE_ID_LINE = Pattern.compile(".*agg (?<id>\\S+)");
+    protected static final Pattern LOGICAL_INTERFACE_ID_LINE = Pattern.compile("\\|\\s(?<id>local|remote)\\s+\\|.*");
     private Cli cli;
 
     public InterfaceReader(Cli cli) {
@@ -51,9 +53,12 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
                 INTERFACE_ID_LINE);
         List<InterfaceKey> aggIds = getAllIds(blockingRead(LAG_PORTS, cli, instanceIdentifier, readContext),
                 LAG_INTERFACE_ID_LINE);
+        List<InterfaceKey> locIds = getAllIds(blockingRead(LOGICAL_INTERFACE, cli, instanceIdentifier, readContext),
+                LOGICAL_INTERFACE_ID_LINE);
         List<InterfaceKey> ids = new ArrayList<>();
         ids.addAll(portIds);
         ids.addAll(aggIds);
+        ids.addAll(locIds);
         return ids;
     }
 

@@ -28,6 +28,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.sa
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.IngressToEgressQmap;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.VlanEthertypePolicy;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 
@@ -102,6 +104,33 @@ public class InterfaceConfigReaderTest {
                     .build())
             .build();
 
+    private static final String SH_LOGICAL_INTERFACE =
+            "+------------------------------- INTERFACE MANAGEMENT ------------------------------+\n"
+            + "| Name            | Domain             | IP Address/Prefix                          |\n"
+            + "+-----------------+--------------------+--------------------------------------------+\n"
+            + "| local           | n/a                | 172.16.1.74/23                             |\n"
+            + "| local           | n/a                | fe80::9e7a:3ff:fe1b:6820/64                |\n"
+            + "| remote          | VLAN 127           | fe80::9e7a:3ff:fe1b:683f/64                |\n"
+            + "+-----------------+--------------------+--------------------------------------------+\n";
+
+    private static final Config EXPECTED_LOCAL_LOGICAL_INTERFACE = new ConfigBuilder()
+            .setName("local")
+            .setType(EthernetCsmacd.class)
+            .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
+                    .setIpv4Prefix(new Ipv4Prefix("172.16.1.74/23"))
+                    .setIpv6Prefix(new Ipv6Prefix("fe80::9e7a:3ff:fe1b:6820/64"))
+                    .build())
+            .build();
+
+    private static final Config EXPECTED_REMOTE_LOGICAL_INTERFACE = new ConfigBuilder()
+            .setName("remote")
+            .setType(EthernetCsmacd.class)
+            .setDescription("VLAN127")
+            .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
+                    .setIpv6Prefix(new Ipv6Prefix("fe80::9e7a:3ff:fe1b:683f/64"))
+                    .build())
+            .build();
+
     private static final String SH_PORT_1_NO_AC = "port disable port 10\n"
             + "port set port 1 mode rj45\n"
             + "port set port 1 max-frame-size 9216 description TEST123\n"
@@ -131,21 +160,28 @@ public class InterfaceConfigReaderTest {
     @Test
     public void testParseInterface() {
         ConfigBuilder parsed = new ConfigBuilder();
+        IfSaosAugBuilder ifSaosAugBuilder = new IfSaosAugBuilder();
         new InterfaceConfigReader(Mockito.mock(Cli.class))
-                .parseInterface(SH_PORT_4, parsed,"4");
+                .parseInterface(SH_PORT_4, parsed, ifSaosAugBuilder, "4");
+        parsed.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
         Assert.assertEquals(EXPECTED_INTERFACE_4, parsed.build());
 
+        ifSaosAugBuilder = new IfSaosAugBuilder();
         new InterfaceConfigReader(Mockito.mock(Cli.class))
-                .parseInterface(SH_PORT_1, parsed, "1");
+                .parseInterface(SH_PORT_1, parsed, ifSaosAugBuilder, "1");
+        parsed.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
         Assert.assertEquals(EXPECTED_INTERFACE_1, parsed.build());
 
+        ifSaosAugBuilder = new IfSaosAugBuilder();
         new InterfaceConfigReader(Mockito.mock(Cli.class))
-                .parseInterface(SH_PORT_1_NO_AC, parsed, "1");
+                .parseInterface(SH_PORT_1_NO_AC, parsed, ifSaosAugBuilder, "1");
         Assert.assertEquals(EXPECTED_INTERFACE_1_NO_AC, parsed.build());
 
         parsed = new ConfigBuilder();
+        ifSaosAugBuilder = new IfSaosAugBuilder();
         new InterfaceConfigReader(Mockito.mock(Cli.class))
-                .parseInterface(SH_PORT_3, parsed, "3");
+                .parseInterface(SH_PORT_3, parsed, ifSaosAugBuilder, "3");
+        parsed.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
         Assert.assertEquals(EXPECTED_INTERFACE_3, parsed.build());
     }
 
@@ -159,5 +195,22 @@ public class InterfaceConfigReaderTest {
         new InterfaceConfigReader(Mockito.mock(Cli.class))
                 .parseType(SH_AGG, parsed, "LAG_LMR-001_East");
         Assert.assertEquals(Ieee8023adLag.class, parsed.getType());
+    }
+
+    @Test
+    public void testParseLogicalInterfaceType() {
+        ConfigBuilder parsed = new ConfigBuilder();
+        IfSaosAugBuilder ifSaosAugBuilder = new IfSaosAugBuilder();
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseLogicalInterface(SH_LOGICAL_INTERFACE, parsed, ifSaosAugBuilder, "local");
+        parsed.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
+        Assert.assertEquals(EXPECTED_LOCAL_LOGICAL_INTERFACE, parsed.build());
+
+        parsed = new ConfigBuilder();
+        ifSaosAugBuilder = new IfSaosAugBuilder();
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseLogicalInterface(SH_LOGICAL_INTERFACE, parsed, ifSaosAugBuilder, "remote");
+        parsed.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
+        Assert.assertEquals(EXPECTED_REMOTE_LOGICAL_INTERFACE, parsed.build());
     }
 }

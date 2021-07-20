@@ -52,6 +52,47 @@ public class InterfaceReaderTest {
             + "+---------+---------+----+--------------+----+---+-------+----+----+-------+----+\n"
             + "\n";
 
+    public static final String LOGICAL_INTERFACE = "\n"
+            + "+------------------------------- INTERFACE MANAGEMENT ------------------------------+\n"
+            + "| Name            | Domain             | IP Address/Prefix                          |\n"
+            + "+-----------------+--------------------+--------------------------------------------+\n"
+            + "| local           | n/a                | 172.16.1.69/23                             |\n"
+            + "| local           | n/a                | fe80::223:8aff:feaa:e860/64                |\n"
+            + "| remote          | VLAN 127           | fe80::9e7a:3ff:fe1b:683f/64                |\n"
+            + "+-----------------+--------------------+--------------------------------------------+\n"
+            + "+---------------- TCP/IP/STACK OPERATIONAL STATE ---------------+\n"
+            + "| Parameter           | Value                                   |\n"
+            + "+---------------------+-----------------------------------------+\n"
+            + "| IPv4 Gateway        | 172.16.0.240                            |\n"
+            + "| IPv6 Gateway        | Not configured                          |\n"
+            + "| IPv4 Forwarding     | Off                                     |\n"
+            + "| Default DSCP        | 0                                       |\n"
+            + "| Mgmt Port Interface | local                                   |\n"
+            + "+---------------------+-----------------------------------------+\n"
+            + "+---------------------- IPV4 STACK STATE -----------------------+\n"
+            + "| Parameter                    | Value                          |\n"
+            + "+------------------------------+--------------------------------+\n"
+            + "| ICMP Accept Redirects        | On                             |\n"
+            + "| ICMP Echo Ignore Broadcasts  | Off                            |\n"
+            + "| ICMP Port Unreachable        | On                             |\n"
+            + "+------------------------------+--------------------------------+\n"
+            + "+---------------------- IPV6 STACK STATE -----------------------+\n"
+            + "| Parameter                    | Value                          |\n"
+            + "+------------------------------+--------------------------------+\n"
+            + "| IPv6 Stack                   | Enabled                        |\n"
+            + "| Stack Preference             | IPv6                           |\n"
+            + "| Accept Router Advertisement  | Off                            |\n"
+            + "| ICMP Accept Redirects        | On                             |\n"
+            + "| ICMP Echo Ignore Broadcasts  | Off                            |\n"
+            + "| ICMP Port Unreachable        | On                             |\n"
+            + "+------------------------------+--------------------------------+\n"
+            + "+----------------------- TCP STACK STATE -----------------------+\n"
+            + "| Parameter                    | Value                          |\n"
+            + "+------------------------------+--------------------------------+\n"
+            + "| TCP Timestamps               | On                             |\n"
+            + "+------------------------------+--------------------------------+\n"
+            + "\n";
+
     public static final String SH_AGG_IFACE = "aggregation create agg LP01\n"
             + "aggregation create agg LM01E\n"
             + "aggregation create agg LM01W\n"
@@ -61,7 +102,7 @@ public class InterfaceReaderTest {
             + "aggregation create agg JMEP\n"
             + "aggregation create agg LSPIRENT01\n";
 
-    public static final String OUTPUT = SH_INTERFACE.concat(SH_AGG_IFACE);
+    public static final String OUTPUT = SH_INTERFACE.concat(SH_AGG_IFACE).concat(LOGICAL_INTERFACE);
 
     private static final List<InterfaceKey> IDS_EXPECTED_PORT = Lists.newArrayList("1", "2", "3", "4", "5", "6",
             "7", "8", "9", "10")
@@ -75,11 +116,20 @@ public class InterfaceReaderTest {
             .map(InterfaceKey::new)
             .collect(Collectors.toList());
 
+    private static final List<InterfaceKey> IDS_EXPECTED_LOGICAL = Lists.newArrayList("local", "remote")
+            .stream()
+            .map(InterfaceKey::new)
+            .collect(Collectors.toList());
+
     @Test
     public void testParseInterfaceAggIds() {
         Assert.assertEquals(IDS_EXPECTED_PORT,
                 new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT, InterfaceReader.INTERFACE_ID_LINE));
         Assert.assertEquals(IDS_EXPECTED_AGG,
                 new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT, InterfaceReader.LAG_INTERFACE_ID_LINE));
+        Assert.assertEquals(IDS_EXPECTED_LOGICAL,
+                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT,
+                        InterfaceReader.LOGICAL_INTERFACE_ID_LINE));
+
     }
 }
