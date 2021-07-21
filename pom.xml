@@ -42,7 +42,6 @@
         <module>cubro</module>
         <module>junos</module>
         <module>huawei</module>
-        <module>features</module>
         <module>unit-parent</module>
         <module>nexus</module>
         <module>dasan</module>
@@ -56,6 +55,7 @@
         <module>network-instance-base</module>
         <module>native-units</module>
         <module>arista</module>
+        <module>features</module>
     </modules>
 
     <build>

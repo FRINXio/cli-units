@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright © 2018 Frinx and others.
+  ~ Copyright © 2020 Frinx and others.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
@@ -27,34 +26,477 @@
         <relativePath/>
     </parent>
 
+    <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.cli</groupId>
-    <artifactId>cli-units-features-aggregator</artifactId>
+    <artifactId>cli-units-features</artifactId>
     <version>4.2.7.rc22-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>${project.artifactId}</name>
 
-    <modules>
-        <module>cli-units-features</module>
-        <module>frinx-cli-unit-all-units</module>
-        <module>frinx-cli-native-units</module>
-        <module>frinx-cli-unit-brocade</module>
-        <module>frinx-cli-unit-cubro</module>
-        <module>frinx-cli-unit-sonic</module>
-        <module>frinx-cli-unit-huawei</module>
-        <module>frinx-cli-unit-ios</module>
-        <module>frinx-cli-unit-ios-initializer</module>
-        <module>frinx-cli-unit-ios-common-handlers</module>
-        <module>frinx-cli-unit-ios-xe</module>
-        <module>frinx-cli-unit-ios-xe-initializer</module>
-        <module>frinx-cli-unit-ios-xr</module>
-        <module>frinx-cli-unit-ios-xr-initializer</module>
-        <module>frinx-cli-unit-ios-xr-lldp</module>
-        <module>frinx-cli-unit-junos</module>
-        <module>frinx-cli-unit-nexus</module>
-        <module>frinx-cli-unit-dasan</module>
-        <module>frinx-cli-unit-saos</module>
-        <module>frinx-cli-unit-sros</module>
-        <module>frinx-cli-unit-ubnt-es</module>
-        <module>frinx-cli-unit-mikrotik</module>
-    </modules>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.frinx.cli</groupId>
+                <artifactId>cli-units-artifacts</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <dependencies>
+        <!-- Generic -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>network-instance-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>interface-base</artifactId>
+        </dependency>
+
+        <!-- Brocade -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>brocade-cdp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>brocade-configuration-metadata-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>brocade-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>brocade-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>brocade-network-instance-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>brocade-stp-unit</artifactId>
+        </dependency>
+
+        <!-- Cubro -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cubro-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cubro-configuration-metadata-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cubro-acl-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cubro-interface-unit</artifactId>
+        </dependency>
+
+        <!-- SONiC -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sonic-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sonic-configuration-metadata-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sonic-interface-unit</artifactId>
+        </dependency>
+
+        <!-- Huawei -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>huawei-bgp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>huawei-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>huawei-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>huawei-network-instance-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>huawei-routing-policy-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>huawei-platform-unit</artifactId>
+        </dependency>
+
+        <!-- IOS -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-bgp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-cdp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-configuration-metadata-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-lldp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-local-routing-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-network-instance-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-ospf-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-platform-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-rib-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-routing-policy-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-acl-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-mpls-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-qos-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-snmp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-privilege-unit</artifactId>
+        </dependency>
+
+        <!-- IOS common -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common-handlers</artifactId>
+        </dependency>
+
+        <!-- IOS XE -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-configuration-metadata-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-bfd-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-evc-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-bgp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-network-instance-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-fhrp-unit</artifactId>
+        </dependency>
+
+        <!-- IOS XR -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-acl-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-bgp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-configuration-metadata-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-lldp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-logging-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-mpls-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-netflow-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-network-instance-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-ospf-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-ospfv3-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-qos-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-routing-policy-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-snmp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-platform-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-hsrp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-lacp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-bfd-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-evpn-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-isis-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-oam-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-lr-unit</artifactId>
+        </dependency>
+
+        <!-- junos -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>junos-acl-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>junos-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>junos-configuration-metadata-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>junos-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>junos-network-instance-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>junos-routing-policy-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.frinx.cli</groupId>
+            <artifactId>junos-ospf-unit</artifactId>
+        </dependency>
+
+        <!-- nexus -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nexus-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nexus-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nexus-lldp-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nexus-configuration-metadata-unit</artifactId>
+        </dependency>
+
+        <!-- dasan -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>dasan-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>dasan-cli-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>dasan-network-instance-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>dasan-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>dasan-configuration-metadata-unit</artifactId>
+        </dependency>
+
+        <!-- SAOS -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-configuration-metadata-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-network-instance-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-8-network-instance-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-8-interface-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-broadcast-containment-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-qos-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-l2-cft-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-acl-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>saos-6-ring-unit</artifactId>
+        </dependency>
+
+        <!-- SROS -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sros-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sros-ipsec-unit</artifactId>
+        </dependency>
+
+        <!-- UBNT ES -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ubnt-es-cli-init-unit</artifactId>
+        </dependency>
+
+        <!-- MIKROTIK -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mikrotik-cli-init-unit</artifactId>
+        </dependency>
+
+        <!-- CLI-NATIVE -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-5-native-models</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>junos-17-native-models</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xr-5-native-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>junos-17-native-unit</artifactId>
+        </dependency>
+
+    </dependencies>
 </project>
