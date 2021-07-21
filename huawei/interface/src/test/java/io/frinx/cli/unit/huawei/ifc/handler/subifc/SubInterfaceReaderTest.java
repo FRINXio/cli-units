@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Frinx and others.
+ * Copyright © 2021 Frinx and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.huawei.ifc.handler;
+package io.frinx.cli.unit.huawei.ifc.handler.subifc;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 
-public class InterfaceReaderTest {
+public class SubInterfaceReaderTest {
 
     private static final String DISPLAY_INT_BRIEF = "PHY: Physical\n"
             + "*down: administratively down\n"
@@ -58,15 +59,18 @@ public class InterfaceReaderTest {
             + "Wlan-Radio0/0/0             up    up           0%     0%          0          0\n";
 
 
-    private static final List<InterfaceKey> EXPECTED_ALL_IDS = Lists.newArrayList("Cellular0/0/0",
-            "Cellular0/0/1", "Ethernet0/0/0", "GigabitEthernet0/0/0", "GigabitEthernet0/0/1", "GigabitEthernet0/0/2",
-            "GigabitEthernet0/0/3", "GigabitEthernet0/0/4", "GigabitEthernet0/0/4.99", "GigabitEthernet0/0/4.100",
-            "GigabitEthernet0/0/5", "LoopBack0", "LoopBack200", "NULL0", "Vlanif2", "Vlanif99", "Vlanif200",
-            "Vlanif911", "Wlan-Radio0/0/0").stream().map(InterfaceKey::new).collect(Collectors.toList());
+    private static final List<SubinterfaceKey> EXPECTED_ALL_SUB_IDS = Lists.newArrayList("99", "100")
+            .stream().map(value -> new SubinterfaceKey(Long.valueOf(value))).collect(Collectors.toList());
 
     @Test
-    public void testParseAllInterfaceIds() {
-        Assert.assertEquals(EXPECTED_ALL_IDS,
-                new InterfaceReader(Mockito.mock(Cli.class)).parseAllInterfaceIds(DISPLAY_INT_BRIEF));
+    public void testParseAllSubInterfaceIds() {
+        Assert.assertEquals(EXPECTED_ALL_SUB_IDS, new SubinterfaceReader(Mockito.mock(Cli.class))
+                .parseSubinterfaceIds(DISPLAY_INT_BRIEF, "GigabitEthernet0/0/4"));
+    }
+
+    @Test
+    public void testParseZeroSubInterfaceIds() {
+        Assert.assertEquals(Collections.EMPTY_LIST, new SubinterfaceReader(Mockito.mock(Cli.class))
+                .parseSubinterfaceIds(DISPLAY_INT_BRIEF, "GigabitEthernet0/0/5"));
     }
 }

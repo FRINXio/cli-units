@@ -16,14 +16,15 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler.subifc;
 
-import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.huawei.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceConfigReader;
-import javax.annotation.Nonnull;
+import java.util.regex.Pattern;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class SubinterfaceConfigReader extends AbstractSubinterfaceConfigReader {
@@ -33,21 +34,25 @@ public final class SubinterfaceConfigReader extends AbstractSubinterfaceConfigRe
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
-                                      @Nonnull ConfigBuilder builder,
-                                      @Nonnull ReadContext ctx) {
-        SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
-        builder.setIndex(subKey.getIndex());
-    }
-
-    @Override
     protected String getReadCommand(String subIfcName) {
-        return null;
+        return f(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, subIfcName);
     }
 
     @Override
-    protected String getSubinterfaceName(InstanceIdentifier<Config> instanceIdentifier) {
-        return null;
+    protected String getSubinterfaceName(InstanceIdentifier<Config> id) {
+        final InterfaceKey ifcKey = id.firstKeyOf(Interface.class);
+        final SubinterfaceKey subKey = id.firstKeyOf(Subinterface.class);
+        return ifcKey.getName() + SubinterfaceReader.SEPARATOR + subKey.getIndex().toString();
+    }
+
+    @Override
+    protected Pattern getShutdownLine() {
+        return InterfaceConfigReader.SHUTDOWN_LINE;
+    }
+
+    @Override
+    protected Pattern getDescriptionLine() {
+        return InterfaceConfigReader.DESCR_LINE;
     }
 
 }

@@ -16,27 +16,71 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler.subifc;
 
+import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.huawei.ifc.handler.InterfaceReader;
+import io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import io.frinx.cli.unit.ifc.base.handler.subifc.AbstractSubinterfaceReader;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class SubinterfaceReader extends AbstractSubinterfaceReader {
 
+    public static final String SEPARATOR = ".";
+    private final InterfaceReader interfaceReader;
+    private final Ipv4ConfigReader v4Reader;
+    private final Cli cli;
+
     public SubinterfaceReader(Cli cli) {
         super(cli);
+        this.cli = cli;
+        this.interfaceReader = new InterfaceReader(cli);
+        this.v4Reader = new Ipv4ConfigReader(cli);
     }
 
+    @Nonnull
     @Override
-    protected String getReadCommand() {
-        return "";
+    public List<SubinterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Subinterface> instanceIdentifier,
+                                           @Nonnull ReadContext readContext) throws ReadFailedException {
+        final String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
+        final List<SubinterfaceKey> keys = parseSubinterfaceIds(blockingRead(getReadCommand(),
+                cli, instanceIdentifier, readContext), ifcName);
+
+        boolean hasIpv4Address = v4Reader.hasIpAddress(instanceIdentifier, ifcName, readContext);
+
+        if (hasIpv4Address) {
+            keys.add(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
+        }
+
+        return keys;
     }
 
     @Override
     protected List<SubinterfaceKey> parseSubinterfaceIds(String output, String ifcName) {
-        // TODO should we check if the interface is IP-enabled?
-        // TODO what if subinterface .0 already exists on the device?
-        return Collections.singletonList(new SubinterfaceKey(ZERO_SUBINTERFACE_ID));
+        // Now exclude interfaces
+        return interfaceReader.parseAllInterfaceIds(output)
+                .stream()
+                .filter(key -> isSubinterface(key.getName()))
+                .map(InterfaceKey::getName)
+                .filter(subifcName -> subifcName.startsWith(ifcName))
+                .map(name -> name.substring(name.lastIndexOf(SEPARATOR) + 1))
+                .map(subifcIndex -> new SubinterfaceKey(Long.valueOf(subifcIndex)))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    protected String getReadCommand() {
+        return InterfaceReader.SH_INTERFACE;
+    }
+
+    public static boolean isSubinterface(final String ifcName) {
+        return InterfaceReader.SUBINTERFACE_NAME.matcher(ifcName).matches();
     }
 }

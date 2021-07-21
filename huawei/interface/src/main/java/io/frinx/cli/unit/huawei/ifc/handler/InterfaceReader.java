@@ -22,13 +22,12 @@ import java.util.regex.Pattern;
 
 public final class InterfaceReader extends AbstractInterfaceReader {
 
-    private static final String SH_INTERFACE = "display ip interface brief";
+    public static final String SH_INTERFACE = "display interface brief";
 
     private static final Pattern INTERFACE_ID_LINES = Pattern.compile(
-            "(?<id>[a-zA-Z]+[0-9/*.]+)\\s+(?<ipAddr>[^\\s]+)\\s+(?<status>[^\\s]+)\\s+(?<protocol>[^\\s]+)\\s*"
-    );
+            "(?<id>[a-zA-Z/-]+[0-9/*.]+)(\\(v\\)|)\\s+(down|up|\\*down|\\*up).*");
 
-    private static final Pattern SUBINTERFACE_NAME = Pattern.compile("(?<ifcId>.+)[.](?<subifcIndex>[0-9]+)");
+    public static final Pattern SUBINTERFACE_NAME = Pattern.compile("(?<ifcId>.+)\\.(?<subifcIndex>\\d+)");
 
     public InterfaceReader(Cli cli) {
         super(cli);

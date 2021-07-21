@@ -26,11 +26,11 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.
 
 public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
 
-    private static final String SH_SINGLE_INTERFACE_CFG = "display current-configuration interface %s";
+    public static final String SH_SINGLE_INTERFACE_CFG = "display current-configuration interface %s";
 
-    private static final Pattern SHUTDOWN_LINE = Pattern.compile("undo shutdown");
+    public static final Pattern SHUTDOWN_LINE = Pattern.compile("undo shutdown");
     private static final Pattern MTU_LINE = Pattern.compile("\\s*mtu (?<mtu>.+)\\s*");
-    private static final Pattern DESCR_LINE = Pattern.compile("\\s*description (?<desc>.+)\\s*");
+    public static final Pattern DESCR_LINE = Pattern.compile("\\s*description (?<desc>.+)\\s*");
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);

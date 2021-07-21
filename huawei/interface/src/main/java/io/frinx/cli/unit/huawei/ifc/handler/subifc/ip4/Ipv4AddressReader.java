@@ -25,7 +25,7 @@ public final class Ipv4AddressReader extends AbstractIpv4AddressesReader {
     static final String DISPLAY_IP_INT_BRIEF = "display ip int brief %s";
     static final Pattern INTERFACE_IP_LINE =
             Pattern.compile("(?<id>[^\\s]+)\\s+(?<ip>[^/]+)/(?<prefix>[0-9]+)\\s+(?<status>[^\\s]+)\\s+"
-                    + "(?<protocol>[^\\s]+)\\s+(?<vpn>[^\\s]+)\\s*");
+                    + "(?<protocol>[^\\s]+).*");
 
     public Ipv4AddressReader(Cli cli) {
         super(cli);
