@@ -21,13 +21,13 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.7.frinx</version>
+        <version>4.2.8.rc1-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-lldp-unit</artifactId>
-    <version>4.2.7.frinx</version>
+    <version>4.2.8.rc1-frinx-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
