@@ -17,6 +17,7 @@
 package io.frinx.cli.unit.iosxr.network.instance.handler.vrf;
 
 import com.google.common.collect.Lists;
+import io.fd.honeycomb.translate.ModificationCache;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -43,9 +44,13 @@ public class L3VrfReaderTest {
     @Mock
     CliReader parentReader;
 
+    @Mock
+    ReadContext ctx;
+
     @Before
     public void setUp() throws ReadFailedException {
         MockitoAnnotations.initMocks(this);
+        Mockito.when((ctx).getModificationCache()).thenReturn(new ModificationCache());
         Mockito.doReturn(OUTPUT).when(parentReader).blockingRead(Mockito.anyString(),
                 Mockito.any(), Mockito.any(), Mockito.any());
     }
@@ -55,7 +60,7 @@ public class L3VrfReaderTest {
         final InstanceIdentifier<NetworkInstance> iid = InstanceIdentifier.create(NetworkInstance.class);
         L3VrfReader reader = new L3VrfReader(Mockito.mock(Cli.class));
 
-        List<NetworkInstanceKey> lst = reader.getAllIds(parentReader, iid, Mockito.mock(ReadContext.class));
+        List<NetworkInstanceKey> lst = reader.getAllIds(parentReader, iid, ctx);
         Assert.assertEquals(lst, EXPECTED_NWI_KEYS);
     }
 }

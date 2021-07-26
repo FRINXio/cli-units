@@ -61,7 +61,8 @@ public class VrpNetworkInstanceUnit extends AbstractUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         // No handling required on the network instance level
         writeRegistry.addNoop(IIDs.NE_NETWORKINSTANCE);
-        writeRegistry.addAfter(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli),
+        writeRegistry.subtreeAddAfter(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigWriter(cli),
+                Sets.newHashSet(IIDs.NE_NE_CO_AUG_HUAWEINIAUG),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
 
         writeRegistry.addNoop(IIDs.NE_NE_PR_PROTOCOL);
@@ -76,7 +77,8 @@ public class VrpNetworkInstanceUnit extends AbstractUnit {
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         // VRFs
         readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
-        readRegistry.add(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli));
+        readRegistry.subtreeAdd(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli),
+                Sets.newHashSet(IIDs.NE_NE_CO_AUG_HUAWEINIAUG));
 
         // Interfaces for VRF
         readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new L3VrfInterfaceReader(cli));
@@ -88,8 +90,9 @@ public class VrpNetworkInstanceUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228
-                .$YangModuleInfoImpl.getInstance());
+        return Sets.newHashSet(IIDs.FRINX_HUAWEI_NETWORK_INSTANCE_EXTENSION,
+                org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228
+                        .$YangModuleInfoImpl.getInstance());
     }
 
     @Override

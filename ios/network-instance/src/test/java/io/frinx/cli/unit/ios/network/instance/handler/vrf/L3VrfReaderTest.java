@@ -17,6 +17,7 @@
 package io.frinx.cli.unit.ios.network.instance.handler.vrf;
 
 import com.google.common.collect.Lists;
+import io.fd.honeycomb.translate.ModificationCache;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -64,6 +65,7 @@ public class L3VrfReaderTest {
     @Before
     public void setUp() throws ReadFailedException {
         MockitoAnnotations.initMocks(this);
+        Mockito.when((ctx).getModificationCache()).thenReturn(new ModificationCache());
         Mockito.when(reader.blockingRead(Mockito.anyString(), Mockito.any(Cli.class),
                 Mockito.eq(id), Mockito.any(ReadContext.class))).thenReturn(SH_IP_VRF);
     }

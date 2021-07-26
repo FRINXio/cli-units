@@ -16,9 +16,17 @@
 
 package io.frinx.cli.unit.huawei.network.instance.handler.vrf;
 
+import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfReader;
+import io.frinx.cli.unit.utils.CliReader;
+import io.frinx.openconfig.network.instance.NetworInstance;
+import java.util.List;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstanceKey;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class L3VrfReader extends AbstractL3VrfReader {
 
@@ -37,5 +45,13 @@ public final class L3VrfReader extends AbstractL3VrfReader {
     @Override
     protected Pattern getVrfLine() {
         return VRF_CONFIGURATION_LINE;
+    }
+
+    public List<NetworkInstanceKey> getAllIds(@Nonnull CliReader reader,
+                                              @Nonnull InstanceIdentifier<?> id,
+                                              @Nonnull ReadContext readContext) throws ReadFailedException {
+        List<NetworkInstanceKey> keys = super.getAllIds(reader, id, readContext);
+        keys.add(NetworInstance.DEFAULT_NETWORK);
+        return keys;
     }
 }

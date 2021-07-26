@@ -16,23 +16,25 @@
 
 package io.frinx.cli.unit.huawei.network.instance.handler.vrf;
 
-import com.google.common.base.Preconditions;
-import io.fd.honeycomb.translate.write.WriteContext;
-import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfConfigWriter;
-import java.util.Objects;
-import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.huawei.rev210726.HuaweiNiAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.types.rev170228.RouteDistinguisher;
-import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class L3VrfConfigWriter extends AbstractL3VrfConfigWriter {
 
     private static final String UPDATE_TEMPLATE = "system-view\n"
             + "ip vpn-instance {$data.name}\n"
+            + "{% if ($before) %}undo ipv4-family\n{% endif %}"
             + "{$data|update(description,description `$data.description`\n,undo description\n)}"
-            + "{% if($config.route_distinguisher) %}route-distinguisher {$config.route_distinguisher}\n{% endif %}"
+            + "{% if($data.route_distinguisher) %}ipv4-family\n"
+            + "route-distinguisher {$data.route_distinguisher.string}\n"
+            // prefix limit can exist only if rd is configured
+            + "{% if($aug_after) %}prefix limit {$aug_after.prefix_limit_from} {$aug_after.prefix_limit_to}\n"
+            + "{% else %}undo prefix limit\n{% endif %}"
+            // from huawei documentation - after setup we cant delete rd directly,
+            // only if we delete ipv4-family conf, rd will be deleted automatically
+            + "{% elseIf (!$before) %}undo ipv4-family\n{% endif %}"
             + "commit\n"
             + "return";
 
@@ -47,19 +49,13 @@ public final class L3VrfConfigWriter extends AbstractL3VrfConfigWriter {
 
     @Override
     protected String updateTemplate(Config before, Config after) {
-        return fT(UPDATE_TEMPLATE, "before", before, "date", after);
-    }
-
-    @Override
-    public boolean updateCurrentAttributesWResult(@Nonnull InstanceIdentifier<Config> id, @Nonnull Config dataBefore,
-                                        @Nonnull Config dataAfter, @Nonnull WriteContext writeContext)
-            throws WriteFailedException.UpdateFailedException {
-        RouteDistinguisher rdBefore = dataBefore.getRouteDistinguisher();
-        RouteDistinguisher rdAfter = dataAfter.getRouteDistinguisher();
-        Preconditions.checkArgument(Objects.equals(rdBefore, rdAfter),
-                "Cannot update route distinguisher once l3vrf already created");
-
-        return super.updateCurrentAttributesWResult(id, dataBefore, dataAfter, writeContext);
+        HuaweiNiAug augConfigAfter = after.getAugmentation(HuaweiNiAug.class);
+        HuaweiNiAug augConfigBefore = null;
+        if (before != null) {
+            augConfigBefore = before.getAugmentation(HuaweiNiAug.class);
+        }
+        return fT(UPDATE_TEMPLATE, "before", before, "aug_before", augConfigBefore,
+                "data", after, "aug_after", augConfigAfter);
     }
 
     @Override

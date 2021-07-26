@@ -17,6 +17,7 @@
 package io.frinx.cli.unit.junos.network.instance.handler.vrf;
 
 import com.google.common.collect.Lists;
+import io.fd.honeycomb.translate.ModificationCache;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ni.base.handler.vrf.AbstractL3VrfReader;
@@ -57,6 +58,7 @@ public class L3VrfReaderTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        Mockito.when((readContext).getModificationCache()).thenReturn(new ModificationCache());
         reader = new L3VrfReader(cli);
     }
 

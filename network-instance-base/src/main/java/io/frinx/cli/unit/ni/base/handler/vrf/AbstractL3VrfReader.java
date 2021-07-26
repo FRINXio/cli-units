@@ -64,11 +64,17 @@ public abstract class AbstractL3VrfReader
 
     public List<NetworkInstanceKey> getAllIds(CliReader cliReader, InstanceIdentifier<?> id, ReadContext ctx)
             throws ReadFailedException {
+        if (ctx.getModificationCache().containsKey(getClass().toString() + "_allIds")) {
+            return ((List<NetworkInstanceKey>) ctx.getModificationCache().get(getClass() + "_allIds"));
+        }
         String output = cliReader.blockingRead(getReadCommand(), cli, id, ctx);
-        return ParsingUtils.parseFields(output, 0,
+        List<NetworkInstanceKey> listAllIds = ParsingUtils.parseFields(output, 0,
             getVrfLine()::matcher,
             matcher -> matcher.group("vrfName"),
-            NetworkInstanceKey::new);
+            NetworkInstanceKey::new,
+            m -> !m.contains("ipv4-family"));
+        ctx.getModificationCache().put(getClass() + "_allIds", listAllIds);
+        return listAllIds;
     }
 
     protected abstract String getReadCommand();

@@ -30,8 +30,8 @@ public final class NetworkInstanceConfigReader extends CompositeReader<Config, C
 
     public NetworkInstanceConfigReader(Cli cli) {
         super(new ArrayList<CompositeReader.Child<Config, ConfigBuilder>>() {{
-                add(new DefaultConfigReader());
                 add(new L3VrfConfigReader(cli));
+                add(new DefaultConfigReader());
             }
         });
     }
