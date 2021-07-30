@@ -56,67 +56,59 @@ import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 
 public class ServiceInstanceWriterTest {
 
-    private static final List<ServiceInstance> WRITE_SERVICE_INSTANCES =
-            Arrays.asList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(false)
-                                    .setEvc("EVC")
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(true)
-                                    .setDot1q(Arrays.asList(1, 2, 3, 5, 6, 7, 8, 9, 10))
-                                    .build())
-                            .setL2protocols(new L2protocolsBuilder()
-                                    .setServiceInstanceL2protocol(
-                                            new ServiceInstanceL2protocolBuilder()
-                                            .setL2protocol(Arrays.asList(
-                                                    new L2protocolBuilder()
-                                                            .setConfig(
-                                                                    new org.opendaylight.yang.gen.v1.http.frinx
-                                                                            .openconfig.net.yang.interfaces.cisco
-                                                                            .rev171024.service.instance.l2protocols
-                                                                            .service.instance.l2protocol
-                                                                            .l2protocol.ConfigBuilder()
-                                                                            .setProtocolType(ProtocolType.Peer)
-                                                                            .setProtocol(Arrays.asList(
-                                                                                    Protocol.RB, Protocol.Lacp))
-                                                                            .build()
-                                                            )
-                                                            .build()
-                                    )).build()).build())
-                            .setBridgeDomain(new BridgeDomainBuilder()
-                                    .setValue("100")
-                                    .setGroupNumber((short) 2)
-                                    .build())
-                            .setRewrite(new RewriteBuilder()
-                                    .setType(Type.Ingress)
-                                    .setOperation(Operation.Pop)
-                                    .build())
-                            .build(),
-                    new ServiceInstanceBuilder()
-                            .setId(200L)
-                            .setKey(new ServiceInstanceKey(200L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(200L)
-                                    .setTrunk(true)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setDot1q(Collections.singletonList(200))
-                                    .build())
-                            .setBridgeDomain(new BridgeDomainBuilder()
-                                    .setValue("from-encapsulation")
-                                    .build())
-                            .build()
-            );
+    private static final List<ServiceInstance> WRITE_SERVICE_INSTANCES = Arrays.asList(
+        new ServiceInstanceBuilder()
+            .setId(100L)
+            .setKey(new ServiceInstanceKey(100L))
+            .setConfig(new ConfigBuilder()
+            .setId(100L)
+            .setTrunk(false)
+            .setEvc("EVC")
+            .build())
+            .setEncapsulation(new EncapsulationBuilder()
+                .setUntagged(true)
+                .setDot1q(Arrays.asList("1-10", "15"))
+                .build())
+            .setL2protocols(new L2protocolsBuilder()
+                .setServiceInstanceL2protocol(new ServiceInstanceL2protocolBuilder()
+                    .setL2protocol(Arrays.asList(new L2protocolBuilder()
+                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco
+                            .rev171024.service.instance.l2protocols.service.instance.l2protocol.l2protocol
+                            .ConfigBuilder()
+                                .setProtocolType(ProtocolType.Peer)
+                                .setProtocol(Arrays.asList(Protocol.RB, Protocol.Lacp))
+                                .build())
+                        .build()))
+                    .build())
+                .build())
+            .setBridgeDomain(new BridgeDomainBuilder()
+                .setValue("100")
+                .setGroupNumber((short) 2)
+                .build())
+            .setRewrite(new RewriteBuilder()
+                .setType(Type.Ingress)
+                .setOperation(Operation.Pop)
+                .build())
+            .build(),
+        new ServiceInstanceBuilder()
+            .setId(200L)
+            .setKey(new ServiceInstanceKey(200L))
+            .setConfig(new ConfigBuilder()
+                .setId(200L)
+                .setTrunk(true)
+                .build())
+            .setEncapsulation(new EncapsulationBuilder()
+                .setDot1q(Collections.singletonList("200"))
+                .build())
+            .setBridgeDomain(new BridgeDomainBuilder()
+                .setValue("from-encapsulation")
+                .build())
+            .build());
 
     private static final String WRITE_INPUT = "configure terminal\n"
             + "interface GigabitEthernet0/0/0\n"
             + "service instance 100 ethernet EVC\n"
-            + "encapsulation untagged , dot1q 1 , 2 , 3 , 5 , 6 , 7 , 8 , 9 , 10\n"
+            + "encapsulation untagged , dot1q 1-10, 15\n"
             + "l2protocol peer RB lacp\n"
             + "bridge-domain 100 split-horizon group 2\n"
             + "rewrite ingress tag pop 1 symmetric\n"
@@ -127,86 +119,68 @@ public class ServiceInstanceWriterTest {
             + "exit\n"
             + "end\n";
 
-    private static final List<ServiceInstance> UPDATE_SERVICE_INSTANCES =
-            Collections.singletonList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(true)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(false)
-                                    .setDot1q(Arrays.asList(1, 9))
-                                    .build())
-                            .setL2protocols(new L2protocolsBuilder()
-                                    .setServiceInstanceL2protocol(
-                                            new ServiceInstanceL2protocolBuilder()
-                                                    .setL2protocol(Arrays.asList(
-                                                            new L2protocolBuilder()
-                                                                    .setConfig(
-                                                                            new org.opendaylight.yang.gen.v1.http.frinx
-                                                                                    .openconfig.net.yang.interfaces
-                                                                                    .cisco.rev171024.service.instance
-                                                                                    .l2protocols.service.instance
-                                                                                    .l2protocol.l2protocol
-                                                                                    .ConfigBuilder()
-                                                                                    .setProtocolType(ProtocolType.Peer)
-                                                                                    .setProtocol(Arrays.asList(
-                                                                                            Protocol.RB, Protocol.Lacp))
-                                                                                    .build()
-                                                                    )
-                                                                    .build()
-                                                    )).build()).build())
-                            .build()
-            );
+    private static final List<ServiceInstance> UPDATE_SERVICE_INSTANCES = Collections.singletonList(
+        new ServiceInstanceBuilder()
+            .setId(100L)
+            .setKey(new ServiceInstanceKey(100L))
+            .setConfig(new ConfigBuilder()
+                .setId(100L)
+                .setTrunk(true)
+                .build())
+            .setEncapsulation(new EncapsulationBuilder()
+                .setUntagged(false)
+                .setDot1q(Arrays.asList("1", "9"))
+                .build())
+            .setL2protocols(new L2protocolsBuilder()
+                .setServiceInstanceL2protocol(new ServiceInstanceL2protocolBuilder()
+                    .setL2protocol(Arrays.asList(new L2protocolBuilder()
+                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                            .cisco.rev171024.service.instance.l2protocols.service.instance
+                            .l2protocol.l2protocol.ConfigBuilder()
+                                .setProtocolType(ProtocolType.Peer)
+                                .setProtocol(Arrays.asList(Protocol.RB, Protocol.Lacp))
+                            .build())
+                        .build()))
+                    .build())
+                .build())
+            .build());
 
-    private static final List<ServiceInstance> UPDATE_SERVICE_INSTANCES_WITH_REWRITE =
-            Collections.singletonList(
-                    new ServiceInstanceBuilder()
-                            .setId(100L)
-                            .setKey(new ServiceInstanceKey(100L))
-                            .setConfig(new ConfigBuilder()
-                                    .setId(100L)
-                                    .setTrunk(true)
-                                    .build())
-                            .setEncapsulation(new EncapsulationBuilder()
-                                    .setUntagged(false)
-                                    .setDot1q(Arrays.asList(1, 9))
-                                    .build())
-                            .setL2protocols(new L2protocolsBuilder()
-                                    .setServiceInstanceL2protocol(
-                                            new ServiceInstanceL2protocolBuilder()
-                                                    .setL2protocol(Arrays.asList(
-                                                            new L2protocolBuilder()
-                                                                    .setConfig(
-                                                                            new org.opendaylight.yang.gen.v1.http.frinx
-                                                                                    .openconfig.net.yang.interfaces
-                                                                                    .cisco.rev171024.service.instance
-                                                                                    .l2protocols.service.instance
-                                                                                    .l2protocol.l2protocol
-                                                                                    .ConfigBuilder()
-                                                                                    .setProtocolType(ProtocolType.Peer)
-                                                                                    .setProtocol(Arrays.asList(
-                                                                                            Protocol.RB, Protocol.Lacp))
-                                                                                    .build()
-                                                                    )
-                                                                    .build()
-                                                    )).build()).build())
-                            .setRewrite(new RewriteBuilder()
-                                    .setType(Type.Egress)
-                                    .setOperation(Operation.Pop)
-                                    .build())
-                            .build()
-            );
+    private static final List<ServiceInstance> UPDATE_SERVICE_INSTANCES_WITH_REWRITE = Collections.singletonList(
+        new ServiceInstanceBuilder()
+            .setId(100L)
+            .setKey(new ServiceInstanceKey(100L))
+            .setConfig(new ConfigBuilder()
+                .setId(100L)
+                .setTrunk(true)
+                .build())
+            .setEncapsulation(new EncapsulationBuilder()
+                .setUntagged(false)
+                .setDot1q(Arrays.asList("1", "9"))
+                .build())
+            .setL2protocols(new L2protocolsBuilder()
+                .setServiceInstanceL2protocol(new ServiceInstanceL2protocolBuilder()
+                    .setL2protocol(Arrays.asList(new L2protocolBuilder()
+                        .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                            .cisco.rev171024.service.instance.l2protocols.service.instance
+                            .l2protocol.l2protocol.ConfigBuilder()
+                                .setProtocolType(ProtocolType.Peer)
+                                .setProtocol(Arrays.asList(Protocol.RB, Protocol.Lacp))
+                                .build())
+                        .build()))
+                    .build())
+                .build())
+            .setRewrite(new RewriteBuilder()
+                .setType(Type.Egress)
+                .setOperation(Operation.Pop)
+                .build())
+            .build());
 
     private static final String UPDATE_INPUT = "configure terminal\n"
             + "interface GigabitEthernet0/0/0\n"
             + "no service instance 100\n"
             + "no service instance trunk 200\n"
             + "service instance trunk 100 ethernet\n"
-            + "encapsulation dot1q 1 , 9\n"
+            + "encapsulation dot1q 1, 9\n"
             + "l2protocol peer RB lacp\n"
             + "exit\n"
             + "end\n";
@@ -247,7 +221,6 @@ public class ServiceInstanceWriterTest {
 
     @Test
     public void write() throws WriteFailedException {
-        // tu
         writer.writeCurrentAttributes(iid, getAug(WRITE_SERVICE_INSTANCES), context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_INPUT, response.getValue().getContent());
@@ -285,8 +258,8 @@ public class ServiceInstanceWriterTest {
     private IfCiscoServiceInstanceAug getAug(final List<ServiceInstance> serviceInstances) {
         return new IfCiscoServiceInstanceAugBuilder()
                 .setServiceInstances(new ServiceInstancesBuilder()
-                        .setServiceInstance(serviceInstances)
-                        .build())
+                    .setServiceInstance(serviceInstances)
+                    .build())
                 .build();
     }
 

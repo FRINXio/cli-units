@@ -21,13 +21,9 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.ServiceInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.service.instance.top.service.instances.service.instance.Encapsulation;
@@ -67,25 +63,7 @@ public final class ServiceInstanceEncapsulationReader implements CliConfigReader
         ParsingUtils.parseField(output, 0,
             SERVICE_INSTANCE_ENCAPSULATION_LINE::matcher,
             matcher -> matcher.group("ids"),
-            value -> encapsulationBuilder.setDot1q(splitMultipleVlans(Arrays.asList(value.split(",")))));
+            value -> encapsulationBuilder.setDot1q(Arrays.asList(value.replaceAll(" ", "")
+                    .split(","))));
     }
-
-    private static List<Integer> splitMultipleVlans(final List<String> vlanStrings) {
-        final List<Integer> splitVlans = new ArrayList<>();
-
-        for (final String vlanString : vlanStrings) {
-            if (vlanString.contains("-")) {
-                final List<Integer> list = Arrays.stream(vlanString.split("-"))
-                        .map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                final IntStream stream = IntStream.range(list.get(0), list.get(1) + 1);
-                stream.forEach(splitVlans::add);
-            } else {
-                splitVlans.add(Integer.parseInt(vlanString));
-            }
-        }
-
-        return splitVlans;
-    }
-
 }
