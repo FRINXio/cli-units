@@ -49,7 +49,8 @@ public class SubPortConfigWriter implements CliWriter<Config> {
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (PortReader.lagCheck.canProcess(instanceIdentifier, writeContext, false)) {
+        if (PortReader.lagCheck.canProcess(instanceIdentifier, writeContext, false)
+                || PortReader.ethernetCheck.canProcess(instanceIdentifier, writeContext, false)) {
             String parentPort = instanceIdentifier.firstKeyOf(Interface.class).getName();
             blockingWriteAndRead(cli, instanceIdentifier, config, writeTemplate(config, parentPort));
         }
@@ -87,7 +88,8 @@ public class SubPortConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        if (PortReader.lagCheck.canProcess(instanceIdentifier, writeContext, false)) {
+        if (PortReader.lagCheck.canProcess(instanceIdentifier, writeContext, false)
+                || PortReader.ethernetCheck.canProcess(instanceIdentifier, writeContext, false)) {
             blockingDelete(deleteTemplate(config), cli, instanceIdentifier);
         }
     }
