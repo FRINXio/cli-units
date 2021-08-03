@@ -22,6 +22,7 @@
 
     <modules>
         <module>init</module>
+        <module>aaa</module>
         <module>interface</module>
         <module>network-instance</module>
         <module>bgp</module>
