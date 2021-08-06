@@ -16,8 +16,12 @@
 
 package io.frinx.cli.unit.huawei.init;
 
+import com.google.common.collect.ImmutableList;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
+import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.CliFlavour;
+import io.frinx.cli.io.OutputFunction;
 import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
 import io.frinx.cli.io.SessionInitializationStrategy;
@@ -30,6 +34,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
@@ -111,5 +116,21 @@ public class VrpCliInitializerUnit extends AbstractUnit {
             }
         }
     }
+
+    public CliFlavour getCliFlavour() {
+        return new CliFlavour(
+                Pattern.compile("display current-configuration (configuration)?"),
+                " ",
+                "",
+                "#",
+                Pattern.compile("\\|"),
+                OutputFunction.ALL,
+                "#",
+                ImmutableList.of(),
+                "",
+                Cli.NEWLINE,
+                "");
+    }
+
 
 }
