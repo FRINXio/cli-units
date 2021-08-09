@@ -17,6 +17,7 @@
 package io.frinx.cli.unit.saos.init;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
@@ -35,6 +36,7 @@ import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -114,7 +116,19 @@ public class SaosCliInitializerUnit extends AbstractUnit {
     }
 
     public CliFlavour getCliFlavour() {
-        return CliFlavour.SAOS;
+        return new CliFlavour(
+                Pattern.compile("configuration (search string|show brief)"),
+                "",
+                "\"",
+                "\"",
+                null,
+                null,
+                null,
+                ImmutableList.of(),
+                "",
+                Cli.NEWLINE,
+                "",
+                Optional.of("configuration show brief"));
     }
 
     public static class SaosCliInitializationStrategy implements SessionInitializationStrategy {

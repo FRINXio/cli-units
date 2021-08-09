@@ -29,7 +29,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 
 public final class L3VrfConfigReader extends AbstractL3VrfConfigReader {
 
-    private static final String DISPLAY_VRF_CFG = "display current-configuration configuration vpn-instance";
+    private static final String DISPLAY_VRF_CFG = "display current-configuration configuration ip vpn-instance";
     private static final Pattern DESC_CONFIG = Pattern.compile(".*description (?<desc>.*)");
     private static final Pattern RD_CONFIG = Pattern.compile(".*route-distinguisher (?<rd>\\S+).*");
     private static final Pattern PREFIX_LIMIT = Pattern.compile(".*prefix limit (?<from>\\d+) (?<to>\\d+).*");
