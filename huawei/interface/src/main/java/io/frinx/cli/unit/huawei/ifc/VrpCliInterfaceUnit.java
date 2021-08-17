@@ -36,6 +36,8 @@ import io.frinx.cli.unit.huawei.ifc.handler.subifc.SubinterfaceStateReader;
 import io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4.Ipv4AddressReader;
 import io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4.Ipv4ConfigReader;
 import io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
+import io.frinx.cli.unit.huawei.ifc.handler.vlan.InterfaceVlanReader;
+import io.frinx.cli.unit.huawei.ifc.handler.vlan.InterfaceVlanWriter;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.cli.unit.utils.NoopCliListWriter;
 import io.frinx.cli.unit.utils.NoopCliWriter;
@@ -91,6 +93,10 @@ public class VrpCliInterfaceUnit extends AbstractUnit {
                 io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
                 new NoopCliWriter<>()));
 
+        writeRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
+                new InterfaceVlanWriter(cli),
+                IIDs.IN_IN_CONFIG, io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_VL_VL_CONFIG);
+
         writeRegistry.add(
                 new GenericWriter<>(
                         io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
@@ -128,6 +134,8 @@ public class VrpCliInterfaceUnit extends AbstractUnit {
             new GenericConfigReader<>(
                     io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
                     new Ipv4ConfigReader(cli)));
+        readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
+                new InterfaceVlanReader(cli));
     }
 
     @Override
