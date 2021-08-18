@@ -27,6 +27,7 @@
         <module>bgp</module>
         <module>routing-policy</module>
         <module>platform</module>
+        <module>acl</module>
     </modules>
 
     <parent>

@@ -115,6 +115,10 @@
         <!-- Huawei -->
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>huawei-acl-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>huawei-bgp-unit</artifactId>
         </dependency>
         <dependency>
