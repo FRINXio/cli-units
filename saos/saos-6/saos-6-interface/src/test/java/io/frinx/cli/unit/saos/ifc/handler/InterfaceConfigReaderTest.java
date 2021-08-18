@@ -115,7 +115,6 @@ public class InterfaceConfigReaderTest {
 
     private static final Config EXPECTED_LOCAL_LOGICAL_INTERFACE = new ConfigBuilder()
             .setName("local")
-            .setType(EthernetCsmacd.class)
             .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
                     .setIpv4Prefix(new Ipv4Prefix("172.16.1.74/23"))
                     .setIpv6Prefix(new Ipv6Prefix("fe80::9e7a:3ff:fe1b:6820/64"))
@@ -124,7 +123,6 @@ public class InterfaceConfigReaderTest {
 
     private static final Config EXPECTED_REMOTE_LOGICAL_INTERFACE = new ConfigBuilder()
             .setName("remote")
-            .setType(EthernetCsmacd.class)
             .setDescription("VLAN127")
             .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
                     .setIpv6Prefix(new Ipv6Prefix("fe80::9e7a:3ff:fe1b:683f/64"))

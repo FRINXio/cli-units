@@ -72,7 +72,6 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
     void parseLogicalInterface(final String output, ConfigBuilder builder,
                                IfSaosAugBuilder ifSaosAugBuilder, String name) {
         builder.setName(name);
-        builder.setType(EthernetCsmacd.class);
         if (name.equals("remote")) {
             setRemoteDescription(output, builder);
         }
