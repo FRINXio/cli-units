@@ -44,10 +44,10 @@ public class L2VLANPortReaderTest {
                 .thenReturn(OUTPUT);
 
         List<InterfaceKey> expected = Arrays.asList(
-                new InterfaceKey("LS02W"),
-                new InterfaceKey("LP01"),
-                new InterfaceKey("LM01W"),
-                new InterfaceKey("LM01E"));
+                new InterfaceKey("cpu_subintf_LS02W"),
+                new InterfaceKey("cpu_subintf_LP01"),
+                new InterfaceKey("cpu_subintf_LM01W"),
+                new InterfaceKey("cpu_subintf_LM01E"));
         Assert.assertEquals(expected, L2VLANInterfaceReader.getAllIds(null, cliReader, null, null));
     }
 }

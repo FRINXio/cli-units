@@ -48,7 +48,7 @@ public class L2VLANInterfaceConfigWriterTest {
     @Mock
     private Cli cli;
 
-    private InstanceIdentifier iid = IIDs.IN_IN_CONFIG;
+    private final InstanceIdentifier<Config> iid = IIDs.IN_IN_CONFIG;
 
     private final ArgumentCaptor<Command> commands = ArgumentCaptor.forClass(Command.class);
 
@@ -63,7 +63,7 @@ public class L2VLANInterfaceConfigWriterTest {
 
     @Test
     public void writeCurrentAttributesWResultTest() throws WriteFailedException {
-        writer.writeCurrentAttributesWResult(iid, createConfig("cpuMGMT", L2vlan.class), null);
+        writer.writeCurrentAttributesWResult(iid, createConfig("cpu_subintf_cpuMGMT", L2vlan.class), null);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
         Assert.assertEquals(WRITE_COMMAND, commands.getValue().getContent());
@@ -77,20 +77,20 @@ public class L2VLANInterfaceConfigWriterTest {
 
     @Test(expected = WriteFailedException.class)
     public void updateCurrentAttributesWResultTest() throws WriteFailedException {
-        writer.updateCurrentAttributesWResult(iid, createConfig("cpuMGMT", L2vlan.class),
-                createConfig("FRINX_TEST", L2vlan.class), null);
+        writer.updateCurrentAttributesWResult(iid, createConfig("cpu_subintf_cpuMGMT", L2vlan.class),
+                createConfig("cpu_subintf_FRINX_TEST", L2vlan.class), null);
     }
 
     @Test
     public void updateCurrentAttributesWResultTest_incorrectType() throws WriteFailedException {
         Assert.assertFalse(writer.updateCurrentAttributesWResult(iid,
                 createConfig("cpuMGMT", Ieee8023adLag.class),
-                createConfig("FRINX_TEST", L2vlan.class), null));
+                createConfig("cpu_subintf_FRINX_TEST", L2vlan.class), null));
     }
 
     @Test
     public void deleteCurrentAttributesWResultTest() throws WriteFailedException {
-        writer.deleteCurrentAttributesWResult(iid, createConfig("cpuMGMT", L2vlan.class), null);
+        writer.deleteCurrentAttributesWResult(iid, createConfig("cpu_subintf_cpuMGMT", L2vlan.class), null);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
         Assert.assertEquals(DELETE_COMMAND, commands.getValue().getContent());

@@ -29,10 +29,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class L2VLANInterfaceConfigWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE =
-            "cpu-interface sub-interface create cpu-subinterface {$data.name}\n"
+            "cpu-interface sub-interface create cpu-subinterface {$name}\n"
                     + "configuration save";
     private static final String DELETE_TEMPLATE =
-            "cpu-interface sub-interface delete cpu-subinterface {$data.name}\n"
+            "cpu-interface sub-interface delete cpu-subinterface {$name}\n"
                     + "configuration save";
 
     private final Cli cli;
@@ -46,7 +46,8 @@ public class L2VLANInterfaceConfigWriter implements CompositeWriter.Child<Config
                                                  @Nonnull Config data,
                                                  @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (L2vlan.class.equals(data.getType())) {
-            blockingWriteAndRead(cli, iid, data, fT(WRITE_TEMPLATE, "data", data));
+            blockingWriteAndRead(cli, iid, data, fT(WRITE_TEMPLATE, "name",
+                    data.getName().replace("cpu_subintf_", "")));
             return true;
         }
 
@@ -71,7 +72,8 @@ public class L2VLANInterfaceConfigWriter implements CompositeWriter.Child<Config
                                                   @Nonnull Config dataBefore,
                                                   @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (L2vlan.class.equals(dataBefore.getType())) {
-            blockingDeleteAndRead(cli, iid, fT(DELETE_TEMPLATE, "data", dataBefore));
+            blockingDeleteAndRead(cli, iid, fT(DELETE_TEMPLATE, "name",
+                    dataBefore.getName().replace("cpu_subintf_", "")));
             return true;
         }
         return false;

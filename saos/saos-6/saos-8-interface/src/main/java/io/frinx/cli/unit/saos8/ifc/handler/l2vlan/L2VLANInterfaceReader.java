@@ -57,10 +57,12 @@ public final class L2VLANInterfaceReader implements
                                                InstanceIdentifier<?> id,
                                                ReadContext context) throws ReadFailedException {
         String output = cliReader.blockingRead(SHOW_COMMAND, cli, id, context);
+        // we have to change the name for the l2vlan interfaces to prevent overlapping
+        // in the database with the physical interfaces
         return ParsingUtils.parseFields(output, 0,
             ALL_IDS::matcher,
             m -> m.group("name"),
-            InterfaceKey::new);
+            value -> new InterfaceKey("cpu_subintf_" + value));
     }
 
     @Override
