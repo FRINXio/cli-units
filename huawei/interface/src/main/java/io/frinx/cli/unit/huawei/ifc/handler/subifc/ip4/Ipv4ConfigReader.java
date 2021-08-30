@@ -16,9 +16,12 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigReader;
 import java.util.regex.Pattern;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class Ipv4ConfigReader extends AbstractIpv4ConfigReader {
 
@@ -33,6 +36,15 @@ public final class Ipv4ConfigReader extends AbstractIpv4ConfigReader {
 
     @Override
     protected String getReadCommand(String ifcName, Long subId) {
+        if (subId != 0) {
+            return f(Ipv4AddressReader.DISPLAY_IP_INT_BRIEF, ifcName + "." + subId);
+        }
         return f(Ipv4AddressReader.DISPLAY_IP_INT_BRIEF, ifcName);
+    }
+
+    @Override
+    @VisibleForTesting
+    public boolean isSupportedInterface(InstanceIdentifier<Config> instanceIdentifier) {
+        return true;
     }
 }

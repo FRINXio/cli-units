@@ -16,6 +16,7 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler.vlan;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -33,6 +34,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev17071
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanModeType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanRange;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -40,8 +42,11 @@ public class InterfaceVlanReader implements CliConfigReader<Config, ConfigBuilde
 
     public static final Pattern SWITCHPORT_ACCESS_VLAN_LINE =
             Pattern.compile("\\s*port default vlan (?<switchportVlan>.+)");
+    private static final Pattern LINK_TYPE_LINE = Pattern.compile("\\s*port link-type (?<type>.+)\\s*");
     public static final Pattern SWITCHPORT_TRUNK_ALLOWED_VLAN_LINE =
             Pattern.compile("\\s*port trunk allow-pass vlan (?<allowedVlan>.+)");
+    public static final Pattern SWITCHPORT_PVID_VLAN_LINE =
+            Pattern.compile("\\s*port trunk pvid vlan (?<pvidVlan>.+)");
 
     private final Cli cli;
 
@@ -54,19 +59,33 @@ public class InterfaceVlanReader implements CliConfigReader<Config, ConfigBuilde
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         final String ifcName = id.firstKeyOf(Interface.class).getName();
-        final String output = blockingRead(f(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx);
-        setSwitchportAccessVlan(output, configBuilder);
-        setSwitchportTrunkAllowedVlan(output, configBuilder);
+        parseVlanInterface(blockingRead(f(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx),
+                configBuilder);
     }
 
-    static void setSwitchportAccessVlan(String output, ConfigBuilder configBuilder) {
+    @VisibleForTesting
+    static void parseVlanInterface(final String output, final ConfigBuilder configBuilder) {
+        setSwitchportAccessVlan(output, configBuilder);
+        setLinkType(output, configBuilder);
+        setSwitchportTrunkAllowedVlan(output, configBuilder);
+        setSwitchportPvidVlan(output, configBuilder);
+    }
+
+    private static void setSwitchportAccessVlan(String output, ConfigBuilder configBuilder) {
         Optional<String> accessVlanValue = ParsingUtils.parseField(output, 0,
             SWITCHPORT_ACCESS_VLAN_LINE::matcher,
             matcher -> matcher.group("switchportVlan"));
         accessVlanValue.ifPresent(s -> configBuilder.setAccessVlan(new VlanId(Integer.parseInt(s))));
     }
 
-    static void setSwitchportTrunkAllowedVlan(String output, ConfigBuilder configBuilder) {
+    private static void setSwitchportPvidVlan(String output, ConfigBuilder configBuilder) {
+        Optional<String> accessVlanValue = ParsingUtils.parseField(output, 0,
+            SWITCHPORT_PVID_VLAN_LINE::matcher,
+            matcher -> matcher.group("pvidVlan"));
+        accessVlanValue.ifPresent(s -> configBuilder.setNativeVlan(new VlanId(Integer.parseInt(s))));
+    }
+
+    private static void setSwitchportTrunkAllowedVlan(String output, ConfigBuilder configBuilder) {
         Optional<String> allowedValues = ParsingUtils.parseField(output, 0,
             SWITCHPORT_TRUNK_ALLOWED_VLAN_LINE::matcher,
             matcher -> matcher.group("allowedVlan"));
@@ -74,6 +93,28 @@ public class InterfaceVlanReader implements CliConfigReader<Config, ConfigBuilde
         allowedValues.ifPresent(s -> configBuilder.setTrunkVlans(getSwitchportTrunkAllowedVlanList(s)));
     }
 
+    private static void setLinkType(String output, ConfigBuilder configBuilder) {
+        final Optional<String> modeValue = ParsingUtils.parseField(output, 0,
+            LINK_TYPE_LINE::matcher,
+            matcher -> matcher.group("type"));
+
+        if (modeValue.isPresent()) {
+            VlanModeType vlanModeType;
+            switch (modeValue.get()) {
+                case "trunk":
+                    vlanModeType = VlanModeType.TRUNK;
+                    break;
+                case "access":
+                    vlanModeType = VlanModeType.ACCESS;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Cannot parse link-type value: " + modeValue.get());
+            }
+            configBuilder.setInterfaceMode(vlanModeType);
+        }
+    }
+
+    @VisibleForTesting
     static List<TrunkVlans> getSwitchportTrunkAllowedVlanList(String allowedValues) {
         if (allowedValues.contains("to")) {
             List<VlanSwitchedConfig.TrunkVlans> trunkVlans = new ArrayList<>();

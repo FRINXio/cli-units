@@ -20,6 +20,11 @@ import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.SubIfHuaweiAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.SubIfHuaweiAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.TrafficDirection.Direction;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.huawei.sub._if.extension.config.TrafficFilterBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.huawei.sub._if.extension.config.TrafficPolicyBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.ConfigBuilder;
 
@@ -38,7 +43,23 @@ public class SubInterfaceConfigReaderTest {
             + "return";
 
     private static final Config EXPECTED_CONFIG = new ConfigBuilder().setName("GigabitEthernet0/0/4.100")
-            .setEnabled(true).setIndex(100L).setDescription("Main Uplink - Production").build();
+            .setEnabled(true)
+            .setIndex(100L)
+            .setDescription("Main Uplink - Production")
+            .addAugmentation(SubIfHuaweiAug.class, new SubIfHuaweiAugBuilder()
+                    .setDot1qVlanId(100L)
+                    .setTrafficFilter(new TrafficFilterBuilder()
+                            .setDirection(Direction.Inbound)
+                            .setAclName("WAN-IN")
+                            .build())
+                    .setTrafficPolicy(new TrafficPolicyBuilder()
+                            .setDirection(Direction.Outbound)
+                            .setTrafficName("TP-NNI-MAIN-OUT")
+                            .build())
+                    .setIpBindingVpnInstance("VLAN271752")
+                    .setTrustDscp(true)
+                    .build())
+            .build();
 
     @Test
     public void testParseInterface() {

@@ -16,15 +16,18 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4AddressesReader;
 import java.util.regex.Pattern;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.Address;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class Ipv4AddressReader extends AbstractIpv4AddressesReader {
 
     static final String DISPLAY_IP_INT_BRIEF = "display ip int brief %s";
     static final Pattern INTERFACE_IP_LINE =
-            Pattern.compile("(?<id>[^\\s]+)\\s+(?<ip>[^/]+)/(?<prefix>[0-9]+)\\s+(?<status>[^\\s]+)\\s+"
+            Pattern.compile("^(?<id>[^\\s]+)\\s+(?<ip>[^/]+)/(?<prefix>[0-9]+)\\s+(?<status>[^\\s]+)\\s+"
                     + "(?<protocol>[^\\s]+).*");
 
     public Ipv4AddressReader(Cli cli) {
@@ -39,5 +42,19 @@ public final class Ipv4AddressReader extends AbstractIpv4AddressesReader {
     @Override
     protected Pattern getIpLine() {
         return INTERFACE_IP_LINE;
+    }
+
+    @Override
+    @VisibleForTesting
+    public boolean isSupportedInterface(InstanceIdentifier<Address> instanceIdentifier) {
+        return true;
+    }
+
+    @Override
+    protected String getInterfaceName(String ifcName, Long subId) {
+        if (subId != 0) {
+            return ifcName + "." + subId;
+        }
+        return ifcName;
     }
 }

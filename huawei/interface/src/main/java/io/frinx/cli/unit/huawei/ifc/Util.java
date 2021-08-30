@@ -21,6 +21,7 @@ import java.util.Set;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.RadioMAC;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.InterfaceType;
 
@@ -38,6 +39,8 @@ public final class Util {
             return EthernetCsmacd.class;
         }  else if (name.startsWith("LoopBack")) {
             return SoftwareLoopback.class;
+        } else if (name.startsWith("Wlan-Radio")) {
+            return RadioMAC.class;
         } else {
             return Other.class;
         }

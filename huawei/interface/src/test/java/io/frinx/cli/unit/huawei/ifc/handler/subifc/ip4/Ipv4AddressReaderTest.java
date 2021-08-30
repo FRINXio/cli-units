@@ -50,11 +50,28 @@ public class Ipv4AddressReaderTest {
             + "GigabitEthernet1/0/6              unassigned           down       down     --  \n"
             + "\n";
 
+    private static final String DISPLAY_IP_INT_BR_LOOPBACK_IP_OUTPUT = "*down: administratively down\n"
+            + "^down: standby\n"
+            + "(l): loopback\n"
+            + "(s): spoofing\n"
+            + "(E): E-Trunk down\n"
+            + "Interface                         IP Address/Mask      Physical   Protocol  \n"
+            + "\n"
+            + "LoopBack0                         198.18.34.112/32     up         up(s)";
+
     @Test
     public void testParse() {
         List<AddressKey> addressKeys = new Ipv4AddressReader(Mockito.mock(Cli.class))
                 .parseAddressIds(DISPLAY_IP_INT_BR_OUTPUT);
         ArrayList<AddressKey> expected = Lists.newArrayList(new AddressKey(new Ipv4AddressNoZone("10.230.10.1")));
+        Assert.assertEquals(expected, addressKeys);
+    }
+
+    @Test
+    public void testParseLoopback() {
+        List<AddressKey> addressKeys = new Ipv4AddressReader(Mockito.mock(Cli.class))
+                .parseAddressIds(DISPLAY_IP_INT_BR_LOOPBACK_IP_OUTPUT);
+        ArrayList<AddressKey> expected = Lists.newArrayList(new AddressKey(new Ipv4AddressNoZone("198.18.34.112")));
         Assert.assertEquals(expected, addressKeys);
     }
 

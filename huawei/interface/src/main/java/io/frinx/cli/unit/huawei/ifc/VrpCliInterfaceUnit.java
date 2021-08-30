@@ -17,11 +17,6 @@
 package io.frinx.cli.unit.huawei.ifc;
 
 import com.google.common.collect.Sets;
-import io.fd.honeycomb.translate.impl.read.GenericConfigListReader;
-import io.fd.honeycomb.translate.impl.read.GenericConfigReader;
-import io.fd.honeycomb.translate.impl.read.GenericOperReader;
-import io.fd.honeycomb.translate.impl.write.GenericListWriter;
-import io.fd.honeycomb.translate.impl.write.GenericWriter;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
@@ -31,6 +26,7 @@ import io.frinx.cli.unit.huawei.ifc.handler.InterfaceConfigWriter;
 import io.frinx.cli.unit.huawei.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.huawei.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.huawei.ifc.handler.subifc.SubinterfaceConfigReader;
+import io.frinx.cli.unit.huawei.ifc.handler.subifc.SubinterfaceConfigWriter;
 import io.frinx.cli.unit.huawei.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.huawei.ifc.handler.subifc.SubinterfaceStateReader;
 import io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4.Ipv4AddressReader;
@@ -39,18 +35,11 @@ import io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4.Ipv4ConfigWriter;
 import io.frinx.cli.unit.huawei.ifc.handler.vlan.InterfaceVlanReader;
 import io.frinx.cli.unit.huawei.ifc.handler.vlan.InterfaceVlanWriter;
 import io.frinx.cli.unit.utils.AbstractUnit;
-import io.frinx.cli.unit.utils.NoopCliListWriter;
-import io.frinx.cli.unit.utils.NoopCliWriter;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.$YangModuleInfoImpl;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.Subinterface1Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.Ipv4Builder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.AddressesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.InterfacesBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.SubinterfacesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -71,6 +60,8 @@ public class VrpCliInterfaceUnit extends AbstractUnit {
         return Sets.newHashSet(
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.$YangModuleInfoImpl
                         .getInstance(),
+                IIDs.FRINX_HUAWEI_IF_EXTENSION,
+                IIDs.FRINX_CISCO_IF_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -84,56 +75,42 @@ public class VrpCliInterfaceUnit extends AbstractUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
-        writeRegistry.add(new GenericListWriter<>(IIDs.IN_INTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli)));
+        writeRegistry.addNoop(IIDs.IN_INTERFACE);
+        writeRegistry.subtreeAddAfter(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.IN_IN_CO_AUG_IFHUAWEIAUG,
+                        IIDs.IN_IN_CO_AUG_IFHUAWEIAUG_TRAFFICFILTER,
+                        IIDs.IN_IN_CO_AUG_IFHUAWEIAUG_TRAFFICPOLICY));
 
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SUBINTERFACE, new NoopCliListWriter<>()));
-        writeRegistry.add(new GenericWriter<>(IIDs.IN_IN_SU_SU_CONFIG, new NoopCliWriter<>()));
-        writeRegistry.add(new GenericWriter<>(
-                io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG,
-                new NoopCliWriter<>()));
+        writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
+        writeRegistry.subtreeAddAfter(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli),
+                Sets.newHashSet(IIDs.IN_IN_SU_SU_CO_AUG_SUBIFHUAWEIAUG,
+                        IIDs.IN_IN_SU_SU_CO_AUG_SUBIFHUAWEIAUG_TRAFFICFILTER,
+                        IIDs.IN_IN_SU_SU_CO_AUG_SUBIFHUAWEIAUG_TRAFFICPOLICY));
 
+        writeRegistry.addNoop(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_VL_CONFIG);
         writeRegistry.addAfter(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
                 new InterfaceVlanWriter(cli),
                 IIDs.IN_IN_CONFIG, io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_VL_VL_CONFIG);
 
-        writeRegistry.add(
-                new GenericWriter<>(
-                        io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
-                        new NoopCliListWriter<>()));
-        writeRegistry.addAfter(
-                new GenericWriter<>(
-                        io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
-                        new Ipv4ConfigWriter(cli)),
+        writeRegistry.addNoop(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS);
+        writeRegistry.addAfter(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
+                new Ipv4ConfigWriter(cli), IIDs.IN_IN_CONFIG, IIDs.IN_IN_SU_SU_CONFIG,
                 io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_IN_INTERFACE);
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.addStructuralReader(IIDs.INTERFACES, InterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.IN_INTERFACE, new InterfaceReader(cli)));
-        readRegistry.add(new GenericOperReader<>(IIDs.IN_IN_STATE, new InterfaceStateReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli)));
+        readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
+        readRegistry.add(IIDs.IN_IN_STATE, new InterfaceStateReader(cli));
+        readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli));
 
-        readRegistry.addStructuralReader(IIDs.IN_IN_SUBINTERFACES, SubinterfacesBuilder.class);
-        readRegistry.add(new GenericConfigListReader<>(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli)));
-        readRegistry.add(new GenericConfigReader<>(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli)));
-        readRegistry.add(new GenericOperReader<>(IIDs.IN_IN_SU_SU_STATE, new SubinterfaceStateReader()));
+        readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli));
+        readRegistry.add(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigReader(cli));
+        readRegistry.add(IIDs.IN_IN_SU_SU_STATE, new SubinterfaceStateReader());
 
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1,
-                Subinterface1Builder.class);
-        readRegistry.addStructuralReader(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IPV4,
-                Ipv4Builder.class);
-        readRegistry.addStructuralReader(
-                io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_ADDRESSES,
-                AddressesBuilder.class);
-        readRegistry.add(
-            new GenericConfigListReader<>(
-                    io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
-                    new Ipv4AddressReader(cli)));
-        readRegistry.add(
-            new GenericConfigReader<>(
-                    io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
-                    new Ipv4ConfigReader(cli)));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
+                    new Ipv4AddressReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
+                    new Ipv4ConfigReader(cli));
         readRegistry.add(io.frinx.openconfig.openconfig.vlan.IIDs.IN_IN_ET_AUG_ETHERNET1_SW_CONFIG,
                 new InterfaceVlanReader(cli));
     }

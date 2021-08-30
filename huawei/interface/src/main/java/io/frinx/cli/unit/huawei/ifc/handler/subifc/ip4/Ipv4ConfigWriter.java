@@ -17,6 +17,7 @@
 package io.frinx.cli.unit.huawei.ifc.handler.subifc.ip4;
 
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.unit.huawei.ifc.handler.subifc.SubinterfaceReader;
 import io.frinx.cli.unit.ifc.base.handler.subifc.ip4.AbstractIpv4ConfigWriter;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.ipv4.top.ipv4.addresses.address.Config;
 
@@ -41,5 +42,13 @@ public final class Ipv4ConfigWriter extends AbstractIpv4ConfigWriter {
     @Override
     protected String deleteTemplate(Config config, String ifcName) {
         return fT(TEMPLATE, ifcName, "delete", true);
+    }
+
+    @Override
+    protected String getInterfaceName(String ifcName, Long subId) {
+        if (subId != 0) {
+            return ifcName + SubinterfaceReader.SEPARATOR + subId;
+        }
+        return ifcName;
     }
 }

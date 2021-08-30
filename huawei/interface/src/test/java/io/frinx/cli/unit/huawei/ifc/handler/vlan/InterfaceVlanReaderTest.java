@@ -16,58 +16,46 @@
 
 package io.frinx.cli.unit.huawei.ifc.handler.vlan;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanSwitchedConfig.TrunkVlans;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.switched.top.switched.vlan.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanRange;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanModeType;
 
 public class InterfaceVlanReaderTest {
 
-    public static String TRUNK_INT_OUTPUT = "[V200R009C00SPC500]\n"
+    public static String VLAN_INT_OUTPUT = "[V200R009C00SPC500]\n"
             + "#\n"
             + "interface GigabitEthernet0/0/1\n"
             + " description EPC3940\n"
             + " set flow-stat interval 10\n"
             + " port link-type trunk\n"
-            + " port trunk allow-pass vlan 2 to 4094\n"
-            + "#\n"
-            + "return\n";
-
-    public static String ACCESS_INT_OUTPUT = "[V200R009C00SPC500]\n"
-            + "#\n"
-            + "interface GigabitEthernet0/0/2\n"
-            + " description IP VPN-135.140.136 - VLAN271752\n"
-            + " set flow-stat interval 10\n"
-            + " port link-type access\n"
             + " port default vlan 100\n"
-            + " trust dscp\n"
+            + " port trunk allow-pass vlan 1 to 4094\n"
+            + " port trunk pvid vlan 200\n"
             + "#\n"
             + "return\n";
 
-    private ConfigBuilder configBuilder;
+    private Config config;
 
     @Before
     public void setup() {
-        configBuilder = new ConfigBuilder();
+        config = new ConfigBuilder()
+                .setAccessVlan(new VlanId(100))
+                .setNativeVlan(new VlanId(200))
+                .setInterfaceMode(VlanModeType.TRUNK)
+                .setTrunkVlans(InterfaceVlanReader.getSwitchportTrunkAllowedVlanList("1 to 4094"))
+                .build();
     }
 
     @Test
-    public void testTrunk() {
-        InterfaceVlanReader.setSwitchportTrunkAllowedVlan(TRUNK_INT_OUTPUT, configBuilder);
-        List<TrunkVlans> trunkVlans = new ArrayList<>();
-        trunkVlans.add(new TrunkVlans(new VlanRange("2..4094")));
-        Assert.assertEquals(trunkVlans, configBuilder.getTrunkVlans());
+    public void testVlanInterfaceIds() {
+        ConfigBuilder builder = new ConfigBuilder();
+        InterfaceVlanReader.parseVlanInterface(VLAN_INT_OUTPUT, builder);
+        Assert.assertEquals(config, builder.build());
     }
 
-    @Test
-    public void testAccess() {
-        InterfaceVlanReader.setSwitchportAccessVlan(ACCESS_INT_OUTPUT, configBuilder);
-        Assert.assertEquals(new VlanId(100), configBuilder.getAccessVlan());
-    }
 
 }

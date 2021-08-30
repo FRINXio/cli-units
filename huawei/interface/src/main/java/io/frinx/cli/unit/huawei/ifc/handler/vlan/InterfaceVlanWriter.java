@@ -27,17 +27,21 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceVlanWriter implements CliWriter<Config> {
 
-    private static final String WRITE_TEMPLATE = "configure terminal\n"
+    private static final String WRITE_UPDATE_TEMPLATE = "system-view\n"
             + "interface {$ifc_name}\n"
-            + "{% if ($config.access_vlan) %}port default vlan {$config.access_vlan.value}\n{% endif %}"
-            + "{% if ($trunk_vlans) %}port trunk allow-pass vlan {$trunk_vlans}\n{% endif %}"
-            + "end";
+            + "{% if ($data.access_vlan) %}port default vlan {$data.access_vlan.value}\n"
+            + "{% else %}undo port default vlan\n{% endif %}"
+            + "{% if ($trunk_vlans) %}port trunk allow-pass vlan {$trunk_vlans}\n"
+            + "{% else %}undo port trunk allow-pass vlan all\n{% endif %}"
+            + "{% if ($data.native_vlan.value) %}port trunk pvid vlan {$data.native_vlan.value}\n"
+            + "{% else %}undo port trunk pvid vlan\n{% endif %}"
+            + "{% if ($data.interface_mode.name) %}port link-type {$data.interface_mode.name}\n"
+            + "{% else %}undo port link-type\n{% endif %}"
+            + "return";
 
-    private static final String DELETE_TEMPLATE = "configure terminal\n"
-            + "interface {$ifc_name}\n"
-            + "undo port default vlan\n"
-            + "undo port trunk allow-pass vlan\n"
-            + "end";
+    private static final String DELETE_TEMPLATE = "system-view\n"
+            + "undo interface {$ifc_name}\n"
+            + "return";
 
     private final Cli cli;
 
@@ -51,18 +55,18 @@ public class InterfaceVlanWriter implements CliWriter<Config> {
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         final String ifcName = instanceIdentifier.firstKeyOf(Interface.class).getName();
         blockingWriteAndRead(cli, instanceIdentifier, config,
-                fT(WRITE_TEMPLATE,
+                fT(WRITE_UPDATE_TEMPLATE,
                         "ifc_name", ifcName,
-                        "config", config,
+                        "data", config,
                         "trunk_vlans", convertVlansToString(config)));
     }
 
     @Override
-    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> id,
+    public void updateCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config dataBefore,
                                         @Nonnull Config dataAfter,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        writeCurrentAttributes(id, dataAfter, writeContext);
+        writeCurrentAttributes(instanceIdentifier, dataAfter, writeContext);
     }
 
     @Override

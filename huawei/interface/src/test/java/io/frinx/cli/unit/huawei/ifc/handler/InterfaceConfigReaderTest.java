@@ -20,9 +20,14 @@ import io.frinx.cli.io.Cli;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.IfHuaweiAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.IfHuaweiAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.TrafficDirection.Direction;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.huawei._if.extension.config.TrafficFilterBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 
 public class InterfaceConfigReaderTest {
@@ -34,11 +39,17 @@ public class InterfaceConfigReaderTest {
             + " undo shutdown\n"
             + " mtu 1200\n"
             + " ip address 192.168.2.241 255.255.255.0\n"
+            + " set flow-stat interval 10\n"
+            + " trust dscp\n"
             + "#\n"
             + "return";
 
     private static final Config EXPECTED_CONFIG = new ConfigBuilder().setName("GigabitEthernet0/0/0")
-            .setEnabled(true).setMtu(1200).setType(EthernetCsmacd.class).build();
+            .setEnabled(true).setMtu(1200).setType(EthernetCsmacd.class)
+            .addAugmentation(IfHuaweiAug.class, new IfHuaweiAugBuilder()
+                    .setFlowStatInterval(10L)
+                    .setTrustDscp(true)
+                    .build()).build();
 
     private static final String DISPLAY_CURRENT_INT2 = "#\n"
             + "interface LoopBack100\n"
@@ -46,8 +57,31 @@ public class InterfaceConfigReaderTest {
             + "#\n"
             + "return\n";
 
+    private static final String DISPLAY_CURRENT_INT_OTHER_IF = "#\n"
+            + "interface Vlanif100\n"
+            + " description Customer access\n"
+            + " ip binding vpn-instance VLAN27\n"
+            + " ip address 172.16.90.1 255.255.255.0\n"
+            + " traffic-filter inbound acl name LAN-IN\n"
+            + "#\n"
+            + "return\n";
+
     private static final Config EXPECTED_CONFIG2 = new ConfigBuilder().setName("LoopBack100").setEnabled(false)
             .setDescription("Example loopback interface").setType(SoftwareLoopback.class).build();
+
+    private static final Config EXPECTED_CONFIG_OTHER_IF = new ConfigBuilder()
+            .setName("Vlanif100")
+            .setEnabled(false)
+            .setDescription("Customer access")
+            .setType(Other.class)
+            .addAugmentation(IfHuaweiAug.class, new IfHuaweiAugBuilder()
+                .setIpBindingVpnInstance("VLAN27")
+                .setTrafficFilter(new TrafficFilterBuilder()
+                    .setDirection(Direction.Inbound)
+                    .setAclName("LAN-IN")
+                    .build())
+                .build())
+            .build();
 
     @Test
     public void testParseInterface() {
@@ -55,10 +89,21 @@ public class InterfaceConfigReaderTest {
         new InterfaceConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(DISPLAY_CURRENT_INT, actualConfig, "GigabitEthernet0/0/0");
         Assert.assertEquals(EXPECTED_CONFIG, actualConfig.build());
+    }
 
+    @Test
+    public void testParseInterface2() {
         ConfigBuilder actualConfig2 = new ConfigBuilder();
         new InterfaceConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(DISPLAY_CURRENT_INT2, actualConfig2, "LoopBack100");
         Assert.assertEquals(EXPECTED_CONFIG2, actualConfig2.build());
+    }
+
+    @Test
+    public void testParseVlanifInterface() {
+        ConfigBuilder actualConfig = new ConfigBuilder();
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseInterface(DISPLAY_CURRENT_INT_OTHER_IF, actualConfig, "Vlanif100");
+        Assert.assertEquals(EXPECTED_CONFIG_OTHER_IF, actualConfig.build());
     }
 }
