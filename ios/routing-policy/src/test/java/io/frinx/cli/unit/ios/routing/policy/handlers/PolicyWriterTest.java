@@ -86,12 +86,12 @@ public class PolicyWriterTest {
                         + "set local-preference 90\n"
                         + "match ip address prefix-list PL-CUST-NETWORKS\n"
                         + "match ipv6 address prefix-list PXL_V6_B2B_VZ_PA_PFX_VLAN011220\n"
-                        + "set community 65222:999\n"
+                        + "set community 1 65222:999\n"
                         + "end",
                 writer.writeTemplate(createPolicyDefinition("test", Collections.singletonList(
                         createStatement("9", "90", null, null, "permit",
                                 Collections.singletonList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220",
-                                null, null, Collections.singletonList("65222:999"), false)))));
+                                null, null, Arrays.asList("1", "65222:999"), false)))));
 
         Assert.assertEquals(
                 "configure terminal\n"

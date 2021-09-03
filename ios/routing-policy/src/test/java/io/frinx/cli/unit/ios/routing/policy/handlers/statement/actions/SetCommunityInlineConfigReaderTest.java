@@ -24,15 +24,25 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.set.community.inline.top.inline.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityTypeString;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.BgpStdCommunityTypeUnit32;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.NOADVERTISE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.types.rev170202.NOEXPORT;
 
 public class SetCommunityInlineConfigReaderTest {
 
+    public static final String OUTPUT = "route-map BLANK permit 10 \n"
+            + "route-map IGP_ADDITIVE permit 300 \n"
+            + " set origin igp\n"
+            + " set community 1 4274389991 65222:999 no-export no-advertise additive\n"
+            + "route-map LOCAL_PREF permit 10 \n"
+            + " set local-preference 90\n";
+
     private static final Config CONFIG = new ConfigBuilder()
             .setCommunities(Arrays.asList(
                     new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(
-                            BgpStdCommunityTypeString.getDefaultInstance("6830:666"))),
+                            BgpStdCommunityTypeUnit32.getDefaultInstance("1"))),
+                    new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(
+                            BgpStdCommunityTypeUnit32.getDefaultInstance("4274389991"))),
                     new SetCommunityInlineConfig.Communities(new BgpStdCommunityType(
                             BgpStdCommunityTypeString.getDefaultInstance("65222:999"))),
                     new SetCommunityInlineConfig.Communities(NOEXPORT.class),
@@ -41,10 +51,10 @@ public class SetCommunityInlineConfigReaderTest {
             .build();
 
     @Test
-    public void test() {
+    public void communitySetParseIds() {
         final ConfigBuilder configBuilder = new ConfigBuilder();
         SetCommunityInlineConfigReader.parseConfig("IGP_ADDITIVE", "300",
-                BgpActionsConfigReaderTest.OUTPUT, configBuilder);
+                OUTPUT, configBuilder);
         Assert.assertEquals(CONFIG, configBuilder.build());
     }
 

@@ -25,7 +25,7 @@ public final class Util {
     private Util() {}
 
     public static String extractRouteMap(final String routeMapName, final String statementId, final String output) {
-        final String string = String.format("(?:route-map %s (permit|deny) %s \\r?\\n)(.*?)(?=\\s*route-map|\\s*$)",
+        final String string = String.format("(?:route-map %s (permit|deny) %s\\s?\\n)(.*?)(?=\\s*route-map|\\s*$)",
                 routeMapName, statementId);
         final Matcher matcher = Pattern.compile(string, Pattern.DOTALL).matcher(output);
         return matcher.find() ? matcher.group() : "";
