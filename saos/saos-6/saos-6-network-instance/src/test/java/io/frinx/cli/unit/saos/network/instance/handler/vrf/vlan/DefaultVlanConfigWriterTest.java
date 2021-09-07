@@ -17,9 +17,14 @@
 package io.frinx.cli.unit.saos.network.instance.handler.vrf.vlan;
 
 import io.frinx.cli.io.Cli;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.VlanSwitchedConfig.TrunkVlans;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev170714.vlan.top.vlans.vlan.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev200210.Config1;
@@ -29,6 +34,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPID0X9100;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.TPIDTYPES;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanRange;
 
 public class DefaultVlanConfigWriterTest {
 
@@ -75,6 +81,20 @@ public class DefaultVlanConfigWriterTest {
                 createConfig(2, "VLAN#2", true, TPID0X8100.class),
                 createConfig(2, "VLAN#2", false, null),
                 "");
+    }
+
+    @Test
+    public void testAddDeleteCommand() {
+        DefaultVlanConfigWriter writer = new DefaultVlanConfigWriter(Mockito.mock(Cli.class));
+        Interface anInterface = new InterfaceBuilder().setName("LS02W").build();
+        List<TrunkVlans> trunkVlans = Arrays.asList(
+                new TrunkVlans(new VlanId(12)),
+                new TrunkVlans(new VlanId(5)),
+                new TrunkVlans(new VlanRange("2000..2222")),
+                new TrunkVlans(new VlanId(2227)),
+                new TrunkVlans(new VlanId(89)));
+        String result = writer.addDeleteCommand(anInterface, 2222, trunkVlans);
+        Assert.assertEquals("vlan remove vlan 2222 port LS02W\n", result);
     }
 
     private void createWriteCommandAndTest(DefaultVlanConfigWriter writer, Config data, String expected) {
