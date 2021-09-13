@@ -29,6 +29,7 @@
         <module>routing-policy</module>
         <module>platform</module>
         <module>acl</module>
+        <module>qos</module>
     </modules>
 
     <parent>

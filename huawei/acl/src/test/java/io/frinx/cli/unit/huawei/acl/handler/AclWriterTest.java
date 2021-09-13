@@ -51,12 +51,12 @@ public class AclWriterTest {
     private static final String ACL_STANDARD_WRITE = "system-view\n"
             + "acl name TEST\n"
             + "rule 20 permit ip source 123.45.6.0 0.0.0.255\n"
-            + "end\n";
+            + "return\n";
 
     private static final String ACL_STANDARD_DELETE = "system-view\n"
             + "acl name TEST\n"
             + "undo rule 10\n"
-            + "end\n";
+            + "return\n";
 
     @Mock
     private Cli cli;

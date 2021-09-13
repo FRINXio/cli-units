@@ -37,11 +37,11 @@ public class AclConfigWriter implements CliListWriter<AclSet, AclSetKey> {
 
     private static final String ACL_IPV4_EXTENDED_WRITE = "system-view\n"
             + "acl name {$aclName} {$type2}\n"
-            + "end\n";
+            + "return\n";
 
     private static final String ACL_IPV4_EXTENDED_DELETE = "system-view\n"
             + "undo acl name {$aclName}\n"
-            + "end\n";
+            + "return\n";
 
     @Override
     public void writeCurrentAttributes(@Nonnull InstanceIdentifier<AclSet> id,

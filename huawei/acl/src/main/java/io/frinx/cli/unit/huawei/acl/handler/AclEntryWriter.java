@@ -62,12 +62,12 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     private static final String ACL_IP_ENTRY = "system-view\n"
             + "acl name {$aclName}\n"
             + "rule {$aclSeqId} {$aclFwdAction} {$aclProtocol}{$aclSrcAddr}{$aclDstAddr}{$aclSrcPort}{$aclDstPort}\n"
-            + "end\n";
+            + "return\n";
 
     private static final String ACL_EXTENDED_DELETE = "system-view\n"
             + "acl name {$aclName}\n"
             + "undo rule {$aclSeqId}\n"
-            + "end\n";
+            + "return\n";
 
     private final Cli cli;
 

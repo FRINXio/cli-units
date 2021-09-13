@@ -145,6 +145,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>huawei-platform-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>huawei-qos-unit</artifactId>
+        </dependency>
 
         <!-- IOS -->
         <dependency>
