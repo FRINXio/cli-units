@@ -204,7 +204,7 @@ public class AclEntryLineParserTest {
     public void testIpv4Extended() {
         String lines = "Mon May 14 14:36:55.408 UTC\n"
                 + "Extended IP access list foo\n"
-                + " 2 deny ip host 0.0.0.0 host 0.0.0.0\n"
+                + " 2 deny ip host 0.0.0.0 host 0.0.0.0 established\n"
                 + " 3 permit udp 192.168.1.1 0.0.0.255 10.10.10.10 0.0.0.255\n"
                 + " 4 permit tcp host 1.2.3.4 eq www any\n"
                 + " 5 deny icmp host 1.1.1.1 host 2.2.2.2 ttl range 0 10\n"
@@ -219,14 +219,15 @@ public class AclEntryLineParserTest {
         LinkedHashMap<Long, AclEntry> expectedResults = new LinkedHashMap<>();
 
         {
-            // 2 deny ip host 0.0.0.0 host 0.0.0.0
-            long sequenceId = 2;
+            // 2 deny ip host 0.0.0.0 host 0.0.0.0 established
             org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields
                     .top.ipv4.ConfigBuilder configBuilder = new org.opendaylight.yang.gen.v1.http.frinx.openconfig
                     .net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder();
             configBuilder.setSourceAddress(new Ipv4Prefix("0.0.0.0/32"));
+            configBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class,
+                    new AclSetAclEntryIpv4WildcardedAugBuilder().setEstablished(true).build());
             configBuilder.setDestinationAddress(new Ipv4Prefix("0.0.0.0/32"));
-
+            long sequenceId = 2;
             expectedResults.put(sequenceId, createIpv4AclEntry(sequenceId, DROP.class, configBuilder.build(),
                     defTransport()));
         }

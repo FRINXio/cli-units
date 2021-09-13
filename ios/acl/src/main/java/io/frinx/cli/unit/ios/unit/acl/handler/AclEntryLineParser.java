@@ -267,11 +267,15 @@ final class AclEntryLineParser {
                     ipv4WildcardedAugBuilder.build());
         }
 
-        // transport
-        Transport transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
-
         // icmp
         final AclEntry1 icmpMsgTypeAugment = parseIcmpMsgType(ipProtocolType, words, true);
+
+        // established state
+        if (!words.isEmpty() && "established".equals(words.peek())) {
+            words.poll();
+            ipv4ProtocolFieldsConfigBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class,
+                    ipv4WildcardedAugBuilder.setEstablished(true).build());
+        }
 
         // ttl
         if (!words.isEmpty() && "ttl".equals(words.peek())) {
@@ -288,6 +292,10 @@ final class AclEntryLineParser {
             throw new IllegalArgumentException("ACL entry contains unsupported expressions that cannot be parsed: "
                     + words);
         }
+
+        // transport
+        Transport transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
+
         return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);
     }
 
