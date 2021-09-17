@@ -30,6 +30,9 @@ import io.frinx.cli.unit.huawei.aaa.handler.authentication.AuthenticationSchemas
 import io.frinx.cli.unit.huawei.aaa.handler.domain.DomainListConfigReader;
 import io.frinx.cli.unit.huawei.aaa.handler.domain.DomainListConfigWriter;
 import io.frinx.cli.unit.huawei.aaa.handler.domain.DomainListReader;
+import io.frinx.cli.unit.huawei.aaa.handler.radius.RadiusTemplateConfigReader;
+import io.frinx.cli.unit.huawei.aaa.handler.radius.RadiusTemplateConfigWriter;
+import io.frinx.cli.unit.huawei.aaa.handler.radius.RadiusTemplateReader;
 import io.frinx.cli.unit.huawei.aaa.handler.users.UsersListConfigReader;
 import io.frinx.cli.unit.huawei.aaa.handler.users.UsersListConfigWriter;
 import io.frinx.cli.unit.huawei.aaa.handler.users.UsersListReader;
@@ -87,6 +90,11 @@ public class VrpAaaUnit extends AbstractUnit {
         writeRegistry.subtreeAddAfter(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_AC_AC_CONFIG,
                 new AccountingSchemasConfigWriter(cli),
                 Sets.newHashSet(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_AC_AC_CO_AC_CONFIG));
+
+        writeRegistry.addNoop(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_RADIUS);
+        writeRegistry.addNoop(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_RA_TEMPLATE);
+        writeRegistry.subtreeAddAfter(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_RA_TE_CONFIG, new RadiusTemplateConfigWriter(cli),
+                Sets.newHashSet(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_RA_TE_CO_AUTHENTICATIONDATA));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -98,6 +106,8 @@ public class VrpAaaUnit extends AbstractUnit {
         readRegistry.add(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_AU_AU_CONFIG, new AuthenticationSchemasConfigReader(cli));
         readRegistry.add(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_AC_ACCOUNT, new AccountingSchemasReader(cli));
         readRegistry.add(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_AC_AC_CONFIG, new AccountingSchemasConfigReader(cli));
+        readRegistry.add(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_RA_TEMPLATE, new RadiusTemplateReader(cli));
+        readRegistry.add(IIDs.AA_AUG_AAAHUAWEISCHEMASAUG_RA_TE_CONFIG, new RadiusTemplateConfigReader(cli));
     }
 
     @Override
