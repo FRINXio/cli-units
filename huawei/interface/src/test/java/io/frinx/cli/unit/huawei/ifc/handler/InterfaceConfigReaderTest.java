@@ -62,7 +62,7 @@ public class InterfaceConfigReaderTest {
             + " description Customer access\n"
             + " ip binding vpn-instance VLAN27\n"
             + " ip address 172.16.90.1 255.255.255.0\n"
-            + " traffic-filter inbound acl name LAN-IN\n"
+            + " traffic-filter inbound ipv6 acl name LAN-IN\n"
             + "#\n"
             + "return\n";
 
@@ -79,6 +79,7 @@ public class InterfaceConfigReaderTest {
                 .setTrafficFilter(new TrafficFilterBuilder()
                     .setDirection(Direction.Inbound)
                     .setAclName("LAN-IN")
+                    .setIpv6(true)
                     .build())
                 .build())
             .build();

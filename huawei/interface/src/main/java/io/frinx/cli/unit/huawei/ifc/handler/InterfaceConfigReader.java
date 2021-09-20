@@ -42,7 +42,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
             Pattern.compile("\\s*set flow-stat interval (?<interval>.+)\\s*");
     private static final Pattern TRUST_DSCP_LINE = Pattern.compile("trust dscp");
     private static final Pattern TRAFFIC_FILTER_LINE =
-            Pattern.compile("traffic-filter (?<direction>.+) acl name (?<aclName>.+)");
+            Pattern.compile("traffic-filter (?<direction>\\S+) (?<ipv6>ipv6\\s)?acl name (?<aclName>.+)");
     private static final Pattern TRAFFIC_POLICY_LINE =
             Pattern.compile("traffic-policy (?<policyName>.+) (?<direction>.+)");
     private static final Pattern VPN_INSTANCE_LINE = Pattern.compile("ip binding vpn-instance (?<aclName>.+)");
@@ -137,11 +137,17 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
             TRAFFIC_FILTER_LINE::matcher,
             matcher -> matcher.group("aclName"));
 
+        final boolean isIpv6 = ParsingUtils.parseField(output, 0,
+            TRAFFIC_FILTER_LINE::matcher,
+            matcher -> matcher.group("ipv6")).isPresent();
+
+
         TrafficFilterBuilder trafficFilterBuilder = new TrafficFilterBuilder();
         direction.ifPresent(value -> trafficFilterBuilder.setDirection(getDirection(value, "filter")));
         aclName.ifPresent(trafficFilterBuilder::setAclName);
 
         if (trafficFilterBuilder.getAclName() != null && trafficFilterBuilder.getDirection() != null) {
+            trafficFilterBuilder.setIpv6(isIpv6);
             ifHuaweiAugBuilder.setTrafficFilter(trafficFilterBuilder.build());
         }
     }
