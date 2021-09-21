@@ -85,8 +85,7 @@ public class SaosLogicalRingUnit extends AbstractUnit {
         readRegistry.add(IIDs.LO_LOGICALRING, new LogicalRingReader(cli));
         readRegistry.add(IIDs.LO_LO_CONFIG, new LogicalRingConfigReader(cli));
         readRegistry.add(IIDs.LO_LO_VI_VIRTUALRING, new VirtualRingReader(cli));
-        readRegistry.add(IIDs.LO_LO_VI_VI_CONFIG, new VirtualRingConfigReader());
+        readRegistry.add(IIDs.LO_LO_VI_VI_CONFIG, new VirtualRingConfigReader(cli));
     }
-
 
 }
