@@ -50,7 +50,6 @@
         <module>saos</module>
         <module>ubnt/edge-switch</module>
         <module>mikrotik</module>
-        <module>yang-docs-plugin</module>
         <module>interface-base</module>
         <module>network-instance-base</module>
         <module>native-units</module>

@@ -191,47 +191,6 @@
     </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.opendaylight.yangtools</groupId>
-                <artifactId>yang-maven-plugin</artifactId>
-                <version>${yangtools.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>io.frinx.yang.docs</groupId>
-                        <artifactId>yang-docs-plugin-common</artifactId>
-                        <version>${project.version}</version>
-                        <type>jar</type>
-                    </dependency>
-                    <dependency>
-                        <groupId>io.frinx.cli</groupId>
-                        <artifactId>yang-docs-plugin</artifactId>
-                        <version>${project.version}</version>
-                        <type>jar</type>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <id>yang-docs</id>
-                        <goals>
-                            <goal>generate-sources</goal>
-                        </goals>
-                        <configuration>
-                            <codeGenerators>
-                                <generator>
-                                    <codeGeneratorClass>io.frinx.cli.unit.binding.ids.cli.YangDocsGenerator</codeGeneratorClass>
-                                    <outputBaseDir>${salGeneratorPath}</outputBaseDir>
-                                    <resourceBaseDir>${project.build.directory}/generated-sources/spi</resourceBaseDir>
-                                </generator>
-                            </codeGenerators>
-                            <inspectDependencies>true</inspectDependencies>
-                            <inspectOnlyDependencies>true</inspectOnlyDependencies>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>

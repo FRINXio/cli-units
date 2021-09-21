@@ -44,7 +44,6 @@ import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.common.rev131028.$YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 
@@ -66,7 +65,7 @@ public class MplsUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet($YangModuleInfoImpl.getInstance(),
+        return Sets.newHashSet(
                 IIDs.FRINX_MPLS_RSVP_EXTENSION,
                 IIDs.FRINX_CISCO_MPLS_TE_EXTENSION,
                 io.frinx.openconfig.openconfig.mpls.IIDs.FRINX_OPENCONFIG_MPLS_LDP,
