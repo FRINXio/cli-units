@@ -36,6 +36,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSets;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.IngressAclSetsBuilder;
@@ -61,7 +62,7 @@ public class IngressAclSetConfigWriterTest {
     private static final String INTERFACE_NAME = "1";
     private static final String ACL_SET_NAME = "FOO";
     private static final String ACL_SET_NAME_OTHER = "BAR";
-    private static final Class<? extends ACLTYPE> ACL_TYPE = ACLTYPE.class;
+    private static final Class<? extends ACLTYPE> ACL_TYPE = ACLIPV4.class;
 
     private static final AclSets ACL_SETS = new AclSetsBuilder()
             .setAclSet(Arrays.asList(

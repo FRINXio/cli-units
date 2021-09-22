@@ -19,7 +19,7 @@ package io.frinx.cli.unit.saos.acl.handler;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetKey;
 
 public class IngressAclSetReaderTest {
@@ -32,7 +32,7 @@ public class IngressAclSetReaderTest {
         final List<IngressAclSetKey> setKeys = IngressAclSetReader.parseAclKeys(OUTPUT);
         Assert.assertEquals(1, setKeys.size());
         Assert.assertEquals("FOO", setKeys.get(0).getSetName());
-        Assert.assertEquals(ACLTYPE.class, setKeys.get(0).getType());
+        Assert.assertEquals(ACLIPV4.class, setKeys.get(0).getType());
     }
 
 }

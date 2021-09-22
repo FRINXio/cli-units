@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetKey;
 
 public class AclSetReaderTest {
@@ -46,13 +46,13 @@ public class AclSetReaderTest {
     @Test
     public void getAllIdsTest() {
         List<AclSetKey> expected = Arrays.asList(
-                new AclSetKey("ACL_TEMPLATE_EVPN_v017", ACLTYPE.class),
-                new AclSetKey("CPE_MGT_TEMPLATE_v08", ACLTYPE.class),
-                new AclSetKey("foo", ACLTYPE.class));
+                new AclSetKey("ACL_TEMPLATE_EVPN_v017", ACLIPV4.class),
+                new AclSetKey("CPE_MGT_TEMPLATE_v08", ACLIPV4.class),
+                new AclSetKey("foo", ACLIPV4.class));
 
         Assert.assertEquals(expected, AclSetReader.getAllIds(OUTPUT));
 
-        Assert.assertEquals(Lists.newArrayList(new AclSetKey("MGT-IN", ACLTYPE.class)),
+        Assert.assertEquals(Lists.newArrayList(new AclSetKey("MGT-IN", ACLIPV4.class)),
                 AclSetReader.getAllIds(OUTPUT_74));
     }
 }

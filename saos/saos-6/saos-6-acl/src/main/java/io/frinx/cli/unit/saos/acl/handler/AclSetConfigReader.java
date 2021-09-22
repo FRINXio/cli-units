@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Saos6AclSetAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Saos6AclSetAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.acl.set.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.acl.set.ConfigBuilder;
@@ -56,7 +56,7 @@ public class AclSetConfigReader implements CliConfigReader<Config, ConfigBuilder
         Saos6AclSetAugBuilder augBuilder = new Saos6AclSetAugBuilder();
 
         builder.setName(aclSetName);
-        builder.setType(ACLTYPE.class);
+        builder.setType(ACLIPV4.class);
         setFwdAction(output, augBuilder, aclSetName);
         setEnabled(output, augBuilder, aclSetName);
 

@@ -25,7 +25,7 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526._interface.ingress.acl.top.ingress.acl.sets.IngressAclSetKey;
@@ -57,7 +57,7 @@ public class IngressAclSetReader implements CliConfigListReader<IngressAclSet, I
         return ParsingUtils.parseFields(output, 0,
             INGRESS_ACL_LINE::matcher,
             matcher -> matcher.group("name"),
-            name -> new IngressAclSetKey(name, ACLTYPE.class));
+            name -> new IngressAclSetKey(name, ACLIPV4.class));
     }
 
     @Override

@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Saos6AclSetAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACCEPT;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.DROP;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.FORWARDINGACTION;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.acl.set.ConfigBuilder;
@@ -51,7 +51,7 @@ public class AclSetConfigReaderTest {
         reader.parseConfig(AclSetReaderTest.OUTPUT, builder, aclProfile);
 
         Assert.assertEquals(aclProfile, builder.getName());
-        Assert.assertEquals(ACLTYPE.class, builder.getType());
+        Assert.assertEquals(ACLIPV4.class, builder.getType());
         Assert.assertEquals(expDefaultFwdAction, builder.getAugmentation(Saos6AclSetAug.class).getDefaultFwdAction());
         Assert.assertEquals(expEnabled ,builder.getAugmentation(Saos6AclSetAug.class).isEnabled());
     }

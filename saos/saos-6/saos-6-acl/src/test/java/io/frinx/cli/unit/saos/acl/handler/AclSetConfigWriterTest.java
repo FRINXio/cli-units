@@ -39,58 +39,58 @@ public class AclSetConfigWriterTest {
     public void writeTemplateTest() {
         Assert.assertEquals(
                 "access-list create acl-profile test1 default-filter-action deny\nconfiguration save",
-                writer.writeTemplate(createConfig("test1", DROP.class, ACLTYPE.class, null)));
+                writer.writeTemplate(createConfig("test1", DROP.class, ACLIPV4.class, null)));
         Assert.assertEquals(
                 "access-list create acl-profile test2 default-filter-action allow\nconfiguration save",
-                writer.writeTemplate(createConfig("test2", ACCEPT.class, ACLTYPE.class, true)));
+                writer.writeTemplate(createConfig("test2", ACCEPT.class, ACLIPV4.class, true)));
         Assert.assertEquals(
                 "access-list create acl-profile test3 default-filter-action allow\n"
                 + "access-list disable profile test3\nconfiguration save",
-                writer.writeTemplate(createConfig("test3", ACCEPT.class, ACLTYPE.class,false)));
+                writer.writeTemplate(createConfig("test3", ACCEPT.class, ACLIPV4.class,false)));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void writeTemplateTest_exceptions() {
-        // incorrect type (ACLIPV4.class)
+        // incorrect type (ACLTYPE.class)
         Assert.assertEquals("",
-                writer.writeTemplate(createConfig("test4", DROP.class, ACLIPV4.class, null)));
+                writer.writeTemplate(createConfig("test4", DROP.class, ACLTYPE.class, null)));
 
         // incorrect action (REJECT.class)
         Assert.assertEquals("",
-                writer.writeTemplate(createConfig("test4", REJECT.class, ACLTYPE.class, false)));
+                writer.writeTemplate(createConfig("test4", REJECT.class, ACLIPV4.class, false)));
     }
 
     @Test
     public void updateTemplate() {
         Assert.assertEquals("access-list disable profile test5\nconfiguration save", writer.updateTemplate(
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, null),
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, false)));
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, null),
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, false)));
 
         Assert.assertEquals("access-list enable profile test5\nconfiguration save", writer.updateTemplate(
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, false),
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, true)));
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, false),
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, true)));
 
         Assert.assertEquals("access-list enable profile test5\nconfiguration save", writer.updateTemplate(
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, false),
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, null)));
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, false),
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, null)));
 
         Assert.assertEquals("access-list disable profile test5\nconfiguration save", writer.updateTemplate(
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, true),
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, false)));
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, true),
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, false)));
 
         Assert.assertEquals("configuration save", writer.updateTemplate(
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, true),
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, null)));
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, true),
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, null)));
 
         Assert.assertEquals("configuration save", writer.updateTemplate(
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, null),
-                createConfig("test5", ACCEPT.class, ACLTYPE.class, true)));
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, null),
+                createConfig("test5", ACCEPT.class, ACLIPV4.class, true)));
     }
 
     @Test
     public void deleteTemplateTest() {
         Assert.assertEquals("access-list delete profile test5\nconfiguration save",
-                writer.deleteTemplate(createConfig("test5", ACCEPT.class, ACLTYPE.class, true)));
+                writer.deleteTemplate(createConfig("test5", ACCEPT.class, ACLIPV4.class, true)));
     }
 
     private Config createConfig(String name, Class<? extends FORWARDINGACTION> action, Class<? extends ACLTYPE> type,

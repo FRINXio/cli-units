@@ -27,7 +27,7 @@ import io.frinx.cli.unit.utils.CliWriter;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Saos6AclSetAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.acl.set.Config;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -63,8 +63,8 @@ public class AclSetConfigWriter implements CliWriter<Config> {
 
     @VisibleForTesting
     String writeTemplate(Config config) {
-        Preconditions.checkArgument(config.getType().equals(ACLTYPE.class),
-                "The type must be " + ACLTYPE.class);
+        Preconditions.checkArgument(config.getType().equals(ACLIPV4.class),
+                "The type must be " + ACLIPV4.class);
 
         Saos6AclSetAug aug = config.getAugmentation(Saos6AclSetAug.class);
 
@@ -83,7 +83,7 @@ public class AclSetConfigWriter implements CliWriter<Config> {
 
     @VisibleForTesting
     String updateTemplate(Config before, Config after) {
-        Preconditions.checkArgument(after.getType().equals(ACLTYPE.class),
+        Preconditions.checkArgument(after.getType().equals(ACLIPV4.class),
                 "Is not possible to change the type");
 
         Saos6AclSetAug augBefore = before.getAugmentation(Saos6AclSetAug.class);

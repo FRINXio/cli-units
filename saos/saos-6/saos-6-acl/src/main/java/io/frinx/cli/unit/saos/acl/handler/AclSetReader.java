@@ -25,7 +25,7 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLTYPE;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.ACLIPV4;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSet;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.rev170526.acl.set.top.acl.sets.AclSetKey;
@@ -54,7 +54,7 @@ public class AclSetReader implements CliConfigListReader<AclSet, AclSetKey, AclS
         return ParsingUtils.parseFields(output, 0,
             ACL_LINE::matcher,
             matcher -> matcher.group("name"),
-            name -> new AclSetKey(name, ACLTYPE.class));
+            name -> new AclSetKey(name, ACLIPV4.class));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class AclSetReader implements CliConfigListReader<AclSet, AclSetKey, AclS
                                       @Nonnull AclSetBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         builder.setName(id.firstKeyOf(AclSet.class).getName());
-        builder.setType(ACLTYPE.class);
+        builder.setType(ACLIPV4.class);
     }
 }
 
