@@ -78,16 +78,6 @@
 
     <profiles>
         <profile>
-            <id>karaf</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>karaf</module>
-            </modules>
-        </profile>
-
-        <profile>
             <!--
                 This profile is to ensure we only build javadocs reports
                 when we plan to deploy Maven site for our project.
