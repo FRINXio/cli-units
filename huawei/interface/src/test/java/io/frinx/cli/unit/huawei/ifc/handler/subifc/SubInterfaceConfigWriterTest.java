@@ -93,6 +93,7 @@ public class SubInterfaceConfigWriterTest {
                     .setTrafficFilter(new TrafficFilterBuilder()
                             .setDirection(Direction.Inbound)
                             .setAclName("WAN-IN")
+                            .setIpv6(false)
                             .build())
                     .setTrafficPolicy(new TrafficPolicyBuilder()
                             .setDirection(Direction.Outbound)

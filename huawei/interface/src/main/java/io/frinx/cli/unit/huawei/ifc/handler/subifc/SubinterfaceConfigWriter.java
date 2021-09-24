@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWriter {
 
-    private static final String UPDATE_TEMPLATE = "system-view\n"
+    private static final String WRITE_UPDATE_TEMPLATE = "system-view\n"
             + "interface {$data.name}\n"
             + "{% if ($data.description) %}description {$data.description}\n"
             + "{% else %}undo description\n{% endif %}"
@@ -40,8 +40,12 @@ public class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWriter {
             + "ip binding vpn-instance {$huawei_aug.ip_binding_vpn_instance}\n{% endif %}"
             + "{% if ($before_huawei_aug.traffic_filter) %}"
             + "undo traffic-filter {$before_huawei_aug.traffic_filter.direction}\n{% endif %}"
-            + "{% if ($huawei_aug.traffic_filter) %}traffic-filter {$huawei_aug.traffic_filter.direction} acl "
-            + "name {$huawei_aug.traffic_filter.acl_name}\n{% endif %}"
+            + "{% if ($huawei_aug.traffic_filter) %}{% if ($is_ipv6 == TRUE) %}"
+            + "traffic-filter {$huawei_aug.traffic_filter.direction} ipv6 acl "
+            + "name {$huawei_aug.traffic_filter.acl_name}\n"
+            + "{% else %}traffic-filter {$huawei_aug.traffic_filter.direction} acl "
+            + "name {$huawei_aug.traffic_filter.acl_name}\n"
+            + "{% endif %}{% endif %}"
             + "{% if ($before_huawei_aug.traffic_policy) %}"
             + "undo traffic-policy {$before_huawei_aug.traffic_policy.direction}\n{% endif %}"
             + "{% if ($huawei_aug.traffic_policy) %}traffic-policy {$huawei_aug.traffic_policy.traffic_name} "
@@ -63,20 +67,25 @@ public class SubinterfaceConfigWriter extends AbstractSubinterfaceConfigWriter {
         SubIfHuaweiAug huaweiAug = after.getAugmentation(SubIfHuaweiAug.class);
         // we need this because chunk template has problems with pulling boolean type from object
         Boolean trustDscp = null;
+        Boolean isIpv6 = null;
         if (huaweiAug != null) {
             trustDscp = huaweiAug.isTrustDscp();
+            if (huaweiAug.getTrafficFilter() != null) {
+                isIpv6 = huaweiAug.getTrafficFilter().isIpv6();
+            }
         }
 
         SubIfHuaweiAug augBefore = null;
         if (before != null) {
             augBefore = before.getAugmentation(SubIfHuaweiAug.class);
         }
-        return fT(UPDATE_TEMPLATE,
+        return fT(WRITE_UPDATE_TEMPLATE,
                 "before", before,
                 "data", after,
                 "before_huawei_aug", augBefore,
                 "huawei_aug", after.getAugmentation(SubIfHuaweiAug.class),
                 "trust_dscp", trustDscp,
+                "is_ipv6", isIpv6,
                 "name", getSubinterfaceName(id));
     }
 

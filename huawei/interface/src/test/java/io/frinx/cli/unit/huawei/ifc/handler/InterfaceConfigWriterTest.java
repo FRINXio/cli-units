@@ -46,7 +46,7 @@ public class InterfaceConfigWriterTest {
             + "no shutdown\n"
             + "ip binding vpn-instance VLAN27\n"
             + "set flow-stat interval 10\n"
-            + "traffic-filter Inbound acl name WAN-IN\n"
+            + "traffic-filter Inbound ipv6 acl name WAN-IN\n"
             + "traffic-policy TP-NNI-MAIN-OUT Outbound\n"
             + "trust dscp\n"
             + "return\n";
@@ -97,6 +97,7 @@ public class InterfaceConfigWriterTest {
                     .setTrafficFilter(new TrafficFilterBuilder()
                             .setDirection(Direction.Inbound)
                             .setAclName("WAN-IN")
+                            .setIpv6(true)
                             .build())
                     .setTrafficPolicy(new TrafficPolicyBuilder()
                             .setDirection(Direction.Outbound)

@@ -39,7 +39,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public final class SubinterfaceConfigReader extends AbstractSubinterfaceConfigReader {
 
     private static final Pattern TRAFFIC_FILTER_LINE =
-            Pattern.compile("traffic-filter (?<direction>.+) acl name (?<aclName>.+)");
+            Pattern.compile("traffic-filter (?<direction>\\S+) (?<ipv6>ipv6\\s)?acl name (?<aclName>.+)");
     private static final Pattern TRAFFIC_POLICY_LINE =
             Pattern.compile("traffic-policy (?<policyName>.+) (?<direction>.+)");
     private static final Pattern VPN_INSTANCE_LINE = Pattern.compile("ip binding vpn-instance (?<aclName>.+)");
@@ -118,11 +118,16 @@ public final class SubinterfaceConfigReader extends AbstractSubinterfaceConfigRe
             TRAFFIC_FILTER_LINE::matcher,
             matcher -> matcher.group("aclName"));
 
+        final boolean isIpv6 = ParsingUtils.parseField(output, 0,
+            TRAFFIC_FILTER_LINE::matcher,
+            matcher -> matcher.group("ipv6")).isPresent();
+
         TrafficFilterBuilder subTrafficFilterBuilder = new TrafficFilterBuilder();
         direction.ifPresent(value -> subTrafficFilterBuilder.setDirection(getDirection(value, "filter")));
         aclName.ifPresent(subTrafficFilterBuilder::setAclName);
 
         if (subTrafficFilterBuilder.getAclName() != null && subTrafficFilterBuilder.getDirection() != null) {
+            subTrafficFilterBuilder.setIpv6(isIpv6);
             subIfHuaweiAugBuilder.setTrafficFilter(subTrafficFilterBuilder.build());
         }
     }
