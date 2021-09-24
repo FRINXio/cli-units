@@ -26,6 +26,7 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -36,6 +37,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.re
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceVlanReader implements CliConfigReader<Config, ConfigBuilder> {
+
+    private static String SH_INTERFACE_SHOW_REMOTE = "interface show remote";
 
     private Cli cli;
 
@@ -50,6 +53,24 @@ public class InterfaceVlanReader implements CliConfigReader<Config, ConfigBuilde
         String ifcName = id.firstKeyOf(Interface.class).getName();
         setVlanIds(blockingRead(f(InterfaceConfigReader.SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx),
                 configBuilder, ifcName);
+        // only remote management interface can contain vlan value
+        if (ifcName.equals("remote")) {
+            setManagementVlanIds(blockingRead(SH_INTERFACE_SHOW_REMOTE, cli, id, ctx), configBuilder);
+        }
+    }
+
+    void setManagementVlanIds(final String output, final ConfigBuilder builder) {
+        Pattern domainVlan = Pattern.compile("\\| Domain *\\| (?<domain>.+) *\\|");
+        final Optional<String> domain = ParsingUtils.parseField(output, 0,
+            domainVlan::matcher,
+            matcher -> matcher.group("domain"));
+        if (domain.isPresent()) {
+            List<VlanSwitchedConfig.TrunkVlans> trunkVlans = new ArrayList<>();
+            trunkVlans.add(new VlanSwitchedConfig.TrunkVlans(
+                new VlanId(Integer.valueOf(domain.get().split(" ")[1]))
+            ));
+            builder.setTrunkVlans(trunkVlans);
+        }
     }
 
     @VisibleForTesting

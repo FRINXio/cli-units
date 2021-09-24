@@ -23,8 +23,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -37,8 +35,6 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.sa
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.IngressToEgressQmap;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.PhysicalType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.VlanEthertypePolicy;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Prefix;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -60,25 +56,14 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
                                       @Nonnull final ReadContext ctx) throws ReadFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
         parseType(blockingRead(f(SH_TYPE, ifcName), cli, id, ctx), builder, ifcName);
-        IfSaosAugBuilder ifSaosAugBuilder = new IfSaosAugBuilder();
-        parseInterface(blockingRead(f(SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx),
-                builder, ifSaosAugBuilder, ifcName);
-        parseLogicalInterface(blockingRead(f(InterfaceReader.LOGICAL_INTERFACE, ifcName), cli, id, ctx),
-                builder, ifSaosAugBuilder, ifcName);
-        builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
-    }
-
-    @VisibleForTesting
-    void parseLogicalInterface(final String output, ConfigBuilder builder,
-                               IfSaosAugBuilder ifSaosAugBuilder, String name) {
-        builder.setName(name);
-        if (name.equals("remote")) {
-            setRemoteDescription(output, builder);
+        if (ifcName.equals("local") || ifcName.equals("remote")) {
+            builder.setName(ifcName);
+        } else {
+            IfSaosAugBuilder ifSaosAugBuilder = new IfSaosAugBuilder();
+            parseInterface(blockingRead(f(SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx),
+                    builder, ifSaosAugBuilder, ifcName);
+            builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
         }
-        setIpvAddressAndMask(output, name, ipv4 -> !ipv4.contains(":"),
-            ipv4 -> ifSaosAugBuilder.setIpv4Prefix(new Ipv4Prefix(ipv4)));
-        setIpvAddressAndMask(output, name, ipv6 -> ipv6.contains(":"),
-            ipv6 -> ifSaosAugBuilder.setIpv6Prefix(new Ipv6Prefix(ipv6)));
     }
 
     @VisibleForTesting
@@ -263,26 +248,4 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
             mode -> builder.setEnabled(false));
     }
 
-    private void setRemoteDescription(final String output, ConfigBuilder builder) {
-        Pattern description = Pattern.compile("\\| remote\\s+\\| (?<description>.*)\\s+\\|.*\\|");
-        ParsingUtils.NEWLINE.splitAsStream(output)
-                .map(description::matcher)
-                .filter(Matcher::matches)
-                .map(m -> m.group("description"))
-                .findFirst()
-                .map(desc -> desc.replaceAll("\\s+", ""))
-                .ifPresent(builder::setDescription);
-    }
-
-    private void setIpvAddressAndMask(final String output, String name, Predicate<String> predicate,
-                                      Consumer<String> consumer) {
-        Pattern ipv4Prefix = Pattern.compile("\\|\\s(?<id>" + name + ")\\s+\\|.*\\|\\s(?<ipvType>\\S+).*");
-        ParsingUtils.NEWLINE.splitAsStream(output)
-                .map(ipv4Prefix::matcher)
-                .filter(Matcher::matches)
-                .map(m -> m.group("ipvType"))
-                .filter(predicate)
-                .findFirst()
-                .ifPresent(consumer);
-    }
 }
