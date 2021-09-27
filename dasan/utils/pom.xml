@@ -29,7 +29,6 @@
 
     <artifactId>dasan-cli-utils</artifactId>
     <version>4.2.9.rc1-frinx-SNAPSHOT</version>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <!-- for JUnit -->

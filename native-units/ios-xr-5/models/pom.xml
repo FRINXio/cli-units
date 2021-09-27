@@ -29,7 +29,6 @@
     <groupId>io.frinx.cli</groupId>
     <artifactId>ios-xr-5-native-models</artifactId>
     <version>4.2.9.rc1-frinx-SNAPSHOT</version>
-    <packaging>bundle</packaging>
 
     <dependencyManagement>
         <dependencies>
@@ -42,33 +41,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <_invalidfilenames/>
-                        <Export-Package>
-                            <!-- Export generated APIs with device label -->
-                            org.opendaylight.yang.gen.v1.http.frinx.io.yang._native.xr5.*;device=xr5
-                        </Export-Package>
-                        <Import-Package>
-                            <!--
-                            For some reason, all the generated packages are added to import section
-                            which is dangerous in runtime. Prevent that with following instruction
-                             -->
-                            !org.opendaylight.yang.gen.v1.http.frinx.io.yang._native.xr5.*,
-                            *,
-                        </Import-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>

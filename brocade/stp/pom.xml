@@ -13,7 +13,6 @@
 
     <artifactId>brocade-stp-unit</artifactId>
     <version>4.2.9.rc1-frinx-SNAPSHOT</version>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
