@@ -163,6 +163,11 @@
                 <artifactId>huawei-qos-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>huawei-system-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- IOS -->
             <dependency>

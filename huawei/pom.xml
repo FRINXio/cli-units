@@ -30,6 +30,7 @@
         <module>platform</module>
         <module>acl</module>
         <module>qos</module>
+        <module>system</module>
     </modules>
 
     <parent>
