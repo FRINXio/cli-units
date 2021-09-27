@@ -27,6 +27,11 @@ import io.frinx.cli.unit.saos.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.saos.ifc.handler.aggregate.AggregateConfigReader;
 import io.frinx.cli.unit.saos.ifc.handler.l2cft.InterfaceCftProfileConfigReader;
 import io.frinx.cli.unit.saos.ifc.handler.l2cft.InterfaceCftProfileConfigWriter;
+import io.frinx.cli.unit.saos.ifc.handler.subifc.SubinterfaceReader;
+import io.frinx.cli.unit.saos.ifc.handler.subifc.ip4.Ipv4AddressReader;
+import io.frinx.cli.unit.saos.ifc.handler.subifc.ip4.Ipv4ConfigReader;
+import io.frinx.cli.unit.saos.ifc.handler.subifc.ip6.Ipv6AddressReader;
+import io.frinx.cli.unit.saos.ifc.handler.subifc.ip6.Ipv6ConfigReader;
 import io.frinx.cli.unit.saos.ifc.handler.vlan.InterfaceVlanReader;
 import io.frinx.cli.unit.saos.ifc.handler.vlan.InterfaceVlanWriter;
 import io.frinx.cli.unit.saos.init.SaosDevices;
@@ -89,6 +94,19 @@ public class SaosInterfaceUnit extends AbstractUnit {
                 new InterfaceVlanReader(cli));
 
         readRegistry.add(IIDs.IN_IN_AUG_SAOS6IFCFTAUG_CF_CONFIG, new InterfaceCftProfileConfigReader(cli));
+
+        readRegistry.add(IIDs.IN_IN_SU_SUBINTERFACE, new SubinterfaceReader(cli));
+
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS,
+                new Ipv4AddressReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_AD_CONFIG,
+                new Ipv4ConfigReader(cli));
+
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_ADDRESS,
+                new Ipv6AddressReader(cli));
+        readRegistry.add(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE2_IP_AD_AD_CONFIG,
+                new Ipv6ConfigReader(cli));
+
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {

@@ -194,21 +194,4 @@ public class InterfaceConfigReaderTest {
                 .parseType(SH_AGG, parsed, "LAG_LMR-001_East");
         Assert.assertEquals(Ieee8023adLag.class, parsed.getType());
     }
-
-    @Test
-    public void testParseLogicalInterfaceType() {
-        ConfigBuilder parsed = new ConfigBuilder();
-        IfSaosAugBuilder ifSaosAugBuilder = new IfSaosAugBuilder();
-        new InterfaceConfigReader(Mockito.mock(Cli.class))
-                .parseLogicalInterface(SH_LOGICAL_INTERFACE, parsed, ifSaosAugBuilder, "local");
-        parsed.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
-        Assert.assertEquals(EXPECTED_LOCAL_LOGICAL_INTERFACE, parsed.build());
-
-        parsed = new ConfigBuilder();
-        ifSaosAugBuilder = new IfSaosAugBuilder();
-        new InterfaceConfigReader(Mockito.mock(Cli.class))
-                .parseLogicalInterface(SH_LOGICAL_INTERFACE, parsed, ifSaosAugBuilder, "remote");
-        parsed.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
-        Assert.assertEquals(EXPECTED_REMOTE_LOGICAL_INTERFACE, parsed.build());
-    }
 }
