@@ -67,7 +67,7 @@ public class SubPortConfigReader implements CliConfigReader<Config, ConfigBuilde
     @VisibleForTesting
     static Optional<String> getSubPortName(String output, String parentPort, Long index) {
         Pattern pattern = Pattern.compile(".* sub-port (?<name>\\S+) parent-port " + parentPort
-                + " classifier-precedence " + index + ".*");
+                + " classifier-precedence " + index + "( .+|$)");
 
         return ParsingUtils.parseField(output, 0,
             pattern::matcher,
