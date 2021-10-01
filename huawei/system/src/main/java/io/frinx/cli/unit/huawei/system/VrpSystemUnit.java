@@ -21,6 +21,12 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
+import io.frinx.cli.unit.huawei.system.handler.connection.STelnetConfigReader;
+import io.frinx.cli.unit.huawei.system.handler.connection.STelnetConfigWriter;
+import io.frinx.cli.unit.huawei.system.handler.connection.SshConfigReader;
+import io.frinx.cli.unit.huawei.system.handler.connection.SshConfigWriter;
+import io.frinx.cli.unit.huawei.system.handler.connection.TelnetConfigReader;
+import io.frinx.cli.unit.huawei.system.handler.connection.TelnetConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.terminal.TerminalConfigReader;
 import io.frinx.cli.unit.huawei.system.handler.terminal.TerminalConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.terminal.TerminalReader;
@@ -48,7 +54,8 @@ public class VrpSystemUnit extends AbstractUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_SYSTEM, IIDs.FRINX_OPENCONFIG_EXTENSIONS,
-                IIDs.FRINX_HUAWEI_TERMINAL_EXTENSION, $YangModuleInfoImpl.getInstance());
+                IIDs.FRINX_HUAWEI_TERMINAL_EXTENSION, IIDs.FRINX_HUAWEI_CONNECTION_EXTENSION,
+                $YangModuleInfoImpl.getInstance());
     }
 
     @Override
@@ -61,12 +68,21 @@ public class VrpSystemUnit extends AbstractUnit {
     }
 
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
+        writeRegistry.add(IIDs.SY_SS_CONFIG, new SshConfigWriter(cli));
+        writeRegistry.add(IIDs.SY_TE_CONFIG, new TelnetConfigWriter(cli));
+        writeRegistry.addNoop(IIDs.SY_AUG_STELNETHUAWEIAUG_STELNETSERVER);
+        writeRegistry.add(IIDs.SY_AUG_STELNETHUAWEIAUG_ST_CONFIG, new STelnetConfigWriter(cli));
+
         writeRegistry.addNoop(IIDs.SY_AUG_TERMINALHUAWEISCHEMASAUG_TE_TERMINAL);
         writeRegistry.subtreeAdd(IIDs.SY_AUG_TERMINALHUAWEISCHEMASAUG_TE_TE_CONFIG, new TerminalConfigWriter(cli),
                 Sets.newHashSet(IIDs.SY_AUG_TERMINALHUAWEISCHEMASAUG_TE_TE_CO_ACL));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
+        readRegistry.add(IIDs.SY_SS_CONFIG, new SshConfigReader(cli));
+        readRegistry.add(IIDs.SY_TE_CONFIG, new TelnetConfigReader(cli));
+        readRegistry.add(IIDs.SY_AUG_STELNETHUAWEIAUG_ST_CONFIG, new STelnetConfigReader(cli));
+
         readRegistry.add(IIDs.SY_AUG_SYSTEM1_TE_TERMINAL, new TerminalReader(cli));
         readRegistry.add(IIDs.SY_AUG_SYSTEM1_TE_TE_CONFIG, new TerminalConfigReader(cli));
     }
