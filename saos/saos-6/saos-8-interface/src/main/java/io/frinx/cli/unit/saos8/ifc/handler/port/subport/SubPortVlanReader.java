@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SubPortVlanReader implements CliConfigReader<Vlan, VlanBuilder> {
 
-    private static final String SUB_PORT_NAME_COMMAND = "configuration search string \"%s classifier-precedence %d\"";
+    private static final String SUB_PORT_NAME_COMMAND = "configuration search string \"%s classifier-precedence %d \"";
     private static final String SH_ELEMENTS_COMMAND = "configuration search string \"sub-port %s class-element\"";
 
     private Cli cli;

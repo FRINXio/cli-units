@@ -57,7 +57,7 @@ public class SubPortReader implements CliConfigListReader<Subinterface, Subinter
 
     @VisibleForTesting
     static List<SubinterfaceKey> getAllIds(String output, String parentPort) {
-        Pattern allIds = Pattern.compile(".* parent-port " + parentPort + " classifier-precedence (?<id>\\d+).*");
+        Pattern allIds = Pattern.compile(".* parent-port " + parentPort + " classifier-precedence (?<id>\\d+)( .+|$)");
         return ParsingUtils.parseFields(output, 0,
             allIds::matcher,
             matcher -> matcher.group("id"),

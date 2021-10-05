@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class SubPortVlanConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String SHOW_COMMAND = "configuration search string \"classifier-precedence %d\"";
+    private static final String SHOW_COMMAND = "configuration search string \"classifier-precedence %d \"";
 
     private Cli cli;
 
