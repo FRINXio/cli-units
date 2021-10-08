@@ -49,7 +49,7 @@ public final class L2VSIReader implements
                 ChecksMap.DataCheck.NetworkInstanceConfig.IID_TRANSFORMATION,
                 ChecksMap.DataCheck.NetworkInstanceConfig.TYPE_L2VSI);
 
-    private Cli cli;
+    private final Cli cli;
 
     public L2VSIReader(Cli cli) {
         this.cli = cli;
