@@ -28,16 +28,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.cli</groupId>
     <artifactId>sonic-it</artifactId>
-    <version>4.2.9.rc2-frinx-SNAPSHOT</version>
+    <version>4.2.9.rc2-frinx</version>
 
     <properties>
-        <cli.version>4.2.9.rc2-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>4.2.9.rc2-frinx-SNAPSHOT</openconfig.version>
+        <cli.version>4.2.9.rc2-frinx</cli.version>
+        <openconfig.version>4.2.9.rc2-frinx</openconfig.version>
         <hc.version>1.18.04-Oxygen-SR2.4_2_9_rc2-frinxodl</hc.version>
         <controller.version>1.7.2-Oxygen-SR2.4_2_9_rc2-frinxodl</controller.version>
         <yangtools.version>2.0.5-Oxygen-SR2.4_2_9_rc2-frinxodl</yangtools.version>
         <mdsal.version>2.4.2-Oxygen-SR2.4_2_9_rc2-frinxodl</mdsal.version>
-        <translate.unit.commons.version>4.2.9.rc2-frinx-SNAPSHOT</translate.unit.commons.version>
+        <translate.unit.commons.version>4.2.9.rc2-frinx</translate.unit.commons.version>
         <mdsalmodel.version>0.12.2-Oxygen-SR2.4_2_9_rc2-frinxodl</mdsalmodel.version>
     </properties>
 
