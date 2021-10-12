@@ -17,17 +17,17 @@
 package io.frinx.cli.unit.huawei.bgp.handler.neighbor;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.huawei.bgp.handler.BgpProtocolReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
-import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.Neighbor;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202.bgp.neighbor.list.NeighborBuilder;
@@ -36,6 +36,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.rev170202
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.IpAddress;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv4Address;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Address;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -45,14 +46,17 @@ public class NeighborReader implements CliConfigListReader<Neighbor, NeighborKey
     private static final String DISPLAY_PEER_CONFIG =
             "display current-configuration configuration bgp | include |^ ipv4-family vpn instance|^* peer";
     private static final Pattern PEER_LINE = Pattern.compile("peer (?<neighborIp>\\S*) as-number .*");
-    private Cli cli;
+    private static final Pattern BASE_PATTERN = Pattern.compile("\\n\\s#\n");
+    private static final Pattern NEW_LINE_PATTERN = Pattern.compile("\n");
+    private final Cli cli;
 
     public NeighborReader(Cli cli) {
         this.cli = cli;
     }
 
-    @Override public List<NeighborKey> getAllIds(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
-                                                        @Nonnull ReadContext readContext) throws ReadFailedException {
+    @Override
+    public List<NeighborKey> getAllIds(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
+                                       @Nonnull ReadContext readContext) throws ReadFailedException {
 
         String networkInstanceName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
         if (BgpProtocolReader.DEFAULT_BGP_INSTANCE.equals(networkInstanceName)) {
@@ -70,45 +74,38 @@ public class NeighborReader implements CliConfigListReader<Neighbor, NeighborKey
 
     @VisibleForTesting
     public static List<NeighborKey> getVrfNeighborKeys(String output, String vrfName) {
+        List<NeighborKey> keys = parsingKeys(output,
+            line -> line.contains("ipv4-family vpn-instance " + vrfName + "\n"),
+            value -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
 
-
-        Optional<String> optionalVrfOutput =
-            Arrays.stream(getSplitedOutput(output)).filter(value -> value.contains(vrfName)).findFirst();
-
-        if (optionalVrfOutput.isPresent()) {
-            return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll(" peer", "\n peer"), 0,
-                PEER_LINE::matcher,
-                matcher -> matcher.group("neighborIp"),
-                value -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
-        }
-
-        return Lists.newArrayList();
-    }
-
-    @Override public void readCurrentAttributes(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
-                                                       @Nonnull NeighborBuilder neighborBuilder,
-                                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        neighborBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
+        keys.addAll(parsingKeys(output, line -> line.contains("ipv6-family vpn-instance " + vrfName + "\n"),
+            value -> new NeighborKey(new IpAddress(new Ipv6Address(value)))));
+        return keys;
     }
 
     @VisibleForTesting
     public static List<NeighborKey> getDefaultNeighborKeys(String output) {
-        Optional<String> optionalVrfOutput =
-            Arrays.stream(getSplitedOutput(output)).filter(value -> !value.contains("vpn-instance")).findFirst();
-
-        if (optionalVrfOutput.isPresent()) {
-            return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll(" peer", "\n peer"), 0,
-                PEER_LINE::matcher,
-                matcher -> matcher.group("neighborIp"),
-                value -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
-        }
-
-        return Lists.newArrayList();
+        return parsingKeys(output, value -> !value.contains("vpn-instance"),
+            value -> new NeighborKey(new IpAddress(new Ipv4Address(value))));
     }
 
-    public static String[] getSplitedOutput(String output) {
-        return output.replaceAll(Cli.NEWLINE, "").replaceAll("\r", "")
-                .replaceAll(" ipv4-family", "\n ipv4-family")
-                .split("\\n");
+    private static List<NeighborKey> parsingKeys(String output, Predicate<String> filter,
+                                                 Function<String, NeighborKey> mapper) {
+        return BASE_PATTERN.splitAsStream(output)
+                .filter(filter)
+                .flatMap(NEW_LINE_PATTERN::splitAsStream)
+                .map(String::trim)
+                .map(PEER_LINE::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> matcher.group("neighborIp"))
+                .map(mapper)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Neighbor> instanceIdentifier,
+                                      @Nonnull NeighborBuilder neighborBuilder,
+                                      @Nonnull ReadContext readContext) throws ReadFailedException {
+        neighborBuilder.setNeighborAddress(instanceIdentifier.firstKeyOf(Neighbor.class).getNeighborAddress());
     }
 }
