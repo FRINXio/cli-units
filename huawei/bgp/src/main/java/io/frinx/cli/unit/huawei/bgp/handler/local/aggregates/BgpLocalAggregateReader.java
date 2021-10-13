@@ -21,7 +21,7 @@ import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.huawei.bgp.handler.BgpProtocolReader;
-import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborReader;
+import io.frinx.cli.unit.huawei.bgp.handler.neighbor.NeighborConfigReader;
 import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.ArrayList;
@@ -77,9 +77,9 @@ public class BgpLocalAggregateReader implements CliConfigListReader<Aggregate, A
 
     @VisibleForTesting
     static List<AggregateKey> getVrfAggregateKeys(String output, String vrfName) {
-        Optional<String> optionalVrfOutput = Arrays.stream(NeighborReader.getSplitedOutput(output)).filter(value ->
-                value.contains(vrfName)).reduce((s1, s2) -> s1
-                + s2);
+        Optional<String> optionalVrfOutput = Arrays.stream(NeighborConfigReader.getSplitedOutput(output))
+                .filter(value -> value.contains(vrfName))
+                .reduce((s1, s2) -> s1 + s2);
 
         if (optionalVrfOutput.isPresent()) {
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll("network", "\nnetwork"), 0,
@@ -95,9 +95,9 @@ public class BgpLocalAggregateReader implements CliConfigListReader<Aggregate, A
 
     @VisibleForTesting
     static List<AggregateKey> getDefaultAggregateKeys(String output) {
-        Optional<String> optionalVrfOutput = Arrays.stream(NeighborReader.getSplitedOutput(output)).filter(value ->
-                !value.contains("vpn-instance")).reduce((s1, s2) -> s1
-                + s2);
+        Optional<String> optionalVrfOutput = Arrays.stream(NeighborConfigReader.getSplitedOutput(output))
+                .filter(value -> !value.contains("vpn-instance"))
+                .reduce((s1, s2) -> s1 + s2);
 
         if (optionalVrfOutput.isPresent()) {
             return ParsingUtils.parseFields(optionalVrfOutput.get().replaceAll("network", "\nnetwork"), 0,

@@ -69,7 +69,7 @@ public class NeighborPolicyConfigReader implements CliConfigReader<Config, Confi
     @VisibleForTesting
     static void parseConfigAttributes(String output, ConfigBuilder configBuilder, String vrfName) {
 
-        String[] vrfSplit = NeighborReader.getSplitedOutput(output);
+        String[] vrfSplit = NeighborConfigReader.getSplitedOutput(output);
 
         if (NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfName)) {
             parseDefault(configBuilder, vrfSplit);

@@ -92,7 +92,7 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
 
     @VisibleForTesting
     public static void parseConfigAttributes(String output, ConfigBuilder configBuilder, String vrfName) {
-        String[] vrfSplit = NeighborReader.getSplitedOutput(output);
+        String[] vrfSplit = getSplitedOutput(output);
 
         if (NetworInstance.DEFAULT_NETWORK_NAME.equals(vrfName)) {
             parseDefault(configBuilder, vrfSplit);
@@ -197,5 +197,11 @@ public class NeighborConfigReader implements CliConfigReader<Config, ConfigBuild
             }
         }
         return null;
+    }
+
+    public static String[] getSplitedOutput(String output) {
+        return output.replaceAll(Cli.NEWLINE, "").replaceAll("\r", "")
+                .replaceAll(" ipv4-family", "\n ipv4-family")
+                .split("\\n");
     }
 }
