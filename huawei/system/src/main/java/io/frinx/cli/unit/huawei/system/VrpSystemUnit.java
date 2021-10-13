@@ -21,6 +21,8 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
+import io.frinx.cli.unit.huawei.system.handler.banner.BannerConfigReader;
+import io.frinx.cli.unit.huawei.system.handler.banner.BannerConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.connection.STelnetConfigReader;
 import io.frinx.cli.unit.huawei.system.handler.connection.STelnetConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.connection.SshConfigReader;
@@ -55,7 +57,7 @@ public class VrpSystemUnit extends AbstractUnit {
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_SYSTEM, IIDs.FRINX_OPENCONFIG_EXTENSIONS,
                 IIDs.FRINX_HUAWEI_TERMINAL_EXTENSION, IIDs.FRINX_HUAWEI_CONNECTION_EXTENSION,
-                $YangModuleInfoImpl.getInstance());
+                IIDs.FRINX_HUAWEI_BANNER_EXTENSION, $YangModuleInfoImpl.getInstance());
     }
 
     @Override
@@ -76,6 +78,9 @@ public class VrpSystemUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.SY_AUG_TERMINALHUAWEISCHEMASAUG_TE_TERMINAL);
         writeRegistry.subtreeAdd(IIDs.SY_AUG_TERMINALHUAWEISCHEMASAUG_TE_TE_CONFIG, new TerminalConfigWriter(cli),
                 Sets.newHashSet(IIDs.SY_AUG_TERMINALHUAWEISCHEMASAUG_TE_TE_CO_ACL));
+
+        writeRegistry.addNoop(IIDs.SY_AUG_BANNERHUAWEIAUG_BANNER);
+        writeRegistry.add(IIDs.SY_AUG_BANNERHUAWEIAUG_BA_CONFIG, new BannerConfigWriter(cli));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -85,6 +90,8 @@ public class VrpSystemUnit extends AbstractUnit {
 
         readRegistry.add(IIDs.SY_AUG_SYSTEM1_TE_TERMINAL, new TerminalReader(cli));
         readRegistry.add(IIDs.SY_AUG_SYSTEM1_TE_TE_CONFIG, new TerminalConfigReader(cli));
+
+        readRegistry.add(IIDs.SY_AUG_BANNERHUAWEIAUG_BA_CONFIG, new BannerConfigReader(cli));
     }
 
     @Override
