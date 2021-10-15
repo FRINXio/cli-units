@@ -34,8 +34,8 @@ public class ConfigMetadataReader implements CliOperReader<ConfigurationMetadata
 
     @VisibleForTesting
     private static final String SHOW_LAST_COMMIT_TIME = "configuration show differences-from-saved";
-    private static final Pattern PATTERN = Pattern.compile(".*< ! Created: {7}(?<date>[A-Za-z]{3} [A-Za-z]{3} [0-9]{2} "
-            + "[0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]{4}).*");
+    private static final Pattern PATTERN = Pattern.compile(".*< ! Created: {7}(?<date>[A-Za-z]{3} [A-Za-z]{3} +"
+        + "([0-9]{1}|[0-9]{2}) [0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]{4}).*");
 
     private final Cli cli;
 
