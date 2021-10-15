@@ -24,6 +24,9 @@ import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.huawei.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.huawei.network.instance.handler.NetworkInstanceReader;
+import io.frinx.cli.unit.huawei.network.instance.handler.vlan.VlanConfigReader;
+import io.frinx.cli.unit.huawei.network.instance.handler.vlan.VlanConfigWriter;
+import io.frinx.cli.unit.huawei.network.instance.handler.vlan.VlanReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.ifc.L3VrfInterfaceReader;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.ifc.L3VrfInterfaceWriter;
 import io.frinx.cli.unit.huawei.network.instance.handler.vrf.protocol.ProtocolConfigReader;
@@ -65,6 +68,10 @@ public class VrpNetworkInstanceUnit extends AbstractUnit {
                 Sets.newHashSet(IIDs.NE_NE_CO_AUG_HUAWEINIAUG),
                 /*handle after ifc configuration*/ io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_CONFIG);
 
+        writeRegistry.addNoop(IIDs.NE_NE_VL_VLAN);
+        writeRegistry.subtreeAddBefore(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigWriter(cli),
+                Sets.newHashSet(IIDs.NET_NET_VLA_VLA_CON_AUG_CONFIG1), IIDs.NE_NE_CONFIG);
+
         writeRegistry.addNoop(IIDs.NE_NE_PR_PROTOCOL);
         writeRegistry.add(IIDs.NE_NE_PR_PR_CONFIG, new ProtocolConfigWriter());
 
@@ -79,6 +86,8 @@ public class VrpNetworkInstanceUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NETWORKINSTANCE, new NetworkInstanceReader(cli));
         readRegistry.subtreeAdd(IIDs.NE_NE_CONFIG, new NetworkInstanceConfigReader(cli),
                 Sets.newHashSet(IIDs.NE_NE_CO_AUG_HUAWEINIAUG));
+        readRegistry.add(IIDs.NE_NE_VL_VLAN, new VlanReader(cli));
+        readRegistry.add(IIDs.NE_NE_VL_VL_CONFIG, new VlanConfigReader(cli));
 
         // Interfaces for VRF
         readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new L3VrfInterfaceReader(cli));
@@ -90,7 +99,7 @@ public class VrpNetworkInstanceUnit extends AbstractUnit {
 
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
-        return Sets.newHashSet(IIDs.FRINX_HUAWEI_NETWORK_INSTANCE_EXTENSION,
+        return Sets.newHashSet(IIDs.FRINX_HUAWEI_NETWORK_INSTANCE_EXTENSION, IIDs.FRINX_SAOS_VLAN_EXTENSION,
                 org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228
                         .$YangModuleInfoImpl.getInstance());
     }
