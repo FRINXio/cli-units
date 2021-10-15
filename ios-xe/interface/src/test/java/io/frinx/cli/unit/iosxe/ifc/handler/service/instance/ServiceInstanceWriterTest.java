@@ -177,7 +177,6 @@ public class ServiceInstanceWriterTest {
 
     private static final String UPDATE_INPUT = "configure terminal\n"
             + "interface GigabitEthernet0/0/0\n"
-            + "no service instance 100\n"
             + "no service instance trunk 200\n"
             + "service instance trunk 100 ethernet\n"
             + "encapsulation dot1q 1, 9\n"
@@ -187,7 +186,6 @@ public class ServiceInstanceWriterTest {
 
     private static final String UPDATE_INPUT_WITH_REWRITE = "configure terminal\n"
             + "interface GigabitEthernet0/0/0\n"
-            + "no service instance 100\n"
             + "no rewrite ingress\n"
             + "no service instance trunk 200\n"
             + "service instance trunk 100 ethernet\n"

@@ -72,7 +72,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         blockingWriteAndRead(cli, id, dataAfter,
                 fT(TEMPLATE,
                         "ifcName", ifcName,
-                        "serviceInstance", getCommands(dataBefore, dataAfter)));
+                        "serviceInstance", handleUpdate(dataBefore, dataAfter)));
     }
 
     @Override
@@ -108,12 +108,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                 final List<ServiceInstance> serviceInstanceList = serviceInstances.getServiceInstance();
                 if (serviceInstanceList != null) {
                     for (final ServiceInstance serviceInstance : serviceInstanceList) {
-                        currentInstances.append(getCreationCommands(serviceInstance, false));
-                        currentInstances.append(getEncapsulationCommands(serviceInstance.getEncapsulation()));
-                        currentInstances.append(getL2ProtocolCommands(serviceInstance.getL2protocols()));
-                        currentInstances.append(getBridgeDomainCommands(serviceInstance.getBridgeDomain()));
-                        currentInstances.append(getRewrite(serviceInstance));
-                        currentInstances.append("exit\n");
+                        extractedWrite(currentInstances, serviceInstance);
                     }
                 }
             }
@@ -135,6 +130,53 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
             }
         }
         return "";
+    }
+
+    private String handleUpdate(final IfCiscoServiceInstanceAug before,
+                              final IfCiscoServiceInstanceAug after) {
+        final StringBuilder currentInstances = new StringBuilder();
+        var instancesBefore = before.getServiceInstances();
+        var instancesAfter = after.getServiceInstances();
+
+        if (instancesBefore != null && instancesAfter != null) {
+            if (instancesBefore.getServiceInstance() != null && instancesAfter.getServiceInstance() != null) {
+
+                var exclusiveToDelete = instancesBefore.getServiceInstance().stream()
+                        .map(ServiceInstance::getId)
+                        .filter(e -> !instancesAfter.getServiceInstance().stream().map(ServiceInstance::getId)
+                                .collect(Collectors.toList()).contains(e))
+                        .collect(Collectors.toList());
+
+                var exclusiveToWrite = instancesAfter.getServiceInstance().stream()
+                        .map(ServiceInstance::getId)
+                        .filter(e -> instancesBefore.getServiceInstance().stream().map(ServiceInstance::getId)
+                                .collect(Collectors.toList()).contains(e))
+                        .collect(Collectors.toList());
+
+                for (final ServiceInstance serviceInstance : instancesBefore.getServiceInstance()) {
+                    if (exclusiveToDelete.contains(serviceInstance.getId())) {
+                        currentInstances.append(getCreationCommands(serviceInstance, true));
+                    }
+                }
+
+                for (final ServiceInstance serviceInstance : instancesAfter.getServiceInstance()) {
+                    if (exclusiveToWrite.contains(serviceInstance.getId())
+                            || !exclusiveToDelete.contains(serviceInstance.getId())) {
+                        extractedWrite(currentInstances, serviceInstance);
+                    }
+                }
+            }
+        }
+        return currentInstances.toString();
+    }
+
+    private void extractedWrite(StringBuilder currentInstances, ServiceInstance serviceInstance) {
+        currentInstances.append(getCreationCommands(serviceInstance, false));
+        currentInstances.append(getEncapsulationCommands(serviceInstance.getEncapsulation()));
+        currentInstances.append(getL2ProtocolCommands(serviceInstance.getL2protocols()));
+        currentInstances.append(getBridgeDomainCommands(serviceInstance.getBridgeDomain()));
+        currentInstances.append(getRewrite(serviceInstance));
+        currentInstances.append("exit\n");
     }
 
     private String getCreationCommands(final ServiceInstance serviceInstance, boolean delete) {
