@@ -25,13 +25,18 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 
 public class PrefixReaderTest {
 
+    public static final String OUTPUT = "ip prefix-list NAME1 seq 5 permit 0.0.0.0/0\n"
+            + "ipv6 prefix-list NAME1 seq 25 deny AB::/64 ge 1 le 128\n"
+            + "ip prefix-list NAME2 seq 10 permit 0.0.0.0/24\n"
+            + "ipv6 prefix-list NAME3 seq 5 permit 0.0.0.0/24\n";
+
     private static final List<PrefixKey> OUTPUT_KEYS = Lists.newArrayList(
             new PrefixKey(IpPrefixBuilder.getDefaultInstance("0.0.0.0/0"), "exact"),
             new PrefixKey(IpPrefixBuilder.getDefaultInstance("AB::/64"), "exact"));
 
     @Test
     public void testAllIds() {
-        Assert.assertEquals(OUTPUT_KEYS, PrefixReader.parseIds(PrefixSetReaderTest.OUTPUT, "NAME1"));
+        Assert.assertEquals(OUTPUT_KEYS, PrefixReader.parseIds(OUTPUT, "NAME1"));
     }
 
 }

@@ -24,14 +24,22 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.polic
 
 public class PrefixSetReaderTest {
 
-    public static final String OUTPUT = "ip prefix-list NAME1 seq 5 permit 0.0.0.0/0\n"
-        + "ipv6 prefix-list NAME1 seq 25 deny AB::/64 ge 1 le 128\n"
-        + "ip prefix-list NAME2 seq 10 permit 0.0.0.0/24\n"
-        + "ipv6 prefix-list NAME3 seq 5 permit 0.0.0.0/24\n";
+    public static final String OUTPUT = "ip prefix-list NAME1: 2 entries\n"
+            + "   seq 5 permit 180.190.200.0/29\n"
+            + "   seq 10 permit 44.55.66.0/29\n"
+            + "ip prefix-list NAME2: 1 entries\n"
+            + "   seq 5 permit 1.1.1.0/24 le 32\n"
+            + "ip prefix-list NAME3: 0 entries\n"
+            + "ipv6 prefix-list NAME1: 2 entries\n"
+            + "   seq 15 permit 2001:CBA:ABC::/64 ge 128\n"
+            + "   seq 20 permit 2123:AAA:BBB::/48 ge 128\n"
+            + "ipv6 prefix-list NAME4: 2 entries\n"
+            + "   seq 15 permit 2001:CBA:ABC::/64\n"
+            + "   seq 20 permit 2123:AAA:BBB::/48\n";
 
     @Test
     public void testIds() {
-        Assert.assertEquals(Lists.newArrayList("NAME1", "NAME2", "NAME3")
+        Assert.assertEquals(Lists.newArrayList("NAME1", "NAME2", "NAME3", "NAME4")
                 .stream()
                 .map(PrefixSetKey::new)
                 .collect(Collectors.toList()),

@@ -61,13 +61,13 @@ public class PrefixConfigReaderTest {
 
     @Test
     public void testPermit() {
-        prefixConfigReader.parseConfig(configBuilderTest, PrefixSetReaderTest.OUTPUT, "0.0.0.0/0", "NAME1");
+        prefixConfigReader.parseConfig(configBuilderTest, PrefixReaderTest.OUTPUT, "0.0.0.0/0", "NAME1");
         Assert.assertEquals(CONFIG_PERMIT, configBuilderTest.build());
     }
 
     @Test
     public void testDeny() {
-        prefixConfigReader.parseConfig(configBuilderTest, PrefixSetReaderTest.OUTPUT, "AB::/64", "NAME1");
+        prefixConfigReader.parseConfig(configBuilderTest, PrefixReaderTest.OUTPUT, "AB::/64", "NAME1");
         Assert.assertEquals(CONFIG_DENY, configBuilderTest.build());
     }
 
