@@ -23,6 +23,7 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public abstract class AbstractInterfaceConfigWriter implements CliWriter<Config> {
@@ -41,6 +42,13 @@ public abstract class AbstractInterfaceConfigWriter implements CliWriter<Config>
             throw new WriteFailedException.CreateFailedException(id, data,
                     new IllegalArgumentException("Physical interface cannot be created"));
         }
+
+        if ((SoftwareLoopback.class.isAssignableFrom(data.getType())) && (data.getMtu() != null)) {
+            throw new WriteFailedException.CreateFailedException(id, data,
+                    new IllegalArgumentException("MTU is not supported on Loopback interface!"));
+
+        }
+
         blockingWriteAndRead(cli, id, data, updateTemplate(null, data));
     }
 

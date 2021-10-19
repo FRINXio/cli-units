@@ -90,7 +90,7 @@ public class InterfaceConfigWriterTest {
                     .build();
     }
 
-    @Test
+    @Test(expected = WriteFailedException.class)
     public void write() throws WriteFailedException {
         this.writer.writeCurrentAttributes(iid, data, context);
 

@@ -32,6 +32,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigWriterTest {
@@ -85,6 +86,17 @@ public class InterfaceConfigWriterTest {
         data = new ConfigBuilder().setEnabled(true).setName("Bundle-Ether45").setType(Ieee8023adLag.class)
                 .setMtu(35).setDescription("test desc")
                 .build();
+    }
+
+    @Test(expected = WriteFailedException.class)
+    public void testCheckMtuValue() throws WriteFailedException {
+        ConfigBuilder builder = new ConfigBuilder();
+        builder.setMtu(9);
+        builder.setType(SoftwareLoopback.class);
+
+        writer.writeCurrentAttributes(iid, builder.build(), context);
+        Mockito.verify(writer).blockingWriteAndRead(Mockito.any(Cli.class), Mockito.eq(iid),
+                Mockito.any(Config.class), Mockito.anyString());
     }
 
     @Test
