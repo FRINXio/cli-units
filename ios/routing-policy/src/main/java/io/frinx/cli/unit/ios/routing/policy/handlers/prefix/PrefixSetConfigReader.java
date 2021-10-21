@@ -32,8 +32,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixSetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static final String IPV4_LINE = "ip prefix-list %s ";
-    private static final String IPV6_LINE = "ipv6 prefix-list %s ";
+    private static final String IPV4_LINE = "ip prefix-list %s";
+    private static final String IPV6_LINE = "ipv6 prefix-list %s";
+    private static final String PREFIX_LIST = "show ip prefix-list %s";
+    private static final String PREFIX_LIST_V6 = "show ipv6 prefix-list %s";
 
     private final Cli cli;
 
@@ -46,8 +48,9 @@ public class PrefixSetConfigReader implements CliConfigReader<Config, ConfigBuil
                                       @Nonnull ConfigBuilder builder,
                                       @Nonnull ReadContext ctx) throws ReadFailedException {
         PrefixSetKey prefixSetKey = id.firstKeyOf(PrefixSet.class);
-        String output = blockingRead(PrefixSetReader.SH_ALL_PREFIX_SETS, cli, id, ctx);
-        parseConfig(prefixSetKey.getName(), output, builder);
+        String outputIpv4 = blockingRead(f(PREFIX_LIST, prefixSetKey.getName()), cli, id, ctx);
+        String outputIpv6 = blockingRead(f(PREFIX_LIST_V6, prefixSetKey.getName()), cli, id, ctx);
+        parseConfig(prefixSetKey.getName(), outputIpv4 + outputIpv6, builder);
     }
 
     @VisibleForTesting

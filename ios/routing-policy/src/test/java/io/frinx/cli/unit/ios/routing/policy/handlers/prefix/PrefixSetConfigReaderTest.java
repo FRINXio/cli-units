@@ -45,7 +45,7 @@ public class PrefixSetConfigReaderTest {
 
     @Test
     public void testV6() {
-        PrefixSetConfigReader.parseConfig("NAME3", PrefixSetReaderTest.OUTPUT, configBuilder);
+        PrefixSetConfigReader.parseConfig("NAME4", PrefixSetReaderTest.OUTPUT, configBuilder);
         Assert.assertEquals(PrefixSetConfig.Mode.IPV6, configBuilder.getMode());
     }
 

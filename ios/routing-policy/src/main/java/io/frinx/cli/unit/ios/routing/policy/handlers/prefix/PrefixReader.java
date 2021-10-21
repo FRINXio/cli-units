@@ -38,6 +38,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class PrefixReader implements CliConfigListReader<Prefix, PrefixKey, PrefixBuilder> {
 
+    public static final String SH_ALL_PREFIX_SETS = "show running-config | include ^ip.* prefix-list";
     private static final String PREFIX_LINE = "ip(v6)? prefix-list %s seq \\d+ \\S+ (?<network>\\S+).*";
 
     private final Cli cli;
@@ -51,7 +52,7 @@ public class PrefixReader implements CliConfigListReader<Prefix, PrefixKey, Pref
     public List<PrefixKey> getAllIds(@Nonnull InstanceIdentifier<Prefix> id,
                                      @Nonnull ReadContext context) throws ReadFailedException {
         PrefixSetKey prefixSetKey = id.firstKeyOf(PrefixSet.class);
-        String output = blockingRead(PrefixSetReader.SH_ALL_PREFIX_SETS, cli, id, context);
+        String output = blockingRead(SH_ALL_PREFIX_SETS, cli, id, context);
         return parseIds(output, prefixSetKey.getName());
     }
 

@@ -59,7 +59,7 @@ public class PrefixConfigReader implements CliConfigReader<Config, ConfigBuilder
         builder.setIpPrefix(prefixKey.getIpPrefix());
         builder.setMasklengthRange(prefixKey.getMasklengthRange());
 
-        String output = blockingRead(PrefixSetReader.SH_ALL_PREFIX_SETS, cli, id, ctx);
+        String output = blockingRead(PrefixReader.SH_ALL_PREFIX_SETS, cli, id, ctx);
         parseConfig(builder, output, Util.getIpPrefixAsString(builder.getIpPrefix()), prefixSetKey.getName());
     }
 
