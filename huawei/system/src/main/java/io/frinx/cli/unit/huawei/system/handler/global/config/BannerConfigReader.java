@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.huawei.system.handler.banner;
+package io.frinx.cli.unit.huawei.system.handler.global.config;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
@@ -24,8 +24,8 @@ import io.frinx.cli.io.Command;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.banner.extension.rev211011.huawei.banner.top.banner.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.banner.extension.rev211011.huawei.banner.top.banner.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.global.config.extension.rev211011.huawei.global.config.top.banner.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.global.config.extension.rev211011.huawei.global.config.top.banner.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public final class BannerConfigReader implements CliConfigReader<Config, ConfigBuilder> {

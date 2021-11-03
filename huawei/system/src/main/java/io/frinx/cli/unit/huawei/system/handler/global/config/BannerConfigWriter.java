@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.huawei.system.handler.banner;
+package io.frinx.cli.unit.huawei.system.handler.global.config;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
@@ -23,7 +23,7 @@ import io.frinx.cli.io.Command;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.banner.extension.rev211011.huawei.banner.top.banner.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.global.config.extension.rev211011.huawei.global.config.top.banner.Config;
 import org.opendaylight.yangtools.concepts.Path;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 

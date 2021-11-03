@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.huawei.system.handler.banner;
+package io.frinx.cli.unit.huawei.system.handler.global.config;
 
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.frinx.cli.io.Cli;
@@ -26,11 +26,11 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.banner.extension.rev211011.huawei.banner.top.banner.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.banner.extension.rev211011.huawei.banner.top.banner.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.global.config.extension.rev211011.huawei.global.config.top.system.name.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.global.config.extension.rev211011.huawei.global.config.top.system.name.ConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class BannerConfigWriterTest {
+public class SystemNameConfigWriterTest {
 
     @Mock
     private Cli cli;
@@ -38,55 +38,47 @@ public class BannerConfigWriterTest {
     @Mock
     private WriteContext writeContext;
 
-    private BannerConfigWriter writer;
+    private SystemNameConfigWriter writer;
 
     private static final String WRITE_DATA = "system-view\n"
-            + "header login information \"\n"
-            + "  -----------------------------------------------------------------------------\n"
-            + " Banner Text\n"
-            + "  -----------------------------------------------------------------------------\n"
-            + "\"\n"
+            + "sysname System_Name My 1\n"
             + "return\n";
 
     private static final String UPDATE_DATA = "system-view\n"
-            + "header login information \"\n"
-            + " Another Banner Text\n"
-            + "\"\n"
+            + "sysname System_Name new 2\n"
             + "return\n";
 
     private static final String DELETE_DATA = "system-view\n"
-            + "undo header login\n"
+            + "undo sysname\n"
             + "return\n";
 
-    private final InstanceIdentifier<Config> iid = IIDs.SY_AUG_BANNERHUAWEIAUG_BA_CONFIG;
+    private final InstanceIdentifier<Config> iid = IIDs.SY_AUG_GLOBALCONFIGHUAWEIAUG_SY_CONFIG;
 
     private final Config config = new ConfigBuilder()
-            .setBannerText("  -----------------------------------------------------------------------------\n"
-                    + " Banner Text\n"
-                    + "  -----------------------------------------------------------------------------\n")
+            .setSystemName("System_Name My 1")
             .build();
 
     private final Config anotherConfig = new ConfigBuilder()
-            .setBannerText(" Another Banner Text\n")
+            .setSystemName("System_Name new 2")
             .build();
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         Mockito.doReturn(CompletableFuture.completedFuture("")).when(cli).executeAndRead(Mockito.any());
-        writer = new BannerConfigWriter(cli);
+        writer = new SystemNameConfigWriter(cli);
     }
 
     @Test
     public void testWrite() throws Exception {
         writer.writeCurrentAttributes(iid, config, writeContext);
-        Mockito.verify(cli).executeAndRead(Command.writeCommandWithWhitespacesAtStart(WRITE_DATA));
+        Mockito.verify(cli).executeAndRead(Command.writeCommand(WRITE_DATA));
     }
 
     @Test
     public void testUpdate() throws Exception {
         writer.updateCurrentAttributes(iid, config, anotherConfig, writeContext);
-        Mockito.verify(cli).executeAndRead(Command.writeCommandWithWhitespacesAtStart(UPDATE_DATA));
+        Mockito.verify(cli).executeAndRead(Command.writeCommand(UPDATE_DATA));
     }
 
     @Test
@@ -95,3 +87,4 @@ public class BannerConfigWriterTest {
         Mockito.verify(cli).executeAndRead(Command.writeCommand(DELETE_DATA));
     }
 }
+

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package io.frinx.cli.unit.huawei.system.handler.banner;
+package io.frinx.cli.unit.huawei.system.handler.global.config;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.banner.extension.rev211011.huawei.banner.top.banner.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.huawei.global.config.extension.rev211011.huawei.global.config.top.system.name.ConfigBuilder;
 
-public class BannerConfigReaderTest {
+public class SystemNameConfigReaderTest {
 
-    private static final String BANNER_OUTPUT = "#\r\n"
-            + "header login information \"\n"
+    private static final String GLOBAL_CONFIG_OUTPUT = "#\r\n"
+            + " sysname System_Name 1\r\n"
+            + " header login information \"\n"
             + "  ---------------------------------------------------------------------------\n"
             + " Banner Text\n"
             + "  ---------------------------------------------------------------------------\n"
@@ -32,14 +33,10 @@ public class BannerConfigReaderTest {
             + "return\n";
 
     @Test
-    public void testBannerIds() {
+    public void testSystemNameIds() {
         ConfigBuilder configBuilder = new ConfigBuilder();
-        BannerConfigReader.parseConfigAttributes(BANNER_OUTPUT, configBuilder);
+        SystemNameConfigReader.parseConfigAttributes(GLOBAL_CONFIG_OUTPUT, configBuilder);
         Assert.assertEquals(configBuilder.build(),
-            new ConfigBuilder()
-                .setBannerText("  ---------------------------------------------------------------------------\n"
-                    + " Banner Text\n"
-                    + "  ---------------------------------------------------------------------------\n")
-                .build());
+                new ConfigBuilder().setSystemName("System_Name 1").build());
     }
 }
