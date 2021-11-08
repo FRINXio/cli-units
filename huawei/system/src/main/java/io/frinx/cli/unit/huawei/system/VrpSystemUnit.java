@@ -27,6 +27,8 @@ import io.frinx.cli.unit.huawei.system.handler.connection.SshConfigReader;
 import io.frinx.cli.unit.huawei.system.handler.connection.SshConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.connection.TelnetConfigReader;
 import io.frinx.cli.unit.huawei.system.handler.connection.TelnetConfigWriter;
+import io.frinx.cli.unit.huawei.system.handler.factory.FactoryConfigurationConfigReader;
+import io.frinx.cli.unit.huawei.system.handler.factory.FactoryConfigurationConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.global.config.BannerConfigReader;
 import io.frinx.cli.unit.huawei.system.handler.global.config.BannerConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.global.config.SystemNameConfigReader;
@@ -62,7 +64,8 @@ public class VrpSystemUnit extends AbstractUnit {
         return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_SYSTEM, IIDs.FRINX_OPENCONFIG_EXTENSIONS,
                 IIDs.FRINX_HUAWEI_TERMINAL_EXTENSION, IIDs.FRINX_HUAWEI_CONNECTION_EXTENSION,
                 IIDs.FRINX_HUAWEI_GLOBAL_CONFIG_EXTENSION,
-                IIDs.FRINX_HUAWEI_HTTP_STATUS_EXTENSION, $YangModuleInfoImpl.getInstance());
+                IIDs.FRINX_HUAWEI_HTTP_STATUS_EXTENSION,
+                IIDs.FRINX_HUAWEI_FACTORY_CONFIG_EXTENSION, $YangModuleInfoImpl.getInstance());
     }
 
     @Override
@@ -92,6 +95,10 @@ public class VrpSystemUnit extends AbstractUnit {
 
         writeRegistry.addNoop(IIDs.SY_AUG_HTTPSERVERSTATUSHUAWEIAUG_HTTPSERVERSTATUS);
         writeRegistry.add(IIDs.SY_AUG_HTTPSERVERSTATUSHUAWEIAUG_HT_CONFIG, new HttpStatusConfigWriter(cli));
+
+        writeRegistry.addNoop(IIDs.SY_AUG_FACTORYCONFIGURATIONSTATUSHUAWEIAUG_FACTORYCONFIGURATIONSTATUS);
+        writeRegistry.add(IIDs.SY_AUG_FACTORYCONFIGURATIONSTATUSHUAWEIAUG_FA_CONFIG,
+                new FactoryConfigurationConfigWriter(cli));
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -106,6 +113,9 @@ public class VrpSystemUnit extends AbstractUnit {
         readRegistry.add(IIDs.SY_AUG_GLOBALCONFIGHUAWEIAUG_SY_CONFIG, new SystemNameConfigReader(cli));
 
         readRegistry.add(IIDs.SY_AUG_HTTPSERVERSTATUSHUAWEIAUG_HT_CONFIG, new HttpStatusConfigReader(cli));
+
+        readRegistry.add(IIDs.SY_AUG_FACTORYCONFIGURATIONSTATUSHUAWEIAUG_FA_CONFIG,
+                new FactoryConfigurationConfigReader(cli));
     }
 
     @Override
