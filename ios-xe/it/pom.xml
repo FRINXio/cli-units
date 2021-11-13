@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>bundle-parent</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_2_10_rc1-frinxodl</version>
+        <version>3.1.1-Oxygen-SR2.4_2_10_rc2-frinxodl-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -33,11 +33,11 @@
     <properties>
         <cli.version>4.2.10.rc1-frinx</cli.version>
         <openconfig.version>4.2.10.rc1-frinx</openconfig.version>
-        <hc.version>1.18.04-Oxygen-SR2.4_2_10_rc1-frinxodl</hc.version>
-        <controller.version>1.7.2-Oxygen-SR2.4_2_10_rc1-frinxodl</controller.version>
-        <yangtools.version>2.0.5-Oxygen-SR2.4_2_10_rc1-frinxodl</yangtools.version>
-        <mdsal.model.version>0.12.2-Oxygen-SR2.4_2_10_rc1-frinxodl</mdsal.model.version>
-        <mdsal.version>2.4.2-Oxygen-SR2.4_2_10_rc1-frinxodl</mdsal.version>
+        <hc.version>1.18.04-Oxygen-SR2.4_2_10_rc2-frinxodl-SNAPSHOT</hc.version>
+        <controller.version>1.7.2-Oxygen-SR2.4_2_10_rc2-frinxodl-SNAPSHOT</controller.version>
+        <yangtools.version>2.0.5-Oxygen-SR2.4_2_10_rc2-frinxodl-SNAPSHOT</yangtools.version>
+        <mdsal.model.version>0.12.2-Oxygen-SR2.4_2_10_rc2-frinxodl-SNAPSHOT</mdsal.model.version>
+        <mdsal.version>2.4.2-Oxygen-SR2.4_2_10_rc2-frinxodl-SNAPSHOT</mdsal.version>
         <translate.unit.commons.version>4.2.10.rc1-frinx</translate.unit.commons.version>
     </properties>
 
