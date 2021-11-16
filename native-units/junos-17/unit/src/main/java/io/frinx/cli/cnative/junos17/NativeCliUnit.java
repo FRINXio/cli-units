@@ -84,6 +84,7 @@ public final class NativeCliUnit extends GenericCliNativeUnit {
                 Collections.emptyList(),
                 ";",
                 Cli.NEWLINE,
-                "");
+                "",
+                Collections.emptySet());
     }
 }

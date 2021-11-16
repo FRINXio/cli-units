@@ -42,6 +42,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
@@ -128,7 +130,8 @@ public class SaosCliInitializerUnit extends AbstractUnit {
                 "",
                 Cli.NEWLINE,
                 "",
-                Optional.of("configuration show brief"));
+                Optional.of("configuration show brief"),
+                Stream.of('^').collect(Collectors.toSet()));
     }
 
     public static class SaosCliInitializationStrategy implements SessionInitializationStrategy {

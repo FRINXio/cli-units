@@ -129,7 +129,8 @@ public class VrpCliInitializerUnit extends AbstractUnit {
                 ImmutableList.of(),
                 "",
                 Cli.NEWLINE,
-                "");
+                "",
+                Collections.emptySet());
     }
 
 
