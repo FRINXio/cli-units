@@ -47,6 +47,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
             Pattern.compile("traffic-policy (?<policyName>.+) (?<direction>.+)");
     private static final Pattern VPN_INSTANCE_LINE = Pattern.compile("ip binding vpn-instance (?<aclName>.+)");
     private static final Pattern RADIO_LINE = Pattern.compile("\\sundo radio enable");
+    private static final Pattern ARP_EXPIRE_TIME_LINE = Pattern.compile("arp expire-time (?<arpExpTime>.*)");
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);
@@ -99,6 +100,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setTrafficFilter(output, ifHuaweiAugBuilder);
         setTrafficPolicy(output, ifHuaweiAugBuilder);
         setVpnInstance(output, ifHuaweiAugBuilder);
+        setArpExpireTime(output, ifHuaweiAugBuilder);
         if (builder.getType() == RadioMAC.class) {
             setRadio(output, ifHuaweiAugBuilder);
         }
@@ -190,5 +192,13 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
             FLOW_STAT_INTERVAL_LINE::matcher,
             matcher -> matcher.group("interval"));
         interval.ifPresent(value -> ifHuaweiAugBuilder.setFlowStatInterval(Long.valueOf(value)));
+    }
+
+    private void setArpExpireTime(String output, IfHuaweiAugBuilder ifHuaweiAugBuilder) {
+        final Optional<String> arpExpTime = ParsingUtils.parseField(output, 0,
+            ARP_EXPIRE_TIME_LINE::matcher,
+            matcher -> matcher.group("arpExpTime"));
+        ifHuaweiAugBuilder.setExpireTimeout(1200L);
+        arpExpTime.ifPresent(value -> ifHuaweiAugBuilder.setExpireTimeout(Long.valueOf(value)));
     }
 }

@@ -48,6 +48,7 @@ public class InterfaceConfigReaderTest {
             .setEnabled(true).setMtu(1200).setType(EthernetCsmacd.class)
             .addAugmentation(IfHuaweiAug.class, new IfHuaweiAugBuilder()
                     .setFlowStatInterval(10L)
+                    .setExpireTimeout(1200L)
                     .setTrustDscp(true)
                     .build()).build();
 
@@ -67,7 +68,10 @@ public class InterfaceConfigReaderTest {
             + "return\n";
 
     private static final Config EXPECTED_CONFIG2 = new ConfigBuilder().setName("LoopBack100").setEnabled(false)
-            .setDescription("Example loopback interface").setType(SoftwareLoopback.class).build();
+            .setDescription("Example loopback interface").setType(SoftwareLoopback.class)
+            .addAugmentation(IfHuaweiAug.class, new IfHuaweiAugBuilder()
+                    .setExpireTimeout(1200L)
+                    .build()).build();
 
     private static final Config EXPECTED_CONFIG_OTHER_IF = new ConfigBuilder()
             .setName("Vlanif100")
@@ -76,6 +80,7 @@ public class InterfaceConfigReaderTest {
             .setType(Other.class)
             .addAugmentation(IfHuaweiAug.class, new IfHuaweiAugBuilder()
                 .setIpBindingVpnInstance("VLAN27")
+                    .setExpireTimeout(1200L)
                 .setTrafficFilter(new TrafficFilterBuilder()
                     .setDirection(Direction.Inbound)
                     .setAclName("LAN-IN")
@@ -83,6 +88,27 @@ public class InterfaceConfigReaderTest {
                     .build())
                 .build())
             .build();
+
+    private static final String DISPLAY_CURRENT_INT_ARP = "#\n"
+            + "interface GigabitEthernet0/0/0\n"
+            + " speed auto\n"
+            + " duplex auto\n"
+            + " undo shutdown\n"
+            + " arp expire-time 60\n"
+            + " mtu 1200\n"
+            + " ip address 192.168.2.241 255.255.255.0\n"
+            + " set flow-stat interval 10\n"
+            + " trust dscp\n"
+            + "#\n"
+            + "return";
+
+    private static final Config EXPECTED_CONFIG_ARP = new ConfigBuilder().setName("GigabitEthernet0/0/0")
+            .setEnabled(true).setMtu(1200).setType(EthernetCsmacd.class)
+            .addAugmentation(IfHuaweiAug.class, new IfHuaweiAugBuilder()
+                    .setFlowStatInterval(10L)
+                    .setTrustDscp(true)
+                    .setExpireTimeout(60L)
+                    .build()).build();
 
     @Test
     public void testParseInterface() {
@@ -106,5 +132,13 @@ public class InterfaceConfigReaderTest {
         new InterfaceConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(DISPLAY_CURRENT_INT_OTHER_IF, actualConfig, "Vlanif100");
         Assert.assertEquals(EXPECTED_CONFIG_OTHER_IF, actualConfig.build());
+    }
+
+    @Test
+    public void testParseInterfaceArp() {
+        ConfigBuilder actualConfig = new ConfigBuilder();
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseInterface(DISPLAY_CURRENT_INT_ARP, actualConfig, "GigabitEthernet0/0/0");
+        Assert.assertEquals(EXPECTED_CONFIG_ARP, actualConfig.build());
     }
 }

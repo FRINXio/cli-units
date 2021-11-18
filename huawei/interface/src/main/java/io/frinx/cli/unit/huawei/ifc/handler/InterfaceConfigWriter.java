@@ -52,6 +52,11 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{$huawei_aug.traffic_policy.direction}\n{% endif %}"
             + "{% if ($trust_dscp == TRUE) %}trust dscp\n"
             + "{% else %}undo trust\n{% endif %}"
+            + "{% if ($huawei_aug.expire_timeout) %}"
+            + "arp expire-time {$huawei_aug.expire_timeout}\n"
+            + "{% else %}"
+            + "undo arp expire-time\n"
+            + "{% endif %}"
             + "return";
 
     private static final String DELETE_TEMPLATE = "system-view\n"

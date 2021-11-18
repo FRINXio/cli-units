@@ -49,6 +49,7 @@ public class InterfaceConfigWriterTest {
             + "traffic-filter Inbound ipv6 acl name WAN-IN\n"
             + "traffic-policy TP-NNI-MAIN-OUT Outbound\n"
             + "trust dscp\n"
+            + "arp expire-time 60\n"
             + "return\n";
 
     private static final String PHYSICAL_INT_CLEAN_INPUT = "system-view\n"
@@ -60,6 +61,7 @@ public class InterfaceConfigWriterTest {
             + "undo traffic-filter Inbound\n"
             + "undo traffic-policy Outbound\n"
             + "undo trust\n"
+            + "undo arp expire-time\n"
             + "return\n";
 
     private static final String OTHER_INT_WRITE_INPUT = "system-view\n"
@@ -67,6 +69,7 @@ public class InterfaceConfigWriterTest {
             + "shutdown\n"
             + "undo set flow-stat interval\n"
             + "undo trust\n"
+            + "arp expire-time 60\n"
             + "return\n";
 
     private static final String OTHER_INT_DELETE_INPUT = "system-view\n"
@@ -83,6 +86,9 @@ public class InterfaceConfigWriterTest {
             .setName("1")
             .setType(Other.class)
             .setEnabled(false)
+            .addAugmentation(IfHuaweiAug.class, new IfHuaweiAugBuilder()
+                    .setExpireTimeout(60L)
+                    .build())
             .build();
 
     private static final Config PHYSICAL_INT_CONFIG = new ConfigBuilder()
@@ -94,6 +100,7 @@ public class InterfaceConfigWriterTest {
                     .setTrustDscp(true)
                     .setFlowStatInterval(10L)
                     .setIpBindingVpnInstance("VLAN27")
+                    .setExpireTimeout(60L)
                     .setTrafficFilter(new TrafficFilterBuilder()
                             .setDirection(Direction.Inbound)
                             .setAclName("WAN-IN")
