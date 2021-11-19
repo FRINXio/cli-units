@@ -153,6 +153,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>huawei-system-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>huawei-snmp-unit</artifactId>
+        </dependency>
 
         <!-- IOS -->
         <dependency>

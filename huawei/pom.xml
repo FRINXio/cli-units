@@ -31,6 +31,7 @@
         <module>acl</module>
         <module>qos</module>
         <module>system</module>
+        <module>snmp</module>
     </modules>
 
     <parent>
