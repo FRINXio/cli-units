@@ -66,7 +66,8 @@ public final class IosXeEvcUnit extends AbstractUnit {
 
     private void provideWriters(@Nonnull CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.EV_EVC);
-        writeRegistry.add(IIDs.EV_EV_CONFIG, new EvcConfigWriter(cli));
+        writeRegistry.addBefore(IIDs.EV_EV_CONFIG, new EvcConfigWriter(cli),
+                io.frinx.openconfig.openconfig.interfaces.IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
