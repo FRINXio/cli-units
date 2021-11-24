@@ -35,10 +35,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class VrfInterfaceReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder> {
 
-    private static final String SH_IP_VRF_INTERFACES_ALL = "show running-config | include ^interface|^ ip vrf "
-            + "forwarding";
-    private static final Pattern VRF_INTERFACE_ID_LINE = Pattern.compile("interface (?<id>\\S+)\\s+ip vrf forwarding "
-            + "(?<vrfId>\\S+)");
+    private static final String SH_IP_VRF_INTERFACES_ALL = "show running-config | include ^interface| vrf forwarding";
+    private static final Pattern VRF_INTERFACE_ID_LINE = Pattern.compile("interface (?<id>\\S+)\\s+(\\S+\\s)?"
+            + "vrf forwarding (?<vrfId>\\S+)");
     private static final Pattern INTERFACE_ID_LINE = Pattern.compile("interface (?<id>\\S+)");
 
     private final Cli cli;

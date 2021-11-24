@@ -109,7 +109,7 @@ public class InterfaceConfigReaderTest {
                     .build())
             .build();
     private static final String SH_INTERFACE_RUN4 = "interface Vlan100\n"
-            + " vrf forwarding VLAN011220\n"
+            + " ip vrf forwarding VLAN011220\n"
             + " no ip address\n"
             + " ip access-group anti-spoof-VLAN998877 in\n"
             + " no ip redirects\n"

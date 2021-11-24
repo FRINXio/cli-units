@@ -48,6 +48,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
             Pattern.compile("storm-control (?<address>\\S+) level (?<level>(\\d|\\.)+).*");
     public static final Pattern NO_SNMP_TRAP_LINE = Pattern.compile("\\s*no snmp trap link-status");
     private static final Pattern MEDIA_TYPE_LINE = Pattern.compile("media-type (?<mediaType>.+)");
+    private static final Pattern VRF_FORWARDING_LINE = Pattern.compile("\\s*(\\S+\\s)?vrf forwarding (?<table>.+)");
     private static final Pattern LLDP_TRANSMIT_LINE = Pattern.compile("no lldp transmit");
     private static final Pattern LLDP_RECEIVE_LINE = Pattern.compile("no lldp receive");
     private static final Pattern NO_NEGOTIATION_AUTO_LINE = Pattern.compile("no negotiation auto");
@@ -73,6 +74,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setFhrpMinimumDelay(output, ifCiscoExtAugBuilder);
         setFhrpReloadDelay(output, ifCiscoExtAugBuilder);
         setIpRedirects(output, ifCiscoExtAugBuilder);
+        setVrfForwarding(output, ifCiscoExtAugBuilder);
         setIpProxyArp(output, ifCiscoExtAugBuilder);
         setIpv6NdRa(output, ifCiscoExtAugBuilder);
         if (Util.isPhysicalInterface(builder.getType())) {
@@ -114,6 +116,11 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         if (LLDP_TRANSMIT_LINE.matcher(output).find()) {
             ifCiscoExtAugBuilder.setLldpTransmit(false);
         }
+    }
+
+    private void setVrfForwarding(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        ParsingUtils.parseField(output, VRF_FORWARDING_LINE::matcher,
+            matcher -> matcher.group("table"), ifCiscoExtAugBuilder::setVrfForwarding);
     }
 
     private boolean isCiscoExtAugNotEmpty(final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {

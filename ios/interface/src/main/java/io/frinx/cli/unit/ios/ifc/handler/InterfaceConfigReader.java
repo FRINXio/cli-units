@@ -53,7 +53,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     public static final Pattern SWITCHPORT_MODE_LINE = Pattern.compile("\\s*switchport mode (?<mode>.+)");
     public static final Pattern NO_IP_REDIRECTS_LINE = Pattern.compile("\\s*no ip redirects");
     public static final Pattern NO_IP_UNREACHABLES_LINE = Pattern.compile("\\s*no ip unreachables");
-    public static final Pattern VRF_FORWARDING_LINE = Pattern.compile("\\s*vrf forwarding (?<table>.+)");
+    public static final Pattern VRF_FORWARDING_LINE = Pattern.compile("\\s*(\\S+\\s)?vrf forwarding (?<table>.+)");
     public static final Pattern NO_IP_PROXY_ARP_LINE = Pattern.compile("\\s*no ip proxy-arp");
     private static final Pattern STORM_CONTROL_LINE =
             Pattern.compile("\\s*storm-control (?<address>\\S+) level (?<level>.+)");

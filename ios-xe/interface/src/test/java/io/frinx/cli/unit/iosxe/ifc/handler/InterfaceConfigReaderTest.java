@@ -33,6 +33,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Bridge;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 
 public class InterfaceConfigReaderTest {
@@ -59,6 +60,13 @@ public class InterfaceConfigReaderTest {
             .setNegotiationAuto(true)
             .build();
 
+    public static final IfCiscoExtAug IF_CISCO_EXT_AUG_WITH_VRF = new IfCiscoExtAugBuilder()
+            .setIpv6NdRaSuppress("all")
+            .setVrfForwarding("VLAN123456")
+            .setIpProxyArp(false)
+            .setIpRedirects(false)
+            .build();
+
     public static final IfSaosAug IF_SAOS_AUG = new IfSaosAugBuilder()
             .setPhysicalType(SaosIfExtensionConfig.PhysicalType.Rj45)
             .build();
@@ -71,6 +79,14 @@ public class InterfaceConfigReaderTest {
             .setMtu(1530)
             .addAugmentation(IfCiscoExtAug.class, IF_CISCO_EXT_AUG)
             .addAugmentation(IfSaosAug.class, IF_SAOS_AUG)
+            .build();
+
+    private static final Config EXPECTED_INTERFACE_WITH_VRF = new ConfigBuilder()
+            .setEnabled(true)
+            .setName("BDI101")
+            .setType(Bridge.class)
+            .setDescription("LAN VLAN123456")
+            .addAugmentation(IfCiscoExtAug.class, IF_CISCO_EXT_AUG_WITH_VRF)
             .build();
 
     private static final String SH_INTERFACE_RUN = "interface GigabitEthernet0/0/0\n"
@@ -108,6 +124,14 @@ public class InterfaceConfigReaderTest {
         new InterfaceConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(SH_INTERFACE_RUN, configBuilder, "GigabitEthernet0/0/0");
         Assert.assertEquals(EXPECTED_INTERFACE, configBuilder.build());
+    }
+
+    @Test
+    public void testParseInterfaceWithVRF() {
+        final ConfigBuilder configBuilder = new ConfigBuilder();
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseInterface(SH_INTERFACE_BDI_RUN, configBuilder, "BDI101");
+        Assert.assertEquals(EXPECTED_INTERFACE_WITH_VRF, configBuilder.build());
     }
 
 }
