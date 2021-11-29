@@ -31,10 +31,21 @@ import io.frinx.cli.unit.huawei.system.handler.factory.FactoryConfigurationConfi
 import io.frinx.cli.unit.huawei.system.handler.factory.FactoryConfigurationConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.global.config.BannerConfigReader;
 import io.frinx.cli.unit.huawei.system.handler.global.config.BannerConfigWriter;
+import io.frinx.cli.unit.huawei.system.handler.global.config.ClockDaylightSavingTimeConfigReader;
+import io.frinx.cli.unit.huawei.system.handler.global.config.ClockDaylightSavingTimeConfigWriter;
+import io.frinx.cli.unit.huawei.system.handler.global.config.ClockTimezoneConfigReader;
+import io.frinx.cli.unit.huawei.system.handler.global.config.ClockTimezoneConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.global.config.SystemNameConfigReader;
 import io.frinx.cli.unit.huawei.system.handler.global.config.SystemNameConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.http.HttpStatusConfigReader;
 import io.frinx.cli.unit.huawei.system.handler.http.HttpStatusConfigWriter;
+import io.frinx.cli.unit.huawei.system.handler.ntp.NtpConfigReader;
+import io.frinx.cli.unit.huawei.system.handler.ntp.NtpConfigWriter;
+import io.frinx.cli.unit.huawei.system.handler.ntp.NtpInterfaceConfigReader;
+import io.frinx.cli.unit.huawei.system.handler.ntp.NtpInterfaceConfigWriter;
+import io.frinx.cli.unit.huawei.system.handler.ntp.NtpServerConfigReader;
+import io.frinx.cli.unit.huawei.system.handler.ntp.NtpServerConfigWriter;
+import io.frinx.cli.unit.huawei.system.handler.ntp.NtpServerReader;
 import io.frinx.cli.unit.huawei.system.handler.terminal.TerminalConfigReader;
 import io.frinx.cli.unit.huawei.system.handler.terminal.TerminalConfigWriter;
 import io.frinx.cli.unit.huawei.system.handler.terminal.TerminalReader;
@@ -99,6 +110,18 @@ public class VrpSystemUnit extends AbstractUnit {
         writeRegistry.addNoop(IIDs.SY_AUG_FACTORYCONFIGURATIONSTATUSHUAWEIAUG_FACTORYCONFIGURATIONSTATUS);
         writeRegistry.add(IIDs.SY_AUG_FACTORYCONFIGURATIONSTATUSHUAWEIAUG_FA_CONFIG,
                 new FactoryConfigurationConfigWriter(cli));
+
+        writeRegistry.addNoop(IIDs.SY_NTP);
+        writeRegistry.addNoop(IIDs.SY_NT_SERVERS);
+        writeRegistry.addNoop(IIDs.SY_NT_SE_SERVER);
+        writeRegistry.add(IIDs.SY_NT_CONFIG, new NtpConfigWriter(cli));
+        writeRegistry.add(IIDs.SY_NT_SE_SE_CONFIG, new NtpServerConfigWriter(cli));
+        writeRegistry.add(IIDs.SY_AUG_NTPINTHUAWEIAUG_NT_CONFIG, new NtpInterfaceConfigWriter(cli));
+        writeRegistry.add(IIDs.SY_AUG_GLOBALCONFIGHUAWEIAUG_SY_TI_CONFIG, new ClockTimezoneConfigWriter(cli));
+        writeRegistry.add(IIDs.SY_AUG_GLOBALCONFIGHUAWEIAUG_SY_DA_CONFIG,
+                new ClockDaylightSavingTimeConfigWriter(cli));
+        writeRegistry.addNoop(IIDs.SY_AUG_GLOBALCONFIGHUAWEIAUG_SY_DA_CO_ENDDAY);
+        writeRegistry.addNoop(IIDs.SY_AUG_GLOBALCONFIGHUAWEIAUG_SY_DA_CO_STARTDAY);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -116,6 +139,14 @@ public class VrpSystemUnit extends AbstractUnit {
 
         readRegistry.add(IIDs.SY_AUG_FACTORYCONFIGURATIONSTATUSHUAWEIAUG_FA_CONFIG,
                 new FactoryConfigurationConfigReader(cli));
+
+        readRegistry.add(IIDs.SY_NT_CONFIG, new NtpConfigReader(cli));
+        readRegistry.add(IIDs.SY_NT_SE_SE_CONFIG, new NtpServerConfigReader(cli));
+        readRegistry.add(IIDs.SY_NT_SE_SERVER, new NtpServerReader(cli));
+        readRegistry.add(IIDs.SY_AUG_NTPINTHUAWEIAUG_NT_CONFIG, new NtpInterfaceConfigReader(cli));
+        readRegistry.add(IIDs.SY_AUG_GLOBALCONFIGHUAWEIAUG_SY_TI_CONFIG, new ClockTimezoneConfigReader(cli));
+        readRegistry.add(IIDs.SY_AUG_GLOBALCONFIGHUAWEIAUG_SY_DA_CONFIG,
+                new ClockDaylightSavingTimeConfigReader(cli));
     }
 
     @Override
