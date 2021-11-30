@@ -32,6 +32,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.re
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.types.inet.rev170403.Ipv6Prefix;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L3ipvlan;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 
 public class InterfaceConfigReaderTest {
 
@@ -111,6 +113,8 @@ public class InterfaceConfigReaderTest {
             + "| local           | n/a                | 172.16.1.74/23                             |\n"
             + "| local           | n/a                | fe80::9e7a:3ff:fe1b:6820/64                |\n"
             + "| remote          | VLAN 127           | fe80::9e7a:3ff:fe1b:683f/64                |\n"
+            + "| vlan2221        | VLAN 2221          | fe80::9e7a:3ff:fe1b:683f/64                |\n"
+            + "| 99              | n/a                | 1.1.1.1/32                                 |\n"
             + "+-----------------+--------------------+--------------------------------------------+\n";
 
     private static final Config EXPECTED_LOCAL_LOGICAL_INTERFACE = new ConfigBuilder()
@@ -118,14 +122,6 @@ public class InterfaceConfigReaderTest {
             .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
                     .setIpv4Prefix(new Ipv4Prefix("172.16.1.74/23"))
                     .setIpv6Prefix(new Ipv6Prefix("fe80::9e7a:3ff:fe1b:6820/64"))
-                    .build())
-            .build();
-
-    private static final Config EXPECTED_REMOTE_LOGICAL_INTERFACE = new ConfigBuilder()
-            .setName("remote")
-            .setDescription("VLAN127")
-            .addAugmentation(IfSaosAug.class, new IfSaosAugBuilder()
-                    .setIpv6Prefix(new Ipv6Prefix("fe80::9e7a:3ff:fe1b:683f/64"))
                     .build())
             .build();
 
@@ -193,5 +189,19 @@ public class InterfaceConfigReaderTest {
         new InterfaceConfigReader(Mockito.mock(Cli.class))
                 .parseType(SH_AGG, parsed, "LAG_LMR-001_East");
         Assert.assertEquals(Ieee8023adLag.class, parsed.getType());
+    }
+
+    @Test
+    public void testParseVlanInterfaceType() {
+        ConfigBuilder parsed = new ConfigBuilder();
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseLogicalInterfaceType(SH_LOGICAL_INTERFACE, parsed,"vlan2221");
+        Assert.assertEquals(L3ipvlan.class, parsed.getType());
+
+
+        parsed.setType(null);
+        new InterfaceConfigReader(Mockito.mock(Cli.class))
+                .parseLogicalInterfaceType(SH_LOGICAL_INTERFACE, parsed, "99");
+        Assert.assertEquals(SoftwareLoopback.class, parsed.getType());
     }
 }

@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public abstract class AbstractIpv4ConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private Cli cli;
+    protected final Cli cli;
 
     public AbstractIpv4ConfigReader(Cli cli) {
         this.cli = cli;

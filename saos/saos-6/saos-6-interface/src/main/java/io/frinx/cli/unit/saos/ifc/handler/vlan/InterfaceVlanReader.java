@@ -38,9 +38,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceVlanReader implements CliConfigReader<Config, ConfigBuilder> {
 
-    private static String SH_INTERFACE_SHOW_REMOTE = "interface show remote";
-
-    private Cli cli;
+    private static final String SH_INTERFACE_SHOW = "interface show %s";
+    private final Cli cli;
 
     public InterfaceVlanReader(Cli cli) {
         this.cli = cli;
@@ -55,7 +54,10 @@ public class InterfaceVlanReader implements CliConfigReader<Config, ConfigBuilde
                 configBuilder, ifcName);
         // only remote management interface can contain vlan value
         if (ifcName.equals("remote")) {
-            setManagementVlanIds(blockingRead(SH_INTERFACE_SHOW_REMOTE, cli, id, ctx), configBuilder);
+            setManagementVlanIds(blockingRead(f(SH_INTERFACE_SHOW, ifcName), cli, id, ctx), configBuilder);
+        } else {
+            setManagementVlanIds(blockingRead(f(SH_INTERFACE_SHOW, "ip-interface " + ifcName), cli, id, ctx),
+                    configBuilder);
         }
     }
 
@@ -64,7 +66,7 @@ public class InterfaceVlanReader implements CliConfigReader<Config, ConfigBuilde
         final Optional<String> domain = ParsingUtils.parseField(output, 0,
             domainVlan::matcher,
             matcher -> matcher.group("domain"));
-        if (domain.isPresent()) {
+        if (domain.isPresent() && !domain.get().contains("n/a")) {
             List<VlanSwitchedConfig.TrunkVlans> trunkVlans = new ArrayList<>();
             trunkVlans.add(new VlanSwitchedConfig.TrunkVlans(
                 new VlanId(Integer.valueOf(domain.get().split(" ")[1]))

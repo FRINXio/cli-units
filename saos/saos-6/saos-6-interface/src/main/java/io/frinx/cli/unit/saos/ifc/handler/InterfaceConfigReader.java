@@ -22,11 +22,13 @@ import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.IfSaosAug;
@@ -37,12 +39,17 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.sa
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.saos.extension.rev200205.SaosIfExtensionConfig.VlanEthertypePolicy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L3ipvlan;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     public static final String SH_SINGLE_INTERFACE_CFG = "configuration search string \"port %s\"";
     private static final String SH_TYPE = "configuration search string \"aggregation create agg %s\"";
+    private static final Pattern LOGICAL_INTERFACE_LINE = Pattern.compile("\\|\\s+(?<vlanInterfaceName>\\S+)\\s+\\|"
+            + "\\s+VLAN (?<vlanId>\\d+)\\s+\\|[\\s\\S]+\\|");
+
 
     private final Cli cli;
 
@@ -55,14 +62,27 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
                                       @Nonnull final ConfigBuilder builder,
                                       @Nonnull final ReadContext ctx) throws ReadFailedException {
         String ifcName = id.firstKeyOf(Interface.class).getName();
-        parseType(blockingRead(f(SH_TYPE, ifcName), cli, id, ctx), builder, ifcName);
-        if (ifcName.equals("local") || ifcName.equals("remote")) {
-            builder.setName(ifcName);
-        } else {
+        parseLogicalInterfaces(id, builder, ctx, ifcName);
+        // Set up all others interfaces
+        if (builder.getType() == null) {
+            parseType(blockingRead(f(SH_TYPE, ifcName), cli, id, ctx), builder, ifcName);
             IfSaosAugBuilder ifSaosAugBuilder = new IfSaosAugBuilder();
             parseInterface(blockingRead(f(SH_SINGLE_INTERFACE_CFG, ifcName), cli, id, ctx),
                     builder, ifSaosAugBuilder, ifcName);
             builder.addAugmentation(IfSaosAug.class, ifSaosAugBuilder.build());
+        }
+    }
+
+    private void parseLogicalInterfaces(InstanceIdentifier<Config> id, ConfigBuilder builder, ReadContext ctx,
+                                        String ifcName) throws ReadFailedException {
+        String output = blockingRead(InterfaceReader.LOGICAL_INTERFACE, cli, id, ctx);
+        List<InterfaceKey> logicalInterfaces = InterfaceReader.getAllIds(output,
+                InterfaceReader.LOGICAL_INTERFACE_ID_LINE);
+        for (InterfaceKey logicalIfc: logicalInterfaces) {
+            if (logicalIfc.getName().equals(ifcName)) {
+                builder.setName(ifcName);
+                parseLogicalInterfaceType(output, builder, ifcName);
+            }
         }
     }
 
@@ -94,6 +114,28 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
                 .filter(Matcher::matches)
                 .skip(0)
                 .findFirst().ifPresent(v -> builder.setType(Ieee8023adLag.class));
+    }
+
+    @VisibleForTesting
+    void parseLogicalInterfaceType(String output, ConfigBuilder builder, String ifcName) {
+        if (ifcName.equals("local") || ifcName.equals("remote")) {
+            builder.setType(L3ipvlan.class);
+        } else {
+            ParsingUtils.NEWLINE.splitAsStream(output)
+                    .map(String::trim)
+                    .filter(line -> !line.contains("n/a"))
+                    .map(LOGICAL_INTERFACE_LINE::matcher)
+                    .filter(Matcher::matches)
+                    .filter(matcher -> ifcName.equals(matcher.group("vlanInterfaceName")))
+                    .map(m -> m.group("vlanId"))
+                    .findFirst()
+                    .ifPresent(value -> builder.setType(L3ipvlan.class));
+        }
+        // Only Loopback interfaces will not be parsed, so their type will be undefined
+        if (builder.getType() == null) {
+            builder.setType(SoftwareLoopback.class);
+        }
+
     }
 
     private void setMtu(final String output, ConfigBuilder builder, String name) {

@@ -39,7 +39,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public abstract class AbstractIpv6AddressesReader implements CliConfigListReader<Address, AddressKey, AddressBuilder> {
 
-    private final Cli cli;
+    protected final Cli cli;
 
     public AbstractIpv6AddressesReader(Cli cli) {
         this.cli = cli;

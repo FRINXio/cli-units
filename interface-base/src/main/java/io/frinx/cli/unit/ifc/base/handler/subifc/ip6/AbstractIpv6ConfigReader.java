@@ -39,7 +39,7 @@ public abstract class AbstractIpv6ConfigReader implements CliConfigReader<Config
 
     protected static final short DEFAULT_PREFIX_LENGHT = (short) 64;
 
-    private Cli cli;
+    protected final Cli cli;
 
     public AbstractIpv6ConfigReader(Cli cli) {
         this.cli = cli;

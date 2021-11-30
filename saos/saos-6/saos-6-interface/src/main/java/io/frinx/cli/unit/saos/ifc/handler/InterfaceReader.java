@@ -38,8 +38,9 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
     private static final String LAG_PORTS = "configuration search string \"aggregation create\"";
     protected static final Pattern INTERFACE_ID_LINE = Pattern.compile("\\|\\s(?<id>\\d+)\\s+\\|.*");
     protected static final Pattern LAG_INTERFACE_ID_LINE = Pattern.compile(".*agg (?<id>\\S+)");
-    public static final Pattern LOGICAL_INTERFACE_ID_LINE = Pattern.compile("\\|\\s(?<id>local|remote)\\s+\\|.*");
-    private Cli cli;
+    public static final Pattern LOGICAL_INTERFACE_ID_LINE = Pattern.compile("\\|\\s+(?<id>\\S+)\\s+\\|"
+            + "[\\s\\S]+\\|(?!\\s+IP)[\\s\\S]+\\|");
+    private final Cli cli;
 
     public InterfaceReader(Cli cli) {
         this.cli = cli;
@@ -63,7 +64,7 @@ public class InterfaceReader implements CliConfigListReader<Interface, Interface
     }
 
     @VisibleForTesting
-    public List<InterfaceKey> getAllIds(String output, Pattern pattern) {
+    public static List<InterfaceKey> getAllIds(String output, Pattern pattern) {
         return ParsingUtils.parseFields(output, 0,
             pattern::matcher,
             m -> m.group("id"), InterfaceKey::new);

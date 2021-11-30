@@ -102,7 +102,7 @@ public class InterfaceReaderTest {
             + "aggregation create agg JMEP\n"
             + "aggregation create agg LSPIRENT01\n";
 
-    public static final String OUTPUT = SH_INTERFACE.concat(SH_AGG_IFACE).concat(LOGICAL_INTERFACE);
+    public static final String OUTPUT = SH_INTERFACE.concat(SH_AGG_IFACE);
 
     private static final List<InterfaceKey> IDS_EXPECTED_PORT = Lists.newArrayList("1", "2", "3", "4", "5", "6",
             "7", "8", "9", "10")
@@ -128,7 +128,7 @@ public class InterfaceReaderTest {
         Assert.assertEquals(IDS_EXPECTED_AGG,
                 new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT, InterfaceReader.LAG_INTERFACE_ID_LINE));
         Assert.assertEquals(IDS_EXPECTED_LOGICAL,
-                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(OUTPUT,
+                new InterfaceReader(Mockito.mock(Cli.class)).getAllIds(LOGICAL_INTERFACE,
                         InterfaceReader.LOGICAL_INTERFACE_ID_LINE));
 
     }

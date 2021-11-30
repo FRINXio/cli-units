@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public abstract class AbstractIpv4AddressesReader implements CliConfigListReader<Address, AddressKey, AddressBuilder> {
 
-    private final Cli cli;
+    protected final Cli cli;
 
     public AbstractIpv4AddressesReader(Cli cli) {
         this.cli = cli;
