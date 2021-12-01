@@ -31,7 +31,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ci
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L3ipvlan;
 
 public class InterfaceConfigReaderTest {
 
@@ -99,7 +99,7 @@ public class InterfaceConfigReaderTest {
 
     private static final Config EXPECTED_INTERFACE4 = new ConfigBuilder().setEnabled(true)
             .setName("Vlan100")
-            .setType(Other.class)
+            .setType(L3ipvlan.class)
             .addAugmentation(IfCiscoExtAug.class, new IfCiscoExtAugBuilder()
                     .setVrfForwarding("VLAN011220")
                     .setIpProxyArp(false)
