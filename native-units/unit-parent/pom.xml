@@ -21,13 +21,13 @@
     <parent>
         <groupId>io.frinx.translate.unit.commons</groupId>
         <artifactId>checkstyle-parent</artifactId>
-        <version>4.2.10.rc4-frinx-SNAPSHOT</version>
+        <version>4.2.10.rc4-frinx</version>
         <relativePath/>
     </parent>
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>native-unit-parent</artifactId>
-    <version>4.2.10.rc4-frinx-SNAPSHOT</version>
+    <version>4.2.10.rc4-frinx</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -40,14 +40,14 @@
                 <groupId>io.frinx.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.10.rc4-frinx-SNAPSHOT</version>
+                <version>4.2.10.rc4-frinx</version>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>cli-units-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.10.rc4-frinx-SNAPSHOT</version>
+                <version>4.2.10.rc4-frinx</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
