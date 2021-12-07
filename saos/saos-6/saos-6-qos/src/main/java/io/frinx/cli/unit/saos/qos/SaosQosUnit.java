@@ -33,6 +33,11 @@ import io.frinx.cli.unit.saos.qos.handler.scheduler.SchedulerPolicyReader;
 import io.frinx.cli.unit.saos.qos.handler.scheduler.SchedulerPolicyWriter;
 import io.frinx.cli.unit.saos.qos.handler.scheduler.SchedulerReader;
 import io.frinx.cli.unit.saos.qos.handler.scheduler.TwoRateThreeColorConfigReader;
+import io.frinx.cli.unit.saos.qos.handler.scheduler.service.queue.maps.ServiceQueueMapConfigReader;
+import io.frinx.cli.unit.saos.qos.handler.scheduler.service.queue.maps.ServiceQueueMapConfigWriter;
+import io.frinx.cli.unit.saos.qos.handler.scheduler.service.queue.maps.ServiceQueueMapReader;
+import io.frinx.cli.unit.saos.qos.handler.scheduler.service.queue.maps.ServiceQueueMapsConfigWriter;
+import io.frinx.cli.unit.saos.qos.handler.scheduler.service.queue.maps.ServiceQueueMapsReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.qos.IIDs;
 import java.util.Set;
@@ -60,7 +65,7 @@ public class SaosQosUnit extends AbstractUnit {
     @Override
     public Set<YangModuleInfo> getYangSchemas() {
         return Sets.newHashSet(IIDs.FRINX_OPENCONFIG_QOS,
-                IIDs.FRINX_SAOS_QOS_EXTENSION,
+                IIDs.FRINX_SAOS_QOS_EXTENSION, IIDs.FRINX_QOS_EXTENSION,
                 $YangModuleInfoImpl.getInstance());
     }
 
@@ -92,6 +97,14 @@ public class SaosQosUnit extends AbstractUnit {
                         IIDs.QO_SC_SC_SC_SC_TWORATETHREECOLOR,
                         IIDs.QO_SC_SC_SC_SC_TW_CONFIG,
                         IIDs.QO_SC_SC_SC_SC_TW_CO_AUG_SAOSQOS2R3CAUG), IIDs.QO_IN_IN_CONFIG);
+
+        writeRegistry.addNoop(IIDs.QO_AUG_QOSQUEUEMAPSAUG_TRAFFICSERVICEQUEUEMAPS);
+        writeRegistry.addNoop(IIDs.QO_AUG_QOSQUEUEMAPSAUG_TR_QUEUEMAPS);
+        writeRegistry.add(IIDs.QO_AUG_QOSQUEUEMAPSAUG_TR_QU_CONFIG,
+                new ServiceQueueMapsConfigWriter(cli));
+        writeRegistry.addNoop(IIDs.QO_AUG_QOSQUEUEMAPSAUG_TR_QU_CO_QUEUEMAP);
+        writeRegistry.add(IIDs.QO_AUG_QOSQUEUEMAPSAUG_TR_QU_CO_QU_CONFIG,
+                new ServiceQueueMapConfigWriter(cli));
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
@@ -103,5 +116,9 @@ public class SaosQosUnit extends AbstractUnit {
         readRegistry.add(IIDs.QO_SC_SC_SC_SCHEDULER, new SchedulerReader(cli));
         readRegistry.add(IIDs.QO_SC_SC_SC_SC_CONFIG, new SchedulerConfigReader(cli));
         readRegistry.add(IIDs.QO_SC_SC_SC_SC_TW_CONFIG, new TwoRateThreeColorConfigReader(cli));
+
+        readRegistry.add(IIDs.QO_AUG_QOSQUEUEMAPSAUG_TR_QUEUEMAPS, new ServiceQueueMapsReader(cli));
+        readRegistry.add(IIDs.QO_AUG_QOSQUEUEMAPSAUG_TR_QU_CO_QUEUEMAP, new ServiceQueueMapReader(cli));
+        readRegistry.add(IIDs.QO_AUG_QOSQUEUEMAPSAUG_TR_QU_CO_QU_CONFIG, new ServiceQueueMapConfigReader(cli));
     }
 }
