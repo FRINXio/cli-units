@@ -25,6 +25,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.MatchCommunityConfigListAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.MatchCommunityConfigListAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.PrefixListConditionsAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.PrefixListConditionsAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.cisco.rpol.extension.conditions.MatchIpPrefixListBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.BgpSetCommunityOptionType;
@@ -72,13 +77,14 @@ public class PolicyWriterTest {
                         + "match ip address prefix-list PL-CUST-NETWORKS\n"
                         + "match ipv6 address prefix-list PXL_V6_B2B_VZ_PA_PFX_VLAN011220\n"
                         + "set origin igp\n"
-                        + "match community TEST-SET\n"
+                        + "match community TEST-SET tesdt\n"
                         + "set community no-export additive\n"
                         + "end",
                 writer.writeTemplate(createPolicyDefinition("test", Collections.singletonList(
                         createStatement("9", "90", "65222", new Short("4"), "permit",
                                 Collections.singletonList("PL-CUST-NETWORKS"), "PXL_V6_B2B_VZ_PA_PFX_VLAN011220",
-                                BgpOriginAttrType.IGP, "TEST-SET", Collections.singletonList("no-export"), true)))));
+                                BgpOriginAttrType.IGP, Arrays.asList("TEST-SET", "tesdt"),
+                                Collections.singletonList("no-export"), true)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -133,7 +139,8 @@ public class PolicyWriterTest {
                         + "end",
                 writer.writeTemplate(createPolicyDefinition("test", Collections.singletonList(
                         createStatement("9", null, null, null, "permit",
-                                null, "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", null, "FOO", null, false)))));
+                                null, "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", null, Arrays.asList("FOO"),
+                                null, false)))));
     }
 
     @Test
@@ -143,13 +150,15 @@ public class PolicyWriterTest {
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "90", "65222", new Short("4"), "permit",
                                         Collections.singletonList("PL-CUST-NETWORKS"),
-                                        "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", BgpOriginAttrType.IGP, "TEST-SET",
+                                        "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", BgpOriginAttrType.IGP,
+                                        Arrays.asList("TEST-SET"),
                                         Collections.singletonList("no-export"), true))),
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "90", "65222", new Short("4"), "permit",
                                         Collections.singletonList("PL-CUST-NETWORKS"),
                                         "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", BgpOriginAttrType.IGP,
-                                        "TEST-SET", Collections.singletonList("no-export"), true)))));
+                                        Arrays.asList("TEST-SET"), Collections.singletonList("no-export"),
+                                        true)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -171,7 +180,8 @@ public class PolicyWriterTest {
                                         Collections.singletonList("65222:999"), false))),
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "95", "65222", new Short("4"), "permit",
-                                        null, null, null, "BAR", Collections.singletonList("6830:13000"), true)))));
+                                        null, null, null, Arrays.asList("BAR"),
+                                        Collections.singletonList("6830:13000"), true)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -182,10 +192,12 @@ public class PolicyWriterTest {
                 writer.updateTemplate(
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "90", "65222", new Short("4"), "permit",
-                                        null, null, null, "FOOBAR", null, false))),
+                                        null, null, null, Arrays.asList("FOOBAR"),
+                                        null, false))),
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "90", "65222", new Short("3"), "permit",
-                                        null, null, null, null, null, true)))));
+                                        null, null, null, null,
+                                        null, true)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -197,10 +209,12 @@ public class PolicyWriterTest {
                 writer.updateTemplate(
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "90", "65222", new Short("4"), "permit",
-                                        null, null, null, null, Collections.singletonList("no-advertise"), false))),
+                                        null, null, null, null,
+                                        Collections.singletonList("no-advertise"), false))),
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", null, "65222", new Short("4"), "permit",
-                                        null, null, null, null, Collections.singletonList("no-advertise"), true)))));
+                                        null, null, null, null,
+                                        Collections.singletonList("no-advertise"), true)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -211,10 +225,12 @@ public class PolicyWriterTest {
                 writer.updateTemplate(
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "90", "65222", new Short("4"), "deny",
-                                        null, null, null, null, null, false))),
+                                        null, null, null, null,
+                                        null, false))),
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "91", null, null, "deny",
-                                        null, null, null, null, null, false)))));
+                                        null, null, null, null,
+                                        null, false)))));
 
         Assert.assertEquals(
                 "configure terminal\n"
@@ -286,11 +302,13 @@ public class PolicyWriterTest {
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "90", "65222", new Short("4"), "permit",
                                         Arrays.asList("PL-CUST-NETWORKS", "testValue"),
-                                        "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", null, null, null, false))),
+                                        "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", null, null,
+                                        null, false))),
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "95", "65222", new Short("4"), "permit",
                                         Collections.singletonList("PL-CUST-NETWORKS"),
-                                        "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", null, "frinx", null, false)))));
+                                        "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", null, Arrays.asList("frinx"),
+                                        null, false)))));
     }
 
     @Test
@@ -303,7 +321,7 @@ public class PolicyWriterTest {
                         createPolicyDefinition("test", Collections.singletonList(
                                 createStatement("9", "90", "65222", new Short("4"), "permit",
                                         Collections.singletonList("PL-CUST-NETWORKS"),
-                                        "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", BgpOriginAttrType.IGP, "FOO",
+                                        "PXL_V6_B2B_VZ_PA_PFX_VLAN011220", BgpOriginAttrType.IGP, Arrays.asList("FOO"),
                                         null, false)))));
     }
 
@@ -324,7 +342,7 @@ public class PolicyWriterTest {
                                       List<String> ip,
                                       String ipv6,
                                       BgpOriginAttrType origin,
-                                      String communitySet,
+                                      List<String> communitySet,
                                       List<String> setCommunities,
                                       boolean additive) {
         // builders
@@ -349,8 +367,8 @@ public class PolicyWriterTest {
         configBuilder.setName(id);
         bgpActionsConfigBuilder.setSetRouteOrigin(origin);
         bgpActionsConfigBuilder.setSetLocalPref(localPref != null ? Long.parseLong(localPref) : null);
-        prefixListAugBuilder.setIpPrefixList(ip);
-        prefixListAugBuilder.setIpv6PrefixList(ipv6);
+//        prefixListAugBuilder.setIpPrefixList(ip);
+//        prefixListAugBuilder.setIpv6PrefixList(ipv6);
 
         if (asn != null) {
             bgpActionsBuilder.setSetAsPathPrepend(new SetAsPathPrependBuilder()
@@ -374,10 +392,20 @@ public class PolicyWriterTest {
             bgpConditionsBuilder.setMatchCommunitySet(new MatchCommunitySetBuilder()
                     .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730
                             .match.community.top.match.community.set.ConfigBuilder()
-                            .setCommunitySet(communitySet)
+                            .addAugmentation(MatchCommunityConfigListAug.class, new MatchCommunityConfigListAugBuilder()
+                                    .setCommunitySetList(communitySet)
+                            .build())
+//                            .setCommunitySet(communitySet)
                             .build())
                     .build());
         }
+        // Set ip and ipv6 match prefix list
+        bgpConditionsBuilder.addAugmentation(PrefixListConditionsAug.class,
+                    new PrefixListConditionsAugBuilder().setMatchIpPrefixList(new MatchIpPrefixListBuilder()
+                                .setIpPrefixList(ip)
+                                .setIpv6PrefixList(ipv6)
+                                .build())
+                    .build());
 
         if (setCommunities != null && setCommunities.size() > 0) {
             bgpActionsBuilder.setSetCommunity(new SetCommunityBuilder()

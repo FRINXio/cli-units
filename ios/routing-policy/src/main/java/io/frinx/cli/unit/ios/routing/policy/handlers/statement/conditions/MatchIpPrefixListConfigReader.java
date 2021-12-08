@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.ios.routing.policy.handlers.statement.conditions;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
 import io.fd.honeycomb.translate.read.ReadFailedException;
 import io.frinx.cli.io.Cli;
@@ -26,47 +25,50 @@ import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.MatchCommunityConfigListAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.MatchCommunityConfigListAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.match.community.top.match.community.set.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.match.community.top.match.community.set.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.cisco.rpol.extension.conditions.MatchIpPrefixList;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.cisco.rpol.extension.conditions.MatchIpPrefixListBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.definitions.top.policy.definitions.PolicyDefinition;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.statements.top.statements.Statement;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class MatchCommunitySetConfigReader implements CliConfigReader<Config, ConfigBuilder> {
+public class MatchIpPrefixListConfigReader implements CliConfigReader<MatchIpPrefixList, MatchIpPrefixListBuilder> {
 
-    private static final String SH_ROUTE_MAPS = "show running-config | include ^route-map |^ match community";
-    private static final Pattern COMMUNITY_LINE = Pattern.compile("match community (?<community>.+)");
+    private static final String SH_ROUTE_MAPS = "show running-config | include ^route-map |^ match ip.* address";
+
+    private static final Pattern ADDRESS_LINE = Pattern.compile("match ip address prefix-list (?<prefixList>.+)");
+    private static final Pattern ADDRESS_V6_LINE = Pattern.compile("match ipv6 address prefix-list (?<prefixList>.+)");
 
     private final Cli cli;
 
-    public MatchCommunitySetConfigReader(Cli cli) {
+    public MatchIpPrefixListConfigReader(Cli cli) {
         this.cli = cli;
     }
 
     @Override
-    public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
-                                      @Nonnull ConfigBuilder configBuilder,
+    public void readCurrentAttributes(@Nonnull InstanceIdentifier<MatchIpPrefixList> instanceIdentifier,
+                                      @Nonnull MatchIpPrefixListBuilder matchIpPrefixListBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
         final String routeMapName = instanceIdentifier.firstKeyOf(PolicyDefinition.class).getName();
         final String statementId = instanceIdentifier.firstKeyOf(Statement.class).getName();
         final String output = blockingRead(SH_ROUTE_MAPS, cli, instanceIdentifier, readContext);
-        parseConfig(routeMapName, statementId, output, configBuilder);
+        parseStatementConfig(routeMapName, statementId, output, matchIpPrefixListBuilder);
     }
 
-    @VisibleForTesting
-    static void parseConfig(final String routeMapName,
-                            final String statementId,
-                            final String output,
-                            final ConfigBuilder configBuilder) {
+    public static void parseStatementConfig(final String routeMapName,
+                                            final String statementId,
+                                            final String output,
+                                            final MatchIpPrefixListBuilder configBuilder) {
         final String routeMapOutput = Util.extractRouteMap(routeMapName, statementId, output);
-        MatchCommunityConfigListAugBuilder augBuilder = new MatchCommunityConfigListAugBuilder();
+
         ParsingUtils.parseField(routeMapOutput, 0,
-            COMMUNITY_LINE::matcher,
-            matcher -> matcher.group("community"),
-            s -> augBuilder.setCommunitySetList(Arrays.asList(s.split(" "))));
-        configBuilder.addAugmentation(MatchCommunityConfigListAug.class, augBuilder.build());
+            ADDRESS_LINE::matcher,
+            matcher -> matcher.group("prefixList"),
+            s -> configBuilder.setIpPrefixList(Arrays.asList(s.split(" "))));
+
+        ParsingUtils.parseField(routeMapOutput, 0,
+            ADDRESS_V6_LINE::matcher,
+            matcher -> matcher.group("prefixList"),
+            configBuilder::setIpv6PrefixList);
     }
 
 }

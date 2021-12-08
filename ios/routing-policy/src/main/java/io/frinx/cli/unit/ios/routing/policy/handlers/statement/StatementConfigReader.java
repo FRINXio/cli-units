@@ -22,7 +22,6 @@ import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.routing.policy.Util;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.DENY;
@@ -40,8 +39,6 @@ public class StatementConfigReader implements CliConfigReader<Config, ConfigBuil
     private static final String SH_ROUTE_MAPS = "show running-config | include ^route-map |^ match ip.* address";
 
     private static final Pattern ACTION_LINE = Pattern.compile("route-map \\S+ (?<action>\\S+) .*");
-    private static final Pattern ADDRESS_LINE = Pattern.compile("match ip address prefix-list (?<prefixList>.+)");
-    private static final Pattern ADDRESS_V6_LINE = Pattern.compile("match ipv6 address prefix-list (?<prefixList>.+)");
 
     private final Cli cli;
 
@@ -71,16 +68,6 @@ public class StatementConfigReader implements CliConfigReader<Config, ConfigBuil
             ACTION_LINE::matcher,
             matcher -> matcher.group("action"),
             s -> prefixListAugBuilder.setSetOperation(s.equals("permit") ? PERMIT.class : DENY.class));
-
-        ParsingUtils.parseField(routeMapOutput, 0,
-            ADDRESS_LINE::matcher,
-            matcher -> matcher.group("prefixList"),
-            s -> prefixListAugBuilder.setIpPrefixList(Arrays.asList(s.split(" "))));
-
-        ParsingUtils.parseField(routeMapOutput, 0,
-            ADDRESS_V6_LINE::matcher,
-            matcher -> matcher.group("prefixList"),
-            prefixListAugBuilder::setIpv6PrefixList);
 
         configBuilder.addAugmentation(PrefixListAug.class, prefixListAugBuilder.build());
     }

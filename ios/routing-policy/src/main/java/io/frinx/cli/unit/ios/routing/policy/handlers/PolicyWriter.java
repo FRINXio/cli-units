@@ -29,6 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.MatchCommunityConfigListAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.PrefixListConditionsAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.cisco.rpol.extension.conditions.MatchIpPrefixList;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Actions2;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.BgpSetCommunityOptionType;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.rev170730.Conditions2;
@@ -53,9 +57,10 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
             + "route-map {$data.name} {$action} {$sequence}\n"
             + "{% if ($localPref) %}set local-preference {$localPref}\n{% endif %}"
             + "{% if ($asnValue) %}set as-path prepend {$asnValue}\n{% endif %}"
-            + "{% if ($aug.ip_prefix_list) %}match ip address prefix-list"
-            + "{% loop in $aug.ip_prefix_list as $ip_prefix %} {$ip_prefix}{% endloop %}\n{% endif %}"
-            + "{% if ($aug.ipv6_prefix_list) %}match ipv6 address prefix-list {$aug.ipv6_prefix_list}\n{% endif %}"
+            + "{% if ($prefixList.ip_prefix_list) %}match ip address prefix-list"
+            + "{% loop in $prefixList.ip_prefix_list as $ip_prefix %} {$ip_prefix}{% endloop %}\n{% endif %}"
+            + "{% if ($prefixList.ipv6_prefix_list) %}match ipv6 address prefix-list {$prefixList.ipv6_prefix_list}\n"
+            + "{% endif %}"
             + "{% if ($origin) %}set origin {$origin}\n{% endif %}"
             + "{% if ($communitySet) %}match community {$communitySet}\n{% endif %}"
             + "{% if ($setCommunities) %}set community{% loop in $setCommunities as $community %} {$community}"
@@ -144,7 +149,8 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                     "origin", actions != null
                             ? getOrigin(actions.getAugmentation(Actions2.class).getBgpActions()) : null,
                     "communitySet", getCommunitySet(statement),
-                    "setCommunities", getSetCommunities(statement)));
+                    "setCommunities", getSetCommunities(statement),
+                    "prefixList", getPrefixList(statement)));
         }
         return commands.toString();
     }
@@ -183,7 +189,8 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                         "localPref", getLocalPref(bgpActionsAugAfter),
                         "asnValue", getAsnValue(bgpActionsAugAfter),
                         "origin", getOrigin(bgpActionsAugAfter),
-                        "communitySet", getCommunitySet(statement)));
+                        "communitySet", getCommunitySet(statement),
+                        "prefixList", getPrefixList(statement)));
             } else {
                 // Statement from dataAfter exists in dataBefore. Compare with statement from dataBefore.
                 Statement statementBefore = statementsMapBefore.get(statementId);
@@ -215,9 +222,9 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                 // Compare asn
                 String afterAsn = compareAsn(bgpActionsAugBefore, bgpActionsAugAfter);
                 // Compare prefix-list ip
-                String afterIp = comparePrefixListIp(prefixListAugBefore, prefixListAugAfter);
+                String afterIp = comparePrefixListIp(getPrefixList(statementBefore), getPrefixList(statementAfter));
                 // Compare prefix-list ipv6
-                String afterIpv6 = comparePrefixListIpv6(prefixListAugBefore, prefixListAugAfter);
+                String afterIpv6 = comparePrefixListIpv6(getPrefixList(statementBefore), getPrefixList(statementAfter));
                 // Compare action
                 String afterSetOperation = compareSetOperation(prefixListAugBefore, prefixListAugAfter);
                 // Compare origin
@@ -244,14 +251,16 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
                             "asnValue", "FALSE".equals(afterAsn) ? bgpActionsAugBefore.getSetAsPathPrepend().getConfig()
                                     .getAsn().getValue().toString() : getAsnValue(bgpActionsAugAfter),
                             "ipEnable", afterIp,
-                            "ip", prefixListAugAfter.getIpPrefixList(),
+                            "ip", getPrefixList(statementAfter).getIpPrefixList(),
                             "ipv6Enable", afterIpv6,
-                            "ipv6", getIpv6Prefix(prefixListAugBefore, prefixListAugAfter, afterIpv6),
+                            "ipv6", getIpv6Prefix(
+                                    getPrefixList(statementBefore), getPrefixList(statementAfter), afterIpv6),
                             "action", getSetOperation(prefixListAugBefore, prefixListAugAfter, afterSetOperation),
                             "originEnable", afterOrigin,
                             "origin", getOrigin(bgpActionsAugAfter),
                             "communitySetEnable", afterCommunitySet,
                             "communitySet", getCommunitySet(statementAfter),
+                            "prefixList", getPrefixList(statementAfter),
                             "setCommunitiesEnable", afterSetCommunities,
                             "setCommunities", getSetCommunities(statementAfter)
                             ));
@@ -320,7 +329,20 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
         if (bgpConditions != null
             && bgpConditions.getMatchCommunitySet() != null
             && bgpConditions.getMatchCommunitySet().getConfig() != null) {
-            return bgpConditions.getMatchCommunitySet().getConfig().getCommunitySet();
+            List<String> list = bgpConditions.getMatchCommunitySet().getConfig()
+                    .getAugmentation(MatchCommunityConfigListAug.class).getCommunitySetList();
+            if (list != null) {
+                return String.join(" ", list);
+            }
+
+        }
+        return null;
+    }
+
+    private MatchIpPrefixList getPrefixList(Statement statement) {
+        BgpConditions bgpConditions = getBgpConditions(statement);
+        if (bgpConditions != null && bgpConditions.getAugmentation(PrefixListConditionsAug.class) != null) {
+            return bgpConditions.getAugmentation(PrefixListConditionsAug.class).getMatchIpPrefixList();
         }
         return null;
     }
@@ -386,7 +408,7 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
         return compareObjects(asnBefore, asnAfter);
     }
 
-    private String comparePrefixListIp(PrefixListAug prefixListAugAugBefore, PrefixListAug prefixListAugAfter) {
+    private String comparePrefixListIp(MatchIpPrefixList prefixListAugAugBefore, MatchIpPrefixList prefixListAugAfter) {
         if (prefixListAugAugBefore != null && prefixListAugAfter != null) {
             List<String> ipPrefixListBefore = prefixListAugAugBefore.getIpPrefixList();
             List<String> ipPrefixListAfter = prefixListAugAfter.getIpPrefixList();
@@ -395,7 +417,8 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
         return null;
     }
 
-    private String comparePrefixListIpv6(PrefixListAug prefixListAugAugBefore, PrefixListAug prefixListAugAfter) {
+    private String comparePrefixListIpv6(MatchIpPrefixList prefixListAugAugBefore,
+                                         MatchIpPrefixList prefixListAugAfter) {
         if (prefixListAugAugBefore != null && prefixListAugAfter != null) {
             String ipv6PrefixListBefore = prefixListAugAugBefore.getIpv6PrefixList();
             String ipv6PrefixListAfter = prefixListAugAfter.getIpv6PrefixList();
@@ -413,7 +436,8 @@ public class PolicyWriter implements CliWriter<PolicyDefinition> {
         return null;
     }
 
-    private String getIpv6Prefix(PrefixListAug prefixListAugBefore, PrefixListAug prefixListAugAfter, String ipv6) {
+    private String getIpv6Prefix(MatchIpPrefixList prefixListAugBefore,
+                                 MatchIpPrefixList prefixListAugAfter, String ipv6) {
         if (prefixListAugBefore != null && prefixListAugAfter != null) {
             return "FALSE".equals(ipv6)
                     ? prefixListAugBefore.getIpv6PrefixList()

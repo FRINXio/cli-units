@@ -13,21 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.frinx.cli.unit.ios.routing.policy.handlers.statement.conditions;
 
-package io.frinx.cli.unit.ios.routing.policy.handlers.statement;
-
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.DENY;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PERMIT;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PrefixListAug;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.cisco.rev210422.PrefixListAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.statements.top.statements.statement.Config;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.routing.policy.rev170714.policy.statements.top.statements.statement.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.cisco.rpol.extension.conditions.MatchIpPrefixList;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.bgp.policy.policy.extension.rev210525.cisco.rpol.extension.conditions.MatchIpPrefixListBuilder;
 
-public class StatementConfigReaderTest {
+public class MatchIpPrefixListConfigReaderTest {
 
-    private static final String ROUTE_MAPS_OUTPUT =
+    private static final String OUTPUT =
             "route-map RM_CI_VLAN112233_PRI_BGP_IN_V4 permit 100 \n"
             + " match ip address prefix-list PXL_V4_B2B_VZ_PA_PFX_SPECIFIC_VLAN112233\n"
             + "route-map RM_CI_VLAN112233_PRI_BGP_IN_V4 permit 200 \n"
@@ -52,35 +48,17 @@ public class StatementConfigReaderTest {
             + " match ipv6 address prefix-list PXL_V6_B2B_VZ_PA_PFX_SPECIFIC_VLAN113399\n"
             + "route-map RM_CI_VLAN113399_PRI_CPE_PRI_PE_V6 deny 1000 \n";
 
-
-    private static final Config PERMIT_CONFIG = new ConfigBuilder()
-            .setName("10")
-            .addAugmentation(PrefixListAug.class, new PrefixListAugBuilder()
-                    .setSetOperation(PERMIT.class)
-                    .build())
-            .build();
-
-    private static final Config DENY_CONFIG = new ConfigBuilder()
-            .setName("1000")
-            .addAugmentation(PrefixListAug.class, new PrefixListAugBuilder()
-                    .setSetOperation(DENY.class)
-                    .build())
+    private static final MatchIpPrefixList CONFIG = new MatchIpPrefixListBuilder()
+            .setIpPrefixList(Arrays.asList("PL-CUST-NETWORKS", "PL-CUST-NETWORKS2"))
+            .setIpv6PrefixList("PXL_V6_B2B_VZ_PA_PFX_SPECIFIC_VLAN011220")
             .build();
 
     @Test
-    public void testPermit() {
-        final ConfigBuilder configBuilder = new ConfigBuilder();
-        StatementConfigReader.parseStatementConfig("RM-IPVPN-CUSTOMER-PRIMARY-IN", "10",
-                ROUTE_MAPS_OUTPUT, configBuilder);
-        Assert.assertEquals(PERMIT_CONFIG, configBuilder.build());
-    }
-
-    @Test
-    public void testDeny() {
-        final ConfigBuilder configBuilder = new ConfigBuilder();
-        StatementConfigReader.parseStatementConfig("RM_CI_VLAN112233_SEC_CPE_SEC_PE_V6", "1000",
-                ROUTE_MAPS_OUTPUT, configBuilder);
-        Assert.assertEquals(DENY_CONFIG, configBuilder.build());
+    public void testValue() {
+        final MatchIpPrefixListBuilder conf = new MatchIpPrefixListBuilder();
+        MatchIpPrefixListConfigReader.parseStatementConfig("RM-IPVPN-CUSTOMER-PRIMARY-IN", "10",
+                OUTPUT, conf);
+        Assert.assertEquals(CONFIG, conf.build());
     }
 
 }
