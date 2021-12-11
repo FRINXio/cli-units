@@ -29,7 +29,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-ios</artifactId>
-    <version>4.2.10.rc5-frinx</version>
+    <version>4.2.10.rc6-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
