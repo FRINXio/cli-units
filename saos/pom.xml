@@ -28,7 +28,7 @@
 
   <groupId>io.frinx.cli</groupId>
   <artifactId>cli-units-saos</artifactId>
-  <version>4.2.10.rc8-frinx</version>
+  <version>4.2.10.rc9-frinx-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
