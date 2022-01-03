@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Frinx and others.
+ * Copyright © 2022 Frinx and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,21 @@ package io.frinx.cli.unit.saos8.ifc.handler;
 
 import com.google.common.collect.Lists;
 import io.frinx.cli.io.Cli;
-import io.frinx.cli.unit.saos8.ifc.handler.l2vlan.L2VLANInterfaceConfigWriter;
-import io.frinx.cli.unit.saos8.ifc.handler.port.PortConfigWriter;
-import io.frinx.translate.unit.commons.handler.spi.CompositeWriter;
+import io.frinx.cli.unit.saos8.ifc.handler.l2vlan.L2VLANInterfaceConfigReader;
+import io.frinx.cli.unit.saos8.ifc.handler.port.PortConfigReader;
+import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 
-public class InterfaceConfigWriter extends CompositeWriter<Config> {
+public class InterfaceListConfigReader extends CompositeReader<Config, ConfigBuilder>
+        implements CliConfigReader<Config, ConfigBuilder> {
 
-    public InterfaceConfigWriter(Cli cli) {
+    public InterfaceListConfigReader(Cli cli) {
         super(Lists.newArrayList(
-                new PortConfigWriter(cli),
-                new L2VLANInterfaceConfigWriter(cli)
+                new PortConfigReader(cli),
+                new L2VLANInterfaceConfigReader(cli),
+                new InterfaceConfigReader(cli)
         ));
     }
 }

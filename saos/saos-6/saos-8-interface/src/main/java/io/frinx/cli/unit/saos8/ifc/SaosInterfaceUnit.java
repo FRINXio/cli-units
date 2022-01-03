@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Frinx and others.
+ * Copyright © 2022 Frinx and others.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.unit.saos.init.SaosDevices;
-import io.frinx.cli.unit.saos8.ifc.handler.InterfaceConfigReader;
-import io.frinx.cli.unit.saos8.ifc.handler.InterfaceConfigWriter;
-import io.frinx.cli.unit.saos8.ifc.handler.InterfaceReader;
+import io.frinx.cli.unit.saos8.ifc.handler.InterfaceListConfigReader;
+import io.frinx.cli.unit.saos8.ifc.handler.InterfaceListConfigWriter;
+import io.frinx.cli.unit.saos8.ifc.handler.InterfaceListReader;
 import io.frinx.cli.unit.saos8.ifc.handler.port.aggregate.AggregateConfigReader;
 import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortConfigReader;
 import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortConfigWriter;
@@ -38,7 +38,6 @@ import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortVlanElementConfig
 import io.frinx.cli.unit.saos8.ifc.handler.port.subport.SubPortVlanReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
-import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ip.rev161222.$YangModuleInfoImpl;
@@ -53,11 +52,7 @@ public class SaosInterfaceUnit extends AbstractUnit {
 
     @Override
     protected Set<Device> getSupportedVersions() {
-        return new HashSet<Device>() {
-            {
-                add(SaosDevices.SAOS_8);
-            }
-        };
+        return Sets.newHashSet(SaosDevices.SAOS_8);
     }
 
     @Override
@@ -87,9 +82,8 @@ public class SaosInterfaceUnit extends AbstractUnit {
     private void provideWriters(CustomizerAwareWriteRegistryBuilder writeRegistry, Cli cli) {
         writeRegistry.addNoop(IIDs.INTERFACES);
         writeRegistry.addNoop(IIDs.IN_INTERFACE);
-        writeRegistry.addAfter(IIDs.IN_IN_CONFIG, new InterfaceConfigWriter(cli),
+        writeRegistry.addAfter(IIDs.IN_IN_CONFIG, new InterfaceListConfigWriter(cli),
                 io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
-
 
         // sub-port of the lag interface
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
@@ -116,8 +110,8 @@ public class SaosInterfaceUnit extends AbstractUnit {
     }
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
-        readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
-        readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli));
+        readRegistry.add(IIDs.IN_INTERFACE, new InterfaceListReader(cli));
+        readRegistry.add(IIDs.IN_IN_CONFIG, new InterfaceListConfigReader(cli));
         readRegistry.add(IIDs.IN_IN_ET_CO_AUG_CONFIG1, new AggregateConfigReader(cli));
 
         // sub-port of the lag interface
