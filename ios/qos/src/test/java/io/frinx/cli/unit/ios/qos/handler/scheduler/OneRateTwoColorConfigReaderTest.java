@@ -29,7 +29,7 @@ public class OneRateTwoColorConfigReaderTest {
             + "    Class BW_REM\n"
             + "      bandwidth remaining percent 64\n"
             + "    Class BW\n"
-            + "      bandwidth percent 50\n"
+            + "      bandwidth 50 (%)\n"
             + "    Class SHAPE\n"
             + "      shape average 325000000 (bits/sec) \n"
             + "    Class SERVICE\n"
