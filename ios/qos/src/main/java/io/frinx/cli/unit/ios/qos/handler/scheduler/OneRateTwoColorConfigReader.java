@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class OneRateTwoColorConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
     private static final Pattern BW_REM_LINE = Pattern.compile("bandwidth remaining percent (?<rem>.+)");
-    private static final Pattern BW_LINE = Pattern.compile("bandwidth percent (?<bw>.+)");
+    private static final Pattern BW_LINE = Pattern.compile("bandwidth (percent )?(?<bw>\\d+)");
     private static final Pattern CIR_BC_LINE = Pattern.compile("police cir (?<bitrate>\\S+) bc (?<burst>\\S+)");
     private static final Pattern SHAPE_LINE = Pattern.compile("shape average (?<bitrate>.+)");
 
