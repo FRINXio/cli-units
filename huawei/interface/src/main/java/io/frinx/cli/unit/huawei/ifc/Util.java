@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Set;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L3ipvlan;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.RadioMAC;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
@@ -41,6 +42,8 @@ public final class Util {
             return SoftwareLoopback.class;
         } else if (name.startsWith("Wlan-Radio")) {
             return RadioMAC.class;
+        } else if (name.startsWith("Vlan")) {
+            return L3ipvlan.class;
         } else {
             return Other.class;
         }

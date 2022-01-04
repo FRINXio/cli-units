@@ -27,7 +27,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.hu
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Other;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.L3ipvlan;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.SoftwareLoopback;
 
 public class InterfaceConfigReaderTest {
@@ -73,11 +73,11 @@ public class InterfaceConfigReaderTest {
                     .setExpireTimeout(1200L)
                     .build()).build();
 
-    private static final Config EXPECTED_CONFIG_OTHER_IF = new ConfigBuilder()
+    private static final Config EXPECTED_CONFIG_VLAN_IF = new ConfigBuilder()
             .setName("Vlanif100")
             .setEnabled(false)
             .setDescription("Customer access")
-            .setType(Other.class)
+            .setType(L3ipvlan.class)
             .addAugmentation(IfHuaweiAug.class, new IfHuaweiAugBuilder()
                 .setIpBindingVpnInstance("VLAN27")
                     .setExpireTimeout(1200L)
@@ -131,7 +131,7 @@ public class InterfaceConfigReaderTest {
         ConfigBuilder actualConfig = new ConfigBuilder();
         new InterfaceConfigReader(Mockito.mock(Cli.class))
                 .parseInterface(DISPLAY_CURRENT_INT_OTHER_IF, actualConfig, "Vlanif100");
-        Assert.assertEquals(EXPECTED_CONFIG_OTHER_IF, actualConfig.build());
+        Assert.assertEquals(EXPECTED_CONFIG_VLAN_IF, actualConfig.build());
     }
 
     @Test
