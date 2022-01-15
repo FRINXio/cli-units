@@ -28,14 +28,14 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>junos-17-native-models</artifactId>
-    <version>4.2.10.rc10-frinx</version>
+    <version>4.2.10.rc11-frinx-SNAPSHOT</version>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.frinx.openconfig</groupId>
                 <artifactId>openconfig-artifacts</artifactId>
-                <version>4.2.10.rc10-frinx</version>
+                <version>4.2.10.rc11-frinx-SNAPSHOT</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
