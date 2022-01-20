@@ -118,24 +118,22 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
 
     @VisibleForTesting
     void parseLogicalInterfaceType(String output, ConfigBuilder builder, String ifcName) {
-        if (ifcName.equals("local") || ifcName.equals("remote")) {
-            builder.setType(L3ipvlan.class);
-        } else {
-            ParsingUtils.NEWLINE.splitAsStream(output)
-                    .map(String::trim)
-                    .filter(line -> !line.contains("n/a"))
-                    .map(LOGICAL_INTERFACE_LINE::matcher)
-                    .filter(Matcher::matches)
-                    .filter(matcher -> ifcName.equals(matcher.group("vlanInterfaceName")))
-                    .map(m -> m.group("vlanId"))
-                    .findFirst()
-                    .ifPresent(value -> builder.setType(L3ipvlan.class));
+        ParsingUtils.NEWLINE.splitAsStream(output)
+                .map(String::trim)
+                .filter(line -> !line.contains("n/a"))
+                .map(LOGICAL_INTERFACE_LINE::matcher)
+                .filter(Matcher::matches)
+                .filter(matcher -> ifcName.equals(matcher.group("vlanInterfaceName")))
+                .map(m -> m.group("vlanId"))
+                .findFirst()
+                .ifPresent(value -> builder.setType(L3ipvlan.class));
+        if ((ifcName.equals("local") || ifcName.equals("remote")) && builder.getType() == null) {
+            builder.setType(EthernetCsmacd.class);
         }
         // Only Loopback interfaces will not be parsed, so their type will be undefined
-        if (builder.getType() == null) {
+        else if (builder.getType() == null) {
             builder.setType(SoftwareLoopback.class);
         }
-
     }
 
     private void setMtu(final String output, ConfigBuilder builder, String name) {
