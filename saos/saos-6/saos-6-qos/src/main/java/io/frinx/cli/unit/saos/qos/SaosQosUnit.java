@@ -110,7 +110,8 @@ public class SaosQosUnit extends AbstractUnit {
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.QO_CONFIG, new QosConfigReader(cli));
         readRegistry.add(IIDs.QO_IN_INTERFACE, new InterfaceReader(cli));
-        readRegistry.add(IIDs.QO_IN_IN_CONFIG, new InterfaceConfigReader(cli));
+        readRegistry.subtreeAdd(IIDs.QO_IN_IN_CONFIG, new InterfaceConfigReader(cli),
+                Sets.newHashSet(IIDs.QO_IN_IN_CO_AUG_SAOSQOSIFAUG));
         readRegistry.add(IIDs.QO_SC_SCHEDULERPOLICY, new SchedulerPolicyReader(cli));
         readRegistry.add(IIDs.QO_SC_SC_CONFIG, new SchedulerPolicyConfigReader(cli));
         readRegistry.add(IIDs.QO_SC_SC_SC_SCHEDULER, new SchedulerReader(cli));

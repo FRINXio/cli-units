@@ -86,7 +86,8 @@ public class SaosInterfaceUnit extends AbstractUnit {
 
     private void provideReaders(CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.IN_INTERFACE, new InterfaceReader(cli));
-        readRegistry.addAfter(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli),
+        readRegistry.subtreeAddAfter(IIDs.IN_IN_CONFIG, new InterfaceConfigReader(cli),
+                Sets.newHashSet(IIDs.IN_IN_CO_AUG_IFSAOSAUG),
                 io.frinx.openconfig.openconfig.network.instance.IIDs.NE_NE_CONFIG);
         readRegistry.add(IIDs.IN_IN_ET_CO_AUG_CONFIG1, new AggregateConfigReader(cli));
 
