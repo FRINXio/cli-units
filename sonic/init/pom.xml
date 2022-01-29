@@ -23,12 +23,12 @@
     <parent>
         <groupId>io.frinx.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.10.rc12-frinx</version>
+        <version>4.2.10.rc13-frinx-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>sonic-cli-init-unit</artifactId>
-    <version>4.2.10.rc12-frinx</version>
+    <version>4.2.10.rc13-frinx-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
