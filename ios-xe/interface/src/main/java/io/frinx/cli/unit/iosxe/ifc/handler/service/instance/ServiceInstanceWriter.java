@@ -21,6 +21,7 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliWriter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoServiceInstanceAug;
@@ -108,7 +109,7 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                 final List<ServiceInstance> serviceInstanceList = serviceInstances.getServiceInstance();
                 if (serviceInstanceList != null) {
                     for (final ServiceInstance serviceInstance : serviceInstanceList) {
-                        extractedWrite(currentInstances, serviceInstance);
+                        extractedWrite(currentInstances, serviceInstance, Optional.empty());
                     }
                 }
             }
@@ -162,7 +163,15 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
                 for (final ServiceInstance serviceInstance : instancesAfter.getServiceInstance()) {
                     if (exclusiveToWrite.contains(serviceInstance.getId())
                             || !exclusiveToDelete.contains(serviceInstance.getId())) {
-                        extractedWrite(currentInstances, serviceInstance);
+                        // get instance that was updated and check if l2protocol was updated too
+                        var instanceToUpdate = instancesBefore.getServiceInstance().stream()
+                                .filter(e -> serviceInstance.getId().equals(e.getId()))
+                                .findFirst();
+                        if (instanceToUpdate.isPresent()) {
+                            extractedWrite(currentInstances, serviceInstance, instanceToUpdate);
+                        } else {
+                            extractedWrite(currentInstances, serviceInstance, Optional.empty());
+                        }
                     }
                 }
             }
@@ -170,10 +179,13 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         return currentInstances.toString();
     }
 
-    private void extractedWrite(StringBuilder currentInstances, ServiceInstance serviceInstance) {
+    private void extractedWrite(StringBuilder currentInstances, ServiceInstance serviceInstance,
+                                Optional<ServiceInstance>  instanceToUpdate) {
         currentInstances.append(getCreationCommands(serviceInstance, false));
         currentInstances.append(getEncapsulationCommands(serviceInstance.getEncapsulation()));
-        currentInstances.append(getL2ProtocolCommands(serviceInstance.getL2protocols()));
+        currentInstances.append(getL2ProtocolCommands(
+                serviceInstance.getL2protocols(),
+                instanceToUpdate.map(ServiceInstance::getL2protocols).orElse(null)));
         currentInstances.append(getBridgeDomainCommands(serviceInstance.getBridgeDomain()));
         currentInstances.append(getRewrite(serviceInstance));
         currentInstances.append("exit\n");
@@ -253,9 +265,23 @@ public final class ServiceInstanceWriter implements CliWriter<IfCiscoServiceInst
         return configCommands.toString();
     }
 
-    private String getL2ProtocolCommands(final L2protocols l2protocols) {
+    private String getL2ProtocolCommands(final L2protocols l2protocols, final L2protocols protocolsBefore) {
         final StringBuilder creationCommands = new StringBuilder();
         if (l2protocols != null && l2protocols.getServiceInstanceL2protocol() != null) {
+            if (protocolsBefore != null && protocolsBefore.getServiceInstanceL2protocol() != null) {
+                // remove old l2 protocols
+                if (!l2protocols.getServiceInstanceL2protocol().getL2protocol().equals(
+                        protocolsBefore.getServiceInstanceL2protocol().getL2protocol())) {
+                    for (L2protocol l2protocol: protocolsBefore.getServiceInstanceL2protocol().getL2protocol()) {
+                        final ProtocolType protocolType = l2protocol.getConfig().getProtocolType();
+                        creationCommands.append("no l2protocol ");
+                        if (protocolType != null) {
+                            creationCommands.append(protocolType.getName());
+                        }
+                        creationCommands.append("\n");
+                    }
+                }
+            }
             for (L2protocol l2protocol: l2protocols.getServiceInstanceL2protocol().getL2protocol()) {
                 final ProtocolType protocolType = l2protocol.getConfig().getProtocolType();
                 final List<Protocol> protocol = l2protocol.getConfig().getProtocol();
