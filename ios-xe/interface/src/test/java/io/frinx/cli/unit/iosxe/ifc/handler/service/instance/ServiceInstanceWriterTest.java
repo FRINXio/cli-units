@@ -76,7 +76,8 @@ public class ServiceInstanceWriterTest {
                             .rev171024.service.instance.l2protocols.service.instance.l2protocol.l2protocol
                             .ConfigBuilder()
                                 .setProtocolType(ProtocolType.Peer)
-                                .setProtocol(Arrays.asList(Protocol.RB, Protocol.Lacp))
+                                .setProtocol(Arrays.asList(Protocol.RB, Protocol.RC, Protocol.RD,
+                                        Protocol.RF, Protocol.Mmrp, Protocol.Mvrp))
                                 .build())
                         .build()))
                     .build())
@@ -109,7 +110,7 @@ public class ServiceInstanceWriterTest {
             + "interface GigabitEthernet0/0/0\n"
             + "service instance 100 ethernet EVC\n"
             + "encapsulation untagged , dot1q 1-10, 15\n"
-            + "l2protocol peer RB lacp\n"
+            + "l2protocol peer RB RC RD RF mmrp mvrp\n"
             + "bridge-domain 100 split-horizon group 2\n"
             + "rewrite ingress tag pop 1 symmetric\n"
             + "exit\n"
@@ -180,6 +181,7 @@ public class ServiceInstanceWriterTest {
             + "no service instance trunk 200\n"
             + "service instance trunk 100 ethernet\n"
             + "encapsulation dot1q 1, 9\n"
+            + "no l2protocol peer\n"
             + "l2protocol peer RB lacp\n"
             + "exit\n"
             + "end\n";
