@@ -29,7 +29,7 @@
 
     <groupId>io.frinx.cli</groupId>
     <artifactId>cli-units-sonic</artifactId>
-    <version>4.2.11.rc4-frinx</version>
+    <version>4.2.11.rc5-frinx-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
