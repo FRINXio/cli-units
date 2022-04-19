@@ -20,6 +20,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfEthExtensionConfig;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfEthCiscoExtAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfEthCiscoExtAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED100MB;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.ConfigBuilder;
@@ -32,6 +35,7 @@ public class EthernetConfigReaderTest {
     private static final String SH_INT_CONFIG_AUTO_SPEED = "interface GigabitEthernet0/0/0\n"
             + " no switchport\n"
             + " ip address 192.168.0.1 255.255.255.0\n"
+            + " lacp rate fast\n"
             + " channel-group 20 mode active\n"
             + "end\n"
             + "\n";
@@ -40,6 +44,8 @@ public class EthernetConfigReaderTest {
             .addAugmentation(Config1.class, new Config1Builder().setAggregateId("20").build())
             .addAugmentation(LacpEthConfigAug.class,
                     new LacpEthConfigAugBuilder().setLacpMode(LacpActivityType.ACTIVE).build())
+            .addAugmentation(IfEthCiscoExtAug.class,
+                    new IfEthCiscoExtAugBuilder().setLacpRate(CiscoIfEthExtensionConfig.LacpRate.FAST).build())
             .build();
 
     private static final String SH_INT_CONFIG_100_SPEED = "interface GigabitEthernet0/0/0\n"
@@ -50,6 +56,8 @@ public class EthernetConfigReaderTest {
 
     private static final Config EXPECTED_CONFIG_100_SPEED = new ConfigBuilder()
             .setPortSpeed(SPEED100MB.class)
+            .addAugmentation(IfEthCiscoExtAug.class,
+                    new IfEthCiscoExtAugBuilder().setLacpRate(CiscoIfEthExtensionConfig.LacpRate.NORMAL).build())
             .build();
 
     private static final String SH_INT_VLAN_CONFIG = "interface Vlan10\n"

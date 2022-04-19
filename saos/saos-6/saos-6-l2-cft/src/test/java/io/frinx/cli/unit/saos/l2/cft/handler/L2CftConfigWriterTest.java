@@ -34,8 +34,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2CftConfigWriterTest {
 
-    private static final String MODE_ONE = "l2-cft set mode mef-ce1\nconfiguration save";
-    private static final String MODE_TWO = "l2-cft set mode mef-ce2\nconfiguration save";
+    private static final String MODE_ONE = "l2-cft set mode mef-ce1";
+    private static final String MODE_TWO = "l2-cft set mode mef-ce2";
 
     @Mock
     private Cli cli;
@@ -47,7 +47,7 @@ public class L2CftConfigWriterTest {
     private L2CftConfigWriter writer;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
         writer = new L2CftConfigWriter(cli);

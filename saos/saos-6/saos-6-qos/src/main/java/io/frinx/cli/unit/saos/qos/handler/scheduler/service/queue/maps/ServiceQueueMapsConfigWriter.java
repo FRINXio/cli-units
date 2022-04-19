@@ -29,12 +29,10 @@ public class ServiceQueueMapsConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_UPDATE_TEMPLATE =
             "{% if($before) %}"
-            + "traffic-services queuing queue-map rename rcos-map {$before.name} name {$after.name}\n"
-            + "{% else %}traffic-services queuing queue-map create rcos-map {$after.name}\n{% endif %}"
-            + "configuration save";
+            + "traffic-services queuing queue-map rename rcos-map {$before.name} name {$after.name}"
+            + "{% else %}traffic-services queuing queue-map create rcos-map {$after.name}{% endif %}";
 
-    private static final String DELETE_TEMPLATE = "traffic-services queuing queue-map delete rcos-map {$name}\n"
-            + "configuration save";
+    private static final String DELETE_TEMPLATE = "traffic-services queuing queue-map delete rcos-map {$name}";
 
     private final Cli cli;
 

@@ -20,45 +20,46 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>bundle-parent</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</version>
+        <groupId>io.frinx.uniconfig.common</groupId>
+        <artifactId>odlparent</artifactId>
+        <version>5.0.6-SNAPSHOT</version>
+        <relativePath>../../../../commons/parents/odlparent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.frinx.cli</groupId>
+    <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>sonic-it</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
 
     <properties>
-        <cli.version>4.2.11.rc6-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>4.2.11.rc6-frinx-SNAPSHOT</openconfig.version>
-        <hc.version>1.18.04-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</hc.version>
-        <controller.version>1.7.2-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</controller.version>
-        <yangtools.version>2.0.5-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</yangtools.version>
-        <mdsal.version>2.4.2-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</mdsal.version>
-        <translate.unit.commons.version>4.2.11.rc6-frinx-SNAPSHOT</translate.unit.commons.version>
-        <mdsalmodel.version>0.12.2-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</mdsalmodel.version>
+        <cli.version>5.0.6-SNAPSHOT</cli.version>
+        <openconfig.version>5.0.6-SNAPSHOT</openconfig.version>
+        <hc.version>5.0.6-SNAPSHOT</hc.version>
+        <controller.version>5.0.6-SNAPSHOT</controller.version>
+        <yangtools.version>5.0.6-SNAPSHOT</yangtools.version>
+        <mdsal.version>5.0.6-SNAPSHOT</mdsal.version>
+        <translate.unit.commons.version>5.0.6-SNAPSHOT</translate.unit.commons.version>
+        <mdsalmodel.version>5.0.6-SNAPSHOT</mdsalmodel.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.opendaylight.yangtools</groupId>
+                <groupId>io.frinx.uniconfig.yangtools</groupId>
                 <artifactId>yangtools-artifacts</artifactId>
                 <version>${yangtools.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.opendaylight.mdsal</groupId>
+                <groupId>io.frinx.uniconfig.core</groupId>
                 <artifactId>mdsal-artifacts</artifactId>
                 <version>${mdsal.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.opendaylight.mdsal.model</groupId>
+                <groupId>io.frinx.uniconfig.model</groupId>
                 <artifactId>mdsal-model-artifacts</artifactId>
                 <version>${mdsalmodel.version}</version>
                 <type>pom</type>
@@ -101,7 +102,7 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>io.frinx.translate.unit.commons</groupId>
+                        <groupId>io.frinx.uniconfig</groupId>
                         <artifactId>checkstyle</artifactId>
                         <version>${project.version}</version>
                     </dependency>
@@ -131,7 +132,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.translate.unit.commons</groupId>
+            <groupId>io.frinx.uniconfig</groupId>
             <artifactId>utils</artifactId>
             <version>${translate.unit.commons.version}</version>
             <scope>test</scope>
@@ -139,91 +140,92 @@
 
         <!-- Honeycomb -->
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>data-api</artifactId>
             <version>${hc.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>data-impl</artifactId>
             <version>${hc.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>translate-impl</artifactId>
             <version>${hc.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>translate-utils</artifactId>
             <version>${hc.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>rpc-impl</artifactId>
             <version>${hc.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
+            <groupId>io.frinx.uniconfig.yangtools</groupId>
             <artifactId>yang-data-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
+            <groupId>io.frinx.uniconfig.yangtools</groupId>
             <artifactId>yang-data-impl</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
+            <groupId>io.frinx.uniconfig.yangtools</groupId>
             <artifactId>yang-data-codec-gson</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
+            <groupId>io.frinx.uniconfig.yangtools</groupId>
             <artifactId>yang-model-api</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
+            <groupId>io.frinx.uniconfig.model</groupId>
             <artifactId>ietf-topology</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
+            <groupId>io.frinx.uniconfig.model</groupId>
             <artifactId>ietf-inet-types-2013-07-15</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
+            <groupId>io.frinx.uniconfig.core</groupId>
             <artifactId>sal-binding-api</artifactId>
             <version>${controller.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
+            <groupId>io.frinx.uniconfig.core</groupId>
             <artifactId>sal-binding-broker-impl</artifactId>
             <version>${controller.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
+            <groupId>io.frinx.uniconfig.core</groupId>
             <artifactId>sal-common-api</artifactId>
             <version>${controller.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
+            <groupId>io.frinx.uniconfig.core</groupId>
             <artifactId>sal-core-api</artifactId>
             <version>${controller.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
+            <groupId>io.frinx.uniconfig.core</groupId>
             <artifactId>mdsal-binding-dom-codec</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
 

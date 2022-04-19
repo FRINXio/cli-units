@@ -46,15 +46,13 @@ public class ServiceSchedulerPolicyWriterTest {
         "traffic-services queuing egress-port-queue-group set queue 0 port 1 eir 1212 scheduler-weight 495\n"
         + "traffic-services queuing egress-port-queue-group set queue 1 port 1 eir 1214 scheduler-weight 501\n"
         + "traffic-services queuing egress-port-queue-group set queue 2 port 1 eir 1216 scheduler-weight 507\n"
-        + "traffic-services queuing egress-port-queue-group set queue 3 port 1 eir 1218 scheduler-weight 513\n"
-        + "configuration save";
+        + "traffic-services queuing egress-port-queue-group set queue 3 port 1 eir 1218 scheduler-weight 513\n";
 
     private static final String SERVICE_WITH_EBS =
         "traffic-services queuing egress-port-queue-group set queue 0 port 1 eir 1458 ebs 35 scheduler-weight 478\n"
         + "traffic-services queuing egress-port-queue-group set queue 1 port 1 eir 1460 ebs 39 scheduler-weight 484\n"
         + "traffic-services queuing egress-port-queue-group set queue 2 port 1 eir 1462 ebs 43 scheduler-weight 490\n"
-        + "traffic-services queuing egress-port-queue-group set queue 3 port 1 eir 1464 ebs 47 scheduler-weight 496\n"
-        + "configuration save";
+        + "traffic-services queuing egress-port-queue-group set queue 3 port 1 eir 1464 ebs 47 scheduler-weight 496\n";
 
     private static final String SERVICE_WITH_PROFILE =
         "traffic-services queuing egress-port-queue-group set queue 0 port 1 eir 1458 ebs 35 scheduler-weight 478 "
@@ -64,18 +62,16 @@ public class ServiceSchedulerPolicyWriterTest {
         + "traffic-services queuing egress-port-queue-group set queue 2 port 1 eir 1462 ebs 43 scheduler-weight 490 "
         + "congestion-avoidance-profile Default-2\n"
         + "traffic-services queuing egress-port-queue-group set queue 3 port 1 eir 1464 ebs 47 scheduler-weight 496 "
-        + "congestion-avoidance-profile Default-3\n"
-        + "configuration save";
+        + "congestion-avoidance-profile Default-3\n";
 
     private static final String SERVICE_DELETE_PROFILE =
         "traffic-services queuing egress-port-queue-group unset queue 0 port 1 congestion-avoidance-profile\n"
-        + "traffic-services queuing egress-port-queue-group unset queue 2 port 1 congestion-avoidance-profile\n"
-        + "configuration save";
+        + "traffic-services queuing egress-port-queue-group unset queue 2 port 1 congestion-avoidance-profile\n";
 
     private ServiceSchedulerPolicyWriter writer;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         writer = new ServiceSchedulerPolicyWriter(Mockito.mock(Cli.class));
     }
 

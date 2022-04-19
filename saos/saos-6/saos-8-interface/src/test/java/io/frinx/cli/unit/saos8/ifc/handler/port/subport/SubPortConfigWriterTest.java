@@ -36,26 +36,23 @@ public class SubPortConfigWriterTest {
     }
 
     @Test
-    public void writeTemplateTest() throws Exception {
+    public void writeTemplateTest() {
         Assert.assertEquals(
-                "sub-port create sub-port LAG=JMEP_VLAN654321_1 parent-port LS02W classifier-precedence 100\n"
-                + "configuration save",
+                "sub-port create sub-port LAG=JMEP_VLAN654321_1 parent-port LS02W classifier-precedence 100",
                 writer.writeTemplate(createConfig("100", "LAG=JMEP_VLAN654321_1"), "LS02W"));
     }
 
     @Test
     public void updateTemplate() {
-        Assert.assertEquals("sub-port set sub-port LAG=JMEP_VLAN654321_1 name LAG=JMEP\n"
-                        + "configuration save",
+        Assert.assertEquals("sub-port set sub-port LAG=JMEP_VLAN654321_1 name LAG=JMEP",
                 writer.updateTemplate(
                         createConfig("100", "LAG=JMEP_VLAN654321_1"),
                         createConfig("100", "LAG=JMEP")));
     }
 
     @Test
-    public void deleteTemplateTest() throws Exception {
-        Assert.assertEquals("sub-port delete sub-port LAG=JMEP_VLAN654321_1\n"
-                        + "configuration save",
+    public void deleteTemplateTest() {
+        Assert.assertEquals("sub-port delete sub-port LAG=JMEP_VLAN654321_1",
                 writer.deleteTemplate(createConfig("100", "LAG=JMEP_VLAN654321_1")));
     }
 

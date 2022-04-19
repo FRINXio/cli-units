@@ -24,10 +24,14 @@ import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceConfigReader;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfEthExtensionConfig;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfEthCiscoExtAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfEthCiscoExtAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.ext.rev190724.SPEEDAUTO;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.ConfigBuilder;
@@ -43,6 +47,7 @@ public final class EthernetConfigReader implements CliConfigReader<Config, Confi
     private static final Pattern PORT_SPEED_LINE = Pattern.compile("speed (?<portSpeed>.+)");
     private static final Pattern CHANNEL_GROUP_ID_LINE = Pattern.compile("channel-group (?<id>\\d+).*");
     private static final Pattern LACP_MODE_LINE = Pattern.compile("channel-group (?<id>\\d+) mode (?<mode>.+)");
+    private static final Pattern LACP_RATE_LINE = Pattern.compile("lacp rate fast.*");
 
     private final Cli cli;
 
@@ -76,6 +81,11 @@ public final class EthernetConfigReader implements CliConfigReader<Config, Confi
                     builder.addAugmentation(LacpEthConfigAug.class, ethConfigAugBuilder.build());
                 }
             }
+            IfEthCiscoExtAugBuilder lacpRateAugBuilder = new IfEthCiscoExtAugBuilder();
+            setLacpRate(ifcOutput, lacpRateAugBuilder);
+            if (lacpRateAugBuilder.getLacpRate() != null) {
+                builder.addAugmentation(IfEthCiscoExtAug.class, lacpRateAugBuilder.build());
+            }
         }
     }
 
@@ -89,6 +99,16 @@ public final class EthernetConfigReader implements CliConfigReader<Config, Confi
             LACP_MODE_LINE::matcher,
             matcher -> matcher.group("mode"),
             mode -> ethConfigAugBuilder.setLacpMode(LacpActivityType.valueOf(mode.toUpperCase())));
+    }
+
+    private static void setLacpRate(final String ifcOutput, final IfEthCiscoExtAugBuilder lacpRateAugBuilder) {
+        lacpRateAugBuilder.setLacpRate(CiscoIfEthExtensionConfig.LacpRate.NORMAL);
+        ParsingUtils.NEWLINE.splitAsStream(ifcOutput)
+                .map(String::trim)
+                .map(LACP_RATE_LINE::matcher)
+                .filter(Matcher::matches)
+                .findFirst()
+                .ifPresent(b -> lacpRateAugBuilder.setLacpRate(CiscoIfEthExtensionConfig.LacpRate.FAST));
     }
 
     private static void setAggregationId(final String ifcOutput, final Config1Builder ethIfAggregationConfigBuilder) {

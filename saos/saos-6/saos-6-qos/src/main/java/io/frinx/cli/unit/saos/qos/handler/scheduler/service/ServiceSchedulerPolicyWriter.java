@@ -90,7 +90,7 @@ public class ServiceSchedulerPolicyWriter
                     "congestion", qos2r3cAug != null ? qos2r3cAug.getCongestionAvoidance() : null));
         }
 
-        return commands.toString() + "configuration save";
+        return commands.toString();
     }
 
     @Override
@@ -138,7 +138,7 @@ public class ServiceSchedulerPolicyWriter
             }
         }
 
-        return commands.toString() + "configuration save";
+        return commands.toString();
     }
 
 
@@ -176,6 +176,6 @@ public class ServiceSchedulerPolicyWriter
             commands.append(cmd);
         }
 
-        return commands.toString() + "configuration save";
+        return commands.toString();
     }
 }

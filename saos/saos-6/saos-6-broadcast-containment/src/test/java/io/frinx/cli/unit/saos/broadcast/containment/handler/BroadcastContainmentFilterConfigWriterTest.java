@@ -66,8 +66,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
 
         Assert.assertEquals("broadcast-containment create filter filter1\n"
                 + "broadcast-containment set filter filter1 kbps 64\n"
-                + "broadcast-containment set filter filter1 containment-classification bcast,unknown-ucast\n"
-                + "configuration save\n",
+                + "broadcast-containment set filter filter1 containment-classification bcast,unknown-ucast\n\n",
                 commands.getValue().getContent());
     }
 
@@ -78,8 +77,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
         Mockito.verify(cli).executeAndRead(commands.capture());
 
         Assert.assertEquals("broadcast-containment create filter filter1\n"
-                        + "broadcast-containment set filter filter1 kbps 64\n"
-                        + "configuration save\n",
+                        + "broadcast-containment set filter filter1 kbps 64\n\n",
                 commands.getValue().getContent());
     }
 
@@ -90,8 +88,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
 
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("broadcast-containment create filter filter1\n"
-                        + "configuration save\n",
+        Assert.assertEquals("broadcast-containment create filter filter1\n\n",
                 commands.getValue().getContent());
     }
 
@@ -103,8 +100,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
         Mockito.verify(cli).executeAndRead(commands.capture());
 
         Assert.assertEquals("broadcast-containment set filter filter1 kbps 128\n"
-                        + "broadcast-containment set filter filter1 containment-classification bcast\n"
-                        + "configuration save\n",
+                        + "broadcast-containment set filter filter1 containment-classification bcast\n\n",
                 commands.getValue().getContent());
     }
 
@@ -115,7 +111,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
                 createConfig("filter1", null, null), null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("configuration save\n",
+        Assert.assertEquals("",
                 commands.getValue().getContent());
     }
 
@@ -126,7 +122,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
                 createConfig("filter1", null, Arrays.asList(B_CAST, UNKNOWN_UCAST)), null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("configuration save\n", commands.getValue().getContent());
+        Assert.assertEquals("", commands.getValue().getContent());
     }
 
     @Test
@@ -137,8 +133,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
         Mockito.verify(cli).executeAndRead(commands.capture());
 
         Assert.assertEquals("broadcast-containment set filter filter1 containment-classi"
-                + "fication unknown-ip-mcast,unknown-l2-mcast\n"
-                + "configuration save\n", commands.getValue().getContent());
+                + "fication unknown-ip-mcast,unknown-l2-mcast\n\n", commands.getValue().getContent());
     }
 
     @Test(expected = NullPointerException.class)
@@ -155,7 +150,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
                 createConfig("filter1", null, null), null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("configuration save\n", commands.getValue().getContent());
+        Assert.assertEquals("", commands.getValue().getContent());
     }
 
     @Test
@@ -165,7 +160,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
                 createConfig("filter1", "64", null), null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("configuration save\n",
+        Assert.assertEquals("",
                 commands.getValue().getContent());
     }
 
@@ -176,7 +171,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
                 createConfig("filter1", "64", null), null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("broadcast-containment set filter filter1 kbps 64\nconfiguration save\n",
+        Assert.assertEquals("broadcast-containment set filter filter1 kbps 64\n\n",
                 commands.getValue().getContent());
     }
 
@@ -192,7 +187,7 @@ public class BroadcastContainmentFilterConfigWriterTest {
         writer.deleteCurrentAttributes(iid, createConfig("filter1", "64", null), null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("broadcast-containment delete filter filter1\nconfiguration save\n",
+        Assert.assertEquals("broadcast-containment delete filter filter1\n",
                 commands.getValue().getContent());
     }
 

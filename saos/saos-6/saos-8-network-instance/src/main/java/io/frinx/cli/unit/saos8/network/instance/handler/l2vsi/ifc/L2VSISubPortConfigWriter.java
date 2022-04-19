@@ -31,11 +31,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2VSISubPortConfigWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
 
-    private static final String WRITE_SUBPORT =
-        "virtual-switch interface attach sub-port {$data.id} vs {$vsName}\nconfiguration save";
-
-    private static final String DELETE_SUBPORT =
-            "virtual-switch interface detach sub-port {$data.id}\nconfiguration save";
+    private static final String WRITE_SUBPORT = "virtual-switch interface attach sub-port {$data.id} vs {$vsName}";
+    private static final String DELETE_SUBPORT = "virtual-switch interface detach sub-port {$data.id}";
 
     private Cli cli;
 

@@ -34,6 +34,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($data.mtu) %}mtu {$data.mtu}\n{% else %}no mtu\n{% endif %}"
             + "{% if ($data.description) %}description {$data.description}\n{% else %}no description\n{% endif %}"
             + "{% if ($enabled) %}no shutdown\n{% else %}shutdown\n{% endif %}"
+            + "{% if ($ipRedirects) %}{$ipRedirects}\n{% endif %}"
             + "{% if ($pt) %}{$pt}{% endif %}"
             + "{% if ($snmpTrap) %}no snmp trap link-status\n{% else %}snmp trap link-status\n{% endif %}"
             + "{% if ($stormControl) %}{$stormControl}{% endif %}"
@@ -42,6 +43,8 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             + "{% if ($negotiationAuto) %}{$negotiationAuto}{% endif %}"
             + "{% if ($fhrpMinimum) %}{$fhrpMinimum}{% endif %}"
             + "{% if ($fhrpReload) %}{$fhrpReload}{% endif %}"
+            + "{% if ($holdQueueIn) %}hold-queue {$holdQueueIn} in\n{% else %}no hold-queue in\n{% endif %}"
+            + "{% if ($holdQueueOut) %}hold-queue {$holdQueueOut} out\n{% else %}no hold-queue out\n{% endif %}"
             + "end";
 
     private static final String WRITE_TEMPLATE_VLAN = "configure terminal\n"
@@ -80,7 +83,10 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                     "lldpReceive", getLldpReceive(ciscoExtAugBefore, ciscoExtAug),
                     "negotiationAuto", getNegotiationAuto(ciscoExtAugBefore, ciscoExtAug),
                     "fhrpMinimum", getFhrpMinimumDelay(ciscoExtAugBefore, ciscoExtAug),
-                    "fhrpReload", getFhrpReloadDelay(ciscoExtAugBefore, ciscoExtAug));
+                    "fhrpReload", getFhrpReloadDelay(ciscoExtAugBefore, ciscoExtAug),
+                    "ipRedirects", getIpRedirect(before, after),
+                    "holdQueueIn", getHoldQueueIn(after),
+                    "holdQueueOut", getHoldQueueOut(after));
         }
         return fT(WRITE_TEMPLATE_VLAN,
                 "before", before,
@@ -255,7 +261,7 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
             if (ciscoExtAugAfter != null && ciscoExtAugAfter.isIpRedirects() != null) {
                 return ciscoExtAugAfter.isIpRedirects() ? "ip redirects" : "no ip redirects";
             } else {
-                return "no ip redirects";
+                return ciscoExtAugBefore.isIpRedirects() ? "ip redirects" : "no ip redirects";
             }
         }
         return null;
@@ -296,6 +302,26 @@ public final class InterfaceConfigWriter extends AbstractInterfaceConfigWriter {
                 return "ipv6 nd ra suppress " + ciscoExtAugAfter.getIpv6NdRaSuppress();
             } else {
                 return "no ipv6 nd ra suppress all";
+            }
+        }
+        return null;
+    }
+
+    private String getHoldQueueIn(Config config) {
+        IfCiscoExtAug ciscoExtAug = getIfCiscoExtAug(config);
+        if (ciscoExtAug != null) {
+            if (ciscoExtAug.getHoldQueue() != null && ciscoExtAug.getHoldQueue().getIn() != null) {
+                return String.valueOf(ciscoExtAug.getHoldQueue().getIn());
+            }
+        }
+        return null;
+    }
+
+    private String getHoldQueueOut(Config config) {
+        IfCiscoExtAug ciscoExtAug = getIfCiscoExtAug(config);
+        if (ciscoExtAug != null) {
+            if (ciscoExtAug.getHoldQueue() != null && ciscoExtAug.getHoldQueue().getOut() != null) {
+                return String.valueOf(ciscoExtAug.getHoldQueue().getOut());
             }
         }
         return null;

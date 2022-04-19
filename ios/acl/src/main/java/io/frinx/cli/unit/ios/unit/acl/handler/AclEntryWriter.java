@@ -25,11 +25,14 @@ import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.ios.unit.acl.handler.util.AclUtil;
 import io.frinx.cli.unit.utils.CliListWriter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +40,9 @@ import org.apache.commons.net.util.SubnetUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4EXTENDED;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4STANDARD;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEstablishedStateAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclOptionAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclPrecedenceAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
@@ -96,7 +102,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
             + "end\n";
     private static final String ACL_IP_ENTRY = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
-            + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclTtl}\n"
+            + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} "
+            + "{$precedence} {$options} {$aclTtl}\n"
             + "end\n";
     private static final String ACL_IP6_ENTRY = "configure terminal\n"
             + "ipv6 access-list {$aclName}\n"
@@ -105,7 +112,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     private static final String ACL_TCP_ENTRY = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
             + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclSrcPort} {$aclDstAddr} "
-            + "{$aclDstPort} {$aclTtl}\n"
+            + "{$aclDstPort} {$established} {$precedence} {$options} {$aclTtl}\n"
             + "end\n";
     private static final String ACL_TCP_IP6_ENTRY = "configure terminal\n"
             + "ipv6 access-list {$aclName}\n"
@@ -115,7 +122,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     private static final String ACL_ICMP_ENTRY = "configure terminal\n"
             + "ip access-list extended {$aclName}\n"
             + "{$aclSeqId} {$aclFwdAction} {$aclProtocol} {$aclSrcAddr} {$aclDstAddr} {$aclIcmpMsgType} "
-            + "{$aclTtl}\n"
+            + "{$precedence} {$options} {$aclTtl}\n"
             + "end\n";
     private static final String ACL_ICMP_IP6_ENTRY = "configure terminal\n"
             + "ipv6 access-list {$aclName}\n"
@@ -136,6 +143,7 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
 
     private static final Pattern PORT_RANGE_PATTERN = Pattern.compile("(?<from>\\d*)..(?<to>\\d*)");
     private static final Pattern PORT_RANGE_NAMED_PATTERN = Pattern.compile("(?<from>\\S*)\\.\\.(?<to>\\S*)");
+    private static final Pattern PORT_RANGE_MULTIPLE_PATTERN = Pattern.compile("\\S+ \\S+.*");
     private static final Pattern IPV4_IN_IPV6_PATTERN =
             Pattern.compile("^(?<ipv6Part>.+:(ffff|FFFF):)(?<ipv4Part>[0-9a-fA-F]{1,4}:[0-9a-fA-F]{1,4})$");
 
@@ -188,6 +196,9 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         // ipv4|ipv6
         if (entry.getIpv4() != null) {
             processIpv4(entry, commandVars, aclSetKey.getType());
+            commandVars.aclPrecedence = formatPrecedence(entry);
+            commandVars.aclOptions = formatOptions(entry);
+            commandVars.aclEstablished = formatEstablishedState(entry);
         } else if (entry.getIpv6() != null) {
             processIpv6(entry, commandVars);
             commandVars.aclSeqId = " sequence " + entry.getSequenceId().toString();
@@ -209,7 +220,9 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                         "aclProtocol", commandVars.aclProtocol,
                         "aclSrcAddr", commandVars.aclSrcAddr,
                         "aclDstAddr", commandVars.aclDstAddr,
-                        "aclTtl", commandVars.aclTtl),
+                        "aclTtl", commandVars.aclTtl,
+                        "precedence", commandVars.aclPrecedence,
+                        "options", commandVars.aclOptions),
                         cli, id, entry);
                 break;
             case "ipv6":
@@ -234,7 +247,10 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                         "aclSrcPort", commandVars.aclSrcPort,
                         "aclDstAddr", commandVars.aclDstAddr,
                         "aclDstPort", commandVars.aclDstPort,
-                        "aclTtl", commandVars.aclTtl),
+                        "aclTtl", commandVars.aclTtl,
+                        "established", commandVars.aclEstablished,
+                        "precedence", commandVars.aclPrecedence,
+                        "options", commandVars.aclOptions),
                         cli, id, entry);
                 break;
             case "icmp":
@@ -246,7 +262,9 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                         "aclSrcAddr", commandVars.aclSrcAddr,
                         "aclDstAddr", commandVars.aclDstAddr,
                         "aclIcmpMsgType", commandVars.aclIcmpMsgType,
-                        "aclTtl", commandVars.aclTtl),
+                        "aclTtl", commandVars.aclTtl,
+                        "precedence", commandVars.aclPrecedence,
+                        "options", commandVars.aclOptions),
                         cli, id, entry);
                 break;
             case "":
@@ -517,10 +535,14 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
     }
 
     private String formatNamedPort(String port) {
-        Matcher matcher = PORT_RANGE_NAMED_PATTERN.matcher(port);
-        if (matcher.find()) {
-            String from = matcher.group("from");
-            String to = matcher.group("to");
+        var namedRangeMatcher = PORT_RANGE_NAMED_PATTERN.matcher(port);
+        var multipleRangeMatcher = PORT_RANGE_MULTIPLE_PATTERN.matcher(port);
+        if (multipleRangeMatcher.find()) {
+            return formatMultiplePort(port);
+        }
+        if (namedRangeMatcher.find()) {
+            var from = namedRangeMatcher.group("from");
+            var to = namedRangeMatcher.group("to");
             if (from.equals("0")) {
                 return f("lt %s", to);
             }
@@ -544,6 +566,39 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
                 return f("eq %s", port);
             }
         }
+    }
+
+    private static String formatEstablishedState(AclEntry entry) {
+        return (isTransportConfig(entry) && entry.getTransport().getConfig()
+                .getAugmentation(AclEstablishedStateAug.class) != null
+                && entry.getTransport().getConfig().getAugmentation(AclEstablishedStateAug.class).isEstablished())
+                ? "established"
+                : "";
+    }
+
+    private static String formatPrecedence(AclEntry entry) {
+        if (entry.getAugmentation(AclPrecedenceAug.class) != null
+                && entry.getAugmentation(AclPrecedenceAug.class).getPrecedence() != null) {
+            return "precedence " + entry.getAugmentation(AclPrecedenceAug.class).getPrecedence()
+                    .getName().toLowerCase();
+        }
+        return "";
+    }
+
+    private static String formatOptions(AclEntry entry) {
+        if (entry.getAugmentation(AclOptionAug.class) != null
+                && entry.getAugmentation(AclOptionAug.class).getOption() != null) {
+            var aug = entry.getAugmentation(AclOptionAug.class);
+            if (aug.getOption().getEnumeration() != null && aug.getOption().getUint8() != null) {
+                throw new IllegalStateException("Unsupported type...");
+            }
+            if (aug.getOption().getUint8() != null) {
+                return "option " + aug.getOption().getUint8().toString();
+            } else if (aug.getOption().getEnumeration() != null) {
+                return "option " + aug.getOption().getEnumeration().getName().toLowerCase();
+            }
+        }
+        return "";
     }
 
     private static String formatTTL(final String rangeString) {
@@ -584,6 +639,66 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         return ttlString;
     }
 
+    private String formatMultiplePort(String port) {
+        List<String> ports = Arrays.stream(port.split(" ")).collect(Collectors.toList());
+        var neq = Pattern.compile(" ").splitAsStream(port)
+                .map(PORT_RANGE_NAMED_PATTERN::matcher)
+                .filter(Matcher::matches)
+                .findFirst()
+                .isPresent();
+        var stringBuilder = new StringBuilder();
+        if (neq) {
+            formatMultipleNeq(stringBuilder, ports);
+            return stringBuilder.toString();
+        } else {
+            stringBuilder.append("eq");
+            ports.forEach(item -> {
+                stringBuilder.append(" ").append(item);
+            });
+            return stringBuilder.toString();
+        }
+    }
+
+    private static void formatMultipleNeq(StringBuilder stringBuilder, List<String> ports) {
+        String from;
+        String to;
+        String prev = null;
+        stringBuilder.append("neq");
+        for (var i = 0; i < ports.size(); i++) {
+            var matcher = PORT_RANGE_NAMED_PATTERN.matcher(ports.get(i));
+            if (matcher.find()) {
+                from = matcher.group("from");
+                to = matcher.group("to");
+            } else {
+                from = ports.get(i);
+                to = from;
+            }
+            if ((i == 0) && (!from.equals("0"))) {
+                createInterval(0, Integer.parseInt(from) - 1, stringBuilder);
+            } else if (i != 0) {
+                createInterval(Integer.parseInt(prev) + 1, Integer.parseInt(from) - 1, stringBuilder);
+            }
+            if ((i == (ports.size() - 1)) && (!to.equals(Integer.toString(MAX_PORT)))) {
+                createInterval(Integer.parseInt(to) + 1, MAX_PORT, stringBuilder);
+            }
+            prev = to;
+        }
+    }
+
+    private static void createInterval(int from, int to, StringBuilder stringBuilder) {
+        if (from == to) {
+            stringBuilder.append(" ").append(from);
+        } else {
+            for (var i = from; i <= to; i++) {
+                stringBuilder.append(" ").append(i);
+            }
+        }
+    }
+
+    private static boolean isTransportConfig(AclEntry entry) {
+        return entry != null && entry.getTransport() != null && entry.getTransport().getConfig() != null;
+    }
+
     @VisibleForTesting
     static class MaxMetricCommandDTO {
         String aclName = "";
@@ -596,5 +711,8 @@ public class AclEntryWriter implements CliListWriter<AclEntry, AclEntryKey> {
         String aclDstPort = "";
         String aclIcmpMsgType = "";
         String aclTtl = "";
+        String aclPrecedence = "";
+        String aclOptions = "";
+        String aclEstablished = "";
     }
 }

@@ -21,6 +21,7 @@ import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Assert;
@@ -39,7 +40,12 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosGroup;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAugBuilder;
-import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.cos.config.CosBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.access.group.config.AccessGroupBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.access.group.config.access.group.AclSetsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.multiple.cos.config.MultipleCosBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.multiple.cos.config.multiple.cos.CosSetsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.multiple.cos.config.multiple.cos.cos.sets.ElementsBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.multiple.cos.config.multiple.cos.cos.sets.elements.ElementBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.Terms;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.TermsBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.Term;
@@ -74,7 +80,13 @@ public class ClassifierWriterTest {
 
     private static final String WRITE_ANY_COS = "configure terminal\n"
             + "class-map match-any map1\n"
-            + "match cos inner 1\n"
+            + "match cos inner 3 5 7\n"
+            + "end\n";
+
+    private static final String WRITE_ANY_ACL = "configure terminal\n"
+            + "class-map match-any map1\n"
+            + "match access-group name SIP\n"
+            + "match access-group name RTP\n"
             + "end\n";
 
     private static final String DELETE_INPUT = "configure terminal\n"
@@ -113,10 +125,11 @@ public class ClassifierWriterTest {
     public void writeAny() throws WriteFailedException {
         data = getClassifier("map1", getTermsAny());
         writer.writeCurrentAttributes(piid, data, context);
-        Mockito.verify(cli, Mockito.times(3)).executeAndRead(response.capture());
+        Mockito.verify(cli, Mockito.times(4)).executeAndRead(response.capture());
         Assert.assertEquals(WRITE_ANY_QOS, response.getAllValues().get(0).getContent());
         Assert.assertEquals(WRITE_ANY_DSCP, response.getAllValues().get(1).getContent());
         Assert.assertEquals(WRITE_ANY_COS, response.getAllValues().get(2).getContent());
+        Assert.assertEquals(WRITE_ANY_ACL, response.getAllValues().get(3).getContent());
     }
 
     @Test
@@ -132,9 +145,14 @@ public class ClassifierWriterTest {
                 .setConditions(new ConditionsBuilder()
                         .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
                                 .setQosGroup(Lists.newArrayList(new QosGroup(10L)))
-                                .setCos(new CosBuilder()
-                                        .setInner(false)
-                                        .setCos(Cos.getDefaultInstance("3"))
+                                .setMultipleCos(new MultipleCosBuilder()
+                                        .setCosSets(List.of(new CosSetsBuilder().setId(1)
+                                                .setElements(new ElementsBuilder().setInner(false)
+                                                        .setElement(List.of(new ElementBuilder().setId(Cos
+                                                                        .getDefaultInstance("3"))
+                                                                .build()))
+                                                        .build())
+                                                .build()))
                                         .build())
                                 .build())
                         .setIpv4(new Ipv4Builder()
@@ -175,15 +193,52 @@ public class ClassifierWriterTest {
                 .setId("3")
                 .setConditions(new ConditionsBuilder()
                         .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
-                                .setCos(new CosBuilder()
-                                        .setInner(true)
-                                        .setCos(Cos.getDefaultInstance("1"))
+                                .setMultipleCos(new MultipleCosBuilder()
+                                        .setCosSets(List.of(new CosSetsBuilder().setId(1)
+                                                .setElements(new ElementsBuilder().setInner(true)
+                                                        .setElement(List.of(new ElementBuilder().setId(Cos
+                                                                        .getDefaultInstance("3"))
+                                                                .build(),
+                                                                new ElementBuilder().setId(Cos.getDefaultInstance("5"))
+                                                                        .build(),
+                                                                new ElementBuilder().setId(Cos.getDefaultInstance("7"))
+                                                                        .build()))
+                                                        .build())
+                                                .build()))
                                         .build())
                                 .build())
                         .build())
                 .build();
 
-        return Lists.newArrayList(term2, term3, term1);
+        Term term4 = new TermBuilder()
+                .setId("4")
+                .setConditions(new ConditionsBuilder()
+                        .addAugmentation(QosConditionAug.class, new QosConditionAugBuilder()
+                                .setAccessGroup(new AccessGroupBuilder()
+                                    .setAclSets(Arrays.asList(
+                                        new AclSetsBuilder()
+                                            .setId(1)
+                                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net
+                                                .yang.qos.extension.rev180304.qos.condition.access.group
+                                                .config.access.group.acl.sets.ConfigBuilder()
+                                                    .setName("SIP")
+                                                .build())
+                                        .build(),
+                                        new AclSetsBuilder()
+                                            .setId(2)
+                                            .setConfig(new org.opendaylight.yang.gen.v1.http.frinx.openconfig.net
+                                                .yang.qos.extension.rev180304.qos.condition.access.group
+                                                .config.access.group.acl.sets.ConfigBuilder()
+                                                    .setName("RTP")
+                                                .build())
+                                        .build())
+                                    )
+                                .build())
+                        .build())
+                    .build())
+                .build();
+
+        return Lists.newArrayList(term2, term3, term1, term4);
     }
 
     private Classifier getClassifier(String name, List<Term> terms) {

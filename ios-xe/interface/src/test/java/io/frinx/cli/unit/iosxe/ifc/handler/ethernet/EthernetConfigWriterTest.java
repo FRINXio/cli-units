@@ -30,6 +30,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.CiscoIfEthExtensionConfig;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfEthCiscoExtAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfEthCiscoExtAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED100MB;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.SPEED10MB;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
@@ -53,28 +56,37 @@ public class EthernetConfigWriterTest {
             .addAugmentation(LacpEthConfigAug.class, new LacpEthConfigAugBuilder()
                     .setLacpMode(LacpActivityType.ACTIVE)
                     .build())
+            .addAugmentation(IfEthCiscoExtAug.class, new IfEthCiscoExtAugBuilder()
+                    .setLacpRate(CiscoIfEthExtensionConfig.LacpRate.NORMAL)
+                    .build())
             .build();
 
     private static final String WRITE_INPUT = "configure terminal\n"
             + "interface GigabitEthernet0/0/0\n"
             + "speed 100\n"
             + "channel-group 20 mode active\n"
+            + "lacp rate normal\n"
             + "end\n";
 
     private static final Config UPDATE_CONFIG = new ConfigBuilder()
             .setPortSpeed(SPEED10MB.class)
+            .addAugmentation(IfEthCiscoExtAug.class, new IfEthCiscoExtAugBuilder()
+                    .setLacpRate(CiscoIfEthExtensionConfig.LacpRate.FAST)
+                    .build())
             .build();
 
     private static final String UPDATE_INPUT = "configure terminal\n"
             + "interface GigabitEthernet0/0/0\n"
             + "speed 10\n"
             + "no channel-group\n"
+            + "lacp rate fast\n"
             + "end\n";
 
     private static final String DELETE_INPUT = "configure terminal\n"
             + "interface GigabitEthernet0/0/0\n"
             + "no speed\n"
             + "no channel-group\n"
+            + "no lacp rate\n"
             + "end\n";
 
     @Mock
@@ -111,7 +123,7 @@ public class EthernetConfigWriterTest {
 
     @Test
     public void delete() throws WriteFailedException {
-        writer.deleteCurrentAttributes(iid, UPDATE_CONFIG, context);
+        writer.deleteCurrentAttributes(iid, WRITE_CONFIG, context);
         Mockito.verify(cli).executeAndRead(response.capture());
         Assert.assertEquals(DELETE_INPUT, response.getValue().getContent());
     }

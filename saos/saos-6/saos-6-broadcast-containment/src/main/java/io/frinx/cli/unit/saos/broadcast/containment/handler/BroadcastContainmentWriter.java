@@ -26,8 +26,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BroadcastContainmentWriter implements CliWriter<Filters> {
 
-    private static final String GLOBAL_TEMPLATE = "broadcast-containment {$enable}\n"
-            + "configuration save";
+    private static final String GLOBAL_TEMPLATE = "broadcast-containment {$enable}";
 
     private Cli cli;
 

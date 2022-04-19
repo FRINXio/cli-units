@@ -34,10 +34,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class L2VSICpuSubinterfaceConfigWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
 
     private static final String WRITE_CPUSUBINTERFACE =
-            "virtual-switch interface attach cpu-subinterface {$data.id} vs {$vsName}\nconfiguration save";
-
-    private static final String DELETE_CPUSUBINTERFACE =
-            "virtual-switch interface detach cpu-subinterface {$data.id}\nconfiguration save";
+            "virtual-switch interface attach cpu-subinterface {$data.id} vs {$vsName}";
+    private static final String DELETE_CPUSUBINTERFACE = "virtual-switch interface detach cpu-subinterface {$data.id}";
 
     private Cli cli;
 

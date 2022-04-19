@@ -70,11 +70,10 @@ public class IngressAclSetConfigWriterTest {
                     createAclSet(ACL_SET_NAME_OTHER, ACL_TYPE)))
             .build();
 
-    private static final String WRITE_INPUT = "port set port " + INTERFACE_NAME + " ingress-acl " + ACL_SET_NAME + "\n"
-            + "configuration save\n";
+    private static final String WRITE_INPUT = "port set port " + INTERFACE_NAME + " ingress-acl " + ACL_SET_NAME
+            + "\n\n";
 
-    private static final String DELETE_INPUT = "port unset port " + INTERFACE_NAME + " ingress-acl\n"
-            + "configuration save\n";
+    private static final String DELETE_INPUT = "port unset port " + INTERFACE_NAME + " ingress-acl" + "\n\n";
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();

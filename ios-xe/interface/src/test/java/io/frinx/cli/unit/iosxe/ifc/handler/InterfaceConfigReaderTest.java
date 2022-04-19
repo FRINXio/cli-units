@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.hold.queue.HoldQueueBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlKey;
@@ -58,6 +59,12 @@ public class InterfaceConfigReaderTest {
             .setSnmpTrapLinkStatus(false)
             .setLldpReceive(false)
             .setNegotiationAuto(true)
+            .setIpRedirects(true)
+            .setHoldQueue(new HoldQueueBuilder()
+                    .setIn(1024L)
+                    .setOut(1024L)
+                    .build()
+            )
             .build();
 
     public static final IfCiscoExtAug IF_CISCO_EXT_AUG_WITH_VRF = new IfCiscoExtAugBuilder()
@@ -104,6 +111,8 @@ public class InterfaceConfigReaderTest {
             + " storm-control broadcast level 10.00\n"
             + " storm-control multicast level bps 0\n"
             + " storm-control unicast level 10.00\n"
+            + " hold-queue 1024 in\n"
+            + " hold-queue 1024 out\n"
             + " !\n"
             + "end\n";
 

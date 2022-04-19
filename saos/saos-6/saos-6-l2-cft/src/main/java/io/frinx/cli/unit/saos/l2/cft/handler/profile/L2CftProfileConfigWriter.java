@@ -25,11 +25,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2CftProfileConfigWriter implements CliWriter<Config> {
 
-    private static final String WRITE_PROFILE =
-            "l2-cft create profile {$data.name}\nconfiguration save";
-
-    private static final String DELETE_PROFILE =
-            "l2-cft delete profile {$data.name}\nconfiguration save";
+    private static final String WRITE_PROFILE = "l2-cft create profile {$data.name}";
+    private static final String DELETE_PROFILE = "l2-cft delete profile {$data.name}";
 
     private Cli cli;
 

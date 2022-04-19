@@ -52,6 +52,7 @@ public class InterfaceConfigWriterTest {
             + "no mtu\n"
             + "no description\n"
             + "shutdown\n"
+            + "ip redirects\n"
             + "no media-type\n"
             + "snmp trap link-status\n"
             + "no storm-control broadcast level\n"
@@ -60,6 +61,8 @@ public class InterfaceConfigWriterTest {
             + "no negotiation auto\n"
             + "no fhrp delay minimum\n"
             + "no fhrp delay reload\n"
+            + "no hold-queue in\n"
+            + "no hold-queue out\n"
             + "end\n";
 
     private static final Config PHYSICAL_INT_CONFIG = new ConfigBuilder()
@@ -77,6 +80,7 @@ public class InterfaceConfigWriterTest {
             + "mtu 1500\n"
             + "description test - ethernet\n"
             + "no shutdown\n"
+            + "ip redirects\n"
             + "media-type rj45\n"
             + "no snmp trap link-status\n"
             + "storm-control broadcast level 10.00\n"
@@ -85,6 +89,8 @@ public class InterfaceConfigWriterTest {
             + "negotiation auto\n"
             + "fhrp delay minimum 1\n"
             + "fhrp delay reload 3600\n"
+            + "hold-queue 1024 in\n"
+            + "hold-queue 1024 out\n"
             + "end\n";
 
     private static final Config LOGICAL_INT_CONFIG = new ConfigBuilder()

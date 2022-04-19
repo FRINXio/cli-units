@@ -37,7 +37,7 @@ public class MatchCommunitySetConfigReaderTest {
         configBuilder = new ConfigBuilder();
     }
 
-    @Test
+    @Test (expected = NullPointerException.class)
     public void testNull() {
         MatchCommunitySetConfigReader.parseConfig("NAME1", "10", OUTPUT, configBuilder);
         Assert.assertNull(configBuilder.getAugmentation(MatchCommunityConfigListAug.class).getCommunitySetList());

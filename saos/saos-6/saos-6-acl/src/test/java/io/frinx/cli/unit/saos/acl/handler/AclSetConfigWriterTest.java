@@ -38,14 +38,14 @@ public class AclSetConfigWriterTest {
     @Test
     public void writeTemplateTest() {
         Assert.assertEquals(
-                "access-list create acl-profile test1 default-filter-action deny\nconfiguration save",
+                "access-list create acl-profile test1 default-filter-action deny\n",
                 writer.writeTemplate(createConfig("test1", DROP.class, ACLIPV4.class, null)));
         Assert.assertEquals(
-                "access-list create acl-profile test2 default-filter-action allow\nconfiguration save",
+                "access-list create acl-profile test2 default-filter-action allow\n",
                 writer.writeTemplate(createConfig("test2", ACCEPT.class, ACLIPV4.class, true)));
         Assert.assertEquals(
                 "access-list create acl-profile test3 default-filter-action allow\n"
-                + "access-list disable profile test3\nconfiguration save",
+                + "access-list disable profile test3",
                 writer.writeTemplate(createConfig("test3", ACCEPT.class, ACLIPV4.class,false)));
     }
 
@@ -62,34 +62,34 @@ public class AclSetConfigWriterTest {
 
     @Test
     public void updateTemplate() {
-        Assert.assertEquals("access-list disable profile test5\nconfiguration save", writer.updateTemplate(
+        Assert.assertEquals("access-list disable profile test5", writer.updateTemplate(
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, null),
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, false)));
 
-        Assert.assertEquals("access-list enable profile test5\nconfiguration save", writer.updateTemplate(
+        Assert.assertEquals("access-list enable profile test5", writer.updateTemplate(
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, false),
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, true)));
 
-        Assert.assertEquals("access-list enable profile test5\nconfiguration save", writer.updateTemplate(
+        Assert.assertEquals("access-list enable profile test5", writer.updateTemplate(
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, false),
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, null)));
 
-        Assert.assertEquals("access-list disable profile test5\nconfiguration save", writer.updateTemplate(
+        Assert.assertEquals("access-list disable profile test5", writer.updateTemplate(
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, true),
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, false)));
 
-        Assert.assertEquals("configuration save", writer.updateTemplate(
+        Assert.assertEquals("", writer.updateTemplate(
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, true),
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, null)));
 
-        Assert.assertEquals("configuration save", writer.updateTemplate(
+        Assert.assertEquals("", writer.updateTemplate(
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, null),
                 createConfig("test5", ACCEPT.class, ACLIPV4.class, true)));
     }
 
     @Test
     public void deleteTemplateTest() {
-        Assert.assertEquals("access-list delete profile test5\nconfiguration save",
+        Assert.assertEquals("access-list delete profile test5",
                 writer.deleteTemplate(createConfig("test5", ACCEPT.class, ACLIPV4.class, true)));
     }
 

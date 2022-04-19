@@ -41,11 +41,11 @@ public class L2VSIInterfaceWriter implements CliListWriter<Interface, InterfaceK
                 "{% if ($delete) %}virtual-switch ethernet remove vs {$vsi_ni_name} port {$vsi_ni_if_name}\n"
                 + "port unset port {$vsi_ni_if_name} untagged-ctrl-vs\n"
                 + "port unset port {$vsi_ni_if_name} untagged-data-vs\n"
-                + "configuration save{% endif %}"
+                + "{% endif %}"
                 + "{% if ($add) %}virtual-switch ethernet add vs {$vsi_ni_name} port {$vsi_ni_if_name}\n"
                 + "port set port {$vsi_ni_if_name} untagged-ctrl-vs {$vsi_ni_name}\n"
                 + "port set port {$vsi_ni_if_name} untagged-data-vs {$vsi_ni_name}\n"
-                + "configuration save{% endif %}";
+                + "{% endif %}";
 
     private Cli cli;
 

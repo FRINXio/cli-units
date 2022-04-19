@@ -32,10 +32,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class SubPortPmInstanceConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_PM_INSTANCE = "pm create sub-port {$subPortName} pm-instance {$data.name} "
-            + "profile-type BasicTxRx bin-count {$data.bin_count}\n"
-            + "configuration save";
+            + "profile-type BasicTxRx bin-count {$data.bin_count}";
 
-    private static final String DELETE_PM_INSTANCE = "pm delete pm-instance {$data.name}\nconfiguration save";
+    private static final String DELETE_PM_INSTANCE = "pm delete pm-instance {$data.name}";
 
     private final Cli cli;
 

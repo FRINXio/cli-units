@@ -32,7 +32,6 @@ public class SubPortVlanConfigWriterTest {
     private static final String WRITE_EGRESS = "sub-port set sub-port MAX egress-l2-transform pop:pop\n";
     private static final String UNSET_INGRESS = "sub-port unset sub-port MAX ingress-l2-transform\n";
     private static final String UNSET_EGRESS = "sub-port unset sub-port MAX egress-l2-transform\n";
-    private static final String COMMIT = "configuration save";
 
     private SubPortVlanConfigWriter writer;
 
@@ -43,13 +42,13 @@ public class SubPortVlanConfigWriterTest {
 
     @Test
     public void writeTemplateTest() {
-        createWriteCommandAndTest(WRITE_INGRESS + WRITE_EGRESS + COMMIT,
+        createWriteCommandAndTest(WRITE_INGRESS + WRITE_EGRESS,
                 createConfig("pop:pop", "pop:pop"));
 
-        createWriteCommandAndTest(WRITE_INGRESS + COMMIT,
+        createWriteCommandAndTest(WRITE_INGRESS,
                 createConfig("pop:pop", null));
 
-        createWriteCommandAndTest(WRITE_EGRESS + COMMIT,
+        createWriteCommandAndTest(WRITE_EGRESS,
                 createConfig(null, "pop:pop"));
     }
 
@@ -59,27 +58,27 @@ public class SubPortVlanConfigWriterTest {
 
     @Test
     public void updateTemplateTest() {
-        createUpdateCommandAndTest(WRITE_INGRESS + WRITE_EGRESS + COMMIT,
+        createUpdateCommandAndTest(WRITE_INGRESS + WRITE_EGRESS,
                 createConfig("pop", "pop"),
                 createConfig("pop:pop", "pop:pop"));
 
-        createUpdateCommandAndTest(COMMIT,
+        createUpdateCommandAndTest("",
                 createConfig("pop:pop", "pop:pop"),
                 createConfig("pop:pop", "pop:pop"));
 
-        createUpdateCommandAndTest(WRITE_INGRESS + COMMIT,
+        createUpdateCommandAndTest(WRITE_INGRESS,
                 createConfig("push-88a8.800.map", "pop:pop"),
                 createConfig("pop:pop", "pop:pop"));
 
-        createUpdateCommandAndTest(WRITE_EGRESS + COMMIT,
+        createUpdateCommandAndTest(WRITE_EGRESS,
                 createConfig("pop:pop", "push-88a8.800.map"),
                 createConfig("pop:pop", "pop:pop"));
 
-        createUpdateCommandAndTest(WRITE_INGRESS + UNSET_EGRESS + COMMIT,
+        createUpdateCommandAndTest(WRITE_INGRESS + UNSET_EGRESS,
                 createConfig("pop", "push-88a8.800.map"),
                 createConfig("pop:pop", null));
 
-        createUpdateCommandAndTest(UNSET_INGRESS + WRITE_EGRESS + COMMIT,
+        createUpdateCommandAndTest(UNSET_INGRESS + WRITE_EGRESS,
                 createConfig("pop", "push-88a8.800.map"),
                 createConfig(null, "pop:pop"));
     }
@@ -90,13 +89,13 @@ public class SubPortVlanConfigWriterTest {
 
     @Test
     public void deleteTemplateTest() {
-        createDeleteCommandAndTest(UNSET_INGRESS + COMMIT,
+        createDeleteCommandAndTest(UNSET_INGRESS,
                 createConfig("pop", null));
 
-        createDeleteCommandAndTest(UNSET_EGRESS + COMMIT,
+        createDeleteCommandAndTest(UNSET_EGRESS,
                 createConfig(null, "pop"));
 
-        createDeleteCommandAndTest(UNSET_INGRESS + UNSET_EGRESS + COMMIT,
+        createDeleteCommandAndTest(UNSET_INGRESS + UNSET_EGRESS,
                 createConfig("pop", "pop:pop"));
     }
 

@@ -31,10 +31,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class InterfaceVlanWriter implements CliWriter<Config> {
 
     private static String WRITE_TEMPLATE =
-                "{% if ($vlanRemove) %}vlan remove vlan {$vlanRemove} port {$portName}\n{% endif %}"
-            +   "{% if ($vlanAdd) %}vlan add vlan {$vlanAdd} port {$portName}\n{% endif %}"
-            +   "configuration save\n";
-
+            "{% if ($vlanRemove) %}vlan remove vlan {$vlanRemove} port {$portName}\n{% endif %}"
+            +   "{% if ($vlanAdd) %}vlan add vlan {$vlanAdd} port {$portName}\n{% endif %}";
 
     private Cli cli;
 

@@ -21,15 +21,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</version>
-        <relativePath/>
+        <groupId>io.frinx.uniconfig.common</groupId>
+        <relativePath>../../../commons/parents/odlparent</relativePath>
+        <version>5.0.6-SNAPSHOT</version>
     </parent>
 
-    <groupId>io.frinx.cli</groupId>
+    <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>cli-units-ios-xe</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -42,6 +42,8 @@
         <module>bgp</module>
         <module>network-instance</module>
         <module>fhrp</module>
+        <module>cable</module>
+        <module>system</module>
     </modules>
 
     <build>
@@ -96,20 +98,4 @@
             </build>
         </profile>
     </profiles>
-
-    <!--
-        Maven Site Configuration
-
-        The following configuration is necessary for maven-site-plugin to
-        correctly identify the correct deployment path for OpenDaylight Maven
-        sites.
-    -->
-    <url>${odl.site.url}/${project.groupId}/${stream}/</url>
-
-    <distributionManagement>
-        <site>
-            <id>opendaylight-site</id>
-            <url>${nexus.site.url}/</url>
-        </site>
-    </distributionManagement>
 </project>

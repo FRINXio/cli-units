@@ -20,16 +20,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>odlparent-lite</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</version>
-        <relativePath/>
+      <groupId>io.frinx.uniconfig.common</groupId>
+      <artifactId>odlparent</artifactId>
+      <version>5.0.6-SNAPSHOT</version>
+      <relativePath>../../../commons/parents/odlparent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.frinx.cli</groupId>
+    <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>cli-units-artifacts</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <dependencyManagement>
@@ -309,6 +309,16 @@
                 <artifactId>ios-xe-fhrp-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xe-cable-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ios-xe-system-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- IOS XR -->
             <dependency>
@@ -444,22 +454,22 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.frinx.cli</groupId>
+                <groupId>io.frinx.uniconfig.cli</groupId>
                 <artifactId>junos-interface-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.frinx.cli</groupId>
+                <groupId>io.frinx.uniconfig.cli</groupId>
                 <artifactId>junos-network-instance-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.frinx.cli</groupId>
+                <groupId>io.frinx.uniconfig.cli</groupId>
                 <artifactId>junos-routing-policy-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.frinx.cli</groupId>
+                <groupId>io.frinx.uniconfig.cli</groupId>
                 <artifactId>junos-ospf-unit</artifactId>
                 <version>${project.version}</version>
             </dependency>

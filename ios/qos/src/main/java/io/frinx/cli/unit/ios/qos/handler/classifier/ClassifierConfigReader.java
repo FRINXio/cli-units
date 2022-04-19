@@ -16,9 +16,15 @@
 
 package io.frinx.cli.unit.ios.qos.handler.classifier;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.fd.honeycomb.translate.read.ReadContext;
+import io.fd.honeycomb.translate.read.ReadFailedException;
+import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
+import io.frinx.cli.unit.utils.ParsingUtils;
 import javax.annotation.Nonnull;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.IosQosClassifierAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.IosQosClassifierAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.classifier.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.classifier.ConfigBuilder;
@@ -26,12 +32,28 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class ClassifierConfigReader implements CliConfigReader<Config, ConfigBuilder> {
 
+    private Cli cli;
+
+    public ClassifierConfigReader(Cli cli) {
+        this.cli = cli;
+    }
+
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
-                                      @Nonnull ReadContext readContext) {
+                                      @Nonnull ReadContext readContext) throws ReadFailedException {
         final String name = instanceIdentifier.firstKeyOf(Classifier.class).getName();
         configBuilder.setName(name);
+        parseQosConfig(blockingRead(f(TermReader.SH_TERMS, name), cli, instanceIdentifier, readContext), configBuilder);
     }
 
+    @VisibleForTesting
+    static void parseQosConfig(String output, ConfigBuilder configBuilder) {
+        IosQosClassifierAugBuilder qosIosClassifierConfig = new IosQosClassifierAugBuilder();
+        ParsingUtils.parseField(output, 0,
+            ClassifierReader.CLASS_LINE::matcher,
+            matcher -> matcher.group("type"),
+            qosIosClassifierConfig::setStatementsMatching);
+        configBuilder.addAugmentation(IosQosClassifierAug.class, qosIosClassifierConfig.build());
+    }
 }

@@ -37,13 +37,11 @@ public class AclEntryWriterTest {
     @Test
     public void writeTemplate() {
         Assert.assertEquals(
-                "access-list add profile AclSet1 rule test1 precedence 1 filter-action allow any\n"
-                        + "configuration save",
+                "access-list add profile AclSet1 rule test1 precedence 1 filter-action allow any",
                 writer.writeTemplate(
                         createAclEntry(new Long("1"), "test1", ACCEPT.class), "AclSet1"));
         Assert.assertEquals(
-                "access-list add profile AclSet1 rule test2 precedence 2 filter-action deny any\n"
-                        + "configuration save",
+                "access-list add profile AclSet1 rule test2 precedence 2 filter-action deny any",
                 writer.writeTemplate(
                         createAclEntry(new Long("2"), "test2", DROP.class), "AclSet1"));
     }
@@ -51,8 +49,7 @@ public class AclEntryWriterTest {
     @Test
     public void updateTemplate() {
         Assert.assertEquals(
-                "access-list set profile AclSet1 rule test1 precedence 1 filter-action deny\n"
-                        + "configuration save",
+                "access-list set profile AclSet1 rule test1 precedence 1 filter-action deny",
                 writer.updateTemplate(
                         createAclEntry(new Long("1"), "test1", ACCEPT.class),
                         createAclEntry(new Long("1"), "test1", DROP.class), "AclSet1"));
@@ -61,8 +58,7 @@ public class AclEntryWriterTest {
     @Test
     public void deleteTemplate() {
         Assert.assertEquals(
-                "access-list remove profile AclSet1 rule test1\n"
-                        + "configuration save",
+                "access-list remove profile AclSet1 rule test1",
                 writer.deleteTemplate(
                         createAclEntry(new Long("1"), "test1", ACCEPT.class), "AclSet1"));
     }

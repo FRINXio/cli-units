@@ -54,7 +54,7 @@ public class L2CftProfileProtocolConfigWriterTest {
             .build();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
         writer = new L2CftProfileProtocolConfigWriter(cli);
@@ -66,7 +66,7 @@ public class L2CftProfileProtocolConfigWriterTest {
 
         Mockito.verify(cli).executeAndRead(commands.capture());
         Assert.assertEquals("l2-cft protocol add profile TEST ctrl-protocol all-bridges-block "
-                + "untagged-disposition discard\nconfiguration save", commands.getValue().getContent());
+                + "untagged-disposition discard", commands.getValue().getContent());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class L2CftProfileProtocolConfigWriterTest {
 
         Mockito.verify(cli).executeAndRead(commands.capture());
         Assert.assertEquals("l2-cft protocol set profile TEST ctrl-protocol all-bridges-block "
-                + "untagged-disposition forward\nconfiguration save", commands.getValue().getContent());
+                + "untagged-disposition forward", commands.getValue().getContent());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class L2CftProfileProtocolConfigWriterTest {
         writer.deleteCurrentAttributes(iid, config, null);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("l2-cft protocol remove profile TEST ctrl-protocol all-bridges-block\n"
-                + "configuration save", commands.getValue().getContent());
+        Assert.assertEquals("l2-cft protocol remove profile TEST ctrl-protocol all-bridges-block",
+                commands.getValue().getContent());
     }
 }

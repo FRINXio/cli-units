@@ -27,8 +27,21 @@ import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStateReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStatisticsConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.InterfaceStatisticsConfigWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableInterfaceConfigReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableInterfaceDownstreamConfigReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableInterfaceDownstreamConfigWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableInterfaceUpstreamConfigReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableInterfaceUpstreamConfigWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableInterfaceUpstreamReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableRfChannelReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableRfChannelWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableUpstreamConfigReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableUpstreamReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.cable.CableUpstreamWriter;
 import io.frinx.cli.unit.iosxe.ifc.handler.cfm.CfmMipReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.cfm.CfmMipWriter;
+import io.frinx.cli.unit.iosxe.ifc.handler.ethernet.EthernetConfigReader;
+import io.frinx.cli.unit.iosxe.ifc.handler.ethernet.EthernetConfigWriter;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.L2protocolConfigReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.L2protocolReader;
 import io.frinx.cli.unit.iosxe.ifc.handler.service.instance.ServiceInstanceBridgeDomainReader;
@@ -86,6 +99,7 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                 IIDs.FRINX_CISCO_IF_EXTENSION,
                 IIDs.FRINX_SAOS_IF_EXTENSION,
                 IIDs.FRINX_IF_ETHERNET_EXTENSION,
+                IIDs.FRINX_RPHY_IF_EXTENSION,
                 io.frinx.openconfig.openconfig._if.ip.IIDs.FRINX_OPENCONFIG_IF_IP,
                 io.frinx.openconfig.openconfig._if.ip.IIDs.FRINX_CISCO_VRRP_EXTENSION,
                 io.frinx.openconfig.openconfig._if.ip.IIDs.FRINX_OPENCONFIG_IF_IP_EXT,
@@ -123,7 +137,31 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_L2_SE_L2_CONFIG,
                         IIDs.IN_IN_AUG_IFCISCOSERVICEINSTANCEAUG_SE_SE_REWRITE));
 
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_IFCABLEAUG);
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_IFCABLEAUG_CABLE);
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_IFCABLEAUG_CA_CONFIG);
+        writeRegistry.add(IIDs.IN_IN_AUG_IFCABLEAUG_CA_RFCHANNELS, new CableRfChannelWriter(cli));
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_IFCABLEAUG_CA_UPSTREAM);
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_IFCABLEAUG_CA_UP_UP_BONDINGGROUP);
+        writeRegistry.add(IIDs.IN_IN_AUG_IFCABLEAUG_CA_UP_UP_BO_CONFIG, new CableUpstreamWriter(cli));
+
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_IFUPSTREAMAUG_UPSTREAM);
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_IFUPSTREAMAUG_UP_UPSTREAMCABLES);
+        writeRegistry.add(IIDs.IN_IN_AUG_IFUPSTREAMAUG_UP_UP_CONFIG, new CableInterfaceUpstreamConfigWriter(cli));
+        writeRegistry.add(IIDs.IN_IN_AUG_IFDOWNSTREAMAUG_DO_CONFIG, new CableInterfaceDownstreamConfigWriter(cli));
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_IFDOWNSTREAMAUG);
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_IFDOWNSTREAMAUG_DOWNSTREAM);
+
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1);
+        writeRegistry.addNoop(IIDs.IN_IN_AUG_INTERFACE1_ETHERNET);
+        writeRegistry.subtreeAdd(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG,
+                new EthernetConfigWriter(cli),
+                Sets.newHashSet(io.frinx.openconfig.openconfig.lacp.IIDs.IN_IN_ET_CO_AUG_LACPETHCONFIGAUG,
+                        IIDs.IN_IN_ET_CO_AUG_IFETHCISCOEXTAUG,
+                        IIDs.IN_IN_ET_CO_AUG_CONFIG1));
+
         writeRegistry.addNoop(IIDs.IN_IN_SU_SUBINTERFACE);
+        writeRegistry.addNoop(IIDs.IN_IN_CO_AUG_IFCISCOEXTAUG_HOLDQUEUE);
         writeRegistry.addAfter(IIDs.IN_IN_SU_SU_CONFIG, new SubinterfaceConfigWriter(cli), IIDs.IN_IN_CONFIG);
 
         writeRegistry.addNoop(io.frinx.openconfig.openconfig._if.ip.IIDs.IN_IN_SU_SU_AUG_SUBINTERFACE1_IP_AD_ADDRESS);
@@ -221,6 +259,17 @@ public final class IosXeInterfaceUnit extends AbstractUnit {
 
         readRegistry.add(IIDs.IN_IN_AUG_IFCISCOSTATSAUG_ST_CONFIG, new InterfaceStatisticsConfigReader(cli));
         readRegistry.add(io.frinx.openconfig.openconfig.oam.IIDs.IN_IN_AUG_IFCFMAUG_CF_MI_LEVEL, new CfmMipReader(cli));
+
+        readRegistry.add(IIDs.IN_IN_AUG_IFCABLEAUG_CA_UP_UP_BONDINGGROUP, new CableUpstreamReader(cli));
+        readRegistry.add(IIDs.IN_IN_AUG_IFCABLEAUG_CA_UP_UP_BO_CONFIG, new CableUpstreamConfigReader(cli));
+        readRegistry.add(IIDs.IN_IN_AUG_IFUPSTREAMAUG_UP_UPSTREAMCABLES, new CableInterfaceUpstreamReader(cli));
+        readRegistry.add(IIDs.IN_IN_AUG_IFUPSTREAMAUG_UP_UP_CONFIG, new CableInterfaceUpstreamConfigReader(cli));
+        readRegistry.add(IIDs.IN_IN_AUG_IFDOWNSTREAMAUG_DO_CONFIG, new CableInterfaceDownstreamConfigReader(cli));
+
+        readRegistry.add(IIDs.IN_IN_AUG_IFCABLEAUG_CA_CONFIG, new CableInterfaceConfigReader(cli));
+        readRegistry.add(IIDs.IN_IN_AUG_IFCABLEAUG_CA_RFCHANNELS, new CableRfChannelReader(cli));
+
+        readRegistry.add(IIDs.IN_IN_AUG_INTERFACE1_ET_CONFIG, new EthernetConfigReader(cli));
     }
 
 }

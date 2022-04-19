@@ -20,22 +20,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>odlparent-lite</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</version>
-        <relativePath/>
+      <groupId>io.frinx.uniconfig.common</groupId>
+      <artifactId>odlparent</artifactId>
+      <version>5.0.6-SNAPSHOT</version>
+      <relativePath>../../../commons/parents/odlparent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.frinx.cli</groupId>
+    <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>cli-units-features</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.frinx.cli</groupId>
+                <groupId>io.frinx.uniconfig.cli</groupId>
                 <artifactId>cli-units-artifacts</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
@@ -267,6 +267,14 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>ios-xe-fhrp-unit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-cable-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ios-xe-system-unit</artifactId>
+        </dependency>
 
         <!-- IOS XR -->
         <dependency>
@@ -376,19 +384,19 @@
             <artifactId>junos-configuration-metadata-unit</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>junos-interface-unit</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>junos-network-instance-unit</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>junos-routing-policy-unit</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>junos-ospf-unit</artifactId>
         </dependency>
 
@@ -501,22 +509,22 @@
         </dependency>
 
         <!-- CLI-NATIVE -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ios-xr-5-native-models</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>junos-17-native-models</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>ios-xr-5-native-unit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>junos-17-native-unit</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>${project.groupId}</groupId>-->
+<!--            <artifactId>ios-xr-5-native-models</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>${project.groupId}</groupId>-->
+<!--            <artifactId>junos-17-native-models</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>${project.groupId}</groupId>-->
+<!--            <artifactId>ios-xr-5-native-unit</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>${project.groupId}</groupId>-->
+<!--            <artifactId>junos-17-native-unit</artifactId>-->
+<!--        </dependency>-->
 
     </dependencies>
 </project>

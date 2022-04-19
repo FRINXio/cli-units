@@ -32,18 +32,15 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class SubPortVlanElementConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE =
-            "sub-port add sub-port {$subIfcName} class-element {$data.id} vtag-stack {$data.vtag_stack}\n"
-            + "configuration save";
+            "sub-port add sub-port {$subIfcName} class-element {$data.id} vtag-stack {$data.vtag_stack}";
 
     private static final String UPDATE_TEMPLATE =
             "{$data|update(vtag_stack,sub-port remove sub-port `$subIfcName` class-element `$data.id`\n,)}"
             + "{$data|update(vtag_stack,sub-port add sub-port `$subIfcName` class-element `$data.id` "
-            + "vtag-stack `$data.vtag_stack`\n,)}"
-            + "configuration save";
+            + "vtag-stack `$data.vtag_stack`\n,)}";
 
     private static final String DELETE_TEMPLATE =
-            "sub-port remove sub-port {$subIfcName} class-element {$data.id}\n"
-            + "configuration save";
+            "sub-port remove sub-port {$subIfcName} class-element {$data.id}";
 
     private Cli cli;
 

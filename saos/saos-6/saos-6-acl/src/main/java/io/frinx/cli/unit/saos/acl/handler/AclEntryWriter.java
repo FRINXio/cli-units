@@ -31,15 +31,12 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class AclEntryWriter implements CliWriter<AclEntry> {
 
     private static final String WRITE_TEMPLATE = "access-list add profile {$aclSetName} rule {$termName} precedence "
-            + "{$data.sequence_id} filter-action {$action} any\n"
-            + "configuration save";
+            + "{$data.sequence_id} filter-action {$action} any";
 
     private static final String UPDATE_TEMPLATE = "access-list set profile {$aclSetName} rule {$termName} precedence "
-            + "{$data.sequence_id} filter-action {$action}\n"
-            + "configuration save";
+            + "{$data.sequence_id} filter-action {$action}";
 
-    private static final String DELETE_TEMPLATE = "access-list remove profile {$aclSetName} rule {$termName}\n"
-            + "configuration save";
+    private static final String DELETE_TEMPLATE = "access-list remove profile {$aclSetName} rule {$termName}";
 
     private final Cli cli;
 

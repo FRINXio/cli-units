@@ -38,12 +38,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2vsicpConfigWriter implements CompositeWriter.Child<Config>, CliWriter<Config> {
 
-    private static final String L2VSICP_DELETE = "virtual-circuit ethernet delete vc %s\nconfiguration save\n";
+    private static final String L2VSICP_DELETE = "virtual-circuit ethernet delete vc %s";
     private static final String L2VSICP_CREATE = "virtual-circuit ethernet create vc {$name} vlan {$vlan.value}\n"
-        + "configuration save\n"
         + "{% if $set_statistics == TRUE %}"
         + "virtual-circuit ethernet set vc {$name} statistics {$statistics}\n"
-        + "configuration save"
         + "{% endif %}";
 
 

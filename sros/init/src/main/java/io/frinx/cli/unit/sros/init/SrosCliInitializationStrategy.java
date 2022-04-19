@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.sros.init;
 
-import com.google.common.base.Preconditions;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.io.Session;
@@ -54,13 +53,6 @@ public class SrosCliInitializationStrategy implements SessionInitializationStrat
     @Override
     public void accept(Session session, String newline) {
         try {
-
-            String prompt = SrosPromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
-
-            Preconditions.checkState(IS_PRIVELEGE_PROMPT.test(prompt),
-                    "%s: SROS cli session initialization failed to enter cli mode. Current prompt: %s",
-                    session, prompt);
-
             LOG.debug("{}: Disable pager to prevent \"Press any key to continue (Q to quit)\" situation", session);
             write(session, newline, SET_TERMINAL_LENGTH_COMMAND);
             session.readUntilTimeout(READ_TIMEOUT_SECONDS);

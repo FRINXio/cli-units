@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.saos.init;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
@@ -131,7 +130,7 @@ public class SaosCliInitializerUnit extends AbstractUnit {
                 Cli.NEWLINE,
                 "",
                 Optional.of("configuration show brief"),
-                Stream.of('^').collect(Collectors.toSet()));
+                Stream.of('^', '*').collect(Collectors.toSet()));
     }
 
     public static class SaosCliInitializationStrategy implements SessionInitializationStrategy {
@@ -139,17 +138,9 @@ public class SaosCliInitializerUnit extends AbstractUnit {
         @Override
         public void accept(Session session, String newline) {
             try {
-                String prompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
-
-                Preconditions.checkState(IS_PRIVELEGE_PROMPT.test(prompt),
-                        "%s: SAOS cli session initialization failed to enter privilege mode. Current prompt: %s",
-                        session, prompt);
-
                 LOG.debug("{}: Disable pager to prevent \"[more x%]\" situation", session);
                 write(session, newline, SET_TERMINAL_PAGER_OFF_COMMAND);
-                session.readUntilTimeout(READ_TIMEOUT_SECONDS);
                 write(session, newline, COMMIT);
-                session.readUntilTimeout(READ_TIMEOUT_SECONDS);
                 LOG.info("{}: SAOS cli session initialized successfully", session);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

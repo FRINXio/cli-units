@@ -19,35 +19,35 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.frinx.translate.unit.commons</groupId>
+        <groupId>io.frinx.uniconfig</groupId>
         <artifactId>checkstyle-parent</artifactId>
-        <version>4.2.11.rc6-frinx-SNAPSHOT</version>
-        <relativePath/>
+        <version>5.0.6-SNAPSHOT</version>
+        <relativePath>../../../southbound/commons/translation-unit-commons/checkstyle-parent</relativePath>
     </parent>
 
-    <groupId>io.frinx.cli</groupId>
+    <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>native-unit-parent</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
-        <hc.version>1.18.04-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</hc.version>
+        <hc.version>5.0.6-SNAPSHOT</hc.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.frinx.cli</groupId>
+                <groupId>io.frinx.uniconfig.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+                <version>5.0.6-SNAPSHOT</version>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>cli-units-artifacts</artifactId>
                 <type>pom</type>
-                <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+                <version>5.0.6-SNAPSHOT</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
@@ -55,7 +55,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>rpc-api</artifactId>
             <version>${hc.version}</version>
             <scope>provided</scope>

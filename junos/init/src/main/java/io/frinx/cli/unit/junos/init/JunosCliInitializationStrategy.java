@@ -16,7 +16,6 @@
 
 package io.frinx.cli.unit.junos.init;
 
-import com.google.common.base.Preconditions;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.io.Command;
 import io.frinx.cli.io.Session;
@@ -67,12 +66,6 @@ public class JunosCliInitializationStrategy implements SessionInitializationStra
                 // enable cli mode
                 tryToEnterCliMode(session, newline);
             }
-
-            String prompt = JunosPromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
-
-            Preconditions.checkState(IS_PRIVELEGE_PROMPT.test(prompt),
-                    "%s: Junos cli session initialization failed to enter cli mode. Current prompt: %s",
-                    session, prompt);
 
             LOG.debug("{}: Setting terminal complete command on space to off", session);
             write(session, newline, DISABLE_COMPLETE_ON_SPACE);

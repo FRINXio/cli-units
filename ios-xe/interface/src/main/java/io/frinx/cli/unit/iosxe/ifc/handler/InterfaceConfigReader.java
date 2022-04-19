@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfCiscoExtAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.hold.queue.HoldQueueBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControl;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.storm.control.StormControlKey;
@@ -58,6 +59,8 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private static final Pattern NO_IP_PROXY_ARP_LINE = Pattern.compile("\\s*no ip proxy-arp");
     private static final Pattern NO_IP_REDIRECTS_LINE = Pattern.compile("\\s*no ip redirects");
     private static final Pattern IPV6_ND_RA_LINE = Pattern.compile("\\s*ipv6 nd ra suppress (?<number>.+)");
+    private static final Pattern HOLD_QUEUE_IN = Pattern.compile("hold-queue (?<in>\\d+) in.*");
+    private static final Pattern HOLD_QUEUE_OUT = Pattern.compile("hold-queue (?<out>\\d+) out.*");
 
     public InterfaceConfigReader(Cli cli) {
         super(cli);
@@ -79,6 +82,7 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
         setIpv6NdRa(output, ifCiscoExtAugBuilder);
         if (Util.isPhysicalInterface(builder.getType())) {
             setLldpReceive(output, ifCiscoExtAugBuilder);
+            setHoldQueue(output, ifCiscoExtAugBuilder);
         }
         setNegotiationAuto(output, ifCiscoExtAugBuilder);
         if (isCiscoExtAugNotEmpty(ifCiscoExtAugBuilder)) {
@@ -203,6 +207,8 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
     private void setIpRedirects(final String output, final IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
         if (NO_IP_REDIRECTS_LINE.matcher(output).find()) {
             ifCiscoExtAugBuilder.setIpRedirects(false);
+        } else {
+            ifCiscoExtAugBuilder.setIpRedirects(true);
         }
     }
 
@@ -217,6 +223,21 @@ public final class InterfaceConfigReader extends AbstractInterfaceConfigReader {
             IPV6_ND_RA_LINE::matcher,
             matcher -> matcher.group("number"),
             ifCiscoExtAugBuilder::setIpv6NdRaSuppress);
+    }
+
+    private void setHoldQueue(String output, IfCiscoExtAugBuilder ifCiscoExtAugBuilder) {
+        HoldQueueBuilder builder = new HoldQueueBuilder();
+        ParsingUtils.parseField(output, 0,
+            HOLD_QUEUE_IN::matcher,
+            matcher -> matcher.group("in"),
+            value -> builder.setIn(Long.valueOf(value)));
+        ParsingUtils.parseField(output, 0,
+            HOLD_QUEUE_OUT::matcher,
+            matcher -> matcher.group("out"),
+            value -> builder.setOut(Long.valueOf(value)));
+        if (builder.getIn() != null || builder.getOut() != null) {
+            ifCiscoExtAugBuilder.setHoldQueue(builder.build());
+        }
     }
 
     @Override

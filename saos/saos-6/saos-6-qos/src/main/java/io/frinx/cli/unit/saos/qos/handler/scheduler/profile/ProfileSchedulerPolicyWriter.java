@@ -34,16 +34,13 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class ProfileSchedulerPolicyWriter
         implements CompositeWriter.Child<SchedulerPolicy>, CliWriter<SchedulerPolicy> {
 
-    private static final String WRITE_PROFILE =
-            "traffic-profiling standard-profile create port {$ifcId} name {$data.name} vs {$vs} cir {$cir}\n"
-            + "configuration save";
+    private static final String WRITE_PROFILE = "traffic-profiling standard-profile create port {$ifcId} name "
+            + "{$data.name} vs {$vs} cir {$cir}";
 
-    private static final String UPDATE_PROFILE =
-            "{% if ($cir) %}traffic-profiling standard-profile set port "
-            + "{$ifcId} profile {$data.name} cir {$cir}\nconfiguration save{% endif %}";
+    private static final String UPDATE_PROFILE = "{% if ($cir) %}traffic-profiling standard-profile set port "
+            + "{$ifcId} profile {$data.name} cir {$cir}{% endif %}";
 
-    private static final String DELETE_PROFILE =
-            "traffic-profiling standard-profile delete port %s profile %s\nconfiguration save";
+    private static final String DELETE_PROFILE = "traffic-profiling standard-profile delete port %s profile %s";
 
     private Cli cli;
 

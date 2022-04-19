@@ -22,6 +22,7 @@ import java.util.Map;
 public final class ServiceToPortMapping {
 
     public static final Map<String, Integer> TCP_MAPPING;
+    public static final Map<String, Integer> UDP_MAPPING;
     public static final Map<String, Short> ICMP_MAPPING;
     public static final Map<String, Short> ICMPV6_MAPPING;
 
@@ -67,6 +68,12 @@ public final class ServiceToPortMapping {
         tcpMap.put("whois", 43);
         tcpMap.put("www", 80);
         TCP_MAPPING = Collections.unmodifiableMap(tcpMap);
+
+        Map<String, Integer> udpMap = new HashMap<>();
+        udpMap.put("ntp", 123);
+        udpMap.put("bootpc", 68);
+        udpMap.put("bootps", 67);
+        UDP_MAPPING = Collections.unmodifiableMap(udpMap);
 
         Map<String, Short> icmpMap = new HashMap<>();
         icmpMap.put("echo-reply", (short) 0);

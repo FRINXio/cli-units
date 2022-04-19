@@ -42,14 +42,11 @@ public class ServiceQueueMapsConfigWriterTest {
 
     private ServiceQueueMapsConfigWriter writer;
 
-    private static final String WRITE = "traffic-services queuing queue-map create rcos-map AAA\n"
-            + "configuration save\n";
+    private static final String WRITE = "traffic-services queuing queue-map create rcos-map AAA\n";
 
-    private static final String UPDATE = "traffic-services queuing queue-map rename rcos-map AAA name BBB\n"
-            + "configuration save\n";
+    private static final String UPDATE = "traffic-services queuing queue-map rename rcos-map AAA name BBB\n";
 
-    private static final String DELETE = "traffic-services queuing queue-map delete rcos-map AAA\n"
-            + "configuration save\n";
+    private static final String DELETE = "traffic-services queuing queue-map delete rcos-map AAA\n";
 
     private final InstanceIdentifier<Config> iid = InstanceIdentifier.create(TrafficServiceQueueMaps.class)
             .child(QueueMaps.class, new QueueMapsKey("AAA"))

@@ -37,8 +37,7 @@ public class BroadcastContainmentFilterConfigWriter implements CliWriter<Config>
             + "{% if ($data.rate) %}broadcast-containment set filter {$data.name} kbps {$data.rate}\n{% endif %}"
             + "{% if ($containList) %}"
             + "broadcast-containment set filter {$data.name} containment-classification {$containList}\n"
-            + "{% endif %}"
-            + "configuration save";
+            + "{% endif %}";
 
     private static final String UPDATE_TEMPLATE =
             "{% if ($rateCompare) %}"
@@ -46,11 +45,9 @@ public class BroadcastContainmentFilterConfigWriter implements CliWriter<Config>
             + "{% endif %}"
             + "{% if ($classificationCompare) %}"
             + "broadcast-containment set filter {$data.name} containment-classification {$containList}\n"
-            + "{% endif %}"
-            + "configuration save";
+            + "{% endif %}";
 
-    private static final String DELETE_TEMPLATE = "broadcast-containment delete filter %s\n"
-            + "configuration save";
+    private static final String DELETE_TEMPLATE = "broadcast-containment delete filter %s";
 
     private Cli cli;
 

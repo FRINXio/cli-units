@@ -20,22 +20,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.opendaylight.mdsal</groupId>
+        <groupId>io.frinx.uniconfig.core</groupId>
         <artifactId>binding-parent</artifactId>
-        <version>0.12.2-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</version>
-        <relativePath/>
+        <version>5.0.6-SNAPSHOT</version>
+
     </parent>
 
-    <groupId>io.frinx.cli</groupId>
+    <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>ios-xr-5-native-models</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.frinx.openconfig</groupId>
                 <artifactId>openconfig-artifacts</artifactId>
-		<version>4.2.11.rc6-frinx-SNAPSHOT</version>
+		<version>5.0.6-SNAPSHOT</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -44,7 +44,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
+            <groupId>io.frinx.uniconfig.model</groupId>
             <artifactId>cli-models</artifactId>
         </dependency>
         <dependency>

@@ -28,12 +28,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class VirtualRingConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_RING =
-            "ring-protection virtual-ring add ring {$data.name} vid {$vlanId}\n"
-            + "configuration save";
+            "ring-protection virtual-ring add ring {$data.name} vid {$vlanId}";
 
     private static final String REMOVE_RING =
-            "ring-protection virtual-ring remove ring {$data.name} vid {$vlanId}\n"
-            + "configuration save";
+            "ring-protection virtual-ring remove ring {$data.name} vid {$vlanId}";
 
     private Cli cli;
 

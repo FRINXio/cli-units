@@ -62,7 +62,7 @@ public class VirtualRingConfigWriterTest {
 
         Mockito.verify(cli).executeAndRead(commands.capture());
         Assert.assertEquals(
-                "ring-protection virtual-ring add ring VSR990101 vs FRINX010_2509\nconfiguration save",
+                "ring-protection virtual-ring add ring VSR990101 vs FRINX010_2509",
                 commands.getValue().getContent());
     }
 
@@ -72,7 +72,7 @@ public class VirtualRingConfigWriterTest {
 
         Mockito.verify(cli).executeAndRead(commands.capture());
         Assert.assertEquals(
-                "ring-protection virtual-ring remove ring VSR990101 vs FRINX010_2509\nconfiguration save",
+                "ring-protection virtual-ring remove ring VSR990101 vs FRINX010_2509",
                 commands.getValue().getContent());
     }
 }

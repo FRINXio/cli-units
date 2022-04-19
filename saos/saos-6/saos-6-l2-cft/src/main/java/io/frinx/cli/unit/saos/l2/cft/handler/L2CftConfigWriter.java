@@ -26,8 +26,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2CftConfigWriter implements CliWriter<Config> {
 
-    private static final String UPDATE_TEMPLATE =
-            "{$data|update(mode,l2-cft set mode `$data.mode`\nconfiguration save,)}";
+    private static final String UPDATE_TEMPLATE = "{$data|update(mode,l2-cft set mode `$data.mode`,)}";
 
     private Cli cli;
 
@@ -40,7 +39,7 @@ public class L2CftConfigWriter implements CliWriter<Config> {
                                        @Nonnull Config config,
                                        @Nonnull WriteContext writeContext) throws WriteFailedException {
         if (config != null && config.getMode().equals("mef-ce2")) {
-            blockingWriteAndRead("l2-cft set mode mef-ce2\nconfiguration save",
+            blockingWriteAndRead("l2-cft set mode mef-ce2",
                     cli, instanceIdentifier, config);
         }
     }
@@ -58,6 +57,6 @@ public class L2CftConfigWriter implements CliWriter<Config> {
     public void deleteCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                         @Nonnull Config config,
                                         @Nonnull WriteContext writeContext) throws WriteFailedException {
-        blockingDeleteAndRead("l2-cft set mode mef-ce1\nconfiguration save", cli, instanceIdentifier);
+        blockingDeleteAndRead("l2-cft set mode mef-ce1", cli, instanceIdentifier);
     }
 }

@@ -43,6 +43,9 @@ import io.frinx.cli.unit.ios.routing.policy.handlers.statement.actions.SetCommun
 import io.frinx.cli.unit.ios.routing.policy.handlers.statement.actions.SetCommunityInlineConfigReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.statement.conditions.MatchCommunitySetConfigReader;
 import io.frinx.cli.unit.ios.routing.policy.handlers.statement.conditions.MatchIpPrefixListConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.tags.TagConfigReader;
+import io.frinx.cli.unit.ios.routing.policy.handlers.tags.TagConfigWriter;
+import io.frinx.cli.unit.ios.routing.policy.handlers.tags.TagReader;
 import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.openconfig.openconfig.policy.IIDs;
 import java.util.HashSet;
@@ -144,6 +147,9 @@ public class RoutingPolicyUnit extends AbstractUnit {
                 new CommunityListConfigWriter(cli),
                 Sets.newHashSet(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_BG_CO_CO_CO_AUG_COMMMEMBERSAUG,
                         io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_BG_CO_CO_CO_AUG_CONFIG1));
+        writerRegistryBuilder.addAfter(io.frinx.openconfig.openconfig.bgp.IIDs
+                        .RO_PO_PO_ST_ST_CO_BG_AUG_BGPCONDITIONS1_TA_TA_CONFIG, new TagConfigWriter(cli),
+                IIDs.RO_PO_POLICYDEFINITION);
     }
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readerRegistryBuilder, Cli cli) {
@@ -174,6 +180,7 @@ public class RoutingPolicyUnit extends AbstractUnit {
                 io.frinx.openconfig.openconfig.bgp.IIDs.RO_PO_PO_ST_ST_CO_BG_AUG_BGPCONDITIONS1_MATCHIPPREFIXLIST,
                 new MatchIpPrefixListConfigReader(cli));
 
+
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_EX_EXTCOMMUNITYSET,
                 new ExtCommunitySetReader(cli));
         readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_AUG_DEFINEDSETS2_BG_CO_COMMUNITYSET,
@@ -182,5 +189,9 @@ public class RoutingPolicyUnit extends AbstractUnit {
                 new CommunityListConfigReader(cli),
                         Sets.newHashSet(io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_BG_CO_CO_CO_AUG_CONFIG1,
                                     io.frinx.openconfig.openconfig.bgp.IIDs.RO_DE_BG_CO_CO_CO_AUG_COMMMEMBERSAUG));
+        readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
+                .RO_PO_PO_ST_ST_CO_BG_AUG_BGPCONDITIONS1_TA_TAG, new TagReader(cli));
+        readerRegistryBuilder.add(io.frinx.openconfig.openconfig.bgp.IIDs
+                .RO_PO_PO_ST_ST_CO_BG_AUG_BGPCONDITIONS1_TA_TA_CONFIG, new TagConfigReader());
     }
 }

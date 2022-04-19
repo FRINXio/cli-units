@@ -17,7 +17,6 @@
 package io.frinx.cli.unit.iosxr.init;
 
 import com.google.common.base.Preconditions;
-import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
 import io.frinx.cli.io.SessionInitializationStrategy;
@@ -59,8 +58,6 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
     @Override
     public void accept(@Nonnull Session session, @Nonnull String newline) {
         try {
-            final String initialPrompt =
-                    PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
 
             // Set terminal length to 0 to prevent "--More--" situation
             LOG.debug("{}: Setting terminal length to 0 to prevent \"--More--\" situation", id);
@@ -70,28 +67,8 @@ public final class IosXrCliInitializer implements SessionInitializationStrategy 
             LOG.debug("{}: Setting terminal width to 0", id);
             write(session, newline, SET_TERMINAL_WIDTH_COMMAND);
 
-            String initOutput = session.readUntilOutput(initialPrompt)
-                    .toCompletableFuture()
-                    .get();
-            LOG.debug("{}: IOS-XR cli session initialized output: {}", id, initOutput);
-
-            // If already in privileged mode, don't do anything else
-            if (initialPrompt.endsWith(PRIVILEGED_PROMPT_SUFFIX)) {
-                LOG.info("{}: IOS-XR cli session initialized successfully", id);
-                return;
-            }
-
             // Enable privileged mode
             tryToEnterPrivilegedMode(session, newline);
-
-            // Check if we are actually in privileged mode
-            String prompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline)
-                    .trim();
-
-            // If not, fail
-            Preconditions.checkState(prompt.endsWith(PRIVILEGED_PROMPT_SUFFIX),
-                    "%s: IOS cli session initialization failed to enter privileged mode. Current prompt: %s", id,
-                    prompt);
 
             LOG.info("{}: IOS-XR cli session initialized successfully", id);
         } catch (InterruptedException e) {

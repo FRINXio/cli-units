@@ -32,20 +32,17 @@ public class InterfaceCftProfileConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE =
             "l2-cft set port {$ifcName} profile {$data.name}\n"
-            + "{% if ($enabled == TRUE) %}l2-cft enable port {$ifcName}\n{% endif %}"
-            + "configuration save";
+            + "{% if ($enabled == TRUE) %}l2-cft enable port {$ifcName}\n{% endif %}";
 
     private static final String UPDATE_TEMPLATE =
             "{$data|update(name,l2-cft set port `$ifcName` profile `$data.name`\n,)}"
             + "{% if ($enabled == TRUE) %}l2-cft enable port {$ifcName}\n"
             + "{% elseIf ($enabled == FALSE) %}l2-cft disable port {$ifcName}\n"
-            + "{% endif %}"
-            + "configuration save";
+            + "{% endif %}";
 
     private static final String DELETE_TEMPLATE =
             "{% if ($enabled) %}l2-cft disable port {$ifcName}\n{% endif %}"
-            + "l2-cft unset port {$ifcName} profile\n"
-            + "configuration save";
+            + "l2-cft unset port {$ifcName} profile\n";
 
     private Cli cli;
 

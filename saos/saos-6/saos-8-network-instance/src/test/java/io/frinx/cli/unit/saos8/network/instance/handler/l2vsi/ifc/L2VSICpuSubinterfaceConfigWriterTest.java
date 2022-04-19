@@ -69,8 +69,8 @@ public class L2VSICpuSubinterfaceConfigWriterTest {
         writer.writeCurrentAttributesWResult(iid, data, null);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("virtual-switch interface attach cpu-subinterface LM01W_IPTV_800_1 vs IPTV_800\n"
-                + "configuration save", commands.getValue().getContent());
+        Assert.assertEquals("virtual-switch interface attach cpu-subinterface LM01W_IPTV_800_1 vs IPTV_800",
+                commands.getValue().getContent());
     }
 
     @Test
@@ -94,8 +94,8 @@ public class L2VSICpuSubinterfaceConfigWriterTest {
         writer.deleteCurrentAttributesWResult(iid, data, null);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("virtual-switch interface detach cpu-subinterface LM01W_IPTV_800_1\n"
-                + "configuration save", commands.getValue().getContent());
+        Assert.assertEquals("virtual-switch interface detach cpu-subinterface LM01W_IPTV_800_1",
+                commands.getValue().getContent());
     }
 
     @Test

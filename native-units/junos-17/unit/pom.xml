@@ -19,26 +19,26 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.frinx.cli</groupId>
+        <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>native-unit-parent</artifactId>
-        <version>4.2.11.rc6-frinx-SNAPSHOT</version>
-        <relativePath>../../unit-parent</relativePath>
+        <version>5.0.6-SNAPSHOT</version>
+
     </parent>
 
     <artifactId>junos-17-native-unit</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>native-cli-unit</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>junos-17-native-models</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>junos-cli-init-unit</artifactId>
         </dependency>
     </dependencies>

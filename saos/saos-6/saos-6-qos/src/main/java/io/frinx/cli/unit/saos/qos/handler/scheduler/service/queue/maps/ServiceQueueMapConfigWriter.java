@@ -28,12 +28,10 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class ServiceQueueMapConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_UPDATE_TEMPLATE =
-            "traffic-services queuing queue-map set rcos-map {$name} rcos {$config.rcos} queue {$config.queue}\n"
-            + "configuration save";
+            "traffic-services queuing queue-map set rcos-map {$name} rcos {$config.rcos} queue {$config.queue}";
 
     private static final String DELETE_TEMPLATE =
-            "traffic-services queuing queue-map set rcos-map {$name} rcos {$config.rcos} queue 0\n"
-            + "configuration save";
+            "traffic-services queuing queue-map set rcos-map {$name} rcos {$config.rcos} queue 0";
 
     private final Cli cli;
 

@@ -33,17 +33,15 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.re
 
 public class L2VsicpConfigWriterTest {
 
-
-
     @Test
     public void updateStatisticsTest() {
         L2vsicpConfigWriter writer = new L2vsicpConfigWriter(Mockito.mock(Cli.class));
         createCommandAndTest(writer,1, true, "test1",
-            "virtual-circuit ethernet create vc test1 vlan 1\nconfiguration save\n"
-                     + "virtual-circuit ethernet set vc test1 statistics on\nconfiguration save");
+            "virtual-circuit ethernet create vc test1 vlan 1\n"
+                     + "virtual-circuit ethernet set vc test1 statistics on\n");
         createCommandAndTest(writer, 2, false, "test2",
-            "virtual-circuit ethernet create vc test2 vlan 2\nconfiguration save\n"
-                    + "virtual-circuit ethernet set vc test2 statistics off\nconfiguration save");
+            "virtual-circuit ethernet create vc test2 vlan 2\n"
+                    + "virtual-circuit ethernet set vc test2 statistics off\n");
 
     }
 

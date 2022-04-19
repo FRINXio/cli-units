@@ -36,8 +36,7 @@ public class SubPortVlanConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_L2_TRANSFORMS =
             "{% if ($ingress) %}sub-port set sub-port {$subIfcName} ingress-l2-transform {$ingress}\n{% endif %}"
-            + "{% if ($egress) %}sub-port set sub-port {$subIfcName} egress-l2-transform {$egress}\n{% endif %}"
-            + "configuration save";
+            + "{% if ($egress) %}sub-port set sub-port {$subIfcName} egress-l2-transform {$egress}\n{% endif %}";
 
     private static final String UPDATE_L2_TRANSFORMS =
             "{% if ($ingressDiff == TRUE) %}"
@@ -49,13 +48,11 @@ public class SubPortVlanConfigWriter implements CliWriter<Config> {
             + "sub-port set sub-port {$subIfcName} egress-l2-transform {$egress}\n"
             + "{% elseIf ($egressDiff == FALSE) %}"
             + "sub-port unset sub-port {$subIfcName} egress-l2-transform\n"
-            + "{% endif %}"
-            + "configuration save";
+            + "{% endif %}";
 
     private static final String DELETE_L2_TRANSFORMS =
             "{% if ($ingress %}sub-port unset sub-port {$subIfcName} ingress-l2-transform\n{% endif %}"
-            + "{% if ($egress %}sub-port unset sub-port {$subIfcName} egress-l2-transform\n{% endif %}"
-            + "configuration save";
+            + "{% if ($egress %}sub-port unset sub-port {$subIfcName} egress-l2-transform\n{% endif %}";
 
     private Cli cli;
 

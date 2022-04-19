@@ -29,6 +29,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.ipv4.protocol.fields.top.ipv4.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosConditionAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosIpv4ConditionAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.multiple.cos.config.multiple.cos.CosSets;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.qos.condition.multiple.cos.config.multiple.cos.cos.sets.elements.Element;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.Term;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.terms.top.terms.term.Conditions;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.classifier.top.classifiers.Classifier;
@@ -42,9 +44,15 @@ public class ClassifierWriter implements CliWriter<Classifier> {
             + "{% endloop %}"
             + "{% endif %}";
 
-    private static final String MATCH_COS = "{% if ($cos) %}{$cos}\n{% endif %}";
+    private static final String MATCH_COS = "{% if ($cos) %}{$cos}{% endif %}";
 
     private static final String MATCH_DSCP = "{% if ($dscp) %}{$dscp}\n{% endif %}";
+
+    private static final String MATCH_ACL = "{% if ($aug.access_group) %}"
+            + "{% loop in $aug.access_group.acl_sets as $acl %}"
+            + "{% if ($acl.config) %}match access-group name {$acl.config.name}\n{% endif %}"
+            + "{% endloop %}"
+            + "{% endif %}";
 
     private static final String WRITE_ALL_TEMPLATE = "{% if ($conditions) %}"
             + "configure terminal\n"
@@ -52,6 +60,7 @@ public class ClassifierWriter implements CliWriter<Classifier> {
             + MATCH_QOS
             + MATCH_COS
             + MATCH_DSCP
+            + MATCH_ACL
             + "end{% endif %}";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
@@ -148,13 +157,29 @@ public class ClassifierWriter implements CliWriter<Classifier> {
 
     private String getCosCommand(Conditions conditions) {
         QosConditionAug aug = conditions.getAugmentation(QosConditionAug.class);
-        if (aug != null && aug.getCos() != null && aug.getCos().getCos() != null) {
+        if (aug != null && aug.getMultipleCos() != null && aug.getMultipleCos().getCosSets() != null) {
+            List<CosSets> cosSets = aug.getMultipleCos().getCosSets();
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("match cos");
-            if (aug.getCos().isInner()) {
-                stringBuilder.append(" inner");
-            }
-            stringBuilder.append(" ").append(aug.getCos().getCos().getValue().toString());
+            cosSets.forEach(set -> {
+                StringBuilder lineBuilder = new StringBuilder();
+                if (set.getElements() != null && set.getElements().getElement() != null) {
+                    boolean inner = false;
+                    if (set.getElements().isInner() != null) {
+                        inner =  set.getElements().isInner();
+                    }
+                    lineBuilder.append("match cos");
+                    if (inner) {
+                        lineBuilder.append(" inner");
+                    }
+                    List<Element> element = set.getElements().getElement();
+                    element.forEach(cos -> {
+                        if (cos.getId() != null) {
+                            lineBuilder.append(" ").append(cos.getId().getValue());
+                        }
+                    });
+                    stringBuilder.append(lineBuilder.toString()).append("\n");
+                }
+            });
             return stringBuilder.toString();
         }
         return null;

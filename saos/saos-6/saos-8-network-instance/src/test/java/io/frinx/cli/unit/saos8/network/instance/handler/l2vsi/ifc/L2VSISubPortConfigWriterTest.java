@@ -70,8 +70,8 @@ public class L2VSISubPortConfigWriterTest {
         writer.writeCurrentAttributesWResult(iid, data, null);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("virtual-switch interface attach sub-port LAG=LM01W_IPTV_800_1 vs IPTV_800\n"
-                + "configuration save", commands.getValue().getContent());
+        Assert.assertEquals("virtual-switch interface attach sub-port LAG=LM01W_IPTV_800_1 vs IPTV_800",
+                commands.getValue().getContent());
     }
 
     @Test
@@ -95,8 +95,8 @@ public class L2VSISubPortConfigWriterTest {
         writer.deleteCurrentAttributesWResult(iid, data, null);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("virtual-switch interface detach sub-port LAG=LM01W_IPTV_800_1\n"
-                + "configuration save", commands.getValue().getContent());
+        Assert.assertEquals("virtual-switch interface detach sub-port LAG=LM01W_IPTV_800_1",
+                commands.getValue().getContent());
     }
 
     @Test

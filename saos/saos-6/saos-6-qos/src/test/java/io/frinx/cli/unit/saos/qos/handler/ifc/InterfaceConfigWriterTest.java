@@ -35,18 +35,14 @@ public class InterfaceConfigWriterTest {
     public void writeTemplateTest() {
         createWriteCmdAndTest(createConfig("1", true, true, Util.getModeName(1)),
                 "traffic-profiling set port 1 mode advanced\n"
-                        + "traffic-profiling enable port 1\n"
-                        + "configuration save");
+                        + "traffic-profiling enable port 1\n");
         createWriteCmdAndTest(createConfig("2", true, true, Util.getModeName(4)),
                 "traffic-profiling set port 2 mode standard-dscp\n"
-                        + "traffic-profiling enable port 2\n"
-                        + "configuration save");
+                        + "traffic-profiling enable port 2\n");
         createWriteCmdAndTest(createConfig("3", true, null, Util.getModeName(7)),
-                "traffic-profiling set port 3 mode standard-vlan-ip-prec\n"
-                        + "configuration save");
+                "traffic-profiling set port 3 mode standard-vlan-ip-prec\n");
         createWriteCmdAndTest(createConfig("4", true, true, null),
-                "traffic-profiling enable port 4\n"
-                        + "configuration save");
+                "traffic-profiling enable port 4\n");
         createWriteCmdAndTest(createConfig("5", false, null, null), null);
     }
 
@@ -60,23 +56,20 @@ public class InterfaceConfigWriterTest {
         // nothing update
         createUpdateCmdAndTest(createConfig("1", true, true, Util.getModeName(1)),
                 createConfig("1", true, true, Util.getModeName(1)),
-                "configuration save");
+                "");
         // enabled update
         createUpdateCmdAndTest(createConfig("2", true, false, null),
                 createConfig("2", true, true, null),
-                "traffic-profiling enable port 2\n"
-                        + "configuration save");
+                "traffic-profiling enable port 2\n");
         // mode update
         createUpdateCmdAndTest(createConfig("3", true, false, Util.getModeName(1)),
                 createConfig("3", true, false, Util.getModeName(2)),
-                "traffic-profiling set port 3 mode standard-dot1dpri\n"
-                        + "configuration save");
+                "traffic-profiling set port 3 mode standard-dot1dpri\n");
         // enabled and mode update
         createUpdateCmdAndTest(createConfig("4", true, false, Util.getModeName(2)),
                 createConfig("4", true, true, Util.getModeName(3)),
                 "traffic-profiling set port 4 mode standard-ip-prec\n"
-                        + "traffic-profiling enable port 4\n"
-                        + "configuration save");
+                        + "traffic-profiling enable port 4\n");
     }
 
     private void createUpdateCmdAndTest(Config before, Config after, String expected) {
@@ -88,15 +81,14 @@ public class InterfaceConfigWriterTest {
     public void deleteTemplateTest() {
         // delete enabled
         createDeleteCmdAndTest(createConfig("1", true, true, null),
-                "traffic-profiling disable port 1\nconfiguration save");
+                "traffic-profiling disable port 1\n");
         // delete mode
         createDeleteCmdAndTest(createConfig("1", true, null, Util.getModeName(2)),
-                "traffic-profiling set port 1 mode standard-dot1dpri\nconfiguration save");
+                "traffic-profiling set port 1 mode standard-dot1dpri\n");
         // delete enabled and mode
         createDeleteCmdAndTest(createConfig("1", true, false, Util.getModeName(3)),
                 "traffic-profiling set port 1 mode standard-dot1dpri\n"
-                        + "traffic-profiling disable port 1\n"
-                        + "configuration save");
+                        + "traffic-profiling disable port 1\n");
     }
 
     private void createDeleteCmdAndTest(Config config, String expected) {

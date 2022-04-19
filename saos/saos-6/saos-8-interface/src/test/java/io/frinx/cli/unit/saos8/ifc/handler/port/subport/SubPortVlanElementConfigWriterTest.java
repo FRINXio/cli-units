@@ -26,9 +26,8 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev
 
 public class SubPortVlanElementConfigWriterTest {
 
-    private static final String WRITE_TEMPLATE = "sub-port add sub-port MAX class-element 1 vtag-stack 46\n";
-    private static final String DELETE_TEMPLATE = "sub-port remove sub-port MAX class-element 1\n";
-    private static final String COMMIT = "configuration save";
+    private static final String WRITE_TEMPLATE = "sub-port add sub-port MAX class-element 1 vtag-stack 46";
+    private static final String DELETE_TEMPLATE = "sub-port remove sub-port MAX class-element 1";
 
     private SubPortVlanElementConfigWriter writer;
 
@@ -39,19 +38,19 @@ public class SubPortVlanElementConfigWriterTest {
 
     @Test
     public void writeTemplateTest() {
-        Assert.assertEquals(WRITE_TEMPLATE + COMMIT,
+        Assert.assertEquals(WRITE_TEMPLATE,
                 writer.writeTemplate(createConfig("1", "46"), "MAX"));
     }
 
     @Test
     public void updateTemplateTest() {
-        Assert.assertEquals(DELETE_TEMPLATE + WRITE_TEMPLATE + COMMIT,
+        Assert.assertEquals(DELETE_TEMPLATE + "\n" + WRITE_TEMPLATE + "\n",
                 writer.updateTemplate(createConfig("1", "45"), createConfig("1", "46"), "MAX"));
     }
 
     @Test
     public void deleteTemplateTest() {
-        Assert.assertEquals(DELETE_TEMPLATE + COMMIT,
+        Assert.assertEquals(DELETE_TEMPLATE,
                 writer.deleteTemplate(createConfig("1", "45"), "MAX"));
     }
 

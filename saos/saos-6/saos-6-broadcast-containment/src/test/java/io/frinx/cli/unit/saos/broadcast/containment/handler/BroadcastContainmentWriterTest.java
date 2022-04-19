@@ -59,8 +59,7 @@ public class BroadcastContainmentWriterTest {
         writer.writeCurrentAttributes(iid, data, null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("broadcast-containment enable\n"
-                        + "configuration save\n",
+        Assert.assertEquals("broadcast-containment enable\n",
                 commands.getValue().getContent());
     }
 
@@ -69,8 +68,7 @@ public class BroadcastContainmentWriterTest {
         writer.deleteCurrentAttributes(iid, data, null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("broadcast-containment disable\n"
-                        + "configuration save\n",
+        Assert.assertEquals("broadcast-containment disable\n",
                 commands.getValue().getContent());
     }
 }

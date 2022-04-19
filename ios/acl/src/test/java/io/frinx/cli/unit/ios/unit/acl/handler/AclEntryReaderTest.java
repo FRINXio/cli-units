@@ -76,7 +76,7 @@ public class AclEntryReaderTest {
                                 .setForwardingAction(ACCEPT.class)
                                 .build())
                         .build())
-                .setTransport(AclEntryLineParserTest.defTransport())
+                .setTransport(AclEntryLineParserTest.defTransport(null))
                 .build();
 
         Assert.assertEquals(expected, aclEntryBuilder.build());

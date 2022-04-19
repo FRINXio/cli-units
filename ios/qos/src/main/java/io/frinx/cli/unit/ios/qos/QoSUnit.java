@@ -89,6 +89,15 @@ public class QoSUnit extends AbstractUnit {
                         IIDs.QO_CL_CL_TE_TE_CONDITIONS,
                         IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG,
                         IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_COS,
+                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_MULTIPLECOS,
+                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_MU_COSSETS,
+                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_MU_CO_CONFIG,
+                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_MU_CO_ELEMENTS,
+                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_MU_CO_EL_ELEMENT,
+                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_MU_CO_EL_EL_CONFIG,
+                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_ACCESSGROUP,
+                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_AC_ACLSETS,
+                        IIDs.QO_CL_CL_TE_TE_CO_AUG_QOSCONDITIONAUG_AC_AC_CONFIG,
                         IIDs.QO_CL_CL_TE_TE_CO_IPV4,
                         IIDs.QO_CL_CL_TE_TE_CO_IP_CONFIG,
                         IIDs.QO_CL_CL_TE_TE_CO_IP_CO_AUG_QOSIPV4CONDITIONAUG));
@@ -119,7 +128,7 @@ public class QoSUnit extends AbstractUnit {
 
     private void provideReaders(@Nonnull CustomizerAwareReadRegistryBuilder readRegistry, Cli cli) {
         readRegistry.add(IIDs.QO_CL_CLASSIFIER, new ClassifierReader(cli));
-        readRegistry.add(IIDs.QO_CL_CL_CONFIG, new ClassifierConfigReader());
+        readRegistry.add(IIDs.QO_CL_CL_CONFIG, new ClassifierConfigReader(cli));
         readRegistry.subtreeAdd(IIDs.QO_CL_CL_TE_TERM, new TermReader(cli),
                 Sets.newHashSet(IIDs.QO_CL_CL_TE_TE_CONFIG));
         readRegistry.subtreeAdd(IIDs.QO_CL_CL_TE_TE_CONDITIONS, new ConditionsReader(cli),

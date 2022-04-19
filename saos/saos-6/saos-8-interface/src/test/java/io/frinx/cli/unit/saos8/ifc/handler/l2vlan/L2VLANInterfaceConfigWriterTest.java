@@ -37,13 +37,9 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2VLANInterfaceConfigWriterTest {
 
-    private static final String WRITE_COMMAND =
-            "cpu-interface sub-interface create cpu-subinterface cpuMGMT\n"
-                    + "configuration save\n";
+    private static final String WRITE_COMMAND = "cpu-interface sub-interface create cpu-subinterface cpuMGMT\n";
 
-    private static final String DELETE_COMMAND =
-            "cpu-interface sub-interface delete cpu-subinterface cpuMGMT\n"
-                    + "configuration save\n";
+    private static final String DELETE_COMMAND = "cpu-interface sub-interface delete cpu-subinterface cpuMGMT\n";
 
     @Mock
     private Cli cli;

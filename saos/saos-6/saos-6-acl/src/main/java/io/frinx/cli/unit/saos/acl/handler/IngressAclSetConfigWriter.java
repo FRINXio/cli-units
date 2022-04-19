@@ -36,12 +36,10 @@ public class IngressAclSetConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE = "{% if ($interface) %}{% if ($acl) %}"
             + "port set port {$interface} ingress-acl {$acl}\n"
-            + "configuration save"
             + "{% endif %}{% endif %}";
 
     private static final String DELETE_TEMPLATE = "{% if ($interface) %}"
             + "port unset port {$interface} ingress-acl\n"
-            + "configuration save"
             + "{% endif %}";
 
     private final Cli cli;

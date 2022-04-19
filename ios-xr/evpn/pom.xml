@@ -22,23 +22,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.frinx.cli</groupId>
+        <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+        <version>5.0.6-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
+
     </parent>
 
     <artifactId>ios-xr-evpn-unit</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>common-handlers</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>ios-xr-cli-init-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -55,7 +56,7 @@
             <version>${openconfig.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
+            <groupId>io.frinx.uniconfig.model</groupId>
             <artifactId>iana-if-type-2014-05-08</artifactId>
         </dependency>
         <dependency>

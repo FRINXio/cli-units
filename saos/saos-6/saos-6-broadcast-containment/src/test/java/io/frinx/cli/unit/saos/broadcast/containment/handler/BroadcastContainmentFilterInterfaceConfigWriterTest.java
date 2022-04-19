@@ -73,8 +73,7 @@ public class BroadcastContainmentFilterInterfaceConfigWriterTest {
         writer.writeCurrentAttributes(iid1, data1, null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("broadcast-containment add filter filter1 port 3\n"
-                        + "configuration save\n",
+        Assert.assertEquals("broadcast-containment add filter filter1 port 3\n",
                 commands.getValue().getContent());
     }
 
@@ -83,8 +82,7 @@ public class BroadcastContainmentFilterInterfaceConfigWriterTest {
         writer.deleteCurrentAttributes(iid1, data1, null);
         Mockito.verify(cli).executeAndRead(commands.capture());
 
-        Assert.assertEquals("broadcast-containment remove filter filter1 port 3\n"
-                        + "configuration save\n",
+        Assert.assertEquals("broadcast-containment remove filter filter1 port 3\n",
                 commands.getValue().getContent());
     }
 }

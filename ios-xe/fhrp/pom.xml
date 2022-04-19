@@ -19,14 +19,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>unit-parent</artifactId>
-        <groupId>io.frinx.cli</groupId>
-        <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+        <groupId>io.frinx.uniconfig.cli</groupId>
+        <version>5.0.6-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
+
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ios-xe-fhrp-unit</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
 
     <dependencies>
         <!-- Dependencies on other translation units -->
@@ -61,7 +62,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>utils-unit</artifactId>
         </dependency>
     </dependencies>

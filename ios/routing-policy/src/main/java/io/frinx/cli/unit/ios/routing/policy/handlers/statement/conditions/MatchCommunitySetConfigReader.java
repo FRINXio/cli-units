@@ -66,7 +66,9 @@ public class MatchCommunitySetConfigReader implements CliConfigReader<Config, Co
             COMMUNITY_LINE::matcher,
             matcher -> matcher.group("community"),
             s -> augBuilder.setCommunitySetList(Arrays.asList(s.split(" "))));
-        configBuilder.addAugmentation(MatchCommunityConfigListAug.class, augBuilder.build());
+        if (augBuilder.getCommunitySetList() != null) {
+            configBuilder.addAugmentation(MatchCommunityConfigListAug.class, augBuilder.build());
+        }
     }
 
 }

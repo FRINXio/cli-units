@@ -20,15 +20,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>io.frinx.cli</groupId>
+        <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+        <version>5.0.6-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-xr-routing-policy-unit</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -37,7 +37,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.translate.unit.commons</groupId>
+            <groupId>io.frinx.uniconfig</groupId>
             <artifactId>ios-xr-route-policy-util</artifactId>
             <version>${translate.unit.commons.version}</version>
         </dependency>

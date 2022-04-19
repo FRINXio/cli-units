@@ -22,25 +22,36 @@ import com.google.common.collect.Maps;
 import com.google.common.net.InetAddresses;
 import io.frinx.cli.unit.ios.unit.acl.handler.util.AclUtil;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4EXTENDED;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.ACLIPV4STANDARD;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEntry1Builder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEstablishedStateAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclEstablishedStateAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclOptionAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclOptionAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclPrecedenceAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclPrecedenceAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv4WildcardedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryIpv6WildcardedAugBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetAclEntryTransportPortNamedAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetOption.Option;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.AclSetPrecedence.Precedence;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config3;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config3Builder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.acl.ext.rev180314.Config4;
@@ -148,6 +159,12 @@ final class AclEntryLineParser {
             if (ACLIPV4EXTENDED.class.equals(aclType)) {
                 builder.setTransport(parseIpv4LineResult.transport);
                 builder.addAugmentation(AclEntry1.class, parseIpv4LineResult.icmpMsgTypeAugment);
+                parseIpv4LineResult.precedenceAugment.ifPresent(p -> {
+                    builder.addAugmentation(AclPrecedenceAug.class, p);
+                });
+                parseIpv4LineResult.optionsAugment.ifPresent(o -> {
+                    builder.addAugmentation(AclOptionAug.class, o);
+                });
             }
         } else if (ACLIPV6.class.equals(aclType)) {
             Ipv6Builder ipv6Builder = new Ipv6Builder();
@@ -202,14 +219,20 @@ final class AclEntryLineParser {
                 .fields.top.ipv4.Config ipv4ProtocolFieldsConfig;
         final Transport transport;
         final AclEntry1 icmpMsgTypeAugment;
+        final Optional<AclPrecedenceAug> precedenceAugment;
+        final Optional<AclOptionAug> optionsAugment;
 
         ParseIpv4LineResult(
                 Config ipv4ProtocolFieldsConfig,
                 Transport transport,
-                final AclEntry1 icmpMsgTypeAugment) {
+                final AclEntry1 icmpMsgTypeAugment,
+                final Optional<AclPrecedenceAug> precedenceAugment,
+                final Optional<AclOptionAug> optionsAugment) {
             this.ipv4ProtocolFieldsConfig = ipv4ProtocolFieldsConfig;
             this.transport = transport;
             this.icmpMsgTypeAugment = icmpMsgTypeAugment;
+            this.precedenceAugment = precedenceAugment;
+            this.optionsAugment = optionsAugment;
         }
     }
 
@@ -241,7 +264,8 @@ final class AclEntryLineParser {
                 ipv4ProtocolFieldsConfigBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class,
                         ipv4WildcardedAugBuilder.build());
             }
-            return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), null, null);
+            return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), null, null,
+                    Optional.empty(), Optional.empty());
         }
 
         // src port
@@ -273,8 +297,16 @@ final class AclEntryLineParser {
         // established state
         if (!words.isEmpty() && "established".equals(words.peek())) {
             words.poll();
-            ipv4ProtocolFieldsConfigBuilder.addAugmentation(AclSetAclEntryIpv4WildcardedAug.class,
-                    ipv4WildcardedAugBuilder.setEstablished(true).build());
+            transportConfigBuilder.addAugmentation(AclEstablishedStateAug.class,
+                    new AclEstablishedStateAugBuilder()
+                            .setEstablished(true)
+                            .build());
+        } else if (isProtocolRef(ipv4ProtocolFieldsConfigBuilder)
+                && ipv4ProtocolFieldsConfigBuilder.getProtocol().getIdentityref().equals(IPTCP.class)) {
+            transportConfigBuilder.addAugmentation(AclEstablishedStateAug.class,
+                    new AclEstablishedStateAugBuilder()
+                            .setEstablished(false)
+                            .build());
         }
 
         // ttl
@@ -287,6 +319,12 @@ final class AclEntryLineParser {
             ipv4ProtocolFieldsConfigBuilder.addAugmentation(Config3.class, hopRangeAugment.build());
         }
 
+        // precedence
+        final var precedence = parsePrecedence(words);
+
+        // options
+        final var options = parseOptions(words);
+
         // if there are some unsupported expressions, ACL cannot be parsed at all
         if (!words.isEmpty()) {
             throw new IllegalArgumentException("ACL entry contains unsupported expressions that cannot be parsed: "
@@ -296,7 +334,8 @@ final class AclEntryLineParser {
         // transport
         Transport transport = new TransportBuilder().setConfig(transportConfigBuilder.build()).build();
 
-        return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);
+        return new ParseIpv4LineResult(ipv4ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment,
+                precedence, options);
     }
 
     private static AclEntry1 parseIcmpMsgType(final IpProtocolType ipProtocolType, final Queue<String> words, boolean
@@ -404,6 +443,11 @@ final class AclEntryLineParser {
         return new ParseIpv6LineResult(ipv6ProtocolFieldsConfigBuilder.build(), transport, icmpMsgTypeAugment);
     }
 
+    private static boolean isProtocolRef(org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields
+                                                 .rev171215.ipv4.protocol.fields.top.ipv4.ConfigBuilder builder) {
+        return builder != null && builder.getProtocol() != null && builder.getProtocol().getIdentityref() != null;
+    }
+
     private static void parseTransportSourcePort(
             final org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.header.fields.rev171215.transport
                     .fields.top.transport.ConfigBuilder transportConfigBuilder,
@@ -500,7 +544,24 @@ final class AclEntryLineParser {
                 ? StringUtils.isNumeric(port1String) : StringUtils.isNumeric(port1String)
                 && StringUtils.isNumeric(port2String);
 
-        if (arePortsNumeric) {
+        if (isMultiple(words, possiblePortRangeKeyword)) {
+            AclSetAclEntryTransportPortNamedAug portNamedAug = transportConfigBuilder
+                    .getAugmentation(AclSetAclEntryTransportPortNamedAug.class);
+            AclSetAclEntryTransportPortNamedAugBuilder portNamedAugBuilder = portNamedAug
+                    != null ? new AclSetAclEntryTransportPortNamedAugBuilder(portNamedAug) : new
+                    AclSetAclEntryTransportPortNamedAugBuilder();
+
+            if (source) {
+                portNamedAugBuilder.setSourcePortNamed(parsePortNumRangeMultiple(possiblePortRangeKeyword,
+                        port1String, words));
+            } else {
+                portNamedAugBuilder.setDestinationPortNamed(parsePortNumRangeMultiple(possiblePortRangeKeyword,
+                                port1String, words));
+            }
+
+            transportConfigBuilder.addAugmentation(AclSetAclEntryTransportPortNamedAug.class, portNamedAugBuilder
+                    .build());
+        } else if (arePortsNumeric) {
             int port1 = serviceToPortNumber(port1String);
 
             if (source) {
@@ -561,7 +622,9 @@ final class AclEntryLineParser {
             case "eq":
                 return port1;
             case "neq":
-                Integer result = ServiceToPortMapping.TCP_MAPPING.get(port1);
+                var result = ServiceToPortMapping.TCP_MAPPING.get(port1) != null
+                        ? ServiceToPortMapping.TCP_MAPPING.get(port1)
+                        : ServiceToPortMapping.UDP_MAPPING.get(port1);
                 if (result == null) {
                     // This is best effort case. We can only transform not SSH, if we know the number behind SSH,
                     // otherwise
@@ -582,6 +645,151 @@ final class AclEntryLineParser {
             default:
                 throw new IllegalArgumentException("Not a port range keyword: " + possiblePortRangeKeyword);
         }
+    }
+
+    private static Optional<AclPrecedenceAug> parsePrecedence(Queue<String> words) {
+        if (!words.isEmpty() && "precedence".equals(words.peek())) {
+            words.poll();
+            if (!words.isEmpty()) {
+                return getPrecedence(words.poll());
+            } else {
+                throw new IllegalArgumentException("Precedence value is missing...");
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<AclOptionAug> parseOptions(Queue<String> words) {
+        if (!words.isEmpty() && "option".equals(words.peek())) {
+            words.poll();
+            if (!words.isEmpty()) {
+                return getOptions(words.poll());
+            } else {
+                throw new IllegalArgumentException("Option value is missing...");
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static boolean isMultiple(Queue<String> words, String operation) {
+        return operation != null && (operation.equals("eq") || operation.equals("neq"))
+                && words != null && words.peek() != null
+                && ((StringUtils.isNumeric(words.peek()) && Integer.valueOf(words.peek()) >= 0
+                && Integer.valueOf(words.peek()) <= MAX_PORT_NUMBER)
+                || (ServiceToPortMapping.TCP_MAPPING.get(words.peek()) != null
+                || ServiceToPortMapping.UDP_MAPPING.get(words.peek()) != null));
+    }
+
+    private static String parsePortNumRangeMultiple(String possiblePortRangeKeyword, String port1,
+                                                    Queue<String> words) {
+        List<String> port;
+        switch (possiblePortRangeKeyword) {
+            case "eq":
+                port = parseMultiplePortInput(port1, words, true);
+                var res = new StringBuilder();
+                port.forEach(i -> {
+                    res.append(i).append(" ");
+                });
+                return res.toString().trim();
+            case "neq":
+                port = parseMultiplePortInput(port1, words, false);
+                return createPortRangeForMultiple(port);
+            default:
+                throw new IllegalArgumentException("Not a multiple port range keyword: " + possiblePortRangeKeyword);
+        }
+    }
+
+    private static String createPortRangeForMultiple(List<String> portList) {
+        List<String> orderedPorts = new ArrayList<>(portList);
+        orderedPorts = sortAsNumbers(orderedPorts);
+        StringBuilder rangeBuilder = new StringBuilder();
+        Integer temp;
+        Integer previous = null;
+        for (var i = 0; i < orderedPorts.size(); i++) {
+            temp = Integer.valueOf(orderedPorts.get(i));
+            fillRangeBuilder(rangeBuilder, temp, previous, i, orderedPorts.size());
+            previous = temp;
+        }
+        return rangeBuilder.toString().trim();
+    }
+
+    private static void fillRangeBuilder(StringBuilder rangeBuilder, Integer temp, Integer previous,
+                                         int iteration, int size) {
+        if ((iteration == 0) && (temp == 1)) {
+            rangeBuilder.append("0").append(" ");
+        } else if ((iteration == 0) && (temp > 1)) {
+            rangeBuilder.append("0..").append(temp - 1).append(" ");
+        } else if ((iteration != 0) && (previous.equals(temp - 2))) {
+            rangeBuilder.append(temp - 1).append(" ");
+        } else if ((iteration != 0) && (previous < (temp - 2))) {
+            rangeBuilder.append(previous + 1).append("..").append(temp - 1).append(" ");
+        }
+        if (iteration == (size - 1) && (iteration != 0) && (temp.equals(MAX_PORT_NUMBER - 1))) {
+            rangeBuilder.append(MAX_PORT_NUMBER).append(" ");
+        } else if (iteration == (size - 1) && (iteration != 0) && (temp < (MAX_PORT_NUMBER - 1))) {
+            rangeBuilder.append(temp + 1).append("..").append(MAX_PORT_NUMBER).append(" ");
+        }
+    }
+
+    private static List<String> sortAsNumbers(List<String> srcList) {
+        if (srcList == null) {
+            throw new IllegalArgumentException("Source list should not be null!");
+        }
+        return srcList.stream()
+                .map(Integer::parseInt)
+                .sorted()
+                .map(i -> Integer.toString(i))
+                .collect(Collectors.toList());
+    }
+
+    private static Optional<AclPrecedenceAug> getPrecedence(String precedence) {
+        if (precedence != null) {
+            precedence = precedence.replace("-", "");
+            return Optional.of(new AclPrecedenceAugBuilder()
+                    .setPrecedence(Precedence.valueOf(precedence.toUpperCase())).build());
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<AclOptionAug> getOptions(String option) {
+        if (option != null && StringUtils.isNumeric(option)) {
+            return Optional.of(new AclOptionAugBuilder().setOption(new Option(Short.valueOf(option))).build());
+        } else if (option != null) {
+            option = option.replace("-", "");
+            return Optional.of(new AclOptionAugBuilder()
+                    .setOption(new Option(Option.Enumeration.valueOf(option.toUpperCase()))).build());
+        }
+        return Optional.empty();
+    }
+
+    private static List<String> parseMultiplePortInput(String port1, Queue<String> words, boolean equal) {
+        List<String> port = new ArrayList<>();
+        if (StringUtils.isNumeric(port1) || equal) {
+            port.add(port1);
+        } else {
+            mapServiceToPort(port1).ifPresentOrElse(port::add, () -> {
+                throw new IllegalArgumentException("Unsupported items for multiple ports entered...");
+            });
+        }
+        while (words.peek() != null) {
+            if (StringUtils.isNumeric(words.peek())) {
+                port.add(words.poll());
+            } else if (mapServiceToPort(words.peek()).isPresent()) {
+                port.add(mapServiceToPort(words.poll()).get());
+            } else {
+                break;
+            }
+        }
+        return port;
+    }
+
+    private static Optional<String> mapServiceToPort(String word) {
+        if (ServiceToPortMapping.TCP_MAPPING.get(word) != null) {
+            return Optional.of(ServiceToPortMapping.TCP_MAPPING.get(word).toString());
+        } else if (ServiceToPortMapping.UDP_MAPPING.get(word) != null) {
+            return Optional.of(ServiceToPortMapping.UDP_MAPPING.get(word).toString());
+        }
+        return Optional.empty();
     }
 
     private static PortNumRange createPortNumRangeFromInt(int lower, int upper) {

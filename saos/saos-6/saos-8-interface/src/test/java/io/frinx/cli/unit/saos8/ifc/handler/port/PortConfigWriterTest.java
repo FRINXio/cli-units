@@ -98,32 +98,31 @@ public class PortConfigWriterTest {
     }
 
     @Test
-    public void updateTemplateTest() throws WriteFailedException {
+    public void updateTemplateTest() {
         // nothig
-        Assert.assertEquals("configuration save",
+        Assert.assertEquals("",
                 writer.updateTemplate(dataBefore,
                         createConfig("4", true, EthernetCsmacd.class, 35, "test")));
 
         // enabled
-        Assert.assertEquals("port disable port 4\nconfiguration save",
+        Assert.assertEquals("port disable port 4\n",
                 writer.updateTemplate(dataBefore,
                         createConfig("4", false, EthernetCsmacd.class, 35, "test")));
 
         // mtu
-        Assert.assertEquals("port set port 4 max-frame-size 3555\nconfiguration save",
+        Assert.assertEquals("port set port 4 max-frame-size 3555\n",
                 writer.updateTemplate(dataBefore,
                         createConfig("4", true, EthernetCsmacd.class, 3555, "test")));
 
         // description
-        Assert.assertEquals("port set port 4 description \"new desc\"\nconfiguration save",
+        Assert.assertEquals("port set port 4 description \"new desc\"\n",
                 writer.updateTemplate(dataBefore,
                         createConfig("4", true, EthernetCsmacd.class, 35, "new desc")));
 
         // all
         Assert.assertEquals("port disable port 4\n"
                         + "port set port 4 description \"new desc\"\n"
-                        + "port set port 4 max-frame-size 3555\n"
-                        + "configuration save",
+                        + "port set port 4 max-frame-size 3555\n",
                 writer.updateTemplate(dataBefore,
                         createConfig("4", false, EthernetCsmacd.class, 3555, "new desc")));
     }

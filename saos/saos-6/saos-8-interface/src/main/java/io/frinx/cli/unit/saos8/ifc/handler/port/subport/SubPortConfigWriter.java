@@ -31,13 +31,11 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class SubPortConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_SUBPORT =
-            "sub-port create sub-port {$subPort} parent-port {$parentPort} classifier-precedence {$data.index}\n"
-            + "configuration save";
+            "sub-port create sub-port {$subPort} parent-port {$parentPort} classifier-precedence {$data.index}";
 
-    private static final String UPDATE_SUBPORT = "sub-port set sub-port {$nameBefore} name {$nameAfter}\n"
-            + "configuration save";
+    private static final String UPDATE_SUBPORT = "sub-port set sub-port {$nameBefore} name {$nameAfter}";
 
-    private static final String DELETE_SUBPORT = "sub-port delete sub-port {$subPort}\nconfiguration save";
+    private static final String DELETE_SUBPORT = "sub-port delete sub-port {$subPort}";
 
     private Cli cli;
 

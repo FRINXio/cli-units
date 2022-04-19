@@ -29,16 +29,14 @@ public class L2CftProfileProtocolConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_PROTOCOL =
             "l2-cft protocol add profile {$profileName} ctrl-protocol {$data.name.name} "
-            + "untagged-disposition {$data.disposition.name}\n"
-            + "configuration save";
+            + "untagged-disposition {$data.disposition.name}";
 
     private static final String UPDATE_PROTOCOL =
             "l2-cft protocol set profile {$profileName} ctrl-protocol {$data.name.name}"
-            + " untagged-disposition {$data.disposition.name}\nconfiguration save";
+            + " untagged-disposition {$data.disposition.name}";
 
     private static final String DELETE_PROTOCOL =
-            "l2-cft protocol remove profile {$profileName} ctrl-protocol {$data.name.name}\n"
-            + "configuration save";
+            "l2-cft protocol remove profile {$profileName} ctrl-protocol {$data.name.name}";
 
     private Cli cli;
 

@@ -21,56 +21,49 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.frinx.translate.unit.commons</groupId>
+        <groupId>io.frinx.uniconfig</groupId>
         <artifactId>checkstyle-parent</artifactId>
-        <version>4.2.11.rc6-frinx-SNAPSHOT</version>
-        <relativePath/>
+        <version>5.0.6-SNAPSHOT</version>
+        <relativePath>../../../southbound/commons/translation-unit-commons/checkstyle-parent</relativePath>
     </parent>
 
-    <groupId>io.frinx.cli</groupId>
+    <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>unit-parent</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
-        <cli.version>4.2.11.rc6-frinx-SNAPSHOT</cli.version>
-        <openconfig.version>4.2.11.rc6-frinx-SNAPSHOT</openconfig.version>
-        <hc.version>1.18.04-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</hc.version>
-        <controller.version>1.7.2-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</controller.version>
-        <yangtools.version>2.0.5-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</yangtools.version>
-        <mdsal.model.version>0.12.2-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</mdsal.model.version>
-        <mdsal.version>2.4.2-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</mdsal.version>
-        <translate.unit.commons.version>4.2.11.rc6-frinx-SNAPSHOT</translate.unit.commons.version>
+        <cli.version>5.0.6-SNAPSHOT</cli.version>
+        <openconfig.version>5.0.6-SNAPSHOT</openconfig.version>
+        <hc.version>5.0.6-SNAPSHOT</hc.version>
+        <controller.version>5.0.6-SNAPSHOT</controller.version>
+        <yangtools.version>5.0.6-SNAPSHOT</yangtools.version>
+        <mdsal.model.version>5.0.6-SNAPSHOT</mdsal.model.version>
+        <mdsal.version>5.0.6-SNAPSHOT</mdsal.version>
+        <translate.unit.commons.version>5.0.6-SNAPSHOT</translate.unit.commons.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.opendaylight.yangtools</groupId>
+                <groupId>io.frinx.uniconfig.yangtools</groupId>
                 <artifactId>yangtools-artifacts</artifactId>
                 <type>pom</type>
                 <version>${yangtools.version}</version>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.opendaylight.mdsal.model</groupId>
+                <groupId>io.frinx.uniconfig.model</groupId>
                 <artifactId>mdsal-model-artifacts</artifactId>
                 <type>pom</type>
                 <version>${mdsal.model.version}</version>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.opendaylight.mdsal</groupId>
+                <groupId>io.frinx.uniconfig.core</groupId>
                 <artifactId>mdsal-artifacts</artifactId>
                 <type>pom</type>
                 <version>${mdsal.version}</version>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.controller</groupId>
-                <artifactId>mdsal-artifacts</artifactId>
-                <type>pom</type>
-                <version>${controller.version}</version>
                 <scope>import</scope>
             </dependency>
             <dependency>
@@ -81,7 +74,7 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>io.frinx.cli</groupId>
+                <groupId>io.frinx.uniconfig.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
                 <version>${cli.version}</version>
@@ -99,17 +92,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.frinx.translate.unit.commons</groupId>
+            <groupId>io.frinx.uniconfig</groupId>
             <artifactId>utils</artifactId>
             <version>${translate.unit.commons.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.translate.unit.commons</groupId>
+            <groupId>io.frinx.uniconfig</groupId>
             <artifactId>handlers</artifactId>
             <version>${translate.unit.commons.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>utils-unit</artifactId>
             <version>${cli.version}</version>
         </dependency>
@@ -133,23 +126,23 @@
 
         <!-- Honeycomb -->
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>rpc-api</artifactId>
             <version>${hc.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>translate-api</artifactId>
             <version>${hc.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>translate-impl</artifactId>
             <version>${hc.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>translate-utils</artifactId>
             <version>${hc.version}</version>
             <exclusions>
@@ -169,13 +162,14 @@
         </dependency>
 
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
+            <groupId>io.frinx.uniconfig.yangtools</groupId>
             <artifactId>concepts</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal</groupId>
-            <artifactId>yang-binding</artifactId>
-        </dependency>
+      <groupId>io.frinx.uniconfig.core</groupId>
+      <artifactId>yang-binding</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>

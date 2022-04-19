@@ -97,12 +97,16 @@ public class AclUnit extends AbstractUnit {
                 IIDs.AC_AC_AC_AC_AC_TR_CONFIG,
                 IIDs.AC_AC_AC_AC_AC_TR_CONFIG,
                 IIDs.AC_AC_AC_AC_AC_TR_CO_AUG_ACLSETACLENTRYTRANSPORTPORTNAMEDAUG,
+                IIDs.AC_AC_AC_AC_AC_TR_CO_AUG_ACLESTABLISHEDSTATEAUG,
 
                 IIDs.AC_AC_AC_AC_AC_ACTIONS,
                 IIDs.AC_AC_AC_AC_AC_AC_CONFIG,
                 IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1,
                 IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_ICMP,
-                IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG));
+                IIDs.AC_AC_AC_AC_AC_AUG_ACLENTRY1_IC_CONFIG,
+
+                IIDs.AC_AC_AC_AC_AC_AUG_ACLPRECEDENCEAUG,
+                IIDs.AC_AC_AC_AC_AC_AUG_ACLOPTIONAUG));
 
         // ingress
         writeRegistry.addNoop(IIDs.AC_IN_IN_IN_INGRESSACLSET);

@@ -20,6 +20,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <artifactId>odlparent</artifactId>
+        <groupId>io.frinx.uniconfig.common</groupId>
+        <relativePath>../../../commons/parents/odlparent</relativePath>
+        <version>5.0.6-SNAPSHOT</version>
+    </parent>
+
     <modules>
         <module>init</module>
         <module>aaa</module>
@@ -34,16 +41,9 @@
         <module>snmp</module>
     </modules>
 
-    <parent>
-        <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>odlparent</artifactId>
-        <version>3.1.1-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</version>
-        <relativePath/>
-    </parent>
-
-    <groupId>io.frinx.cli</groupId>
+    <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>huawei</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <build>
@@ -98,20 +98,4 @@
             </build>
         </profile>
     </profiles>
-
-    <!--
-        Maven Site Configuration
-
-        The following configuration is necessary for maven-site-plugin to
-        correctly identify the correct deployment path for OpenDaylight Maven
-        sites.
-    -->
-    <url>${odl.site.url}/${project.groupId}/${stream}/</url>
-
-    <distributionManagement>
-        <site>
-            <id>opendaylight-site</id>
-            <url>${nexus.site.url}/</url>
-        </site>
-    </distributionManagement>
 </project>

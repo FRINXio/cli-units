@@ -20,14 +20,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.frinx.cli</groupId>
+        <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.11.rc6-frinx-SNAPSHOT</version>
-        <relativePath>../../unit-parent/pom.xml</relativePath>
+        <version>5.0.6-SNAPSHOT</version>
+        <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>sonic-interface-unit</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
 
     <dependencies>
 
@@ -36,7 +36,7 @@
             <artifactId>openconfig-if-ip</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>sonic-cli-init-unit</artifactId>
         </dependency>
         <dependency>

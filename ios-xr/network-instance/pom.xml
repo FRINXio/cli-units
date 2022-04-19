@@ -21,14 +21,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.frinx.cli</groupId>
+        <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+        <version>5.0.6-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>ios-xr-network-instance-unit</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -57,17 +57,17 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>ios-xr-lr-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>ios-xr-isis-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>ios-xr-interface-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -77,7 +77,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>translate-spi</artifactId>
             <version>${hc.version}</version>
         </dependency>

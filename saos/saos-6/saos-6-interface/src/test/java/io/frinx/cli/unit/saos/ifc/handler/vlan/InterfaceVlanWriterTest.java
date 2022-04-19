@@ -39,18 +39,13 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.rev17071
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.types.rev170714.VlanId;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-
-
 public class InterfaceVlanWriterTest {
-    private static final String WRITE_INPUT = "vlan add vlan 1234 port 4\n"
-            + "configuration save\n"
-            + "\n";
-    private static final String DELETE_INPUT = "vlan remove vlan 1234 port 4\n"
-            + "configuration save\n"
-            + "\n";
-    private static final String UPDATE_INPUT = "vlan add vlan 25,50 port 4\n"
-            + "configuration save\n"
-            + "\n";
+    private static final String WRITE_INPUT = "vlan add vlan 1234 port 4\n\n";
+
+    private static final String DELETE_INPUT = "vlan remove vlan 1234 port 4\n\n";
+
+    private static final String UPDATE_INPUT = "vlan add vlan 25,50 port 4\n\n";
+
     @Mock
     private Cli cli;
 

@@ -30,47 +30,46 @@ public class InterfaceCftProfileConfigWriterTest {
     private static final String UNSET_PROFILE = "l2-cft unset port 1 profile\n";
     private static final String ENABLE = "l2-cft enable port 1\n";
     private static final String DISABLE = "l2-cft disable port 1\n";
-    private static final String COMMIT = "configuration save";
 
     private InterfaceCftProfileConfigWriter writer;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         writer = new InterfaceCftProfileConfigWriter(Mockito.mock(Cli.class));
     }
 
     @Test
     public void writeTemplateTest() {
-        createTemplateAndTest(SET_PROFILE + ENABLE + COMMIT, createConfig("TEST", true), null);
-        createTemplateAndTest(SET_PROFILE + COMMIT, createConfig("TEST", false), null);
-        createTemplateAndTest(SET_PROFILE + COMMIT, createConfig("TEST", null), null);
+        createTemplateAndTest(SET_PROFILE + ENABLE, createConfig("TEST", true), null);
+        createTemplateAndTest(SET_PROFILE, createConfig("TEST", false), null);
+        createTemplateAndTest(SET_PROFILE, createConfig("TEST", null), null);
     }
 
     @Test
     public void updateTemplateTest() {
-        createTemplateAndTest(SET_PROFILE + COMMIT,
+        createTemplateAndTest(SET_PROFILE,
                 createConfig("Test", true), createConfig("TEST", true));
 
-        createTemplateAndTest(COMMIT, createConfig("HH", true), createConfig("HH", true));
-        createTemplateAndTest(DISABLE + COMMIT, createConfig("Test", true), createConfig("Test", false));
-        createTemplateAndTest(DISABLE + COMMIT, createConfig("Test", true), createConfig("Test", null));
+        createTemplateAndTest("", createConfig("HH", true), createConfig("HH", true));
+        createTemplateAndTest(DISABLE, createConfig("Test", true), createConfig("Test", false));
+        createTemplateAndTest(DISABLE, createConfig("Test", true), createConfig("Test", null));
 
-        createTemplateAndTest(COMMIT, createConfig("Test", false), createConfig("Test", false));
-        createTemplateAndTest(ENABLE + COMMIT, createConfig("Test", false), createConfig("Test", true));
-        createTemplateAndTest(COMMIT, createConfig("Test", false), createConfig("Test", null));
+        createTemplateAndTest("", createConfig("Test", false), createConfig("Test", false));
+        createTemplateAndTest(ENABLE, createConfig("Test", false), createConfig("Test", true));
+        createTemplateAndTest("", createConfig("Test", false), createConfig("Test", null));
 
-        createTemplateAndTest(COMMIT, createConfig("Test", null), createConfig("Test", null));
-        createTemplateAndTest(ENABLE + COMMIT, createConfig("Test", null), createConfig("Test", true));
-        createTemplateAndTest(COMMIT, createConfig("Test", null), createConfig("Test", false));
+        createTemplateAndTest("", createConfig("Test", null), createConfig("Test", null));
+        createTemplateAndTest(ENABLE, createConfig("Test", null), createConfig("Test", true));
+        createTemplateAndTest("", createConfig("Test", null), createConfig("Test", false));
     }
 
     @Test
     public void deleteTemplateTest() {
-        Assert.assertEquals(DISABLE + UNSET_PROFILE + COMMIT,
+        Assert.assertEquals(DISABLE + UNSET_PROFILE,
                 writer.deleteTemplate(createConfig("Test", true), "1"));
-        Assert.assertEquals(UNSET_PROFILE + COMMIT,
+        Assert.assertEquals(UNSET_PROFILE,
                 writer.deleteTemplate(createConfig("Test", false), "1"));
-        Assert.assertEquals(UNSET_PROFILE + COMMIT,
+        Assert.assertEquals(UNSET_PROFILE,
                 writer.deleteTemplate(createConfig("Test", null), "1"));
     }
 

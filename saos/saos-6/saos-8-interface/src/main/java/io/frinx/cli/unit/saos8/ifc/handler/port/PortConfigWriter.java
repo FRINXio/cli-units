@@ -35,8 +35,7 @@ public class PortConfigWriter implements CompositeWriter.Child<Config>, CliWrite
     private static final String WRITE_TEMPLATE_SAOS =
             "{% if ($enabled) %}port {$enabled} port {$data.name}\n{% endif %}"
             + "{$data|update(description,port set port `$data.name` description \"`$data.description`\"\n,)}"
-            + "{$data|update(mtu,port set port `$data.name` max-frame-size `$data.mtu`\n,)}"
-            + "configuration save";
+            + "{$data|update(mtu,port set port `$data.name` max-frame-size `$data.mtu`\n,)}";
 
     private Cli cli;
 

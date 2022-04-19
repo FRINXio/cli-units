@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
-import io.frinx.cli.io.PromptResolutionStrategy;
 import io.frinx.cli.io.Session;
 import io.frinx.cli.io.SessionException;
 import io.frinx.cli.io.SessionInitializationStrategy;
@@ -127,9 +126,6 @@ public class IosCliInitializerUnit extends AbstractUnit {
         @Override
         public void accept(@Nonnull Session session, @Nonnull String newline) {
             try {
-                final String initialPrompt =
-                        PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
-
                 // Set terminal length to 0 to prevent "--More--" situation
                 LOG.debug("{}: Setting terminal length to 0 to prevent \"--More--\" situation", id);
                 write(session, newline, SET_TERMINAL_LENGTH_COMMAND);
@@ -138,27 +134,8 @@ public class IosCliInitializerUnit extends AbstractUnit {
                 LOG.debug("{}: Setting terminal width to 0", id);
                 write(session, newline, SET_TERMINAL_WIDTH_COMMAND);
 
-                String initOutput = session.readUntilOutput(initialPrompt)
-                        .toCompletableFuture()
-                        .get();
-
-                LOG.debug("{}: {} cli session initialized output: {}", id, getOsNameForLogging(), initOutput);
-                // If already in privileged mode, don't do anything else
-                if (initialPrompt.endsWith(PRIVILEGED_PROMPT_SUFFIX)) {
-                    LOG.info("{}: {} cli session initialized successfully", id, getOsNameForLogging());
-                    return;
-                }
-
                 // Enable privileged mode
                 tryToEnterPrivilegedMode(session, newline);
-
-                // Check if we are actually in privileged mode
-                String prompt = PromptResolutionStrategy.ENTER_AND_READ.resolvePrompt(session, newline).trim();
-
-                // If not, fail
-                Preconditions.checkState(prompt.endsWith(PRIVILEGED_PROMPT_SUFFIX),
-                        "%s: %s cli session initialization failed to enter privileged mode. Current prompt: %s",
-                        id, getOsNameForLogging(), prompt);
 
                 LOG.info("{}: {} cli session initialized successfully", id, getOsNameForLogging());
             } catch (InterruptedException e) {

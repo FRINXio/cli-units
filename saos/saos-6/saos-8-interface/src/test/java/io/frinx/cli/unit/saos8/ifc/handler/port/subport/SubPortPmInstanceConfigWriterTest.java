@@ -30,15 +30,13 @@ public class SubPortPmInstanceConfigWriterTest {
     @Test
     public void writeTemplateTest() {
         Assert.assertEquals(
-                "pm create sub-port LAG=FRINX pm-instance FRINX_PM_1 profile-type BasicTxRx bin-count 1\n"
-                        + "configuration save", writer.writeTemplate(createConfig("FRINX_PM_1", "1"),
-                        "LAG=FRINX"));
+                "pm create sub-port LAG=FRINX pm-instance FRINX_PM_1 profile-type BasicTxRx bin-count 1",
+                writer.writeTemplate(createConfig("FRINX_PM_1", "1"), "LAG=FRINX"));
     }
 
     @Test
     public void deleteTemplateTest() {
-        Assert.assertEquals(
-                "pm delete pm-instance FRINX_PM_1\nconfiguration save",
+        Assert.assertEquals("pm delete pm-instance FRINX_PM_1",
                 writer.deleteTemplate(createConfig("FRINX_PM_1", "32")));
     }
 

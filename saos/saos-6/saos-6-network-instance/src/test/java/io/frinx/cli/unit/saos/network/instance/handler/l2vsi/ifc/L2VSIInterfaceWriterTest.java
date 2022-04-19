@@ -40,8 +40,7 @@ public class L2VSIInterfaceWriterTest {
 
     private static final String L2_VSI_INTERFACE_DELETE_INPUT = "virtual-switch ethernet remove vs VLAN111444 port 4\n"
             + "port unset port 4 untagged-ctrl-vs\n"
-            + "port unset port 4 untagged-data-vs\n"
-            + "configuration save\n";
+            + "port unset port 4 untagged-data-vs\n\n";
 
     @Mock
     private Cli cli;
@@ -72,8 +71,7 @@ public class L2VSIInterfaceWriterTest {
 
         Assert.assertEquals("virtual-switch ethernet add vs VLAN111444 port 4\n"
                         + "port set port 4 untagged-ctrl-vs VLAN111444\n"
-                        + "port set port 4 untagged-data-vs VLAN111444\n"
-                        + "configuration save\n",
+                        + "port set port 4 untagged-data-vs VLAN111444\n\n",
                 commands.getValue().getContent());
     }
 

@@ -20,15 +20,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.opendaylight.odlparent</groupId>
+    <groupId>io.frinx.uniconfig.common</groupId>
     <artifactId>odlparent</artifactId>
-    <version>3.1.1-Oxygen-SR2.4_2_11_rc6-frinxodl-SNAPSHOT</version>
-    <relativePath/>
+    <version>5.0.6-SNAPSHOT</version>
+    <relativePath>../../../../commons/parents/odlparent</relativePath>
   </parent>
 
-  <groupId>io.frinx.cli</groupId>
+  <groupId>io.frinx.uniconfig.cli</groupId>
   <artifactId>cli-units-ubnt-es</artifactId>
-  <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+  <version>5.0.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>

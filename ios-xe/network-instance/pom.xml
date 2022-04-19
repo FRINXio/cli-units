@@ -21,14 +21,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.frinx.cli</groupId>
+        <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+        <version>5.0.6-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
+
     </parent>
 
     <artifactId>ios-xe-network-instance-unit</artifactId>
-    <version>4.2.11.rc6-frinx-SNAPSHOT</version>
+    <version>5.0.6-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -37,7 +38,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>ios-xe-interface-unit</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -57,7 +58,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.translate.unit.commons</groupId>
+            <groupId>io.frinx.uniconfig</groupId>
             <artifactId>handlers</artifactId>
             <version>${translate.unit.commons.version}</version>
         </dependency>
@@ -67,12 +68,12 @@
             <version>${cli.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.frinx.cli</groupId>
+            <groupId>io.frinx.uniconfig.cli</groupId>
             <artifactId>network-instance-base</artifactId>
             <version>${cli.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.fd.honeycomb</groupId>
+            <groupId>io.frinx.uniconfig.honeycomb</groupId>
             <artifactId>translate-spi</artifactId>
             <version>${hc.version}</version>
         </dependency>
@@ -100,11 +101,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
+            <groupId>io.frinx.uniconfig.model</groupId>
             <artifactId>ietf-inet-types-2013-07-15</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
+            <groupId>io.frinx.uniconfig.core</groupId>
             <artifactId>sal-common-api</artifactId>
             <version>${controller.version}</version>
         </dependency>

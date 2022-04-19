@@ -42,15 +42,14 @@ public class ProfileSchedulerPolicyWriterTest {
     private ProfileSchedulerPolicyWriter writer;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         writer = new ProfileSchedulerPolicyWriter(Mockito.mock(Cli.class));
     }
 
     @Test
     public void writeTemplateTest() {
         Assert.assertEquals(
-                "traffic-profiling standard-profile create port 2 name Prof_1 vs VLAN111222 cir 10042\n"
-                + "configuration save",
+                "traffic-profiling standard-profile create port 2 name Prof_1 vs VLAN111222 cir 10042",
                 writer.writeTemplate(createConfig("Prof_1","2",
                         createScheduler("VLAN111222", "10042")), "Prof_1"));
     }
@@ -58,7 +57,7 @@ public class ProfileSchedulerPolicyWriterTest {
     @Test
     public void updateTemplateTest() {
         Assert.assertEquals(
-                "traffic-profiling standard-profile set port 1 profile Prof_1 cir 20048\nconfiguration save",
+                "traffic-profiling standard-profile set port 1 profile Prof_1 cir 20048",
                 writer.updateTemplate("Prof_1",
                         createConfig("Prof_1", "1", createScheduler("VLAN111222", "10048")),
                         createConfig("Prof_1", "1", createScheduler("VLAN111222", "20048"))));
@@ -67,7 +66,7 @@ public class ProfileSchedulerPolicyWriterTest {
     @Test
     public void deleteTemplateTest() {
         Assert.assertEquals(
-                "traffic-profiling standard-profile delete port 1 profile Profil_1\nconfiguration save",
+                "traffic-profiling standard-profile delete port 1 profile Profil_1",
                 writer.deleteTemplate("Profil_1",
                         createConfig("Profil_1", "1", createScheduler("VLAN111222", "10043"))));
     }

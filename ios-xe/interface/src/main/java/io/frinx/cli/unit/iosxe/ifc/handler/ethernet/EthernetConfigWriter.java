@@ -25,6 +25,7 @@ import io.frinx.cli.unit.utils.CliWriter;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.aggregate.rev161222.Config1;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.cisco.rev171024.IfEthCiscoExtAug;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ETHERNETSPEED;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.ethernet.rev161222.ethernet.top.ethernet.Config;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
@@ -38,14 +39,15 @@ public final class EthernetConfigWriter implements CliWriter<Config> {
             + "interface {$ifc_name}\n"
             + "{% if ($port_speed) %}{$port_speed}\n{% endif %}"
             + "{% if ($channel_id) %}channel-group {$channel_id} mode {$channel-group_id}\n"
-            + "{% else %}no channel-group\n"
-            + "{% endif %}"
+            + "{% else %}{% if ($channel_before) %}no channel-group\n{% endif %}{% endif %}"
+            + "{% if ($rate) %}lacp rate {$rate}\n{% endif %}"
             + "end";
 
     private static final String DELETE_TEMPLATE = "configure terminal\n"
             + "interface {$ifc_name}\n"
-            + "no speed\n"
-            + "no channel-group\n"
+            + "{% if ($port_speed) %}no speed\n{% endif %}"
+            + "{% if ($channel_before) %}no channel-group\n{% endif %}"
+            + "{% if ($rate) %}no lacp rate\n{% endif %}"
             + "end";
 
     private final Cli cli;
@@ -61,13 +63,15 @@ public final class EthernetConfigWriter implements CliWriter<Config> {
         final String ifcName = id.firstKeyOf(Interface.class).getName();
         final Long channelId = getChannelId(dataAfter);
         final String channelGroup = getChannelGroup(dataAfter, ifcName, channelId);
+        final String rate = getLacpRate(dataAfter);
 
         blockingWriteAndRead(cli, id, dataAfter,
                 fT(WRITE_UPDATE_TEMPLATE,
                         "ifc_name", ifcName,
                         "port_speed", getSpeed(null, dataAfter),
                         "channel_id", channelId,
-                        "channel-group_id", channelGroup));
+                        "channel-group_id", channelGroup,
+                        "rate", rate));
     }
 
     @Override
@@ -78,13 +82,16 @@ public final class EthernetConfigWriter implements CliWriter<Config> {
         final String ifcName = id.firstKeyOf(Interface.class).getName();
         final Long channelId = getChannelId(dataAfter);
         final String channelGroup = getChannelGroup(dataAfter, ifcName, channelId);
+        final String rate = getLacpRate(dataAfter);
 
         blockingWriteAndRead(cli, id, dataAfter,
                 fT(WRITE_UPDATE_TEMPLATE,
                         "ifc_name", ifcName,
                         "port_speed", getSpeed(dataBefore, dataAfter),
                         "channel_id", channelId,
-                        "channel-group_id", channelGroup));
+                        "channel_before", dataBefore.getAugmentation(Config1.class),
+                        "channel-group_id", channelGroup,
+                        "rate", rate));
     }
 
     @Override
@@ -95,7 +102,11 @@ public final class EthernetConfigWriter implements CliWriter<Config> {
 
         blockingDeleteAndRead(cli, id,
                 fT(DELETE_TEMPLATE,
-                        "ifc_name", ifcName));
+                        "ifc_name", ifcName,
+                        "channel_before", dataBefore.getAugmentation(Config1.class),
+                        "rate", getLacpRate(dataBefore),
+                        "port_speed", dataBefore.getPortSpeed()
+                        ));
     }
 
     private String getSpeed(Config dataBefore, Config dataAfter) {
@@ -134,4 +145,11 @@ public final class EthernetConfigWriter implements CliWriter<Config> {
         return Long.valueOf(aggregateIfcName);
     }
 
+    private String getLacpRate(Config datatAfter) {
+        final IfEthCiscoExtAug aug = datatAfter.getAugmentation(IfEthCiscoExtAug.class);
+        if (aug == null || aug.getLacpRate() == null) {
+            return null;
+        }
+        return aug.getLacpRate().getName().toLowerCase();
+    }
 }

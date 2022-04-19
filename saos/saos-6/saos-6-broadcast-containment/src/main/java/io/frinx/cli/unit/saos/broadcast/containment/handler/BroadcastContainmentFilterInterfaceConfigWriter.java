@@ -30,10 +30,8 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class BroadcastContainmentFilterInterfaceConfigWriter implements CliWriter<Config> {
 
-    private static final String WRITE_TEMPLATE = "broadcast-containment add filter {$filter_name} port {$port}\n"
-            + "configuration save";
-    private static final String DELETE_TEMPLATE = "broadcast-containment remove filter {$filter_name} port {$port}\n"
-            + "configuration save";
+    private static final String WRITE_TEMPLATE = "broadcast-containment add filter {$filter_name} port {$port}";
+    private static final String DELETE_TEMPLATE = "broadcast-containment remove filter {$filter_name} port {$port}";
 
     private Cli cli;
 

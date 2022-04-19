@@ -19,6 +19,7 @@ package io.frinx.cli.unit.iosxe.init;
 import com.google.common.collect.Sets;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareReadRegistryBuilder;
 import io.fd.honeycomb.translate.spi.builder.CustomizerAwareWriteRegistryBuilder;
+import io.frinx.cli.io.CliFlavour;
 import io.frinx.cli.io.SessionInitializationStrategy;
 import io.frinx.cli.registry.api.TranslationUnitCollector;
 import io.frinx.cli.registry.spi.TranslateUnit;
@@ -49,6 +50,11 @@ public class IosXeCliInitializerUnit extends AbstractUnit {
     @Override
     protected String getUnitName() {
         return "IOS-XE cli init (FRINX) translate unit";
+    }
+
+    @Override
+    public CliFlavour getCliFlavour() {
+        return super.getCliFlavour();
     }
 
     @Override

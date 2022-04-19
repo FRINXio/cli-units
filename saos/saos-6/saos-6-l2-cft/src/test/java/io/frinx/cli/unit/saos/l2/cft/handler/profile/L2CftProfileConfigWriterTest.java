@@ -46,7 +46,7 @@ public class L2CftProfileConfigWriterTest {
     private final Config config = new ConfigBuilder().setName("CTB").build();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
         writer = new L2CftProfileConfigWriter(cli);
@@ -57,7 +57,7 @@ public class L2CftProfileConfigWriterTest {
         writer.writeCurrentAttributes(iid, config, null);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("l2-cft create profile CTB\nconfiguration save",
+        Assert.assertEquals("l2-cft create profile CTB",
                 commands.getValue().getContent());
     }
 
@@ -73,7 +73,7 @@ public class L2CftProfileConfigWriterTest {
         writer.deleteCurrentAttributes(iid, config, null);
 
         Mockito.verify(cli).executeAndRead(commands.capture());
-        Assert.assertEquals("l2-cft delete profile CTB\nconfiguration save",
+        Assert.assertEquals("l2-cft delete profile CTB",
                 commands.getValue().getContent());
     }
 

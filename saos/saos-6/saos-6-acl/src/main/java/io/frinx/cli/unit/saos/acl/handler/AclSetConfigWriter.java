@@ -35,18 +35,15 @@ public class AclSetConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE =
             "access-list create acl-profile {$data.name} default-filter-action {$action}\n"
-            + "{% if ($enabled == FALSE) %}access-list disable profile {$data.name}\n{% endif %}"
-            + "configuration save";
+            + "{% if ($enabled == FALSE) %}access-list disable profile {$data.name}{% endif %}";
 
     private static final String UPDATE_TEMPLATE =
-            "{% if ($enabled == TRUE) %}access-list enable profile {$data.name}\n"
-            + "{% elseIf ($enabled == FALSE) %}access-list disable profile {$data.name}\n"
-            + "{% endif %}"
-            + "configuration save";
+            "{% if ($enabled == TRUE) %}access-list enable profile {$data.name}"
+            + "{% elseIf ($enabled == FALSE) %}access-list disable profile {$data.name}"
+            + "{% endif %}";
 
     private static final String DELETE_TEMPLATE =
-            "access-list delete profile {$data.name}\n"
-            + "configuration save";
+            "access-list delete profile {$data.name}";
 
     private final Cli cli;
 
