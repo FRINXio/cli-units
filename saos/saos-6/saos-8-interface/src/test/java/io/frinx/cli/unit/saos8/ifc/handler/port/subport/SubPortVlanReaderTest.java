@@ -33,7 +33,8 @@ public class SubPortVlanReaderTest {
 
     private static final String OUTPUT =
             "sub-port add sub-port LAG=LS02W_100_1 class-element 100 vtag-stack 100\n"
-            + "sub-port add sub-port LAG=LS02W_100_1 class-element 32 vtag-stack *";
+            + "sub-port add sub-port LAG=LS02W_100_1 class-element 32 vtag-stack *\n"
+            + "sub-port add sub-port LAG=LS02W_100_1 class-element 38 vlan-untagged-data\n";
 
     private final ClassElements expecredElements =
             new ClassElementsBuilder()
@@ -44,6 +45,7 @@ public class SubPortVlanReaderTest {
                             .setConfig(new ConfigBuilder()
                                 .setId("100")
                                 .setVtagStack("100")
+                                .setVlanUntaggedData(false)
                                 .build())
                             .build(),
                         new ClassElementBuilder()
@@ -51,7 +53,15 @@ public class SubPortVlanReaderTest {
                             .setConfig(new ConfigBuilder()
                                 .setId("32")
                                 .setVtagStack("*")
+                                .setVlanUntaggedData(false)
                                 .build())
+                            .build(),
+                        new ClassElementBuilder()
+                            .setKey(new ClassElementKey("38"))
+                            .setConfig(new ConfigBuilder()
+                                 .setId("38")
+                                 .setVlanUntaggedData(true)
+                                 .build())
                             .build()
                     )
                 ).build();

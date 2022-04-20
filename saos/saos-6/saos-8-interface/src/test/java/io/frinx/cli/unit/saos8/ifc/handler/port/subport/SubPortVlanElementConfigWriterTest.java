@@ -27,6 +27,7 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.vlan.saos.rev
 public class SubPortVlanElementConfigWriterTest {
 
     private static final String WRITE_TEMPLATE = "sub-port add sub-port MAX class-element 1 vtag-stack 46";
+    private static final String WRITE_TEMPL_UNTAGGED = "sub-port add sub-port MAX class-element 1 vlan-untagged-data";
     private static final String DELETE_TEMPLATE = "sub-port remove sub-port MAX class-element 1";
 
     private SubPortVlanElementConfigWriter writer;
@@ -39,22 +40,30 @@ public class SubPortVlanElementConfigWriterTest {
     @Test
     public void writeTemplateTest() {
         Assert.assertEquals(WRITE_TEMPLATE,
-                writer.writeTemplate(createConfig("1", "46"), "MAX"));
+                writer.writeTemplate(createConfig("1", "46", false), "MAX"));
+        Assert.assertEquals(WRITE_TEMPL_UNTAGGED,
+                writer.writeTemplate(createConfig("1", null, true), "MAX"));
     }
 
     @Test
     public void updateTemplateTest() {
         Assert.assertEquals(DELETE_TEMPLATE + "\n" + WRITE_TEMPLATE + "\n",
-                writer.updateTemplate(createConfig("1", "45"), createConfig("1", "46"), "MAX"));
+                writer.updateTemplate(createConfig("1", "45", false), createConfig("1", "46", false), "MAX"));
+        Assert.assertEquals(DELETE_TEMPLATE + "\n" + WRITE_TEMPL_UNTAGGED + "\n",
+                writer.updateTemplate(createConfig("1", "45", false), createConfig("1", null, true), "MAX"));
     }
 
     @Test
     public void deleteTemplateTest() {
         Assert.assertEquals(DELETE_TEMPLATE,
-                writer.deleteTemplate(createConfig("1", "45"), "MAX"));
+                writer.deleteTemplate(createConfig("1", "45", false), "MAX"));
     }
 
-    private Config createConfig(String id, String vtag) {
-        return new ConfigBuilder().setId(id).setVtagStack(vtag).build();
+    private Config createConfig(String id, String vtag, boolean untagged) {
+        var builder = new ConfigBuilder().setId(id);
+        if (untagged) {
+            return builder.setVlanUntaggedData(true).build();
+        }
+        return builder.setVtagStack(vtag).setVlanUntaggedData(false).build();
     }
 }

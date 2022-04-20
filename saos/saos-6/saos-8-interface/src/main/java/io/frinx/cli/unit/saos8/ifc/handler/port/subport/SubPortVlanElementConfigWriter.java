@@ -18,6 +18,7 @@ package io.frinx.cli.unit.saos8.ifc.handler.port.subport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
+import com.x5.template.Chunk;
 import io.fd.honeycomb.translate.write.WriteContext;
 import io.fd.honeycomb.translate.write.WriteFailedException;
 import io.frinx.cli.io.Cli;
@@ -32,12 +33,15 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public class SubPortVlanElementConfigWriter implements CliWriter<Config> {
 
     private static final String WRITE_TEMPLATE =
-            "sub-port add sub-port {$subIfcName} class-element {$data.id} vtag-stack {$data.vtag_stack}";
+            "sub-port add sub-port {$subIfcName} class-element {$data.id}"
+            + "{% if ($data.vtag_stack) %} vtag-stack {$data.vtag_stack}{% endif %}"
+            + "{% if ($untagged_data) %} vlan-untagged-data{% endif %}";
 
     private static final String UPDATE_TEMPLATE =
-            "{$data|update(vtag_stack,sub-port remove sub-port `$subIfcName` class-element `$data.id`\n,)}"
-            + "{$data|update(vtag_stack,sub-port add sub-port `$subIfcName` class-element `$data.id` "
-            + "vtag-stack `$data.vtag_stack`\n,)}";
+            "sub-port remove sub-port {$subIfcName} class-element {$before.id}\n"
+            + "sub-port add sub-port {$subIfcName} class-element {$data.id}"
+            + "{% if ($data.vtag_stack) %} vtag-stack {$data.vtag_stack}{% endif %}"
+            + "{% if ($untagged_data) %} vlan-untagged-data{% endif %}\n";
 
     private static final String DELETE_TEMPLATE =
             "sub-port remove sub-port {$subIfcName} class-element {$data.id}";
@@ -71,6 +75,7 @@ public class SubPortVlanElementConfigWriter implements CliWriter<Config> {
     @VisibleForTesting
     String writeTemplate(Config config, String subIfcName) {
         return fT(WRITE_TEMPLATE, "data", config,
+                    "untagged_data", config.isVlanUntaggedData() ? Chunk.TRUE : null,
                     "subIfcName", subIfcName);
     }
 
@@ -95,8 +100,10 @@ public class SubPortVlanElementConfigWriter implements CliWriter<Config> {
 
     @VisibleForTesting
     String updateTemplate(Config dataBefore, Config dataAfter, String subIfcName) {
-        return fT(UPDATE_TEMPLATE, "data", dataAfter, "before", dataBefore,
-            "subIfcName", subIfcName);
+        return fT(UPDATE_TEMPLATE, "data", dataAfter,
+                    "before", dataBefore,
+                    "subIfcName", subIfcName,
+                    "untagged_data", dataAfter.isVlanUntaggedData() ? Chunk.TRUE : null);
     }
 
     @Override

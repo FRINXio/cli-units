@@ -93,7 +93,8 @@ public class SubPortVlanReader implements CliConfigReader<Vlan, VlanBuilder> {
         ClassElementsBuilder classElementsBuilder = new ClassElementsBuilder();
         List<ClassElement> classElements = new ArrayList<>();
 
-        Pattern allIdsPattern = Pattern.compile(".* class-element (?<id>\\d+) vtag-stack .*");
+        Pattern allIdsPattern = Pattern
+                .compile(".* class-element (?<id>\\d+) (vlan-untagged-data|vtag-stack).*");
 
         List<String> allIds = ParsingUtils.parseFields(output, 0,
             allIdsPattern::matcher,
@@ -117,6 +118,13 @@ public class SubPortVlanReader implements CliConfigReader<Vlan, VlanBuilder> {
                 matcher -> matcher.group("vtag"),
                 elementConfigBuilder::setVtagStack);
 
+            Pattern untaggedPattern = Pattern.compile(".* class-element " + id + " vlan-untagged-data");
+
+            elementConfigBuilder.setVlanUntaggedData(false);
+            ParsingUtils.parseField(output, 0,
+                untaggedPattern::matcher,
+                matcher -> true,
+                t -> elementConfigBuilder.setVlanUntaggedData(true));
             elementBuilder.setConfig(elementConfigBuilder.build());
             classElements.add(elementBuilder.build());
         }
