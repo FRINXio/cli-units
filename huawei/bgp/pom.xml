@@ -22,13 +22,13 @@
     <parent>
         <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>5.0.6-SNAPSHOT</version>
+        <version>5.0.6</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>huawei-bgp-unit</artifactId>
-    <version>5.0.6-SNAPSHOT</version>
+    <version>5.0.6</version>
 
     <dependencies>
         <dependency>
@@ -39,7 +39,7 @@
         <dependency>
             <groupId>io.frinx.uniconfig</groupId>
             <artifactId>checks</artifactId>
-            <version>5.0.6-SNAPSHOT</version>
+            <version>5.0.6</version>
         </dependency>
 
         <!-- Openconfig models -->

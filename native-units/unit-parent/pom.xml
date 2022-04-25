@@ -21,17 +21,17 @@
     <parent>
         <groupId>io.frinx.uniconfig</groupId>
         <artifactId>checkstyle-parent</artifactId>
-        <version>5.0.6-SNAPSHOT</version>
+        <version>5.0.6</version>
         <relativePath>../../../southbound/commons/translation-unit-commons/checkstyle-parent</relativePath>
     </parent>
 
     <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>native-unit-parent</artifactId>
-    <version>5.0.6-SNAPSHOT</version>
+    <version>5.0.6</version>
     <packaging>pom</packaging>
 
     <properties>
-        <hc.version>5.0.6-SNAPSHOT</hc.version>
+        <hc.version>5.0.6</hc.version>
     </properties>
 
     <dependencyManagement>
@@ -40,14 +40,14 @@
                 <groupId>io.frinx.uniconfig.cli</groupId>
                 <artifactId>cli-artifacts</artifactId>
                 <type>pom</type>
-                <version>5.0.6-SNAPSHOT</version>
+                <version>5.0.6</version>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>cli-units-artifacts</artifactId>
                 <type>pom</type>
-                <version>5.0.6-SNAPSHOT</version>
+                <version>5.0.6</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>

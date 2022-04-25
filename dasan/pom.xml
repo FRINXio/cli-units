@@ -23,7 +23,7 @@
         <artifactId>odlparent</artifactId>
         <groupId>io.frinx.uniconfig.common</groupId>
         <relativePath>../../../commons/parents/odlparent</relativePath>
-        <version>5.0.6-SNAPSHOT</version>
+        <version>5.0.6</version>
     </parent>
 
     <modules>
@@ -36,7 +36,7 @@
 
     <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>dasan</artifactId>
-    <version>5.0.6-SNAPSHOT</version>
+    <version>5.0.6</version>
     <packaging>pom</packaging>
 
     <build>

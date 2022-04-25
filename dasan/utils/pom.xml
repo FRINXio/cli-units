@@ -23,12 +23,12 @@
     <parent>
         <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>5.0.6-SNAPSHOT</version>
+        <version>5.0.6</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>dasan-cli-utils</artifactId>
-    <version>5.0.6-SNAPSHOT</version>
+    <version>5.0.6</version>
 
     <dependencies>
         <!-- for JUnit -->
