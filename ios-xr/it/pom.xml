@@ -22,24 +22,24 @@
     <parent>
         <groupId>io.frinx.uniconfig.common</groupId>
         <artifactId>odlparent</artifactId>
-        <version>5.0.6</version>
+        <version>5.0.7-SNAPSHOT</version>
         <relativePath>../../../../commons/parents/odlparent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>ios-xr-it</artifactId>
-    <version>5.0.6</version>
+    <version>5.0.7-SNAPSHOT</version>
 
     <properties>
-        <cli.version>5.0.6</cli.version>
-        <openconfig.version>5.0.6</openconfig.version>
-        <hc.version>5.0.6</hc.version>
-        <controller.version>5.0.6</controller.version>
-        <yangtools.version>5.0.6</yangtools.version>
-        <mdsal.model.version>5.0.6</mdsal.model.version>
-        <mdsal.version>5.0.6</mdsal.version>
-        <translate.unit.commons.version>5.0.6</translate.unit.commons.version>
+        <cli.version>5.0.7-SNAPSHOT</cli.version>
+        <openconfig.version>5.0.7-SNAPSHOT</openconfig.version>
+        <hc.version>5.0.7-SNAPSHOT</hc.version>
+        <controller.version>5.0.7-SNAPSHOT</controller.version>
+        <yangtools.version>5.0.7-SNAPSHOT</yangtools.version>
+        <mdsal.model.version>5.0.7-SNAPSHOT</mdsal.model.version>
+        <mdsal.version>5.0.7-SNAPSHOT</mdsal.version>
+        <translate.unit.commons.version>5.0.7-SNAPSHOT</translate.unit.commons.version>
     </properties>
 
     <dependencyManagement>

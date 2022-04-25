@@ -24,7 +24,7 @@
         <artifactId>odlparent</artifactId>
         <groupId>io.frinx.uniconfig.common</groupId>
         <relativePath>../../../commons/parents/odlparent</relativePath>
-        <version>5.0.6</version>
+        <version>5.0.7-SNAPSHOT</version>
     </parent>
 
     <modules>
@@ -43,7 +43,7 @@
 
     <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>huawei</artifactId>
-    <version>5.0.6</version>
+    <version>5.0.7-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <build>
