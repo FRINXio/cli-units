@@ -75,7 +75,8 @@ public class SubPortVlanElementConfigWriter implements CliWriter<Config> {
     @VisibleForTesting
     String writeTemplate(Config config, String subIfcName) {
         return fT(WRITE_TEMPLATE, "data", config,
-                    "untagged_data", config.isVlanUntaggedData() ? Chunk.TRUE : null,
+                    "untagged_data", config.isVlanUntaggedData() != null && config.isVlanUntaggedData()
+                        ? Chunk.TRUE : null,
                     "subIfcName", subIfcName);
     }
 
