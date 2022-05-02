@@ -96,8 +96,7 @@ public class MikrotikCliInitializerUnit extends AbstractUnit {
                 //  basically without these options, Mikrotik's CLI cannot be talked to
                 //  https://wiki.mikrotik.com/wiki/Manual:Console_login_process
                 // tested with version 5.25, 6.45 and 7.0
-                "+tc",
-                Collections.emptySet());
+                "+tc");
     }
 
     public static class MikrotikCliInitializer implements SessionInitializationStrategy {

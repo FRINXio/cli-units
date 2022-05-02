@@ -103,8 +103,7 @@ public class CubroCliInitializerUnit extends AbstractUnit {
                 ImmutableList.of("end", "Building configuration", "Current configuration"),
                 "",
                 "\n",
-                "",
-                Collections.emptySet());
+                "");
     }
 
     /**

@@ -35,14 +35,11 @@ import io.frinx.cli.unit.utils.AbstractUnit;
 import io.frinx.translate.unit.commons.handler.spi.ChecksMap;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.CliNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
@@ -53,8 +50,6 @@ import org.slf4j.LoggerFactory;
 public class SaosCliInitializerUnit extends AbstractUnit {
 
     private static final Logger LOG = LoggerFactory.getLogger(SaosCliInitializerUnit.class);
-
-    private static final int READ_TIMEOUT_SECONDS = 1;
 
     private static final String PRIVILEGED_PROMPT_SUFFIX = ">";
     private static final String SET_TERMINAL_PAGER_OFF_COMMAND = "system shell session set more off";
@@ -129,8 +124,8 @@ public class SaosCliInitializerUnit extends AbstractUnit {
                 "",
                 Cli.NEWLINE,
                 "",
-                Optional.of("configuration show brief"),
-                Stream.of('^', '*').collect(Collectors.toSet()));
+                Pattern.compile("\\^|\\*"),
+                "configuration show brief");
     }
 
     public static class SaosCliInitializationStrategy implements SessionInitializationStrategy {

@@ -38,11 +38,10 @@ public final class L2VSIReader implements
         CliConfigListReader<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder>,
         CompositeListReader.Child<NetworkInstance, NetworkInstanceKey, NetworkInstanceBuilder> {
 
-    public static final String SH_VIRTUAL_SWITCH_TEMPLATE =
-            "configuration search string \"create vs\"";
+    private static final String SH_VIRTUAL_SWITCH_IDS = "configuration search string \"virtual-switch create vs\"";
 
     private static final Pattern VIRTUAL_SWITCH_LINE_PATTERN =
-        Pattern.compile("virtual-switch create vs (?<vs>\\S+).*");
+            Pattern.compile("virtual-switch create vs (?<vs>\\S+).*");
 
     private Cli cli;
 
@@ -61,9 +60,7 @@ public final class L2VSIReader implements
     public static List<NetworkInstanceKey> getAllIds(Cli cli, CliReader cliReader,
                                               @Nonnull InstanceIdentifier<?> id,
                                               @Nonnull ReadContext readContext) throws ReadFailedException {
-
-        String output = cliReader.blockingRead(SH_VIRTUAL_SWITCH_TEMPLATE, cli, id, readContext);
-
+        var output = cliReader.blockingRead(SH_VIRTUAL_SWITCH_IDS, cli, id, readContext);
         return ParsingUtils.parseFields(output, 0,
             VIRTUAL_SWITCH_LINE_PATTERN::matcher,
             m -> m.group("vs"),
@@ -74,8 +71,7 @@ public final class L2VSIReader implements
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<NetworkInstance> instanceIdentifier,
                                       @Nonnull NetworkInstanceBuilder networkInstanceBuilder,
                                       @Nonnull ReadContext readContext) {
-        String interfaceId = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        networkInstanceBuilder.setName(interfaceId);
+        networkInstanceBuilder.setName(instanceIdentifier.firstKeyOf(NetworkInstance.class).getName());
     }
 
     @Override

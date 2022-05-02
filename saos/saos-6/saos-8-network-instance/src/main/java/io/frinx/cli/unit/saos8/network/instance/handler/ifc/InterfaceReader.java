@@ -34,7 +34,6 @@ public class InterfaceReader extends CompositeListReader<Interface, InterfaceKey
             {
                 add(new L2VSISubPortReader(cli));
                 add(new L2VSICpuSubinterfaceReader(cli));
-
             }
         });
     }

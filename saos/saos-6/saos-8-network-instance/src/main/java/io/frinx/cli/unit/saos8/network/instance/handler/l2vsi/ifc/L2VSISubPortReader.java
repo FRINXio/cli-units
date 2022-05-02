@@ -33,13 +33,16 @@ import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.insta
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces.InterfaceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.network.instance.interfaces._interface.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.saos._interface.rev200414.Saos8NiIfcAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.saos._interface.rev200414.Saos8NiIfcAugBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.Ieee8023adLag;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class L2VSISubPortReader implements CliConfigListReader<Interface, InterfaceKey, InterfaceBuilder>,
         CompositeListReader.Child<Interface, InterfaceKey, InterfaceBuilder> {
 
-    public static final String SHOW_COMMAND =
-            "configuration search string \"virtual-switch interface attach sub-port\"";
+    static final String SHOW_COMMAND = "configuration search string \"vs %s\"";
 
     private final Cli cli;
 
@@ -60,8 +63,8 @@ public class L2VSISubPortReader implements CliConfigListReader<Interface, Interf
                                                      @Nonnull InstanceIdentifier<?> id,
                                                      @Nonnull ReadContext readContext,
                                                      String vsName) throws ReadFailedException {
-        String output = cliReader.blockingRead(SHOW_COMMAND, cli, id, readContext);
-        Pattern subPortPattern = Pattern.compile("virtual-switch interface attach sub-port (?<name>\\S+)"
+        var output = cliReader.blockingRead(String.format(SHOW_COMMAND, vsName), cli, id, readContext);
+        var subPortPattern = Pattern.compile("virtual-switch interface attach sub-port (?<name>\\S+)"
                 + " vs " + vsName);
 
         return ParsingUtils.parseFields(output, 0,
@@ -73,8 +76,10 @@ public class L2VSISubPortReader implements CliConfigListReader<Interface, Interf
     @Override
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                       @Nonnull InterfaceBuilder interfaceBuilder,
-                                      @Nonnull ReadContext readContext) throws ReadFailedException {
-        interfaceBuilder.setId(instanceIdentifier.firstKeyOf(Interface.class).getId());
+                                      @Nonnull ReadContext readContext) {
+        final var id = instanceIdentifier.firstKeyOf(Interface.class).getId();
+        interfaceBuilder.setId(id).setConfig(new ConfigBuilder().setId(id).addAugmentation(Saos8NiIfcAug.class,
+                        new Saos8NiIfcAugBuilder().setType(Ieee8023adLag.class).build()).build());
     }
 
     @Override

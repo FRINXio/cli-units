@@ -24,6 +24,7 @@ import io.fd.honeycomb.translate.spi.builder.Check;
 import io.frinx.cli.io.Cli;
 import io.frinx.cli.unit.utils.CliConfigReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
+import io.frinx.openconfig.network.instance.NetworInstance;
 import io.frinx.translate.unit.commons.handler.spi.CompositeReader;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -37,7 +38,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 public final class L2VSIConfigReader implements CliConfigReader<Config, ConfigBuilder>,
         CompositeReader.Child<Config, ConfigBuilder> {
 
-    public static final String SH_VIRTUAL_SWITCH_TEMPLATE = "configuration search string \"set vs\"";
+    private static final String SH_VIRTUAL_SWITCH_TEMPLATE = "configuration search string \"virtual-switch set vs %s\"";
 
     private Cli cli;
 
@@ -49,16 +50,16 @@ public final class L2VSIConfigReader implements CliConfigReader<Config, ConfigBu
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Config> instanceIdentifier,
                                       @Nonnull ConfigBuilder configBuilder,
                                       @Nonnull ReadContext readContext) throws ReadFailedException {
-        if (isVSI(instanceIdentifier, readContext)) {
-            String vsName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-            String output = blockingRead(SH_VIRTUAL_SWITCH_TEMPLATE, cli, instanceIdentifier, readContext);
-            parseL2VSIConfig(output, configBuilder, vsName);
+        var instance = instanceIdentifier.firstKeyOf(NetworkInstance.class);
+        if (instance.equals(NetworInstance.DEFAULT_NETWORK)) {
+            return;
         }
+        parseL2VSIConfig(blockingRead(String.format(SH_VIRTUAL_SWITCH_TEMPLATE, instance.getName()),
+                cli, instanceIdentifier, readContext), configBuilder, instance.getName());
     }
 
     @VisibleForTesting
     static void parseL2VSIConfig(String output, ConfigBuilder builder, String vsName) {
-        Pattern desc = Pattern.compile("virtual-switch set vs " + vsName + " description (?<desc>(\\S+\\s*)+).*");
         builder.setName(vsName);
         builder.setType(L2VSI.class);
         getDescForVS(output, builder, vsName);
@@ -79,11 +80,6 @@ public final class L2VSIConfigReader implements CliConfigReader<Config, ConfigBu
                 m -> m.group("desc"),
                 configBuilder::setDescription);
         }
-    }
-
-    private boolean isVSI(InstanceIdentifier<Config> id, ReadContext readContext) throws ReadFailedException {
-        return L2VSIReader.getAllIds(cli, this, id, readContext)
-                .contains(id.firstKeyOf(NetworkInstance.class));
     }
 
     @Override

@@ -25,7 +25,6 @@ import io.frinx.cli.unit.saos.init.SaosDevices;
 import io.frinx.cli.unit.saos8.network.instance.handler.NetworkInstanceConfigReader;
 import io.frinx.cli.unit.saos8.network.instance.handler.NetworkInstanceConfigWriter;
 import io.frinx.cli.unit.saos8.network.instance.handler.NetworkInstanceReader;
-import io.frinx.cli.unit.saos8.network.instance.handler.ifc.InterfaceConfigReader;
 import io.frinx.cli.unit.saos8.network.instance.handler.ifc.InterfaceConfigWriter;
 import io.frinx.cli.unit.saos8.network.instance.handler.ifc.InterfaceReader;
 import io.frinx.cli.unit.saos8.network.instance.handler.l2vsi.ring.VirtualRingConfigReader;
@@ -101,7 +100,7 @@ public class SaosNetworkInstanceUnit extends AbstractUnit {
         readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_VI_VIRTUALRING, new VirtualRingReader(cli));
         readRegistry.add(IIDs.NE_NE_AUG_SAOS8VRAUG_VI_VI_CONFIG, new VirtualRingConfigReader());
 
-        readRegistry.add(IIDs.NE_NE_IN_INTERFACE, new InterfaceReader(cli));
-        readRegistry.add(IIDs.NE_NE_IN_IN_CONFIG, new InterfaceConfigReader(cli));
+        readRegistry.subtreeAdd(IIDs.NE_NE_IN_INTERFACE, new InterfaceReader(cli),
+                Sets.newHashSet(IIDs.NE_NE_IN_IN_CONFIG, IIDs.NE_NE_IN_IN_CO_AUG_SAOS8NIIFCAUG));
     }
 }
