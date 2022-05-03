@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.frinx.cli.unit.ios.it;
 
 import ch.qos.logback.classic.Level;
@@ -33,6 +34,7 @@ import io.fd.honeycomb.translate.read.registry.ReaderRegistry;
 import io.fd.honeycomb.translate.util.YangDAG;
 import io.fd.honeycomb.translate.write.registry.WriterRegistry;
 import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.impl.CliDefaultParametersService;
 import io.frinx.cli.io.impl.IOConfigurationBuilder;
 import io.frinx.cli.io.impl.cli.KeepaliveCli;
 import io.frinx.cli.registry.api.TranslateContext;
@@ -54,8 +56,12 @@ import io.frinx.cli.unit.ios.rib.RibUnit;
 import io.frinx.cli.unit.ios.snmp.SnmpUnit;
 import io.frinx.cli.unit.ospf.OspfUnit;
 import io.frinx.openconfig.openconfig.interfaces.IIDs;
+import io.frinx.translate.unit.commons.handler.spi.GenericTranslateContext;
 import io.frinx.translate.unit.commons.utils.NoopDataBroker;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.InetSocketAddress;
 import java.security.Security;
 import java.util.Collections;
@@ -85,6 +91,8 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMService;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
+import org.opendaylight.mdsal.binding.dom.codec.util.DataReader;
+import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -97,11 +105,19 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topo
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.topology.rev170520.cli.node.keepalive.keepalive.strategy.KeepaliveBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.Device;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.cli.translate.registry.rev170520.DeviceIdBuilder;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.util.BindingReflections;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTree;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeConfiguration;
@@ -139,6 +155,8 @@ public class IosAll {
                     .setKeepaliveTimeout(30)
                     .setKeepaliveInitialDelay(30)
                     .build())
+            .setMaxConnectionAttempts(1L)
+            .setMaxReconnectionAttempts(1L)
             .build();
 
     private static final ScheduledExecutorService EXECUTOR = Executors.newScheduledThreadPool(4);
@@ -173,6 +191,8 @@ public class IosAll {
     private ReadWriteTransaction mockTx;
     @Mock
     private BindingTransactionChain mockTxChain;
+    @Mock
+    private CliDefaultParametersService cliDefaultParametersService;
 
     private DataBroker bindingBroker;
     protected RpcRegistry rpcReg;
@@ -188,6 +208,7 @@ public class IosAll {
         setRootLogLevel();
         MockitoAnnotations.initMocks(this);
         mockBroker();
+        mockDefaultParamsService();
 
         TranslateRegistryImpl reg = getTranslateRegistry(mockBroker);
 
@@ -204,7 +225,8 @@ public class IosAll {
                 .setKeepaliveExecutor(EXECUTOR)
                 .setCliInitExecutor(ForkJoinPool.commonPool())
                 .setReconnectListener(RECONNECT_LISTENER)
-                .setErrorPatterns(translateContext.getErrorPatterns());
+                .setErrorPatterns(translateContext.getErrorPatterns())
+                .setCliDefaultParametersService(cliDefaultParametersService);
 
         cli = ioConfigurationBuilder.getIO()
                 .toCompletableFuture()
@@ -238,6 +260,24 @@ public class IosAll {
                 return domBroker;
             }
         }.load(DataBroker.class).get());
+    }
+
+    private void mockDefaultParamsService() {
+        Mockito.doReturn(null).when(cliDefaultParametersService).readDefaultParameters();
+        Mockito.doReturn(CLI_CFG.getKeepaliveStrategy()).when(cliDefaultParametersService)
+                .getKeepaliveStrategy(Mockito.any(), Mockito.any());
+        Mockito.doReturn(CLI_CFG.getDryRunJournalSize()).when(cliDefaultParametersService)
+                .getDryrunJournalSize(Mockito.any(), Mockito.any());
+        Mockito.doReturn(CLI_CFG.getJournalSize()).when(cliDefaultParametersService)
+                .getJournalSize(Mockito.any(), Mockito.any());
+        Mockito.doReturn(CLI_CFG.getJournalLevel()).when(cliDefaultParametersService)
+                .getJournalLevel(Mockito.any(), Mockito.any());
+        Mockito.doReturn(CLI_CFG.getParsingEngine()).when(cliDefaultParametersService)
+                .getParsingEngine(Mockito.any(), Mockito.any());
+        Mockito.doReturn(CLI_CFG.getMaxConnectionAttempts()).when(cliDefaultParametersService)
+                .getMaxConnectionAttempts(Mockito.any(), Mockito.any());
+        Mockito.doReturn(CLI_CFG.getMaxReconnectionAttempts()).when(cliDefaultParametersService)
+                .getMaxReconnectionAttempts(Mockito.any(), Mockito.any());
     }
 
     protected InetSocketAddress getAddress() {
@@ -341,7 +381,8 @@ public class IosAll {
                     .setCliInitExecutor(ForkJoinPool.commonPool())
                     .setReconnectListener(RECONNECT_LISTENER)
                     .setPromptResolver(translateContext.getPromptResolver())
-                    .setErrorPatterns(Collections.emptySet());
+                    .setErrorPatterns(Collections.emptySet())
+                    .setCliDefaultParametersService(cliDefaultParametersService);
 
             Cli io = ioConfigurationBuilder.getIO()
                     .toCompletableFuture()
@@ -352,7 +393,8 @@ public class IosAll {
     }
 
     protected CliNode getCliNode() {
-        return CLI_CFG;
+        return (CliNode) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{CliNode.class},
+                new CliNodeInvocationHandler(CLI_CFG));
     }
 
     @Ignore
@@ -426,6 +468,37 @@ public class IosAll {
             }
             jsonWriter.endObject();
             return out.toString();
+        }
+    }
+
+    private class CliNodeInvocationHandler implements InvocationHandler, DataReader {
+        private final BindingToNormalizedNodeCodec codec;
+        private CliNode cliCfg;
+
+        CliNodeInvocationHandler(CliNode cliCfg) {
+            this.cliCfg = cliCfg;
+            ModuleInfoBackedContext mibContext = ModuleInfoBackedContext.create();
+            mibContext.addModuleInfos(BindingReflections.loadModuleInfos());
+            SchemaContext newCtx = mibContext.getSchemaContext();
+            codec = GenericTranslateContext.getCodec(mibContext, newCtx);
+        }
+
+        @Override
+        public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
+            return method.invoke(cliCfg, objects);
+        }
+
+        @Override
+        public NormalizedNodeContainer<?, YangInstanceIdentifier.PathArgument, NormalizedNode<?, ?>> getData() {
+            // Use codec to provide normalizedNode version of cliCfg
+            // This is for the cli default params provider service, it needs normalizedNode version of it
+            return (NormalizedNodeContainer<?, YangInstanceIdentifier.PathArgument, NormalizedNode<?, ?>>)
+                    codec.toNormalizedNode(
+                            InstanceIdentifier.builder(NetworkTopology.class)
+                                    .child(Topology.class, CLI_TOPO_KEY)
+                                    .child(Node.class, new NodeKey(new NodeId(MOUNT_ID)))
+                                    .augmentation(CliNode.class).build(),
+                            cliCfg).getValue();
         }
     }
 }
