@@ -27,6 +27,7 @@ import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.network.instance.rev170228.network.instance.top.network.instances.NetworkInstance;
@@ -53,7 +54,9 @@ public class L2VSICpuSubinterfaceReader implements CliConfigListReader<Interface
     public List<InterfaceKey> getAllIds(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                         @Nonnull ReadContext readContext) throws ReadFailedException {
         String vsName = instanceIdentifier.firstKeyOf(NetworkInstance.class).getName();
-        return getAllIds(cli, this, instanceIdentifier, readContext, vsName);
+        List<InterfaceKey> allIds = getAllIds(cli, this, instanceIdentifier, readContext, vsName);
+        readContext.getModificationCache().put(getClass().getName(), Set.copyOf(allIds));
+        return allIds;
     }
 
     @VisibleForTesting
@@ -76,9 +79,13 @@ public class L2VSICpuSubinterfaceReader implements CliConfigListReader<Interface
     public void readCurrentAttributes(@Nonnull InstanceIdentifier<Interface> instanceIdentifier,
                                       @Nonnull InterfaceBuilder interfaceBuilder,
                                       @Nonnull ReadContext readContext) {
-        final var id = instanceIdentifier.firstKeyOf(Interface.class).getId();
-        interfaceBuilder.setId(id).setConfig(new ConfigBuilder().setId(id).addAugmentation(Saos8NiIfcAug.class,
-                        new Saos8NiIfcAugBuilder().setType(L2vlan.class).build()).build());
+        final var id = instanceIdentifier.firstKeyOf(Interface.class);
+        final var subInterfaces = (Set<InterfaceKey>) readContext.getModificationCache().get(getClass().getName());
+        if (!subInterfaces.isEmpty() && subInterfaces.contains(id)) {
+            interfaceBuilder.setId(id.getId()).setConfig(new ConfigBuilder().setId(id.getId())
+                    .addAugmentation(Saos8NiIfcAug.class,
+                    new Saos8NiIfcAugBuilder().setType(L2vlan.class).build()).build());
+        }
     }
 
     @Override
