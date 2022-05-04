@@ -26,6 +26,7 @@ import io.frinx.cli.unit.utils.CliConfigListReader;
 import io.frinx.cli.unit.utils.CliReader;
 import io.frinx.cli.unit.utils.ParsingUtils;
 import io.frinx.translate.unit.commons.handler.spi.CompositeListReader;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -81,11 +82,22 @@ public class L2VSISubPortReader implements CliConfigListReader<Interface, Interf
                                       @Nonnull InterfaceBuilder interfaceBuilder,
                                       @Nonnull ReadContext readContext) {
         final var id = instanceIdentifier.firstKeyOf(Interface.class);
-        final var subPort = (Set<InterfaceKey>) readContext.getModificationCache().get(getClass().getName());
+
+        final var subPort =
+                readContext.getModificationCache().containsKey(getClass().getName())
+                        ? (Set<InterfaceKey>) readContext.getModificationCache().get(getClass().getName())
+                        : Collections.emptySet();
+
         if (!subPort.isEmpty() && subPort.contains(id)) {
-            interfaceBuilder.setId(id.getId()).setConfig(new ConfigBuilder().setId(id.getId())
-                    .addAugmentation(Saos8NiIfcAug.class,
-                    new Saos8NiIfcAugBuilder().setType(Ieee8023adLag.class).build()).build());
+            interfaceBuilder
+                    .setId(id.getId())
+                    .setConfig(new ConfigBuilder()
+                            .setId(id.getId())
+                            .setInterface(id.getId())
+                            .addAugmentation(Saos8NiIfcAug.class,
+                                    new Saos8NiIfcAugBuilder().setType(Ieee8023adLag.class)
+                                            .build())
+                            .build());
         }
     }
 
