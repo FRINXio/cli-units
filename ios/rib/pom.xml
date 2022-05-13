@@ -22,13 +22,13 @@
     <parent>
         <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>5.0.7-SNAPSHOT</version>
+        <version>5.0.7</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ios-rib-unit</artifactId>
-    <version>5.0.7-SNAPSHOT</version>
+    <version>5.0.7</version>
 
     <dependencies>
         <dependency>

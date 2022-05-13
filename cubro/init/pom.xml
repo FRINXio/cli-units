@@ -23,12 +23,12 @@
     <parent>
         <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>5.0.7-SNAPSHOT</version>
+        <version>5.0.7</version>
         <relativePath>../../unit-parent</relativePath>
     </parent>
 
     <artifactId>cubro-cli-init-unit</artifactId>
-    <version>5.0.7-SNAPSHOT</version>
+    <version>5.0.7</version>
 
     <dependencies>
         <dependency>
@@ -39,7 +39,7 @@
         <dependency>
             <groupId>io.frinx.uniconfig</groupId>
             <artifactId>checks</artifactId>
-            <version>5.0.7-SNAPSHOT</version>
+            <version>5.0.7</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

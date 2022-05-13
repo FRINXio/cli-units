@@ -21,13 +21,13 @@
     <parent>
       <groupId>io.frinx.uniconfig.common</groupId>
       <artifactId>odlparent</artifactId>
-      <version>5.0.7-SNAPSHOT</version>
+      <version>5.0.7</version>
       <relativePath>../../commons/parents/odlparent</relativePath>
     </parent>
 
     <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>junos-17-native</artifactId>
-    <version>5.0.7-SNAPSHOT</version>
+    <version>5.0.7</version>
     <packaging>pom</packaging>
 
     <modules>
