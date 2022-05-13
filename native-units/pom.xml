@@ -21,13 +21,13 @@
     <parent>
       <groupId>io.frinx.uniconfig.common</groupId>
       <artifactId>odlparent</artifactId>
-      <version>5.0.7</version>
+      <version>5.0.8-SNAPSHOT</version>
       <relativePath>../../commons/parents/odlparent</relativePath>
     </parent>
 
     <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>cli-native-units</artifactId>
-    <version>5.0.7</version>
+    <version>5.0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>

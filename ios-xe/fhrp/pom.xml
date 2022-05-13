@@ -20,14 +20,14 @@
     <parent>
         <artifactId>unit-parent</artifactId>
         <groupId>io.frinx.uniconfig.cli</groupId>
-        <version>5.0.7</version>
+        <version>5.0.8-SNAPSHOT</version>
         <relativePath>../../unit-parent</relativePath>
 
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ios-xe-fhrp-unit</artifactId>
-    <version>5.0.7</version>
+    <version>5.0.8-SNAPSHOT</version>
 
     <dependencies>
         <!-- Dependencies on other translation units -->

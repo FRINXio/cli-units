@@ -24,13 +24,13 @@
     <parent>
         <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>unit-parent</artifactId>
-        <version>5.0.7</version>
+        <version>5.0.8-SNAPSHOT</version>
         <relativePath>../../../unit-parent</relativePath>
 
     </parent>
 
     <artifactId>saos-6-configuration-metadata-unit</artifactId>
-    <version>5.0.7</version>
+    <version>5.0.8-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
