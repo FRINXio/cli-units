@@ -22,7 +22,7 @@
 
     <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>cli-units-ios</artifactId>
-    <version>5.0.8-SNAPSHOT</version>
+    <version>5.0.7</version>
     <packaging>pom</packaging>
 
     <modules>

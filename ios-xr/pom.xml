@@ -24,12 +24,12 @@
         <artifactId>odlparent</artifactId>
         <groupId>io.frinx.uniconfig.common</groupId>
         <relativePath>../../../commons/parents/odlparent</relativePath>
-        <version>5.0.8-SNAPSHOT</version>
+        <version>5.0.7</version>
     </parent>
 
     <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>cli-units-ios-xr</artifactId>
-    <version>5.0.8-SNAPSHOT</version>
+    <version>5.0.7</version>
     <packaging>pom</packaging>
 
     <modules>

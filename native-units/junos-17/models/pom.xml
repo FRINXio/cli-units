@@ -22,20 +22,20 @@
     <parent>
         <groupId>io.frinx.uniconfig.core</groupId>
         <artifactId>binding-parent</artifactId>
-        <version>5.0.8-SNAPSHOT</version>
+        <version>5.0.7</version>
 
     </parent>
 
     <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>junos-17-native-models</artifactId>
-    <version>5.0.8-SNAPSHOT</version>
+    <version>5.0.7</version>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.frinx.openconfig</groupId>
                 <artifactId>openconfig-artifacts</artifactId>
-                <version>5.0.8-SNAPSHOT</version>
+                <version>5.0.7</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>

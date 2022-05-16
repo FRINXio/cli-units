@@ -21,12 +21,12 @@
     <parent>
         <groupId>io.frinx.uniconfig.cli</groupId>
         <artifactId>native-unit-parent</artifactId>
-        <version>5.0.8-SNAPSHOT</version>
+        <version>5.0.7</version>
 
     </parent>
 
     <artifactId>ios-xr-5-native-unit</artifactId>
-    <version>5.0.8-SNAPSHOT</version>
+    <version>5.0.7</version>
 
     <dependencies>
         <dependency>
