@@ -22,7 +22,7 @@
 
     <groupId>io.frinx.uniconfig.cli</groupId>
     <artifactId>cli-units-junos</artifactId>
-    <version>5.0.7</version>
+    <version>5.0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
