@@ -40,6 +40,9 @@ public class InterfaceConfigReaderTest {
     private static final String SH_PORT_4 = "port disable port 4\n"
             + "port set port 4 mode rj45\n"
             + "port set port 4 max-frame-size 9216 description \"two words\" ingress-to-egress-qmap NNI-NNI\n"
+            + "port set port 4 resolved-cos-remark-l2 true\n"
+            + "rstp disable port 4\n"
+            + "mstp disable port 4\n"
             + "vlan add vlan 25,50 port 4\n"
             + "vlan add vlan 127,1234 port 4\n"
             + "port set port 4 acceptable-frame-type tagged-only vs-ingress-filter on\n"
@@ -61,6 +64,9 @@ public class InterfaceConfigReaderTest {
                     .setIngressToEgressQmap(IngressToEgressQmap.NNINNI)
                     .setMaxDynamicMacs(200)
                     .setForwardUnlearned(false)
+                    .setResolvedCosRemarkL2(true)
+                    .setRstpEnabled(false)
+                    .setMstpEnabled(false)
                     .build())
             .build();
 
@@ -85,6 +91,9 @@ public class InterfaceConfigReaderTest {
                     .setPhysicalType(PhysicalType.Rj45)
                     .setVsIngressFilter(true)
                     .setMaxDynamicMacs(200)
+                    .setResolvedCosRemarkL2(false)
+                    .setMstpEnabled(true)
+                    .setRstpEnabled(true)
                     .build())
             .build();
 
@@ -103,6 +112,9 @@ public class InterfaceConfigReaderTest {
                     .setAcceptableFrameType(AcceptableFrameType.All)
                     .setVsIngressFilter(false)
                     .setForwardUnlearned(false)
+                    .setResolvedCosRemarkL2(false)
+                    .setMstpEnabled(true)
+                    .setRstpEnabled(true)
                     .build())
             .build();
 
@@ -146,6 +158,9 @@ public class InterfaceConfigReaderTest {
                     .setPhysicalType(PhysicalType.Rj45)
                     .setVsIngressFilter(true)
                     .setMaxDynamicMacs(200)
+                    .setResolvedCosRemarkL2(false)
+                    .setRstpEnabled(true)
+                    .setMstpEnabled(true)
                     .build())
             .build();
 

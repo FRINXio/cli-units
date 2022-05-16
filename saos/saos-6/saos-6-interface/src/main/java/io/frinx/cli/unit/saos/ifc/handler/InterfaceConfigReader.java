@@ -100,6 +100,9 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
         setVlanEthertypePolicy(output, ifSaosAugBuilder, name);
         setIngressToEgressQmap(output, ifSaosAugBuilder, name);
         setAccessControlAttributes(output, ifSaosAugBuilder, name);
+        setRstpEnabled(output, ifSaosAugBuilder, name);
+        setMstpEnabled(output, ifSaosAugBuilder, name);
+        setResolvedCosRemarkL2(output, ifSaosAugBuilder, name);
     }
 
     @VisibleForTesting
@@ -286,6 +289,33 @@ public class InterfaceConfigReader implements CliConfigReader<Config, ConfigBuil
             portEnabled::matcher,
             matcher -> true,
             mode -> builder.setEnabled(false));
+    }
+
+    protected void setRstpEnabled(final String output, final IfSaosAugBuilder ifSaosAugBuilder, String name) {
+        Pattern rstpEnabled = Pattern.compile("rstp disable port " + name + "$");
+        ifSaosAugBuilder.setRstpEnabled(true);
+        ParsingUtils.parseField(output, 0,
+            rstpEnabled::matcher,
+            matcher -> true,
+            mode -> ifSaosAugBuilder.setRstpEnabled(false));
+    }
+
+    protected void setMstpEnabled(final String output, final IfSaosAugBuilder ifSaosAugBuilder, String name) {
+        Pattern mstpEnabled = Pattern.compile("mstp disable port " + name + "$");
+        ifSaosAugBuilder.setMstpEnabled(true);
+        ParsingUtils.parseField(output, 0,
+            mstpEnabled::matcher,
+            matcher -> true,
+            mode -> ifSaosAugBuilder.setMstpEnabled(false));
+    }
+
+    private void setResolvedCosRemarkL2(final String output, IfSaosAugBuilder ifSaosAugBuilder, String name) {
+        Pattern portRcrl = Pattern.compile("port set port " + name + " .*resolved-cos-remark-l2 true.*");
+        ifSaosAugBuilder.setResolvedCosRemarkL2(false);
+        ParsingUtils.parseField(output, 0,
+            portRcrl::matcher,
+            matcher -> true,
+            mode -> ifSaosAugBuilder.setResolvedCosRemarkL2(true));
     }
 
 }

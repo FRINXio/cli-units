@@ -48,13 +48,19 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
             + "{% if ($pt) %}port set port {$data.name} mode {$pt}\n{% endif %}"
             // vs-ingress-filter
             + "{% if ($vif) %}port set port {$data.name} vs-ingress-filter {$vif}\n{% endif %}"
+            // resolved-cos-remark-l2
+            + "{% if ($rcrl) %}port set port {$data.name} resolved-cos-remark-l2 {$rcrl}\n{% endif %}"
             // vlan-ethertype-policy
             + "{% if ($vep) %}virtual-circuit ethernet set port {$data.name} vlan-ethertype-policy {$vep}\n{% endif %}"
             // ingress-to-egress-qmap
             + "{% if ($iteq) %}port set port {$data.name} ingress-to-egress-qmap {$iteq}\n{% endif %}"
             // flow access-control
             + "{% if ($max_macs) %}flow access-control set port {$data.name} max-dynamic-macs {$max_macs}\n{% endif %}"
-            + "{% if ($fwd_un) %}flow access-control set port {$data.name} forward-unlearned {$fwd_un}\n{% endif %}";
+            + "{% if ($fwd_un) %}flow access-control set port {$data.name} forward-unlearned {$fwd_un}\n{% endif %}"
+            // rstp disable port
+            + "{% if ($rstp_enabled) %}rstp {$rstp_enabled} port {$data.name}\n{% endif %}"
+            // mstp disable port
+            + "{% if ($mstp_enabled) %}mstp {$mstp_enabled} port {$data.name}\n{% endif %}";
 
     private Cli cli;
 
@@ -114,7 +120,10 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
                 "vep", updateVlanEthertypePolicy(dateBefore, dataAfter),
                 "iteq", updateIngressQmap(dateBefore, dataAfter),
                 "max_macs", updateMaxDynamicMacs(dateBefore, dataAfter),
-                "fwd_un", updateForwardUnlearned(dateBefore, dataAfter));
+                "fwd_un", updateForwardUnlearned(dateBefore, dataAfter),
+                "rstp_enabled", updateRstpEnabled(dateBefore, dataAfter),
+                "mstp_enabled", updateMstpEnabled(dateBefore, dataAfter),
+                "rcrl", updateResolvedCosRemarkL2(dateBefore, dataAfter));
     }
 
     private String updateEnabled(Config dataBefore, Config dataAfter) {
@@ -262,6 +271,63 @@ public class InterfaceConfigWriter implements CliWriter<Config> {
         IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
         if (ifSaosAug != null) {
             return ifSaosAug.isForwardUnlearned();
+        }
+        return null;
+    }
+
+    private String updateRstpEnabled(Config dataBefore, Config dataAfter) {
+        Boolean enabledBefore = setRstpEnabled(dataBefore);
+        Boolean enabledAfter = setRstpEnabled(dataAfter);
+        if (!Objects.equals(enabledAfter, enabledBefore)) {
+            if (enabledAfter != null) {
+                return enabledAfter ? "enable" : "disable";
+            }
+        }
+        return null;
+    }
+
+    private Boolean setRstpEnabled(Config config) {
+        IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
+        if (ifSaosAug != null) {
+            return ifSaosAug.isRstpEnabled();
+        }
+        return null;
+    }
+
+    private String updateMstpEnabled(Config dataBefore, Config dataAfter) {
+        Boolean enabledBefore = setMstpEnabled(dataBefore);
+        Boolean enabledAfter = setMstpEnabled(dataAfter);
+        if (!Objects.equals(enabledAfter, enabledBefore)) {
+            if (enabledAfter != null) {
+                return enabledAfter ? "enable" : "disable";
+            }
+        }
+        return null;
+    }
+
+    private Boolean setMstpEnabled(Config config) {
+        IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
+        if (ifSaosAug != null) {
+            return ifSaosAug.isMstpEnabled();
+        }
+        return null;
+    }
+
+    private String updateResolvedCosRemarkL2(Config dataBefore, Config dataAfter) {
+        Boolean rcrlEnabledBefore = setResolvedCosRemarkL2(dataBefore);
+        Boolean rcrlEnabledAfter = setResolvedCosRemarkL2(dataAfter);
+        if (!Objects.equals(rcrlEnabledAfter, rcrlEnabledBefore)) {
+            if (rcrlEnabledAfter != null) {
+                return rcrlEnabledAfter ? "true" : "false";
+            }
+        }
+        return null;
+    }
+
+    private Boolean setResolvedCosRemarkL2(Config config) {
+        IfSaosAug ifSaosAug = config.getAugmentation(IfSaosAug.class);
+        if (ifSaosAug != null) {
+            return ifSaosAug.isResolvedCosRemarkL2();
         }
         return null;
     }

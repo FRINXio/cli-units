@@ -74,7 +74,7 @@ public class InterfaceConfigWriterTest {
     private void initializeData() {
         dataBefore = createConfig(true, EthernetCsmacd.class, 35, "test",
                 createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
-                        VlanEthertypePolicy.VlanTpid,  false));
+                        VlanEthertypePolicy.VlanTpid,  false, true, true, false));
 
         lagDataBefore = createConfig(true, Ieee8023adLag.class, 35, "lag interface", null);
     }
@@ -102,7 +102,7 @@ public class InterfaceConfigWriterTest {
                 writer.updateTemplate(dataBefore,
                         createConfig(true, EthernetCsmacd.class, 35, "test",
                                 createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
-                                        VlanEthertypePolicy.VlanTpid,  false)))
+                                        VlanEthertypePolicy.VlanTpid,  false, true, true, false)))
         );
 
         // enabled
@@ -110,62 +110,83 @@ public class InterfaceConfigWriterTest {
                 writer.updateTemplate(dataBefore,
                         createConfig(false, EthernetCsmacd.class, 35, "test",
                                 createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
-                                        VlanEthertypePolicy.VlanTpid,  false))));
+                                        VlanEthertypePolicy.VlanTpid,  false, true, true, false))));
 
         // mtu
         Assert.assertEquals("port set port test_name max-frame-size 1500\n",
                 writer.updateTemplate(dataBefore,
                         createConfig(true, EthernetCsmacd.class, 1500, "test",
                                 createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
-                                        VlanEthertypePolicy.VlanTpid,  false))));
+                                        VlanEthertypePolicy.VlanTpid,  false, true, true, false))));
 
         // description
         Assert.assertEquals("port set port test_name description \"new description\"\n",
                 writer.updateTemplate(dataBefore,
                         createConfig(true, EthernetCsmacd.class, 35, "new description",
                                 createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
-                                        VlanEthertypePolicy.VlanTpid,  false))));
+                                        VlanEthertypePolicy.VlanTpid,  false, true, true, false))));
 
         // physical type
         Assert.assertEquals("port set port test_name mode sfp\n",
                 writer.updateTemplate(dataBefore,
                         createConfig(true, EthernetCsmacd.class, 35, "test",
                                 createAugBuilder(PhysicalType.Sfp, IngressToEgressQmap.DefaultRCOS, 200, true,
-                                        VlanEthertypePolicy.VlanTpid,  false))));
+                                        VlanEthertypePolicy.VlanTpid,  false, true, true, false))));
         // ingress to egress qmap
         Assert.assertEquals("port set port test_name ingress-to-egress-qmap NNI-NNI\n",
                 writer.updateTemplate(dataBefore,
                        createConfig(true, EthernetCsmacd.class, 35, "test",
                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.NNINNI, 200, true,
-                                       VlanEthertypePolicy.VlanTpid,  false))));
+                                       VlanEthertypePolicy.VlanTpid,  false, true, true, false))));
 
         // max dynamic
         Assert.assertEquals("flow access-control set port test_name max-dynamic-macs 300\n",
                 writer.updateTemplate(dataBefore,
                        createConfig(true, EthernetCsmacd.class, 35, "test",
                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 300, true,
-                                       VlanEthertypePolicy.VlanTpid,  false))));
+                                       VlanEthertypePolicy.VlanTpid,  false, true, true, false))));
 
         // ingress filter
         Assert.assertEquals("port set port test_name vs-ingress-filter off\n",
                 writer.updateTemplate(dataBefore,
                         createConfig(true, EthernetCsmacd.class, 35, "test",
                                 createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, false,
-                                        VlanEthertypePolicy.VlanTpid,  false))));
+                                        VlanEthertypePolicy.VlanTpid,  false, true, true, false))));
+
+        // resolved-cos-remark-l2
+        Assert.assertEquals("port set port test_name resolved-cos-remark-l2 true\n",
+                writer.updateTemplate(dataBefore,
+                        createConfig(true, EthernetCsmacd.class, 35, "test",
+                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
+                                        VlanEthertypePolicy.VlanTpid,  false, true, true, true))));
 
         // ethertype policy
         Assert.assertEquals("virtual-circuit ethernet set port test_name vlan-ethertype-policy all\n",
                 writer.updateTemplate(dataBefore,
                         createConfig(true, EthernetCsmacd.class, 35, "test",
                                 createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
-                                        VlanEthertypePolicy.All,  false))));
+                                        VlanEthertypePolicy.All,  false, true, true, false))));
 
         // forward unlearned
         Assert.assertEquals("flow access-control set port test_name forward-unlearned on\n",
                 writer.updateTemplate(dataBefore,
                         createConfig(true, EthernetCsmacd.class, 35, "test",
                                 createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
-                                        VlanEthertypePolicy.VlanTpid,  true))));
+                                        VlanEthertypePolicy.VlanTpid,  true, true, true, false))));
+
+        // rstp disabled
+        Assert.assertEquals("rstp disable port test_name\n",
+                writer.updateTemplate(dataBefore,
+                        createConfig(true, EthernetCsmacd.class, 35, "test",
+                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
+                                        VlanEthertypePolicy.VlanTpid,  false, false, true, false))));
+
+        // mstp disabled
+        Assert.assertEquals("mstp disable port test_name\n",
+                writer.updateTemplate(dataBefore,
+                        createConfig(true, EthernetCsmacd.class, 35, "test",
+                                createAugBuilder(PhysicalType.Rj45, IngressToEgressQmap.DefaultRCOS, 200, true,
+                                        VlanEthertypePolicy.VlanTpid,  false, true, false, false))));
 
         // all
         Assert.assertEquals("port disable port test_name\n"
@@ -173,14 +194,17 @@ public class InterfaceConfigWriterTest {
                 + "port set port test_name max-frame-size 1500\n"
                 + "port set port test_name mode sfp\n"
                 + "port set port test_name vs-ingress-filter off\n"
+                + "port set port test_name resolved-cos-remark-l2 true\n"
                 + "virtual-circuit ethernet set port test_name vlan-ethertype-policy all\n"
                 + "port set port test_name ingress-to-egress-qmap NNI-NNI\n"
                 + "flow access-control set port test_name max-dynamic-macs 350\n"
-                + "flow access-control set port test_name forward-unlearned on\n",
+                + "flow access-control set port test_name forward-unlearned on\n"
+                + "rstp disable port test_name\n"
+                + "mstp disable port test_name\n",
                 writer.updateTemplate(dataBefore,
                         createConfig(false, EthernetCsmacd.class, 1500, "new description",
                                 createAugBuilder(PhysicalType.Sfp, IngressToEgressQmap.NNINNI, 350, false,
-                                        VlanEthertypePolicy.All,  true))));
+                                        VlanEthertypePolicy.All,  true, false, false, true))));
     }
 
     @Test
@@ -201,7 +225,8 @@ public class InterfaceConfigWriterTest {
 
     private IfSaosAugBuilder createAugBuilder(PhysicalType type, IngressToEgressQmap qmap, Integer maxDynamic,
                                               Boolean ingressFilter, VlanEthertypePolicy etherTypePolicy,
-                                              Boolean fwUnlearned) {
+                                              Boolean fwUnlearned, Boolean rstpEnabled, Boolean mstpEnabled,
+                                              Boolean resolvedCosRemarkL2) {
         IfSaosAugBuilder builder = new IfSaosAugBuilder();
 
         if (type != null) {
@@ -221,6 +246,15 @@ public class InterfaceConfigWriterTest {
         }
         if (fwUnlearned != null) {
             builder.setForwardUnlearned(fwUnlearned);
+        }
+        if (rstpEnabled != null) {
+            builder.setRstpEnabled(rstpEnabled);
+        }
+        if (mstpEnabled != null) {
+            builder.setMstpEnabled(mstpEnabled);
+        }
+        if (resolvedCosRemarkL2 != null) {
+            builder.setResolvedCosRemarkL2(resolvedCosRemarkL2);
         }
 
         return builder;
