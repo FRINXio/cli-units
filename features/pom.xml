@@ -508,6 +508,16 @@
             <artifactId>mikrotik-cli-init-unit</artifactId>
         </dependency>
 
+        <!-- CER -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cer-cli-init-unit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cer-interface-unit</artifactId>
+        </dependency>
+
         <!-- CLI-NATIVE -->
 <!--        <dependency>-->
 <!--            <groupId>${project.groupId}</groupId>-->

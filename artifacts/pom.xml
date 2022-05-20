@@ -628,6 +628,18 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- CER -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>cer-cli-init-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>cer-interface-unit</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
        </dependencies>
     </dependencyManagement>
 </project>

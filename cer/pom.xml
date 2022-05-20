@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright © 2018 Frinx and others.
+  ~ Copyright © 2022 Frinx and others.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -20,42 +20,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-      <groupId>io.frinx.uniconfig.common</groupId>
-      <artifactId>odlparent</artifactId>
-      <version>5.0.8-SNAPSHOT</version>
-      <relativePath>../../commons/parents/odlparent</relativePath>
-    </parent>
-
     <groupId>io.frinx.uniconfig.cli</groupId>
-    <artifactId>cli-units-aggregator</artifactId>
+    <artifactId>cli-units-cer</artifactId>
     <version>5.0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>artifacts</module>
-        <module>ios-common</module>
-        <module>ios</module>
-        <module>ios-xe</module>
-        <module>ios-xr</module>
-        <module>brocade</module>
-        <module>cubro</module>
-        <module>junos</module>
-        <module>huawei</module>
-        <module>unit-parent</module>
-        <module>nexus</module>
-        <module>dasan</module>
-        <module>sonic</module>
-        <module>sros</module>
-        <module>saos</module>
-        <module>ubnt/edge-switch</module>
-        <module>mikrotik</module>
-        <module>interface-base</module>
-        <module>network-instance-base</module>
-<!--        <module>native-units</module>-->
-        <module>arista</module>
-        <module>features</module>
-        <module>cer</module>
+        <module>interface</module>
+        <module>it</module>
+        <module>init</module>
     </modules>
 
     <build>
