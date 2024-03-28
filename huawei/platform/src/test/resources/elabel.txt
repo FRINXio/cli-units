@@ -1,0 +1,1763 @@
+/$[System Integration Version]
+/$SystemIntegrationVersion = 3.0
+
+[Rack_1]
+[SubRack_1]
+
+[BackPlane]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR5B0BKP1674
+BarCode=2102359915P0FC000004
+Item=02359915
+Description=Assembling Components,CR5B0BKP1674,NE40E-X16A Integrated AC Chassis Components  (Including 4 Fan Tray)
+Manufactured=2015-12-23
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Slot_1]
+/$[Board Integration Version]
+/$BoardIntegrationVersion=3.0
+
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57E2NLFX22
+BarCode=210305583810G1000005
+Item=03055838
+Description=NetEngine40E,CR57E2NLFX22,2-Port 100GBase-CFP2 + 24-Port 10GBase LAN/WAN-SFP+ Integrated Line Processing Unit (LPUI-480)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Main_Board_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57E2NLFX22
+BarCode=210305583810G1000005
+Item=03055838
+Description=NetEngine40E,CR57E2NLFX22,2-Port 100GBase-CFP2 + 24-Port 10GBase LAN/WAN-SFP+ Integrated Line Processing Unit (LPUI-480)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Daughter_Board_1/0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57E2NCE1
+BarCode=030UQJ10G1000006
+Item=03030UQJ
+Description=Finished Board,NetEngine40E,CR57E2NCE1,2-Port 100GBase-CFP2 Fixed Card A
+Manufactured=2016-01-08
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Port_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=JC2R10LR4AA1HW
+BarCode=FF4863650016
+Item=
+Description=103.125Gb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-03
+VendorName=JDSU
+IssueNumber=
+CLEICode=
+BOM=34060727
+
+
+[Port_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=FIM37401/301
+BarCode=37401301XX300S
+Item=
+Description=111.8Gb/s-1310nm-LC-40km(0.009mm)
+Manufactured=2015-10-07
+VendorName=FUJITSU
+IssueNumber=
+CLEICode=
+BOM=
+
+
+[Daughter_Board_1/1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57LFXFE1
+BarCode=030UQE10G1000021
+Item=03030UQE
+Description=Finished Board,NetEngine40E,CR57LFXFE1,24-Port 10GBase LAN/WAN-SFP+ Fixed  Card
+Manufactured=2016-01-12
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Port_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0332092
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-26
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0332213
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-27
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_2]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0332020
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-26
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_3]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0332096
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-26
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_4]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBP0220603
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-10-19
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_5]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBP0220625
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-10-19
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_6]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBP0220632
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-10-19
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_7]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBP0220890
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-10-20
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_8]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBP0220906
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-10-20
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_9]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBP0220988
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-10-20
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_10]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBP0220950
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-10-20
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_11]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBP0220641
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-10-19
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_12]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBP0220983
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-10-20
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_13]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBP0220928
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-10-20
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_14]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0461789
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-04
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_15]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0461740
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-04
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_16]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0461750
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-04
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_17]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0461749
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-04
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_18]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0462597
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-04
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_19]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0461783
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-04
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_20]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0461764
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-04
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_21]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0462538
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-04
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_22]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0461763
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-04
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_23]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0461781
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-04
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Slot_2]
+/$[Board Integration Version]
+/$BoardIntegrationVersion=3.0
+
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57E2NLFX22
+BarCode=210305583810G1000003
+Item=03055838
+Description=NetEngine40E,CR57E2NLFX22,2-Port 100GBase-CFP2 + 24-Port 10GBase LAN/WAN-SFP+ Integrated Line Processing Unit (LPUI-480)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Main_Board_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57E2NLFX22
+BarCode=210305583810G1000003
+Item=03055838
+Description=NetEngine40E,CR57E2NLFX22,2-Port 100GBase-CFP2 + 24-Port 10GBase LAN/WAN-SFP+ Integrated Line Processing Unit (LPUI-480)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Daughter_Board_2/0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57E2NCE1
+BarCode=030UQJ10G1000008
+Item=03030UQJ
+Description=Finished Board,NetEngine40E,CR57E2NCE1,2-Port 100GBase-CFP2 Fixed Card A
+Manufactured=2016-01-08
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Port_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=JC2R10LR4AA1HW
+BarCode=FF4863650036
+Item=
+Description=103.125Gb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-03
+VendorName=JDSU
+IssueNumber=
+CLEICode=
+BOM=34060727
+
+
+[Port_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=
+
+
+[Board Properties]
+BoardType=
+BarCode=
+Item=
+Description=
+Manufactured=
+VendorName=
+IssueNumber=
+CLEICode=
+BOM=
+
+
+[Daughter_Board_2/1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57LFXFE1
+BarCode=030UQE10G1000020
+Item=03030UQE
+Description=Finished Board,NetEngine40E,CR57LFXFE1,24-Port 10GBase LAN/WAN-SFP+ Fixed  Card
+Manufactured=2016-01-12
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Port_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0331448
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-25
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0331453
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-25
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_2]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0331437
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-25
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_3]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0332764
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-28
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_4]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0460819
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-02
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_5]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0331433
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-25
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_6]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0331445
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-25
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_7]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0331457
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-25
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_8]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0331450
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-25
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_9]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0331463
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-25
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_10]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0460286
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-30
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_11]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0460599
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-01
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_12]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0460261
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-30
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_13]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0460214
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-30
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_14]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0460260
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-30
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_15]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0461421
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-03
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_16]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0460283
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-30
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_17]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0332330
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-27
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_18]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0460502
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-12-01
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_19]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBV0460263
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-30
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_20]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0332077
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-26
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_21]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0332088
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-26
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_22]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0332079
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-26
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Port_23]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=TR-PX13L-N00
+BarCode=INFBU0332210
+Item=
+Description=10300Mb/s-1310nm-LC-10km(0.009mm)
+Manufactured=2015-11-27
+VendorName=INNOLIGHT
+IssueNumber=
+CLEICode=
+BOM=34060742
+
+
+[Slot_17]
+/$[Board Integration Version]
+/$BoardIntegrationVersion=3.0
+
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56MPUB50
+BarCode=210305577810G1000008
+Item=03055778
+Description=Finished Board Unit,NetEngine40E,Main Processing Unit B5
+Manufactured=2016-01-17
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Main_Board_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56MPUB50
+BarCode=210305577810G1000008
+Item=03055778
+Description=Finished Board Unit,NetEngine40E,Main Processing Unit B5
+Manufactured=2016-01-17
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Slot_18]
+/$[Board Integration Version]
+/$BoardIntegrationVersion=3.0
+
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56MPUB50
+BarCode=210305577810G1000007
+Item=03055778
+Description=Finished Board Unit,NetEngine40E,Main Processing Unit B5
+Manufactured=2016-01-17
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Main_Board_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56MPUB50
+BarCode=210305577810G1000007
+Item=03055778
+Description=Finished Board Unit,NetEngine40E,Main Processing Unit B5
+Manufactured=2016-01-17
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Slot_19]
+/$[Board Integration Version]
+/$BoardIntegrationVersion=3.0
+
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57SFU1TB00
+BarCode=210305609110G1000004
+Item=03056091
+Description=Finished Board Unit,NetEngine40E,CR57SFU1TB00,1Tbps Switch Fabric Unit B(SFUI-1T-B)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Main_Board_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57SFU1TB00
+BarCode=210305609110G1000004
+Item=03056091
+Description=Finished Board Unit,NetEngine40E,CR57SFU1TB00,1Tbps Switch Fabric Unit B(SFUI-1T-B)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Slot_20]
+/$[Board Integration Version]
+/$BoardIntegrationVersion=3.0
+
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57SFU1TB00
+BarCode=210305609110G1000003
+Item=03056091
+Description=Finished Board Unit,NetEngine40E,CR57SFU1TB00,1Tbps Switch Fabric Unit B(SFUI-1T-B)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Main_Board_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57SFU1TB00
+BarCode=210305609110G1000003
+Item=03056091
+Description=Finished Board Unit,NetEngine40E,CR57SFU1TB00,1Tbps Switch Fabric Unit B(SFUI-1T-B)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Slot_21]
+/$[Board Integration Version]
+/$BoardIntegrationVersion=3.0
+
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57SFU1TB00
+BarCode=210305609110G1000002
+Item=03056091
+Description=Finished Board Unit,NetEngine40E,CR57SFU1TB00,1Tbps Switch Fabric Unit B(SFUI-1T-B)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Main_Board_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57SFU1TB00
+BarCode=210305609110G1000002
+Item=03056091
+Description=Finished Board Unit,NetEngine40E,CR57SFU1TB00,1Tbps Switch Fabric Unit B(SFUI-1T-B)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Slot_22]
+/$[Board Integration Version]
+/$BoardIntegrationVersion=3.0
+
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57SFU1TB00
+BarCode=210305609110G1000001
+Item=03056091
+Description=Finished Board Unit,NetEngine40E,CR57SFU1TB00,1Tbps Switch Fabric Unit B(SFUI-1T-B)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[Main_Board_1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR57SFU1TB00
+BarCode=210305609110G1000001
+Item=03056091
+Description=Finished Board Unit,NetEngine40E,CR57SFU1TB00,1Tbps Switch Fabric Unit B(SFUI-1T-B)
+Manufactured=2016-01-16
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[PowerFrame_25]
+
+
+PM: 1[A1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000011
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 2[A2]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000094
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 3[A3]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000082
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 4[A4]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000015
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-27
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 5[A5]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000103
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 6[A6]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000067
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 7[A7]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000087
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[PowerFrame_26]
+
+
+PM: 1[B1]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000098
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 2[B2]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000072
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 3[B3]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000088
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 4[B4]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000080
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 5[B5]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000069
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 6[B6]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000079
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+PM: 7[B7]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=PAC-2700WB
+BarCode=2102310SHPD0FC000074
+Item=02310SHP
+Description=Function Module, AC PSU, PAC-2700WB, 2700W AC Power module
+Manufactured=2015-12-25
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[FanSlot_27]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+FanFrame
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56FCBJ
+BarCode=2102120866P0FC000101
+Item=02120866
+Description=Fan Box,NE5000E-X16A,CR56FCBJ,Fan Box,Fan Unit
+Manufactured=2015-12-23
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[FanSlot_28]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+FanFrame
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56FCBJ
+BarCode=2102120866P0FC000109
+Item=02120866
+Description=Fan Box,NE5000E-X16A,CR56FCBJ,Fan Box,Fan Unit
+Manufactured=2015-12-23
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[FanSlot_29]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+FanFrame
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56FCBJ
+BarCode=2102120866P0G1000411
+Item=02120866
+Description=Fan Box,NE5000E-X16A,CR56FCBJ,Fan Box,Fan Unit
+Manufactured=2016-01-17
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[FanSlot_30]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+FanFrame
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56FCBJ
+BarCode=2102120866P0FC000112
+Item=02120866
+Description=Fan Box,NE5000E-X16A,CR56FCBJ,Fan Box,Fan Unit
+Manufactured=2015-12-23
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[FanSlot_31]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+FanFrame
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56FCBJ
+BarCode=2102120866P0FC000104
+Item=02120866
+Description=Fan Box,NE5000E-X16A,CR56FCBJ,Fan Box,Fan Unit
+Manufactured=2015-12-23
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[FanSlot_32]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+FanFrame
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56FCBJ
+BarCode=2102120866P0G1000412
+Item=02120866
+Description=Fan Box,NE5000E-X16A,CR56FCBJ,Fan Box,Fan Unit
+Manufactured=2016-01-17
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[PmuBoard_33]
+
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56PMUA
+BarCode=2102310QUCP0FC000079
+Item=02310QUC
+Description=Function Module,NE5000E-X16A,CR56PMUA,Power  Monitor Module
+Manufactured=2015-12-23
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+
+[PmuBoard_34]
+
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+[Main_Board_0]
+/$[ArchivesInfo Version]
+/$ArchivesInfoVersion=3.0
+
+
+[Board Properties]
+BoardType=CR56PMUA
+BarCode=2102310QUCP0FB000461
+Item=02310QUC
+Description=Function Module,NE5000E-X16A,CR56PMUA,Power  Monitor Module
+Manufactured=2015-12-23
+VendorName=Huawei
+IssueNumber=00
+CLEICode=
+BOM=
+
+<bud0f1a-r2n0-hu>
