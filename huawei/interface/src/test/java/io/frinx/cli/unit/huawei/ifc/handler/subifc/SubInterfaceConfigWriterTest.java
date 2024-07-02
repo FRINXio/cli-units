@@ -1,0 +1,165 @@
+/*
+ * Copyright © 2021 Frinx and others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.frinx.cli.unit.huawei.ifc.handler.subifc;
+
+import io.fd.honeycomb.translate.write.WriteContext;
+import io.fd.honeycomb.translate.write.WriteFailedException;
+import io.frinx.cli.io.Cli;
+import io.frinx.cli.io.Command;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.SubIfHuaweiAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.SubIfHuaweiAugBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.TrafficDirection.Direction;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.huawei.sub._if.extension.config.TrafficFilterBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.huawei.extension.rev210729.huawei.sub._if.extension.config.TrafficPolicyBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.Interfaces;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.Interface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.Subinterfaces;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.Subinterface;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.SubinterfaceKey;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.Config;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.subinterfaces.top.subinterfaces.subinterface.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.iana._if.type.rev140508.EthernetCsmacd;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+
+class SubInterfaceConfigWriterTest {
+
+    private static final String PHYSICAL_INT_INPUT = """
+            system-view
+            interface GigabitEthernet0/0/4.100
+            description test - ethernet
+            ip binding vpn-instance VLAN27
+            traffic-filter Inbound acl name WAN-IN
+            traffic-policy TP-NNI-MAIN-OUT Outbound
+            trust dscp
+            return
+            """;
+
+    private static final String PHYSICAL_INT_CLEAN_INPUT = """
+            system-view
+            interface GigabitEthernet0/0/4.100
+            undo description
+            undo ip binding vpn-instance VLAN27
+            undo traffic-filter Inbound
+            undo traffic-policy Outbound
+            undo trust
+            return
+            """;
+
+    private static final String OTHER_INT_WRITE_INPUT = """
+            system-view
+            interface GigabitEthernet0/0/4.100
+            undo description
+            undo trust
+            return
+            """;
+
+    private static final String OTHER_INT_DELETE_INPUT = """
+            system-view
+            undo interface GigabitEthernet0/0/4.100
+            return
+            """;
+
+    private static final Config PHYSICAL_INT_CLEAN_CONFIG = new ConfigBuilder()
+            .setName("GigabitEthernet0/0/4.100")
+            .setEnabled(false)
+            .build();
+
+    private static final Config OTHER_INT_CLEAN_CONFIG = new ConfigBuilder()
+            .setName("GigabitEthernet0/0/4.100")
+            .setEnabled(false)
+            .build();
+
+    private static final Config PHYSICAL_INT_CONFIG = new ConfigBuilder()
+            .setName("GigabitEthernet0/0/4.100")
+            .setDescription("test - ethernet")
+            .setEnabled(true)
+            .addAugmentation(SubIfHuaweiAug.class, new SubIfHuaweiAugBuilder()
+                    .setTrustDscp(true)
+                    .setIpBindingVpnInstance("VLAN27")
+                    .setTrafficFilter(new TrafficFilterBuilder()
+                            .setDirection(Direction.Inbound)
+                            .setAclName("WAN-IN")
+                            .setIpv6(false)
+                            .build())
+                    .setTrafficPolicy(new TrafficPolicyBuilder()
+                            .setDirection(Direction.Outbound)
+                            .setTrafficName("TP-NNI-MAIN-OUT")
+                            .build())
+                    .build())
+            .build();
+
+    @Mock
+    private Cli cli;
+
+    @Mock
+    private Interface parent;
+
+    @Mock
+    private WriteContext context;
+
+    private SubinterfaceConfigWriter writer;
+    private final InstanceIdentifier<Config> iid = InstanceIdentifier.create(Interfaces.class)
+            .child(Interface.class, new InterfaceKey("GigabitEthernet0/0/4"))
+            .child(Subinterfaces.class)
+            .child(Subinterface.class, new SubinterfaceKey(Long.valueOf(100))).child(Config.class);
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.initMocks(this);
+        Mockito.when(cli.executeAndRead(Mockito.any())).then(invocation -> CompletableFuture.completedFuture(""));
+        org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces
+                .rev161222.interfaces.top.interfaces._interface.Config cfg = new org.opendaylight.yang.gen.v1.http
+                .frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces._interface.ConfigBuilder()
+                .setType(EthernetCsmacd.class).build();
+        Mockito.when(parent.getConfig()).thenReturn(cfg);
+        Mockito.when(context.readAfter(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(parent));
+        Mockito.when(context.readBefore(Mockito.any(InstanceIdentifier.class))).thenReturn(Optional.of(parent));
+        writer = new SubinterfaceConfigWriter(cli);
+    }
+
+    @Test
+    void writeOtherInterface() throws WriteFailedException {
+        writer.writeCurrentAttributes(iid, OTHER_INT_CLEAN_CONFIG, context);
+        Mockito.verify(cli).executeAndRead(Command.writeCommand(OTHER_INT_WRITE_INPUT));
+    }
+
+    @Test
+    void updatePhysical() throws WriteFailedException {
+        writer.updateCurrentAttributes(iid, PHYSICAL_INT_CLEAN_CONFIG, PHYSICAL_INT_CONFIG, context);
+        Mockito.verify(cli).executeAndRead(Command.writeCommand(PHYSICAL_INT_INPUT));
+    }
+
+    @Test
+    void updateCleanPhysical() throws WriteFailedException {
+        writer.updateCurrentAttributes(iid, PHYSICAL_INT_CONFIG, PHYSICAL_INT_CLEAN_CONFIG, context);
+        Mockito.verify(cli).executeAndRead(Command.writeCommand(PHYSICAL_INT_CLEAN_INPUT));
+    }
+
+    @Test
+    void deleteOtherInterface() throws WriteFailedException {
+        writer.deleteCurrentAttributes(iid, OTHER_INT_CLEAN_CONFIG, context);
+        Mockito.verify(cli).executeAndRead(Command.writeCommand(OTHER_INT_DELETE_INPUT));
+    }
+}
