@@ -1,0 +1,69 @@
+/*
+ * Copyright © 2021 Frinx and others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.frinx.cli.unit.huawei.system.handler.terminal;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.terminal.huawei.extension.rev210923.huawei.terminal.extension.terminals.terminal.Config.ProtocolInbound;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.terminal.huawei.extension.rev210923.huawei.terminal.extension.terminals.terminal.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.terminal.huawei.extension.rev210923.huawei.terminal.extension.terminals.terminal.config.Acl.Direction;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.system.terminal.huawei.extension.rev210923.huawei.terminal.extension.terminals.terminal.config.AclBuilder;
+
+class TerminalConfigReaderTest {
+
+    private final String outputTerminals = """
+            user-interface con 0\r
+             authentication-mode aaa\r
+             idle-timeout 30 0\r
+            user-interface vty 0 4\r
+             acl 3000 inbound\r
+             authentication-mode aaa\r
+             user privilege level 15\r
+             idle-timeout 30 0\r
+             protocol inbound ssh\r
+            #
+            """;
+
+    @Test
+    void testTerminalsIdsWithConfig() {
+        ConfigBuilder configBuilder = new ConfigBuilder();
+        TerminalConfigReader.parseConfigAttributes(outputTerminals, configBuilder, "vty");
+        assertEquals(new ConfigBuilder()
+            .setFirstUiNumber((short) 0)
+            .setLastUiNumber((short) 4)
+            .setAcl(new AclBuilder().setAclId(3000).setDirection(Direction.Inbound).build())
+            .setTimeoutMin(30)
+            .setTimeoutSec((short) 0)
+            .setAuthName("aaa")
+            .setPrivilegeLevel((short) 15)
+            .setProtocolInbound(ProtocolInbound.Ssh)
+            .build(), configBuilder.build());
+    }
+
+    @Test
+    void testTerminalsIdsWithoutConfig() {
+        ConfigBuilder configBuilder = new ConfigBuilder();
+        TerminalConfigReader.parseConfigAttributes(outputTerminals, configBuilder, "con");
+        assertEquals(new ConfigBuilder()
+                .setFirstUiNumber((short) 0)
+                .setTimeoutMin(30)
+                .setTimeoutSec((short) 0)
+                .setAuthName("aaa")
+                .build(), configBuilder.build());
+    }
+}

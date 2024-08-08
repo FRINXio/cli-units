@@ -1,0 +1,172 @@
+module junos17-interfaces-clinative {
+    yang-version "1.1";
+    namespace "http://frinx.io/yang/native/junos17/interfaces";
+    prefix "junos-ifcs-n";
+
+    import network-topology {
+        prefix nt;
+        revision-date "2013-10-21";
+    }
+    import frinx-uniconfig-topology {
+        prefix ut;
+        revision-date "2017-11-21";
+    }
+    import cli-native-extensions {
+        prefix cne;
+        revision-date "2020-03-09";
+    }
+    import junos17-template {
+        prefix jt;
+        revision-date "2020-04-17";
+    }
+
+    revision "2020-03-12" {
+        description
+          "Broadened model";
+        reference
+          "4.2.4";
+    }
+    revision "2019-09-30" {
+        description
+          "Initial model";
+        reference
+          "4.2.3";
+    }
+
+    grouping common-family-settings {
+        leaf address {
+            type string;
+        }
+        container filter {
+            choice input {
+                leaf input {
+                    type string;
+                }
+                leaf input-list {
+                    type string;
+                }
+            }
+            choice output {
+                leaf output {
+                    type string;
+                }
+                leaf output-list {
+                    type string;
+                }
+            }
+        }
+    }
+
+    grouping interface-common {
+        leaf disable {
+            type empty;
+        }
+        leaf description {
+            type string;
+            cne:quotation-mark "\"";
+        }
+        list unit {
+            key id;
+            leaf id {
+                type string;
+            }
+            leaf disable {
+                type empty;
+            }
+            leaf description {
+                type string;
+                cne:quotation-mark "\"";
+            }
+            container family {
+                container inet {
+                    uses common-family-settings;
+                }
+                container inet6 {
+                    uses common-family-settings;
+                }
+            }
+            leaf vlan-id {
+                type uint32;
+            }
+        }
+        leaf mtu {
+            type uint32;
+        }
+    }
+
+    grouping interfaces-top {
+        list interfaces {
+            key "name";
+
+            leaf name {
+                type string;
+            }
+
+            uses interface-common;
+
+            choice interfaces {
+                // aggregated-ethernet
+                case ae {
+                    container aggregated-ether-options {
+                        container lacp {
+                            choice lacp {
+                                leaf active {
+                                    type empty;
+                                }
+                                leaf passive {
+                                    type empty;
+                                }
+                            }
+                            leaf periodic {
+                                type enumeration {
+                                    enum fast;
+                                    enum slow;
+                                }
+                            }
+                        }
+                    }
+                }
+                // gigabit ethernet
+                case ge {
+                    container hold-time {
+                        list up {
+                            key value;
+                            max-elements 1;
+
+                            leaf value {
+                                type uint32;
+                            }
+                            leaf down {
+                                type uint32;
+                            }
+                        }
+                    }
+                    container damping {
+                        leaf enable {
+                            type empty;
+                        }
+                        leaf half-life {
+                            type uint32;
+                        }
+                        leaf max-suppress {
+                            type uint32;
+                        }
+                        leaf reuse {
+                            type uint32;
+                        }
+                        leaf suppress {
+                            type uint32;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    uses interfaces-top;
+
+    // augment statements
+    augment "/nt:network-topology/nt:topology/nt:node/ut:configuration" {
+        uses interfaces-top;
+    }
+}
