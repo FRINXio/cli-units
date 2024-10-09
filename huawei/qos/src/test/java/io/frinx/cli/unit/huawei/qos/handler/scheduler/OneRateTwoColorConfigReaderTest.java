@@ -1,0 +1,82 @@
+/*
+ * Copyright © 2021 Frinx and others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.frinx.cli.unit.huawei.qos.handler.scheduler;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosMaxQueueDepthBpsAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.QosSchedulerColorConfig.ColorMode;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.extension.rev180304.VrpQosSchedulerColorAug;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.qos.rev161216.qos.scheduler._1r2c.top.one.rate.two.color.ConfigBuilder;
+
+class OneRateTwoColorConfigReaderTest {
+
+    private static final String OUTPUT_PCT = """
+              User Defined Traffic Policy Information:
+               Classifier: VIDEO
+                Operator: OR
+                 Behavior: VIDEO
+                  statistic: enable
+                  Assured Forwarding:
+                    Bandwidth 30 (%)
+                    Drop Method: Tail
+                    Queue Length: 64 (Packets) 131072 (Bytes)
+                  Committed Access Rate:
+                    CIR percent 30 (%)
+                    Color Mode: color Blind\s
+                    Conform Action: remark 8021p 3 and pass
+                    Yellow  Action: remark 8021p 2 and pass
+                    Exceed  Action: remark 8021p 2 and pass
+                 Precedence: 10\
+            """;
+
+    private ConfigBuilder builder;
+
+    @BeforeEach
+    void setup() {
+        this.builder = new ConfigBuilder();
+    }
+
+    @Test
+    void testBandwidth() {
+        OneRateTwoColorConfigReader.parseConfig(OUTPUT_PCT, builder);
+        assertEquals(30, builder.getCirPct().getValue().intValue());
+        assertNull(builder.getAugmentation(QosMaxQueueDepthBpsAug.class));
+    }
+
+    @Test
+    void testMaxQueueDepthPackets() {
+        OneRateTwoColorConfigReader.parseConfig(OUTPUT_PCT, builder);
+        assertEquals(Long.valueOf("64"), builder.getMaxQueueDepthPackets());
+    }
+
+    @Test
+    void testColorMode() {
+        OneRateTwoColorConfigReader.parseConfig(OUTPUT_PCT, builder);
+        assertEquals(ColorMode.ColorBlind,
+                builder.getAugmentation(VrpQosSchedulerColorAug.class).getColorMode());
+    }
+
+    @Test
+    void testBc() {
+        OneRateTwoColorConfigReader.parseConfig(OUTPUT_PCT, builder);
+        assertEquals("Tail",
+                builder.getAugmentation(VrpQosSchedulerColorAug.class).getDropMethod());
+    }
+}
