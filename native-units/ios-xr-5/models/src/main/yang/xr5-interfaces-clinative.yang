@@ -1,0 +1,253 @@
+module xr5-interfaces-clinative {
+    yang-version "1.1";
+    namespace "http://frinx.io/yang/native/xr5/interface";
+    prefix "xr5-ifcs-n";
+
+    import network-topology {
+        prefix nt;
+        revision-date "2013-10-21";
+    }
+    import frinx-uniconfig-topology {
+        prefix ut;
+        revision-date "2017-11-21";
+    }
+    import cli-native-extensions {
+        prefix cne;
+        revision-date "2020-03-09";
+    }
+    import xr5-template {
+        prefix xrt;
+        revision-date "2020-04-20";
+    }
+
+    revision "2020-03-12" {
+        description
+          "Broadened model";
+        reference
+          "4.2.4";
+    }
+    revision "2019-09-26" {
+        description
+          "Initial model";
+        reference
+          "4.2.3";
+    }
+
+    grouping address-family-settings {
+        leaf multicast {
+            type empty;
+        }
+    }
+
+    grouping access-group-settings {
+        list access-group {
+            key "acl-name";
+
+            leaf acl-name {
+                type string;
+            }
+            choice acl-type {
+                leaf ingress {
+                    type empty;
+                }
+                leaf egress {
+                    type empty;
+                }
+            }
+        }
+    }
+
+    grouping interface-common {
+        leaf description {
+            type string;
+            cne:quotation-mark "\"";
+        }
+        container address-family {
+            container ipv4 {
+                uses address-family-settings;
+            }
+            container ipv6 {
+                uses address-family-settings;
+            }
+        }
+        leaf mtu {
+            type uint16;
+        }
+        container service-policy {
+            leaf input {
+                type string;
+            }
+            leaf output {
+                type string;
+            }
+        }
+        container ipv4 {
+            leaf address {
+                type string;
+            }
+            uses verify;
+            uses access-group-settings;
+        }
+        container ipv6 {
+            leaf address {
+                type string;
+            }
+            uses verify;
+            uses access-group-settings;
+        }
+        leaf load-interval {
+            type uint32;
+        }
+        leaf dampening {
+            type string;
+        }
+        leaf shutdown {
+            type empty;
+        }
+    }
+
+    grouping verify {
+        container verify {
+            container unicast {
+                container source {
+                    container reachable-via {
+                        choice reachable-via {
+                            case c-any {
+                                leaf any {
+                                    type bits {
+                                        bit allow-default;
+                                        bit allow-self-ping;
+                                    }
+                                }
+                            }
+                            case c-rx {
+                                leaf rx {
+                                    type bits {
+                                        bit allow-default;
+                                        bit allow-self-ping;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    grouping aggregated-interface-common {
+        container bundle {
+            list id {
+                key value;
+                max-elements 1;
+
+                leaf value {
+                    type uint32;
+                }
+                leaf mode {
+                    type enumeration {
+                        enum active;
+                        enum passive;
+                        enum on;
+                    }
+                }
+            }
+            container minimum-active {
+                leaf links {
+                    type uint32;
+                }
+            }
+        }
+        container lacp {
+            container period {
+                leaf short {
+                    type empty;
+                }
+            }
+        }
+        container ethernet {
+            container cfm {
+                container mep {
+                    list domain {
+                        key name;
+                        leaf name {
+                            type string;
+                        }
+                        list service {
+                            key name;
+                            leaf name {
+                                type string;
+                            }
+                            leaf mep-id {
+                                type uint32;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    grouping interfaces-top {
+        list interface {
+            key "name";
+
+            leaf name {
+                type string;
+            }
+
+            uses interface-common;
+            uses aggregated-interface-common;
+
+            choice interface {
+                case bundle-ether {
+                    container bfd {
+                        leaf mode {
+                            type enumeration {
+                                enum cisco;
+                                enum ietf;
+                            }
+                        }
+                        container address-family {
+                            container ipv4 {
+                                leaf fast-detect {
+                                    type empty;
+                                }
+                                leaf destination {
+                                    type string;
+                                }
+                                leaf minimum-interval {
+                                    type uint32;
+                                }
+                                leaf multiplier {
+                                    type uint32;
+                                }
+                            }
+                        }
+                    }
+                }
+                case gigabit {
+                    container carrier-delay {
+                        list up {
+                            key value;
+                            max-elements 1;
+
+                            leaf value {
+                                type uint32;
+                            }
+                            leaf down {
+                                type uint32;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    uses interfaces-top;
+
+    augment "/nt:network-topology/nt:topology/nt:node/ut:configuration" {
+        uses interfaces-top;
+    }
+}

@@ -1,0 +1,73 @@
+module xr5-acl-clinative {
+    yang-version 1.1;
+    namespace "http://frinx.io/yang/native/xr5/acl";
+    prefix xr5-acl-n;
+
+    import network-topology {
+        prefix nt;
+        revision-date "2013-10-21";
+    }
+    import frinx-uniconfig-topology {
+        prefix ut;
+        revision-date "2017-11-21";
+    }
+    import cli-native-extensions {
+        prefix cne;
+        revision-date "2020-03-09";
+    }
+    import xr5-template {
+        prefix xt;
+        revision-date "2020-04-20";
+    }
+
+    revision "2020-03-10" {
+        description
+          "Initial revision";
+    }
+
+    grouping common-acl-config {
+        list access-list {
+            key "name sequence-number";
+            leaf name {
+                type string;
+            }
+            leaf sequence-number {
+                type uint32;
+            }
+            choice access-list {
+                leaf permit {
+                    type cne:blob-data;
+                }
+                leaf deny {
+                    type cne:blob-data;
+                }
+                leaf remark {
+                    type string;
+                    cne:quotation-mark "\"";
+                }
+            }
+        }
+    }
+
+    grouping acl4-top {
+        container ipv4 {
+            uses common-acl-config;
+        }
+    }
+
+    grouping acl6-top {
+        container ipv6 {
+            uses common-acl-config;
+        }
+    }
+
+    uses acl4-top;
+    uses acl6-top;
+
+    augment "/nt:network-topology/nt:topology/nt:node/ut:configuration" {
+        uses acl4-top;
+    }
+    augment "/nt:network-topology/nt:topology/nt:node/ut:configuration" {
+        uses acl6-top;
+    }
+}
