@@ -1,0 +1,104 @@
+/*
+ * Copyright © 2020 Frinx and others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.frinx.cli.unit.cubro.ifc.handler;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.google.common.collect.Lists;
+import io.frinx.cli.io.Cli;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.opendaylight.yang.gen.v1.http.frinx.openconfig.net.yang.interfaces.rev161222.interfaces.top.interfaces.InterfaceKey;
+
+class InterfaceReaderTest {
+
+    private static final String TEST_SH_STRING = """
+            Current configuration:
+            !
+            !Version Monitor Switch Version: V2.0R14.3 (Build: 20191215100728)
+            !Schema version 0.1.8
+            timezone set utc
+            !
+            !
+            !
+            snmp-server community pubic
+            vlan 1
+            interface elag 10
+            interface elag 1
+            interface egroup 32
+            interface 1 comment ahoj
+            interface 1\s
+                rx on
+                speed 100000
+                elag 10
+                innerhash enable
+                inneracl enable
+                vxlanterminated enable
+                apply access-list ip acl2 in
+            interface 2\s
+                rx on
+                elag 10
+                elag 1
+            interface 11 comment vole vole\s
+            interface 11\s
+                rx on
+                speed 40000
+                elag 123
+            interface 15\s
+                rx on
+                speed 100000
+                apply access-list ip int15 in
+            interface 32\s
+                split
+            interface 32-1\s
+                force_tx on
+                speed 10000
+                egroup 32
+            interface 32-2\s
+                force_tx on
+                speed 10000
+                egroup 32
+            interface 32-3\s
+                force_tx on
+                speed 10000
+                egroup 32
+            interface 32-4\s
+                force_tx on
+                speed 10000
+                egroup 32access-list ipv4 acl2
+                2000 forward elag 10 any 10.0.0.0/255.0.0.0 any count\s
+                2004 forward elag 10 any 100.64.0.0/255.192.0.0 any count\s
+            access-list ipv4 acl3
+                2001 forward elag 10 any 10.0.0.0/255.0.0.0 any count\s
+                2002 forward elag 10 any 100.64.0.0/255.192.0.0 any count\s
+            access-list ipv4 int15
+                100 forward port 15 any any any""";
+
+    private static final List<InterfaceKey> IDS_EXPECTED = Lists.newArrayList("1", "2",
+            "11", "15", "32")
+            .stream()
+            .map(InterfaceKey::new)
+            .collect(Collectors.toList());
+
+    @Test
+    void testParseInterfaceIds() {
+        assertEquals(IDS_EXPECTED,
+                new InterfaceReader(Mockito.mock(Cli.class)).parseInterfaceIds(TEST_SH_STRING));
+    }
+}

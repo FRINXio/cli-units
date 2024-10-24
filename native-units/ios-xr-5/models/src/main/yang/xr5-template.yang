@@ -1,0 +1,18 @@
+module xr5-template {
+    yang-version 1.1;
+    namespace "http://frinx.io/yang/native/xr5/template";
+    prefix xr5-template;
+
+    import cli-native-extensions {
+        revision-date "2020-03-09";
+        prefix cne;
+    }
+
+    revision "2020-04-20" {
+        description "Initial revision";
+    }
+
+    cne:show-command "show running-config";
+    cne:config-pattern "#{command}";
+    cne:delete-pattern "no #{command}";
+}

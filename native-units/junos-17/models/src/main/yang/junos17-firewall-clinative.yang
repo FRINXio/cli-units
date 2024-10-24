@@ -1,0 +1,104 @@
+module junos17-firewall-clinative {
+    yang-version 1.1;
+    namespace "http://frinx.io/yang/native/junos17/firewall";
+    prefix j17-fr-n;
+
+    import network-topology {
+        prefix nt;
+        revision-date "2013-10-21";
+    }
+    import frinx-uniconfig-topology {
+        prefix ut;
+        revision-date "2017-11-21";
+    }
+    import cli-native-extensions {
+        prefix cne;
+        revision-date "2020-03-09";
+    }
+    import junos17-template {
+        prefix jt;
+        revision-date "2020-04-17";
+    }
+
+    revision "2020-03-09" {
+        description
+          "Initial revision";
+    }
+
+    grouping terms {
+        list term {
+            key "name";
+            leaf name {
+                type string;
+            }
+            leaf filter {
+                type leafref {
+                    path "../name";
+                }
+            }
+            leaf from {
+                type cne:blob-data;
+            }
+            leaf then {
+                type cne:blob-data;
+            }
+        }
+    }
+
+    grouping filter-settings {
+        leaf enhanced-mode {
+            type empty;
+        }
+        leaf enhanced-mode-override {
+            type empty;
+        }
+        leaf fast-lookup-filter {
+            type empty;
+        }
+        leaf instance-shared {
+            type empty;
+        }
+        leaf interface-shared {
+            type empty;
+        }
+        leaf interface-specific {
+            type empty;
+        }
+        leaf physical-interface-filter {
+            type empty;
+        }
+    }
+
+    grouping filters {
+        list filter {
+            key "name";
+            leaf name {
+                type string;
+            }
+            uses filter-settings;
+            uses terms;
+        }
+    }
+
+    grouping firewall-top {
+        container firewall {
+            uses filters;
+            container family {
+                choice family {
+                    container inet {
+                        uses filters;
+                    }
+                    container inet6 {
+                        uses filters;
+                    }
+                }
+            }
+        }
+    }
+
+    uses firewall-top;
+
+    augment "/nt:network-topology/nt:topology/nt:node/ut:configuration" {
+        uses firewall-top;
+    }
+}
